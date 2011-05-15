@@ -217,7 +217,7 @@ function bo_tile()
 		}
 	}
 
-	$zoom_show_deviation = defined('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM') ? intval('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM') : 12;
+	$zoom_show_deviation = defined('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM') ? intval(BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM) : 12;
 	
 	//add some space around
 	if ($zoom >= $zoom_show_deviation)
