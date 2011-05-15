@@ -69,8 +69,6 @@ function bo_tile()
 	session_write_close();
 	register_shutdown_function('bo_purge_tiles');
 
-	$zoom_show_deviation = 12;
-
 	$x = intval($_GET['x']);
 	$y = intval($_GET['y']);
 	$zoom = intval($_GET['zoom']);
@@ -143,7 +141,7 @@ function bo_tile()
 	$filename = 'tile_'.$type.'_'.$x.'x'.$y.'_'.$zoom.'_'.$only_own.'_'.bo_user_get_level().'.png';
 	$file = $dir.$filename;
 
-	if (0 && file_exists($file))
+	if (file_exists($file))
 	{
 		$filetime = filemtime($file);
 		$file_minute = intval(intval(date('i', $filetime)) / $update_interval);
@@ -219,7 +217,8 @@ function bo_tile()
 		}
 	}
 
-
+	$zoom_show_deviation = defined('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM') ? intval('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM') : 12;
+	
 	//add some space around
 	if ($zoom >= $zoom_show_deviation)
 		$space = 2;

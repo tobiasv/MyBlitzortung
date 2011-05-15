@@ -24,6 +24,9 @@ if (!defined("BO_VER"))
 	define("BO_DIR", dirname(__FILE__).'/');
 	define("BO_VER", '0.1');
 
+	//Some default PHP-Options
+	ini_set('magic_quotes_runtime', 0); 
+	
 	//Config var.
 	global $_BO, $_BL;
 	$_BO = array();

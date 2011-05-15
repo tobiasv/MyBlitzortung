@@ -149,6 +149,7 @@ define('BO_MAP_CIRCLE_OPAC_LINE', '0.8');
 define('BO_MAP_CIRCLE_COLOR_FILL', '#FF0000');
 define('BO_MAP_CIRCLE_OPAC_FILL', '0.05');
 define('BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM', 9);
+define('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM', 12);
 
 $_BO['mapcfg'][0]['tstart'] = 15;
 $_BO['mapcfg'][0]['trange'] = 15;
@@ -180,6 +181,17 @@ for ($i=0;$i<20;$i++)
 $_BO['mapcfg'][2]['default_show'] = false;
 $_BO['mapcfg'][2]['sel_name'] = '2-24 h';
 
+/*
+// Example for 1 to 10 days. Be carful: can cause high database load!
+$_BO['mapcfg'][3]['tstart'] = 60 * 24 * 10;
+$_BO['mapcfg'][3]['trange'] = 60 * 24 * 9;
+$_BO['mapcfg'][3]['upd_intv'] = 1;
+for ($i=0;$i<20;$i++)
+	$_BO['mapcfg'][3]['col'][] = array(80 + 2*$i/20, 50   +200*$i/20, 230   -200*$i/20);
+$_BO['mapcfg'][3]['default_show'] = false;
+$_BO['mapcfg'][3]['sel_name'] = '1-10 days';
+$_BO['mapcfg'][3]['only_loggedin'] = true;
+*/
 
 /*** Image Map ***/
 
