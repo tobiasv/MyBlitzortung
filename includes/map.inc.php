@@ -231,9 +231,13 @@ function bo_show_lightning_map()
 	}
 
 	if ($no_google)
-	{
+	{	
+		$footer= $_BO['mapimg'][$static_map_id]['footer'];
+		
 		echo '<h3>'._BL('Lightning map').'</h3>';
 		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'">';
+		echo '<div class="bo_map_footer">'.$footer.'</div>';
+		
 		return;
 	}
 
