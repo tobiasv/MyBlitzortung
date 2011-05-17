@@ -231,7 +231,7 @@ function bo_update_strikes($force = false)
 				$utime = strtotime("$date $time UTC");
 
 				// update strike-data only some seconds min *before* the *last download*
-				if ($utime < $last - 10)
+				if ($utime < $last - 120)
 				{
 					$a++;
 					continue;
