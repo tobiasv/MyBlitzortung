@@ -32,9 +32,12 @@ if (!defined("BO_VER"))
 	$_BO = array();
 	$_BL = array();
 
-	if (!file_exists(BO_DIR.'config.php') || !file_exists(BO_DIR.'settings.php') )
-		die('Missing or corrupted config file(s)!');
+	if (!file_exists(BO_DIR.'config.php'))
+		die('Missing config.php! Please run installation first!');
 
+	if (!file_exists(BO_DIR.'settings.php'))
+		die('Missing settings.php!');
+		
 	//Load Config
 	require_once 'config.php';
 	require_once 'settings.php';

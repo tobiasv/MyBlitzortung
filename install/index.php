@@ -20,8 +20,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+if (!class_exists('mysqli'))
+	require_once '../includes/db_mysql.inc.php';
+else
+	require_once '../includes/db_mysqli.inc.php';
+
 error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 1);
+
+ini_set('magic_quotes_runtime', 0); 
 
 $path = realpath(dirname(__FILE__).'/../').'/';
 
@@ -88,7 +95,6 @@ define("BO_UTF8", false);
 ?>';
 
 $step = intval($_GET['step']);
-
 $msg = 0;
 
 if (!file_exists($path.'config.php'))
@@ -121,23 +127,20 @@ else
 	}
 	else
 	{
-		$connid = new mysqli(BO_DB_HOST, BO_DB_USER, BO_DB_PASS);
+		$connid = BoDb::connect(false);
 
 		if ($connid === false)
 		{
 			$step = 1;
 			$msg = 1;
 		}
-		else
+		elseif(!BoDb::select_db(false))
 		{
-			if (!$connid->select_db(BO_DB_NAME))
-			{
-				$step = 1;
-				$msg = 2;
-			}
+			$step = 1;
+			$msg = 2;
 		}
 
-		$erg = $connid->query("SHOW TABLES");
+		$erg = BoDb::query("SHOW TABLES");
 
 		if (!$erg)
 		{
@@ -148,7 +151,8 @@ else
 		{
 			$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'user');
 			$rows = 0;
-			$res = $connid->query("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
+			$res = BoDb::query("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
+
 			while($row = $res->fetch_assoc())
 			{
 				$name = substr($row['Name'], strlen(BO_DB_PREF));
@@ -165,22 +169,23 @@ else
 
 			if (!count($tables) && $step == 2) //already installed --> no reinstall
 				$step = 3;
-
-			if ($rows) // there's already sth in the database --> last step
+			else if ($rows) // there's already sth in the database --> last step
 				$step = 4;
 		}
-
 	}
-
 }
 
 echo '
 <html>
 <head>
 <title>MyBlitzortung installation</title>
+<link rel="stylesheet" href="../style.css" type="text/css">
 </head>
 <body>
-<h1>MyBlitzortung installation</h1>
+<h1><span class="bo_my">My</span>Blitzortung installation</h1> 
+
+<div style="margin-left: 20px">
+
 ';
 
 switch($step)
@@ -286,7 +291,7 @@ switch($step)
 
 		foreach($queries as $query)
 		{
-			if (trim($query) && !$connid->query($query))
+			if (trim($query) && !BoDb::query($query))
 			{
 				echo 'Error: <p>'.htmlspecialchars($connid->error).'</p> at <p>'.htmlspecialchars($query).'</p>';
 				$err = true;
@@ -373,20 +378,37 @@ switch($step)
 				<p>
 				For linux users:<ul><li> <em>chmod -R 777 '.$path.'cache</em></li></ul>
 				</p>';
-		echo '<h3>Set up the automatic data collection on your home- or webserver. </h3>
-					<p>You can now manually do an update it by clicking the following link:
+		echo '<h3>Set up the automatic data collection</h3>
+					<p>This is the automatic update-url:
 					<ul><li>
-					<a href="'.$update_url.'" target="_blank">'.$update_url.'</a> (the link may not work if you use your own helper-file)
+					<a href="'.$update_url.'" target="_blank">'.$update_url.'</a> </em>(the link may not work if you use your own helper-file)</em>
+					<br>
+					For example, you can use www.cronjob.de to automattically retrieve the URL. Use the link above by right-clicking it and "copy URL" ...
+					<br>&nbsp;
 					</li>
 					<li>
-					Use "'.$update_url.'&force" if you want to force an update (only for testing!).
+					
+					Use "'.$update_url.'&force" if you want to manually force an update (only for testing!).
+					With the force-option, there is no internal timer! Do not use it periodically.
+					It will cause high load on the Blitzortung-server!
 					</li>
 					</ul>
 			';
 		echo '<h3>Change your individual configuration</h3>
 				<p>The file is "settings.php". Most of the settings are described.</p>';
-		echo '<h3>JpGraph</h3>
-			<p>Copy JpGraph files to includes/jpgraph. You can get them at <a href="http://jpgraph.net/download/">http://jpgraph.net/download/</a>. JpGraph is used for creating the graphs.</p>';
+				
+		echo '<h3>Copy JpGraph files.</h3>
+			<p>JpGraph is used for creating the graphs.
+			You can get it at <a href="http://jpgraph.net/download/">http://jpgraph.net/download/</a>. 
+			Copy the files from the JpGraph-<em>src</em> direcory to includes/jpgraph. 
+			You can omit the directories <em>src/barcode</em>, <em>src/Examples</em>, <em>src/themes</em> 
+			and all files beginnig width <em>flag</em>.
+			No further installation needed!
+			</p>';
+
+		echo '<h3>Finished!</h3>
+				<p>Click <a href="../">here</a> to view your MyBlitzortung installation!</p>
+				<p>You can login with your Blitzortung.org username/password.</p>';
 
 
 
@@ -396,6 +418,7 @@ switch($step)
 }
 
 echo '
+</div>
 </body>
 </html>
 ';

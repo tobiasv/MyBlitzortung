@@ -29,14 +29,13 @@ function bo_db($query = '', $die_on_errors = true)
 	if (!$query)
 		return $connid;
 
-	$qtype = strtolower(substr(trim($query), 0, 6));
-
 	$erg = BoDb::query($query);
 
 	if ($die_on_errors && $erg === false)
 		die("<p>Database Query Error:</p><pre>" . htmlspecialchars(BoDb::error()) .
 			"</pre> <p>for query</p> <pre>" . htmlspecialchars($query) . "</pre>");
 
+	$qtype = strtolower(substr(trim($query), 0, 6));
 	switch ($qtype)
 	{
 		case 'insert':

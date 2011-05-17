@@ -31,23 +31,47 @@ class BoDb
 	// establishes a connection to the database using
 	// the globally defined constants for user, pass etc.
 	// returns an existing connection if there is one.
-	public static function connect()
+	public static function connect($prepare_all = true)
 	{
 		if(!is_null(self::$dbh) && self::$dbh->ping())
 		{
 			return self::$dbh;
 		}
 
-		self::$dbh = new mysqli(BO_DB_HOST, BO_DB_USER, BO_DB_PASS, BO_DB_NAME);
+		self::$dbh = new mysqli(BO_DB_HOST, BO_DB_USER, BO_DB_PASS);
 
-		if (mysqli_connect_error())
-				die('Database: Connect ERROR (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
+		if (mysqli_connect_error() && $die_on_error)
+			die('Database: Connect ERROR (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
 
-		self::$dbh->set_charset('latin1') or die('Database: Charset ERROR');
-
+		if ($prepare_all)
+		{
+			self::select_db();
+			self::set_charset();
+		}
+			
 		return self::$dbh;
 	}
 
+	public static function select_db($die_on_error = true)
+	{
+		$ok = self::$dbh->select_db(BO_DB_NAME);
+		
+		if (!$ok && $die_on_error)
+			die ("Database not found! (".mysqli_connect_errno().")");
+		
+		return $ok;
+	}
+
+	public static function set_charset($die_on_error = true)
+	{	
+		$ok = self::$dbh->set_charset('latin1');
+		
+		if (!$ok && $die_on_error)
+			die('Database: Charset ERROR ('.mysqli_connect_errno().")");
+		
+		return $ok;
+	}
+	
 	public static function error()
 	{
 		return self::$dbh->error;

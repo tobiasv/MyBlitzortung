@@ -58,7 +58,7 @@ class BoDb
 	// establishes a connection to the database using
 	// the globally defined constants for user, pass etc.
 	// returns an existing connection if there is one.
-	public static function connect()
+	public static function connect($prepare_all = true)
 	{
 		if(!is_null(self::$dbh))
 		{
@@ -66,13 +66,34 @@ class BoDb
 		}
 
 		self::$dbh = mysql_connect(BO_DB_HOST, BO_DB_USER, BO_DB_PASS) or die("Database: Connect ERROR ");
-		mysql_select_db(BO_DB_NAME, self::$dbh) or die ("Database not found");
 
-		mysql_set_charset('latin1', self::$dbh) or die('Database: Charset ERROR');
-
+		if ($prepare_all)
+		{
+			self::select_db();
+			self::set_charset();
+		}
+		
 		return self::$dbh;
 	}
 
+	public static function select_db($die_on_error = true)
+	{
+		$ok = mysql_select_db(BO_DB_NAME, self::$dbh);
+		if (!$ok && $die_on_error)
+			die ("Database not found (".mysql_error(self::$dbh).")");
+		
+		return $ok;
+	}
+
+	public static function set_charset($die_on_error = true)
+	{
+		$ok = mysql_set_charset('latin1', self::$dbh);
+		if (!$ok && $die_on_error)
+			die("Database: Charset ERROR (".mysql_error(self::$dbh).")");
+			
+		return $ok;
+	}
+	
 	public static function error()
 	{
 		return mysql_error(self::$dbh);
