@@ -22,7 +22,7 @@
 if (!defined("BO_VER"))
 {
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.1.1');
+	define("BO_VER", '0.1.2');
 
 	//Some default PHP-Options
 	ini_set('magic_quotes_runtime', 0); 

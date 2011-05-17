@@ -271,7 +271,6 @@ function bo_show_statistics_network()
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before')." $last_update ".($last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.intval(count($D)).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.intval($whole_sig_count).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.intval($strikesh).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.intval($max_part).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.intval($avg_part).'</span>';
@@ -281,6 +280,7 @@ function bo_show_statistics_network()
 	echo '<li><span class="bo_descr">'._BL('Mean strike ratio').': </span><span class="bo_value">';
 	echo $whole_strike_ratio ? number_format($whole_strike_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.intval($whole_sig_count).'</span>';
 	echo '</ul>';
 
 	echo '<a name="table_network"></a>';
