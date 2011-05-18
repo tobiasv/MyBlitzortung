@@ -138,7 +138,7 @@ function bo_tile()
 
 	//Caching
 	$dir = BO_DIR.'cache/tiles/';
-	$filename = 'tile_'.$type.'_'.$x.'x'.$y.'_'.$zoom.'_'.$only_own.'_'.bo_user_get_level().'.png';
+	$filename = 'tile_'.$type.'_'.$x.'x'.$y.'_'.$zoom.'_'.$only_own.'_'.(bo_user_get_level() ? 1 : 0).'.png';
 	$file = $dir.$filename;
 
 	if (file_exists($file))

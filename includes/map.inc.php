@@ -272,8 +272,7 @@ function bo_show_lightning_map()
 	
 	echo '</fieldset>';
 
-	echo '<div id="bo_gmap" class="bo_map"></div>';
-	
+	echo '<div id="bo_gmap" class="bo_map" style="width:500px; height:400px;"></div>';
 	
 
 	?>

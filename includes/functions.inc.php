@@ -68,6 +68,12 @@ function bo_set_conf($name, $data)
 	$name_esc = BoDb::esc($name);
 	$data_esc = BoDb::esc($data);
 
+	if ($data === null)
+	{
+		$sql = "DELETE FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
+		return bo_db($sql);
+	}
+	
 	$sql = "SELECT data, name FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
 	$row = bo_db($sql)->fetch_object();
 
@@ -293,7 +299,7 @@ function bo_copyright_footer()
 
 		echo '<div id="bo_login_link">';
 
-		if (bo_user_get_level())
+		if (bo_user_get_name())
 		{
 			echo '<a href="'.$file.'&bo_login">'.bo_user_get_name().'</a>';
 			echo ' (<a href="'.$file.'&bo_logout">'._BL('Logout').'</a>)';

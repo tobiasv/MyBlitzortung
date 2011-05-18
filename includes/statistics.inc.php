@@ -97,8 +97,8 @@ function bo_show_statistics_station()
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Station active').': </span><span class="bo_value">'.($active ? _BL('yes') : _BL('no')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before')." $last_update ".($last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.intval($signalsh_own).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.intval($strikesh_own).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.number_format($signalsh_own, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.number_format($strikesh_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Locating ratio').': </span><span class="bo_value">';
 	echo $signalsh_own ? number_format($strikesh_own / $signalsh_own * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
@@ -252,16 +252,6 @@ function bo_show_statistics_network()
 	if ($whole_sig_ratio_cnt)
 		$whole_sig_ratio /= $whole_sig_ratio_cnt;
 
-	switch($sort)
-	{
-		case 'city': case 'country': case 'distance':
-			asort($S);
-			break;
-		default:
-			arsort($S);
-			break;
-	}
-
 	echo '<div id="bo_stat_network">';
 
 	echo '<p class="bo_stat_description" id="bo_stat_network_descr_lasth">';
@@ -270,17 +260,17 @@ function bo_show_statistics_network()
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before')." $last_update ".($last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.intval(count($D)).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.intval($strikesh).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.intval($max_part).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.intval($avg_part).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikesh, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.number_format($avg_part, 1, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Mean locating ratio').': </span><span class="bo_value">';
 	echo $whole_sig_ratio ? number_format($whole_sig_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Mean strike ratio').': </span><span class="bo_value">';
 	echo $whole_strike_ratio ? number_format($whole_strike_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.intval($whole_sig_count).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.number_format($whole_sig_count, 0, _BL('.'), _BL(',')).'</span>';
 	echo '</ul>';
 
 	echo '<a name="table_network"></a>';
@@ -309,6 +299,18 @@ function bo_show_statistics_network()
 				<th><a href="'.bo_insert_url('bo_sort', 'signals_ratio').'#table_network">'._BL('Ratio').'</a></th>
 			</tr>
 			';
+
+	
+	// Stations table
+	switch($sort)
+	{
+		case 'city': case 'country': case 'distance':
+			asort($S);
+			break;
+		default:
+			arsort($S);
+			break;
+	}
 
 	$pos = 1;
 	foreach($S as $id => $d)
@@ -400,6 +402,15 @@ function bo_show_statistics_longtime()
 	//MyBO
 	$first_update		= bo_get_conf('first_update_time');
 
+	if (!$max_str_day_all[0])
+		$max_str_day_all[1] = 0;
+	if (!$max_str_dayrad_all[0])
+		$max_str_dayrad_all[1] = 0;
+	if (!$max_str_day_own[0])
+		$max_str_day_own[1] = 0;
+	if (!$max_str_dayrad_own[0])
+		$max_str_dayrad_own[1] = 0;
+		
 	echo '<div id="bo_stat_network">';
 
 	echo '<p class="bo_stat_description" id="bo_stat_longtime_descr">';
@@ -414,8 +425,8 @@ function bo_show_statistics_longtime()
 	echo '<li><span class="bo_descr">'._BL('Active').': </span><span class="bo_value">'.number_format($active_days, 1, _BL('.'), _BL(',')).' '._BL('days').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Inactive').': </span><span class="bo_value">'.number_format($inactive_days, 1, _BL('.'), _BL(',')).' '._BL('days').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'.number_format($max_str_own, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_own[0], 0, _BL('.'), _BL(',')).' ('.date(_BL('_date'), strtotime($max_str_day_own[1])).')</span>';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS.'km) : </span><span class="bo_value">'.intval($max_str_dayrad_own[0]).($max_str_dayrad_own[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_own[1])).')' : '').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_own[0], 0, _BL('.'), _BL(',')).($max_str_day_own[1] ? ' ('.date(_BL('_date'), strtotime($max_str_day_own[1])).')' : '' ).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_own[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_own[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_own[1])).')' : '').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'.number_format($min_dist_own, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'.number_format($max_dist_own, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'.number_format($max_sig_own, 0, _BL('.'), _BL(',')).'</span>';
@@ -425,15 +436,15 @@ function bo_show_statistics_longtime()
 	echo '<h4>'._BL('h4_stat_longtime_network').'</h4>';
 
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'.intval($max_str_all).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.intval($max_str_day_all[0]).' ('.date(_BL('_date'), strtotime($max_str_day_all[1])).')</span>';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS.'km) : </span><span class="bo_value">'.intval($max_str_dayrad_all[0]).($max_str_dayrad_all[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_all[1])).')' : '').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'.number_format($max_str_all, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_all[0], 0, _BL('.'), _BL(',')).($max_str_day_all[1] ? ' ('.date(_BL('_date'), strtotime($max_str_day_all[1])).')' : '').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_all[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_all[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_all[1])).')' : '').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'.number_format($min_dist_all, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'.number_format($max_dist_all, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'.intval($max_sig_all).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.intval($max_part).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max active stations').': </span><span class="bo_value">'.intval($max_active).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max active stations (sending signals)').': </span><span class="bo_value">'.intval($max_active_sig).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'.number_format($max_sig_all, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max active stations').': </span><span class="bo_value">'.number_format($max_active, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max active stations (sending signals)').': </span><span class="bo_value">'.number_format($max_active_sig, 0, _BL('.'), _BL(',')).'</span>';
 	echo '</ul>';
 
 	echo '<a name="longtime_network"></a>';
@@ -482,9 +493,21 @@ function bo_show_statistics_other()
 	echo '</p>';
 
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('Last update strikes').': </span><span class="bo_value">'.date(_BL('_datetime'), $last_str).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Last update stations').': </span><span class="bo_value">'.date(_BL('_datetime'), $last_net).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Last update signals').': </span><span class="bo_value">'.date(_BL('_datetime'), $last_sig).'</span>';
+	echo '<li><span class="bo_descr">'
+				._BL('Last update strikes').': </span><span class="bo_value">'
+					.date(_BL('_datetime'), $last_str)
+					.' ('._BL('update every').' '.intval(BO_UP_INTVL_STRIKES).' '._BL('unit_minutes').')'
+				.'</span>';
+	echo '<li><span class="bo_descr">'
+				._BL('Last update stations').': </span><span class="bo_value">'
+					.date(_BL('_datetime'), $last_net)
+					.' ('._BL('update every').' '.intval(BO_UP_INTVL_STATIONS).' '._BL('unit_minutes').')'
+				.'</span>';
+	echo '<li><span class="bo_descr">'
+				._BL('Last update signals').': </span><span class="bo_value">'
+					.date(_BL('_datetime'), $last_sig)
+					.' ('._BL('update every').' '.intval(BO_UP_INTVL_RAW).' '._BL('unit_minutes').')'
+					.'</span>';
 	echo '</ul>';
 
 
@@ -504,6 +527,29 @@ function bo_show_statistics_other()
 			</span>';
 	echo '</ul>';
 	
+	
+	$ant1 = bo_get_conf('antenna1_bearing');
+	$ant2 = bo_get_conf('antenna2_bearing');
+	$show_ant = false;
+	
+	if ($ant1 !== '' && $ant1 !== null && $ant2 !== '' && $ant2 !== null)
+	{
+		$show_ant = true;
+		$ant1 = round($ant1);
+		$ant2 = round($ant2);
+		
+		echo '<h4>'._BL('h4_stat_other_antennas').'</h4>';
+		echo '<p class="bo_stat_description" id="bo_stat_other_descr_antennas">';
+		echo _BL('bo_stat_other_antennas_descr');
+		echo '</p>';
+
+		echo '<ul class="bo_stat_overview">';
+		echo '<li><span class="bo_descr">'._BL('Direction antenna 1').': </span><span class="bo_value">'.$ant1.'&deg; - '.($ant1+180).'&deg ('.(_BL(bo_bearing2direction($ant1)).'-'._BL(bo_bearing2direction($ant1+180))).')</span>';
+		echo '<li><span class="bo_descr">'._BL('Direction antenna 2').': </span><span class="bo_value">'.$ant2.'&deg; - '.($ant2+180).'&deg ('.(_BL(bo_bearing2direction($ant2)).'-'._BL(bo_bearing2direction($ant2+180))).')</span>';
+		echo '</ul>';
+		
+	}
+	
 	//Show GPS Info
 	if (defined("BO_SHOW_GPS_INFO") && BO_SHOW_GPS_INFO)
 	{
@@ -513,8 +559,11 @@ function bo_show_statistics_other()
 		echo '</p>';
 
 		$stinfo = bo_station_info();
-		$text = '';
+		$js_data = '';
 		$height = array();
+		$lat = array();
+		$lon = array();
+		
 		$res = bo_db("SELECT lat, lon, height
 						FROM ".BO_DB_PREF."raw
 						WHERE time > '".gmdate('Y-m-d H:i:s', time() - 24 * 3600)."'
@@ -522,12 +571,49 @@ function bo_show_statistics_other()
 						ORDER BY time");
 		while($row = $res->fetch_assoc())
 		{
-			$text .= ($text ? ',' : '').'new google.maps.LatLng('.$row['lat'].','.$row['lon'].')';
+			$js_data .= ($js_data ? ',' : '').'new google.maps.LatLng('.$row['lat'].','.$row['lon'].')';
 			$height[] = $row['height'];
+			$lat[] = $row['lat'];
+			$lon[] = $row['lon'];
 		}
 
 		$st_height = round(array_sum($height) / count($height));
+		$st_lat = array_sum($lat) / count($lat);
+		$st_lon = array_sum($lon) / count($lon);
 
+		if ($show_ant)
+		{
+			$dist = 50;
+			list($lat1a, $lon1a) = bo_distbearing2latlong($dist, $ant1, $st_lat, $st_lon);
+			list($lat1b, $lon1b) = bo_distbearing2latlong($dist, $ant1+180, $st_lat, $st_lon);
+			list($lat2a, $lon2a) = bo_distbearing2latlong($dist, $ant2, $st_lat, $st_lon);
+			list($lat2b, $lon2b) = bo_distbearing2latlong($dist, $ant2+180, $st_lat, $st_lon);
+			
+			$js_data_ant = '
+			var ant1 = [ new google.maps.LatLng('.$lat1a.','.$lon1a.'), new google.maps.LatLng('.$lat1b.','.$lon1b.') ];
+			var ant2 = [ new google.maps.LatLng('.$lat2a.','.$lon2a.'), new google.maps.LatLng('.$lat2b.','.$lon2b.') ];
+		
+			var ant1Path = new google.maps.Polyline({
+				path: ant1,
+				strokeColor: "#ff0000",
+				strokeOpacity: 0.5,
+				strokeWeight: 2,
+				clickable: false
+			});
+			ant1Path.setMap(bo_map);
+			
+			var ant1Path = new google.maps.Polyline({
+				path: ant2,
+				strokeColor: "#00ff00",
+				strokeOpacity: 0.5,
+				strokeWeight: 2,
+				clickable: false
+			});
+			ant1Path.setMap(bo_map);
+			
+			';
+		}
+		
 		echo '<ul class="bo_stat_overview">';
 		echo '<li><span class="bo_descr">'._BL('Coordinates').': </span><span class="bo_value">'.$stinfo['lat'].'&deg; / '.$stinfo['lon'].'&deg'.'</span>';
 		echo '<li><span class="bo_descr">'._BL('Height').': </span><span class="bo_value">'.$st_height.'m</span>';
@@ -543,7 +629,7 @@ function bo_show_statistics_other()
 		function bo_gmap_init2()
 		{
 			var coordinates;
-			coordinates = [ <?php echo $text ?> ];
+			coordinates = [ <?php echo $js_data ?> ];
 
 			var gpsPath = new google.maps.Polyline({
 				path: coordinates,
@@ -559,7 +645,8 @@ function bo_show_statistics_other()
 				bounds.extend(coordinates[i]);
 			}
 			bo_map.fitBounds(bounds);
-
+			
+			<?php echo $js_data_ant ?>
 		}
 
 		</script>
@@ -569,6 +656,8 @@ function bo_show_statistics_other()
 		bo_insert_map(0, BO_LAT, BO_LON, 19, 'ROADMAP');
 	}
 	
+	
+
 }
 
 

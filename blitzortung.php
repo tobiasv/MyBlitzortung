@@ -24,6 +24,15 @@ if (!defined("BO_VER"))
 	define("BO_DIR", dirname(__FILE__).'/');
 	define("BO_VER", '0.1.2');
 
+	define("BO_PERM_ADMIN", 		1);
+	define("BO_PERM_SETTINGS", 		2);
+	define("BO_PERM_NOLIMIT", 		4);
+	define("BO_PERM_ALERT", 		8);
+	define("BO_PERM_ALERT_ALL",		16);
+	define("BO_PERM_ALERT_SMS",		32);
+	define("BO_PERM_ALERT_URL",		64);
+	define("BO_PERM_COUNT",	7);
+	
 	//Some default PHP-Options
 	ini_set('magic_quotes_runtime', 0); 
 	
@@ -64,7 +73,6 @@ if (!defined("BO_VER"))
 		include $locdir.'own.php';
 
 	//includes #1
-	
 	require_once 'includes/functions.inc.php';
 	require_once 'includes/image.inc.php';
 	require_once 'includes/user.inc.php';
@@ -75,12 +83,12 @@ if (!defined("BO_VER"))
 		require_once 'includes/db_mysqli.inc.php';
 		
 	define("BO_TILE_SIZE", 256);
-	$_BO['radius'] = bo_user_get_level() ? 0 : BO_RADIUS;
+	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
 
 	//creating tiles should be very fast
 	if (isset($_GET['tile']))
 	{
-		if (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !bo_user_get_level())
+		if (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !(bo_user_get_level() & BO_PERM_NOLIMIT))
 			exit('Google Maps disabled');
 			
 		bo_tile();
@@ -94,6 +102,7 @@ if (!defined("BO_VER"))
 	require_once 'includes/map.inc.php';
 	require_once 'includes/archive.inc.php';
 	require_once 'includes/info.inc.php';
+	require_once 'includes/alert.inc.php';
 
 
 	//Update with new data from blitzortung.org

@@ -77,11 +77,20 @@ margin: 10px 10px 10px 15px;
 }
 
 #myblitzortung legend {
+border: 1px solid #e4e4e4;
+padding: 3px 5px;
+background: #ffffff;
+font-weight: bold;
+font-size: 12px;
 }
 
 #myblitzortung fieldset {
 font-size: 14px;
-margin: 8px 2px;
+margin: 18px 2px 8px 2px;
+max-width: 600px;
+background: #f9f9f9;
+border: 1px solid #e4e4e4;
+font-size: 12px;
 }
 
 
@@ -91,6 +100,7 @@ font-size: 12px;
 
 #myblitzortung ul {
 list-style-image: none;
+font-size: 12px;
 }
 
 
@@ -244,8 +254,8 @@ margin: -3px 3px 0 0;
 }
 
 #myblitzortung .bo_map {
-width:780px; 
-height:800px; 
+width:780px !important; 
+height:800px !important; 
 border: 1px solid #ccc;
 margin-left: 10px;
 }
@@ -293,7 +303,7 @@ margin: 0 auto;
 width: 400px;
 border: 1px solid red;
 background: #fff;
-margin: 20px auto;
+margin: 20px 0;
 text-align:center;
 font-weight: bold;
 font-size: 15px;
@@ -307,11 +317,26 @@ margin: 0 0 0 10px;
 #myblitzortung .bo_table td, .bo_table th {
 border: 1px solid #999;
 padding: 2px 10px;
-font-size: 14px;
+font-size: 13px;
+}
+
+#myblitzortung .bo_table th {
+background: #e7e7e7;
+}
+
+#myblitzortung .bo_table td {
+background: #f3f3f3;
+}
+
+#myblitzortung .bo_table a {
+font-weight: bold;
+text-decoration: none;
 }
 
 #myblitzortung .bo_form_descr {
 width: 200px;
+font-weight: bold;
+color: #666;
 }
 
 #myblitzortung ul#bo_menu {
@@ -440,4 +465,26 @@ margin-left: 10px;
 #myblitzortung .bo_graph_img {
 margin-left: 10px;
 border: 1px solid #f0f0f0;
+}
+
+/*** User ***/
+#myblitzortung .bo_form_checkbox_text {
+display: inline-block;
+width: 195px;
+margin: 2px 5px 5px 0px;
+}
+#myblitzortung .bo_admin_user_fieldset .bo_form_submit {
+display: block;
+}
+
+/*** Alerts ***/
+#myblitzortung .bo_input_container {
+margin: 8px 0px;
+}
+#myblitzortung .bo_input_container label {
+margin-right: 10px;
+}
+
+#myblitzortung .bo_map_alert {
+margin-right: 10px;
 }

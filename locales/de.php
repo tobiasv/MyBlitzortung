@@ -268,6 +268,17 @@ $_BL['de']['stat_navi_alarm'] = 'Blitz-Alarm';
 $_BL['de']['user_welcome_text'] = 'Du bist angemeldet als';
 $_BL['de']['MyBlitzortung version'] = 'MyBlitzortung Version';
 $_BL['de']['No permisson for saving to DB!'] = 'Keine Berechtigung zum Abspeichern in der Datenbank!';
+$_BL['de']['User list'] = 'Benutzerliste';
+$_BL['de']['Alert'] = 'Alarm';
+$_BL['de']['new'] = 'neu';
+
+$_BL['de']['user_perm0'] = 'Benutzereinstellungen';
+$_BL['de']['user_perm1'] = 'Andere Einstellungen';
+$_BL['de']['user_perm2'] = 'Beschränkungen aufheben';
+$_BL['de']['user_perm3'] = 'Alarme definieren';
+$_BL['de']['user_perm4'] = 'Alarme überall';
+$_BL['de']['user_perm5'] = 'Alarme: SMS';
+$_BL['de']['user_perm6'] = 'Alarme: URL';
 
 
 /*************************************************************/
@@ -362,3 +373,53 @@ $_BL['de']['bo_graph_descr_radi'] = 'Übersicht über die eigene Ortungsqute in Ab
 $_BL['de']['bo_graph_descr_strikes'] = 'Zu sehen ist die Gesamtanzahl an Blitzen pro Stunde aus dem Ortungsnetzwerk, die Anzahl der detektierten Blitze der Station {STATION} sowie zum Vergleich der Durchschnitt aller Stationen.';
 $_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der gesendeten Signale pro Stunde der Station {STATION} sowie zum Vergleich der Durchschnitt aller Stationen.';
 
+/*************************************************************/
+/* Statistics: Alerts                                        */
+/*************************************************************/
+$_BL['de']['Strike alert'] = 'Blitzalarm';
+$_BL['de']['New alert'] = 'Neuer Alarm';
+$_BL['de']['Alert settings for user '] = 'Alarmeinstellungen für Benutzer';
+$_BL['de']['alert_settings_legend1'] = 'Allgemeines';
+$_BL['de']['alert_name'] = 'Name / Beschreibung';
+$_BL['de']['alert_type'] = 'Art des Versands';
+$_BL['de']['alert_mail'] = 'E-Mail';
+$_BL['de']['alert_sms'] = 'SMS';
+$_BL['de']['Number'] = 'Nummer';
+$_BL['de']['alert_url'] = 'URL';
+$_BL['de']['URL'] = 'URL';
+$_BL['de']['alert_settings_legend2'] = 'Versand auslösen';
+$_BL['de']['alert_lat'] = 'Breite';
+$_BL['de']['alert_lon'] = 'Länge';
+$_BL['de']['alert_distance'] = 'Max. Entfernung (km)';
+$_BL['de']['alert_count'] = 'Min. Anzahl';
+$_BL['de']['alert_interval'] = 'Suchzeit';
+$_BL['de']['Ok'] = 'Ok';
+$_BL['de']['Cancel'] = 'Abbrechen';
+$_BL['de']['alert_settings_legend_table'] = '';
+$_BL['de']['show other users'] = 'Einstellungen anderer Benutzer zeigen';
+$_BL['de']['User'] = 'Benutzer';
+$_BL['de']['Alert name'] = 'Name';
+$_BL['de']['Send to'] = 'Senden an';
+$_BL['de']['Lat/Lon'] = 'Koordinaten';
+$_BL['de']['Max. Distance'] = 'Max. Entfernung';
+$_BL['de']['Min. strike rate'] = 'Min. Blitzrate';
+$_BL['de']['Last alert'] = 'Letzter Alarm';
+$_BL['de']['Alert count'] = 'Alarmierungen';
+$_BL['de']['Create new alert'] = 'Neuen Alarm erstellen';
+$_BL['de']['Change settings'] = 'Einstellungen ändern';
+$_BL['de']['SMS'] = 'SMS';
+$_BL['de']['URL'] = 'URL';
+$_BL['de']['alert_mail_description'] = 'Die folgenden Angaben wurden von MyBlitzortung der Station {STATION} automatisch ermittelt und versendet. Ohne Gewähr!';
+$_BL['de']['alert_mail_time range']   = 'Untersuchter Zeitraum ';
+$_BL['de']['alert_mail_strikes']      = 'Anzahl an Blitzen     ';
+$_BL['de']['alert_mail_last_strike']  = 'Letzter Blitz         ';
+$_BL['de']['alert_mail_first_strike'] = 'Erster Blitz          ';
+$_BL['de']['alert_sms_last_strike']   = 'Letzter Blitz';
+$_BL['de']['alert_sms_description']   = 'Automatisch versendet von MyBlitzortung der Station {STATION}';
+
+$_BL['de']['No alerts available. Create one yourself!'] = 'Noch keine Alarme vorhanden.';
+$_BL['de']['You must fill all fields!'] = 'Es müssen alle Felder ausgefüllt werden!';
+$_BL['de']['Wrong format of E-Mail address'] = 'Falsches Format der E-Mail-Adresse';
+$_BL['de']['Wrong format of telephone number'] = 'Falsches Format der Telefonnummer';
+$_BL['de']['You have to stay in the area around the station!'] = 'Sie müssen innerhalb des Bereichs der Station {STATION} bleiben!';
+$_BL['de']['Enter URL like this'] = 'Bitte die URL folgendermaßen eingeben';

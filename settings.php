@@ -237,7 +237,21 @@ $_BO['mapimg'][1]['col'][] = array(225,   0, 0);
 
 //Settings for Developers
 define("BO_DEBUG", false);
-define("BO_LANG_AUTO_ADD", false);
+define("BO_LANG_AUTO_ADD", true);
 
+
+//Enable/disable alarms
+define("BO_ALERTS", true);
+
+// SMS-Gateway URL
+// Leave it blank, if you don't want to use that feature.
+// {text} will be replaced by the message text
+// {tel}  will be replaced by the telephone number
+/* Some examples. Of course you have to register yourself at the gateway provider and change USER/PASS to your values!         */
+/*  http://gateway.smstrade.de/?key=PASS&to={tel}&message={text}&from=MyBO&route=gold                         */
+/*  http://gateway.sms77.de/?u=USER&p=PASS&to={tel}&text={text}&type=quality&from=MyBO                        */
+/*  http://www.innosend.de/gateway/sms.php?id=USER&pw=PASS&absender=MyBO&empfaenger={tel}&text={text}&type=4  */
+ 
+define("BO_SMS_GATEWAY_URL", '');
 
 ?>

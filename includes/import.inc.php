@@ -173,13 +173,16 @@ function bo_update_raw_signals($force = false)
 		bo_set_conf('count_raw_signals', $count + $i);
 
 		bo_match_strike2raw();
+		
+		$updated = true;
 	}
 	else
 	{
 		echo "\nNO UPDATE! Last update ".(time() - $last)." seconds ago.\n";
+		$updated = false;
 	}
 
-	return true;
+	return $updated;
 }
 
 // Get new strikes from blitzortung.org
@@ -217,6 +220,10 @@ function bo_update_strikes($force = false)
 		if ($file === false)
 			return false;
 
+		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
+		$row = $res->fetch_assoc();
+		$last_strike = strtotime($row['mtime'].' UTC');
+			
 		$loadcount = bo_get_conf('upcount_strikes');
 		bo_set_conf('upcount_strikes', $loadcount+1);
 
@@ -230,8 +237,8 @@ function bo_update_strikes($force = false)
 
 				$utime = strtotime("$date $time UTC");
 
-				// update strike-data only some seconds min *before* the *last download*
-				if ($utime < $last - 120)
+				// update strike-data only some seconds *before* the *last strike in Database*
+				if ($utime < $last_strike - 10)
 				{
 					$a++;
 					continue;
@@ -422,14 +429,16 @@ function bo_update_strikes($force = false)
 		if (!$min || $min > $min_dist_own)
 			bo_set_conf('longtime_min_dist_own', $min_dist_own);
 
-
+		$updated = true;
+		
 	}
 	else
 	{
 		echo "\nNO UPDATE! Last update ".(time() - $last)." seconds ago.\n";
+		$updated = false;
 	}
 
-	return true;
+	return $updated;
 }
 
 
@@ -763,13 +772,15 @@ function bo_update_stations($force = false)
 
 		}
 
+		$updated = true;
 	}
 	else
 	{
 		echo "\nNO UPDATE! Last update ".(time() - $last)." seconds ago.\n";
+		$updated = false;
 	}
 
-	return true;
+	return $updated;
 }
 
 
@@ -786,7 +797,6 @@ function bo_update_all($force)
 		sleep(rand(0,30));
 
 	ini_set('default_socket_timeout', 10);
-	bo_set_conf('is_updating', 0);
 	$is_updating = bo_get_conf('is_updating');
 
 	//Check if sth. went wrong on the last update (if older than 120sec continue)
@@ -801,19 +811,38 @@ function bo_update_all($force)
 	if (!bo_get_conf('first_update_time'))
 		bo_set_conf('first_update_time', time());
 
+		
+	//check if we should do a async update
+	if ( !(BO_UP_INTVL_STRIKES < BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS < BO_UP_INTVL_RAW) )
+	{
+		echo '<p>Asynchronous update!</p>';
+		$async = true;
+	}
+	else
+		$async = false;
+	
 	/*** Get the data! ***/
+	//Update signals/stations only after strikes where imported
+	
 	flush();
 	$t = time();
-	if (bo_update_strikes($force) !== false)
+	if (bo_update_strikes($force) !== false || $async || $force)
 	{	
 		flush();
-		if (bo_update_stations($force) !== false)
-		{
-			flush();
-			bo_update_raw_signals($force);
-		}
+		bo_update_stations($force);
+		
+		flush();
+		bo_update_raw_signals($force);
 	}
 
+	/*** Check and send strike alerts ***/
+	if (defined('BO_ALERTS') && BO_ALERTS)
+	{
+		flush();
+		echo '<h2>Checking and sending strike alerts.</h2>';
+		bo_alert_send();
+	}
+	
 	/*** Purge old data ***/
 	echo '<h2>Purging data</h2>';
 	flush();

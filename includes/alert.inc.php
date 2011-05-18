@@ -23,7 +23,7 @@
 function bo_alert_settings()
 {
 	$level = bo_user_get_level();
-	$show_all = ($level & BO_PERM_SETTINGS) && isset($_GET['bo_all']);
+	$show_all = ($level & BO_PERM_ALERT) && isset($_GET['bo_all']);
 	
 	if (substr($_GET['bo_action2'],0,10) == 'alert_form')
 	{
@@ -57,7 +57,7 @@ function bo_alert_settings()
 	
 	echo '<div id="bo_alert_settings">';
 	
-	if (($level & BO_PERM_SETTINGS))
+	if (($level & BO_PERM_ALERT))
 	{
 		echo '<form action="?" method="GET">';
 		echo bo_insert_html_hidden(array('bo_all', 'bo_action2'));
@@ -146,7 +146,7 @@ function bo_alert_settings_form()
 	$level = bo_user_get_level();
 	
 	if ( !($level&BO_PERM_ALERT))
-	{
+	{echo BO_PERM_ALERT;
 		echo '<div class="bo_info_fail">';
 		echo _BL('No permission!');
 		echo '</div>';
@@ -194,7 +194,7 @@ function bo_alert_settings_form()
 		if ($A['interval'] < BO_UP_INTVL_STRIKES)
 			$A['interval'] = BO_UP_INTVL_STRIKES;
 		
-		if (!($level & BO_PERM_SETTINGS) && $A['user_id'] != bo_user_get_id())
+		if (!($level & BO_PERM_ALERT) && $A['user_id'] != bo_user_get_id())
 		{
 			echo '<div class="bo_info_fail">';
 			echo _BL('No permission!');
@@ -209,6 +209,10 @@ function bo_alert_settings_form()
 				
 			return true;
 		}
+		
+		if (!($level&BO_PERM_ALERT_ALL))
+			$dist = bo_latlon2dist($A['lat'], $A['lon']);
+		
 		
 		if ( !($A['user_id'] && $A['name'] && $A['type']
 				&& $A['address'] && $A['lat'] && $A['lon']
@@ -226,7 +230,11 @@ function bo_alert_settings_form()
 		}
 		else if ($A['type'] == 3 && !preg_match("@^http://.{5}@i",$A['address']))
 		{
-			echo '<div class="bo_info_fail">'._BL('Enter URL like this: http://domain.com/site...').'</div>';
+			echo '<div class="bo_info_fail">'._BL('Enter URL like this').': http://domain.com/site...'.'</div>';
+		}
+		else if (!($level&BO_PERM_ALERT_ALL) && ($dist > BO_RADIUS || $A['dist'] > BO_RADIUS))
+		{
+			echo '<div class="bo_info_fail">'._BL('You have to stay in the area around the station!').'</div>';
 		}
 		else
 		{
@@ -271,7 +279,7 @@ function bo_alert_settings_form()
 	else
 		echo '<h3>'._BL('New alert').'</h3>';
 		
-	if (($level & BO_PERM_SETTINGS))
+	if (($level & BO_PERM_ALERT))
 	{
 		echo '<h4>'._BL('Alert settings for user ').' '.bo_user_get_name($user_id).'</h4>';
 	}
@@ -288,6 +296,7 @@ function bo_alert_settings_form()
 	echo '<input type="text" name="bo_alert_name" value="'.htmlentities($A['name']).'" id="bo_alert_name_input" class="bo_form_text bo_alert_input">';
 
 	echo '<span class="bo_form_descr">'._BL('alert_type').':</span>';
+	echo '<div class="bo_input_container">';
 	echo '<input type="radio" name="bo_alert_type" value="1" '.($A['type'] == 1 ? 'checked="checked' : '').' id="bo_alert_type_mail" class="bo_form_radio bo_alert_input">';
 	echo '<label for="bo_alert_type_mail">'._BL('alert_mail').'</label>';
 	
@@ -295,18 +304,20 @@ function bo_alert_settings_form()
 	{
 		echo '<input type="radio" name="bo_alert_type" value="2" '.($A['type'] == 2 ? 'checked="checked' : '').' id="bo_alert_type_sms" class="bo_form_radio bo_alert_input">';
 		echo '<label for="bo_alert_type_sms">'._BL('alert_sms').'</label>';
-		$adress_text .= _BL(' / Number');
+		$adress_text .= ' / '._BL('Number');
 	}
 
 	if (($level&BO_PERM_ALERT_URL))
 	{
 		echo '<input type="radio" name="bo_alert_type" value="3" '.($A['type'] == 3 ? 'checked="checked' : '').' id="bo_alert_type_url" class="bo_form_radio bo_alert_input">';
 		echo '<label for="bo_alert_type_url">'._BL('alert_url').'</label>';
-		$adress_text .= _BL(' / URL');
+		$adress_text .= ' / '._BL('URL');
 	}
-
+	
+	echo '</div>';
+	
 	echo '<span class="bo_form_descr">'.$adress_text.':</span>';
-	echo '<input type="text" name="bo_alert_address" value="'.htmlentities($A['address']).'" id="bo_alert_address_input" class="bo_form_text bo_alert_input">';
+	echo '<input type="text" name="bo_alert_address" value="'.htmlentities($A['address']).'" style="width:95%" id="bo_alert_address_input" class="bo_form_text bo_alert_input">';
 	
 	
 	echo '</fieldset>';
@@ -421,8 +432,8 @@ function bo_alert_send()
 	$Alerts = array();
 	$log = array();
 
-	$check_continue = 1; //continues without further checks, if message was sent less than given minutes before
-	$min_send_interval = 15; //waits given minutes and sends next message after negative check
+	$check_continue = 15; //continues without further checks, if message was sent less than given minutes before
+	$min_send_interval = 15; //waits given minutes and sends next message after negative check (minimum time without strikes)
 	
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes";
 	$res = bo_db($sql);
@@ -436,7 +447,7 @@ function bo_alert_send()
 		//Warning! May cause very high Database load!
 		$sql = "SELECT name, data, changed
 				FROM ".BO_DB_PREF."conf
-				WHERE name LIKE 'alert%'";
+				WHERE name LIKE 'alert_%'";
 		$res = bo_db($sql);
 		while ($row = $res->fetch_assoc())
 		{
@@ -444,13 +455,8 @@ function bo_alert_send()
 			
 			if (preg_match('/alert_([0-9]+)_([0-9]+)/', $row['name'], $r) && is_array($d) && !empty($d))
 			{
-				print_r($d);
 				if ($max_time - $d['last_check'] < $check_continue * 60)
-				{
 					continue;
-				}
-				
-				
 				
 				$alert_dbname = $row['name'];
 				
@@ -458,7 +464,7 @@ function bo_alert_send()
 				$alert_cnt = $r[2];
 				
 				list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 225, $d['lat'], $d['lon']);
-				list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 45, $d['lat'], $d['lon']);
+				list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 45,  $d['lat'], $d['lon']);
 
 				$search_time = $max_time - 60 * $d['interval'] - 60;
 				$search_date = gmdate('Y-m-d H:i:s', $search_time);
@@ -504,7 +510,7 @@ function bo_alert_send()
 								
 								if (defined('BO_SMS_GATEWAY_URL') && BO_SMS_GATEWAY_URL)
 								{
-									$text = "*** MyBlitzortung ({name}) ***\n".
+									$text = "*** ({name}) ***\n".
 											"{strikes} "._BL('Strikes detected')."\n".
 											_BL('alert_sms_last_strike').": {time}\n".
 											_BL('alert_sms_description');
@@ -546,8 +552,30 @@ function bo_alert_send()
 		
 		if (!empty($log))
 		{
+			$oldlog = unserialize(bo_get_conf('alerts_log'));
+			$newlog = array();
+			
+			if (is_array($log))
+			{
+				krsort($oldlog);
+				$count = 0;
+				foreach($oldlog as $logid => $logdata)
+				{
+					$newlog[$logid] = $logdata;
+					
+					if ($count++ > 100)
+						break;
+				}
+				
+				foreach($log as $logid => $logdata)
+				{
+					$newlog[$max_time.'_'.$logid] = $logdata;
+				}
+			}
+			
+			bo_set_conf('alerts_log', serialize($newlog));
 		
-		
+			echo '<p>Sent '.count($log).' alerts.</p>';
 		}
 		else
 			echo '<p>No alerts sent.</p>';

@@ -49,42 +49,41 @@ function bo_show_login()
 
 	$level = bo_user_get_level();
 
+	
+	$remove_vars = array('bo_action','bo_action2','login','id');
+	
 	if ($level)
 	{
 
 		echo '<ul id="bo_menu">';
 
-		if ($level == 1 || $level == 2)
+		if (BO_PERM_SETTINGS & $level)
 		{
-			echo '<li><a href="'.bo_insert_url(array('action','login','id')).'&action=user_settings">'._BL('Add/Remove User').'</a>';
-			echo '<li><a href="'.bo_insert_url(array('action','login','id')).'&action=calibrate">'._BL('Calibrate Antennas').'</a>';
+			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=user_settings">'._BL('Add/Remove User').'</a>';
+			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=calibrate">'._BL('Calibrate Antennas').'</a>';
 		}
 
-		if (file_exists(BO_DIR.'includes/alarm.inc.php'))
-		{
-			include BO_DIR.'includes/alarm.inc.php';
-			echo '<li><a href="'.bo_insert_url('bo_show', 'alarm').'" class="bo_navi'.($show == 'alarm' ? '_active' : '').'">'._BL('stat_navi_alarm').'</a></li>';
-		}
+		if (defined('BO_ALERTS') && BO_ALERTS && ($level & BO_PERM_ALERT))
+			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=alert" class="bo_navi'.($show == 'alert' ? '_active' : '').'">'._BL('Strike alert').'</a></li>';
 		
 		echo '</ul>';
 
-		switch($_GET['action'])
+		switch($_GET['bo_action'])
 		{
 
-
 			case 'user_settings':
-				if ($level == 1 || $level == 2)
+				if (BO_PERM_SETTINGS & $level)
 					bo_user_admin();
 
 				break;
 
 			case 'calibrate':
-				if ($level == 1 || $level == 2)
+				if (BO_PERM_SETTINGS & $level)
 					bo_calibrate_antennas();
 				break;
 
-			case 'alarm':
-				bo_alarm_settings();
+			case 'alert':
+				bo_alert_settings();
 				break;
 				
 			default:
@@ -114,15 +113,15 @@ function bo_show_login_form($fail = false)
 	if ($fail)
 		echo '<div class="bo_info_fail">'._BL('Login fail!').'</div>';
 
-	echo '<form action="'.bo_insert_url('logout').'" method="POST" class="bo_login_form">';
+	echo '<form action="'.bo_insert_url('bo_logout').'" method="POST" class="bo_login_form">';
 
 	echo '<fieldset class="bo_login_fieldset">';
 	echo '<legend>'._BL('login_legend').'</legend>';
 
-	echo '<span style="bo_form_descr">'._BL('Login').':</span>';
+	echo '<span class="bo_form_descr">'._BL('Login').':</span>';
 	echo '<input type="text" name="bo_user" id="bo_login_user" class="bo_form_text bo_login_input">';
 
-	echo '<span style="bo_form_descr">'._BL('Password').':</span>';
+	echo '<span class="bo_form_descr">'._BL('Password').':</span>';
 	echo '<input type="password" name="bo_pass" id="bo_login_pass" class="bo_form_text bo_login_input">';
 
 	echo '<input type="submit" name="ok" value="'._BL('Login').'" id="bo_login_submit" class="bo_form_submit">';
@@ -143,7 +142,7 @@ function bo_user_do_login($user, $pass)
 	{
 		if ($pass == BO_PASS && defined('BO_PASS') && strlen(BO_PASS))
 		{
-			bo_user_set_session(1, 1);
+			bo_user_set_session(1, pow(2, BO_PERM_COUNT) - 1);
 			return true;
 		}
 	}
@@ -177,13 +176,18 @@ function bo_user_set_session($user, $level)
 	$_SESSION['bo_user_level'] = $level;
 }
 
+function bo_user_get_id()
+{
+	return $_SESSION['bo_user'];
+}
+
 function bo_user_get_level($user_id = 0)
 {
 	if (!$user_id)
 		return $_SESSION['bo_user_level'];
 
 	if ($user_id == 1)
-		return 1;
+		return pow(2, BO_PERM_COUNT) - 1;
 
 	$erg = bo_db("SELECT level FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
 	$row = $erg->fetch_assoc();
@@ -193,33 +197,50 @@ function bo_user_get_level($user_id = 0)
 
 function bo_user_get_name($user_id = 0)
 {
+	static $names;
+	
 	if (!$user_id)
 		$user_id = $_SESSION['bo_user'];
 
 	if ($user_id == 1)
 		return BO_USER;
 
-	$erg = bo_db("SELECT login FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
-	$row = $erg->fetch_assoc();
-
-	return $row['login'];
+	if (!isset($names[$user_id]))
+	{
+		$erg = bo_db("SELECT login FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+		$row = $erg->fetch_assoc();
+		$names[$user_id] = $row['login'];
+	}
+	
+	return $names[$user_id];
 }
 
 function bo_user_admin()
 {
 	$user_id = intval($_GET['id']);
 
-	if (isset($_POST['bo_admin_user']) && bo_user_get_level() == 1)
+	if (isset($_POST['bo_admin_user']) && (bo_user_get_level() & BO_PERM_ADMIN) )
 	{
 		$user_id = intval($_POST['user_id']);
 		$new_user_login = BoDb::esc($_POST['bo_user_login']);
 
 		if ($user_id == 1 || $new_user_login)
 		{
+			$new_user_level = 0;
+			if (is_array($_POST['bo_user_perm']))
+			{
+				foreach($_POST['bo_user_perm'] as $perm => $checked)
+				{
+					if ($checked)
+						$new_user_level += $perm; 
+				}
+			}
+			
 			$new_user_pass = BoDb::esc($_POST['bo_user_pass']);
 			$new_user_mail = BoDb::esc($_POST['bo_user_mail']);
-			$new_user_level = BoDb::esc($_POST['bo_user_level']);
-
+			//$new_user_level = BoDb::esc($_POST['bo_user_level']);
+			
+			
 			$sql = " ".BO_DB_PREF."user SET login='$new_user_login', mail='$new_user_mail', level='$new_user_level' ";
 
 			if (strlen(trim($new_user_pass)))
@@ -237,13 +258,13 @@ function bo_user_admin()
 		}
 	}
 
-	if (isset($_GET['delete']) && $user_id > 1 && bo_user_get_level() == 1)
+	if (isset($_GET['delete']) && $user_id > 1 && (bo_user_get_level() & BO_PERM_ADMIN) )
 		bo_db("DELETE FROM ".BO_DB_PREF."user WHERE id='$user_id'");
 
 
 	echo '<div id="bo_user_admin">';
 
-
+	echo '<h3>'._BL('User list').'</h3>';
 	echo '<table class="bo_table" id="bo_user_table">';
 	echo '<tr>
 			<th>ID</th>
@@ -251,6 +272,7 @@ function bo_user_admin()
 			<th>'._BL('Level').'</th>
 			<th>'._BL('E-Mail').'</th>
 			<th>'._BL('Delete').'</th>
+			<th>'._BL('Alert').'</th>
 			</tr>';
 
 	$sql = "SELECT id, login, password, level, mail
@@ -276,7 +298,11 @@ function bo_user_admin()
 		if ($row['id'] > 1)
 			echo '<a href="'.bo_insert_url(array('user_settings','user_id','delete')).'&id='.$row['id'].'&delete" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
 
-		echo '</td></tr>';
+		echo '</td>';
+		
+		echo '<td><a href="'.bo_insert_url(array('bo_action', 'bo_action2', 'user_settings')).'&bo_action=alert&bo_action2=alert_form%2C'.$row['id'].'">'._BL('new').'</a></td>';
+		
+		echo '</tr>';
 
 		if ($user_id == $row['id'])
 		{
@@ -289,25 +315,41 @@ function bo_user_admin()
 
 	echo '</table>';
 
-	$disabled = $user_id == 1 ? ' disabled' : '';
+	if ($user_id == 1)
+	{
+		$disabled = ' disabled="disabled"';
+		$user_level = pow(2, BO_PERM_COUNT) - 1;
+	}
 
-	echo '<form action="'.bo_insert_url(array('logout', 'user_id', 'id', 'delete')).'" method="POST" class="bo_admin_user_form">';
+	echo '<form action="'.bo_insert_url(array('bo_logout', 'user_id', 'id', 'delete')).'" method="POST" class="bo_admin_user_form">';
 
 	echo '<fieldset class="bo_admin_user_fieldset">';
 	echo '<legend>'._BL('admin_user_legend').'</legend>';
 
-	echo '<span style="bo_form_descr">'._BL('Login').':</span>';
+	echo '<span class="bo_form_descr">'._BL('Login').':</span>';
 	echo '<input type="text" name="bo_user_login" value="'.htmlentities($user_login).'" id="bo_user_login" class="bo_form_text bo_admin_input" '.$disabled.'>';
 
-	echo '<span style="bo_form_descr">'._BL('Password').':</span>';
+	echo '<span class="bo_form_descr">'._BL('Password').':</span>';
 	echo '<input type="password" name="bo_user_pass" id="bo_user_login" class="bo_form_text bo_admin_input" '.$disabled.'>';
 
-	echo '<span style="bo_form_descr">'._BL('Level').':</span>';
-	echo '<input type="text" name="bo_user_level" value="'.htmlentities($user_level).'" id="bo_user_level" class="bo_form_text bo_admin_input" '.$disabled.'>';
+	//echo '<span class="bo_form_descr">'._BL('Level').':</span>';
+	//echo '<input type="text" name="bo_user_level" value="'.htmlentities($user_level).'" id="bo_user_level" class="bo_form_text bo_admin_input" '.$disabled.'>';
 
-	echo '<span style="bo_form_descr">'._BL('E-Mail').':</span>';
+	echo '<span class="bo_form_descr">'._BL('E-Mail').':</span>';
 	echo '<input type="text" name="bo_user_mail"  value="'.htmlentities($user_mail).'" id="bo_user_mail" class="bo_form_text bo_login_input">';
 
+	echo '<span class="bo_form_descr">'._BL('Level').':</span>';
+	echo '<div class="bo_input_container">';
+	for ($i=0; $i<BO_PERM_COUNT;$i++)
+	{
+		$l = pow(2, $i);
+		
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="checkbox" value="1" name="bo_user_perm['.$l.']" id="bo_user_perm'.$i.'" class="bo_form_checkbox" '.$disabled.(($user_level & $l) ? ' checked="checked"' : '').'>';
+		echo '<label for="bo_user_perm'.$i.'" class="bo_form_descr_checkbox">'._BL('user_perm'.$i).'</label>';
+		echo '</span>';
+	}
+	echo '</div>';
 	echo '<input type="hidden" name="bo_admin_user" value="1">';
 	echo '<input type="hidden" name="user_id" value="'.$user_id.'">';
 
@@ -336,13 +378,13 @@ function bo_calibrate_antennas()
 	echo '<fieldset class="bo_admin_user_fieldset">';
 	echo '<legend>'._BL('admin_calibrate_legend').'</legend>';
 
-	echo '<span style="bo_form_descr">'._BL('Limit').':</span>';
+	echo '<span class="bo_form_descr">'._BL('Limit').':</span>';
 	echo '<input type="text" name="bo_limit" value="'.$limit.'" id="bo_calibrate_limit" class="bo_form_text bo_form_input">';
 
-	echo '<span style="bo_form_descr">'._BL('Max Distance (Kilometers)').':</span>';
+	echo '<span class="bo_form_descr">'._BL('Max Distance (Kilometers)').':</span>';
 	echo '<input type="text" name="bo_max_dist" value="'.($dist ? $dist : '').'" id="bo_calibrate_dist" class="bo_form_text bo_form_input">';
 
-	echo '<span style="bo_form_descr">'._BL('Max Age (Days)').':</span>';
+	echo '<span class="bo_form_descr">'._BL('Max Age (Days)').':</span>';
 	echo '<input type="text" name="bo_max_age" value="'.($age ? $age : '').'" id="bo_calibrate_age" class="bo_form_text bo_form_input">';
 
 
@@ -441,12 +483,12 @@ function bo_calibrate_antennas()
 
 		echo '<h4>'._BL('Direction').'</h4>';
 		echo '<ul>';
-		echo '<li>'._BL('Antenna').' 1: '.$alpha[0].'&deg; ('.bo_bearing2direction($alpha[0]).' <-> '.bo_bearing2direction($alpha[0] + 180).')</li>';
-		echo '<li>'._BL('Antenna').' 2: '.$alpha[1].'&deg; ('.bo_bearing2direction($alpha[1]).' <-> '.bo_bearing2direction($alpha[1] + 180).')</li>';
+		echo '<li>'._BL('Antenna').' 1: '.$alpha[0].'&deg; ('._BL(bo_bearing2direction($alpha[0])).' <-> '._BL(bo_bearing2direction($alpha[0] + 180)).')</li>';
+		echo '<li>'._BL('Antenna').' 2: '.$alpha[1].'&deg; ('._BL(bo_bearing2direction($alpha[1])).' <-> '._BL(bo_bearing2direction($alpha[1] + 180)).')</li>';
 		echo '<li>'._BL('Difference').': '.abs($alpha[1]-$alpha[0]).'&deg;</li>';
 
 
-		if (bo_user_get_level() == 1)
+		if ((bo_user_get_level() & BO_PERM_ADMIN))
 		{
 			if ($alpha[0] !== null)
 				bo_set_conf('antenna1_bearing', $alpha[0]);
@@ -534,7 +576,7 @@ function bo_calibrate_antennas()
 
 				echo $pos_dir[$i].'&deg';
 
-				if (bo_user_get_level() == 1)
+				if ((bo_user_get_level() & BO_PERM_ADMIN))
 				{
 					echo ' ('._BL('Saved to DB').')';
 					bo_set_conf('antenna'.($i+1).'_bearing_elec', $pos_dir[$i]);

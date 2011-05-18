@@ -169,15 +169,22 @@ function bo_show_archive_search()
 		{
 			echo '<li>';
 			echo '<span class="bo_descr">'._BL('Count').':</span> ';
+			echo '<span class="bo_value">';
 			echo $more_found ? _BL('More than') : _BL('Exact');
 			echo ' '.$count.' ';
 			echo $count == 1 ? _BL('Strike') : _BL('Strikes');
 			echo ' '._BL('found');
+			echo '</span>';
 			echo '</li>';
 
 			echo '<li><span class="bo_descr">'._BL('Oldest').':</span><span class="bo_value"> '.date(_BL('_datetime'), $time_min).'</value></li>';
 			echo '<li><span class="bo_descr">'._BL('Newest').':</span><span class="bo_value"> '.date(_BL('_datetime'), $time_max).'</value></li>';
 		}
+		else
+		{
+			echo '<li>'._BL('No strikes found!').'</li>';
+		}
+		
 		echo '</ul>';
 	}
 
@@ -378,7 +385,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
 
 	$time_end  = strtotime($row['time'].' UTC');
-	$date_end  = gmdate('Y-m-d H:i:s', $time_end - 60 * 5);
+	$date_end  = gmdate('Y-m-d H:i:s', $time_end);
 	$date_start    = gmdate('Y-m-d H:i:s', time() - 3600 * $hours_back);
 	$c = 299792458;
 
