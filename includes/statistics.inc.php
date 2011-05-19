@@ -455,6 +455,21 @@ function bo_show_statistics_longtime()
 
 	echo '</ul>';
 
+	echo '<a name="graph_ratio_distance"></a>';
+	echo '<h4>'._BL('h4_graph_ratio_distance_longtime').'</h4>';
+	echo '<p class="bo_graph_description" id="bo_graph_descr_radi_longtime">';
+	echo _BL('bo_graph_descr_radi_longtime');
+	echo '</p>';
+	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_distance_longtime" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+
+	echo '<a name="graph_ratio_bearing"></a>';
+	echo '<h4>'._BL('h4_graph_ratio_bearing_longtime').'</h4>';
+	echo '<p class="bo_graph_description" id="bo_graph_descr_bear_longtime">';
+	echo _BL('bo_graph_descr_bear_longtime');
+	echo '</p>';
+	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_bearing_longtime" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+
+	
 	echo '</div>';
 
 }

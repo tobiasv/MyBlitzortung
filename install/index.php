@@ -325,7 +325,6 @@ switch($step)
 		flush();
 
 		echo '<div style="font-family: Courier; font-size: 0.8em; border: 1px solid #999; padding: 10px; ">';
-		ini_set('allow_url_fopen', 'on'); 
 		bo_update_all(true);
 		echo '</div>';
 

@@ -21,6 +21,10 @@ define("BO_UP_INTVL_STRIKES", 5);
 define("BO_UP_INTVL_STATIONS", 15);
 define("BO_UP_INTVL_RAW", 60);
 
+//Disable station statistics
+//Station statistics currently cause high load when importing. You can disable them, by setting this to true.
+define("BO_STATION_STAT_DISABLE", false);
+
 //Experimental Polarity
 define("BO_EXPERIMENTAL_POLARITY_CHECK", true);
 define("BO_EXPERIMENTAL_POLARITY_ZOOM", 8);
@@ -238,6 +242,7 @@ $_BO['mapimg'][1]['col'][] = array(225,   0, 0);
 //Settings for Developers
 define("BO_DEBUG", false);
 define("BO_LANG_AUTO_ADD", true);
+define("BO_CACHE_DISABLE", false);
 
 
 //Enable/disable alarms
@@ -253,5 +258,7 @@ define("BO_ALERTS", true);
 /*  http://www.innosend.de/gateway/sms.php?id=USER&pw=PASS&absender=MyBO&empfaenger={tel}&text={text}&type=4  */
  
 define("BO_SMS_GATEWAY_URL", '');
+
+
 
 ?>

@@ -141,7 +141,9 @@ function bo_tile()
 	$filename = 'tile_'.$type.'_'.$x.'x'.$y.'_'.$zoom.'_'.$only_own.'_'.(bo_user_get_level() ? 1 : 0).'.png';
 	$file = $dir.$filename;
 
-	if (file_exists($file))
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+	
+	if (file_exists($file) && $caching)
 	{
 		$filetime = filemtime($file);
 		$file_minute = intval(intval(date('i', $filetime)) / $update_interval);
@@ -179,7 +181,7 @@ function bo_tile()
 				)
 			{
 
-				if (!file_exists($dir.'na.png'))
+				if (!file_exists($dir.'na.png') || !$caching)
 				{
 					$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
 
@@ -204,12 +206,18 @@ function bo_tile()
 						imagestring($I, 5, 30, 120+$i*12, $line, $textcol);
 
 					imagecolortransparent($I, $blank);
-
+					
+					if ($caching)
+					{
+						imagepng($I);
+						exit;
+					}
+					
 					imagepng($I, $dir.'na.png');
 
 				}
-
-				readfile($dir.'na.png');
+				
+					readfile($dir.'na.png');
 
 				exit;
 			}
@@ -363,8 +371,14 @@ function bo_tile()
 
 	imagecolortransparent($I, $blank);
 
-	imagepng($I, $file);
-	readfile($file);
+	if ($caching)
+	{
+		imagepng($I, $file);
+		readfile($file);
+	}
+	else
+		imagepng($I);
+		
 	imagedestroy($I);
 
 	exit;
@@ -392,6 +406,8 @@ function bo_purge_tiles()
 function bo_get_map_image()
 {
 	set_time_limit(10);
+	
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 
 	global $_BO;
 
@@ -413,9 +429,8 @@ function bo_get_map_image()
 
 	//Caching
 	$cache_file = BO_DIR.'cache/maps/'.$id.'.png';
-	if (file_exists($cache_file) && filemtime($cache_file) >= $last_update)
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
-
 		readfile($cache_file);
 		exit;
 	}
@@ -565,8 +580,14 @@ function bo_get_map_image()
 
 
 	header("Content-Type: image/png");
-	imagepng($I, $cache_file);
-	readfile($cache_file);
+	
+	if ($caching)
+	{
+		imagepng($I, $cache_file);
+		readfile($cache_file);
+	}
+	else
+		imagepng($I);
 
 	exit;
 }

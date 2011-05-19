@@ -23,11 +23,16 @@
 function bo_alert_settings()
 {
 	$level = bo_user_get_level();
-	$show_all = ($level & BO_PERM_ALERT) && isset($_GET['bo_all']);
+	$show_all = ($level & BO_PERM_ADMIN) && $_GET['bo_all'];
 	
 	if (substr($_GET['bo_action2'],0,10) == 'alert_form')
 	{
 		if (!bo_alert_settings_form())
+			return;
+	}
+	else if ($_GET['bo_action2'] == 'alert_log')
+	{
+		if (!bo_alert_log($show_all))
 			return;
 	}
 	
@@ -57,7 +62,7 @@ function bo_alert_settings()
 	
 	echo '<div id="bo_alert_settings">';
 	
-	if (($level & BO_PERM_ALERT))
+	if (($level & BO_PERM_ALERT_ALL))
 	{
 		echo '<form action="?" method="GET">';
 		echo bo_insert_html_hidden(array('bo_all', 'bo_action2'));
@@ -137,7 +142,7 @@ function bo_alert_settings()
 	$user_id = bo_user_get_id();
 	
 	echo '<p><a href="'.bo_insert_url(array('bo_action2'), 'alert_form,'.$user_id).'">'._BL('Create new alert').'</a></p>';
-	
+	echo '<p><a href="'.bo_insert_url(array('bo_action2'), 'alert_log').'">'._BL('Show log').'</a></p>';
 	echo '</div>';
 }
 
@@ -146,7 +151,7 @@ function bo_alert_settings_form()
 	$level = bo_user_get_level();
 	
 	if ( !($level&BO_PERM_ALERT))
-	{echo BO_PERM_ALERT;
+	{
 		echo '<div class="bo_info_fail">';
 		echo _BL('No permission!');
 		echo '</div>';
@@ -166,6 +171,8 @@ function bo_alert_settings_form()
 	{
 		$A = array();
 		$A['interval'] = BO_UP_INTVL_STRIKES;
+		$A['address'] = bo_user_get_mail($user_id);
+		$A['type'] = $A['address'] ? 1 : 0;
 	}
 
 	if (!$A['lat'] || !$A['lon'])
@@ -182,19 +189,24 @@ function bo_alert_settings_form()
 	{
 		
 		$A['user_id'] = intval($_POST['bo_alert_user']);
-		$A['name'] = trim($_POST['bo_alert_name']);
+		$A['name'] = stripslashes(trim($_POST['bo_alert_name']));
+		$A['address'] = stripslashes(trim($_POST['bo_alert_address']));
 		$A['type'] = intval($_POST['bo_alert_type']);
-		$A['address'] = trim($_POST['bo_alert_address']);
-		$A['lat'] = (double)$_POST['bo_alert_lat'];
-		$A['lon'] = (double)$_POST['bo_alert_lon'];
 		$A['dist'] = intval($_POST['bo_alert_distance']);
 		$A['count'] = intval($_POST['bo_alert_count']);
 		$A['interval'] = intval($_POST['bo_alert_interval']);
+
+		if ($_POST['bo_alert_lat'] && $_POST['bo_alert_lon'])
+		{
+			$A['lat'] = (double)$_POST['bo_alert_lat'];
+			$A['lon'] = (double)$_POST['bo_alert_lon'];
+		}
+
 		
 		if ($A['interval'] < BO_UP_INTVL_STRIKES)
 			$A['interval'] = BO_UP_INTVL_STRIKES;
 		
-		if (!($level & BO_PERM_ALERT) && $A['user_id'] != bo_user_get_id())
+		if (!($level & BO_PERM_ADMIN) && $A['user_id'] != bo_user_get_id())
 		{
 			echo '<div class="bo_info_fail">';
 			echo _BL('No permission!');
@@ -341,7 +353,7 @@ function bo_alert_settings_form()
 	echo '<span class="bo_form_descr">'._BL('alert_count').':</span>';
 	echo '<input type="text" name="bo_alert_count" value="'.htmlentities($A['count']).'" id="bo_alert_count_input" class="bo_form_text bo_alert_input">';
 
-	echo '<span class="bo_form_descr">'._BL('alert_interval').':</span>';
+	echo '<span class="bo_form_descr">'._BL('alert_interval').' ('._BL('unit_minutes').'):</span>';
 	echo '<input type="text" name="bo_alert_interval" value="'.htmlentities($A['interval']).'" id="bo_alert_interval_input" class="bo_form_text bo_alert_input">';
 
 	
@@ -354,6 +366,23 @@ function bo_alert_settings_form()
 		echo '<input type="submit" name="delete" value="'._BL('Delete').'" id="bo_alert_delete" class="bo_form_submit bo_form_delete">';
 	
 	echo '</form>';
+
+	if (($level&BO_PERM_ALERT_URL))	
+	{
+		echo '<div id="bo_alert_form_descr">';
+		
+		echo '<p>'._BL('For usage with "URL"').':</p>';
+		
+		echo '<ul id="bo_alert_form_descr_ul">
+				<li><span class="bo_descr">{name}:</span> <span class="bo_value">'._BL('Name of your alert').'</span></li>
+				<li><span class="bo_descr">{strikes}:</span> <span class="bo_value">'._BL('Strike count').'</span></li>
+				<li><span class="bo_descr">{time}:</span> <span class="bo_value">'._BL('Time of last strike').'</span></li>
+				<li><span class="bo_descr">{first}:</span> <span class="bo_value">'._BL('Time of first strike in time range').'</span></li>
+				<li><span class="bo_descr">{dist}:</span> <span class="bo_value">'._BL('Distance to selected position').'</span></li>
+				</ul>';
+		echo '</div>';
+	}
+	
 	echo '</div>';
 	
 	//Map
@@ -469,11 +498,14 @@ function bo_alert_send()
 				$search_time = $max_time - 60 * $d['interval'] - 60;
 				$search_date = gmdate('Y-m-d H:i:s', $search_time);
 				
-				$sql = "SELECT COUNT(id) cnt, MAX(time) maxtime, MIN(time) mintime
+				$sql = "SELECT COUNT(id) cnt, MAX(time) maxtime, MIN(time) mintime, 
+								MIN(ABS(lat-".(double)$d['lat'].")) minlat, 
+								MIN(ABS(lon-".(double)$d['lon'].")) minlon
 						FROM ".BO_DB_PREF."strikes
 						WHERE 1
 							AND NOT (lat < $str_lat_min OR lat > $str_lat_max OR lon < $str_lon_min OR lon > $str_lon_max)
-							AND time >= '$search_date' ";
+							AND time >= '$search_date' 
+						ORDER BY time DESC";
 				$res2 = bo_db($sql);
 				$row2 = $res2->fetch_assoc();
 				
@@ -483,26 +515,35 @@ function bo_alert_send()
 					
 					if (!$d['disarmed']) //SEND IT
 					{
+						$dist = round(bo_latlon2dist($d['lat'], $d['lon'], $row2['minlat']+$d['lat'], $row2['minlon']+$d['lon']) / 1000);
+						
 						$replace = array(
 									'{name}' 	=> $d['name'],
 									'{strikes}' => $row2['cnt'],
 									'{time}'	=> date(_BL('_datetime'), strtotime($row2['maxtime'].' UTC')),
 									'{first}'	=> date(_BL('_datetime'), strtotime($row2['mintime'].' UTC')),
+									'{dist}'	=> $dist
 										);
 						
+						$log[$alert_dbname] = array();
 						
 						switch($d['type'])
 						{
 							case 1: //E-Mail
-								
-								$ret = mail(	$d['address'], 
-										'MyBlitzortung: '._BL('Strikes detected').' ('.$d['name'].')', 
-										_BL('alert_mail_description')."\n\n".
+
+								$text = _BL('alert_mail_description')."\n\n".
 										_BL('alert_mail_time range').': '.date(_BL('_datetime'), $search_time).' - '.date(_BL('_datetime'), $max_time)."\n".
 										_BL('alert_mail_strikes').': '.$row2['cnt']."\n".
-										_BL('alert_mail_last_strike').': '.date(_BL('_datetime'), strtotime($row2['maxtime'].' UTC'))."\n".
-										_BL('alert_mail_first_strike').': '.date(_BL('_datetime'), strtotime($row2['mintime'].' UTC'))."\n\n"
-										);
+										_BL('alert_mail_distance').': '.$dist." "._BL('unit_kilometers')."\n".
+										_BL('alert_mail_last_strike').': '.date(_BL('H:i:s'), strtotime($row2['maxtime'].' UTC'))."\n".
+										_BL('alert_mail_first_strike').': '.date(_BL('H:i:s'), strtotime($row2['mintime'].' UTC'))."\n\n";
+										
+								$ret = mail($d['address'], 
+											'MyBlitzortung: '._BL('Strikes detected').' ('.$d['name'].')', 
+											$text
+											);
+								
+								$log[$alert_dbname]['text']   = $text;
 								
 								break;
 							
@@ -513,26 +554,33 @@ function bo_alert_send()
 									$text = "*** ({name}) ***\n".
 											"{strikes} "._BL('Strikes detected')."\n".
 											_BL('alert_sms_last_strike').": {time}\n".
+											_BL('alert_sms_distance').": {dist}km\n".
 											_BL('alert_sms_description');
 									
 									$text = strtr($text, $replace);
-									$text = urlencode($text);
+									$log[$alert_dbname]['text']   = $text;
 									
 									$url = BO_SMS_GATEWAY_URL;
-									$url = strtr($url, array('{text}' => $text, '{tel}' => $d['address']));
+									$url = strtr($url, array('{text}' => urlencode($text), '{tel}' => $d['address']));
 									
 									$ret = file_get_contents($url);
 								}
-							
+								
+								break;
+								
 							case 3: //URL
 								
 								$url = strtr($d['address'], $replace);
 								$ret = file_get_contents($url);
+								$log[$alert_dbname]['text'] = $url;
 								
 								break;
 						}
 						
-						$log[$alert_dbname] = array($d['type'], $text, $ret, $d['address']);
+						$log[$alert_dbname]['type']   = $d['type'];
+						$log[$alert_dbname]['return'] = $ret;
+						$log[$alert_dbname]['address'] = $d['address'];
+						$log[$alert_dbname]['name'] = $d['name'];
 						
 						$d['last_send'] = time();
 						$d['disarmed'] = true;
@@ -587,6 +635,76 @@ function bo_alert_send()
 }
 
 
+function bo_alert_log($all = false)
+{
+	$log = unserialize(bo_get_conf('alerts_log'));
+	krsort($log);
+	
+	$count = 0;
+	
+	if (is_array($log))
+	{
+		echo '<table class="bo_table" id="bo_alert_table">';
+		echo '<tr>
+				<th>'._BL('Time').'</th>
+				<th>'._BL('User').'</th>
+				<th>'._BL('Alert name').'</th>
+				<th>'._BL('Type').'</th>
+				<th>'._BL('To').'</th>
+				<th>'._BL('Return value').'</th>
+				<th>'._BL('Text').'</th>
+				</tr>';
 
+		foreach($log as $logid => $d)
+		{
+			if (!preg_match('/([0-9]+)_alert_([0-9]+)_([0-9]+)/', $logid, $r))
+				continue;
+			
+			$time = $r[1];
+			$user_id = $r[2];
+			$alert_id = $r[3];
+			
+			if (!$all && $user_id != bo_user_get_id())
+				continue;
+			
+			if (!$d['name'])
+				$d['name'] = '?';
+			
+			echo '<tr>';
+			echo '<td>'.date(_BL('_datetime'), $time).'</td>';
+			echo '<td>'.bo_user_get_name($user_id).'</td>';
+			echo '<td><a href="'.bo_insert_url('bo_action2', 'alert_form,'.$user_id.','.$alert_id).'">'.$d['name'].'</a></td>';
+			echo '<td>';
+			switch ($d['type'])
+			{
+				default: echo '?'; break;
+				case 1: echo _BL('E-Mail'); break;
+				case 2: echo _BL('SMS'); break;
+				case 3: echo _BL('URL'); break;
+			}
+			echo '</td>';
+			echo '<td>'.($d['type'] != 3 ? htmlentities($d['address']) : '').'</td>';
+			echo '<td>';
+			echo $d['return'] ? $d['return'] : _BL('Error');
+			echo '</td>';
+			
+			echo '<td>';
+			echo htmlentities(strlen($d['text']) > 70 ? substr($d['text'], 0, 50).'...'.substr($d['text'], -10) : $d['text']);
+			echo '</td>';
+			echo '</tr>';
+			
+			$count++;
+		}
+				
+		echo '</table>';
+	}
+	
+	if (!$count)
+		echo '<p>'._BL('No log entries').'</p>';
+	
+	echo '<p><a href="'.bo_insert_url(array('bo_action2')).'">'._BL('Back').'</a></p>';
+	
+	return false;
+}
 
 ?>

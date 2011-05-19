@@ -24,6 +24,8 @@
 // Graph from raw dataset
 function bo_graph_raw($id)
 {
+	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
+		bo_graph_error(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
 
 	$id = intval($id);
 
@@ -64,7 +66,7 @@ function bo_graph_raw($id)
 	$n = count($datax);
 	$xmin = $datax[0];
 	$xmax = $datax[$n-1];
-
+	
 	require_once 'jpgraph/jpgraph.php';
 	require_once 'jpgraph/jpgraph_line.php';
 	require_once 'jpgraph/jpgraph_plotline.php';
@@ -152,6 +154,10 @@ function bo_graph_raw($id)
 
 function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 24)
 {
+
+	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
+		bo_graph_error(BO_GRAPH_STAT_W, BO_GRAPH_STAT_H);
+
 	session_write_close();
 
 	$hours_back = intval($hours_back) ? intval($hours_back) : 24;
@@ -167,15 +173,88 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 	$X = $Y = array(); //data array
 
-	//Special Query for own "ratio strikes by distance" - may be slow!
-	if ($type == 'ratio_distance' || $type == 'ratio_bearing')
+	
+	if ($type == 'ratio_distance_longtime')
+	{
+		$own = unserialize(bo_get_conf('longtime_dist_own'));
+		$all = unserialize(bo_get_conf('longtime_dist'));
+		
+		if (is_array($own) && is_array($all))
+		{
+			foreach($own as $dist => $cnt)
+			{
+				$X[$dist] = $dist * 10;
+				
+				if ($all[$dist])
+					$Y[$dist] = $cnt / $all[$dist] * 100;
+				else
+					$Y[$dist] = null;
+				
+				$max_dist = max($max_dist, $dist);
+			}
+			
+			foreach($all as $dist => $cnt)
+			{
+				$Y2[$dist] = $cnt;
+				$max_dist = max($max_dist, $dist);
+			}
+			
+			for ($i=0;$i<=$max_dist;$i++)
+			{
+				$X[$i] = $i * 10;
+				$Y[$i] = isset($Y[$i]) ? $Y[$i] : null;
+				$Y2[$i] = isset($Y2[$i]) ? $Y2[$i] : null;
+			}
+			
+		}
+		
+		$graph_type = 'linlin';
+		$add_title = ' '._BL('since begin of data logging');
+	
+	}
+	else if($type == 'ratio_bearing_longtime')
+	{
+		$own = unserialize(bo_get_conf('longtime_bear_own'));
+		$all = unserialize(bo_get_conf('longtime_bear'));
+		
+		if (is_array($own) && is_array($all))
+		{
+			foreach($own as $bear => $cnt)
+			{
+				$X[$bear] = $bear * 10;
+				
+				if ($all[$bear])
+					$Y[$bear] = $cnt / $all[$bear] * 100;
+				else
+					$Y[$bear] = null;
+			}
+			
+			foreach($all as $bear => $cnt)
+			{
+				$Y2[$bear] = $cnt;
+			}
+			
+			for ($i=0;$i<360;$i++)
+			{
+				$X[$i] = $i;
+				$Y[$i] = isset($Y[$i]) ? $Y[$i] : null;
+				$Y2[$i] = isset($Y2[$i]) ? $Y2[$i] : null;
+			}
+			
+		}
+		
+		$graph_type = 'linlin';
+		$add_title = ' '._BL('since begin of data logging');
+
+	}
+	else if ($type == 'ratio_distance' || $type == 'ratio_bearing')
 	{
 		$dist_div = BO_GRAPH_STAT_RATIO_DIST_DIV; //interval in km
 		$bear_div = BO_GRAPH_STAT_RATIO_BEAR_DIV;
 
 		$tmp = array();
 		$ticks = 0;
-		if ($station_id)
+		if ($station_id) //Special Query for own "ratio strikes by distance" - may be slow!
 		{
 			$station_info = bo_station_info($station_id);
 			$stLat = $station_info['lat'];
@@ -315,7 +394,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	$info_station_id = $station_id ? $station_id : $stId;
 
 
-	$add_title = ' '._BL('of the last').' '.$hours_back.'h';
+	if (!$add_title)
+		$add_title = ' '._BL('of the last').' '.$hours_back.'h';
 
 	if ($station_id)
 	{
@@ -482,14 +562,14 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			}
 
 			$graph->xaxis->title->Set(_BL('Time'));
-			$graph->yaxis->title->Set(_BL('Count per hour'));
+			$graph->yaxis->title->Set(_BL('Count'));
 
 			break;
 
-		case 'ratio_distance':
+		case 'ratio_distance': 
+		case 'ratio_distance_longtime':
 
 			$graph->title->Set(_BL('graph_stat_title_ratio_distance').$add_title);
-
 
 			if (BO_GRAPH_STAT_RATIO_DIST_LINE)
 			{
@@ -523,11 +603,16 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 			$graph->xaxis->title->Set(_BL('Distance').'   [km]');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
-			$graph->ynaxis[0]->title->Set(_BL('Count per hour'));
+			
+			if ($type == 'ratio_distance_longtime')
+				$graph->ynaxis[0]->title->Set(_BL('Count'));
+			else
+				$graph->ynaxis[0]->title->Set(_BL('Count per hour'));
 
 			break;
 
-		case 'ratio_bearing':
+		case 'ratio_bearing': 
+		case 'ratio_bearing_longtime':
 
 			$graph->title->Set(_BL('graph_stat_title_ratio_bearing').$add_title);
 
@@ -563,7 +648,11 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$graph->xaxis->scale->SetAutoMin(0);
 			$graph->xaxis->title->Set(_BL('Bearing').'   [°]');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
-			$graph->ynaxis[0]->title->Set(_BL('Count per hour'));
+			
+			if ($type == 'ratio_bearing_longtime')
+				$graph->ynaxis[0]->title->Set(_BL('Count'));
+			else
+				$graph->ynaxis[0]->title->Set(_BL('Count per hour'));
 
 			break;
 
@@ -603,6 +692,22 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	imagepng($I);
 
 
+}
+
+function bo_graph_error($w, $h)
+{
+	$I = imagecreate($w, $h);
+	$back  = imagecolorallocate($I, 255, 150, 150);
+	$black = imagecolorallocate($I, 0, 0, 0); 
+
+	imagestring($I, 2, $w / 2 - 90, $h/2-25, 'File', $black);
+	imagestring($I, 2, $w / 2 - 90, $h/2-10, '"includes/jpgraph/jpgraph.php"', $black);
+	imagestring($I, 2, $w / 2 - 90, $h/2+5, 'not found!', $black);
+	imagefttext($I, $fsize, 0,$fsize * 2, $h / 2, $black, 'config/fonts/arial.ttf', $text);	
+	imagerectangle($I, 0,0,$w-1,$h-1,$black);
+	Header("Content-type: image/png"); 
+	Imagepng($I);
+	exit;
 }
 
 ?>

@@ -1,0 +1,45 @@
+
+*****************************
+   MyBlitzortung Changelog
+*****************************
+
+
+Version 0.2.1 (2011-05-19)
+--------------------------
+- added this Changelog ;-)
+- added manual update link for admin
+- added alert log
+- added distance in alerts
+- manual antenna calibratin
+- password changeing
+- longtime statistics graphs
+- error message if jpgraph.php is not present
+- added BO_STATION_STAT_DISABLE to disable statistics of other stations
+- filled README
+
+
+Version 0.2.0 (2011-05-18)
+--------------------------
+- Strike alerts (SMS, E-Mail, URL)
+  New constants added: BO_ALERTS, BO_SMS_GATEWAY_URL
+- New user levels
+- import improvements
+- main map has now own width/height (you have to use the '!important' tag to change size!)
+
+
+Version 0.1.2 (2011-05-17)
+--------------------------
+- caching fixed
+- deviation display setting 
+- added example to display data from 1 to 10 days in map
+- magic_quotes_runtime disabled
+- HTML footer for static maps
+- install script improvements, added style
+- mysql (without "i") support in install script (thanks to ke2705)
+- avoiding too much strike duplicates
+- bugfixes
+
+
+Version 0.1 (2011-05-15)
+------------------------
+- initial release

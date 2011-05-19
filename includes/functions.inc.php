@@ -198,7 +198,12 @@ function bo_station_name2id($name)
 //returns your station_id
 function bo_station_id()
 {
-	return bo_station_name2id(BO_USER);
+	static $id = 0;
+	
+	if (!$id)
+		$id = bo_station_name2id(BO_USER);
+	
+	return $id;
 }
 
 //returns your station name

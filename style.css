@@ -76,6 +76,11 @@ background: #fff7e7;
 margin: 10px 10px 10px 15px;
 }
 
+#myblitzortung a, 
+#myblitzortung a:visited{
+color: blue;
+}
+
 #myblitzortung legend {
 border: 1px solid #e4e4e4;
 padding: 3px 5px;
@@ -299,15 +304,24 @@ width: 200px;
 margin: 0 auto;
 }
 
-#myblitzortung .bo_info_fail {
+#myblitzortung .bo_info_fail,
+#myblitzortung .bo_info_ok {
 width: 400px;
-border: 1px solid red;
 background: #fff;
 margin: 20px 0;
 text-align:center;
 font-weight: bold;
 font-size: 15px;
 }
+
+#myblitzortung .bo_info_fail {
+border: 1px solid red;
+}
+
+#myblitzortung .bo_info_ok {
+border: 1px solid green;
+}
+
 
 #myblitzortung .bo_table {
 border-collapse: collapse;

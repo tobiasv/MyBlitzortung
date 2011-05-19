@@ -79,6 +79,12 @@ function bo_update_raw_signals($force = false)
 {
 	echo '<h3>Raw-Data</h3>';
 
+	if (!defined('BO_UP_INTVL_RAW') || !BO_UP_INTVL_RAW)
+	{
+		echo '<p>Disabled!</p>';
+		return true;
+	}
+	
 	$last = bo_get_conf('uptime_raw');
 
 	$i = 0;
@@ -347,7 +353,7 @@ function bo_update_strikes($force = false)
 				}
 
 				//Update Strike <-> All Participated Stations
-				if ($id)
+				if ($id && !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true) )
 				{
 					$sql = '';
 					foreach($participants as $user)
@@ -570,6 +576,11 @@ function bo_update_stations($force = false)
 
 	echo '<h3>Stations</h3>';
 
+	if (!defined('BO_UP_INTVL_STATIONS') || !BO_UP_INTVL_STATIONS)
+	{
+		echo '<p>Disabled!</p>';
+	}
+	
 	$i = 0;
 	$u = 0;
 
@@ -646,18 +657,27 @@ function bo_update_stations($force = false)
 		$datetime      = gmdate('Y-m-d H:i:s', time());
 		$datetime_back = gmdate('Y-m-d H:i:s', time() - 3600);
 
+		$only_own = false;
+		if ((defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true))
+			 $only_own = bo_station_id();
+			
+
 		$sql = "SELECT a.station_id sid, COUNT(a.station_id) cnt
 				FROM ".BO_DB_PREF."stations_strikes a, ".BO_DB_PREF."strikes b
 				WHERE a.strike_id=b.id AND b.time > '$datetime_back'
+					".($only_own ? " AND a.station_id='".$only_own."'" : "")."
 				GROUP BY a.station_id";
 		$res = bo_db($sql);
 		while ($row = $res->fetch_assoc())
 			$Count[intval($row['sid'])]['strikes'] = $row['cnt'];
-
+		
 		$active_stations = 0;
 		$active_sig_stations = 0;
 		foreach($Count as $id => $data)
 		{
+			if ($only_own && $only_own != $id)
+				continue;
+			
 			if ($id && $data['active']) //($data['sig'] || $data['strikes'] || $data['active']) )
 			{
 				bo_db("INSERT INTO ".BO_DB_PREF."stations_stat
@@ -813,7 +833,7 @@ function bo_update_all($force)
 
 		
 	//check if we should do a async update
-	if ( !(BO_UP_INTVL_STRIKES < BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS < BO_UP_INTVL_RAW) )
+	if ( !(BO_UP_INTVL_STRIKES <= BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS <= BO_UP_INTVL_RAW) )
 	{
 		echo '<p>Asynchronous update!</p>';
 		$async = true;

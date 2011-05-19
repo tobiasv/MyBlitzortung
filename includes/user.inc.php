@@ -57,11 +57,16 @@ function bo_show_login()
 
 		echo '<ul id="bo_menu">';
 
-		if (BO_PERM_SETTINGS & $level)
-		{
+		echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=">'._BL('Start').'</a>';
+		if (bo_user_get_id() > 1)
+			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=password">'._BL('Password').'</a>';
+		
+		if (BO_PERM_ADMIN & $level)
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=user_settings">'._BL('Add/Remove User').'</a>';
+		
+		if (BO_PERM_SETTINGS & $level)
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=calibrate">'._BL('Calibrate Antennas').'</a>';
-		}
+
 
 		if (defined('BO_ALERTS') && BO_ALERTS && ($level & BO_PERM_ALERT))
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=alert" class="bo_navi'.($show == 'alert' ? '_active' : '').'">'._BL('Strike alert').'</a></li>';
@@ -72,27 +77,45 @@ function bo_show_login()
 		{
 
 			case 'user_settings':
-				if (BO_PERM_SETTINGS & $level)
-					bo_user_admin();
+				if (BO_PERM_ADMIN & $level)
+					bo_user_show_admin();
 
 				break;
 
+			case 'password':
+				if (bo_user_get_id() > 1)
+					bo_user_show_passw_change();
+				break;
+				
 			case 'calibrate':
 				if (BO_PERM_SETTINGS & $level)
-					bo_calibrate_antennas();
+					bo_show_calibrate_antennas();
 				break;
 
 			case 'alert':
-				bo_alert_settings();
+				if (BO_PERM_ALERT & $level)
+					bo_alert_settings();
 				break;
 				
 			default:
 				echo '<ul class="bo_login_info">
 						<li>'._BL('user_welcome_text').': <strong>'.bo_user_get_name().'</strong></li>
-						<li>'._BL('MyBlitzortung version').': <strong>'.BO_VER.'</strong></li>
-						</ul>';
+						<li>'._BL('MyBlitzortung version').': <strong>'.BO_VER.'</strong></li>';
+				
+				if (BO_PERM_ADMIN & $level)
+					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=update">'._BL('Do manual update').'</a></li>';
+				
+				echo '</ul>';
 				
 				break;
+		}
+		
+		if ( (BO_PERM_ADMIN & $level) && $_GET['bo_action'] == 'update')
+		{
+			echo flush();
+			echo '<div style="font-family: Courier; font-size: 0.7em; border: 1px solid #999; padding: 10px; ">';
+			bo_update_all(true);
+			echo '</div>';
 		}
 
 	}
@@ -215,7 +238,66 @@ function bo_user_get_name($user_id = 0)
 	return $names[$user_id];
 }
 
-function bo_user_admin()
+function bo_user_get_mail($user_id = 0)
+{
+	static $mails;
+	
+	if (!$user_id)
+		$user_id = $_SESSION['bo_user'];
+
+	if (!isset($mails[$user_id]))
+	{
+		$erg = bo_db("SELECT mail FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+		$row = $erg->fetch_assoc();
+		$mails[$user_id] = $row['mail'];
+	}
+	
+	return $mails[$user_id];
+}
+
+function bo_user_show_passw_change()
+{
+	if ($_POST['ok'])
+	{
+		$pass1 = trim(stripslashes($_POST['pass1']));
+		$pass2 = trim(stripslashes($_POST['pass2']));
+		
+		if ($pass1 && $pass2 && $pass1 == $pass2)
+		{
+			$pass = md5($pass1);
+			bo_db("UPDATE ".BO_DB_PREF."user SET password='$pass' WHERE id='".bo_user_get_id()."'");
+			echo '<div class="bo_info_ok">';
+			echo _BL('Password changed!');
+			echo '</div>';
+		}
+		else
+		{
+			echo '<div class="bo_info_fail">';
+			echo _BL('Password was not changed!');
+			echo '</div>';
+		}
+	}
+	
+	echo '<h3>'._BL('Change password').'</h3>';
+	
+	echo '<form action="'.bo_insert_url(array()).'" method="POST" class="bo_admin_user_form">';
+
+	echo '<fieldset class="bo_admin_user_fieldset">';
+	echo '<legend>'._BL('user_change_passw_legend').'</legend>';
+
+	echo '<span class="bo_form_descr">'._BL('New password').':</span>';
+	echo '<input type="password" name="pass1" value="" id="bo_change_pass1" class="bo_form_text bo_form_input">';
+
+	echo '<span class="bo_form_descr">'._BL('Repeat password').':</span>';
+	echo '<input type="password" name="pass2" value="" id="bo_change_pass1" class="bo_form_text bo_form_input">';
+
+	echo '<input type="submit" name="ok" value="'._BL('Change').'" id="bo_user_admin_submit" class="bo_form_submit">';
+	echo '</fieldset>';
+	
+	echo '</form>';
+}
+
+function bo_user_show_admin()
 {
 	$user_id = intval($_GET['id']);
 
@@ -258,8 +340,11 @@ function bo_user_admin()
 		}
 	}
 
-	if (isset($_GET['delete']) && $user_id > 1 && (bo_user_get_level() & BO_PERM_ADMIN) )
+	if (isset($_GET['bo_delete']) && $user_id > 1 && (bo_user_get_level() & BO_PERM_ADMIN) )
+	{
 		bo_db("DELETE FROM ".BO_DB_PREF."user WHERE id='$user_id'");
+		bo_db("DELETE FROM ".BO_DB_PREF."conf WHERE name LIKE 'alert_$user_id%'");
+	}
 
 
 	echo '<div id="bo_user_admin">';
@@ -289,18 +374,18 @@ function bo_user_admin()
 		}
 
 		echo '<tr>
-			<td><a href="'.bo_insert_url(array('user_settings','id')).'&id='.$row['id'].'">'.$row['id'].'</a></td>
+			<td><a href="'.bo_insert_url(array('id')).'&id='.$row['id'].'">'.$row['id'].'</a></td>
 			<td>'.$row['login'].'</td>
 			<td>'.$row['level'].'</td>
 			<td>'.$row['mail'].'</td>
 			<td>';
 
 		if ($row['id'] > 1)
-			echo '<a href="'.bo_insert_url(array('user_settings','user_id','delete')).'&id='.$row['id'].'&delete" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
+			echo '<a href="'.bo_insert_url(array('user_id','bo_delete')).'&id='.$row['id'].'&bo_delete" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
 
 		echo '</td>';
 		
-		echo '<td><a href="'.bo_insert_url(array('bo_action', 'bo_action2', 'user_settings')).'&bo_action=alert&bo_action2=alert_form%2C'.$row['id'].'">'._BL('new').'</a></td>';
+		echo '<td><a href="'.bo_insert_url(array('bo_action', 'bo_action2')).'&bo_action=alert&bo_action2=alert_form%2C'.$row['id'].'">'._BL('new').'</a></td>';
 		
 		echo '</tr>';
 
@@ -365,14 +450,51 @@ function bo_user_admin()
 
 }
 
-function bo_calibrate_antennas()
+function bo_show_calibrate_antennas()
 {
+	if (!$_POST['bo_calibrate'])
+	{
+		if ($_POST['bo_calibrate_manual'])
+		{
+			bo_set_conf('antenna1_bearing', (double)$_POST['bo_antenna1_bearing']);	
+			bo_set_conf('antenna2_bearing', (double)$_POST['bo_antenna2_bearing']);	
+			bo_set_conf('antenna1_bearing_elec', (double)$_POST['bo_antenna1_bearing_elec']);
+			bo_set_conf('antenna2_bearing_elec', (double)$_POST['bo_antenna2_bearing_elec']);
+		}
+		
+		echo '<h3>'._BL('Manual antenna calibration').'</h3>';
+		
+		echo '<form action="'.bo_insert_url(array()).'" method="POST" class="bo_admin_user_form">';
 
+		echo '<fieldset class="bo_admin_user_fieldset">';
+		echo '<legend>'._BL('admin_calibrate_manual_legend').'</legend>';
+
+		echo '<span class="bo_form_descr">'._BL('Antenna 1 bearing').' (0-180°):</span>';
+		echo '<input type="text" name="bo_antenna1_bearing" value="'.(double)bo_get_conf('antenna1_bearing').'" id="bo_antenna1_bearing_id" class="bo_form_text bo_form_input">';
+		echo '<span class="bo_form_descr">'._BL('Antenna 2 bearing').' (0-180°):</span>';
+		echo '<input type="text" name="bo_antenna2_bearing" value="'.(double)bo_get_conf('antenna2_bearing').'" id="bo_antenna2_bearing_id" class="bo_form_text bo_form_input">';
+
+		echo '<span class="bo_form_descr">'._BL('Antenna 1 electrical bearing').' (0-360°):</span>';
+		echo '<input type="text" name="bo_antenna1_bearing_elec" value="'.(double)bo_get_conf('antenna1_bearing_elec').'" id="bo_antenna1_elec_bearing_id" class="bo_form_text bo_form_input">';
+		echo '<span class="bo_form_descr">'._BL('Antenna 2 electrical bearing').' (0-360°):</span>';
+		echo '<input type="text" name="bo_antenna2_bearing_elec" value="'.(double)bo_get_conf('antenna2_bearing_elec').'" id="bo_antenna2_elec_bearing_id" class="bo_form_text bo_form_input">';
+
+
+		echo '<input type="submit" name="bo_calibrate_manual" value="'._BL('Ok').'" id="bo_admin_submit" class="bo_form_submit">';
+
+		echo '</fieldset>';
+		echo '</form>';
+	}
+
+	/*** Auto-calibration begins here ***/
+	
 	$dist = intval($_POST['bo_max_dist']) * 1000;
 	$age = (double)$_POST['bo_max_age'];
 	$limit = intval($_POST['bo_limit']);
 	$limit = $limit ? $limit : 5000;
 
+	echo '<h3>'._BL('Automatic antenna calibration').'</h3>';
+	
 	echo '<form action="'.bo_insert_url(array()).'" method="POST" class="bo_admin_user_form">';
 
 	echo '<fieldset class="bo_admin_user_fieldset">';

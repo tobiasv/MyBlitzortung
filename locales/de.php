@@ -105,6 +105,10 @@ $_BL['de']['Coordinates'] = 'Koordinaten';
 $_BL['de']['Locating ratio'] = 'Ortungsquote';
 $_BL['de']['Last update'] = 'Letzte Aktualisierung';
 $_BL['de']['Strike ratio'] = 'Blitzquote';
+$_BL['de']['Type'] = 'Typ';
+$_BL['de']['Text'] = 'Text';
+$_BL['de']['Error'] = 'Fehler';
+$_BL['de']['Back'] = 'Zurück';
 
 /*************************************************************/
 /* Main Menu (Standalone)                                    */
@@ -166,6 +170,8 @@ $_BL['de']['h4_graph_ratio'] = 'Quoten';
 $_BL['de']['h4_graph_ratio_distance'] = 'Blitzquote nach Entfernung';
 $_BL['de']['h4_graph_ratio_bearing'] = 'Blitzquote nach Himmelsrichtung';
 $_BL['de']['h4_graph_stations'] = 'Anzahl aktiver Stationen';
+$_BL['de']['h4_graph_ratio_distance_longtime'] = 'Blitzquoten nach Entfernung';
+$_BL['de']['h4_graph_ratio_bearing_longtime'] = 'Blitzquoten nach Himmelsrichtung';
 
 
 /*************************************************************/
@@ -180,6 +186,7 @@ $_BL['de']['h3_arch_search'] = 'Suche nach Blitzen in einem Bereich';
 $_BL['de']['h3_arch_last_signals'] = 'Zuletzt empfangene Signale';
 $_BL['de']['You have to place the pointer inside the red circle!'] = 'Der Marker muss innerhalb des roten Bereichs platziert werden!';
 $_BL['de']['archive_legend'] = 'Suchoptionen';
+$_BL['de']['No strikes found!'] = 'Keine Blitze gefunden!';
 
 /*************************************************************/
 /* Statistics                                                */
@@ -198,7 +205,12 @@ $_BL['de']['h4_table_network'] = 'Tabellarische Übersicht';
 $_BL['de']['h3_stat_network'] = 'Statistiken zum gesamten Ortungsnetzwerk';
 $_BL['de']['h3_stat_longtime'] = 'Langzeitstatistik';
 $_BL['de']['h3_stat_database'] = 'Statistik der lokalen Datenbank';
+$_BL['de']['h4_stat_other_antennas'] = 'Antennenausrichtung';
 
+$_BL['de']['since begin of data logging'] = 'seit Beginn der Aufzeichnung';
+$_BL['de']['update every'] = 'Erneuerung alle';
+$_BL['de']['Direction antenna 1'] = 'Ausrichtung Antenne 1';
+$_BL['de']['Direction antenna 2'] = 'Ausrichtung Antenne 2';
 $_BL['de']['Max participants per strike'] = 'Größte Beteiligung an einem Blitz';
 $_BL['de']['Mean participants per strike'] = 'Mittlere Beteiligung pro Blitz';
 $_BL['de']['Mean locating ratio'] = 'Mittlere Ortungsquote';
@@ -271,6 +283,24 @@ $_BL['de']['No permisson for saving to DB!'] = 'Keine Berechtigung zum Abspeiche
 $_BL['de']['User list'] = 'Benutzerliste';
 $_BL['de']['Alert'] = 'Alarm';
 $_BL['de']['new'] = 'neu';
+$_BL['de']['Do manual update'] = 'Daten von blitzortung.org manuell importieren';
+$_BL['de']['Antenna directions saved to database'] = 'Antennenausrichtung gespeichert';
+$_BL['de']['Saved to DB'] = 'Gespeichert';
+$_BL['de']['admin_calibrate_manual_legend'] = 'Einstellungen';
+$_BL['de']['Antenna 1 bearing'] = 'Ausrichtung Antenne 1';
+$_BL['de']['Antenna 2 bearing'] = 'Ausrichtung Antenne 2';
+$_BL['de']['Antenna 1 electrical bearing'] = 'Elektrische Ausrichtung Antenne 1';
+$_BL['de']['Antenna 2 electrical bearing'] = 'Elektrische Ausrichtung Antenne 2';
+$_BL['de']['Automatic antenna calibration'] = 'Automatische Kalibrierung';
+$_BL['de']['Manual antenna calibration'] = 'Manuelle Kalibrierung';
+$_BL['de']['Change password'] = 'Passwort ändern';
+$_BL['de']['user_change_passw_legend'] = 'Eingabe';
+$_BL['de']['New password'] = 'Neues Passwort';
+$_BL['de']['Repeat password'] = 'Passwort wiederholen';
+$_BL['de']['Change'] = 'Ändern';
+$_BL['de']['Password changed!'] = 'Passwort wurde geändert';
+$_BL['de']['No permission!'] = 'Keine Berechtigung!';
+$_BL['de']['Password was not changed!'] = 'Passwort wurde NICHT geändert!';
 
 $_BL['de']['user_perm0'] = 'Benutzereinstellungen';
 $_BL['de']['user_perm1'] = 'Andere Einstellungen';
@@ -367,14 +397,17 @@ $_BL['de']['bo_graph_descr_bear'] = 'Übersicht über die eigene Ortungsqute in Ab
 $_BL['de']['bo_stat_longtime_descr'] = 'Die hier dargestellten Angaben werden seit Beginn der Aufzeichnung von MyBlitzortung auf dieser Seite fortgeführt. Die Distanzen beziehen sich immer auf den Standort der Station {STATION}.';
 $_BL['de']['bo_stat_other_database_descr'] = 'Alle Blitze, Signal- und Stationsdaten uvm. auf dieser werden in einer Datenbank gespeichert. Hier sind einige Angaben dazu:';
 $_BL['de']['bo_stat_other_updates_descr'] = 'In bestimmten Zeitintervallen werden alle notwendigen Daten von blitzortung.org geholt und auf dieser Seite gespeichert. Hier sind die Zeitpunkte der letzten Aktualisierung zu sehen:';
-$_BL['de']['bo_stat_other_gps_descr'] = 'Informationen zum GPS-Empfang, zusätzlich werden die Positionsdaten der letzten 24 Stunden in der Karte eingezeichnet.';
+$_BL['de']['bo_stat_other_gps_descr'] = 'Informationen zum GPS-Empfänger, welcher zur exakten Ermittlung der aktuellen Uhrzeit benötigt wird. Die Positionsdaten der letzten 24 Stunden sind in der Karte eingezeichnet. Falls die Antennenausrichtungen bekannt sind, so sind diese ebenfalls sichtbar.';
 $_BL['de']['bo_stat_station_descr_lasth'] = 'Alle Angaben beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung.';
 $_BL['de']['bo_graph_descr_radi'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Entfernung zur Station {STATION}. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
 $_BL['de']['bo_graph_descr_strikes'] = 'Zu sehen ist die Gesamtanzahl an Blitzen pro Stunde aus dem Ortungsnetzwerk, die Anzahl der detektierten Blitze der Station {STATION} sowie zum Vergleich der Durchschnitt aller Stationen.';
 $_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der gesendeten Signale pro Stunde der Station {STATION} sowie zum Vergleich der Durchschnitt aller Stationen.';
+$_BL['de']['bo_stat_other_antennas_descr'] = 'Die Ausrichtung der Antennen wird durch MyBlitzortung automatisch bestimmt. Sie kann zur Bestimmung der Polarität eines Blitzes bestimmt werden.';
+$_BL['de']['bo_graph_descr_radi_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt und gibt evtl. wertvolle Hinweise auf die Empfindlichkeit der Station. ';
+$_BL['de']['bo_graph_descr_bear_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt.';
 
 /*************************************************************/
-/* Statistics: Alerts                                        */
+/* Alerts                                                    */
 /*************************************************************/
 $_BL['de']['Strike alert'] = 'Blitzalarm';
 $_BL['de']['New alert'] = 'Neuer Alarm';
@@ -395,7 +428,7 @@ $_BL['de']['alert_count'] = 'Min. Anzahl';
 $_BL['de']['alert_interval'] = 'Suchzeit';
 $_BL['de']['Ok'] = 'Ok';
 $_BL['de']['Cancel'] = 'Abbrechen';
-$_BL['de']['alert_settings_legend_table'] = '';
+$_BL['de']['alert_settings_legend_table'] = 'Optionen';
 $_BL['de']['show other users'] = 'Einstellungen anderer Benutzer zeigen';
 $_BL['de']['User'] = 'Benutzer';
 $_BL['de']['Alert name'] = 'Name';
@@ -412,14 +445,28 @@ $_BL['de']['URL'] = 'URL';
 $_BL['de']['alert_mail_description'] = 'Die folgenden Angaben wurden von MyBlitzortung der Station {STATION} automatisch ermittelt und versendet. Ohne Gewähr!';
 $_BL['de']['alert_mail_time range']   = 'Untersuchter Zeitraum ';
 $_BL['de']['alert_mail_strikes']      = 'Anzahl an Blitzen     ';
+$_BL['de']['alert_mail_distance']     = 'Entfernung            ';
 $_BL['de']['alert_mail_last_strike']  = 'Letzter Blitz         ';
 $_BL['de']['alert_mail_first_strike'] = 'Erster Blitz          ';
 $_BL['de']['alert_sms_last_strike']   = 'Letzter Blitz';
+$_BL['de']['alert_sms_distance']      = 'Entfernung';
 $_BL['de']['alert_sms_description']   = 'Automatisch versendet von MyBlitzortung der Station {STATION}';
-
 $_BL['de']['No alerts available. Create one yourself!'] = 'Noch keine Alarme vorhanden.';
 $_BL['de']['You must fill all fields!'] = 'Es müssen alle Felder ausgefüllt werden!';
 $_BL['de']['Wrong format of E-Mail address'] = 'Falsches Format der E-Mail-Adresse';
 $_BL['de']['Wrong format of telephone number'] = 'Falsches Format der Telefonnummer';
 $_BL['de']['You have to stay in the area around the station!'] = 'Sie müssen innerhalb des Bereichs der Station {STATION} bleiben!';
 $_BL['de']['Enter URL like this'] = 'Bitte die URL folgendermaßen eingeben';
+$_BL['de']['Show log'] = 'Verlauf anzeigen';
+$_BL['de']['Return value'] = 'Rückgabewert';
+$_BL['de']['Alert name'] = 'Name';
+$_BL['de']['Name of your alert'] = 'Name des Alarms';
+$_BL['de']['Strike count'] = 'Blitzanzahl';
+$_BL['de']['Time of last strike'] = 'Zeitpunkt des letzten Blitzes';
+$_BL['de']['Time of first strike in time range'] = 'Zeitpunkt des ersten Blitzes im Suchintervall';
+$_BL['de']['Distance to selected position'] = 'Distanz zur gewählten Position';
+$_BL['de']['For usage with "URL"'] = 'Zur Benutzung mit "URL"';
+$_BL['de']['To'] = 'Versand an';
+$_BL['de']['Start'] = 'Start';
+$_BL['de']['No log entries'] = 'Keine Einträge im Verlauf';
+
