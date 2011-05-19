@@ -401,6 +401,8 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	}
 	else
 	{
+		$date_end   = gmdate('Y-m-d H:i:s', $time_end - 120); // strike data my be older
+		
 		$sql_join = BO_DB_PREF."raw r LEFT OUTER JOIN ".BO_DB_PREF."strikes s ON s.raw_id=r.id ";
 		$table = 'r';
 	}
