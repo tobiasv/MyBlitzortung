@@ -703,7 +703,7 @@ function bo_graph_error($w, $h)
 	imagestring($I, 2, $w / 2 - 90, $h/2-25, 'File', $black);
 	imagestring($I, 2, $w / 2 - 90, $h/2-10, '"includes/jpgraph/jpgraph.php"', $black);
 	imagestring($I, 2, $w / 2 - 90, $h/2+5, 'not found!', $black);
-	imagefttext($I, $fsize, 0,$fsize * 2, $h / 2, $black, 'config/fonts/arial.ttf', $text);	
+
 	imagerectangle($I, 0,0,$w-1,$h-1,$black);
 	Header("Content-type: image/png"); 
 	Imagepng($I);
