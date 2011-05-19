@@ -4,6 +4,11 @@
 *****************************
 
 
+Version 0.2.1a (2011-05-19)
+---------------------------
+- fix for distance calc for alerts
+- purged locale en.php
+
 Version 0.2.1 (2011-05-19)
 --------------------------
 - added this Changelog ;-)

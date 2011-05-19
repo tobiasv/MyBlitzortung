@@ -492,20 +492,20 @@ function bo_alert_send()
 				$user_id = $r[1];
 				$alert_cnt = $r[2];
 				
+				//this calculation does search the strikes in a square, not in a circle but it is much faster for the database!
 				list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 225, $d['lat'], $d['lon']);
 				list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 45,  $d['lat'], $d['lon']);
 
 				$search_time = $max_time - 60 * $d['interval'] - 60;
 				$search_date = gmdate('Y-m-d H:i:s', $search_time);
+
+				$sql_where = "	AND NOT (lat < $str_lat_min OR lat > $str_lat_max OR lon < $str_lon_min OR lon > $str_lon_max)
+								AND time >= '$search_date'
+								";
 				
-				$sql = "SELECT COUNT(id) cnt, MAX(time) maxtime, MIN(time) mintime, 
-								MIN(ABS(lat-".(double)$d['lat'].")) minlat, 
-								MIN(ABS(lon-".(double)$d['lon'].")) minlon
+				$sql = "SELECT COUNT(id) cnt, MAX(time) maxtime, MIN(time) mintime
 						FROM ".BO_DB_PREF."strikes
-						WHERE 1
-							AND NOT (lat < $str_lat_min OR lat > $str_lat_max OR lon < $str_lon_min OR lon > $str_lon_max)
-							AND time >= '$search_date' 
-						ORDER BY time DESC";
+						WHERE 1	$sql_where";
 				$res2 = bo_db($sql);
 				$row2 = $res2->fetch_assoc();
 				
@@ -515,7 +515,16 @@ function bo_alert_send()
 					
 					if (!$d['disarmed']) //SEND IT
 					{
-						$dist = round(bo_latlon2dist($d['lat'], $d['lon'], $row2['minlat']+$d['lat'], $row2['minlon']+$d['lon']) / 1000);
+						//only use the poition of the last strike in the interval to avoid to much calculating
+						$sql = "SELECT lat, lon
+								FROM ".BO_DB_PREF."strikes
+								WHERE 1	$sql_where 
+								ORDER BY time DESC
+								LIMIT 1";
+						$res3 = bo_db($sql);
+						$row3 = $res3->fetch_assoc();
+
+						$dist = round(bo_latlon2dist($d['lat'], $d['lon'], $row3['lat'], $row3['lon']) / 1000);
 						
 						$replace = array(
 									'{name}' 	=> $d['name'],
@@ -535,8 +544,8 @@ function bo_alert_send()
 										_BL('alert_mail_time range').': '.date(_BL('_datetime'), $search_time).' - '.date(_BL('_datetime'), $max_time)."\n".
 										_BL('alert_mail_strikes').': '.$row2['cnt']."\n".
 										_BL('alert_mail_distance').': '.$dist." "._BL('unit_kilometers')."\n".
-										_BL('alert_mail_last_strike').': '.date(_BL('H:i:s'), strtotime($row2['maxtime'].' UTC'))."\n".
-										_BL('alert_mail_first_strike').': '.date(_BL('H:i:s'), strtotime($row2['mintime'].' UTC'))."\n\n";
+										_BL('alert_mail_last_strike').': '.date('H:i:s', strtotime($row2['maxtime'].' UTC'))."\n".
+										_BL('alert_mail_first_strike').': '.date('H:i:s', strtotime($row2['mintime'].' UTC'))."\n\n";
 										
 								$ret = mail($d['address'], 
 											'MyBlitzortung: '._BL('Strikes detected').' ('.$d['name'].')', 

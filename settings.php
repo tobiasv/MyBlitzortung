@@ -241,7 +241,7 @@ $_BO['mapimg'][1]['col'][] = array(225,   0, 0);
 
 //Settings for Developers
 define("BO_DEBUG", false);
-define("BO_LANG_AUTO_ADD", true);
+define("BO_LANG_AUTO_ADD", false);
 define("BO_CACHE_DISABLE", false);
 
 
