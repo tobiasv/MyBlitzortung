@@ -120,8 +120,6 @@ function bo_latlon2bearing($lat2, $lon2, $lat1 = BO_LAT, $lon1 = BO_LON)
      }
 
      //return the angle, normalized
-
-
 	 $beta = (rad2deg(atan2($dLon, $dPhi)) + 360);
 	 $beta = fmod($beta, 360);
 

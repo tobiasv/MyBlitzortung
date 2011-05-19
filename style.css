@@ -301,7 +301,7 @@ display: inline;
 
 #myblitzortung .bo_login_fieldset {
 width: 200px;
-margin: 0 auto;
+margin: 0;
 }
 
 #myblitzortung .bo_info_fail,

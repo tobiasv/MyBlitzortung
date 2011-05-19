@@ -284,19 +284,19 @@ function bo_show_statistics_network()
 	echo '<table id="bo_network_stations">';
 	echo '<tr>
 			<th rowspan="2">'._BL('Pos.').'</th>
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'country').'#table_network">'._BL('Country').'</a></th>
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'city').'#table_network">'._BL('City').'</a></th>
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'distance').'#table_network">'._BL('Distance').'</a></th>
+			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'country').'#table_network" rel="nofollow">'._BL('Country').'</a></th>
+			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'city').'#table_network" rel="nofollow">'._BL('City').'</a></th>
+			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'distance').'#table_network" rel="nofollow">'._BL('Distance').'</a></th>
 			<th colspan="2">'._BL('Strikes/h').'</th>
 			<th colspan="2">'._BL('Signals/h').'</th>
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'efficiency').'#table_network">'._BL('Efficiency').'</a></th>
+			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'efficiency').'#table_network" rel="nofollow">'._BL('Efficiency').'</a></th>
 
 			</tr>
 			<tr>
-				<th><a href="'.bo_insert_url('bo_sort', 'strikes').'#table_network">'._BL('Count').'</a></th>
-				<th><a href="'.bo_insert_url('bo_sort', 'strikes').'#table_network">'._BL('Ratio').'</a></th>
-				<th><a href="'.bo_insert_url('bo_sort', 'signals').'#table_network">'._BL('Count').'</a></th>
-				<th><a href="'.bo_insert_url('bo_sort', 'signals_ratio').'#table_network">'._BL('Ratio').'</a></th>
+				<th><a href="'.bo_insert_url('bo_sort', 'strikes').'#table_network" rel="nofollow">'._BL('Count').'</a></th>
+				<th><a href="'.bo_insert_url('bo_sort', 'strikes').'#table_network" rel="nofollow">'._BL('Ratio').'</a></th>
+				<th><a href="'.bo_insert_url('bo_sort', 'signals').'#table_network" rel="nofollow">'._BL('Count').'</a></th>
+				<th><a href="'.bo_insert_url('bo_sort', 'signals_ratio').'#table_network" rel="nofollow">'._BL('Ratio').'</a></th>
 			</tr>
 			';
 

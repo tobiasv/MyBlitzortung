@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}raw` (
   `strike_id` int(10) unsigned NOT NULL,
   `data` blob NOT NULL,
   PRIMARY KEY  (`id`),
-  KEY `strike_id` (`strike_id`)
+  KEY `strike_id` (`strike_id`),
+  KEY `time` (`time`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (

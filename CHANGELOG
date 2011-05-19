@@ -3,6 +3,12 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.2.2 (2011-05-19)
+--------------------------
+- added important database index -> PLEASE UPDATE!
+- alert performance improvements
+- show bearing in alerts
+- added vars to config alert times
 
 Version 0.2.1a (2011-05-19)
 ---------------------------

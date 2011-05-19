@@ -55,6 +55,15 @@ function bo_show_login()
 	if ($level)
 	{
 
+		if (bo_user_get_id() == 1)
+		{
+			include 'update.inc.php';
+			
+			if (bo_check_for_update() == true)
+				return;
+		}
+		
+	
 		echo '<ul id="bo_menu">';
 
 		echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=">'._BL('Start').'</a>';
@@ -100,7 +109,7 @@ function bo_show_login()
 			default:
 				echo '<ul class="bo_login_info">
 						<li>'._BL('user_welcome_text').': <strong>'.bo_user_get_name().'</strong></li>
-						<li>'._BL('MyBlitzortung version').': <strong>'.BO_VER.'</strong></li>';
+						<li>'._BL('MyBlitzortung version').': <strong>'.bo_get_conf('version').'</strong></li>';
 				
 				if (BO_PERM_ADMIN & $level)
 					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=update">'._BL('Do manual update').'</a></li>';

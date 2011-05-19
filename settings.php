@@ -244,10 +244,13 @@ define("BO_DEBUG", false);
 define("BO_LANG_AUTO_ADD", false);
 define("BO_CACHE_DISABLE", false);
 
-
+// ALERTS
 //Enable/disable alarms
 define("BO_ALERTS", true);
+define("BO_ALARM_CHECK_INTERVAL", 15); // (minutes) after sending alert, ignores new strikes in given interval
+define("BO_ALARM_SEND_INTERVAL", 45); // (minutes) waits minimum time without strikes, before sending next alert
 
+		
 // SMS-Gateway URL
 // Leave it blank, if you don't want to use that feature.
 // {text} will be replaced by the message text
