@@ -32,7 +32,10 @@ class BoDbQuery
 	public function DoQuery($sql, $dbh)
 	{
 		$this->query = mysql_query($sql, $dbh);
-		$this->num_rows = mysql_num_rows($this->query);
+		
+		if (strtolower(substr(trim($sql), 0, 6)) == 'select')
+			$this->num_rows = mysql_num_rows($this->query);
+		
 		return $this->query;
 	}
 	

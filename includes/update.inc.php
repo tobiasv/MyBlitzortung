@@ -83,6 +83,13 @@ function bo_check_for_update()
 		echo '<h4>Update done!</h4>';
 	}
 	
+	if ($cur_version != BO_VER)
+	{
+		bo_set_conf('version', BO_VER);
+		echo '<h4>Info: Setting new version to '.BO_VER.' .</h4>';
+	}
+	
+		
 	
 }
 
