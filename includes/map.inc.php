@@ -38,7 +38,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	
 	$station_lat = BO_LAT;
 	$station_lon = BO_LON;
-	$station_text = $info['city'].' '.$info['height'].'m';
+	$station_text = $info['city'];
 	
 ?>
 

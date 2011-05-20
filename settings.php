@@ -247,8 +247,8 @@ define("BO_CACHE_DISABLE", false);
 // ALERTS
 //Enable/disable alarms
 define("BO_ALERTS", true);
-define("BO_ALARM_CHECK_INTERVAL", 15); // (minutes) after sending alert, ignores new strikes in given interval
-define("BO_ALARM_SEND_INTERVAL", 45); // (minutes) waits minimum time without strikes, before sending next alert
+define("BO_ALERT_CHECK_INTERVAL", 15); // (minutes) after sending alert, ignores new strikes in given interval
+define("BO_ALERT_SEND_INTERVAL", 45); // (minutes) waits minimum time without strikes, before sending next alert
 
 		
 // SMS-Gateway URL

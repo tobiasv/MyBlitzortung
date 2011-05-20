@@ -97,8 +97,8 @@ function bo_show_statistics_station()
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Station active').': </span><span class="bo_value">'.($active ? _BL('yes') : _BL('no')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before')." $last_update ".($last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.number_format($signalsh_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.number_format($strikesh_own, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.number_format($signalsh_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Locating ratio').': </span><span class="bo_value">';
 	echo $signalsh_own ? number_format($strikesh_own / $signalsh_own * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
@@ -311,6 +311,8 @@ function bo_show_statistics_network()
 			arsort($S);
 			break;
 	}
+	
+	$urls = unserialize(bo_get_conf('mybo_stations'));
 
 	$pos = 1;
 	foreach($S as $id => $d)
@@ -327,11 +329,14 @@ function bo_show_statistics_network()
 		echo '</td>';
 
 		echo '<td class="bo_text '.($sort == 'country' ? 'bo_marked' : '').'">';
-		echo $d['country'];
+		echo _BC($d['country']);
 		echo '</td>';
 
 		echo '<td class="bo_text '.($sort == 'city' ? 'bo_marked' : '').'">';
-		echo $d['city'];
+		if (isset($urls[$id]))
+			echo '<a href="'.$urls[$id].'" target="_blank">'._BC($d['city']).'</a>';
+		else
+			echo _BC($d['city']);
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'distance' ? 'bo_marked' : '').'">';

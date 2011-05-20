@@ -359,8 +359,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 				if ($data_id > 0)
 				{
 					//Strike Ratio
-					if ($Y[0]['astr'][$index])
-						$Y[$data_id]['str_ratio'][$index] = $row['astr'] / $Y[0]['astr'][$index] * 100;
+					if (intval($Y[0]['astr'][$index]))
+						$Y[$data_id]['str_ratio'][$index] = $row['astr'] / intval($Y[0]['astr'][$index]) * 100;
 
 					//Signal Ratio
 					if ($row['sig'])
@@ -401,7 +401,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	{
 		$stInfo = bo_station_info($station_id);
 		$add_title .= ' '._BL('for_station').': '.$stInfo['city'];
-		bo_station_city($stInfo['city']);
+		bo_station_city($stInfo['city'], false);
 	}
 
 	require_once 'jpgraph/jpgraph.php';

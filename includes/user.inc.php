@@ -37,8 +37,8 @@ function bo_show_login()
 
 	if (isset($_POST['bo_do_login']))
 	{
-		$login_name = BoDb::esc($_POST['bo_user']);
-		$login_pass = BoDb::esc($_POST['bo_pass']);
+		$login_name = BoDb::esc(bo_gpc_prepare($_POST['bo_user']));
+		$login_pass = BoDb::esc(bo_gpc_prepare($_POST['bo_pass']));
 
 		if (!bo_user_do_login($login_name, $login_pass))
 			$login_fail = true;
@@ -47,14 +47,15 @@ function bo_show_login()
 	if (isset($_GET['bo_logout']))
 		bo_user_do_logout();
 
-	$level = bo_user_get_level();
+	
 
 	
 	$remove_vars = array('bo_action','bo_action2','login','id');
 	
-	if ($level)
+	if (bo_user_get_id())
 	{
-
+		$level = bo_user_get_level();
+		
 		if (bo_user_get_id() == 1)
 		{
 			include 'update.inc.php';
@@ -105,10 +106,15 @@ function bo_show_login()
 				if (BO_PERM_ALERT & $level)
 					bo_alert_settings();
 				break;
-				
+			
+			case 'mybo_station_update':
+				if (BO_PERM_ADMIN & $level)
+					bo_my_station_update();
+				break;
+			
 			default:
 				echo '<ul class="bo_login_info">
-						<li>'._BL('user_welcome_text').': <strong>'.bo_user_get_name().'</strong></li>
+						<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>
 						<li>'._BL('MyBlitzortung version').': <strong>'.bo_get_conf('version').'</strong></li>';
 				echo '</ul>';
 				
@@ -122,6 +128,7 @@ function bo_show_login()
 					$mysql_ver = $row['Value'];
 					
 					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=update">'._BL('Do manual update').'</a></li>';
+					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=mybo_station_update">'._BL('Update MyBlitzortung Stations').'</a></li>';
 					echo '<li>PHP version: '.phpversion().' (<a href="'.bo_insert_url($remove_vars).'&bo_action=phpinfo">'._BL('Show PHP info').'</a>)</li>';
 					echo '<li>MySQL version: '.$mysql_ver.'</li>';
 				}
@@ -287,8 +294,8 @@ function bo_user_show_passw_change()
 {
 	if ($_POST['ok'])
 	{
-		$pass1 = trim(stripslashes($_POST['pass1']));
-		$pass2 = trim(stripslashes($_POST['pass2']));
+		$pass1 = bo_gpc_prepare($_POST['pass1']);
+		$pass2 = bo_gpc_prepare($_POST['pass2']);
 		
 		if ($pass1 && $pass2 && $pass1 == $pass2)
 		{
@@ -332,7 +339,7 @@ function bo_user_show_admin()
 	if (isset($_POST['bo_admin_user']) && (bo_user_get_level() & BO_PERM_ADMIN) )
 	{
 		$user_id = intval($_POST['user_id']);
-		$new_user_login = BoDb::esc($_POST['bo_user_login']);
+		$new_user_login = BoDb::esc(bo_gpc_prepare($_POST['bo_user_login']));
 
 		if ($user_id == 1 || $new_user_login)
 		{
@@ -346,10 +353,9 @@ function bo_user_show_admin()
 				}
 			}
 			
-			$new_user_pass = BoDb::esc($_POST['bo_user_pass']);
-			$new_user_mail = BoDb::esc($_POST['bo_user_mail']);
+			$new_user_pass = BoDb::esc(bo_gpc_prepare($_POST['bo_user_pass']));
+			$new_user_mail = BoDb::esc(bo_gpc_prepare($_POST['bo_user_mail']));
 			//$new_user_level = BoDb::esc($_POST['bo_user_level']);
-			
 			
 			$sql = " ".BO_DB_PREF."user SET login='$new_user_login', mail='$new_user_mail', level='$new_user_level' ";
 
@@ -362,16 +368,17 @@ function bo_user_show_admin()
 			if ($user_id)
 				$ok = bo_db("UPDATE $sql WHERE id='$user_id'");
 			else
-				bo_db("INSERT INTO $sql");
+				bo_db("INSERT IGNORE INTO $sql");
 
 			$user_id = 0;
 		}
 	}
 
-	if (isset($_GET['bo_delete']) && $user_id > 1 && (bo_user_get_level() & BO_PERM_ADMIN) )
+	if ($_GET['bo_action2'] == 'delete' && $user_id > 1 && (bo_user_get_level() & BO_PERM_ADMIN) )
 	{
 		bo_db("DELETE FROM ".BO_DB_PREF."user WHERE id='$user_id'");
 		bo_db("DELETE FROM ".BO_DB_PREF."conf WHERE name LIKE 'alert_$user_id%'");
+		$user_id = 0;
 	}
 
 
@@ -390,6 +397,7 @@ function bo_user_show_admin()
 
 	$sql = "SELECT id, login, password, level, mail
 			FROM ".BO_DB_PREF."user
+			ORDER BY login
 			";
 	$res = bo_db($sql);
 	while ($row = $res->fetch_assoc())
@@ -402,14 +410,14 @@ function bo_user_show_admin()
 		}
 
 		echo '<tr>
-			<td><a href="'.bo_insert_url(array('id')).'&id='.$row['id'].'">'.$row['id'].'</a></td>
-			<td>'.$row['login'].'</td>
-			<td>'.$row['level'].'</td>
-			<td>'.$row['mail'].'</td>
+			<td><a href="'.bo_insert_url(array('bo_action2', 'id')).'&id='.$row['id'].'">'.$row['id'].'</a></td>
+			<td>'._BC($row['login']).'</td>
+			<td>'._BC($row['level']).'</td>
+			<td>'._BC($row['mail']).'</td>
 			<td>';
 
 		if ($row['id'] > 1)
-			echo '<a href="'.bo_insert_url(array('user_id','bo_delete')).'&id='.$row['id'].'&bo_delete" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
+			echo '<a href="'.bo_insert_url(array('bo_action2')).'&bo_action2=delete&id='.$row['id'].'" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
 
 		echo '</td>';
 		
@@ -434,22 +442,22 @@ function bo_user_show_admin()
 		$user_level = pow(2, BO_PERM_COUNT) - 1;
 	}
 
-	echo '<form action="'.bo_insert_url(array('bo_logout', 'user_id', 'id', 'delete')).'" method="POST" class="bo_admin_user_form">';
+	echo '<form action="'.bo_insert_url(array('bo_logout', 'id', 'bo_action2')).'" method="POST" class="bo_admin_user_form">';
 
 	echo '<fieldset class="bo_admin_user_fieldset">';
 	echo '<legend>'._BL('admin_user_legend').'</legend>';
 
 	echo '<span class="bo_form_descr">'._BL('Login').':</span>';
-	echo '<input type="text" name="bo_user_login" value="'.htmlentities($user_login).'" id="bo_user_login" class="bo_form_text bo_admin_input" '.$disabled.'>';
+	echo '<input type="text" name="bo_user_login" value="'._BC($user_login).'" id="bo_user_login" class="bo_form_text bo_admin_input" '.$disabled.'>';
 
 	echo '<span class="bo_form_descr">'._BL('Password').':</span>';
 	echo '<input type="password" name="bo_user_pass" id="bo_user_login" class="bo_form_text bo_admin_input" '.$disabled.'>';
 
 	//echo '<span class="bo_form_descr">'._BL('Level').':</span>';
-	//echo '<input type="text" name="bo_user_level" value="'.htmlentities($user_level).'" id="bo_user_level" class="bo_form_text bo_admin_input" '.$disabled.'>';
+	//echo '<input type="text" name="bo_user_level" value="'._BC($user_level).'" id="bo_user_level" class="bo_form_text bo_admin_input" '.$disabled.'>';
 
 	echo '<span class="bo_form_descr">'._BL('E-Mail').':</span>';
-	echo '<input type="text" name="bo_user_mail"  value="'.htmlentities($user_mail).'" id="bo_user_mail" class="bo_form_text bo_login_input">';
+	echo '<input type="text" name="bo_user_mail"  value="'._BC($user_mail).'" id="bo_user_mail" class="bo_form_text bo_login_input">';
 
 	echo '<span class="bo_form_descr">'._BL('Level').':</span>';
 	echo '<div class="bo_input_container">';
@@ -497,14 +505,14 @@ function bo_show_calibrate_antennas()
 		echo '<fieldset class="bo_admin_user_fieldset">';
 		echo '<legend>'._BL('admin_calibrate_manual_legend').'</legend>';
 
-		echo '<span class="bo_form_descr">'._BL('Antenna 1 bearing').' (0-180°):</span>';
+		echo '<span class="bo_form_descr">'._BL('Antenna 1 bearing').' (0-180&deg;):</span>';
 		echo '<input type="text" name="bo_antenna1_bearing" value="'.(double)bo_get_conf('antenna1_bearing').'" id="bo_antenna1_bearing_id" class="bo_form_text bo_form_input">';
-		echo '<span class="bo_form_descr">'._BL('Antenna 2 bearing').' (0-180°):</span>';
+		echo '<span class="bo_form_descr">'._BL('Antenna 2 bearing').' (0-180&deg;):</span>';
 		echo '<input type="text" name="bo_antenna2_bearing" value="'.(double)bo_get_conf('antenna2_bearing').'" id="bo_antenna2_bearing_id" class="bo_form_text bo_form_input">';
 
-		echo '<span class="bo_form_descr">'._BL('Antenna 1 electrical bearing').' (0-360°):</span>';
+		echo '<span class="bo_form_descr">'._BL('Antenna 1 electrical bearing').' (0-360&deg;):</span>';
 		echo '<input type="text" name="bo_antenna1_bearing_elec" value="'.(double)bo_get_conf('antenna1_bearing_elec').'" id="bo_antenna1_elec_bearing_id" class="bo_form_text bo_form_input">';
-		echo '<span class="bo_form_descr">'._BL('Antenna 2 electrical bearing').' (0-360°):</span>';
+		echo '<span class="bo_form_descr">'._BL('Antenna 2 electrical bearing').' (0-360&deg;):</span>';
 		echo '<input type="text" name="bo_antenna2_bearing_elec" value="'.(double)bo_get_conf('antenna2_bearing_elec').'" id="bo_antenna2_elec_bearing_id" class="bo_form_text bo_form_input">';
 
 
@@ -659,7 +667,7 @@ function bo_show_calibrate_antennas()
 
 		for ($i=0;$i<2;$i++)
 		{
-			echo '<h6>'._BL('Antenna').' '.($i+1)." (".$alpha[$i]."°)</h6>";
+			echo '<h6>'._BL('Antenna').' '.($i+1)." (".$alpha[$i]."&deg;)</h6>";
 			echo '<ul>';
 
 
@@ -704,7 +712,7 @@ function bo_show_calibrate_antennas()
 
 				$c++;
 
-				echo '<li>'.round($beta1).'° to '.round($beta2).'° :';
+				echo '<li>'.round($beta1).'&deg; to '.round($beta2).'&deg; :';
 				echo ' '._BL('Positive').": $pos / "._BL('Negative').": $neg ";
 				//echo " (Current: ".round($cur_pos,1)." / ".round($cur_neg,1)." kA/perStrike) ";
 				echo '</li>';
@@ -741,6 +749,127 @@ function bo_show_calibrate_antennas()
 
 		}
 	}
+}
+
+function bo_my_station_update()
+{
+	define('BO_LINK_HOST', 'www.wetter-rosstal.de');
+	define('BO_LINK_URL',  '/blitzortung/bo.php');
+
+	if ($_POST['ok'])	
+	{
+		echo '<h3>'._BL('Linking with other MyBlitzortung stations').'</h3>';
+		echo '<h4>'._BL('Getting Login string').'</h4>';
+		
+		$login_id = bo_get_login_str();
+		
+		if (!$login_id)
+		{
+			echo '<p>'._BL('Couldn\'t get login id').'.</p>';
+		}
+		else
+		{
+			echo '<p>'._BL('String is').': <em>'.$login_id.'</em></p>';
+			echo '<h4>'._BL('Requesting data').'</h4>';
+			echo '<p>'._BL('Connecting to ').' <em>'.BO_LINK_HOST.'</em></p>';
+			
+			$request = 'id='.bo_station_id().'&login='.$login_id.'&url='.urlencode(trim($_POST['bo_url']));
+			$url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
+			
+			$content = file_get_contents($url);
+			
+			$R = unserialize($content);
+			
+			if (!$R || !is_array($R))
+			{
+				echo '<p>'._BL('Error talking to the server. Please try again later.').'</p>';
+			}
+			else
+			{
+				switch($R['status'])
+				{
+					case 'auth_fail':
+						echo '<p>'._BL('Authentication failure').'.</p>';
+						break;
+
+					case 'request_fail':
+						echo '<p>'._BL('Failure in Request URL: ').'<em>'._BC($url).'</em></p>';
+						break;
+					
+					case 'ok':
+						$urls = $R['urls'];
+						
+						if (is_array($urls))
+						{
+							bo_set_conf('mybo_stations', serialize($urls));
+							
+							echo '<p>'._BL('Received urls').': '.count($urls).'</p>';
+							echo '<p>'._BL('DONE').'!</p>';
+							
+							echo '<ul>';
+							ksort($urls);
+							foreach($urls as $id => $st_url)
+							{
+								echo '<li>'.$id.': '._BC($st_url).'</url>';
+							
+							}
+							echo '</ul>';
+						
+						}
+						else
+						{
+							echo '<p>'._BL('Cannot read url data').'!</p>';
+						}
+						
+						break;
+				}
+			}
+		}
+	}
+	else
+	{
+		echo '<h3>'._BL('Link with the MyBlitzortung network').'</h3>';
+		
+?>
+		<p>
+		With this feature, you can link your MyBlitzortung installation
+		with other stations that have MyBlitzortung running.
+		The following things will happen, when you click on the link below:
+		</p>
+		
+		<ul>
+		<li>1. Your station id and the url of this website will be send to a server.
+		</li>
+		<li>2. You will get all urls of the other stations that are currently in the list.
+		</li>
+		</ul>
+		
+		<p>
+		Of course, you have to update the data from time to time, so that new stations will appear.
+		Currently, you can see the linked stations only in the statistics table.
+		</p>
+		
+		<p>
+		To authenticate you as a blitzortung.org member, a login-id will be requestet at blitzortung.org.
+		This id will be sent to <em><?php echo BO_LINK_HOST ?></em> and there it will rechecked again at blitzortung.org.
+		The id will not be saved! Your password will never be sent to other websites than blitzortung.org!
+		</p>
+<?php
+	
+		$url = 'http://'.$_SERVER["HTTP_HOST"].dirname($_SERVER["REQUEST_URI"]);
+	
+		echo '<form action="'.bo_insert_url().'" method="POST" class="bo_login_form">';
+
+		echo '<fieldset class="bo_mylink_fieldset">';
+		echo '<span class="bo_form_descr">'._BL('URL of your website').' ('._BL('Leave blank to remove your station from the list').'):</span>';
+		echo '<input type="text" name="bo_url" id="bo_mylink_url" value="'._BC($url).'" class="bo_form_text" style="width:100%">';
+		echo '<input type="submit" name="ok" value="'._BL('Agree and Send').'" id="bo_login_submit" class="bo_form_submit" onclick="return confirm(\'Really continue?\');">';
+		echo '</fieldset>';
+		
+		echo '</form>';
+	
+	}
+
 }
 
 ?>

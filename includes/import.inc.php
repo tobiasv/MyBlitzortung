@@ -32,7 +32,6 @@ function bo_get_login_str()
 	{
 		$bo_login_id = $r[1];
 		bo_set_conf('bo_login_id', $bo_login_id);
-		echo "\n<p>New Login ID: ".substr($bo_login_id,0,4)."...</p>\n";
 	}
 
 	return $bo_login_id;
@@ -40,7 +39,7 @@ function bo_get_login_str()
 
 
 // Get archive data from blitzortung cgi
-function bo_get_archive($args='', $bo_login_id='')
+function bo_get_archive($args='', $bo_login_id=false)
 {
 	if (!$bo_login_id)
 	{
@@ -58,7 +57,9 @@ function bo_get_archive($args='', $bo_login_id='')
 		if ($auto_id)
 		{
 			$bo_login_id = bo_get_login_str();
-
+			
+			echo "\n<p>New Login ID: ".substr($bo_login_id,0,4)."...</p>\n";
+			
 			if ($bo_login_id)
 				return bo_get_archive($args,$bo_login_id);
 			else
@@ -77,11 +78,11 @@ function bo_get_archive($args='', $bo_login_id='')
 // Get raw data from blitzortung.org
 function bo_update_raw_signals($force = false)
 {
-	echo '<h3>Raw-Data</h3>';
+	echo "<h3>Raw-Data</h3>\n";
 
 	if (!defined('BO_UP_INTVL_RAW') || !BO_UP_INTVL_RAW)
 	{
-		echo '<p>Disabled!</p>';
+		echo "<p>Disabled!</p>\n";
 		return true;
 	}
 	
@@ -172,7 +173,7 @@ function bo_update_raw_signals($force = false)
 			}
 		}
 
-		echo "\nLines: ".count($lines)." *** New Raw Data: $i *** Updated: $u *** Already read: $a\n";
+		echo "\n<p>Lines: ".count($lines)." *** New Raw Data: $i *** Updated: $u *** Already read: $a</p>\n";
 
 		//Longtime
 		$count = bo_get_conf('count_raw_signals');
@@ -184,7 +185,7 @@ function bo_update_raw_signals($force = false)
 	}
 	else
 	{
-		echo "\nNO UPDATE! Last update ".(time() - $last)." seconds ago.\n";
+		echo "\n<p>NO UPDATE! Last update ".(time() - $last)." seconds ago.</p>\n";
 		$updated = false;
 	}
 
@@ -196,7 +197,7 @@ function bo_update_strikes($force = false)
 {
 	$last = bo_get_conf('uptime_strikes');
 
-	echo '<h3>Strikes</h3>';
+	echo "<h3>Strikes</h3>\n";
 
 	if (time() - $last > BO_UP_INTVL_STRIKES * 60 - 30 || $force)
 	{
@@ -236,9 +237,9 @@ function bo_update_strikes($force = false)
 		$loadcount = bo_get_conf('upcount_strikes');
 		bo_set_conf('upcount_strikes', $loadcount+1);
 
-		echo '<p>Last strike: '.date('Y-m-d H:i:s', $last_strike).' 
-				*** Importing only strikes newer than: '.date('Y-m-d H:i:s', $time_update).'
-				*** This is update #'.$loadcount.'</p>';
+		echo "\n".'<p>Last strike: '.date('Y-m-d H:i:s', $last_strike). 
+				' *** Importing only strikes newer than: '.date('Y-m-d H:i:s', $time_update).
+				' *** This is update #'.$loadcount.'</p>'."\n";
 		
 		$lines = explode("\n", $file);
 		foreach($lines as $l)
@@ -386,7 +387,7 @@ function bo_update_strikes($force = false)
 			}
 		}
 
-		echo "\nLines: ".count($lines)." *** New Strikes: $i *** Updated: $u *** Already read: $a\n";
+		echo "\n<p>Lines: ".count($lines)." *** New Strikes: $i *** Updated: $u *** Already read: $a</p>\n";
 
 		$count = bo_get_conf('count_strikes');
 		bo_set_conf('count_strikes', $count + $i);
@@ -447,7 +448,7 @@ function bo_update_strikes($force = false)
 	}
 	else
 	{
-		echo "\nNO UPDATE! Last update ".(time() - $last)." seconds ago.\n";
+		echo "\n<p>NO UPDATE! Last update ".(time() - $last)." seconds ago.</p>\n";
 		$updated = false;
 	}
 
@@ -546,9 +547,9 @@ function bo_match_strike2raw()
 		//echo "<br>Strike: ".$row['time'].".".$row['time_ns']." <-> Your Station: ".$row2['time'].".".$row2['time_ns']." Num Rows: ".$num;
 	}
 
-	echo "\n<p>Assign raw data to strikes:
-			".(count($u) + count($n) + count($m))." strikes analyzed
-			*** Unique: ".count($u)." *** Not found: ".count($n)." *** Multiple: ".count($m)."</p>";
+	echo "\n<p>Assign raw data to strikes:".
+			(count($u) + count($n) + count($m))." strikes analyzed".
+			"*** Unique: ".count($u)." *** Not found: ".count($n)." *** Multiple: ".count($m)."</p>";
 
 	//Update matched
 	foreach($u as $raw_id => $strike_id)
@@ -579,11 +580,11 @@ function bo_update_stations($force = false)
 {
 	$last = bo_get_conf('uptime_stations');
 
-	echo '<h3>Stations</h3>';
+	echo "<h3>Stations</h3>\n";
 
 	if (!defined('BO_UP_INTVL_STATIONS') || !BO_UP_INTVL_STATIONS)
 	{
-		echo '<p>Disabled!</p>';
+		echo "<p>Disabled!</p>\n";
 	}
 	
 	$i = 0;
@@ -618,7 +619,7 @@ function bo_update_stations($force = false)
 
 			$stUser 	= $cols[1];
 			$stCity 	= html_entity_decode($cols[3]);
-			$stCountry 	= $cols[4];
+			$stCountry 	= html_entity_decode($cols[4]);
 			$stLat	 	= $cols[5];
 			$stLon 		= $cols[6];
 			$stTime 	= substr($cols[7], 0, 10).' '.substr($cols[7], 16, 8);
@@ -656,7 +657,7 @@ function bo_update_stations($force = false)
 
 		}
 
-		echo "\nStations: ".(count($lines)-2)." *** New Stations: $i *** Updated: $u\n";
+		echo "\n<p>Stations: ".(count($lines)-2)." *** New Stations: $i *** Updated: $u</p>\n";
 
 		//Update Statistics
 		$datetime      = gmdate('Y-m-d H:i:s', time());
@@ -801,7 +802,7 @@ function bo_update_stations($force = false)
 	}
 	else
 	{
-		echo "\nNO UPDATE! Last update ".(time() - $last)." seconds ago.\n";
+		echo "\n<p>NO UPDATE! Last update ".(time() - $last)." seconds ago.</p>\n";
 		$updated = false;
 	}
 
@@ -812,9 +813,9 @@ function bo_update_stations($force = false)
 function bo_update_all($force)
 {
 
-	echo '<h1>MyBlitzortung</h1>';
+	echo "<h1>MyBlitzortung</h1>\n\n";
 
-	echo '<h2>Getting lightning data from blitzortung.org</h2>';
+	echo "<h2>Getting lightning data from blitzortung.org</h2>\n";
 
 	set_time_limit(50);
 
@@ -827,7 +828,7 @@ function bo_update_all($force)
 	//Check if sth. went wrong on the last update (if older than 120sec continue)
 	if ($is_updating && time() - $is_updating < 120)
 	{
-		echo '<p>Error: Another update is running</p>';
+		echo "\n<p>Error: Another update is running</p>\n";
 		return;
 	}
 
@@ -840,7 +841,9 @@ function bo_update_all($force)
 	//check if we should do a async update
 	if ( !(BO_UP_INTVL_STRIKES <= BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS <= BO_UP_INTVL_RAW) )
 	{
-		echo '<p>Asynchronous update!</p>';
+		if (!$force)
+			echo '<p>Asynchronous update!</p>';
+		
 		$async = true;
 	}
 	else
@@ -864,12 +867,12 @@ function bo_update_all($force)
 	if (defined('BO_ALERTS') && BO_ALERTS)
 	{
 		flush();
-		echo '<h2>Checking and sending strike alerts.</h2>';
+		echo "\n<h2>Checking and sending strike alerts.</h2>\n";
 		bo_alert_send();
 	}
 	
 	/*** Purge old data ***/
-	echo '<h2>Purging data</h2>';
+	echo "\n<h2>Purging data</h2>\n";
 	flush();
 
 	if (BO_PURGE_ENABLE === true)
@@ -885,7 +888,7 @@ function bo_update_all($force)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_SIG_NS * 3600);
 				$num = bo_db("DELETE FROM ".BO_DB_PREF."raw WHERE time < '$dtime' AND strike_id=0");
-				echo "<p>Raw signals (with no strikes assigned): $num</p>";
+				echo "<p>Raw signals (with no strikes assigned): $num</p>\n";
 
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."raw");
 
@@ -900,7 +903,7 @@ function bo_update_all($force)
 
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."raw");
 
-				echo "<p>Raw signals: $num</p>";
+				echo "<p>Raw signals: $num</p>\n";
 				flush();
 			}
 
@@ -914,7 +917,7 @@ function bo_update_all($force)
 
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes, ".BO_DB_PREF."strikes");
 
-				echo "<p>Strikes (not participated): $num</p>";
+				echo "<p>Strikes (not participated): $num</p>\n";
 				flush();
 			}
 
@@ -928,7 +931,7 @@ function bo_update_all($force)
 
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes, ".BO_DB_PREF."strikes");
 
-				echo "<p>Strikes (over ".BO_PURGE_STR_DIST_KM."km away): $num</p>";
+				echo "<p>Strikes (over ".BO_PURGE_STR_DIST_KM."km away): $num</p>\n";
 				flush();
 			}
 
@@ -942,7 +945,7 @@ function bo_update_all($force)
 
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes, ".BO_DB_PREF."strikes");
 
-				echo "<p>Strikes: $num</p>";
+				echo "<p>Strikes: $num</p>\n";
 				flush();
 			}
 
@@ -958,7 +961,7 @@ function bo_update_all($force)
 
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes");
 
-				echo "<p>Strike <-> Station table: $num</p>";
+				echo "<p>Strike <-> Station table: $num</p>\n";
 				flush();
 			}
 
@@ -969,7 +972,7 @@ function bo_update_all($force)
 
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STA_OTHER * 3600);
 				$num = bo_db("DELETE FROM ".BO_DB_PREF."stations_stat WHERE time < '$dtime' AND station_id != '$stId' AND station_id != 0");
-				echo "<p>Station statistics (not yours): $num</p>";
+				echo "<p>Station statistics (not yours): $num</p>\n";
 				flush();
 			}
 
@@ -978,7 +981,7 @@ function bo_update_all($force)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STA_ALL * 3600);
 				bo_db("DELETE FROM ".BO_DB_PREF."stations_stat WHERE time < '$dtime'");
-				echo "<p>Station statistics: $num</p>";
+				echo "<p>Station statistics: $num</p>\n";
 				flush();
 			}
 
@@ -988,7 +991,7 @@ function bo_update_all($force)
 	}
 	else
 	{
-		echo '<p>Purgin disabled!</p>';
+		echo "<p>Purgin disabled!</p>\n";
 	}
 
 	bo_set_conf('is_updating', 0);

@@ -3,6 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.2.3 (2011-05-20)
+--------------------------
+- improved UTF8 support
+- Auto link to other MyBlitzortung stations
+- calling update from command line now possible
+
+
 Version 0.2.2b (2011-05-20)
 ---------------------------
 (no new features, bugfix release)

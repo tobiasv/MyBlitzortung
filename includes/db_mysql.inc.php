@@ -88,9 +88,12 @@ class BoDb
 		return $ok;
 	}
 
-	public static function set_charset($die_on_error = true)
+	public static function set_charset($charset = false, $die_on_error = true)
 	{
-		$ok = mysql_set_charset('latin1', self::$dbh);
+		if (!$charset)
+			$charset = 'latin1';
+			
+		$ok = mysql_set_charset($charset, self::$dbh);
 		if (!$ok && $die_on_error)
 			die("Database: Charset ERROR (".mysql_error(self::$dbh).")");
 			

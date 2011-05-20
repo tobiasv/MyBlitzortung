@@ -62,9 +62,12 @@ class BoDb
 		return $ok;
 	}
 
-	public static function set_charset($die_on_error = true)
+	public static function set_charset($charset = false, $die_on_error = true)
 	{	
-		$ok = self::$dbh->set_charset('latin1');
+		if (!$charset)
+			$charset = 'latin1';
+		
+		$ok = self::$dbh->set_charset($charset);
 		
 		if (!$ok && $die_on_error)
 			die('Database: Charset ERROR ('.mysqli_connect_errno().")");

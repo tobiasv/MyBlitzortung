@@ -215,7 +215,7 @@ function bo_station_city($force_name = '')
 	if ($name)
 		return $name;
 
-	$tmp = bo_station_info();
+	$tmp = bo_station_info(0, true);
 	$name = $tmp['city'];
 
 	return $name;
@@ -227,17 +227,19 @@ function bo_station_info($id = 0)
 	if ($id)
 	{
 		$tmp = bo_stations('id', $id);
-		return $tmp[$id];
+		$ret = $tmp[$id];
 	}
 	else //own station info
 	{
 		$tmp = bo_stations('user', BO_USER);
-
+		
 		if (defined('BO_STATION_NAME') && BO_STATION_NAME)
 			$tmp[BO_USER]['city'] = BO_STATION_NAME;
-
-		return $tmp[BO_USER];
+			
+		$ret = $tmp[BO_USER];
 	}
+
+	return $ret;
 }
 
 //insert HTML-hidden tags of actual GET-Request
@@ -257,6 +259,9 @@ function bo_insert_url($exclude = array(), $add = null)
 	if (!is_array($exclude))
 		$exclude = array($exclude);
 
+	if (bo_user_get_id())
+		$exclude[] = 'bo_login';
+		
 	$query = '';
 	foreach($_GET as $name => $val)
 	{
@@ -266,13 +271,15 @@ function bo_insert_url($exclude = array(), $add = null)
 		$query .= urlencode($name).(strlen($val) ? '='.urlencode($val) : '').'&';
 	}
 
-	if (count($exclude) == 1 && $add !== null)
+	if (count($exclude) && $add !== null)
 		$query .= $exclude[0].'='.urlencode($add).'&';
 
 
 	$url = $_SERVER['REQUEST_URI'];
 	preg_match('@/([^/\?]+)\?|$@', $url, $r);
 
+	$query = strtr($query, array('&&' => '&'));
+	
 	return $r[1].'?'.$query;
 }
 
@@ -304,7 +311,7 @@ function bo_copyright_footer()
 
 		if (bo_user_get_name())
 		{
-			echo '<a href="'.$file.'&bo_login">'.bo_user_get_name().'</a>';
+			echo '<a href="'.$file.'&bo_login">'._BC(bo_user_get_name()).'</a>';
 			echo ' (<a href="'.$file.'&bo_logout">'._BL('Logout').'</a>)';
 		}
 		else
@@ -325,6 +332,8 @@ function _BL($msgid, $noutf = false)
 	$locale = $_BL['locale'];
 	$msg = $_BL[$locale][$msgid];
 
+	$utf = defined('BO_UTF8') && BO_UTF8 && !$noutf;
+	
 	if (!$msg)
 	{
 		if (defined('BO_LANG_AUTO_ADD') && BO_LANG_AUTO_ADD)
@@ -344,13 +353,21 @@ function _BL($msgid, $noutf = false)
 			$msg = strtr($msg, array('{STATION}' => bo_station_city()));
 
 		$msg = strtr($msg, array('{USER}' => bo_user_get_name()));
-
 	}
 
-	if (defined('BO_UTF8') && BO_UTF8 && !$noutf)
+	if ($utf)
 		$msg = utf8_encode($msg);
 
 	return $msg;
+}
+
+//charset
+function _BC($text)
+{
+	if (defined('BO_UTF8') && BO_UTF8)
+		return utf8_encode($text);
+	else
+		return htmlspecialchars($text);
 }
 
 // helper function for developers
@@ -480,10 +497,10 @@ function bo_show_menu()
 	$page = $_GET['bo_page'] ? $_GET['bo_page'] : 'map';
 
 	echo '<ul id="bo_mainmenu">';
-	echo '<li><a href="'.bo_insert_url('bo_page', 'map').'"        id="bo_mainmenu_map"  class="bo_mainmenu'.($page == 'map' ? '_active' : '').'">'._BL('main_menu_map').'</a></li>';
-	echo '<li><a href="'.bo_insert_url('bo_page', 'archive').'"    id="bo_mainmenu_arch" class="bo_mainmenu'.($page == 'archive' ? '_active' : '').'">'._BL('main_menu_archive').'</a></li>';
-	echo '<li><a href="'.bo_insert_url('bo_page', 'statistics').'" id="bo_mainmenu_stat" class="bo_mainmenu'.($page == 'statistics' ? '_active' : '').'">'._BL('main_menu_statistics').'</a></li>';
-	echo '<li><a href="'.bo_insert_url('bo_page', 'info').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'info' ? '_active' : '').'">'._BL('main_menu_info').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_action', 'bo_action2'), 'map').'"        id="bo_mainmenu_map"  class="bo_mainmenu'.($page == 'map' ? '_active' : '').'">'._BL('main_menu_map').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_action', 'bo_action2'), 'archive').'"    id="bo_mainmenu_arch" class="bo_mainmenu'.($page == 'archive' ? '_active' : '').'">'._BL('main_menu_archive').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_action', 'bo_action2'), 'statistics').'" id="bo_mainmenu_stat" class="bo_mainmenu'.($page == 'statistics' ? '_active' : '').'">'._BL('main_menu_statistics').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_action', 'bo_action2'), 'info').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'info' ? '_active' : '').'">'._BL('main_menu_info').'</a></li>';
 	echo '</ul>';
 
 }
@@ -503,6 +520,18 @@ function bo_get_title()
 	}
 
 	return $title;
+}
+
+function bo_gpc_prepare($text)
+{
+	$text = trim($text);
+	$text = stripslashes($text);
+	
+	if (defined('BO_UTF8') && BO_UTF8)
+		return utf8_decode($text);
+	else
+		return $text;
+
 }
 
 ?>

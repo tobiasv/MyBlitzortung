@@ -58,6 +58,8 @@ function bo_alert_settings()
 			$alert_cnt = $r[2];
 			$Alerts[$user_id][$alert_cnt] = $data;
 		}
+		
+	
 	}
 	
 	echo '<div id="bo_alert_settings">';
@@ -98,7 +100,7 @@ function bo_alert_settings()
 				echo '<td>'.bo_user_get_name($user_id).'</td>';
 				echo '<td>';
 				echo '<a href="'.bo_insert_url('bo_action2', 'alert_form,'.$user_id.','.$alert_id).'">';
-				echo $d['name'];
+				echo _BC($d['name']);
 				echo '</a>';
 				echo '</td>';
 				echo '<td>';
@@ -116,9 +118,9 @@ function bo_alert_settings()
 				echo ': ';
 				
 				if (strlen($d['address']) > 25)
-					echo substr($d['address'], 0, 15).'...'.substr($d['address'], -3);
+					echo _BC(substr($d['address'], 0, 15).'...'.substr($d['address'], -3));
 				else
-					echo $d['address'];
+					echo _BC($d['address']);
 					
 				echo '</td>';
 				echo '<td>'.number_format($d['lat'], 4, _BL('.'), _BL(',')).'&deg; / '.number_format($d['lon'], 4, _BL('.'), _BL(',')).'&deg;</td>';
@@ -189,8 +191,8 @@ function bo_alert_settings_form()
 	{
 		
 		$A['user_id'] = intval($_POST['bo_alert_user']);
-		$A['name'] = stripslashes(trim($_POST['bo_alert_name']));
-		$A['address'] = stripslashes(trim($_POST['bo_alert_address']));
+		$A['name'] = bo_gpc_prepare($_POST['bo_alert_name']);
+		$A['address'] = bo_gpc_prepare($_POST['bo_alert_address']);
 		$A['type'] = intval($_POST['bo_alert_type']);
 		$A['dist'] = intval($_POST['bo_alert_distance']);
 		$A['count'] = intval($_POST['bo_alert_count']);
@@ -198,8 +200,8 @@ function bo_alert_settings_form()
 
 		if ($_POST['bo_alert_lat'] && $_POST['bo_alert_lon'])
 		{
-			$A['lat'] = (double)$_POST['bo_alert_lat'];
-			$A['lon'] = (double)$_POST['bo_alert_lon'];
+			$A['lat'] = substr((double)$_POST['bo_alert_lat'],0,10);
+			$A['lon'] = substr((double)$_POST['bo_alert_lon'],0,10);
 		}
 
 		
@@ -225,7 +227,6 @@ function bo_alert_settings_form()
 		if (!($level&BO_PERM_ALERT_ALL))
 			$dist = bo_latlon2dist($A['lat'], $A['lon']);
 		
-		
 		if ( !($A['user_id'] && $A['name'] && $A['type']
 				&& $A['address'] && $A['lat'] && $A['lon']
 				&& $A['dist'] && $A['count'] && $A['interval']) )
@@ -250,12 +251,10 @@ function bo_alert_settings_form()
 		}
 		else
 		{
-			$A['address'] = BoDb::esc($A['address']);
-			$A['name'] = BoDb::esc($A['name']);
-			
 			$A['disarmed'] = false;
+			$d['no_checking'] = false;
 			$A['last_check'] = 0;
-			
+
 			if ($alert_id)
 			{
 				bo_set_conf('alert_'.$user_id.'_'.$alert_id, serialize($A));
@@ -305,7 +304,7 @@ function bo_alert_settings_form()
 	echo '<input type="hidden" name="bo_alert_id" value="'.intval($alert_id).'">';
 	
 	echo '<span class="bo_form_descr">'._BL('alert_name').':</span>';
-	echo '<input type="text" name="bo_alert_name" value="'.htmlentities($A['name']).'" id="bo_alert_name_input" class="bo_form_text bo_alert_input">';
+	echo '<input type="text" name="bo_alert_name" value="'._BC($A['name']).'" id="bo_alert_name_input" class="bo_form_text bo_alert_input">';
 
 	echo '<span class="bo_form_descr">'._BL('alert_type').':</span>';
 	echo '<div class="bo_input_container">';
@@ -329,7 +328,7 @@ function bo_alert_settings_form()
 	echo '</div>';
 	
 	echo '<span class="bo_form_descr">'.$adress_text.':</span>';
-	echo '<input type="text" name="bo_alert_address" value="'.htmlentities($A['address']).'" style="width:95%" id="bo_alert_address_input" class="bo_form_text bo_alert_input">';
+	echo '<input type="text" name="bo_alert_address" value="'._BC($A['address']).'" style="width:95%" id="bo_alert_address_input" class="bo_form_text bo_alert_input">';
 	
 	
 	echo '</fieldset>';
@@ -463,14 +462,14 @@ function bo_alert_send()
 	$log = array();
 
 	//continues without further checks, if message was sent less than given minutes before
-	if (defined('BO_ALARM_CHECK_INTERVAL') && intval(BO_ALARM_CHECK_INTERVAL))
-		$check_continue = intval(BO_ALARM_CHECK_INTERVAL);
+	if (defined('BO_ALERT_CHECK_INTERVAL') && intval(BO_ALERT_CHECK_INTERVAL))
+		$check_continue = intval(BO_ALERT_CHECK_INTERVAL);
 	else
 		$check_continue = 15; 
 	
 	//waits given minutes and sends next message after negative check (minimum time without strikes)
-	if (defined('BO_ALARM_SEND_INTERVAL') && intval(BO_ALARM_SEND_INTERVAL))
-		$min_send_interval = intval(BO_ALARM_SEND_INTERVAL);
+	if (defined('BO_ALERT_SEND_INTERVAL') && intval(BO_ALERT_SEND_INTERVAL))
+		$min_send_interval = intval(BO_ALERT_SEND_INTERVAL);
 	else
 		$min_send_interval = 45; 
 	
@@ -530,7 +529,7 @@ function bo_alert_send()
 				$res2 = bo_db($sql);
 				$row2 = $res2->fetch_assoc();
 				
-				if ($row2['cnt'] >= $d['count'])
+				if ($row2['cnt'] >= $d['count'] && !$d['no_checking'])
 				{
 					if (!$d['disarmed']) //SEND IT
 					{
@@ -544,13 +543,13 @@ function bo_alert_send()
 						$row3 = $res3->fetch_assoc();
 
 						$dist = round(bo_latlon2dist($d['lat'], $d['lon'], $row3['lat'], $row3['lon']) / 1000);
-						$bear = _BL(bo_bearing2direction(bo_latlon2bearing($row3['lat'], $row3['lon'], $d['lat'], $d['lon'])));
+						$bear = _BL(bo_bearing2direction(bo_latlon2bearing($row3['lat'], $row3['lon'], $d['lat'], $d['lon'])), true);
 						
 						$replace = array(
 									'{name}' 	=> $d['name'],
 									'{strikes}' => $row2['cnt'],
-									'{time}'	=> date(_BL('_datetime'), strtotime($row2['maxtime'].' UTC')),
-									'{first}'	=> date(_BL('_datetime'), strtotime($row2['mintime'].' UTC')),
+									'{time}'	=> date(_BL('_datetime', true), strtotime($row2['maxtime'].' UTC')),
+									'{first}'	=> date(_BL('_datetime', true), strtotime($row2['mintime'].' UTC')),
 									'{dist}'	=> $dist,
 									'{bear}'	=> $bear
 										);
@@ -561,15 +560,15 @@ function bo_alert_send()
 						{
 							case 1: //E-Mail
 
-								$text = _BL('alert_mail_description')."\n\n".
-										_BL('alert_mail_time range').': '.date(_BL('_datetime'), $search_time).' - '.date(_BL('_datetime'), $max_time)."\n".
-										_BL('alert_mail_strikes').': '.$row2['cnt']."\n".
-										_BL('alert_mail_distance').': '.$dist." "._BL('unit_kilometers')." (".$bear.")\n".
-										_BL('alert_mail_first_strike').': '.date('H:i:s', strtotime($row2['mintime'].' UTC'))."\n".
-										_BL('alert_mail_last_strike').': '.date('H:i:s', strtotime($row2['maxtime'].' UTC'))."\n\n";
+								$text = _BL('alert_mail_description', true)."\n\n".
+										_BL('alert_mail_time range', true).': '.date(_BL('_datetime', true), $search_time).' - '.date(_BL('_datetime', true), $max_time)."\n".
+										_BL('alert_mail_strikes', true).': '.$row2['cnt']."\n".
+										_BL('alert_mail_distance', true).': '.$dist." "._BL('unit_kilometers', true)." (".$bear.")\n".
+										_BL('alert_mail_first_strike', true).': '.date('H:i:s', strtotime($row2['mintime'].' UTC'))."\n".
+										_BL('alert_mail_last_strike', true).': '.date('H:i:s', strtotime($row2['maxtime'].' UTC'))."\n\n";
 										
 								$ret = mail($d['address'], 
-											'MyBlitzortung: '._BL('Strikes detected').' ('.$d['name'].')', 
+											'MyBlitzortung: '._BL('Strikes detected', true).' ('.$d['name'].')', 
 											$text
 											);
 								
@@ -582,10 +581,10 @@ function bo_alert_send()
 								if (defined('BO_SMS_GATEWAY_URL') && BO_SMS_GATEWAY_URL)
 								{
 									$text = "*** ({name}) ***\n".
-											"{strikes} "._BL('Strikes detected')."\n".
-											_BL('alert_sms_last_strike').": {time}\n".
-											_BL('alert_sms_distance').": {dist}km (".$bear.")\n".
-											_BL('alert_sms_description');
+											"{strikes} "._BL('Strikes detected', true)."\n".
+											_BL('alert_sms_last_strike', true).": {time}\n".
+											_BL('alert_sms_distance', true).": {dist}km (".$bear.")\n".
+											_BL('alert_sms_description', true);
 									
 									$text = strtr($text, $replace);
 									$log[$alert_dbname]['text']   = $text;
@@ -621,10 +620,24 @@ function bo_alert_send()
 					
 					bo_set_conf($alert_dbname, serialize($d));
 				}
-				elseif ($d['disarmed'] && $max_time - $d['last_check'] > $min_send_interval * 60)
+				elseif ($d['disarmed'] || $d['no_checking'])
 				{
-					$d['disarmed'] = false;
-					bo_set_conf($alert_dbname, serialize($d));
+
+					if ($max_time - $d['last_check'] > $min_send_interval * 60)
+					{
+						//no strike detected for a long time
+						//RESET
+						$d['disarmed'] = false;
+						$d['no_checking'] = false;
+						bo_set_conf($alert_dbname, serialize($d));
+					}
+					else if (!$d['no_checking'])
+					{
+						//no strike detected and disarmed
+						//do NOTHING during the next minutes
+						$d['no_checking'] = true;
+						bo_set_conf($alert_dbname, serialize($d));
+					}
 				}
 			}
 
@@ -634,8 +647,8 @@ function bo_alert_send()
 		{
 			$oldlog = unserialize(bo_get_conf('alerts_log'));
 			$newlog = array();
-			
-			if (is_array($log))
+
+			if (is_array($oldlog))
 			{
 				krsort($oldlog);
 				$count = 0;
@@ -646,7 +659,10 @@ function bo_alert_send()
 					if ($count++ > 100)
 						break;
 				}
-				
+			}
+			
+			if (is_array($log))
+			{
 				foreach($log as $logid => $logdata)
 				{
 					$newlog[$max_time.'_'.$logid] = $logdata;

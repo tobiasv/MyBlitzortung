@@ -22,7 +22,7 @@
 if (!defined("BO_VER"))
 {
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.2.2b');
+	define("BO_VER", '0.2.3');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -52,11 +52,15 @@ if (!defined("BO_VER"))
 	require_once 'settings.php';
 
 	date_default_timezone_set(BO_TIMEZONE);
-
+	
 	if (defined('BO_DEBUG') && BO_DEBUG)
 	{
 		error_reporting(E_ALL & ~E_NOTICE);
 		ini_set('display_errors', 1);
+	}
+	else
+	{
+		ini_set('display_errors', 0);
 	}
 
 	//Session handling
@@ -106,14 +110,31 @@ if (!defined("BO_VER"))
 
 
 	//Update with new data from blitzortung.org
+	$do_update = false;
+	$force_update = false;
 	if (isset($_GET['update']))
 	{
 		if (defined('BO_UPDATE_SECRET') && BO_UPDATE_SECRET && $_GET['secret'] !== BO_UPDATE_SECRET)
 			exit('Wrong secret: "<b>'.htmlentities($_GET['secret']).'</b>"  Look in your config.php for "<b>BO_UPDATE_SECRET</b>"');
-		
-		ini_set('allow_url_fopen', 'on'); 
-		$force = isset($_GET['force']);
-		bo_update_all($force);
+
+		$do_update = true;
+		$force_update = isset($_GET['force']);
+	}
+	else if (isset($argv))
+	{
+		foreach ($argv as $a)
+		{
+			if ($a == 'update')
+				$do_update = true;
+			elseif ($a == 'force')
+				$force_update = true;
+		}
+	}
+	
+	if ($do_update)
+	{
+		ini_set('allow_url_fopen', 'on'); //doesnt work
+		bo_update_all($force_update);
 		exit;
 	}
 

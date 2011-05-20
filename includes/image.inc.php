@@ -538,7 +538,7 @@ function bo_get_map_image()
 	imagestring($I, $fontsize, 1, 1, date('H:i', $time_min).' - '.date('H:i', $time_max), $text_col);
 
 	//Strikes
-	$text = _BL('Strikes').': '.array_sum($count);
+	$text = _BL('Strikes', true).': '.array_sum($count);
 	$fw = imagefontwidth($fontsize) * strlen($text);
 	imagestring($I, $fontsize, $w - $fw - 1, 1, $text, $text_col);
 
