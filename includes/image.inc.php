@@ -28,8 +28,6 @@ function bo_icon($icon)
 	$dir = BO_DIR."cache/icons/";
 	$file = $dir.$icon.'.png';
 
-	Header("Content-type: image/png");
-
 	$s = 11;
 
 	if (!file_exists($file))
@@ -50,11 +48,12 @@ function bo_icon($icon)
 			$col = ImageColorAllocate ($im, 0,0,0);
 			imageellipse( $im, $c, $c, $c+2, $c+2, $col );
 		}
-
+		
 		Imagepng($im, $file);
 		ImageDestroy($im);
 	}
-
+	
+	Header("Content-type: image/png");
 	readfile($file);
 
 	exit;
@@ -96,18 +95,22 @@ function bo_tile()
 	$exp_time = $mod_time + 60 * $update_interval + 59;
 	$age      = $exp_time - time();
 
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+	
 	//Headers
-	header("Content-Type: image/png");
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
 
-	// *** Caching not allowed ***
-	//header("Pragma: no-cache");
-	//header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
-
-	// *** Caching allowed ***
-	header("Pragma: ");
-	header("Cache-Control: public, max-age=".$age);
+	if ($caching)
+	{
+		header("Pragma: ");
+		header("Cache-Control: public, max-age=".$age);
+	}
+	else
+	{
+		header("Pragma: no-cache");
+		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+	}
 
 	//send only the info image (colors, time)
 	if ($only_info)
@@ -131,6 +134,8 @@ function bo_tile()
 		$col = imagecolorallocate($I, 255,255,255);
 		imagestring($I, 2, 1, $col_height + 1, date('H:i', $time_min).' - '.date('H:i', $time_max), $col);
 
+		
+		header("Content-Type: image/png");
 		imagepng($I);
 		exit;
 	}
@@ -141,8 +146,6 @@ function bo_tile()
 	$filename = 'tile_'.$type.'_'.$x.'x'.$y.'_'.$zoom.'_'.$only_own.'_'.(bo_user_get_level() ? 1 : 0).'.png';
 	$file = $dir.$filename;
 
-	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
-	
 	if (file_exists($file) && $caching)
 	{
 		$filetime = filemtime($file);
@@ -150,6 +153,7 @@ function bo_tile()
 
 		if ($cur_minute == $file_minute && time() - $filetime < $update_interval * 60 )
 		{
+			header("Content-Type: image/png");
 			readfile($file);
 			exit;
 		}
@@ -207,8 +211,9 @@ function bo_tile()
 
 					imagecolortransparent($I, $blank);
 					
-					if ($caching)
+					if (!$caching)
 					{
+						header("Content-Type: image/png");
 						imagepng($I);
 						exit;
 					}
@@ -216,8 +221,9 @@ function bo_tile()
 					imagepng($I, $dir.'na.png');
 
 				}
-				
-					readfile($dir.'na.png');
+
+				header("Content-Type: image/png");
+				readfile($dir.'na.png');
 
 				exit;
 			}
@@ -278,6 +284,8 @@ function bo_tile()
 	{
 		$img = file_get_contents(BO_DIR.'images/blank_tile.png');
 		file_put_contents($file, $img);
+		
+		header("Content-Type: image/png");
 		echo $img;
 		exit;
 	}
@@ -371,6 +379,7 @@ function bo_tile()
 
 	imagecolortransparent($I, $blank);
 
+	header("Content-Type: image/png");
 	if ($caching)
 	{
 		imagepng($I, $file);
@@ -420,7 +429,6 @@ function bo_get_map_image()
 	$last_update = bo_get_conf('uptime_strikes');
 	$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
 
-	header("Content-Type: image/png");
 	header("Pragma: ");
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
@@ -431,6 +439,7 @@ function bo_get_map_image()
 	$cache_file = BO_DIR.'cache/maps/'.$id.'.png';
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
+		header("Content-Type: image/png");
 		readfile($cache_file);
 		exit;
 	}
@@ -580,7 +589,6 @@ function bo_get_map_image()
 
 
 	header("Content-Type: image/png");
-	
 	if ($caching)
 	{
 		imagepng($I, $cache_file);

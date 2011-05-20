@@ -110,21 +110,40 @@ function bo_show_login()
 				echo '<ul class="bo_login_info">
 						<li>'._BL('user_welcome_text').': <strong>'.bo_user_get_name().'</strong></li>
 						<li>'._BL('MyBlitzortung version').': <strong>'.bo_get_conf('version').'</strong></li>';
+				echo '</ul>';
 				
+				echo '<h4>Admin</h4>';
+				
+				echo '<ul>';
 				if (BO_PERM_ADMIN & $level)
+				{
+					$res = bo_db("SHOW VARIABLES LIKE 'version'");
+					$row = $res->fetch_assoc();
+					$mysql_ver = $row['Value'];
+					
 					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=update">'._BL('Do manual update').'</a></li>';
+					echo '<li>PHP version: '.phpversion().' (<a href="'.bo_insert_url($remove_vars).'&bo_action=phpinfo">'._BL('Show PHP info').'</a>)</li>';
+					echo '<li>MySQL version: '.$mysql_ver.'</li>';
+				}
 				
 				echo '</ul>';
 				
 				break;
 		}
 		
-		if ( (BO_PERM_ADMIN & $level) && $_GET['bo_action'] == 'update')
+		if ( (BO_PERM_ADMIN & $level) )
 		{
-			echo flush();
-			echo '<div style="font-family: Courier; font-size: 0.7em; border: 1px solid #999; padding: 10px; ">';
-			bo_update_all(true);
-			echo '</div>';
+			if ($_GET['bo_action'] == 'update')
+			{
+				echo flush();
+				echo '<div style="font-family: Courier; font-size: 0.7em; border: 1px solid #999; padding: 10px; ">';
+				bo_update_all(true);
+				echo '</div>';
+			}
+			else if ($_GET['bo_action'] == 'phpinfo')
+			{
+				phpinfo();
+			}
 		}
 
 	}
@@ -182,11 +201,11 @@ function bo_user_do_login($user, $pass)
 	if (BO_LOGIN_ALLOW == 2)
 	{
 		$pass = md5($pass);
-		$erg = bo_db("SELECT id, login, level FROM ".BO_DB_PREF."user WHERE login='$user' AND password='$pass'");
+		$res = bo_db("SELECT id, login, level FROM ".BO_DB_PREF."user WHERE login='$user' AND password='$pass'");
 
-		if ($erg->num_rows == 1)
+		if ($res->num_rows == 1)
 		{
-			$row = $erg->fetch_assoc();
+			$row = $res->fetch_assoc();
 			bo_user_set_session($row['id'], $row['level']);
 			return true;
 		}
@@ -221,8 +240,8 @@ function bo_user_get_level($user_id = 0)
 	if ($user_id == 1)
 		return pow(2, BO_PERM_COUNT) - 1;
 
-	$erg = bo_db("SELECT level FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
-	$row = $erg->fetch_assoc();
+	$res = bo_db("SELECT level FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+	$row = $res->fetch_assoc();
 
 	return $row['level'];
 }
@@ -239,8 +258,8 @@ function bo_user_get_name($user_id = 0)
 
 	if (!isset($names[$user_id]))
 	{
-		$erg = bo_db("SELECT login FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
-		$row = $erg->fetch_assoc();
+		$res = bo_db("SELECT login FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+		$row = $res->fetch_assoc();
 		$names[$user_id] = $row['login'];
 	}
 	
@@ -256,8 +275,8 @@ function bo_user_get_mail($user_id = 0)
 
 	if (!isset($mails[$user_id]))
 	{
-		$erg = bo_db("SELECT mail FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
-		$row = $erg->fetch_assoc();
+		$res = bo_db("SELECT mail FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+		$row = $res->fetch_assoc();
 		$mails[$user_id] = $row['mail'];
 	}
 	
@@ -372,8 +391,8 @@ function bo_user_show_admin()
 	$sql = "SELECT id, login, password, level, mail
 			FROM ".BO_DB_PREF."user
 			";
-	$erg = bo_db($sql);
-	while ($row = $erg->fetch_assoc())
+	$res = bo_db($sql);
+	while ($row = $res->fetch_assoc())
 	{
 		if ($row['id'] == 1)
 		{
@@ -539,8 +558,8 @@ function bo_show_calibrate_antennas()
 					".($age ? " AND s.time > '".gmdate('Y-m-d H:i:s', time() - 3600 * 24 * $age)."' " : '')."
 				ORDER BY RAND()
 				LIMIT $limit";
-		$erg = bo_db($sql);
-		while ($row = $erg->fetch_assoc())
+		$res = bo_db($sql);
+		while ($row = $res->fetch_assoc())
 		{
 			$bearing = bo_latlon2bearing($row['lat'], $row['lon']);
 

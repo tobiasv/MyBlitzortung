@@ -194,8 +194,6 @@ function bo_update_raw_signals($force = false)
 // Get new strikes from blitzortung.org
 function bo_update_strikes($force = false)
 {
-	global $LATITUDE, $LONGITUDE;
-
 	$last = bo_get_conf('uptime_strikes');
 
 	echo '<h3>Strikes</h3>';
@@ -220,7 +218,7 @@ function bo_update_strikes($force = false)
 		$min_dist_all = 9E12;
 		$max_dist_own = 0;
 		$min_dist_own = 9E12;
-
+		
 		$file = file_get_contents('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt');
 
 		if ($file === false)
@@ -229,10 +227,19 @@ function bo_update_strikes($force = false)
 		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
 		$row = $res->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
-			
+		
+		if ($last_strike > time())
+			$last_strike = time() - 3600 * 24;
+		
+		$time_update = $last_strike - 10;
+		
 		$loadcount = bo_get_conf('upcount_strikes');
 		bo_set_conf('upcount_strikes', $loadcount+1);
 
+		echo '<p>Last strike: '.date('Y-m-d H:i:s', $last_strike).' 
+				*** Importing only strikes newer than: '.date('Y-m-d H:i:s', $time_update).'
+				*** This is update #'.$loadcount.'</p>';
+		
 		$lines = explode("\n", $file);
 		foreach($lines as $l)
 		{
@@ -244,7 +251,7 @@ function bo_update_strikes($force = false)
 				$utime = strtotime("$date $time UTC");
 
 				// update strike-data only some seconds *before* the *last strike in Database*
-				if ($utime < $last_strike - 10)
+				if ($utime < $time_update)
 				{
 					$a++;
 					continue;
@@ -570,8 +577,6 @@ function bo_match_strike2raw()
 // Get stations-data and statistics from blitzortung.org
 function bo_update_stations($force = false)
 {
-	global $LATITUDE, $LONGITUDE;
-
 	$last = bo_get_conf('uptime_stations');
 
 	echo '<h3>Stations</h3>';

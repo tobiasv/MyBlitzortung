@@ -3,6 +3,15 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.2.2b (2011-05-20)
+---------------------------
+(no new features, bugfix release)
+- debug output when importing strikes
+- moved sending image headers
+- adding version information
+- cleanup
+
+
 Version 0.2.2a (2011-05-19)
 ---------------------------
 - fix for mysql_num_rows error
