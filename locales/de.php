@@ -237,7 +237,7 @@ $_BL['de']['Sum of Signals'] = 'Anzahl aller Signale';
 $_BL['de']['Sum of Strikes'] = 'Anzahl an Blitzen';
 $_BL['de']['Strikes detected'] = 'Blitze registriert';
 $_BL['de']['of the last'] = 'der letzten';
-
+$_BL['de']['Currently no GPS coordinates available!'] = 'Momentan sind keine GPS Koordinaten verfügbar';
 
 
 /*************************************************************/
@@ -529,4 +529,3 @@ $_BL['de']['mybo_station_update_info'] = '
 		</p>';
 		
 
-$_BL['de']['Currently no GPS coordinates available!'] = '';

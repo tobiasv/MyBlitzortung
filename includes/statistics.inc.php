@@ -646,11 +646,11 @@ function bo_show_statistics_other()
 		
 		echo '<ul class="bo_stat_overview">';
 		
-		if ($st_lat[0] && $st_lat[0])
+		if ($lat[0] && $lon[0])
 		{
 			
-			echo '<li><span class="bo_descr">'._BL('Coordinates').': </span><span class="bo_value">'.$st_lat[0].'&deg; / '.$st_lon[0].'&deg'.'</span>';
-			echo '<li><span class="bo_descr">'._BL('Height').': </span><span class="bo_value">'.$st_height[0].'m</span>';
+			echo '<li><span class="bo_descr">'._BL('Coordinates').': </span><span class="bo_value">'.$lat[0].'&deg; / '.$lon[0].'&deg'.'</span>';
+			echo '<li><span class="bo_descr">'._BL('Height').': </span><span class="bo_value">'.$height[0].'m</span>';
 			
 		}
 		else
