@@ -109,49 +109,62 @@ function bo_show_login()
 			
 			case 'mybo_station_update':
 				if (BO_PERM_ADMIN & $level)
-					bo_my_station_update();
+					bo_my_station_update_form();
+				break;
+			
+			case 'update':
+				
+				if ( (BO_PERM_ADMIN & $level) )
+				{
+					echo flush();
+					echo '<div style="font-family: Courier; font-size: 0.7em; border: 1px solid #999; padding: 10px; ">';
+					bo_update_all(true);
+					echo '</div>';
+				}
+				break;
+			
+			case 'cache_info':
+				if ( (BO_PERM_ADMIN & $level) )
+					bo_cache_info();
+			
+			
 				break;
 			
 			default:
+				echo '<h4>'._BL('Welcome to MyBlitzortung user area').'!</h4>';
 				echo '<ul class="bo_login_info">
-						<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>
-						<li>'._BL('MyBlitzortung version').': <strong>'.bo_get_conf('version').'</strong></li>';
+						<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>';
 				echo '</ul>';
 				
-				echo '<h4>Admin</h4>';
+				if (BO_PERM_ADMIN & $level)
+				{
+					echo '<h4>'._BL('Admin tools').'</h4>';
+					echo '<ul>';
+					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=update">'._BL('Do manual update').'</a></li>';
+					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=mybo_station_update">'._BL('Update MyBlitzortung Stations').'</a></li>';
+					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=cache_info">'._BL('File cache info').'</a></li>';
+					echo '</ul>';
+
+				}
 				
+				echo '<h4>'._BL('Version information').'</h4>';
 				echo '<ul>';
+				echo '<li>'._BL('MyBlitzortung version').': <strong>'.bo_get_conf('version').'</strong></li>';
 				if (BO_PERM_ADMIN & $level)
 				{
 					$res = bo_db("SHOW VARIABLES LIKE 'version'");
 					$row = $res->fetch_assoc();
 					$mysql_ver = $row['Value'];
 					
-					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=update">'._BL('Do manual update').'</a></li>';
-					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=mybo_station_update">'._BL('Update MyBlitzortung Stations').'</a></li>';
-					echo '<li>PHP version: '.phpversion().' (<a href="'.bo_insert_url($remove_vars).'&bo_action=phpinfo">'._BL('Show PHP info').'</a>)</li>';
-					echo '<li>MySQL version: '.$mysql_ver.'</li>';
+					echo '<li>'._BL('PHP version').': '.phpversion().' (<a href="'.bo_insert_url($remove_vars).'&bo_action=phpinfo" target="_blank">'._BL('Show PHP info').'</a>)</li>';
+					echo '<li>'._BL('MySQL version').': '.$mysql_ver.'</li>';
 				}
-				
 				echo '</ul>';
 				
 				break;
 		}
 		
-		if ( (BO_PERM_ADMIN & $level) )
-		{
-			if ($_GET['bo_action'] == 'update')
-			{
-				echo flush();
-				echo '<div style="font-family: Courier; font-size: 0.7em; border: 1px solid #999; padding: 10px; ">';
-				bo_update_all(true);
-				echo '</div>';
-			}
-			else if ($_GET['bo_action'] == 'phpinfo')
-			{
-				phpinfo();
-			}
-		}
+
 
 	}
 	else
@@ -751,125 +764,89 @@ function bo_show_calibrate_antennas()
 	}
 }
 
-function bo_my_station_update()
+function bo_cache_info()
 {
-	define('BO_LINK_HOST', 'www.wetter-rosstal.de');
-	define('BO_LINK_URL',  '/blitzortung/bo.php');
-
-	if ($_POST['ok'])	
+	$dirs['Tiles'] = 'cache/tiles/';
+	$dirs['Icons'] = 'cache/icons/';
+	$dirs['Maps'] = 'cache/maps/';
+	
+	echo '<h3>'._BL('File cache info').'</h3>';
+	
+	foreach($dirs as $name => $dir)
 	{
-		echo '<h3>'._BL('Linking with other MyBlitzortung stations').'</h3>';
-		echo '<h4>'._BL('Getting Login string').'</h4>';
+		echo '<h4>'.$name.' <em>'.$dir.'</em></h4>';
 		
-		$login_id = bo_get_login_str();
+		$dir = BO_DIR.$dir;
+		$files = scandir($dir);
 		
-		if (!$login_id)
+		$size = 0;
+		$count = 0;
+		foreach($files as $file)
 		{
-			echo '<p>'._BL('Couldn\'t get login id').'.</p>';
-		}
-		else
-		{
-			echo '<p>'._BL('String is').': <em>'.$login_id.'</em></p>';
-			echo '<h4>'._BL('Requesting data').'</h4>';
-			echo '<p>'._BL('Connecting to ').' <em>'.BO_LINK_HOST.'</em></p>';
-			
-			$request = 'id='.bo_station_id().'&login='.$login_id.'&url='.urlencode(trim($_POST['bo_url']));
-			$url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
-			
-			$content = file_get_contents($url);
-			
-			$R = unserialize($content);
-			
-			if (!$R || !is_array($R))
+			$file = $dir.$file;
+			if (!is_dir($file))
 			{
-				echo '<p>'._BL('Error talking to the server. Please try again later.').'</p>';
-			}
-			else
-			{
-				switch($R['status'])
+				if ($_GET['bo_action2'] == 'unlink')
+					$ok = @unlink($file);
+				else
+					$ok = false;
+				
+				if (!$ok)
 				{
-					case 'auth_fail':
-						echo '<p>'._BL('Authentication failure').'.</p>';
-						break;
-
-					case 'request_fail':
-						echo '<p>'._BL('Failure in Request URL: ').'<em>'._BC($url).'</em></p>';
-						break;
-					
-					case 'ok':
-						$urls = $R['urls'];
-						
-						if (is_array($urls))
-						{
-							bo_set_conf('mybo_stations', serialize($urls));
-							
-							echo '<p>'._BL('Received urls').': '.count($urls).'</p>';
-							echo '<p>'._BL('DONE').'!</p>';
-							
-							echo '<ul>';
-							ksort($urls);
-							foreach($urls as $id => $st_url)
-							{
-								echo '<li>'.$id.': '._BC($st_url).'</url>';
-							
-							}
-							echo '</ul>';
-						
-						}
-						else
-						{
-							echo '<p>'._BL('Cannot read url data').'!</p>';
-						}
-						
-						break;
+					$size += filesize($file);
+					$count++;
 				}
 			}
 		}
+		
+		echo '<p>'._BL('Files').': <strong>'.$count.'</strong> ('.number_format($size / 1024, 1, _BL('.'), _BL(',')).' kB)</p>';
+	}
+
+	
+	echo '<h3>Clear all files</h3>';
+	
+	echo '<p><a href="'.bo_insert_url().'&bo_action2=unlink">'._BL('Click here to delete all files').'</a></p>';
+}
+
+function bo_my_station_update_form()
+{
+	if ($_POST['ok'])	
+	{
+		$url = trim($_POST['bo_url']);
+		$ret = bo_my_station_update($url);
+		
+		if ($ret && $url)
+			bo_set_conf('mybo_stations_autoupdate', $_POST['bo_auto'] ? 1 : 0);
+		else
+			bo_set_conf('mybo_stations_autoupdate', 0);
 	}
 	else
 	{
-		echo '<h3>'._BL('Link with the MyBlitzortung network').'</h3>';
-		
-?>
-		<p>
-		With this feature, you can link your MyBlitzortung installation
-		with other stations that have MyBlitzortung running.
-		The following things will happen, when you click on the link below:
-		</p>
-		
-		<ul>
-		<li>1. Your station id and the url of this website will be send to a server.
-		</li>
-		<li>2. You will get all urls of the other stations that are currently in the list.
-		</li>
-		</ul>
-		
-		<p>
-		Of course, you have to update the data from time to time, so that new stations will appear.
-		Currently, you can see the linked stations only in the statistics table.
-		</p>
-		
-		<p>
-		To authenticate you as a blitzortung.org member, a login-id will be requestet at blitzortung.org.
-		This id will be sent to <em><?php echo BO_LINK_HOST ?></em> and there it will rechecked again at blitzortung.org.
-		The id will not be saved! Your password will never be sent to other websites than blitzortung.org!
-		</p>
-<?php
 	
-		$url = 'http://'.$_SERVER["HTTP_HOST"].dirname($_SERVER["REQUEST_URI"]);
-	
-		echo '<form action="'.bo_insert_url().'" method="POST" class="bo_login_form">';
+		$st_urls = unserialize(bo_get_conf('mybo_stations'));
+		
+		if (is_array($st_urls) && $st_urls[bo_station_id()])
+			$url = $st_urls[bo_station_id()];
+		else
+			$url = 'http://'.$_SERVER["HTTP_HOST"].dirname($_SERVER["REQUEST_URI"]);
 
+			
+		echo '<h3>'._BL('Link with the MyBlitzortung network').'</h3>';
+		echo strtr(_BL('mybo_station_update_info'), array('{LINK_HOST}' => BO_LINK_HOST));
+		echo '<form action="'.bo_insert_url().'" method="POST" class="bo_login_form">';
 		echo '<fieldset class="bo_mylink_fieldset">';
 		echo '<span class="bo_form_descr">'._BL('URL of your website').' ('._BL('Leave blank to remove your station from the list').'):</span>';
 		echo '<input type="text" name="bo_url" id="bo_mylink_url" value="'._BC($url).'" class="bo_form_text" style="width:100%">';
-		echo '<input type="submit" name="ok" value="'._BL('Agree and Send').'" id="bo_login_submit" class="bo_form_submit" onclick="return confirm(\'Really continue?\');">';
+		echo '<div class="bo_input_container">';
+		echo '<span class="bo_form_descr">'.' '._BL('Do an auto update every 24h to retrieve new stations').':</span>';
+		echo '<input type="checkbox" value="1" name="bo_auto" '.(bo_get_conf('mybo_stations_autoupdate') == 1 ? ' checked ' : '').'>';
+		echo '</div>';
+		echo '<input type="submit" name="ok" value="'._BL('Agree and Send').'" id="bo_login_submit" class="bo_form_submit" onclick="return confirm(\''._BL('Really continue?').'\');">';
 		echo '</fieldset>';
-		
 		echo '</form>';
 	
 	}
 
 }
-
+		
 ?>

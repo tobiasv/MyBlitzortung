@@ -301,6 +301,15 @@ $_BL['de']['Change'] = 'Ändern';
 $_BL['de']['Password changed!'] = 'Passwort wurde geändert';
 $_BL['de']['No permission!'] = 'Keine Berechtigung!';
 $_BL['de']['Password was not changed!'] = 'Passwort wurde NICHT geändert!';
+$_BL['de']['Welcome to MyBlitzortung user area'] = 'Willkommen im Myblitzortung Nutzerbereich';
+$_BL['de']['Admin tools'] = 'Administrationstools';
+$_BL['de']['File cache info'] = 'Dateicache';
+$_BL['de']['Version information'] = 'Versionsinformation';
+$_BL['de']['PHP version'] = 'PHP Version';
+$_BL['de']['Show PHP info'] = 'Zeige PHP Informationen';
+$_BL['de']['MySQL version'] = 'MySQL Version';
+$_BL['de']['Files'] = 'Dateien';
+$_BL['de']['Click here to delete all files'] = 'Hier klicken um alle Dateien zu löschen';
 
 $_BL['de']['user_perm0'] = 'Benutzereinstellungen';
 $_BL['de']['user_perm1'] = 'Andere Einstellungen';
@@ -471,3 +480,53 @@ $_BL['de']['To'] = 'Versand an';
 $_BL['de']['Start'] = 'Start';
 $_BL['de']['No log entries'] = 'Keine Einträge im Verlauf';
 
+
+/*************************************************************/
+/* MyBo station linking                                      */
+/*************************************************************/
+$_BL['de']['Link with the MyBlitzortung network'] = 'Mit Stationen verlinken, die MyBlitzortung einsetzen';
+$_BL['de']['URL of your website'] = 'Adresse Deiner Webseite';
+$_BL['de']['Leave blank to remove your station from the list'] = 'Leer lassen, um Deine Station von der Liste zu entfernen';
+$_BL['de']['Do an auto update every 24h to retrieve new stations'] = 'Automatisch alle 24h aktualisieren, um die neuesten Links zu bekommen';
+$_BL['de']['Agree and Send'] = 'Einverstanden und Los gehts';
+$_BL['de']['Update MyBlitzortung Stations'] = 'MyBlitzortung Stationen aktualisieren';
+$_BL['de']['Linking with other MyBlitzortung stations'] = 'Mit dem MyBlitzortung Stationsnetzwerk verlinken';
+$_BL['de']['Getting Login string'] = 'Hole eindeutigen Login Kennung';
+$_BL['de']['String is'] = 'Login Kennung ist';
+$_BL['de']['Requesting data'] = 'Daten abfragen';
+$_BL['de']['Connecting to '] = 'Verbinden mit';
+$_BL['de']['Received urls'] = 'Links empfangen';
+$_BL['de']['DONE'] = 'FERTIG';
+$_BL['de']['Really continue?'] = 'Wirklich fortfahren?';
+
+$_BL['de']['mybo_station_update_info'] = '
+		<p>
+		Hier hast Du die Möglichkeit Deine MyBlitzortung-Webseite mit anderen Stationen 
+		zu verknüpfen, die ebenfalls MyBlitzortung einsetzen.
+		Die folgenden Dinge werden passieren wenn Du fortfährst:
+		</p>
+		
+		<ul>
+		<li>1. Deine Stations-ID, Deine Website-Adresse sowie die von Dir hinterlegten Koordinaten werden zu einem Server gesendet.
+		</li>
+		<li>2. Gleichzeitig bekommst Du eine Liste von Stationen, die dies ebenfalls getan haben zurück.
+		</li>
+		</ul>
+		
+		<p>
+		Du solltest diese Daten von Zeit zu Zeit erneuern bzw. die automatische Aktualisierung aktivieren.
+		Momentan sind die verlinkten Stationen nur in der Stationstabelle auf der Statistikseite zu sehen.
+		</p>
+		
+		<p>
+		Wichtiger HINWEIS:
+		Um Dich als Teilnehmer zu authentifizieren wird mit Deinen Zugangsdaten eine Login-Kennung bei blitzortung.org abgefragt.
+		Diese wird an <em>{LINK_HOST}</em> gesendet und dort wiederrum bei blitzortung.org überprüft.
+		Somit ist sichergestellt, dass nur Teilnehmer diesen Mechanismus benutzen können.
+		Die Login-Kennung wird nicht gespeichert. Sie wird sofort wieder unbrauchbar gemacht.
+		Dein Passwort wird niemals an andere Webseiten außer blitzortung.org gesendet!
+		Um dieses Feature nutzen zu können, muss Deine Station in den letzten zwei Stunden Signale gesendet haben.
+		</p>';
+		
+
+$_BL['de']['Currently no GPS coordinates available!'] = '';

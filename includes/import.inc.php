@@ -813,8 +813,6 @@ function bo_update_stations($force = false)
 function bo_update_all($force)
 {
 
-	echo "<h1>MyBlitzortung</h1>\n\n";
-
 	echo "<h2>Getting lightning data from blitzortung.org</h2>\n";
 
 	set_time_limit(50);
@@ -861,16 +859,18 @@ function bo_update_all($force)
 		
 		flush();
 		bo_update_raw_signals($force);
+		
+
+		/*** Check and send strike alerts ***/
+		if (defined('BO_ALERTS') && BO_ALERTS)
+		{
+			flush();
+			echo "\n<h2>Checking and sending strike alerts.</h2>\n";
+			bo_alert_send();
+		}
+		
 	}
 
-	/*** Check and send strike alerts ***/
-	if (defined('BO_ALERTS') && BO_ALERTS)
-	{
-		flush();
-		echo "\n<h2>Checking and sending strike alerts.</h2>\n";
-		bo_alert_send();
-	}
-	
 	/*** Purge old data ***/
 	echo "\n<h2>Purging data</h2>\n";
 	flush();
@@ -994,9 +994,109 @@ function bo_update_all($force)
 		echo "<p>Purgin disabled!</p>\n";
 	}
 
+	bo_my_station_autoupdate($force);
+	
 	bo_set_conf('is_updating', 0);
 
 	return;
+}
+
+function bo_my_station_autoupdate($force)
+{
+	if (bo_get_conf('mybo_stations_autoupdate'))
+	{
+		$last = bo_get_conf('uptime_mybo_stations');
+		bo_set_conf('uptime_mybo_stations', time());
+		
+		if (time() - $last > 24 * 3600 - 30 || $force)
+		{
+			$st_urls = unserialize(bo_get_conf('mybo_stations'));
+		
+			if (is_array($st_urls) && trim($st_urls[bo_station_id()]))
+				bo_my_station_update(trim($st_urls[bo_station_id()]));
+			else
+				echo '<p>Error: Own URL is empty!</p>';
+			
+		}
+	
+	}
+
+}
+
+function bo_my_station_update($url)
+{
+	echo '<h2>'._BL('Linking with other MyBlitzortung stations').'</h2>';
+	echo '<h3>'._BL('Getting Login string').'</h3>';
+	
+	$login_id = bo_get_login_str();
+	
+	$ret = false;
+	
+	if (!$login_id)
+	{
+		echo '<p>'._BL('Couldn\'t get login id').'.</p>';
+	}
+	else
+	{
+		echo '<p>'._BL('String is').': <em>'.$login_id.'</em></p>';
+		echo '<h3>'._BL('Requesting data').'</h3>';
+		echo '<p>'._BL('Connecting to ').' <em>'.BO_LINK_HOST.'</em></p>';
+		
+		$request = 'id='.bo_station_id().'&login='.$login_id.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON);
+		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
+		
+		$content = file_get_contents($data_url);
+		
+		$R = unserialize($content);
+		
+		if (!$R || !is_array($R))
+		{
+			echo '<p>'._BL('Error talking to the server. Please try again later.').'</p>';
+		}
+		else
+		{
+			switch($R['status'])
+			{
+				case 'auth_fail':
+					echo '<p>'._BL('Authentication failure').'.</p>';
+					break;
+
+				case 'request_fail':
+					echo '<p>'._BL('Failure in Request URL: ').'<em>'._BC($data_url).'</em></p>';
+					break;
+				
+				case 'ok':
+					$urls = $R['urls'];
+					
+					if (is_array($urls))
+					{
+						bo_set_conf('mybo_stations', serialize($urls));
+						
+						echo '<p>'._BL('Received urls').': '.count($urls).'</p>';
+						echo '<p>'._BL('DONE').'!</p>';
+						
+						echo '<ul>';
+						ksort($urls);
+						foreach($urls as $id => $st_url)
+						{
+							echo '<li>'.$id.': '._BC($st_url).'</url>';
+						}
+						echo '</ul>';
+						
+						$ret = true;
+					
+					}
+					else
+					{
+						echo '<p>'._BL('Cannot read url data').'!</p>';
+					}
+					
+					break;
+			}
+		}
+	}
+
+	return $ret;
 }
 
 

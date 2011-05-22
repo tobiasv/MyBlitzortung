@@ -405,7 +405,7 @@ function bo_purge_tiles()
 		foreach($files as $file)
 		{
 			if (!is_dir($dir.$file) && fileatime($dir.$file) < time() - 3600 * 6)
-				unlink($dir.$file);
+				@unlink($dir.$file);
 		}
 	}
 

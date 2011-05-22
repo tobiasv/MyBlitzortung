@@ -1,8 +1,59 @@
 <?php
 
 /*
-  Config file for MyBlitzortung
+  Example config file for MyBlitzortung
+  You can create your own config.php with individual settings.
+  It won't be overwritten by a new file during an update!
 */
+
+
+/*** Database settings  ***/
+
+define("BO_DB_USER", "###Database: Username###");
+define("BO_DB_PASS", "###Database: Password###");
+define("BO_DB_NAME", "###Database: Name of database###");
+define("BO_DB_HOST", "localhost"); // should work in most cases
+define("BO_DB_PREF", "mybo_"); // you can change this individually
+
+
+/*** blitzortung.org Login ***/
+
+define("BO_USER", "###Your Blitzortung.org Login###");
+define("BO_PASS", "###Your Blitzortung.org Password###");
+
+
+/*** Station info ***/
+
+define("BO_LAT", "###Latitude of your Station###");
+define("BO_LON", "###Longitude of your Station###");
+define("BO_STATION_NAME", "###Name of your station (i.e. city name)###");
+
+/*** Update secret  ***/
+/*   For importing the skrike data. You can leave it blank,   */
+/*   but then everybody can trigger a data import!            */
+
+define("BO_UPDATE_SECRET", "");
+
+
+/*** Main File and path for creating graphs and images   ***/
+/*   You can use relative or absolute (with leading "/") paths:                                      */
+/*   Example: http://myhomepage.com/strikes/blitzortung.php ==> BO_FILE = /strikes/blitzortung.php   */
+
+define("BO_FILE", "blitzortung.php");
+
+
+/*** Default language ***/
+
+define("BO_LOCALE", "de");
+
+/*** Time Zone setting ***/
+
+define("BO_TIMEZONE", "Europe/Berlin");
+
+/*** UTF8-Encoding ***/
+/*   Most Content-Management-Systems use UTF8-encoding */
+
+define("BO_UTF8", false);
 
 //User / Login
 define("BO_LOGIN_SHOW", true);
@@ -261,7 +312,5 @@ define("BO_ALERT_SEND_INTERVAL", 45); // (minutes) waits minimum time without st
 /*  http://www.innosend.de/gateway/sms.php?id=USER&pw=PASS&absender=MyBO&empfaenger={tel}&text={text}&type=4  */
  
 define("BO_SMS_GATEWAY_URL", '');
-
-
 
 ?>

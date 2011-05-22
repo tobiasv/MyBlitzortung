@@ -411,6 +411,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	require_once 'jpgraph/jpgraph_date.php';
 
 	$graph = new Graph(BO_GRAPH_STAT_W,BO_GRAPH_STAT_H,"auto");
+	$graph->ClearTheme();
 	$graph->SetScale($graph_type);
 
 	if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)

@@ -365,14 +365,13 @@ switch($step)
 				
 		echo '<li><em>cache</em>: <span style="color:';
 		if (is_writeable('../cache/')) echo 'green;">OK.'; else echo 'red;">Not writeable! Please correct.';
-		echo '</li><li><em>cache/icons</em>: <span style="color:';
+		echo '</span></li><li><em>cache/icons</em>: <span style="color:';
 		if (is_writeable('../cache/icons')) echo 'green;">OK.'; else echo 'red;">Not writeable! Please correct.';
-		echo '</li><li><em>cache/maps</em>: <span style="color:';
+		echo '</span></li><li><em>cache/maps</em>: <span style="color:';
 		if (is_writeable('../cache/maps')) echo 'green;">OK.'; else echo 'red;">Not writeable! Please correct.';
-		echo '</li><li><em>cache/tiles</em>: <span style="color:';
+		echo '</span></li><li><em>cache/tiles</em>: <span style="color:';
 		if (is_writeable('../cache/tiles')) echo 'green;">OK.'; else echo 'red;">Not writeable! Please correct.';
-		
-		echo '</li>
+		echo '</span></li>
 				</ul>
 				<p>
 				For linux users:<ul><li> <em>chmod -R 777 '.$path.'cache</em></li></ul>

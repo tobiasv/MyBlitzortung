@@ -3,6 +3,16 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.2.4 (2011-05-22)
+--------------------------
+- new: no more settings.php! Use config.php for individual settings! (IMPORTANT !!!)
+- new: style.css changed to include in own website
+- new: define own.css for individual style in standalone version
+- new: Auto update of MyBlitzortung station list
+- new: link to clear file cache links
+- fixed: colors in statistics graphs
+- minor changes and improvements
+
 Version 0.2.3 (2011-05-20)
 --------------------------
 - improved UTF8 support

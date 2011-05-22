@@ -21,8 +21,9 @@
 
 if (!defined("BO_VER"))
 {
+
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.2.3');
+	define("BO_VER", '0.2.4');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -32,6 +33,11 @@ if (!defined("BO_VER"))
 	define("BO_PERM_ALERT_SMS",		32);
 	define("BO_PERM_ALERT_URL",		64);
 	define("BO_PERM_COUNT",	7);
+	
+	//Do not change these values (needed for auto linking stations)
+	define('BO_LINK_HOST', 'www.wetter-rosstal.de');
+	define('BO_LINK_URL',  '/blitzortung/bo.php');
+
 	
 	//Some default PHP-Options
 	ini_set('magic_quotes_runtime', 0); 
@@ -43,13 +49,10 @@ if (!defined("BO_VER"))
 
 	if (!file_exists(BO_DIR.'config.php'))
 		die('Missing config.php! Please run installation first!');
-
-	if (!file_exists(BO_DIR.'settings.php'))
-		die('Missing settings.php!');
 		
 	//Load Config
 	require_once 'config.php';
-	require_once 'settings.php';
+	require_once 'includes/default_settings.inc.php';
 
 	date_default_timezone_set(BO_TIMEZONE);
 	
@@ -98,7 +101,14 @@ if (!defined("BO_VER"))
 		bo_tile();
 		exit;
 	}
+	//phpinfo for admin
+	else if ((BO_PERM_ADMIN & bo_user_get_level()) && $_GET['bo_action'] == 'phpinfo')
+	{
+		phpinfo();
+		exit;
+	}
 
+	
 	// includes #2
 	require_once 'includes/statistics.inc.php';
 	require_once 'includes/import.inc.php';
@@ -162,7 +172,7 @@ if (!defined("BO_VER"))
 
 	// include extra language (after images with caching machanism!)
 	$locale = '';
-	if (preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
+	if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
 	{
 		$locale = strtolower($_GET['bo_lang']);
 		$_SESSION['bo_locale'] = $locale;

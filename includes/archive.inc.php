@@ -198,11 +198,11 @@ function bo_show_archive_search()
 	echo '<legend>'._BL('archive_legend').'</legend>';
 
 	echo '<span class="bo_form_descr">'._BL('Coordinates').':</span>';
-	echo '<input type="text" name="bo_lat" value="'.htmlentities($lat).'" id="bo_archive_lat" class="bo_form_text bo_archive_latlon">';
-	echo '<input type="text" name="bo_lon" value="'.htmlentities($lon).'" id="bo_archive_lon" class="bo_form_text bo_archive_latlon">';
+	echo '<input type="text" name="bo_lat" value="'._BC($lat).'" id="bo_archive_lat" class="bo_form_text bo_archive_latlon">';
+	echo '<input type="text" name="bo_lon" value="'._BC($lon).'" id="bo_archive_lon" class="bo_form_text bo_archive_latlon">';
 
 	echo '<span class="bo_form_descr">'._BL('Distance').' '.'('._BL('unit_meters').'):</span>';
-	echo '<input type="text" name="bo_dist" value="'.htmlentities($delta_dist).'" id="bo_archive_dist" class="bo_form_text bo_archive_dist">';
+	echo '<input type="text" name="bo_dist" value="'._BC($delta_dist).'" id="bo_archive_dist" class="bo_form_text bo_archive_dist">';
 
 
 	echo '<input type="hidden" name="bo_map_zoom" id="bo_map_zoom">';
@@ -345,7 +345,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	$per_page = 10;
 
 	$only_strikes = isset($_GET['only_strikes']);
-	$page = intval($_GET['page']);
+	$page = intval($_GET['bo_action']);
 	$page = $page < 0 ? 0 : $page;
 
 	if ($lat !== null && $lon !== null)
@@ -369,7 +369,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 
 		echo '<form action="" method="GET">';
 
-		echo bo_insert_html_hidden(array('only_strikes', 'page'));
+		echo bo_insert_html_hidden(array('only_strikes', 'bo_action'));
 
 		echo '<fieldset>';
 		echo '<legend>'._BL('settings').'</legend>';
@@ -423,9 +423,9 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	echo '<div class="bo_sig_navi">';
 
 	if ($res->num_rows > $per_page)
-		echo '<a href="'.bo_insert_url('page', $page+1).'" class="bo_sig_prev" index="nofollow">'.htmlentities('< '._BL('Older')).'</a>';
+		echo '<a href="'.bo_insert_url('bo_action', $page+1).'" class="bo_sig_prev" index="nofollow">&lt; '._BL('Older').'</a>';
 	if ($page)
-		echo '<a href="'.bo_insert_url('page', $page-1).'" class="bo_sig_next" index="nofollow">'.htmlentities(_BL('Newer').' >').'</a>';
+		echo '<a href="'.bo_insert_url('bo_action', $page-1).'" class="bo_sig_next" index="nofollow">'._BL('Newer').' &gt;</a>';
 	echo '</div>';
 
 	echo '<table class="bo_sig_table">';
@@ -579,9 +579,9 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	{
 		echo '<div class="bo_sig_navi">';
 		if ($count == $per_page)
-			echo '<a href="'.bo_insert_url('page', $page+1).'" class="bo_sig_prev" index="nofollow">'.htmlentities('< '._BL('Older')).'</a>';
+			echo '<a href="'.bo_insert_url('bo_action', $page+1).'" class="bo_sig_prev" index="nofollow">&lt; '._BL('Older').'</a>';
 		if ($page)
-			echo '<a href="'.bo_insert_url('page', $page-1).'" class="bo_sig_next" index="nofollow">'.htmlentities(_BL('Newer').' >').'</a>';
+			echo '<a href="'.bo_insert_url('bo_action', $page-1).'" class="bo_sig_next" index="nofollow">'._BL('Newer').' &gt;</a>';
 		echo '</div>';
 	}
 
