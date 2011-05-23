@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.2.4a (2011-05-23)
+---------------------------
+- fix: MyBo stations auto update should work now
+
+
 Version 0.2.4 (2011-05-22)
 --------------------------
 - new: no more settings.php! Use config.php for individual settings! (IMPORTANT !!!)
@@ -12,6 +17,7 @@ Version 0.2.4 (2011-05-22)
 - new: link to clear file cache links
 - fixed: colors in statistics graphs
 - minor changes and improvements
+
 
 Version 0.2.3 (2011-05-20)
 --------------------------

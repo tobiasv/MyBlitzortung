@@ -1006,10 +1006,11 @@ function bo_my_station_autoupdate($force)
 	if (bo_get_conf('mybo_stations_autoupdate'))
 	{
 		$last = bo_get_conf('uptime_mybo_stations');
-		bo_set_conf('uptime_mybo_stations', time());
 		
 		if (time() - $last > 24 * 3600 - 30 || $force)
 		{
+			bo_set_conf('uptime_mybo_stations', time());
+			
 			$st_urls = unserialize(bo_get_conf('mybo_stations'));
 		
 			if (is_array($st_urls) && trim($st_urls[bo_station_id()]))
