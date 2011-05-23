@@ -803,7 +803,7 @@ function bo_cache_info()
 	}
 
 	
-	echo '<h3>Clear all files</h3>';
+	echo '<h3>'._BL('Clear all files').'</h3>';
 	
 	echo '<p><a href="'.bo_insert_url().'&bo_action2=unlink">'._BL('Click here to delete all files').'</a></p>';
 }

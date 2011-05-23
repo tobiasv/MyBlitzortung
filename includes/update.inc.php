@@ -32,8 +32,8 @@ function bo_check_for_update()
 
 	if ($cur_version_num < max($updates) && $_GET['bo_action'] != 'do_update')
 	{
-		echo 'Database version changed! ';
-		echo '<a href="'.bo_insert_url('bo_action', 'do_update').'">Click to update</a>';
+		echo _BL('Database version changed!');
+		echo ' <a href="'.bo_insert_url('bo_action', 'do_update').'">Click to update</a>';
 		bo_copyright_footer();
 		return true;
 	}
@@ -45,7 +45,7 @@ function bo_check_for_update()
 		if ($cur_version_num >= $number)
 			continue;
 		
-		echo '<h4>Updating from '.$cur_version.' to '.$new_version.'</h4>';
+		echo '<h4>'._BL('Updating version').' '.$cur_version.' -&gt; '.$new_version.'</h4>';
 		
 		echo '<ul>';
 		
@@ -59,7 +59,7 @@ function bo_check_for_update()
 				$sql = 'ALTER TABLE '.BO_DB_PREF.'raw ADD INDEX (`time`)';
 				$ok = bo_db($sql);
 				
-				echo '<li><em>'.$sql.'</em>: <b>'.($ok ? 'OK' : 'FAIL').'</b></li>';
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				
 				$ok = true; //doesn't matter too much if this fails ;-)
 				break;
@@ -80,13 +80,13 @@ function bo_check_for_update()
 	
 	if ($updated)
 	{
-		echo '<h4>Update done!</h4>';
+		echo '<h4>'._BL('Update done!').'</h4>';
 	}
 	
 	if ($cur_version != BO_VER)
 	{
 		bo_set_conf('version', BO_VER);
-		echo '<h4>Info: Setting new version to '.BO_VER.' .</h4>';
+		echo '<h4>'._BL('Update-Info: Setting version number to').' '.BO_VER.'</h4>';
 	}
 	
 		

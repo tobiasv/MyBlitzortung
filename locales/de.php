@@ -310,6 +310,7 @@ $_BL['de']['Show PHP info'] = 'Zeige PHP Informationen';
 $_BL['de']['MySQL version'] = 'MySQL Version';
 $_BL['de']['Files'] = 'Dateien';
 $_BL['de']['Click here to delete all files'] = 'Hier klicken um alle Dateien zu löschen';
+$_BL['de']['Clear all files'] = 'Dateien bereinigen.';
 
 $_BL['de']['user_perm0'] = 'Benutzereinstellungen';
 $_BL['de']['user_perm1'] = 'Andere Einstellungen';
@@ -498,6 +499,7 @@ $_BL['de']['Connecting to '] = 'Verbinden mit';
 $_BL['de']['Received urls'] = 'Links empfangen';
 $_BL['de']['DONE'] = 'FERTIG';
 $_BL['de']['Really continue?'] = 'Wirklich fortfahren?';
+$_BL['de']['Couldn\'t get login id'] = 'Konnte Login Kennung nicht holen';
 
 $_BL['de']['mybo_station_update_info'] = '
 		<p>
@@ -527,5 +529,13 @@ $_BL['de']['mybo_station_update_info'] = '
 		Dein Passwort wird niemals an andere Webseiten außer blitzortung.org gesendet!
 		Um dieses Feature nutzen zu können, muss Deine Station in den letzten zwei Stunden Signale gesendet haben.
 		</p>';
-		
+
+/*************************************************************/
+/* Update                                                    */
+/*************************************************************/
+$_BL['de']['Updating version'] = 'Aktualisiere Version';
+$_BL['de']['Database version changed!'] = 'Datenbankversion hat sich geändert!';
+$_BL['de']['FAIL'] = 'Fehler';
+$_BL['de']['Update done!'] = 'Aktualisierung beendet!';
+$_BL['de']['Update-Info: Setting version number to'] = 'Update-Info: Setze Version auf';
 

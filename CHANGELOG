@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.2.4b (2011-05-23)
+---------------------------
+- fix: changes for MySQL strict-mode (thanks to Franz)
+- fix: locale
+
 Version 0.2.4a (2011-05-23)
 ---------------------------
 - fix: MyBo stations auto update should work now

@@ -379,6 +379,7 @@ function bo_add_locale_msgid($locale, $msgid)
 
 	if (!isset($_BL[$locale][$msgid]) && is_writeable($file))
 	{
+		$msgid = strtr($msgid, array("'" => "\\'"));
 		file_put_contents($file, '$_BL[\''.$locale.'\'][\''.$msgid.'\'] = \'\';'."\n", FILE_APPEND);
 		$_BL[$locale][$msgid] = '';
 	}

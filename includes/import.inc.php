@@ -155,6 +155,7 @@ function bo_update_raw_signals($force = false)
 							time_ns='$time_ns',
 							lat='$lat',lon='$lon',
 							height='$height',
+							strike_id='0',
 							data=x'$data'
 							";
 							
@@ -231,6 +232,8 @@ function bo_update_strikes($force = false)
 		
 		if ($last_strike > time())
 			$last_strike = time() - 3600 * 24;
+		else if ($last_strike <= 0 || !$last_strike)
+			$last_strike = strtotime('2000-01-01');
 		
 		$time_update = $last_strike - 10;
 		
@@ -684,10 +687,10 @@ function bo_update_stations($force = false)
 			if ($only_own && $only_own != $id)
 				continue;
 			
-			if ($id && $data['active']) //($data['sig'] || $data['strikes'] || $data['active']) )
+			if ($id && $data['active']) 
 			{
 				bo_db("INSERT INTO ".BO_DB_PREF."stations_stat
-					SET station_id='$id', time='$datetime', signalsh='".$data['sig']."', strikesh='".$data['strikes']."'");
+					SET station_id='$id', time='$datetime', signalsh='".intval($data['sig'])."', strikesh='".intval($data['strikes'])."'");
 			}
 
 			if ($data['active'])
@@ -1075,7 +1078,7 @@ function bo_my_station_update($url)
 						
 						echo '<p>'._BL('Received urls').': '.count($urls).'</p>';
 						echo '<p>'._BL('DONE').'!</p>';
-						
+						_BL('co\'sad');
 						echo '<ul>';
 						ksort($urls);
 						foreach($urls as $id => $st_url)
