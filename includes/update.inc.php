@@ -24,7 +24,7 @@
 function bo_check_for_update()
 {
 	
-	$updates = array('0.2.2' => 202);
+	$updates = array('0.2.2' => 202, '0.3' => 300);
 	$cur_version = bo_get_conf('version');
 
 	preg_match('/([0-9]+)(\.([0-9]+)(\.([0-9]+))?)?/', $cur_version, $r);
@@ -33,7 +33,7 @@ function bo_check_for_update()
 	if ($cur_version_num < max($updates) && $_GET['bo_action'] != 'do_update')
 	{
 		echo _BL('Database version changed!');
-		echo ' <a href="'.bo_insert_url('bo_action', 'do_update').'">Click to update</a>';
+		echo ' <a href="'.bo_insert_url('bo_action', 'do_update').'">'._BL('Click to update').'</a>';
 		bo_copyright_footer();
 		return true;
 	}
@@ -46,21 +46,24 @@ function bo_check_for_update()
 			continue;
 		
 		echo '<h4>'._BL('Updating version').' '.$cur_version.' -&gt; '.$new_version.'</h4>';
-		
 		echo '<ul>';
 		
 		$ok = false;
 		switch ($new_version)
 		{
 			case '0.2.2':
-			
 				bo_db('ALTER TABLE '.BO_DB_PREF.'raw DROP INDEX `time`', false); // to be sure the key is not added twice
-			
 				$sql = 'ALTER TABLE '.BO_DB_PREF.'raw ADD INDEX (`time`)';
-				$ok = bo_db($sql);
-				
+				$ok = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
-				
+				$ok = true; //doesn't matter too much if this fails ;-)
+				break;
+			
+			case '0.2.5':
+				bo_db('ALTER TABLE '.BO_DB_PREF.'stations_stat DROP INDEX `stations_time`', false); // to be sure the key is not added twice
+				$sql = 'CREATE INDEX stations_time ON '.BO_DB_PREF.'stations_stat (station_id, time)';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				$ok = true; //doesn't matter too much if this fails ;-)
 				break;
 		}
@@ -74,8 +77,6 @@ function bo_check_for_update()
 			$cur_version_num = $number;
 			$updated = true;
 		}
-		
-		
 	}
 	
 	if ($updated)

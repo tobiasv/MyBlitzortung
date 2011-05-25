@@ -23,12 +23,13 @@
 //show all available statistics and menu
 function bo_show_statistics()
 {
-	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'station';
+	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'strikes';
 
 	echo '<div id="bo_statistics">';
 
 	echo '<ul id="bo_menu">';
 
+	echo '<li><a href="'.bo_insert_url('bo_show', 'strikes').'" class="bo_navi'.($show == 'strikes' ? '_active' : '').'">'._BL('stat_navi_strikes').'</a></li>';
 	echo '<li><a href="'.bo_insert_url('bo_show', 'station').'" class="bo_navi'.($show == 'station' ? '_active' : '').'">'._BL('stat_navi_station').'</a></li>';
 	echo '<li><a href="'.bo_insert_url('bo_show', 'network').'" class="bo_navi'.($show == 'network' ? '_active' : '').'">'._BL('stat_navi_network').'</a></li>';
 	echo '<li><a href="'.bo_insert_url('bo_show', 'longtime').'" class="bo_navi'.($show == 'longtime' ? '_active' : '').'">'._BL('stat_navi_longtime').'</a></li>';
@@ -40,6 +41,11 @@ function bo_show_statistics()
 	switch($show)
 	{
 		default:
+		case 'strikes':
+			echo '<h3>'._BL('h3_stat_strikes').'</h3>';
+			bo_show_statistics_strikes();
+			break;
+
 		case 'station':
 			echo '<h3>'._BL('h3_stat_station').'</h3>';
 			bo_show_statistics_station();
@@ -65,6 +71,88 @@ function bo_show_statistics()
 	echo '</div>';
 
 	bo_copyright_footer();
+}
+
+//strike statistics 
+function bo_show_statistics_strikes()
+{
+	$year = intval($_GET['bo_year']);
+	$month = intval($_GET['bo_month']);
+	
+	$time = mktime(0,0,0,date('m')-1, date('d'), date('Y'));
+	
+	if (!$year)
+		$year = date('Y', $time);
+	
+	if (!$month)
+		$month = date('m', $time);
+	
+	$D = array();
+	
+	$years = array();
+	$months = array();
+	
+	$months[-1] = _BL('All');
+	
+	$res = bo_db("SELECT DISTINCT SUBSTRING(name, 9, 6) time
+					FROM ".BO_DB_PREF."conf
+					WHERE name LIKE 'strikes_".$year."%'
+					ORDER BY time");
+	while($row = $res->fetch_assoc())
+	{
+		$y = substr($row['time'], 0, 4);
+		$m = substr($row['time'], 4, 2);
+		
+		$years[$y] = $y;
+		$months[$m] = _BL(date('M', strtotime("$y-$m-01")));
+	}
+	
+	if (!$years[$year] || !$months[$month])
+	{
+		$year = $y;
+		$month = $m;
+	}
+	
+	echo '<div id="bo_stat_strikes">';
+
+	
+	echo '<form action="?" method="GET" class="bo_stat_strikes_form">';
+	echo bo_insert_html_hidden(array('bo_year', 'bo_month'));
+
+	echo '<fieldset>';
+	echo '<legend>'._BL('legend_stat_strikes').'</legend>';
+	
+	echo '<select name="bo_year" onchange="submit();" id="bo_stat_strikes_select_year">';
+	foreach($years as $i => $y)
+		echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$y.'</option>';
+	echo '</select>';
+
+	echo '<select name="bo_month" onchange="submit();" id="bo_stat_strikes_select_month">';
+	foreach($months as $i => $m)
+		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').'>'.$m.'</option>';
+	echo '</select>';
+	
+	echo '</fieldset>';
+	
+	echo '</form>';
+	
+	echo '<a name="graph_strikes"></a>';
+	echo '<h4>'._BL('h4_graph_strikes_time').'</h4>';
+	echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time">';
+	echo _BL('bo_graph_descr_strikes_time');
+	echo '</p>';
+	echo '<img src="'.BO_FILE.'?graph_statistics=strikes_time&year='.$year.'&month='.$month.'&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+
+	echo '<a name="graph_strikes"></a>';
+	echo '<h4>'._BL('h4_graph_strikes_time_radius').'</h4>';
+	echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time_radius">';
+	echo strtr(_BL('bo_graph_descr_strikes_time_radius'), array('{RADIUS}' => BO_RADIUS));
+	echo '</p>';
+	echo '<img src="'.BO_FILE.'?graph_statistics=strikes_time&year='.$year.'&month='.$month.'&radius=1&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+
+	
+	echo '</div>';
+
 }
 
 //show station-statistics
@@ -112,35 +200,35 @@ function bo_show_statistics_station()
 	echo '<p class="bo_graph_description" id="bo_graph_descr_strikes">';
 	echo _BL('bo_graph_descr_strikes');
 	echo '</p>';
-	echo '<img src="'.BO_FILE.'?graph_statistics=strikes" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+	echo '<img src="'.BO_FILE.'?graph_statistics=strikes&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
 
 	echo '<a name="graph_signals"></a>';
 	echo '<h4>'._BL('h4_graph_signals').'</h4>';
 	echo '<p class="bo_graph_description" id="bo_graph_descr_signals">';
 	echo _BL('bo_graph_descr_signals');
 	echo '</p>';
-	echo '<img src="'.BO_FILE.'?graph_statistics=signals" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+	echo '<img src="'.BO_FILE.'?graph_statistics=signals&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
 
 	echo '<a name="graph_ratio"></a>';
 	echo '<h4>'._BL('h4_graph_ratio').'</h4>';
 	echo '<p class="bo_graph_description" id="bo_graph_descr_ratio">';
 	echo _BL('bo_graph_descr_ratio');
 	echo '</p>';
-	echo '<img src="'.BO_FILE.'?graph_statistics=ratio" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+	echo '<img src="'.BO_FILE.'?graph_statistics=ratio&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
 
 	echo '<a name="graph_ratio_distance"></a>';
 	echo '<h4>'._BL('h4_graph_ratio_distance').'</h4>';
 	echo '<p class="bo_graph_description" id="bo_graph_descr_radi">';
 	echo _BL('bo_graph_descr_radi');
 	echo '</p>';
-	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_distance" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_distance&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
 
 	echo '<a name="graph_ratio_bearing"></a>';
 	echo '<h4>'._BL('h4_graph_ratio_bearing').'</h4>';
 	echo '<p class="bo_graph_description" id="bo_graph_descr_bear">';
 	echo _BL('bo_graph_descr_bear');
 	echo '</p>';
-	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_bearing" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_bearing&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
 
 	echo '</div>';
 }
@@ -373,7 +461,7 @@ function bo_show_statistics_network()
 
 	echo '<a name="graph_stations"></a>';
 	echo '<h4>'._BL('h4_graph_stations').'</h4>';
-	echo '<img src="'.BO_FILE.'?graph_statistics=stations" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+	echo '<img src="'.BO_FILE.'?graph_statistics=stations&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
 
 	echo '</div>';
 
@@ -465,14 +553,14 @@ function bo_show_statistics_longtime()
 	echo '<p class="bo_graph_description" id="bo_graph_descr_radi_longtime">';
 	echo _BL('bo_graph_descr_radi_longtime');
 	echo '</p>';
-	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_distance_longtime" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_distance_longtime&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
 
 	echo '<a name="graph_ratio_bearing"></a>';
 	echo '<h4>'._BL('h4_graph_ratio_bearing_longtime').'</h4>';
 	echo '<p class="bo_graph_description" id="bo_graph_descr_bear_longtime">';
 	echo _BL('bo_graph_descr_bear_longtime');
 	echo '</p>';
-	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_bearing_longtime" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
+	echo '<img src="'.BO_FILE.'?graph_statistics=ratio_bearing_longtime&bo_lang='._BL().'" class="bo_graph_img" style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;">';
 
 	
 	echo '</div>';

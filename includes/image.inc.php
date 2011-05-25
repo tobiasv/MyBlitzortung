@@ -420,23 +420,99 @@ function bo_get_map_image()
 
 	global $_BO;
 
-	$id = intval($_GET['map']);
+	$id 			= intval($_GET['map']);
+	$date 			= $_GET['date'];
+	$transparent 	= isset($_GET['transparent']);
+	$blank 			= isset($_GET['blank']);
+	
 	$cfg = $_BO['mapimg'][$id];
-
 	if (!is_array($cfg))
 		exit;
+		
+	if ($blank)
+	{
+		$file = $cfg['file'];
+		
+		$mod_time = filemtime(BO_DIR.'images/'.$file);
+		$exp_time = time() + 3600 * 24 * 7;
+		$age      = $exp_time - time();
 
+		header("Content-Type: image/png");
+		header("Pragma: ");
+		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");
+		header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
+		header("Cache-Control: public, max-age=".$age);
+		
+		readfile(BO_DIR.'images/'.$file);
+		exit;
+	}
+
+	$cache_file = BO_DIR.'cache/maps/'.$cache_file;
+	
+	if ($transparent)
+		$cache_file .= 'transp_';
+	
+
+		
 	$last_update = bo_get_conf('uptime_strikes');
-	$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
+	
+	if (preg_match('/^[0-9\-]+$/', $date))
+	{
+		$year = substr($date, 0, 4);
+		$month = substr($date, 4, 2);
+		$day = substr($date, 6, 2);
 
+		$hour = substr($date, 8, 2);
+		$minute = substr($date, 10, 2);
+		$duration = substr($date, 13);
+
+		if ($duration > 60 * 24)
+			exit;
+		
+		if ($duration)
+		{
+			$time_min = strtotime("$year-$month-$day $hour:$minute:00");
+			$time_max = strtotime("$year-$month-$day $hour:$minute:00 +$duration minutes");
+		}
+		else
+		{
+			$time_min = strtotime("$year-$month-$day 00:00:00");
+			$time_max = strtotime("$year-$month-$day 23:59:59");
+		}
+		
+		if ($time_max > $last_update)
+			$time_max = $last_update;
+		else
+			$last_update = $time_max + 3600;
+			
+		$expire = time() + 3600;
+		
+		
+		$time_string = date('d.m.Y H:i - ', $time_min).date('H:i', $time_max);
+		
+		$cache_file .= $id.'_'.$date.'.png';
+	}
+	else
+	{
+		$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
+		$time = time();
+		$time_min = $time - 3600 * $cfg['trange'];
+		$time_max = $time;
+		$time_string = date('H:i', $time_min).' - '.date('H:i', $time_max);
+		
+		$cache_file .= $id.'.png';
+	}
+
+	$date_min = gmdate('Y-m-d H:i:s', $time_min);
+	$date_max = gmdate('Y-m-d H:i:s', $time_max);
+	
+	
 	header("Pragma: ");
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
 	header("Cache-Control: public, max-age=".($expire - time()));
 
-
 	//Caching
-	$cache_file = BO_DIR.'cache/maps/'.$id.'.png';
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
 		header("Content-Type: image/png");
@@ -452,12 +528,6 @@ function bo_get_map_image()
 	$c = $cfg['col'];
 	$size = $cfg['point_size'];
 
-	$time = time();
-	$time_min = $time - 3600 * $cfg['trange'];
-	$time_max = $time;
-	$date_min = gmdate('Y-m-d H:i:s', $time_min);
-	$date_max = gmdate('Y-m-d H:i:s', $time_max);
-
 	if ($cfg['dim'][0] && $cfg['dim'][1])
 	{
 		$w = $cfg['dim'][0];
@@ -467,7 +537,17 @@ function bo_get_map_image()
 
 	if ($file)
 	{
-		if ($w && $h)
+		if ($transparent)
+		{
+			if (!$w || !$h)
+				list($w, $h) = getimagesize(BO_DIR.'images/'.$file);
+			
+			$I = imagecreate($w, $h);
+			$blank = imagecolorallocate($I, 0, 0, 0);
+			imagefilledrectangle( $I, 0, 0, $w, $h, $blank);
+			imagecolortransparent($I, $blank);
+		}
+		else if ($w && $h)
 		{
 			$J = imagecreatefrompng(BO_DIR.'images/'.$file);
 			imagecopy($I, $J, 0, 0, 0, 0, imagesx($J), imagesy($J));
@@ -485,9 +565,6 @@ function bo_get_map_image()
 	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
 	$w_x = $w / ($x2 - $x1);
 	$h_y = $h / ($y2 - $y1);
-
-
-
 
 	foreach($c as $i => $rgb)
 	{
@@ -535,7 +612,7 @@ function bo_get_map_image()
 	$time_max = intval($time_max / 60 / BO_UP_INTVL_STRIKES) * 60 * BO_UP_INTVL_STRIKES;
 	$time_min = intval($time_min / 60 / BO_UP_INTVL_STRIKES) * 60 * BO_UP_INTVL_STRIKES;
 	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
-	imagestring($I, $fontsize, 1, 1, date('H:i', $time_min).' - '.date('H:i', $time_max), $text_col);
+	imagestring($I, $fontsize, 1, 1, $time_string, $text_col);
 
 	//Strikes
 	$text = _BL('Strikes', true).': '.array_sum($count);

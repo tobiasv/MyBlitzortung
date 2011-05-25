@@ -37,6 +37,9 @@ function bo_graph_raw($id)
 
 	$data[0] = array();
 	$data[1] = array();
+	$tickLabels = array();
+	$tickMajPositions = array();
+	$tickPositions = array();
 
 	for ($i=0;$i<strlen($row['data']);$i++)
 	{
@@ -66,7 +69,7 @@ function bo_graph_raw($id)
 	$n = count($datax);
 	$xmin = $datax[0];
 	$xmax = $datax[$n-1];
-	
+
 	require_once 'jpgraph/jpgraph.php';
 	require_once 'jpgraph/jpgraph_line.php';
 	require_once 'jpgraph/jpgraph_plotline.php';
@@ -108,7 +111,6 @@ function bo_graph_raw($id)
 
 	$graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
 	$graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
-
 
 	if (BO_GRAPH_RAW_COLOR_XGRID)
 	{
@@ -172,48 +174,148 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	$time_start = strtotime($date_start." UTC");
 
 	$X = $Y = array(); //data array
-
+	$tickLabels = array();
+	$tickMajPositions = array();
+	$tickPositions = array();
+	$xmin = null;
+	$xmax = null;
 	
-	if ($type == 'ratio_distance_longtime')
+	if ($type == 'strikes_time')
 	{
+		$station_id = 0;
+		
+		$year = intval($_GET['year']);
+		$month = intval($_GET['month']);
+		$radius = intval($_GET['radius']);
+		
+		$add_title .= '';
+		
+		if ($radius)
+		{
+			$rad = 2;
+			$add_title .= ' '.strtr(_BL('_in_radius'), array('{RADIUS}' => BO_RADIUS));
+		}
+
+		if ($month == -1)
+		{
+			$like = 'strikes_'.$year.'%';
+			$time_begin = strtotime("$year-01-01");
+			$days = date('L', $time_begin) ? 366 : 365;
+
+			$xtitle = 'Month';
+			$add_title .= ' '.$year;
+		}
+		else
+		{
+			$like = 'strikes_'.$year.sprintf('%02d', $month).'%';
+			$time_begin = strtotime("$year-$month-01");
+			$days = date('t', $time_begin);
+
+			$xtitle = 'Day';
+			$add_title .= ' '._BL(date('F', $time_begin)).' '.$year;
+		}
+
+		$day_offset = date('z', $time_begin);
+
+		for ($i=0;$i<$days;$i++)
+		{
+			$time = mktime(0,0,0,$month == -1 ? 1 : $month, $i+1, $year);
+
+			if ($month == -1 && date('d', $time) == 1)
+			{
+				$tickLabels[] = _BL(date('M', $time));
+				$tickMajPositions[] = $i;
+			}
+			else if ($month != -1 && !($i%5))
+			{
+				$tickLabels[] = date('d.m', $time);
+				$tickMajPositions[] = $i;
+			}
+			
+			$Y1[$i] = 0;
+			$Y2[$i] = 0;
+		}
+
+		$sql = "SELECT DISTINCT SUBSTRING(name, 9) time, data, changed
+				FROM ".BO_DB_PREF."conf
+				WHERE name LIKE '$like'
+				ORDER BY time";
+		$res = bo_db($sql);
+		while($row = $res->fetch_assoc())
+		{
+
+			$y = substr($row['time'], 0, 4);
+			$m = substr($row['time'], 4, 2);
+			$d = substr($row['time'], 6, 2);
+			$time = strtotime("$y-$m-$d");
+
+			$i = date('z', $time) - $day_offset;
+
+			$d = unserialize($row['data']);
+
+			$Y2[$i] = $d[0 + $rad] - $d[1 + $rad];
+			$Y1[$i] = $d[1 + $rad];
+		}
+
+		$caption  = (array_sum($Y1) + array_sum($Y2)).' '._BL('total strikes');
+		$caption .= "\n";
+		$caption .= array_sum($Y1).' '._BL('total strikes station');
+		
+		$graph_type = 'textlin';
+	}
+	else if ($type == 'ratio_distance_longtime')
+	{
+		$station_id = 0;
+		
 		$own = unserialize(bo_get_conf('longtime_dist_own'));
 		$all = unserialize(bo_get_conf('longtime_dist'));
-		
+
 		if (is_array($own) && is_array($all))
 		{
 			foreach($own as $dist => $cnt)
 			{
 				$X[$dist] = $dist * 10;
-				
+
 				if ($all[$dist])
 					$Y[$dist] = $cnt / $all[$dist] * 100;
 				else
 					$Y[$dist] = null;
-				
+
 				$max_dist = max($max_dist, $dist);
 			}
-			
+
 			foreach($all as $dist => $cnt)
 			{
 				$Y2[$dist] = $cnt;
 				$max_dist = max($max_dist, $dist);
 			}
-			
+
 			for ($i=0;$i<=$max_dist;$i++)
 			{
-				$X[$i] = $i * 10;
 				$Y[$i] = isset($Y[$i]) ? $Y[$i] : null;
 				$Y2[$i] = isset($Y2[$i]) ? $Y2[$i] : null;
+				
+				if ( !($i%5))
+					$tickPositions[] = $i;
+
+				if ( !($i%50))
+				{
+					$tickLabels[] = $i * 10;
+					$tickMajPositions[] = $i;
+				}
+				
+				
 			}
 			
 		}
-		
-		$graph_type = 'linlin';
+
+		$graph_type = 'textlin';
 		$add_title = ' '._BL('since begin of data logging');
-	
 	}
 	else if($type == 'ratio_bearing_longtime')
 	{
+		$station_id = 0;
+		
 		$own = unserialize(bo_get_conf('longtime_bear_own'));
 		$all = unserialize(bo_get_conf('longtime_bear'));
 		
@@ -222,36 +324,50 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			foreach($own as $bear => $cnt)
 			{
 				$X[$bear] = $bear * 10;
-				
+
 				if ($all[$bear])
 					$Y[$bear] = $cnt / $all[$bear] * 100;
 				else
 					$Y[$bear] = null;
 			}
-			
+
 			foreach($all as $bear => $cnt)
 			{
 				$Y2[$bear] = $cnt;
 			}
-			
+
 			for ($i=0;$i<360;$i++)
 			{
-				$X[$i] = $i;
 				$Y[$i] = isset($Y[$i]) ? $Y[$i] : null;
 				$Y2[$i] = isset($Y2[$i]) ? $Y2[$i] : null;
+				
+				if ( !($i%5))
+					$tickPositions[] = $i;
+
+				if ( !($i%45))
+				{
+					$tickLabels[] = $i;
+					$tickMajPositions[] = $i;
+				}
+				
 			}
-			
+
 		}
-		
+
 		$graph_type = 'linlin';
 		$add_title = ' '._BL('since begin of data logging');
-
+		$xmin = 0;
+		$xmax = 360;
 	}
 	else if ($type == 'ratio_distance' || $type == 'ratio_bearing')
 	{
 		$dist_div = BO_GRAPH_STAT_RATIO_DIST_DIV; //interval in km
 		$bear_div = BO_GRAPH_STAT_RATIO_BEAR_DIV;
 
+		$xmin = 0;
+		if ($type == 'ratio_bearing')
+			$xmax = 360 / $bear_div;
+		
 		$tmp = array();
 		$ticks = 0;
 		if ($station_id) //Special Query for own "ratio strikes by distance" - may be slow!
@@ -300,15 +416,24 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			}
 		}
 
-
-
 		for($i=0;$i<$ticks;$i++)
 		{
-
 			if ($type == 'ratio_bearing')
-				$X[$i] = $bear_div*$i;
+			{
+				if ( !(($i*$bear_div)%45))
+				{
+					$tickLabels[] = $i*$bear_div;
+					$tickMajPositions[] = $i;
+				}
+			}
 			else
-				$X[$i] = $dist_div*$i;
+			{
+				if ( !(($i*$dist_div)%500))
+				{
+					$tickLabels[] = $i*$dist_div;
+					$tickMajPositions[] = $i;
+				}
+			}
 
 			if ($tmp[0][$i])
 				$Y[$i] = $tmp[1][$i] / ($tmp[0][$i]+$tmp[1][$i]) * 100;
@@ -318,7 +443,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$Y2[$i] = intval($tmp[0][$i]+$tmp[1][$i]);
 		}
 
-		$graph_type = 'linlin';
+		$graph_type = 'textlin';
 
 	}
 	else
@@ -339,7 +464,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$sql = "SELECT time, AVG(signalsh) sig, AVG(strikesh) astr, MAX(strikesh) mstr, COUNT(time) / COUNT(DISTINCT time) cnt
 					FROM ".BO_DB_PREF."stations_stat
 					WHERE time BETWEEN '$date_start' AND '$date_end' AND (signalsh > 0 OR strikesh > 0) AND $sqlw
-					GROUP BY HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
+					GROUP BY DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())
 			{
@@ -355,7 +480,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 				$Y[$data_id]['mstr'][$index] = $row['mstr']; //maximum strikes
 				$Y[$data_id]['cnt'][$index] = $row['cnt']; //count
 
-
 				if ($data_id > 0)
 				{
 					//Strike Ratio
@@ -369,8 +493,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 				//Active stations
 				$Y[$data_id]['ratio'][$index] = $row['mstr'];
-
-				//$ticks = max($index+1, $ticks);
 			}
 
 			for($i=0;$i<$ticks;$i++)
@@ -384,7 +506,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 				if (!isset($Y[$data_id]['cnt'][$i])) $Y[$data_id]['cnt'][$i] = $Y[$data_id]['cnt'][$i-1];
 				if (!isset($Y[$data_id]['sig_ratio'][$i])) $Y[$data_id]['sig_ratio'][$i] = $Y[$data_id]['sig_ratio'][$i-1];
 				if (!isset($Y[$data_id]['str_ratio'][$i])) $Y[$data_id]['str_ratio'][$i] = $Y[$data_id]['str_ratio'][$i-1];
-
 			}
 		}
 
@@ -392,7 +513,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	}
 
 	$info_station_id = $station_id ? $station_id : $stId;
-
 
 	if (!$add_title)
 		$add_title = ' '._BL('of the last').' '.$hours_back.'h';
@@ -412,7 +532,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 	$graph = new Graph(BO_GRAPH_STAT_W,BO_GRAPH_STAT_H,"auto");
 	$graph->ClearTheme();
-	$graph->SetScale($graph_type);
+	$graph->SetScale($graph_type, null, null, $xmin, $xmax);
 
 	if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
 		$graph->img->SetAntiAliasing();
@@ -433,12 +553,53 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	else
 		$graph->SetBox(false);
 
-	$graph->SetMargin(40,40,40,80);
-	$graph->legend->SetPos(0.5,0.98,"center","bottom");
+	$graph->SetMargin(50,50,20,70);
+	
+	$graph->legend->SetPos(0.5,0.99,"center","bottom");
 	$graph->legend->SetColumns(2);
+	$graph->legend->SetFillColor(BO_GRAPH_STAT_COLOR_LEGEND_FILL);
+	$graph->legend->SetColor(BO_GRAPH_STAT_COLOR_LEGEND_TEXT, BO_GRAPH_STAT_COLOR_LEGEND_FRAME);
+	$graph->legend->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
+	
+	if ($caption)
+	{
+		$caption=new Text($caption,60,30); 
+		$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 7);
+		$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
+		$graph->AddText($caption);
 
+	}
+	
 	switch($type)
 	{
+
+
+		case 'strikes_time':
+
+			$plot1=new BarPlot($Y1);
+			$plot1->SetColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_L1);
+			if (BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1)
+				$plot1->SetFillColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1);
+			$plot1->SetLegend(_BL('graph_legend_strikes_time_own'));
+
+			$plot2=new BarPlot($Y2);
+			$plot2->SetColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_L2);
+			if (BO_GRAPH_STAT_STRIKES_TIME_COLOR_F2)
+				$plot2->SetFillColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_F2);
+			$plot2->SetLegend(_BL('graph_legend_strikes_time_all'));
+
+			$plot = new AccBarPlot(array($plot1,$plot2), $X);
+			if (BO_GRAPH_STAT_STRIKES_TIME_WIDTH)
+				$plot->SetWidth(BO_GRAPH_STAT_STRIKES_TIME_WIDTH);
+
+			$graph->Add($plot);
+			$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+			$graph->yaxis->title->Set(_BL('Count'));
+			$graph->xaxis->title->Set(_BL($xtitle));
+			$graph->title->Set(_BL('graph_stat_title_strikes_time').$add_title);
+			
+			break;
+
 		case 'strikes':
 
 			$graph->title->Set(_BL('graph_stat_title_strikes').$add_title);
@@ -448,7 +609,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_STR_COLOR_F1)
 				$plot->SetFillColor(BO_GRAPH_STAT_STR_COLOR_F1);
 			$plot->SetWeight(BO_GRAPH_STAT_STR_WIDTH_1);
-			$plot->SetLegend(_BL('legend_strikes_sum'));
+			$plot->SetLegend(_BL('graph_legend_strikes_sum'));
 			$graph->Add($plot);
 
 			$plot=new LinePlot($Y[2]['astr'], $X);
@@ -456,7 +617,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_STR_COLOR_F3)
 				$plot->SetFillColor(BO_GRAPH_STAT_STR_COLOR_F3);
 			$plot->SetWeight(BO_GRAPH_STAT_STR_WIDTH_3);
-			$plot->SetLegend(_BL('legend_strikes_avg_all'));
+			$plot->SetLegend(_BL('graph_legend_strikes_avg_all'));
 			$graph->Add($plot);
 
 			$plot=new LinePlot($Y[1]['astr'], $X);
@@ -464,7 +625,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_STR_COLOR_F2)
 				$plot->SetFillColor(BO_GRAPH_STAT_STR_COLOR_F2);
 			$plot->SetWeight(BO_GRAPH_STAT_STR_WIDTH_2);
-			$plot->SetLegend(_BL('legend_strikes_own'));
+			$plot->SetLegend(_BL('graph_legend_strikes_own'));
 			$graph->Add($plot);
 
 			$graph->xaxis->title->Set(_BL('Time'));
@@ -481,7 +642,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_SIG_COLOR_F1)
 				$plot->SetFillColor(BO_GRAPH_STAT_SIG_COLOR_F1);
 			$plot->SetWeight(BO_GRAPH_STAT_SIG_WIDTH_1);
-			$plot->SetLegend(_BL('legend_signals_avg_all'));
+			$plot->SetLegend(_BL('graph_legend_signals_avg_all'));
 			$graph->Add($plot);
 
 			$plot=new LinePlot($Y[1]['sig'], $X);
@@ -489,7 +650,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_SIG_COLOR_F2)
 				$plot->SetFillColor(BO_GRAPH_STAT_SIG_COLOR_F2);
 			$plot->SetWeight(BO_GRAPH_STAT_SIG_WIDTH_2);
-			$plot->SetLegend(_BL('legend_signals_own'));
+			$plot->SetLegend(_BL('graph_legend_signals_own'));
 			$graph->Add($plot);
 
 			$graph->xaxis->title->Set(_BL('Time'));
@@ -505,7 +666,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_RAT_COLOR_F1)
 				$plot->SetFillColor(BO_GRAPH_STAT_RAT_COLOR_F1);
 			$plot->SetWeight(BO_GRAPH_STAT_RAT_WIDTH_1);
-			$plot->SetLegend(_BL('legend_ratio_sig_all'));
+			$plot->SetLegend(_BL('graph_legend_ratio_sig_all'));
 			$graph->Add($plot);
 
 			$plot=new LinePlot($Y[1]['sig_ratio'], $X);
@@ -513,7 +674,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_RAT_COLOR_F2)
 				$plot->SetFillColor(BO_GRAPH_STAT_RAT_COLOR_F2);
 			$plot->SetWeight(BO_GRAPH_STAT_RAT_WIDTH_2);
-			$plot->SetLegend(_BL('legend_ratio_sig_own'));
+			$plot->SetLegend(_BL('graph_legend_ratio_sig_own'));
 			$graph->Add($plot);
 
 			$plot=new LinePlot($Y[2]['str_ratio'], $X);
@@ -521,7 +682,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_RAT_COLOR_F3)
 				$plot->SetFillColor(BO_GRAPH_STAT_RAT_COLOR_F3);
 			$plot->SetWeight(BO_GRAPH_STAT_RAT_WIDTH_3);
-			$plot->SetLegend(_BL('legend_ratio_str_all'));
+			$plot->SetLegend(_BL('graph_legend_ratio_str_all'));
 			$graph->Add($plot);
 
 			$plot=new LinePlot($Y[1]['str_ratio'], $X);
@@ -529,7 +690,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_RAT_COLOR_F4)
 				$plot->SetFillColor(BO_GRAPH_STAT_RAT_COLOR_F4);
 			$plot->SetWeight(BO_GRAPH_STAT_RAT_WIDTH_4);
-			$plot->SetLegend(_BL('legend_ratio_str_own'));
+			$plot->SetLegend(_BL('graph_legend_ratio_str_own'));
 			$graph->Add($plot);
 
 			$graph->xaxis->title->Set(_BL('Time'));
@@ -547,7 +708,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			if (BO_GRAPH_STAT_STA_COLOR_F1)
 				$plot->SetFillColor(BO_GRAPH_STAT_STA_COLOR_F1);
 			$plot->SetWeight(BO_GRAPH_STAT_STA_WIDTH_1);
-			$plot->SetLegend(_BL('legend_stations_active'));
+			$plot->SetLegend(_BL('graph_legend_stations_active'));
 			$graph->Add($plot);
 
 
@@ -556,7 +717,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			{
 				$sline  = new PlotLine(HORIZONTAL, $max_stations, BO_GRAPH_STAT_STA_COLOR_L2, 1);
 				$sline->SetWeight(BO_GRAPH_STAT_STA_WIDTH_2);
-				$sline->SetLegend(_BL('legend_stations_max_active'));
+				$sline->SetLegend(_BL('graph_legend_stations_max_active'));
 				$graph->AddLine($sline);
 
 				$graph->yscale->SetAutoMax($max_stations + 10);
@@ -567,19 +728,19 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 			break;
 
-		case 'ratio_distance': 
+		case 'ratio_distance':
 		case 'ratio_distance_longtime':
 
 			$graph->title->Set(_BL('graph_stat_title_ratio_distance').$add_title);
 
 			if (BO_GRAPH_STAT_RATIO_DIST_LINE)
 			{
-				$plot=new LinePlot($Y, $X);
+				$plot=new LinePlot($Y);
 				$plot->SetWeight(BO_GRAPH_STAT_RATIO_DIST_WIDTH1);
 			}
 			else
 			{
-				$plot=new BarPlot($Y, $X);
+				$plot=new BarPlot($Y);
 				if (BO_GRAPH_STAT_RATIO_DIST_WIDTH1)
 					$plot->SetWidth(BO_GRAPH_STAT_RATIO_DIST_WIDTH1);
 			}
@@ -589,22 +750,23 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$plot->SetColor(BO_GRAPH_STAT_RATIO_DIST_COLOR_L1);
 			if (BO_GRAPH_STAT_RATIO_DIST_COLOR_F1)
 				$plot->SetFillColor(BO_GRAPH_STAT_RATIO_DIST_COLOR_F1);
-			$plot->SetLegend(_BL('legend_ratio_distance'));
+			$plot->SetLegend(_BL('graph_legend_ratio_distance'));
 			$graph->Add($plot);
 
 
-			$plot=new LinePlot($Y2, $X);
+			$plot=new LinePlot($Y2);
 			$plot->SetColor(BO_GRAPH_STAT_RATIO_DIST_COLOR_L2);
 			if (BO_GRAPH_STAT_RATIO_DIST_COLOR_F2)
 				$plot->SetFillColor(BO_GRAPH_STAT_RATIO_DIST_COLOR_F2);
 			$plot->SetWeight(BO_GRAPH_STAT_RATIO_DIST_WIDTH2);
-			$plot->SetLegend(_BL('legend_count_distance'));
+			$plot->SetLegend(_BL('graph_legend_count_distance'));
 			$graph->SetYScale(0,'lin');
 			$graph->AddY(0,$plot);
 
+			$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
 			$graph->xaxis->title->Set(_BL('Distance').'   [km]');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
-			
+
 			if ($type == 'ratio_distance_longtime')
 				$graph->ynaxis[0]->title->Set(_BL('Count'));
 			else
@@ -612,19 +774,19 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 			break;
 
-		case 'ratio_bearing': 
+		case 'ratio_bearing':
 		case 'ratio_bearing_longtime':
 
 			$graph->title->Set(_BL('graph_stat_title_ratio_bearing').$add_title);
 
 			if (BO_GRAPH_STAT_RATIO_BEAR_LINE)
 			{
-				$plot=new LinePlot($Y, $X);
+				$plot=new LinePlot($Y);
 				$plot->SetWeight(BO_GRAPH_STAT_RATIO_BEAR_WIDTH1);
 			}
 			else
 			{
-				$plot=new BarPlot($Y, $X);
+				$plot=new BarPlot($Y);
 				if (BO_GRAPH_STAT_RATIO_BEAR_WIDTH1)
 					$plot->SetWidth(BO_GRAPH_STAT_RATIO_BEAR_WIDTH1);
 			}
@@ -632,24 +794,23 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$plot->SetColor(BO_GRAPH_STAT_RATIO_BEAR_COLOR_L1);
 			if (BO_GRAPH_STAT_RATIO_BEAR_COLOR_F1)
 				$plot->SetFillColor(BO_GRAPH_STAT_RATIO_BEAR_COLOR_F1);
-			$plot->SetLegend(_BL('legend_ratio_bearing'));
+			$plot->SetLegend(_BL('graph_legend_ratio_bearing'));
 			$graph->Add($plot);
 
 
-			$plot=new LinePlot($Y2, $X);
+			$plot=new LinePlot($Y2);
 			$plot->SetColor(BO_GRAPH_STAT_RATIO_BEAR_COLOR_L2);
 			if (BO_GRAPH_STAT_RATIO_BEAR_COLOR_F2)
 				$plot->SetFillColor(BO_GRAPH_STAT_RATIO_BEAR_COLOR_F2);
 			$plot->SetWeight(BO_GRAPH_STAT_RATIO_BEAR_WIDTH2);
-			$plot->SetLegend(_BL('legend_count_bearing'));
+			$plot->SetLegend(_BL('graph_legend_count_bearing'));
 			$graph->SetYScale(0,'lin');
 			$graph->AddY(0,$plot);
 
-			$graph->xaxis->scale->SetAutoMax(400);
-			$graph->xaxis->scale->SetAutoMin(0);
+			$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
 			$graph->xaxis->title->Set(_BL('Bearing').'   [°]');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
-			
+
 			if ($type == 'ratio_bearing_longtime')
 				$graph->ynaxis[0]->title->Set(_BL('Count'));
 			else
@@ -664,12 +825,25 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	$graph->xaxis->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
 	$graph->yaxis->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
 	$graph->yaxis->SetLabelMargin(1);
-
+	$graph->yaxis->SetTitleMargin(35);
 	//$graph->xaxis->SetLabelAngle(45);
-	//$graph->xaxis->title->Set(_BL('timeclock'));
+
 
 	if ($graph_type == 'datlin')
-		$graph->xaxis->scale->SetDateFormat('H:i');
+	{
+		if ($X[count($X)-1] - $X[0] > 3600 * 24 * 3)
+		{
+			$graph->xaxis->title->Set(_BL('day'));
+			$graph->xaxis->scale->SetDateFormat('d.m');
+			$graph->xaxis->scale->ticks->Set(5);
+		}
+		else
+		{
+			$graph->xaxis->title->Set(_BL('timeclock'));
+			$graph->xaxis->scale->SetDateFormat('H:i');
+		}
+	}
+
 	$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 	$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 
@@ -679,7 +853,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 		$graph->ynaxis[0]->SetLabelMargin(3);
 		$graph->ynaxis[0]->SetTitleMargin(30);
 		$graph->ynaxis[0]->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-
+		$graph->ynaxis[0]->SetTitleMargin(45);
 	}
 
 	header("Content-Type: image/png");
@@ -699,14 +873,14 @@ function bo_graph_error($w, $h)
 {
 	$I = imagecreate($w, $h);
 	$back  = imagecolorallocate($I, 255, 150, 150);
-	$black = imagecolorallocate($I, 0, 0, 0); 
+	$black = imagecolorallocate($I, 0, 0, 0);
 
 	imagestring($I, 2, $w / 2 - 90, $h/2-25, 'File', $black);
 	imagestring($I, 2, $w / 2 - 90, $h/2-10, '"includes/jpgraph/jpgraph.php"', $black);
 	imagestring($I, 2, $w / 2 - 90, $h/2+5, 'not found!', $black);
 
 	imagerectangle($I, 0,0,$w-1,$h-1,$black);
-	Header("Content-type: image/png"); 
+	Header("Content-type: image/png");
 	Imagepng($I);
 	exit;
 }

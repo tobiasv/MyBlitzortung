@@ -3,10 +3,21 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.3 (2011-05-25)
+------------------------
+- new: show strike count for month/year
+- new: archive maps and animations
+- new: show no. of participants in archive -> strike search
+- new: templates for maps
+- fix: corrected graphs with "hours" bigger than 24
+- added Database index for statistics
+- style improved
+
 Version 0.2.4b (2011-05-23)
 ---------------------------
 - fix: changes for MySQL strict-mode (thanks to Franz)
 - fix: locale
+
 
 Version 0.2.4a (2011-05-23)
 ---------------------------

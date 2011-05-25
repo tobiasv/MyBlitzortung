@@ -1,10 +1,10 @@
 <?php
 /*
-    MyBlitzortung - a tool for participants of blitzortung.org 
+    MyBlitzortung - a tool for participants of blitzortung.org
 	to display lightning data on their web sites.
-	
+
     Copyright (C) 2011  Tobias Volgnandt
-	
+
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,7 @@ if (!defined("BO_VER"))
 {
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.2.4b');
+	define("BO_VER", '0.2.5');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -33,15 +33,15 @@ if (!defined("BO_VER"))
 	define("BO_PERM_ALERT_SMS",		32);
 	define("BO_PERM_ALERT_URL",		64);
 	define("BO_PERM_COUNT",	7);
-	
+
 	//Do not change these values (needed for auto linking stations)
 	define('BO_LINK_HOST', 'www.wetter-rosstal.de');
 	define('BO_LINK_URL',  '/blitzortung/bo.php');
 
-	
+
 	//Some default PHP-Options
-	ini_set('magic_quotes_runtime', 0); 
-	
+	ini_set('magic_quotes_runtime', 0);
+
 	//Config var.
 	global $_BO, $_BL;
 	$_BO = array();
@@ -49,13 +49,14 @@ if (!defined("BO_VER"))
 
 	if (!file_exists(BO_DIR.'config.php'))
 		die('Missing config.php! Please run installation first!');
-		
+
 	//Load Config
+	require_once 'includes/templates.inc.php';
 	require_once 'config.php';
 	require_once 'includes/default_settings.inc.php';
 
 	date_default_timezone_set(BO_TIMEZONE);
-	
+
 	if (defined('BO_DEBUG') && BO_DEBUG)
 	{
 		error_reporting(E_ALL & ~E_NOTICE);
@@ -72,10 +73,15 @@ if (!defined("BO_VER"))
 
 	//Very simple locale support
 	$locdir = BO_DIR.'locales/';
-	include $locdir.'en.php'; // always include this first
 	if (file_exists($locdir.BO_LOCALE.'.php'))
+	{
 		include $locdir.BO_LOCALE.'.php';
-	
+	}
+	else
+	{
+		include $locdir.'en.php';
+	}
+
 	if (file_exists($locdir.'own.php'))
 		include $locdir.'own.php';
 
@@ -83,12 +89,12 @@ if (!defined("BO_VER"))
 	require_once 'includes/functions.inc.php';
 	require_once 'includes/image.inc.php';
 	require_once 'includes/user.inc.php';
-	
+
 	if (!class_exists('mysqli'))
 		require_once 'includes/db_mysql.inc.php';
 	else
 		require_once 'includes/db_mysqli.inc.php';
-		
+
 	define("BO_TILE_SIZE", 256);
 	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
 
@@ -97,7 +103,7 @@ if (!defined("BO_VER"))
 	{
 		if (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !(bo_user_get_level() & BO_PERM_NOLIMIT))
 			exit('Google Maps disabled');
-			
+
 		bo_tile();
 		exit;
 	}
@@ -108,7 +114,7 @@ if (!defined("BO_VER"))
 		exit;
 	}
 
-	
+
 	// includes #2
 	require_once 'includes/statistics.inc.php';
 	require_once 'includes/import.inc.php';
@@ -140,7 +146,7 @@ if (!defined("BO_VER"))
 				$force_update = true;
 		}
 	}
-	
+
 	if ($do_update)
 	{
 		ini_set('allow_url_fopen', 'on'); //doesnt work
@@ -184,7 +190,12 @@ if (!defined("BO_VER"))
 		$locale = $_SESSION['bo_locale'];
 
 	if ($locale && file_exists($locdir.$locale.'.php') && $locale != BO_LOCALE)
-		 include $locdir.$locale.'.php';
+	{
+		include $locdir.$locale.'.php';
+
+		if (file_exists($locdir.'own.php')) //include this 2nd time
+			include $locdir.'own.php';
+	}
 
 	// these graphs have a lot of text and no caching --> translate them individually
 	if (isset($_GET['graph_statistics']))
@@ -192,7 +203,7 @@ if (!defined("BO_VER"))
 		bo_graph_statistics($_GET['graph_statistics'], intval($_GET['id']), intval($_GET['hours']));
 		exit;
 	}
-		 
+
 	//workaround when no special login-url is specified
 	if (!defined('BO_LOGIN_FILE') || !BO_LOGIN_FILE)
 	{
@@ -201,7 +212,7 @@ if (!defined("BO_VER"))
 			bo_show_login();
 			exit;
 		}
-		
+
 		if (isset($_GET['bo_logout']))
 			bo_user_do_logout();
 	}

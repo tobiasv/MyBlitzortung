@@ -325,11 +325,15 @@ function bo_copyright_footer()
 }
 
 // translate text
-function _BL($msgid, $noutf = false)
+function _BL($msgid='', $noutf = false)
 {
 	global $_BL;
 
 	$locale = $_BL['locale'];
+	
+	if ($msgid === '')
+		return $locale;
+	
 	$msg = $_BL[$locale][$msgid];
 
 	$utf = defined('BO_UTF8') && BO_UTF8 && !$noutf;

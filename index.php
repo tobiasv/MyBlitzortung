@@ -11,7 +11,7 @@ if (defined('BO_UTF8') && BO_UTF8)
 <html>
 	<head>
 		<title>MyBlitzortung: <?php echo $title ?></title>
-		<link rel="stylesheet" href="style.css" type="text/css"> 
+		<link rel="stylesheet" href="style.css?ver=<?php echo BO_VER ?>" type="text/css"> 
 		<?php echo file_exists('own.css') ? '<link rel="stylesheet" href="own.css" type="text/css"> ' : '' ?>
 		<style>
 			body { font-size: 100.01%; font-family: Arial,Helvetica,sans-serif; margin: 0;  padding: 0; background: #f6f6f9; }

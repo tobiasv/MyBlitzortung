@@ -23,8 +23,30 @@ $_BL['de']['unit_meters'] = 'm';
 $_BL['de']['unit_minutes'] = 'Minuten';
 $_BL['de']['unit_hours'] = 'Stunden';
 
+$_BL['de']['Jan'] = 'Jan';
+$_BL['de']['Feb'] = 'Feb';
+$_BL['de']['Mar'] = 'Mar';
+$_BL['de']['Apr'] = 'Apr';
+$_BL['de']['May'] = 'Mai';
+$_BL['de']['Jun'] = 'Jun';
+$_BL['de']['Jul'] = 'Jul';
+$_BL['de']['Aug'] = 'Aug';
+$_BL['de']['Sep'] = 'Sep';
+$_BL['de']['Oct'] = 'Okt';
+$_BL['de']['Nov'] = 'Nov';
+$_BL['de']['Dec'] = 'Dez';
+
+$_BL['de']['All'] = 'Alle';
+$_BL['de']['Day'] = 'Tag';
+$_BL['de']['Date'] = 'Datum';
+$_BL['de']['Picture'] = 'Bild';
+$_BL['de']['Animation'] = 'Animation';
+$_BL['de']['Today'] = 'Heute';
+$_BL['de']['Yesterday'] = 'Gestern';
 $_BL['de']['settings'] = 'Einstellungen';
 $_BL['de']['time'] = 'Uhrzeit';
+$_BL['de']['timeclock'] = 'Uhrzeit';
+$_BL['de']['day'] = 'Tag';
 $_BL['de']['no'] = 'nein';
 $_BL['de']['yes'] = 'ja';
 $_BL['de']['distance'] = 'Entfernung';
@@ -109,6 +131,7 @@ $_BL['de']['Type'] = 'Typ';
 $_BL['de']['Text'] = 'Text';
 $_BL['de']['Error'] = 'Fehler';
 $_BL['de']['Back'] = 'Zurück';
+$_BL['de']['Participants'] = 'Teilnehmer';
 
 /*************************************************************/
 /* Main Menu (Standalone)                                    */
@@ -142,26 +165,26 @@ $_BL['de']['Dynamic map'] = 'Dynamische Karte';
 /*************************************************************/
 
 $_BL['de']['graph_stat_title_strikes'] = 'Blitzstatistik';
-$_BL['de']['legend_strikes_sum'] = 'Blitze Gesamt';
-$_BL['de']['legend_strikes_avg_all'] = 'Durchschnitt aller Stationen';
-$_BL['de']['legend_strikes_own'] = 'Detektierte Blitze Station {STATION}';
+$_BL['de']['graph_legend_strikes_sum'] = 'Blitze Gesamt';
+$_BL['de']['graph_legend_strikes_avg_all'] = 'Durchschnitt aller Stationen';
+$_BL['de']['graph_legend_strikes_own'] = 'Detektierte Blitze Station {STATION}';
 $_BL['de']['graph_stat_title_signals'] = 'Signalstatistik';
-$_BL['de']['legend_signals_avg_all'] = 'Durchschnitt Signale pro Station';
-$_BL['de']['legend_signals_own'] = 'Signale Station {STATION}';
+$_BL['de']['graph_legend_signals_avg_all'] = 'Durchschnitt Signale pro Station';
+$_BL['de']['graph_legend_signals_own'] = 'Signale Station {STATION}';
 $_BL['de']['graph_stat_title_ratio'] = 'Ortungs- und Blitzquoten';
-$_BL['de']['legend_ratio_sig_all'] = 'Gesamtortungsquote';
-$_BL['de']['legend_ratio_sig_own'] = 'Ortungsquote Station {STATION}';
-$_BL['de']['legend_ratio_str_all'] = 'Gesamtblitzquote';
-$_BL['de']['legend_ratio_str_own'] = 'Blitzquote Station {STATION}';
+$_BL['de']['graph_legend_ratio_sig_all'] = 'Gesamtortungsquote';
+$_BL['de']['graph_legend_ratio_sig_own'] = 'Ortungsquote Station {STATION}';
+$_BL['de']['graph_legend_ratio_str_all'] = 'Gesamtblitzquote';
+$_BL['de']['graph_legend_ratio_str_own'] = 'Blitzquote Station {STATION}';
 $_BL['de']['graph_stat_title_stations'] = 'Anzahl Stationen';
-$_BL['de']['legend_stations_active'] = 'Aktive Stationen';
+$_BL['de']['graph_legend_stations_active'] = 'Aktive Stationen';
 $_BL['de']['graph_stat_title_ratio_distance'] = 'Blitzquote nach Entfernung';
-$_BL['de']['legend_ratio_distance'] = 'Blitzquote Station {STATION}';
+$_BL['de']['graph_legend_ratio_distance'] = 'Blitzquote Station {STATION}';
 $_BL['de']['graph_stat_title_ratio_bearing'] = 'Blitzquote nach Himmelsrichtung';
-$_BL['de']['legend_stations_max_active'] = 'Größte jemals gemessene Anzahl';
-$_BL['de']['legend_count_distance'] = 'Gesamte Blitzanzahl';
-$_BL['de']['legend_ratio_bearing'] = 'Ortungsquote Station {STATION}';
-$_BL['de']['legend_count_bearing'] = 'Gesamte Blitzanzahl';
+$_BL['de']['graph_legend_stations_max_active'] = 'Größte jemals gemessene Anzahl';
+$_BL['de']['graph_legend_count_distance'] = 'Gesamte Blitzanzahl';
+$_BL['de']['graph_legend_ratio_bearing'] = 'Ortungsquote Station {STATION}';
+$_BL['de']['graph_legend_count_bearing'] = 'Gesamte Blitzanzahl';
 
 $_BL['de']['h3_graphs'] = 'Diagramme';
 $_BL['de']['h4_graph_strikes'] = 'Blitzanzahl';
@@ -187,6 +210,9 @@ $_BL['de']['h3_arch_last_signals'] = 'Zuletzt empfangene Signale';
 $_BL['de']['You have to place the pointer inside the red circle!'] = 'Der Marker muss innerhalb des roten Bereichs platziert werden!';
 $_BL['de']['archive_legend'] = 'Suchoptionen';
 $_BL['de']['No strikes found!'] = 'Keine Blitze gefunden!';
+$_BL['de']['arch_navi_maps'] = 'Karten';
+$_BL['de']['h3_arch_maps'] = 'Blitzarchiv: Karten und Animationen';
+$_BL['de']['legend_arch_strikes'] = 'Optionen';
 
 /*************************************************************/
 /* Statistics                                                */
@@ -206,6 +232,9 @@ $_BL['de']['h3_stat_network'] = 'Statistiken zum gesamten Ortungsnetzwerk';
 $_BL['de']['h3_stat_longtime'] = 'Langzeitstatistik';
 $_BL['de']['h3_stat_database'] = 'Statistik der lokalen Datenbank';
 $_BL['de']['h4_stat_other_antennas'] = 'Antennenausrichtung';
+$_BL['de']['h3_stat_strikes'] = 'Blitzzahlen pro Monat und Jahr';
+$_BL['de']['h4_graph_strikes_time'] = 'Alle Blitze';
+$_BL['de']['h4_graph_strikes_time_radius'] = 'Blitze in einem Bereich um die Station {STATION}';
 
 $_BL['de']['since begin of data logging'] = 'seit Beginn der Aufzeichnung';
 $_BL['de']['update every'] = 'Erneuerung alle';
@@ -238,6 +267,15 @@ $_BL['de']['Sum of Strikes'] = 'Anzahl an Blitzen';
 $_BL['de']['Strikes detected'] = 'Blitze registriert';
 $_BL['de']['of the last'] = 'der letzten';
 $_BL['de']['Currently no GPS coordinates available!'] = 'Momentan sind keine GPS Koordinaten verfügbar';
+$_BL['de']['stat_navi_strikes'] = 'Blitze';
+$_BL['de']['graph_legend_strikes_time_all'] = 'Alle Blitze des Ortungsnetzwerks';
+$_BL['de']['graph_legend_strikes_time_own'] = 'Nur von Station {STATION} registrierte Blitze';
+$_BL['de']['total strikes'] = 'Blitze gesamt';
+$_BL['de']['total strikes station'] = 'Blitze gesamt Station {STATION}';
+$_BL['de']['legend_stat_strikes'] = 'Zeitraum';
+$_BL['de']['Strikes station'] = 'Blitze Station {STATION}';
+$_BL['de']['_in_radius'] = ' (max. {RADIUS}km) ';
+$_BL['de']['graph_stat_title_strikes_time'] = 'Blitze';
 
 
 /*************************************************************/
@@ -415,6 +453,9 @@ $_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der gesendeten Signale pro St
 $_BL['de']['bo_stat_other_antennas_descr'] = 'Die Ausrichtung der Antennen wird durch MyBlitzortung automatisch bestimmt. Sie kann zur Bestimmung der Polarität eines Blitzes bestimmt werden.';
 $_BL['de']['bo_graph_descr_radi_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt und gibt evtl. wertvolle Hinweise auf die Empfindlichkeit der Station. ';
 $_BL['de']['bo_graph_descr_bear_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt.';
+$_BL['de']['bo_graph_descr_strikes_time'] = 'Verlauf der Anzahl aller Blitze des Ortungsnetzwerkes bzw. der Station {STATION}';
+$_BL['de']['bo_graph_descr_strikes_time_radius'] = 'Hier werden nur die Blitze gezählt, welche eine maximale Distanz von {RADIUS}km um die Station {STATION} aufweisen.';
+
 
 /*************************************************************/
 /* Alerts                                                    */
@@ -538,4 +579,9 @@ $_BL['de']['Database version changed!'] = 'Datenbankversion hat sich geändert!';
 $_BL['de']['FAIL'] = 'Fehler';
 $_BL['de']['Update done!'] = 'Aktualisierung beendet!';
 $_BL['de']['Update-Info: Setting version number to'] = 'Update-Info: Setze Version auf';
+$_BL['de']['Click to update'] = 'Update durchführen!';
 
+
+
+$_BL['de']['Month'] = '';
+$_BL['de']['Month'] = '';

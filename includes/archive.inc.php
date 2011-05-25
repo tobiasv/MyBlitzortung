@@ -22,10 +22,11 @@
 
 function bo_show_archive()
 {
-	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'search';
+	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'maps';
 
 	echo '<ul id="bo_menu">';
 
+	echo '<li><a href="'.bo_insert_url('bo_show', 'maps').'" class="bo_navi'.($show == 'maps' ? '_active' : '').'">'._BL('arch_navi_maps').'</a></li>';
 	echo '<li><a href="'.bo_insert_url('bo_show', 'search').'" class="bo_navi'.($show == 'search' ? '_active' : '').'">'._BL('arch_navi_search').'</a></li>';
 	echo '<li><a href="'.bo_insert_url('bo_show', 'signals').'" class="bo_navi'.($show == 'signals' ? '_active' : '').'">'._BL('arch_navi_signals').'</a></li>';
 
@@ -35,6 +36,11 @@ function bo_show_archive()
 	switch($show)
 	{
 		default:
+		case 'maps':
+			echo '<h3>'._BL('h3_arch_maps').' </h3>';
+			bo_show_archive_map();
+			break;
+
 		case 'search':
 			echo '<h3>'._BL('h3_arch_search').' </h3>';
 			bo_show_archive_search();
@@ -50,6 +56,186 @@ function bo_show_archive()
 
 	bo_copyright_footer();
 
+}
+
+function bo_show_archive_map()
+{
+	global $_BO;
+
+	$ani_div = 15;
+	$ani_pic_interval = 120;
+	
+	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;
+	$year = intval($_GET['bo_year']);
+	$month = intval($_GET['bo_month']);
+	$day = intval($_GET['bo_day']);
+	$day_add = intval($_GET['bo_day_add']);
+	$ani = isset($_GET['bo_animation']);
+	
+	$time = mktime(0,0,0,date('m'), date('d')-1+$day_add, date('Y'));
+	
+	if (!$year || $year < 0 || $day_add)
+		$year = date('Y', $time);
+
+	if (!$month || $month < 0 || $day_add)
+		$month = date('m', $time);
+
+	if (!$day || $day_add)
+		$day = date('d', $time);
+	
+	
+	
+	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+	$start_time = strtotime($row['mintime'].' UTC');
+	$end_time = strtotime($row['maxtime'].' UTC');
+	
+	//if (defined('BO_PURGE_STR_ALL') && BO_PURGE_STR_ALL)
+	
+	echo '<div id="bo_arch_maps">';
+
+	echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
+	echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add'));
+
+	echo '<fieldset>';
+	echo '<legend>'._BL('legend_arch_strikes').'</legend>';
+
+	
+	echo '<span class="bo_form_descr">'._BL('Map').':</span> ';
+	
+	echo '<select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
+	foreach($_BO['mapimg'] as $id => $d)
+	{
+		if (!$d['name'] || !$d['archive'])
+			continue;
+			
+		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BC($d['name']).'</option>';
+		
+		if ($map < 0)
+			$map = $id;
+	}
+	echo '</select>';
+	
+	echo '<span class="bo_form_descr">'._BL('Date').':</span> ';
+	echo '<select name="bo_year" id="bo_arch_strikes_select_year">';
+	for($i=date('Y', $start_time); $i<=date('Y');$i++)
+		echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$i.'</option>';
+	echo '</select>';
+
+	echo '<select name="bo_month" id="bo_arch_strikes_select_month">';
+	for($i=1;$i<=12;$i++)
+		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').'>'.date('M', strtotime("2000-$i-01")).'</option>';
+	echo '</select>';
+
+	echo '<select name="bo_day" id="bo_arch_strikes_select_day">';
+	for($i=1;$i<=31;$i++)
+		echo '<option value="'.$i.'" '.($i == $day ? 'selected' : '').'>'.$i.'</option>';
+	echo '</select>';
+
+	echo '<input type="submit" name="bo_ok" value="'._BL('Picture').'" id="bo_archive_maps_submit" class="bo_form_submit">';
+	echo '<input type="submit" name="bo_animation" value="'._BL('Animation').'" id="bo_archive_maps_animation" class="bo_form_submit">';
+	
+	echo '</fieldset>';
+	
+	echo '</form>';
+
+
+	if ($_BO['mapimg'][$map]['archive'])
+	{
+		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
+
+		echo '<div class="bo_arch_map_links">';
+		echo _BL('Yesterday').':&nbsp;';
+		echo '<a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=0" >'._BL('Picture').'</a> ';
+		echo '<a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=0&bo_animation" >'._BL('Animation').'</a> ';
+		echo ' | ';
+		echo _BL('Today').':&nbsp;';
+		echo '<a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=1" >'._BL('Picture').'</a> ';
+		echo '<a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
+		echo '</div>';
+
+		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
+		
+		if ($ani)
+		{
+			$img_file = BO_FILE.'?map='.$map.'&blank';
+			$bo_file_url = BO_FILE.'?map='.$map.'&transparent&date=';
+			
+			
+			$images = '';
+			
+			for ($i=0; $i<= 24 * 60; $i+= $ani_div)
+			{
+				$time = strtotime("$year-$month-$day 00:00:00 +$i minutes");
+				
+				if ($time + 60 * $ani_pic_interval > $end_time)
+					break;
+				
+				$images .= ($images ? ',' : '').'"'.date('YmdHi', $time).'-'.$ani_pic_interval.'"';
+			}
+			
+			echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
+			echo '<img style="position:absolute;top:0;left:0;" id="bo_arch_map_img_ani" src="'.BO_FILE.'?map='.$map.'&transparent&date='.sprintf('%04d%02d%02d0000-%d', $year, $month, $day, $ani_pic_interval).'">';
+		}
+		else
+		{
+			$img_file = BO_FILE.'?map='.$map.'&date='.sprintf('%04d%02d%02d', $year, $month, $day);
+			echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
+		}
+		
+		echo '</div>';
+		echo '</div>';
+	}
+	
+?>
+	
+<script type="text/javascript">
+
+var bo_maps_pics   = new Array(<?= $images ?>);
+var bo_maps_img    = new Array();
+var bo_maps_loaded = 0;
+
+function bo_maps_animation(nr)
+{
+	var timeout = 100;
+	document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[nr].src;
+	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += 1000; }
+	window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
+	
+}
+
+function bo_maps_load()
+{
+	for (var i=0; i<bo_maps_pics.length; i++)
+	{
+		bo_maps_img[i] = new Image();
+		bo_maps_img[i].onload=bo_maps_animation_start;
+		bo_maps_img[i].onerror=bo_maps_animation_start;
+		bo_maps_img[i].src = "<?php echo $bo_file_url ?>" + bo_maps_pics[i];
+	}
+}
+
+function bo_maps_animation_start()
+{
+	bo_maps_loaded++;
+	
+	if (bo_maps_loaded+1 >= bo_maps_pics.length && bo_maps_loaded > 0)
+	{
+		bo_maps_animation(0);
+		bo_maps_loaded = -1;
+	}
+	else
+	{
+		document.getElementById('bo_arch_map_img_ani').src = bo_maps_img[bo_maps_loaded-1].src;
+	}
+}
+window.setTimeout("bo_maps_load();", 500);
+</script>
+
+<?
+	
+	
+	echo '</div>';
+	
 }
 
 function bo_show_archive_search()
@@ -103,7 +289,7 @@ function bo_show_archive_search()
 		$count = 0;
 		$text = '';
 		$more_found = false;
-		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns,
+		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
 						s.current current, s.deviation deviation, s.current current, s.polarity polarity, s.part part, s.raw_id raw_id
 				FROM ".BO_DB_PREF."strikes s
 				WHERE 1
@@ -135,6 +321,7 @@ function bo_show_archive_search()
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Current').':</span><span class=\'bo_value\'> '.number_format($row['current'], 1, _BL('.'), _BL(',')).'kA ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Polarity').':</span><span class=\'bo_value\'> '.($row['polarity'] === null ? '?' : ($row['polarity'] < 0 ? _BL('negative') : _BL('positive'))).' ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participated').':</span><span class=\'bo_value\'> '.($row['part'] ? _BL('yes') : _BL('no')).'</span></li>';
+			$description .= '<li><span class=\'bo_descr\'>'._BL('Participants').':</span><span class=\'bo_value\'> '.intval($row['users']).'</span></li>';
 			$description .= '</ul>';
 
 			if ($row['raw_id'])
@@ -410,7 +597,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	$count = 0;
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
 					s.deviation deviation, s.current current,
-					s.time stime, s.time_ns stimens,
+					s.time stime, s.time_ns stimens, s.users users, 
 					r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data
 			FROM $sql_join
 			WHERE 1
@@ -482,17 +669,6 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 
 			echo '<ul>';
 
-			/*
-			echo '<li>';
-			echo '<span class="bo_descr">';
-			echo _BL('Time').': ';
-			echo '</span>';
-			echo '<span class="bo_value">';
-			echo date(_BL('_datetime'), $stime).'.'.sprintf('%09d', $row['stimens']);
-			echo '</span>';
-			echo '</li>';
-			*/
-
 			echo '<li>';
 			echo '<span class="bo_descr">';
 			echo _BL('Runtime').': ';
@@ -511,9 +687,10 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			echo '</span>';
 			echo '<span class="bo_value">';
 			echo number_format($row['distance'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
+			echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
 			echo '</span>';
 			echo '</li>';
-
+/*
 			echo '<li>';
 			echo '<span class="bo_descr">';
 			echo _BL('Bearing').': ';
@@ -522,7 +699,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			echo _BL(bo_bearing2direction($bearing));
 			echo '</span>';
 			echo '</li>';
-
+*/
 			echo '<li>';
 			echo '<span class="bo_descr">';
 			echo _BL('Deviation').': ';
@@ -556,6 +733,14 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			echo '</span>';
 			echo '</li>';
 
+			echo '<li>';
+			echo '<span class="bo_descr">';
+			echo _BL('Participants').': ';
+			echo '</span>';
+			echo '<span class="bo_value">';
+			echo number_format($row['users'], 0, _BL('.'), _BL(','));
+			echo '</span>';
+			echo '</li>';
 
 			echo '</ul>';
 

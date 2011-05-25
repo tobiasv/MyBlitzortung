@@ -764,7 +764,6 @@ function bo_update_stations($force = false)
 		// Daily Statistics and longtime strike-count
 		if (!$yesterday_count)
 		{
-
 			$yesterday = gmdate('Y-m-d', $ytime);
 			$sql = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes WHERE {where} time BETWEEN '$yesterday 00:00:00' AND '$yesterday 23:59:59'";
 
@@ -855,13 +854,16 @@ function bo_update_all($force)
 	
 	flush();
 	$t = time();
-	if (bo_update_strikes($force) !== false || $async || $force)
+	
+	$strikes_imported = bo_update_strikes($force);
+	
+	if ($strikes_imported !== false || $async || $force)
 	{	
 		flush();
-		bo_update_stations($force);
+		$stations_imported = bo_update_stations($force);
 		
 		flush();
-		bo_update_raw_signals($force);
+		$signals_imported = bo_update_raw_signals($force);
 		
 
 		/*** Check and send strike alerts ***/
@@ -871,9 +873,13 @@ function bo_update_all($force)
 			echo "\n<h2>Checking and sending strike alerts.</h2>\n";
 			bo_alert_send();
 		}
-		
 	}
-
+	
+	if (!$strikes_imported && !$stations_imported && !$signals_imported)
+	{
+		bo_my_station_autoupdate($force);
+	}
+	
 	/*** Purge old data ***/
 	echo "\n<h2>Purging data</h2>\n";
 	flush();
@@ -997,8 +1003,6 @@ function bo_update_all($force)
 		echo "<p>Purgin disabled!</p>\n";
 	}
 
-	bo_my_station_autoupdate($force);
-	
 	bo_set_conf('is_updating', 0);
 
 	return;
@@ -1046,7 +1050,7 @@ function bo_my_station_update($url)
 		echo '<h3>'._BL('Requesting data').'</h3>';
 		echo '<p>'._BL('Connecting to ').' <em>'.BO_LINK_HOST.'</em></p>';
 		
-		$request = 'id='.bo_station_id().'&login='.$login_id.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON);
+		$request = 'id='.bo_station_id().'&login='.$login_id.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS);
 		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
 		
 		$content = file_get_contents($data_url);
@@ -1072,9 +1076,14 @@ function bo_my_station_update($url)
 				case 'ok':
 					$urls = $R['urls'];
 					
+					$info['lats'] = $R['lats'];
+					$info['lons'] = $R['lons'];
+					$info['rads'] = $R['rads'];
+
 					if (is_array($urls))
 					{
 						bo_set_conf('mybo_stations', serialize($urls));
+						bo_set_conf('mybo_stations_info', serialize($info));
 						
 						echo '<p>'._BL('Received urls').': '.count($urls).'</p>';
 						echo '<p>'._BL('DONE').'!</p>';

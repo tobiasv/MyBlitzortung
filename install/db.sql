@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations_stat` (
   `signalsh` mediumint(11) unsigned NOT NULL default '0',
   `strikesh` mediumint(11) unsigned NOT NULL default '0',
   KEY `time` (`time`),
-  KEY `station_id` (`station_id`)
+  KEY `station_id` (`station_id`),
+  KEY `stations_time` (`station_id`, `time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 

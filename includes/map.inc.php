@@ -75,7 +75,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 		var marker = new google.maps.Marker({
 		  position: myLatlng, 
 		  map: bo_map, 
-		  title:"<?php echo $station_text ?>",
+		  title:"<?php echo _BC($station_text) ?>",
 		  icon: 'http://labs.google.com/ridefinder/images/mm_20_red.png'
 		});
 		
@@ -234,7 +234,7 @@ function bo_show_lightning_map()
 	{	
 		$footer= $_BO['mapimg'][$static_map_id]['footer'];
 		
-		echo '<h3>'._BL('Lightning map').'</h3>';
+		//echo '<h3>'._BL('Lightning map').'</h3>';
 		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'">';
 		echo '<div class="bo_map_footer">'.$footer.'</div>';
 		
@@ -252,6 +252,7 @@ function bo_show_lightning_map()
 	echo '<fieldset class="bo_map_options">';
 	echo '<legend>'._BL("map_options").'</legend>';
 
+	ksort($_BO['mapcfg']);
 	foreach ($_BO['mapcfg'] as $mapid => $cfg)
 	{
 		if ($cfg['only_loggedin'] && !bo_user_get_level())

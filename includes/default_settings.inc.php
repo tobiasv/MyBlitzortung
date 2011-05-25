@@ -26,6 +26,11 @@
 /* Use config.php for individual setting!         */
 /**************************************************/
 
+@define("BO_FILE", 'blitzortung.php');
+@define("BO_LOCALE", 'en');
+@define("BO_UTF8", true);
+
+
 //User / Login
 @define("BO_LOGIN_SHOW", true);
 @define("BO_LOGIN_ALLOW", 2); //0=nobody, 1=you, 2=all
@@ -80,6 +85,7 @@
 @define("BO_GRAPH_STAT_COLOR3", '#800@0.6');
 @define("BO_GRAPH_STAT_COLOR_BOX", '#d0d0d0');
 @define("BO_GRAPH_STAT_COLOR_BACK", '#fff');
+@define("BO_GRAPH_STAT_COLOR_CAPTION", '#666');
 @define("BO_GRAPH_STAT_COLOR_MARGIN",'#fff');
 @define("BO_GRAPH_STAT_COLOR_FRAME", '#fff');
 @define("BO_GRAPH_STAT_COLOR_XGRID", '#eee');
@@ -88,6 +94,17 @@
 @define("BO_GRAPH_STAT_COLOR_YAXIS", '#666');
 @define("BO_GRAPH_STAT_COLOR_XAXIS_TITLE", '#666');
 @define("BO_GRAPH_STAT_COLOR_YAXIS_TITLE", '#666');
+@define("BO_GRAPH_STAT_COLOR_LEGEND_FILL", '#fff');
+@define("BO_GRAPH_STAT_COLOR_LEGEND_TEXT", '#666');
+@define("BO_GRAPH_STAT_COLOR_LEGEND_FRAME", '#fff');
+
+//Statistics-Graph: Strikes (Month, Year)
+@define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_L1", '#00f@0.9');
+@define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1", '#f99@0.4');
+@define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_L2", '#00f@0.9');
+@define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_F2", '#99f@0.4');
+@define("BO_GRAPH_STAT_STRIKES_TIME_WIDTH", 0.98);
+
 
 //Statistics-Graph: Strikes
 @define("BO_GRAPH_STAT_STR_COLOR_L1", '#99f@1');
@@ -134,7 +151,7 @@
 @define("BO_GRAPH_STAT_RATIO_DIST_LINE", false);
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_L1", '#00f@1');
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_F1", '#ada@0');
-@define("BO_GRAPH_STAT_RATIO_DIST_WIDTH1",  2);
+@define("BO_GRAPH_STAT_RATIO_DIST_WIDTH1",  1);
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_L2", '#22f@0.8');
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_F2", '#22f@0.95');
 @define("BO_GRAPH_STAT_RATIO_DIST_WIDTH2",  1);
@@ -144,7 +161,7 @@
 @define("BO_GRAPH_STAT_RATIO_BEAR_LINE", false);
 @define("BO_GRAPH_STAT_RATIO_BEAR_COLOR_L1", '#00f@1');
 @define("BO_GRAPH_STAT_RATIO_BEAR_COLOR_F1", '#ada@0');
-@define("BO_GRAPH_STAT_RATIO_BEAR_WIDTH1",  14);
+@define("BO_GRAPH_STAT_RATIO_BEAR_WIDTH1",  null);
 @define("BO_GRAPH_STAT_RATIO_BEAR_COLOR_L2", '#22f@0.8');
 @define("BO_GRAPH_STAT_RATIO_BEAR_COLOR_F2", '#22f@0.95');
 @define("BO_GRAPH_STAT_RATIO_BEAR_WIDTH2",  1);
@@ -177,102 +194,25 @@
 @define('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM', 12);
 
 if (!isset($_BO['mapcfg'][0]))
-{
-	$_BO['mapcfg'][0]['tstart'] = 15;
-	$_BO['mapcfg'][0]['trange'] = 15;
-	$_BO['mapcfg'][0]['upd_intv'] = 5;
-	$_BO['mapcfg'][0]['col'][] = array(255, 255, 0);
-	$_BO['mapcfg'][0]['col'][] = array(255, 240, 0);
-	$_BO['mapcfg'][0]['col'][] = array(255, 225, 0);
-	$_BO['mapcfg'][0]['default_show'] = true;
-	$_BO['mapcfg'][0]['sel_name'] = '0-15 min';
-}
+	$_BO['mapcfg'][0] = $_BO['tpl_gmap']['0-15'];
 
 if (!isset($_BO['mapcfg'][1]))
-{
-	$_BO['mapcfg'][1]['tstart'] = 120;
-	$_BO['mapcfg'][1]['trange'] = 105;
-	$_BO['mapcfg'][1]['upd_intv'] = 15;
-	$_BO['mapcfg'][1]['col'][] = array(250, 190, 0);
-	$_BO['mapcfg'][1]['col'][] = array(245, 170, 10);
-	$_BO['mapcfg'][1]['col'][] = array(240, 150, 10);
-	$_BO['mapcfg'][1]['col'][] = array(235, 130, 10);
-	$_BO['mapcfg'][1]['col'][] = array(230, 110, 10);
-	$_BO['mapcfg'][1]['col'][] = array(225,  90, 10);
-	$_BO['mapcfg'][1]['col'][] = array(220,  70, 10);
-	$_BO['mapcfg'][1]['default_show'] = true;
-	$_BO['mapcfg'][1]['sel_name'] = '15-120 min';
-}
-
+	$_BO['mapcfg'][1] = $_BO['tpl_gmap']['15-120'];
+	
 if (!isset($_BO['mapcfg'][2]))
-{
-	$_BO['mapcfg'][2]['tstart'] = 60 * 24;
-	$_BO['mapcfg'][2]['trange'] = 60 * 22;
-	$_BO['mapcfg'][2]['upd_intv'] = 30;
-	for ($i=0;$i<20;$i++)
-		$_BO['mapcfg'][2]['col'][] = array(200-150*$i/20, 10+40*$i/20, 50+200*$i/20);
-	$_BO['mapcfg'][2]['default_show'] = false;
-	$_BO['mapcfg'][2]['sel_name'] = '2-24 h';
-}
-
-/*
-// Example for 1 to 10 days. Be careful: can cause high database load!
-$_BO['mapcfg'][3]['tstart'] = 60 * 24 * 10;
-$_BO['mapcfg'][3]['trange'] = 60 * 24 * 9;
-$_BO['mapcfg'][3]['upd_intv'] = 1;
-for ($i=0;$i<20;$i++)
-	$_BO['mapcfg'][3]['col'][] = array(80 + 2*$i/20, 50   +200*$i/20, 230   -200*$i/20);
-$_BO['mapcfg'][3]['default_show'] = false;
-$_BO['mapcfg'][3]['sel_name'] = '1-10 days';
-$_BO['mapcfg'][3]['only_loggedin'] = true;
-*/
+	$_BO['mapcfg'][2] = $_BO['tpl_gmap']['2-24h'];
 
 /*** Image Maps ***/
-
-//Europe
 if (!isset($_BO['mapimg'][0]))
-{
-	$_BO['mapimg'][0]['name'] = 'Europa';
-	$_BO['mapimg'][0]['menu'] = true;
-	$_BO['mapimg'][0]['file'] = 'map_europe.png';
-	$_BO['mapimg'][0]['coord'] = array(68, 50, 23, -20); //North, East, South, West (Degrees)
-	$_BO['mapimg'][0]['trange'] = 2; //hours!
-	$_BO['mapimg'][0]['upd_intv'] = 15; //minutes
-	$_BO['mapimg'][0]['textcolor'] = array(255,255,255);
-	$_BO['mapimg'][0]['textsize'] = 5;
-	$_BO['mapimg'][0]['point_type'] = 2;
-	$_BO['mapimg'][0]['point_size'] = 2;
-	$_BO['mapimg'][0]['legend'] = array(5, 100, 80, 4, 4, 1);
-	$_BO['mapimg'][0]['col'][] = array(255, 255, 0);
-	$_BO['mapimg'][0]['col'][] = array(255, 200, 0);
-	$_BO['mapimg'][0]['col'][] = array(255, 150, 0);
-	$_BO['mapimg'][0]['col'][] = array(255, 100, 0);
-	$_BO['mapimg'][0]['col'][] = array(255,   0, 0);
-	$_BO['mapimg'][0]['col'][] = array(225,   0, 0);
-}
+	$_BO['mapimg'][0] = $_BO['tpl_imgmap']['europe'];
 
-//Germany (mini)
 if (!isset($_BO['mapimg'][1]))
-{
-	$_BO['mapimg'][1]['name'] = 'Deutschland (mini)';
-	$_BO['mapimg'][1]['menu'] = false;
-	$_BO['mapimg'][1]['file'] = 'map_germany.png';
-	$_BO['mapimg'][1]['coord'] = array(56, 18.3, 46.3, 1.8); //North, East, South, West (Degrees)
-	$_BO['mapimg'][1]['trange'] = 2; //hours!
-	$_BO['mapimg'][1]['upd_intv'] = 5; //minutes
-	$_BO['mapimg'][1]['textcolor'] = array(255,255,255);
-	$_BO['mapimg'][1]['textsize'] = 1;
-	$_BO['mapimg'][1]['point_type'] = 2;
-	$_BO['mapimg'][1]['point_size'] = 1;
-	$_BO['mapimg'][1]['legend'] = array(0, 54, 26, 0, 0, 0);
-	$_BO['mapimg'][1]['col'][] = array(255, 255, 0);
-	$_BO['mapimg'][1]['col'][] = array(255, 200, 0);
-	$_BO['mapimg'][1]['col'][] = array(255, 150, 0);
-	$_BO['mapimg'][1]['col'][] = array(255, 100, 0);
-	$_BO['mapimg'][1]['col'][] = array(255,   0, 0);
-	$_BO['mapimg'][1]['col'][] = array(225,   0, 0);
-}
+	$_BO['mapimg'][1] = $_BO['tpl_imgmap']['germany_mini'];
 
+if (!isset($_BO['mapimg'][2]))
+	$_BO['mapimg'][2] = $_BO['tpl_imgmap']['germany_lkr'];
+
+	
 // ALERTS
 @define("BO_ALERTS", true);
 @define("BO_ALERT_CHECK_INTERVAL", 15);
