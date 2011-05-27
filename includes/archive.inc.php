@@ -109,7 +109,7 @@ function bo_show_archive_map()
 		if (!$d['name'] || !$d['archive'])
 			continue;
 			
-		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BC(_BL($d['name'])).'</option>';
+		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
 		
 		if ($map < 0)
 			$map = $id;

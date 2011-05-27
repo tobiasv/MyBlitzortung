@@ -1279,7 +1279,6 @@ function bo_update_densities($max_time)
 			
 			if ($timeout)
 				return;
-
 			
 		}
 	}
