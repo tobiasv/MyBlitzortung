@@ -1072,8 +1072,7 @@ function bo_update_densities($max_time)
 	$ranges[] = array(mktime(0,0,0,date('m')-1,1,date('Y')), mktime(0,0,0,date('m'),0,date('Y')) );
 	
 	//current month (for testing only!)
-	$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), mktime(0,0,0,date('m')+1,0,date('Y')) ); 
-
+	//$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), mktime(0,0,0,date('m')+1,0,date('Y')) ); 
 	//last year (will work, but takes VERY long ==> calculate from month-data)
 	//$ranges[] = array( 	strtotime( (date('Y')-1).'-01-01'), strtotime( (date('Y')-1).'-12-31') ); 
 	
