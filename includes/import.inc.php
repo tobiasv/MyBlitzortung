@@ -1071,9 +1071,10 @@ function bo_update_densities($max_time)
 	//last month
 	$ranges[] = array(mktime(0,0,0,date('m')-1,1,date('Y')), mktime(0,0,0,date('m'),0,date('Y')) );
 	
+	//current month (for testing only!)
 	$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), mktime(0,0,0,date('m')+1,0,date('Y')) ); 
-	
-	//last year
+
+	//last year (will work, but takes VERY long ==> calculate from month-data)
 	//$ranges[] = array( 	strtotime( (date('Y')-1).'-01-01'), strtotime( (date('Y')-1).'-12-31') ); 
 	
 	//insert
@@ -1181,7 +1182,12 @@ function bo_update_densities($max_time)
 			
 			if ($b['station_id'] == bo_station_id())
 			{
-				$sql_where = " AND part=1 ";
+				$sql_where = " AND s.part=1 ";
+			}
+			elseif ($b['station_id'])
+			{
+				$sql_join  = ",".BO_DB_PREF."stations_strikes ss ";
+				$sql_where = " AND ss.strike_id=s.id AND ss.station_id='".intval($b['station_id'])."'";
 			}
 
 			$max_count = 0;
@@ -1199,11 +1205,12 @@ function bo_update_densities($max_time)
 				$last_lon_id = 0;
 				
 				// line by line
-				$sql = "SELECT COUNT(*) cnt, FLOOR((lon+".(-$lon).")/(".$dlon.")) lon_id
-						FROM ".BO_DB_PREF."strikes
+				$sql = "SELECT COUNT(*) cnt, FLOOR((s.lon+".(-$lon).")/(".$dlon.")) lon_id
+						FROM ".BO_DB_PREF."strikes s
+							$sql_join
 						WHERE 1
-							AND NOT (lat < ".($lat)." OR lat > ".($lat+$dlat)." OR lon < ".$lon." OR lon > ".$lon_end.") 
-							AND time BETWEEN '".$b['date_start']."' AND '".$b['date_end']."'
+							AND NOT (s.lat < ".($lat)." OR s.lat > ".($lat+$dlat)." OR s.lon < ".$lon." OR s.lon > ".$lon_end.") 
+							AND s.time BETWEEN '".$b['date_start']."' AND '".$b['date_end']."'
 							$sql_where
 						GROUP BY lon_id
 						";
