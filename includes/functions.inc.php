@@ -201,7 +201,7 @@ function bo_station_id()
 	if (!$id)
 		$id = bo_station_name2id(BO_USER);
 	
-	return $id;
+	return $id ? $id : -1;
 }
 
 //returns your station name
@@ -261,11 +261,14 @@ function bo_insert_url($exclude = array(), $add = null)
 
 	if (bo_user_get_id())
 		$exclude[] = 'bo_login';
-		
+	
+	$exclude_bo = array_search('bo_*', $exclude) !== false;
+	
 	$query = '';
 	foreach($_GET as $name => $val)
 	{
-		if (array_search($name, $exclude) !== false)
+		
+		if (array_search($name, $exclude) !== false || ($exclude_bo && substr($name,0,3) == 'bo_' && $name != 'bo_page') )
 			continue;
 
 		$query .= urlencode($name).(strlen($val) ? '='.urlencode($val) : '').'&';
@@ -304,7 +307,7 @@ function bo_copyright_footer()
 
 	if (BO_LOGIN_SHOW === true)
 	{
-		$file = BO_LOGIN_FILE !== false ? BO_LOGIN_FILE : BO_FILE;
+		$file = BO_LOGIN_URL !== false ? BO_LOGIN_URL : BO_FILE;
 		$file .= strpos($file, '?') === false ? '?' : '';
 
 		echo '<div id="bo_login_link">';
@@ -502,10 +505,10 @@ function bo_show_menu()
 	$page = $_GET['bo_page'] ? $_GET['bo_page'] : 'map';
 
 	echo '<ul id="bo_mainmenu">';
-	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_action', 'bo_action2'), 'map').'"        id="bo_mainmenu_map"  class="bo_mainmenu'.($page == 'map' ? '_active' : '').'">'._BL('main_menu_map').'</a></li>';
-	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_action', 'bo_action2'), 'archive').'"    id="bo_mainmenu_arch" class="bo_mainmenu'.($page == 'archive' ? '_active' : '').'">'._BL('main_menu_archive').'</a></li>';
-	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_action', 'bo_action2'), 'statistics').'" id="bo_mainmenu_stat" class="bo_mainmenu'.($page == 'statistics' ? '_active' : '').'">'._BL('main_menu_statistics').'</a></li>';
-	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_action', 'bo_action2'), 'info').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'info' ? '_active' : '').'">'._BL('main_menu_info').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'map').'"        id="bo_mainmenu_map"  class="bo_mainmenu'.($page == 'map' ? '_active' : '').'">'._BL('main_menu_map').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'archive').'"    id="bo_mainmenu_arch" class="bo_mainmenu'.($page == 'archive' ? '_active' : '').'">'._BL('main_menu_archive').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'statistics').'" id="bo_mainmenu_stat" class="bo_mainmenu'.($page == 'statistics' ? '_active' : '').'">'._BL('main_menu_statistics').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'info').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'info' ? '_active' : '').'">'._BL('main_menu_info').'</a></li>';
 	echo '</ul>';
 
 }

@@ -47,10 +47,7 @@ function bo_show_login()
 	if (isset($_GET['bo_logout']))
 		bo_user_do_logout();
 
-	
-
-	
-	$remove_vars = array('bo_action','bo_action2','login','id');
+	$remove_vars = array('bo_*','login','id');
 	
 	if (bo_user_get_id())
 	{

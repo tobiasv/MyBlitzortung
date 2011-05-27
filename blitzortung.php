@@ -23,7 +23,7 @@ if (!defined("BO_VER"))
 {
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.3');
+	define("BO_VER", '0.3.1');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -155,7 +155,12 @@ if (!defined("BO_VER"))
 	}
 
 	//graphics, login...
-	if (isset($_GET['map']))
+	if (isset($_GET['density']))
+	{
+		bo_get_density_image();
+		exit;
+	}
+	elseif (isset($_GET['map']))
 	{
 		bo_get_map_image();
 		exit;
@@ -175,7 +180,7 @@ if (!defined("BO_VER"))
 		bo_get_image($_GET['image']);
 		exit;
 	}
-
+	
 	// include extra language (after images with caching machanism!)
 	$locale = '';
 	if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
@@ -205,7 +210,7 @@ if (!defined("BO_VER"))
 	}
 
 	//workaround when no special login-url is specified
-	if (!defined('BO_LOGIN_FILE') || !BO_LOGIN_FILE)
+	if (!defined('BO_LOGIN_URL') || !BO_LOGIN_URL)
 	{
 		if (isset($_GET['bo_login']))
 		{

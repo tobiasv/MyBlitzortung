@@ -26,9 +26,9 @@ function bo_show_archive()
 
 	echo '<ul id="bo_menu">';
 
-	echo '<li><a href="'.bo_insert_url('bo_show', 'maps').'" class="bo_navi'.($show == 'maps' ? '_active' : '').'">'._BL('arch_navi_maps').'</a></li>';
-	echo '<li><a href="'.bo_insert_url('bo_show', 'search').'" class="bo_navi'.($show == 'search' ? '_active' : '').'">'._BL('arch_navi_search').'</a></li>';
-	echo '<li><a href="'.bo_insert_url('bo_show', 'signals').'" class="bo_navi'.($show == 'signals' ? '_active' : '').'">'._BL('arch_navi_signals').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'maps').'" class="bo_navi'.($show == 'maps' ? '_active' : '').'">'._BL('arch_navi_maps').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'search').'" class="bo_navi'.($show == 'search' ? '_active' : '').'">'._BL('arch_navi_search').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'signals').'" class="bo_navi'.($show == 'signals' ? '_active' : '').'">'._BL('arch_navi_signals').'</a></li>';
 
 	echo '</ul>';
 
@@ -83,7 +83,7 @@ function bo_show_archive_map()
 	if (!$day || $day_add)
 		$day = date('d', $time);
 	
-	
+	$time = strtotime("$year-$month-$day 00:00:00 UTC");
 	
 	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$start_time = strtotime($row['mintime'].' UTC');
@@ -102,13 +102,14 @@ function bo_show_archive_map()
 	
 	echo '<span class="bo_form_descr">'._BL('Map').':</span> ';
 	
+	ksort($_BO['mapimg']);
 	echo '<select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
 	foreach($_BO['mapimg'] as $id => $d)
 	{
 		if (!$d['name'] || !$d['archive'])
 			continue;
 			
-		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BC($d['name']).'</option>';
+		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BC(_BL($d['name'])).'</option>';
 		
 		if ($map < 0)
 			$map = $id;
@@ -123,7 +124,7 @@ function bo_show_archive_map()
 
 	echo '<select name="bo_month" id="bo_arch_strikes_select_month">';
 	for($i=1;$i<=12;$i++)
-		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').'>'.date('M', strtotime("2000-$i-01")).'</option>';
+		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').'>'._BL(date('M', strtotime("2000-$i-01"))).'</option>';
 	echo '</select>';
 
 	echo '<select name="bo_day" id="bo_arch_strikes_select_day">';
@@ -137,25 +138,31 @@ function bo_show_archive_map()
 	echo '</fieldset>';
 	
 	echo '</form>';
-
-
+	
 	if ($_BO['mapimg'][$map]['archive'])
 	{
 		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 
 		echo '<div class="bo_arch_map_links">';
-		echo _BL('Yesterday').':&nbsp;';
-		echo '<a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=0" >'._BL('Picture').'</a> ';
-		echo '<a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=0&bo_animation" >'._BL('Animation').'</a> ';
-		echo ' | ';
-		echo _BL('Today').':&nbsp;';
-		echo '<a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=1" >'._BL('Picture').'</a> ';
-		echo '<a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
+		echo _BL('Yesterday').': &nbsp; ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=0" >'._BL('Picture').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=0&bo_animation" >'._BL('Animation').'</a> ';
+		echo '  &nbsp;  &nbsp; &nbsp; ';
+		echo _BL('Today').': &nbsp; ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=1" >'._BL('Picture').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
 		echo '</div>';
 
-		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
+		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 		
-		if ($ani)
+		if ($time < $start_time || $time > $end_time)
+		{
+			$text = _BL('arch_select_dates_beween');
+			echo '<p>';
+			echo strtr($text, array('{START}' => date(_BL('_date'), $start_time), '{END}' => date(_BL('_date'), $end_time) ));
+			echo '</p>';
+		}
+		else if ($ani)
 		{
 			$img_file = BO_FILE.'?map='.$map.'&blank';
 			$bo_file_url = BO_FILE.'?map='.$map.'&transparent&date=';
@@ -184,6 +191,7 @@ function bo_show_archive_map()
 		
 		echo '</div>';
 		echo '</div>';
+		
 	}
 	
 ?>
@@ -198,7 +206,7 @@ function bo_maps_animation(nr)
 {
 	var timeout = 100;
 	document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[nr].src;
-	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += 1000; }
+	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += 2000; }
 	window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
 	
 }
@@ -499,7 +507,6 @@ function bo_show_archive_search()
 				google.maps.event.addListener(marker, 'click', function() {
 					infowindow.setContent(this.content);
 					infowindow.open(bo_map, this);
-
 				});
 
 			}

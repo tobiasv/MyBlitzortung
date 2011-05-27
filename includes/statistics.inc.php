@@ -29,11 +29,11 @@ function bo_show_statistics()
 
 	echo '<ul id="bo_menu">';
 
-	echo '<li><a href="'.bo_insert_url('bo_show', 'strikes').'" class="bo_navi'.($show == 'strikes' ? '_active' : '').'">'._BL('stat_navi_strikes').'</a></li>';
-	echo '<li><a href="'.bo_insert_url('bo_show', 'station').'" class="bo_navi'.($show == 'station' ? '_active' : '').'">'._BL('stat_navi_station').'</a></li>';
-	echo '<li><a href="'.bo_insert_url('bo_show', 'network').'" class="bo_navi'.($show == 'network' ? '_active' : '').'">'._BL('stat_navi_network').'</a></li>';
-	echo '<li><a href="'.bo_insert_url('bo_show', 'longtime').'" class="bo_navi'.($show == 'longtime' ? '_active' : '').'">'._BL('stat_navi_longtime').'</a></li>';
-	echo '<li><a href="'.bo_insert_url('bo_show', 'other').'" class="bo_navi'.($show == 'other' ? '_active' : '').'">'._BL('stat_navi_other').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'" class="bo_navi'.($show == 'strikes' ? '_active' : '').'">'._BL('stat_navi_strikes').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'station').'" class="bo_navi'.($show == 'station' ? '_active' : '').'">'._BL('stat_navi_station').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'network').'" class="bo_navi'.($show == 'network' ? '_active' : '').'">'._BL('stat_navi_network').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'longtime').'" class="bo_navi'.($show == 'longtime' ? '_active' : '').'">'._BL('stat_navi_longtime').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'other').'" class="bo_navi'.($show == 'other' ? '_active' : '').'">'._BL('stat_navi_other').'</a></li>';
 
 	echo '</ul>';
 
@@ -264,7 +264,7 @@ function bo_show_statistics_network()
 					WHERE 1
 							AND a.id=b.station_id
 							AND b.time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)
-							AND b.signalsh > 0");
+							-- AND b.signalsh > 0");
 	while($row = $res->fetch_assoc())
 	{
 		$D[$row['sid']] = $row;

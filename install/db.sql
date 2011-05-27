@@ -83,3 +83,27 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}user` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `login` (`login`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}densities` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `date_start` date default NULL,
+  `date_end` date default NULL,
+  `status` tinyint(4) NOT NULL,
+  `station_id` smallint(5) unsigned NOT NULL,
+  `length` decimal(4,1) NOT NULL,
+  `lat_min` decimal(5,2) NOT NULL,
+  `lon_min` decimal(5,2) NOT NULL,
+  `lat_max` decimal(5,2) NOT NULL,
+  `lon_max` decimal(5,2) NOT NULL,
+  `type` smallint(5) unsigned NOT NULL,
+  `info` varchar(500) NOT NULL,
+  `data` longblob NOT NULL,
+  `changed` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `unique_dataset` (`date_start`,`date_end`,`station_id`,`type`),
+  KEY `date_start` (`date_start`,`date_end`),
+  KEY `status` (`status`),
+  KEY `type` (`type`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
+

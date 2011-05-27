@@ -24,7 +24,7 @@
 function bo_check_for_update()
 {
 	
-	$updates = array('0.2.2' => 202, '0.3' => 300);
+	$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301);
 	$cur_version = bo_get_conf('version');
 
 	preg_match('/([0-9]+)(\.([0-9]+)(\.([0-9]+))?)?/', $cur_version, $r);
@@ -66,6 +66,33 @@ function bo_check_for_update()
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				$ok = true; //doesn't matter too much if this fails ;-)
 				break;
+			
+			case '0.3.1':
+			
+				$sql = " CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}densities` (
+						  `id` int(10) unsigned NOT NULL auto_increment,
+						  `date_start` date default NULL,
+						  `date_end` date default NULL,
+						  `status` tinyint(4) NOT NULL,
+						  `station_id` smallint(5) unsigned NOT NULL,
+						  `length` decimal(4,1) NOT NULL,
+						  `lat_min` decimal(5,2) NOT NULL,
+						  `lon_min` decimal(5,2) NOT NULL,
+						  `lat_max` decimal(5,2) NOT NULL,
+						  `lon_max` decimal(5,2) NOT NULL,
+						  `type` smallint(5) unsigned NOT NULL,
+						  `info` varchar(500) NOT NULL,
+						  `data` longblob NOT NULL,
+						  `changed` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+						  PRIMARY KEY  (`id`),
+						  UNIQUE KEY `unique_dataset` (`date_start`,`date_end`,`station_id`,`type`),
+						  KEY `date_start` (`date_start`,`date_end`),
+						  KEY `status` (`status`),
+						  KEY `type` (`type`)
+						) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
+				
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 		}
 		
 		echo '</ul>';

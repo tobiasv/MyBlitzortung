@@ -393,7 +393,7 @@ switch($step)
 					</ul>
 			';
 		echo '<h3>Change your individual configuration</h3>
-				<p>The file is "settings.php". Most of the settings are described.</p>';
+				<p>Perhaps you want to add some settings to config.php. See README or <em>includes/default_settings.inc.php</em> for details.</p>';
 				
 		echo '<h3>Copy JpGraph files.</h3>
 			<p>JpGraph is used for creating the graphs.

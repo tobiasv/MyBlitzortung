@@ -3,6 +3,15 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.3.1 (2011-05-27)
+--------------------------
+- style changes (again)
+- no more config.php.example (Sorry, look default_settings.inc.php)
+- prepare for strike density maps (disabled by default can cause very high load!!!)
+- new: show stations on map
+- fixed: DEFAULT_ZOOM... constants changed their names and working now
+
+
 Version 0.3 (2011-05-25)
 ------------------------
 - new: show strike count for month/year
@@ -12,6 +21,7 @@ Version 0.3 (2011-05-25)
 - fix: corrected graphs with "hours" bigger than 24
 - added Database index for statistics
 - style improved
+
 
 Version 0.2.4b (2011-05-23)
 ---------------------------

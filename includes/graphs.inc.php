@@ -463,7 +463,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			//one SQL-Query for all graphs -> Query Cache should improve performance (if enabled)
 			$sql = "SELECT time, AVG(signalsh) sig, AVG(strikesh) astr, MAX(strikesh) mstr, COUNT(time) / COUNT(DISTINCT time) cnt
 					FROM ".BO_DB_PREF."stations_stat
-					WHERE time BETWEEN '$date_start' AND '$date_end' AND (signalsh > 0 OR strikesh > 0) AND $sqlw
+					WHERE time BETWEEN '$date_start' AND '$date_end' AND $sqlw
+							-- AND (signalsh > 0 OR strikesh > 0)
 					GROUP BY DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())
@@ -712,7 +713,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$graph->Add($plot);
 
 
-			$max_stations = bo_get_conf('longtime_count_max_active_stations_sig');
+			$max_stations = bo_get_conf('longtime_count_max_active_stations');
 			if ($max_stations)
 			{
 				$sline  = new PlotLine(HORIZONTAL, $max_stations, BO_GRAPH_STAT_STA_COLOR_L2, 1);
@@ -720,7 +721,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 				$sline->SetLegend(_BL('graph_legend_stations_max_active'));
 				$graph->AddLine($sline);
 
-				$graph->yscale->SetAutoMax($max_stations + 10);
+				$graph->yscale->SetAutoMax($max_stations + 1);
 			}
 
 			$graph->xaxis->title->Set(_BL('Time'));
@@ -835,7 +836,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 		{
 			$graph->xaxis->title->Set(_BL('day'));
 			$graph->xaxis->scale->SetDateFormat('d.m');
-			$graph->xaxis->scale->ticks->Set(5);
 		}
 		else
 		{

@@ -211,12 +211,13 @@ function bo_show_lightning_map()
 	
 	$static_map_id = intval($_GET['bo_showmap']);
 	$menu_text = '';
+	ksort($_BO['mapimg']);
 	foreach($_BO['mapimg'] as $id => $d)
 	{
 		if (!$d['name'] || !$d['menu'])
 			continue;
 		
-		$menu_text .= '<li><a href="'.bo_insert_url('bo_showmap', "$id").'" class="bo_navi'.($no_google && $static_map_id == $id ? '_active' : '').'">'.htmlentities($d['name']).'</a></li>';
+		$menu_text .= '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), "$id").'" class="bo_navi'.($no_google && $static_map_id == $id ? '_active' : '').'">'._BC(_BL($d['name'])).'</a></li>';
 	}
 	
 	if ($menu_text)
@@ -224,7 +225,7 @@ function bo_show_lightning_map()
 		echo '<ul id="bo_menu">';
 		
 		if (!$disabled)
-			echo '<li><a href="'.bo_insert_url('bo_showmap').'" class="bo_navi'.(!$no_google ? '_active' : '').'">'._BL('Dynamic map').'</a></li>';
+			echo '<li><a href="'.bo_insert_url(array('bo_*')).'" class="bo_navi'.(!$no_google ? '_active' : '').'">'._BL('Dynamic map').'</a></li>';
 		
 		echo $menu_text;
 		echo '</ul>';
@@ -234,53 +235,247 @@ function bo_show_lightning_map()
 	{	
 		$footer= $_BO['mapimg'][$static_map_id]['footer'];
 		
-		//echo '<h3>'._BL('Lightning map').'</h3>';
+		
+		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
+		
+		echo '<div class="bo_arch_map_links">';
+		echo '<a href="'.BO_ARCHIVE_URL.'&bo_map='.$static_map_id.'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
+		echo '</div>';
+		
+		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
 		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'">';
 		echo '<div class="bo_map_footer">'.$footer.'</div>';
+		echo '</div>';
+
+		echo '</div>';
 		
 		return;
-	}
+	} 
 
+	//Get Stations
+	$sid = bo_station_id();
+	$js_stations = '';
+	$res = bo_db("SELECT id, city, lat, lon
+					FROM ".BO_DB_PREF."stations a
+					WHERE status='A' AND id != '$sid'");
+	while($row = $res->fetch_assoc())
+	{
+		$js_stations .= $js_stations ? ",\n" : '';
+		$js_stations .= '{';
+		$js_stations .= 'lat:'.round($row['lat'],1).', lon:'.round($row['lon'], 1).', city:"'._BC($row['city']).'"';
+		$js_stations .= '}';
 	
+		$st_cities[$row['id']] = $row['city'];
+	}
+	
+	//Get MyBo Stations
+	$mybo_info = unserialize(bo_get_conf('mybo_stations_info'));
+	$js_mybo_stations = '';
+	if (is_array($mybo_info) && count($mybo_info) > 1)
+	{
+		$mybo_urls = unserialize(bo_get_conf('mybo_stations'));
+		
+		foreach($mybo_info['lats'] as $id => $dummy)
+		{
+			if ($id == $sid)
+				continue;
+			
+			if ($mybo_info['lats'][$id] && $mybo_info['lons'][$id])
+			{
+				$rad = $mybo_info['rads'][$id] ? $mybo_info['rads'][$id] : BO_RADIUS;
+				
+				$js_mybo_stations .= $js_mybo_stations ? ",\n" : '';
+				$js_mybo_stations .= '{';
+				$js_mybo_stations .= 'lat:'.$mybo_info['lats'][$id].', lon:'.$mybo_info['lons'][$id].', rad:'.$rad.', url:"'.$mybo_urls[$id].'", city:"'._BC($st_cities[$id]).'"';
+				$js_mybo_stations .= '}';
+			}
+		}
+	}
 	
 	$radius = $_BO['radius'] * 1000;
-	$zoom = 9;
+	$zoom = BO_DEFAULT_ZOOM;
 	$lat = BO_LAT;
 	$lon = BO_LON;
 
 
 	echo '<fieldset class="bo_map_options">';
 	echo '<legend>'._BL("map_options").'</legend>';
-
 	ksort($_BO['mapcfg']);
+	$min_upd_interval = null;
 	foreach ($_BO['mapcfg'] as $mapid => $cfg)
 	{
 		if ($cfg['only_loggedin'] && !bo_user_get_level())
 			continue;
-
-		$name = strtr($cfg['sel_name'], array('min' => _BL('unit_minutes'), 'h' => _BL('unit_hours')));
 		
+		if ($min_upd_interval == null || $min_upd_interval > $cfg['upd_intv'])
+			$min_upd_interval = $cfg['upd_intv'];
+		
+		$name = strtr($cfg['sel_name'], array('min' => _BL('unit_minutes'), 'h' => _BL('unit_hours')));
+		echo '<span class="bo_form_checkbox_text">';
 		echo '<input type="checkbox" onclick="bo_map_toggle_overlay(this.checked, '.$mapid.');" ';
 		echo $cfg['default_show'] ? ' checked="checked" ' : '';
 		echo ' id="bo_map_opt'.$mapid.'"> ';
 		echo '<label for="bo_map_opt'.$mapid.'">'.$name.'</label> &nbsp ';
+		echo '</span>';
 	}
+
+	echo ' <input type="submit" value="'._BL('more').' &dArr;" onclick="document.getElementById(\'bo_map_more_container\').style.display=\'block\'; return false;" id="bo_map_more">';
+	echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_overlays(); return false;" id="bo_map_reload">';
+
+	echo '<span class="bo_form_checkbox_text">';
+	echo '<input type="checkbox" onclick="bo_toggle_autoupdate(this.checked)" id="bo_autoupdate"> ';
+	echo '<label for="bo_autoupdate">'._BL('auto update').'</label> ';
+	echo '</span>';
 	
+	echo '<div id="bo_map_more_container" style="display: none">';
+
+	echo '<div class="bo_input_container">';
+	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="checkbox" onclick="bo_map_toggle_own(this.checked);" id="bo_map_opt_own"> ';
 	echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label>';
+	echo '</span>';
+	echo '</div>';
 	
-	echo '<input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_overlays(); return false;" id="bo_map_reload">';
+	echo '<div class="bo_input_container">';
+	echo '<span class="bo_form_descr">'._BL('Show Stations').':</span> ';
 	
+	echo '<span class="bo_form_checkbox_text">';
+	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="1" name="bo_map_station" id="bo_map_station0" checked>';
+	echo '<label for="bo_map_station0">'._BL('None').'</label> &nbsp ';
+	echo '</span>';
+
+	echo '<span class="bo_form_checkbox_text">';
+	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="2" name="bo_map_station" id="bo_map_station1">';
+	echo '<label for="bo_map_station1">'._BL('Active stations').'</label> &nbsp ';
+	echo '</span>';
+
+	echo '<span class="bo_form_checkbox_text">';
+	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="3" name="bo_map_station" id="bo_map_station2">';
+	echo '<label for="bo_map_station2">'._BL('MyBlitzortung stations').'</label> &nbsp ';
+	echo '</span>';
+
+	echo '</div>';
+	
+	echo '</div>';
 	echo '</fieldset>';
 
 	echo '<div id="bo_gmap" class="bo_map" style="width:500px; height:400px;"></div>';
-	
 
 	?>
-	
 	<script type="text/javascript">
-	
 	var bo_show_only_own = 0;
+	var bo_mybo_markers = [];
+	var bo_station_markers = [];
+	var bo_stations_display = 1;
+	var bo_mybo_stations = [ <?php echo $js_mybo_stations ?> ];
+	var bo_stations      = [ <?php echo $js_stations ?> ];
+	var bo_infowindow;
+	var bo_autoupdate = false;
+	var bo_autoupdate_running = false;
+	
+	function bo_toggle_autoupdate(auto)
+	{
+		bo_autoupdate = auto;
+		bo_start_autoupdate();
+	}
+
+	function bo_start_autoupdate()
+	{
+		if (bo_autoupdate_running)
+			return;
+		
+		if (bo_autoupdate)
+		{
+			bo_autoupdate_running = true;
+			window.setTimeout("bo_do_autoupdate();", <?php echo 1000 * 60 * intval($min_upd_interval) ?>);
+		}
+	}
+
+	function bo_do_autoupdate()
+	{
+		bo_map_reload_overlays();
+		bo_autoupdate_running = false;
+		bo_start_autoupdate();
+	}
+
+	
+	function bo_map_toggle_stations(display)
+	{
+		if (display)
+			bo_stations_display = display;
+		else if (bo_stations_display == 3)
+			display = 3;
+			
+		for (i in bo_mybo_markers)
+			bo_mybo_markers[i].setMap(null);
+
+		for (i in bo_station_markers)
+			bo_station_markers[i].setMap(null);
+			
+		if (display == 0 && bo_map.getZoom() > 10)
+		{
+			document.getElementById('bo_map_station1').disabled = true;
+			
+			if (bo_stations_display == 2)
+				return;
+		}
+		else if (display == 0 && bo_map.getZoom() <= 10)
+		{
+			document.getElementById('bo_map_station1').disabled = false;
+			
+			if (bo_stations_display == 2)
+				display = 2;
+		}
+		
+		if (display == 2)
+		{
+			if (bo_station_markers.length == 0)
+			{
+				for (i in bo_stations)
+				{
+					bo_station_markers[i] = new google.maps.Marker({
+					  position: new google.maps.LatLng(bo_stations[i].lat,bo_stations[i].lon), 
+					  map: bo_map, 
+					  title:bo_stations[i].city,
+					  icon: 'http://maps.google.com/mapfiles/kml/pal4/icon24.png'
+					});
+				}
+			}
+			else
+			{
+				for (i in bo_station_markers)
+					bo_station_markers[i].setMap(bo_map);
+			}
+		}
+		else if (display == 3)
+		{
+			if (bo_mybo_markers.length == 0)
+			{
+				for (i in bo_mybo_stations)
+				{
+					bo_mybo_markers[i] = new google.maps.Marker({
+					  position: new google.maps.LatLng(bo_mybo_stations[i].lat,bo_mybo_stations[i].lon), 
+					  map: bo_map, 
+					  title:bo_mybo_stations[i].city,
+					  icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png',
+					  content: '<a href="'+bo_mybo_stations[i].url+'" target="_blank">' + bo_mybo_stations[i].city + '</a>'
+					});
+					
+					google.maps.event.addListener(bo_mybo_markers[i], 'click', function() {
+						bo_infowindow.setContent(this.content);
+						bo_infowindow.open(bo_map, this);
+					});
+				}
+
+			}
+			else
+			{
+				for (i in bo_mybo_markers)
+					bo_mybo_markers[i].setMap(bo_map);
+			}
+		}
+		
+	}
 	
 	function bo_map_toggle_overlay(checked, type)
 	{
@@ -392,6 +587,8 @@ function bo_show_lightning_map()
 	
 	function bo_gmap_init2()
 	{
+	
+		bo_infowindow = new google.maps.InfoWindow({content: ''});
 <?php
 		
 		foreach($_BO['mapcfg'] as $mapid => $cfg)
@@ -443,10 +640,12 @@ function bo_show_lightning_map()
 		});
 
 		google.maps.event.addListener(bo_map, 'zoom_changed', function() {
-			if (this.getZoom() < 4)
-				 this.setZoom(4);
+			if (this.getZoom() < <?php echo BO_MIN_ZOOM_OUT ?>)
+				 this.setZoom(<?php echo BO_MIN_ZOOM_OUT ?>);
 			else
 				bo_setcookie('bo_map_zoom', bo_map.getZoom());
+			
+			bo_map_toggle_stations(0);
 		});
 		
 		

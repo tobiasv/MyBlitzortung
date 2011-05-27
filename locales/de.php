@@ -133,6 +133,9 @@ $_BL['de']['Error'] = 'Fehler';
 $_BL['de']['Back'] = 'Zurück';
 $_BL['de']['Participants'] = 'Teilnehmer';
 
+$_BL['de']['Europe'] = 'Europa';
+$_BL['de']['Germany'] = 'Deutschland';
+
 /*************************************************************/
 /* Main Menu (Standalone)                                    */
 /*************************************************************/
@@ -583,5 +586,11 @@ $_BL['de']['Click to update'] = 'Update durchführen!';
 
 
 
-$_BL['de']['Month'] = '';
-$_BL['de']['Month'] = '';
+$_BL['de']['Month'] = 'Monat';
+$_BL['de']['more'] = 'Mehr';
+$_BL['de']['Show Stations'] = 'Zeige Stationen';
+$_BL['de']['None'] = 'Keine';
+$_BL['de']['MyBlitzortung stations'] = 'Stationen mit MyBlitzortung';
+$_BL['de']['Active stations'] = 'Aktive Stationen';
+$_BL['de']['auto update'] = 'Automatisch aktualisieren';
+$_BL['de']['arch_select_dates_beween'] = 'Daten sind nur von {START} bis {END} vorhanden!';

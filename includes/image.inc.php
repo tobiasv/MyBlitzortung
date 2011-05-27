@@ -168,7 +168,7 @@ function bo_tile()
 
 	if ($radius)
 	{
-		if ($zoom < BO_MAX_ZOOM_OUT) //set max. distance to 0 (no limit) for small zoom levels
+		if ($zoom < BO_MAX_ZOOM_LIMIT) //set max. distance to 0 (no limit) for small zoom levels
 		{
 			$radius = 0;
 		}
@@ -677,6 +677,189 @@ function bo_get_map_image()
 	exit;
 }
 
+
+//render a map with strike positions and strike-bar-plot
+function bo_get_density_image()
+{
+	$year = intval($_GET['bo_year']);
+	$month = intval($_GET['bo_month']);
+	$map_id = intval($_GET['map']);
+	$station_id = intval($_GET['id']);
+	
+	set_time_limit(10);
+	
+	//$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+
+	global $_BO;
+
+	//Image settings
+	$cfg = $_BO['mapimg'][$map_id];
+	if (!is_array($cfg))
+		exit;
+
+	$file = $cfg['file'];
+	$latN = $cfg['coord'][0];
+	$lonE = $cfg['coord'][1];
+	$latS = $cfg['coord'][2];
+	$lonW = $cfg['coord'][3];
+
+	$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$file);
+	$w = imagesx($tmpImage);
+	$h = imagesy($tmpImage);
+	
+	$I = imagecreatetruecolor($w, $h);
+	imagecopy($I,$tmpImage,0,0,0,0,$w,$h);
+	imagedestroy($tmpImage);
+	imagealphablending($I, true);
+	
+	list($x1, $y1) = bo_latlon2mercator($latS, $lonW);
+	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
+	$w_x = $w / ($x2 - $x1);
+	$h_y = $h / ($y2 - $y1);
+
+	if ($month)
+	{
+		$date_start = "$year-$month-01";
+		$date_end   = date('Y-m-d', mktime(0,0,0,$month+1,0,$year));
+	}
+	else
+	{
+		$date_start = "$year-01-01";
+		$date_end   = "$year-12-31";	
+	}
+	
+	//find density to image
+	$sql = "SELECT id, type, info, data, lat_max, lon_max, lat_min, lon_min, length
+					FROM ".BO_DB_PREF."densities 
+					WHERE 1 
+						AND status=1 
+						AND date_start = '$date_start'
+						AND date_end   = '$date_end'
+						AND station_id = $station_id
+						AND lat_max >= '$latN'
+						AND lon_max >= '$lonE'
+						AND lat_min <= '$latS'
+						AND lon_min <= '$lonW'
+					ORDER BY length ASC
+					LIMIT 1					
+						";
+	$res = bo_db($sql);
+	$row = $res->fetch_assoc();
+
+	if (!$row['id'])
+		exit('No data available!');
+	
+	//Data and info
+	$DATA = gzinflate($row['data']);
+	$info = unserialize($row['info']);
+	$bps = $info['bps'];
+	
+	//coordinates
+	$lat       = $row['lat_min'];
+	$lon       = $row['lon_min'];
+	$lat_end   = $row['lat_max'];
+	$lon_end   = $row['lon_max'];
+	$length    = $row['length'];
+	$area      = pow($length, 2);
+
+	
+	//Density settings
+	$dens = $_BO['density'][$row['type']];
+	$colors = $dens['col'];
+
+	//max strike count
+	$max_density = $info['max'] / $area;
+
+	//pointer on current part of string
+	$string_pos = 0;
+	
+	$lonW = $lon;
+	$lonE = $lon_end;
+	$lonN = $lat_end;
+	$lonS = $lat;
+	
+	$last_y = $h;
+	while ($lat < $lat_end)
+	{
+		//density: difference to current lat/lon
+		list($dlat, $dlon) = bo_distbearing2latlong($length * sqrt(2) * 1000, 45, $lat, $lon);
+		$dlat -= $lat;
+		$dlon -= $lon;
+	
+		// check if latitude lies in picture
+		if ($lat + $dlat >= $latS)
+		{
+			//select correct data segment from data string
+			$lon_start_pos  = floor(($lonW-$lon)/$dlon) * 2 * $bps;
+			$lon_string_len = floor(($lonE-$lon)/$dlon) * 2 * $bps - $lon_start_pos;
+		
+			$lon_data = substr($DATA, $string_pos + $lon_start_pos, $lon_string_len);
+			
+			//image coordinates (left side of image, height is current latitude)
+			list($px, $py) = bo_latlon2mercator($lat, $lonE);
+			$y  = $h - ($py - $y1) * $h_y; //image y
+			$dx = $dlon / ($lonE - $lonW) * $w;
+			
+			//get the data!
+			for($j=0; $j<$lon_string_len/2/$bps; $j++)
+			{
+				//strikes per square kilometer
+				$value = hexdec(substr($lon_data, $j * 2 * $bps, 2 * $bps));
+				$value /= $area;
+				$value /= $max_density; //relative
+		
+				//color
+				$oldcolor = $colors[0];
+				$red = $green = $blue = $alpha = 10;
+				foreach($colors as $color_index => $c)
+				{
+					$color_value = ($color_index+1) / count($colors);
+					if ($value <= $color_value)
+					{
+						//find "position" between the two colors
+						$color_value = $color_value - $value; 
+						
+						$red   = $oldcolor[0] + ($c[0] - $oldcolor[0]) * $color_value;
+						$green = $oldcolor[1] + ($c[1] - $oldcolor[1]) * $color_value;
+						$blue  = $oldcolor[2] + ($c[2] - $oldcolor[2]) * $color_value;
+						$alpha = $oldcolor[3] + ($c[3] - $oldcolor[3]) * $color_value;
+						break;
+					}
+					
+					$oldcolor = $c;
+				}
+
+				$color = imagecolorallocatealpha($I, $red, $green, $blue, $alpha);
+				imagefilledrectangle($I, $j * $dx, $y, ($j+1) * $dx-1, $last_y-1, $color);
+			}
+			
+			$last_y = $y;
+		
+		}
+		
+
+		$string_pos += (floor(($lon_end-$lon)/$dlon)+2) * 2 * $bps;
+		$lat += $dlat;
+
+		// stop if picture is full
+		if ($lat > $latN)
+			break;
+	
+	}
+
+	
+	header("Content-Type: image/png");
+	if ($caching)
+	{
+		imagepng($I, $cache_file);
+		readfile($cache_file);
+	}
+	else
+		imagepng($I);
+
+	exit;
+	
+}
 
 //get an image from /images directory
 //we need this for easy integration of MyBlitzortung in other projects

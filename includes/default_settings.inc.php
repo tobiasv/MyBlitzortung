@@ -34,14 +34,13 @@
 //User / Login
 @define("BO_LOGIN_SHOW", true);
 @define("BO_LOGIN_ALLOW", 2); //0=nobody, 1=you, 2=all
-@define("BO_LOGIN_FILE", 'index.php?bo_page=login');
 
 //Map display
-@define("BO_RADIUS", 50);
-@define("BO_DEFAULT_ZOOM", 7);
-@define("BO_DEFAULT_MAP", 'TERRAIN');
-@define("BO_MAX_ZOOM_IN", 16);
-@define("BO_MAX_ZOOM_OUT", 8);
+@define("BO_RADIUS", 50);             // (kilometers) limits strike display to radius around station
+@define("BO_DEFAULT_ZOOM", 7);        // default zoom level
+@define("BO_MAX_ZOOM_LIMIT", 8);      // when zoom reaches this level, strike display is limited to max. distance around station (BO_RADIUS)
+@define("BO_MIN_ZOOM_OUT", 4);        // minimal zoom level
+@define("BO_DEFAULT_MAP", 'TERRAIN'); 
 
 //Update intervals (Minutes!)
 @define("BO_UP_INTVL_STRIKES", 5);
@@ -51,12 +50,22 @@
 //Disable station statistics
 @define("BO_STATION_STAT_DISABLE", false);
 
+//URLs
+@define("BO_MAP_URL", 'index.php?bo_page=map');
+@define("BO_ARCHIVE_URL", 'index.php?bo_page=archive');
+@define("BO_STATISTICS_URL", 'index.php?bo_page=statistics');
+@define("BO_INFO_URL", 'index.php?bo_page=info');
+@define("BO_LOGIN_URL", 'index.php?bo_page=login');
+
 //Experimental Polarity
 @define("BO_EXPERIMENTAL_POLARITY_CHECK", true);
 @define("BO_EXPERIMENTAL_POLARITY_ZOOM", 8);
 
 //Show GPS Info
 @define("BO_SHOW_GPS_INFO", true);
+
+//Calculate Densities
+@define("BO_CALC_DENSITIES", false);
 
 /*** Graphs ***/
 @define("BO_GRAPH_ANTIALIAS", false);
@@ -213,6 +222,14 @@ if (!isset($_BO['mapimg'][2]))
 	$_BO['mapimg'][2] = $_BO['tpl_imgmap']['germany_lkr'];
 
 	
+/*** Densities ***/
+if (!isset($_BO['density'][0]))
+	$_BO['density'][0] = $_BO['tpl_density']['europe'];
+
+if (!isset($_BO['density'][1]))
+	$_BO['density'][1] = $_BO['tpl_density']['germany'];
+	
+
 // ALERTS
 @define("BO_ALERTS", true);
 @define("BO_ALERT_CHECK_INTERVAL", 15);

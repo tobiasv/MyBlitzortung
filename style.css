@@ -16,6 +16,7 @@ margin: 20px 0px 5px 12px;
 padding: 1px;
 border-bottom: 1px solid #eef;
 font-size: 25px;
+display:none;
 }
 
 #mybo_head h3 {
@@ -59,9 +60,44 @@ background: #fe8;
 }
 
 ul#bo_mainmenu li a.bo_mainmenu_active {
-text-decoration: underline;
 background: #fff7e7;
 }
+
+/* Submenu */
+
+#myblitzortung ul#bo_menu {
+border-top: 0px solid #ddd;
+border-bottom: 1px solid #ddd;
+margin: -10px -10px 20px -15px;
+padding: 5px 0 0 20px;
+height: 22px;
+font-size: 14px;
+background: #fffaf5;
+list-style-image: none;
+list-style-type: none;
+}
+
+#myblitzortung ul#bo_menu li {
+float: left;
+margin-right: 60px;
+}
+
+#myblitzortung ul#bo_menu a {
+font-weight: bold;
+color: #f80;
+border-bottom: none;
+text-decoration:none;
+}
+
+#myblitzortung ul#bo_menu a:hover {
+text-decoration: underline;
+}
+
+#myblitzortung ul#bo_menu a.bo_navi_active {
+color: red;
+font-weight: bolder;
+}
+
 
 /* Main */
 #myblitzortung {
@@ -254,6 +290,14 @@ white-space: nowrap;
 
 /*** Google Strike Map ***/
 
+#myblitzortung .bo_map {
+width:780px !important; 
+height:800px !important; 
+border: 1px solid #ccc;
+margin-left: 10px;
+}
+
+#myblitzortung #bo_map_more, 
 #myblitzortung #bo_map_reload {
 float: right;
 margin: -3px 3px 0 0;
@@ -264,11 +308,10 @@ width: 780px;
 max-width: none;
 }
 
-#myblitzortung .bo_map {
-width:780px !important; 
-height:800px !important; 
-border: 1px solid #ccc;
-margin-left: 10px;
+#myblitzortung #bo_map_more_container {
+width: auto;
+border-top: 1px dotted #e4e4e4;
+padding: 6px 0 0 0;
 }
 
 /*** Archive ***/
@@ -309,7 +352,7 @@ float: right;
 }
 
 #myblitzortung .bo_arch_map_links {
-font-size: 10px;
+font-size: 11px;
 text-align:center;
 margin-bottom: 2px;
 }
@@ -369,39 +412,6 @@ text-decoration: none;
 width: 200px;
 font-weight: bold;
 color: #666;
-}
-
-#myblitzortung ul#bo_menu {
-border-top: 1px solid #ddd;
-border-bottom: 1px solid #ddd;
-margin: 25px 0 20px 0;
-padding: 5px 0 0 20px;
-height: 22px;
-font-size: 14px;
-background: #fff6e9;
-list-style-image: none;
-list-style-type: none;
-}
-
-#myblitzortung ul#bo_menu li {
-float: left;
-margin-right: 60px;
-}
-
-#myblitzortung ul#bo_menu a {
-font-weight: bold;
-color: #f80;
-border-bottom: none;
-}
-
-#myblitzortung ul#bo_menu a:hover {
-text-decoration: underline;
-}
-
-#myblitzortung ul#bo_menu a.bo_navi_active {
-color: red;
-font-weight: bolder;
-
 }
 
 #myblitzortung .bo_my_logo {
@@ -502,7 +512,6 @@ border: 1px solid #f0f0f0;
 /*** User ***/
 #myblitzortung .bo_form_checkbox_text {
 display: inline-block;
-width: 195px;
 margin: 2px 5px 5px 0px;
 }
 #myblitzortung .bo_admin_user_fieldset .bo_form_submit {

@@ -814,13 +814,17 @@ function bo_update_stations($force = false)
 
 function bo_update_all($force)
 {
-
+bo_update_densities(30);
+return;
 	echo "<h2>Getting lightning data from blitzortung.org</h2>\n";
 
-	set_time_limit(50);
+	$start_time = time();
+	$max_time = 50;
+	
+	set_time_limit($max_time+10);
 
 	if (!$force)
-		sleep(rand(0,30));
+		sleep(rand(0,30)); // to avoid to much connections from different stations to blitzortung.org at the same time
 
 	ini_set('default_socket_timeout', 10);
 	$is_updating = bo_get_conf('is_updating');
@@ -875,11 +879,24 @@ function bo_update_all($force)
 		}
 	}
 	
+	if (time() - $start_time > $max_time)
+	{
+		echo '<p>TIMEOUT!</p>';
+		return;
+	}
+
+	/*** Update MyBlitzortung stations ***/
 	if (!$strikes_imported && !$stations_imported && !$signals_imported)
 	{
 		bo_my_station_autoupdate($force);
 	}
-	
+
+	if (time() - $start_time > $max_time)
+	{
+		echo '<p>TIMEOUT!</p>';
+		return;
+	}
+
 	/*** Purge old data ***/
 	echo "\n<h2>Purging data</h2>\n";
 	flush();
@@ -1000,11 +1017,275 @@ function bo_update_all($force)
 	}
 	else
 	{
-		echo "<p>Purgin disabled!</p>\n";
+		echo "<p>Purging disabled!</p>\n";
+	}
+	
+	if (time() - $start_time > $max_time)
+	{
+		echo '<p>TIMEOUT!</p>';
+		return;
 	}
 
+	bo_update_densities($max_time + $start_time - time());
+
+	
 	bo_set_conf('is_updating', 0);
 
+	return;
+}
+
+function bo_update_densities($max_time)
+{
+	global $_BO;
+	
+	$start_time = time();
+
+	if (!defined('BO_CALC_DENSITIES') || !BO_CALC_DENSITIES)
+		return true;
+	
+	if (!is_array($_BO['density']))
+		return true;
+	
+	$stations = array();
+	$stations[0] = 0;
+	$stations[bo_station_id()] = bo_station_id();
+	
+	if (defined('BO_DENSITY_STATIONS') && BO_DENSITY_STATIONS)
+	{
+		$tmp = explode(',', BO_DENSITY_STATIONS);
+		foreach($tmp as $station_id)
+			$stations[$station_id] = $station_id;
+	}
+	
+	echo "\n<h2>Updating densities.</h2>\n";
+	
+	/*
+	//Min/Max strike times
+	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+	$start_time = strtotime($row['mintime'].' UTC');
+	$end_time = strtotime($row['maxtime'].' UTC');
+	*/
+	
+	//Which time ranges to create
+	$ranges = array();
+	//last month
+	$ranges[] = array(mktime(0,0,0,date('m')-1,1,date('Y')), mktime(0,0,0,date('m'),0,date('Y')) );
+	
+	$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), mktime(0,0,0,date('m')+1,0,date('Y')) ); 
+	
+	//last year
+	//$ranges[] = array( 	strtotime( (date('Y')-1).'-01-01'), strtotime( (date('Y')-1).'-12-31') ); 
+	
+	//insert
+	foreach($ranges as $d)
+	{
+		$date_start = date('Y-m-d', $d[0]);
+		$date_end   = date('Y-m-d', $d[1]);
+
+		//check if rows already exists
+		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities 
+					WHERE date_start='$date_start' AND date_end='$date_end'";
+		$row = bo_db($sql)->fetch_assoc();
+		
+		// if rows missing --> insert to prepare for getting the data
+		if (count($stations) * count($_BO['density']) > $row['cnt'])
+		{
+			foreach($_BO['density'] as $type_id => $d)
+			{
+				if (!isset($d) || !is_array($d))
+					continue;
+				
+				$lat_min = $d['coord'][2];
+				$lon_min = $d['coord'][3];
+				$lat_max = $d['coord'][0];
+				$lon_max = $d['coord'][1];
+				$length  = $d['length'];
+				
+				foreach($stations as $station_id)
+				{
+					bo_db("INSERT IGNORE INTO ".BO_DB_PREF."densities 
+							SET date_start='$date_start', date_end='$date_end', 
+							type='$type_id', station_id='$station_id', status=0,
+							lat_min='$lat_min',lon_min='$lon_min',
+							lat_max='$lat_max',lon_max='$lon_max',
+							length='$length'
+							");
+				}
+			}
+		}
+	}
+	
+	//check which densities are pending
+	$pending = array();
+	$res = bo_db("SELECT id, type, date_start, date_end, station_id, info 
+					FROM ".BO_DB_PREF."densities 
+					WHERE status=0 
+					ORDER BY date_start DESC, date_end");
+	while ($row = $res->fetch_assoc())
+	{
+		$pending[$row['type']][$row['id']] = $row;
+	}
+	
+	//create densities by type
+	$timeout = false;
+	foreach($_BO['density'] as $type_id => $a)
+	{
+		if (!isset($pending[$type_id]))
+			continue;
+		
+		echo "\n<h3>".$a['name']."</h3>\n";
+		flush();
+		
+		// length in meters of an element
+		$length = $a['length'] * 1000;
+		
+		// area of each element
+		$area = pow($length, 2);
+		
+		// data bytes of each sample
+		$bps = $a['bps'];
+		
+		//zero strikes
+		$zero = str_repeat('00', $bps);
+		
+		echo "\n<p>Length: $length m / Area: $area square meters / Bytes per Area: $bps</p>\n";
+		
+		//calculate densities for every pending database entry
+		foreach($pending[$type_id] as $id => $b)
+		{
+		
+			$info = unserialize($b['info']);
+
+			if ($info && isset($info['last_lat']) && isset($info['last_lon']))
+			{
+				// get start position from var settings (begin southwest)
+				$lat = $info['last_lat'];
+				$lon = $info['last_lon'];
+			}
+			else
+			{
+				//start positions from database
+				$lat = $a['coord'][2];
+				$lon = $a['coord'][3];
+			}
+
+			$lat_end = $a['coord'][0];
+			$lon_end = $a['coord'][1];
+
+			echo '<p>Station: #'.$b['station_id'];
+			echo " *** Start: $lat&deg; / $lon&deg; *** End: $lat_end&deg; / $lon_end&deg; *** <em>... Calculating ...</em>";
+			flush();
+			
+			$sql_where = '';
+			$sql_join  = '';
+			
+			if ($b['station_id'] == bo_station_id())
+			{
+				$sql_where = " AND part=1 ";
+			}
+
+			$max_count = 0;
+			$DATA = '';
+			
+			// counting strikes from west to east and south to north
+			$i = 500000;
+			while ($lat < $lat_end)
+			{
+				//difference to current lat/lon
+				list($dlat, $dlon) = bo_distbearing2latlong($length * sqrt(2), 45, $lat, $lon);
+				$dlat -= $lat;
+				$dlon -= $lon;
+
+				$last_lon_id = 0;
+				
+				// line by line
+				$sql = "SELECT COUNT(*) cnt, FLOOR((lon+".(-$lon).")/(".$dlon.")) lon_id
+						FROM ".BO_DB_PREF."strikes
+						WHERE 1
+							AND NOT (lat < ".($lat)." OR lat > ".($lat+$dlat)." OR lon < ".$lon." OR lon > ".$lon_end.") 
+							AND time BETWEEN '".$b['date_start']."' AND '".$b['date_end']."'
+							$sql_where
+						GROUP BY lon_id
+						";
+				$res = bo_db($sql);
+				while ($row = $res->fetch_assoc())
+				{
+					$max_count = max($max_count, $row['cnt']);
+					
+					//add zero strikes
+					$DATA .= str_repeat($zero, ($row['lon_id'] - $last_lon_id));
+
+					if ($row['cnt'] >= pow(2, $bps * 8)-1)
+						$row['cnt'] = pow(2, $bps * 8)-2;
+					
+					//add strike count
+					$DATA .= sprintf("%0".(2*$bps)."d", dechex($row['cnt']));
+					
+					$last_lon_id = $row['lon_id'] + 1;
+					
+					//Check for timeout
+					if (time() - $start_time > $max_time - 1)
+						$timeout = true;
+				
+				}
+
+				// fill rest of the string
+				$DATA .= str_repeat($zero, floor(($lon_end-$lon)/$dlon) - $last_lon_id + 1);
+				
+				// new line (= new lat)
+				$DATA .= str_repeat('ff', $bps);
+
+				$lat += $dlat;
+				
+				if ($i-- <= 0 || $timeout)
+				{
+					$timeout = true;
+					break;
+				}
+				
+			}
+			
+			echo " New data collected: ".(strlen($DATA) / 2).'bytes ';
+			
+			//collect old data and decompress
+			$sql = "SELECT data FROM ".BO_DB_PREF."densities WHERE id='$id'";
+			$row = bo_db($sql)->fetch_assoc();
+			$OLDDATA = $row['data'] ? gzinflate($row['data']) : '';
+			
+			//new data string
+			$DATA = $OLDDATA.$DATA;
+			
+			echo ' *** Whole data: '.(strlen($DATA)).'bytes ';
+			
+			//database storage 
+			$DATA = BoDb::esc(gzdeflate($DATA));
+			$status = $timeout ? 0 : 1;
+			$info['last_lat'] = $lat;
+			$info['last_lon'] = $lon; // currently no change from start value
+			$info['bps'] = $bps;
+			$info['max'] = max($max_count, $info['max']);
+
+			$sql = "UPDATE ".BO_DB_PREF."densities 
+							SET data='$DATA', info='".serialize($info)."', status='$status'
+							WHERE id='$id'";
+			$res = bo_db($sql);
+			
+			echo ' *** Max strike count: '.$info['max'].' *** Whole data compressed: '.(strlen($DATA)).'bytes ';
+			
+			if ($timeout)
+				echo ' *** NOT YET READY! ';
+			else
+				echo ' *** FINISHED! ';
+			
+			echo "</p>\n";
+			
+			if ($timeout)
+				return;
+
+			
+		}
+	}
+	
 	return;
 }
 
@@ -1087,7 +1368,6 @@ function bo_my_station_update($url)
 						
 						echo '<p>'._BL('Received urls').': '.count($urls).'</p>';
 						echo '<p>'._BL('DONE').'!</p>';
-						_BL('co\'sad');
 						echo '<ul>';
 						ksort($urls);
 						foreach($urls as $id => $st_url)
