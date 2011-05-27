@@ -59,7 +59,7 @@ function bo_check_for_update()
 				$ok = true; //doesn't matter too much if this fails ;-)
 				break;
 			
-			case '0.2.5':
+			case '0.3':
 				bo_db('ALTER TABLE '.BO_DB_PREF.'stations_stat DROP INDEX `stations_time`', false); // to be sure the key is not added twice
 				$sql = 'CREATE INDEX stations_time ON '.BO_DB_PREF.'stations_stat (station_id, time)';
 				$ok = bo_db($sql, false);
