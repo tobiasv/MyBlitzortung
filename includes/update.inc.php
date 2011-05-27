@@ -69,7 +69,7 @@ function bo_check_for_update()
 			
 			case '0.3.1':
 			
-				$sql = " CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}densities` (
+				$sql = ' CREATE TABLE IF NOT EXISTS `'.BO_DB_PREF.'densities` (
 						  `id` int(10) unsigned NOT NULL auto_increment,
 						  `date_start` date default NULL,
 						  `date_end` date default NULL,
@@ -89,7 +89,7 @@ function bo_check_for_update()
 						  KEY `date_start` (`date_start`,`date_end`),
 						  KEY `status` (`status`),
 						  KEY `type` (`type`)
-						) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
+						) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
 				
 				$ok = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
