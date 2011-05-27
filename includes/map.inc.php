@@ -217,7 +217,7 @@ function bo_show_lightning_map()
 		if (!$d['name'] || !$d['menu'])
 			continue;
 		
-		$menu_text .= '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), "$id").'" class="bo_navi'.($no_google && $static_map_id == $id ? '_active' : '').'">'._BC(_BL($d['name'])).'</a></li>';
+		$menu_text .= '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), "$id").'" class="bo_navi'.($no_google && $static_map_id == $id ? '_active' : '').'">'._BL($d['name']).'</a></li>';
 	}
 	
 	if ($menu_text)
