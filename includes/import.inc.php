@@ -814,6 +814,8 @@ function bo_update_stations($force = false)
 
 function bo_update_all($force)
 {
+	session_write_close();
+	
 	echo "<h2>Getting lightning data from blitzortung.org</h2>\n";
 
 	$start_time = time();
