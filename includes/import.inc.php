@@ -814,8 +814,6 @@ function bo_update_stations($force = false)
 
 function bo_update_all($force)
 {
-bo_update_densities(30);
-return;
 	echo "<h2>Getting lightning data from blitzortung.org</h2>\n";
 
 	$start_time = time();
