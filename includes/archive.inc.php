@@ -308,7 +308,7 @@ function bo_show_archive_density()
 	echo '<div id="bo_dens_maps">';
 
 	echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
-	echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_map', 'bo_station', 'bo_ratio'));
+	echo bo_insert_html_hidden(array('bo_year', 'bo_map', 'bo_station', 'bo_ratio'));
 
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_arch_densities').'</legend>';
