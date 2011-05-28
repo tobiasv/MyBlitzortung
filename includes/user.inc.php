@@ -766,6 +766,7 @@ function bo_cache_info()
 	$dirs['Tiles'] = 'cache/tiles/';
 	$dirs['Icons'] = 'cache/icons/';
 	$dirs['Maps'] = 'cache/maps/';
+	$dirs['Other'] = 'cache/';
 	
 	echo '<h3>'._BL('File cache info').'</h3>';
 	

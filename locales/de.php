@@ -606,3 +606,5 @@ $_BL['de']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo
 
 $_BL['de']['stations'] = 'Stationen';
 $_BL['de']['Not enough data available!'] = 'Nicht genügend Daten vorhanden!';
+$_BL['de']['Lightning data from Blitzortung.org'] = 'Blitzdaten von Blitzortung.org';
+$_BL['de']['Blitzortung.org'] = 'Blitzortung.org';

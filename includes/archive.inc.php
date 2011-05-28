@@ -32,6 +32,8 @@ function bo_show_archive()
 		$show = $_GET['bo_show'];
 	else if ($maps_enabled)
 		$show = 'maps';
+	else if ($densities_enabled)
+		$show = 'density';
 	else
 		$show = 'search';
 
@@ -210,6 +212,9 @@ function bo_show_archive_map()
 			echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
 		}
 		
+		$footer = $_BO['mapimg'][$map]['footer'];
+		echo '<div class="bo_map_footer">'.$footer.'</div>';
+		
 		echo '</div>';
 		echo '</div>';
 		
@@ -383,6 +388,9 @@ function bo_show_archive_density()
 	
 	$img_file = BO_FILE.'?density&map='.$map.'&bo_year='.$year.'&bo_month='.$month.'&id='.$station_id.($ratio ? '&ratio' : '').'&bo_lang='._BL();
 	echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
+
+	$footer = $_BO['mapimg'][$map]['footer'];
+	echo '<div class="bo_map_footer">'.$footer.'</div>';
 
 	echo '</div>';
 }

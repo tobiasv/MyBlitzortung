@@ -633,10 +633,6 @@ function bo_get_map_image()
 	$fw = imagefontwidth($fontsize) * strlen($text);
 	imagestring($I, $fontsize, $w - $fw - 1, 1, $text, $text_col);
 
-
-	//Copyright
-	imagestring($I, $fontsize, 1, $h - 9 - $fontsize, '(c) blitzortung.org', $text_col);
-
 	//lightning legend
 	if (isset($cfg['legend']) && is_array($cfg['legend']) && count($cfg['legend']))
 	{
@@ -677,7 +673,12 @@ function bo_get_map_image()
 		}
 	}
 
-
+	//Copyright
+	$text = _BL('Lightning data from Blitzortung.org', true);
+	$fw = imagefontwidth($fontsize) * strlen($text);
+	if ($fw > $w - $cw - 5)
+		$text = _BL('Blitzortung.org', true);
+	imagestring($I, $fontsize, 4, $h - 9 - $fontsize, $text, $text_col);
 
 	header("Content-Type: image/png");
 	if ($caching)
@@ -995,7 +996,11 @@ function bo_get_density_image()
 	}
 	
 	//Copyright
-	imagestring($I, $fontsize, 1, $h - 9 - $fontsize, '(c) blitzortung.org', $text_col);
+	$text = _BL('Lightning data from Blitzortung.org', true);
+	$fw = imagefontwidth($fontsize) * strlen($text);
+	if ($fw > $w - 5)
+		$text = _BL('Blitzortung.org', true);
+	imagestring($I, $fontsize, 4, $h - 9 - $fontsize, $text, $text_col);
 
 	
 	header("Content-Type: image/png");
