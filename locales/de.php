@@ -25,7 +25,7 @@ $_BL['de']['unit_hours'] = 'Stunden';
 
 $_BL['de']['Jan'] = 'Jan';
 $_BL['de']['Feb'] = 'Feb';
-$_BL['de']['Mar'] = 'Mar';
+$_BL['de']['Mar'] = 'Mär';
 $_BL['de']['Apr'] = 'Apr';
 $_BL['de']['May'] = 'Mai';
 $_BL['de']['Jun'] = 'Jun';
@@ -221,7 +221,7 @@ $_BL['de']['legend_arch_strikes'] = 'Optionen';
 /* Statistics                                                */
 /*************************************************************/
 $_BL['de']['h3_stat_last_signals'] = 'Die letzten empfangenen Signale ';
-$_BL['de']['h3_stat_station'] = 'Statistiken der Station {STATION}';
+$_BL['de']['h3_stat_station'] = 'Statistiken der Station {STATION_CITY}';
 $_BL['de']['h3_stat_graphs'] = 'Statistiken: Diagramme';
 $_BL['de']['h3_stat_other'] = 'Weitere Statistiken';
 $_BL['de']['h4_stat_longtime_myblitzortung'] = 'MyBlitzortung';
@@ -360,6 +360,7 @@ $_BL['de']['user_perm3'] = 'Alarme definieren';
 $_BL['de']['user_perm4'] = 'Alarme überall';
 $_BL['de']['user_perm5'] = 'Alarme: SMS';
 $_BL['de']['user_perm6'] = 'Alarme: URL';
+$_BL['de']['user_perm7'] = 'Archiv';
 
 
 /*************************************************************/
@@ -445,14 +446,14 @@ $_BL['de']['bo_graph_descr_ratio'] = 'Sowohl Blitz- als auch Ortungsqute sind wi
 $_BL['de']['bo_stat_network_descr_lasth'] = 'Alle Angaben beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung.';
 $_BL['de']['bo_stat_network_descr_table'] = 'Hier sind alle aktiven Stationen des Ortungsnetzwerks aufgelistet. Durch Anklicken der Spaltenüberschriften kann die Tabelle entsprechend sortiert werden.';
 $_BL['de']['bo_graph_descr_bear'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Himmelsrichtung. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
-$_BL['de']['bo_stat_longtime_descr'] = 'Die hier dargestellten Angaben werden seit Beginn der Aufzeichnung von MyBlitzortung auf dieser Seite fortgeführt. Die Distanzen beziehen sich immer auf den Standort der Station {STATION}.';
+$_BL['de']['bo_stat_longtime_descr'] = 'Die hier dargestellten Angaben werden seit Beginn der Aufzeichnung von MyBlitzortung auf dieser Seite fortgeführt. Die Distanzen beziehen sich immer auf den Standort der Station {STATION_CITY}.';
 $_BL['de']['bo_stat_other_database_descr'] = 'Alle Blitze, Signal- und Stationsdaten uvm. auf dieser werden in einer Datenbank gespeichert. Hier sind einige Angaben dazu:';
 $_BL['de']['bo_stat_other_updates_descr'] = 'In bestimmten Zeitintervallen werden alle notwendigen Daten von blitzortung.org geholt und auf dieser Seite gespeichert. Hier sind die Zeitpunkte der letzten Aktualisierung zu sehen:';
 $_BL['de']['bo_stat_other_gps_descr'] = 'Informationen zum GPS-Empfänger, welcher zur exakten Ermittlung der aktuellen Uhrzeit benötigt wird. Die Positionsdaten der letzten 24 Stunden sind in der Karte eingezeichnet. Falls die Antennenausrichtungen bekannt sind, so sind diese ebenfalls sichtbar.';
 $_BL['de']['bo_stat_station_descr_lasth'] = 'Alle Angaben beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung.';
-$_BL['de']['bo_graph_descr_radi'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Entfernung zur Station {STATION}. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
-$_BL['de']['bo_graph_descr_strikes'] = 'Zu sehen ist die Gesamtanzahl an Blitzen pro Stunde aus dem Ortungsnetzwerk, die Anzahl der detektierten Blitze der Station {STATION} sowie zum Vergleich der Durchschnitt aller Stationen.';
-$_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der gesendeten Signale pro Stunde der Station {STATION} sowie zum Vergleich der Durchschnitt aller Stationen.';
+$_BL['de']['bo_graph_descr_radi'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Entfernung zur Station {STATION_CITY}. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
+$_BL['de']['bo_graph_descr_strikes'] = 'Zu sehen ist die Gesamtanzahl an Blitzen pro Stunde aus dem Ortungsnetzwerk, die Anzahl der detektierten Blitze der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
+$_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der gesendeten Signale pro Stunde der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
 $_BL['de']['bo_stat_other_antennas_descr'] = 'Die Ausrichtung der Antennen wird durch MyBlitzortung automatisch bestimmt. Sie kann zur Bestimmung der Polarität eines Blitzes bestimmt werden.';
 $_BL['de']['bo_graph_descr_radi_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt und gibt evtl. wertvolle Hinweise auf die Empfindlichkeit der Station. ';
 $_BL['de']['bo_graph_descr_bear_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt.';
@@ -594,3 +595,14 @@ $_BL['de']['MyBlitzortung stations'] = 'Stationen mit MyBlitzortung';
 $_BL['de']['Active stations'] = 'Aktive Stationen';
 $_BL['de']['auto update'] = 'Automatisch aktualisieren';
 $_BL['de']['arch_select_dates_beween'] = 'Daten sind nur von {START} bis {END} vorhanden!';
+$_BL['de']['arch_navi_density'] = 'Blitzdichte';
+$_BL['de']['h3_arch_density'] = 'Blitzdichten';
+$_BL['de']['legend_arch_densities'] = 'Optionen';
+$_BL['de']['Station'] = 'Station';
+$_BL['de']['Max strikes density'] = 'Max. Blitzdichte';
+$_BL['de']['Year'] = 'Jahr';
+$_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
+$_BL['de']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
+
+$_BL['de']['stations'] = 'Stationen';
+$_BL['de']['Not enough data available!'] = 'Nicht genügend Daten vorhanden!';

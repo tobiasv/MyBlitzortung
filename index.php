@@ -10,7 +10,7 @@ if (defined('BO_UTF8') && BO_UTF8)
 ?><!DOCTYPE html>
 <html>
 	<head>
-		<title>MyBlitzortung: <?php echo $title ?></title>
+		<title><?php echo strip_tags(_BL('MyBlitzortung')) ?>: <?php echo $title ?></title>
 		<link rel="stylesheet" href="style.css?ver=<?php echo BO_VER ?>" type="text/css"> 
 		<?php echo file_exists('own.css') ? '<link rel="stylesheet" href="own.css" type="text/css"> ' : '' ?>
 		<style>
@@ -19,7 +19,7 @@ if (defined('BO_UTF8') && BO_UTF8)
 	</head>
 	<body>
 		<div id="mybo_head">
-			<h1><span class="bo_my">My</span>Blitzortung</h1>
+			<h1><?php echo _BL('MyBlitzortung') ?></h1>
 			<?php bo_show_menu() ?>
 			<h2><?php echo $title ?></h2>
 		</div>

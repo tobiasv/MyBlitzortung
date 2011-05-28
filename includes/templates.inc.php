@@ -21,6 +21,40 @@
 */
 
 
+
+/**************************************/
+/* Calculation settings for density   */
+/**************************************/
+
+$_BO['tpl_density_colors'][] = array(150, 150, 250, 110);
+$_BO['tpl_density_colors'][] = array(50, 150, 155, 0);
+$_BO['tpl_density_colors'][] = array(205, 205, 50, 0);
+$_BO['tpl_density_colors'][] = array(255, 0, 0, 0);
+$_BO['tpl_density_colors'][] = array(255, 0, 128, 0);
+$_BO['tpl_density_colors'][] = array(255, 128, 255, 0);
+
+
+//Europe
+$_BO['tpl_density']['europe']['name'] 	= 'Europe';
+$_BO['tpl_density']['europe']['coord'] 	= array(70, 52, 20, -22); //North, East, South, West (Degrees)
+$_BO['tpl_density']['europe']['length']	= 10; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
+$_BO['tpl_density']['europe']['bps'] 	= 2; // bytes per area 
+$_BO['tpl_density']['europe']['col'] 	= $_BO['tpl_density_colors']; 
+
+
+//Germany
+$_BO['tpl_density']['germany']['name'] 		= 'Germany';
+$_BO['tpl_density']['germany']['coord'] 	= array(56, 16, 46, 5); //North, East, South, West (Degrees)
+$_BO['tpl_density']['germany']['length']	= 2; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
+$_BO['tpl_density']['germany']['bps'] 		= 2; // bytes per area 
+$_BO['tpl_density']['germany']['col'] 		= $_BO['tpl_density_colors'];
+
+
+
+/**************************************/
+/* Dynamic map tiles                  */
+/**************************************/
+
 $_BO['tpl_gmap']['0-15']['tstart'] = 15;
 $_BO['tpl_gmap']['0-15']['trange'] = 15;
 $_BO['tpl_gmap']['0-15']['upd_intv'] = 5;
@@ -86,7 +120,10 @@ $_BO['tpl_imgmap']['europe']['col'][] = array(255, 150, 0);
 $_BO['tpl_imgmap']['europe']['col'][] = array(255, 100, 0);
 $_BO['tpl_imgmap']['europe']['col'][] = array(255,   0, 0);
 $_BO['tpl_imgmap']['europe']['col'][] = array(225,   0, 0);
-
+$_BO['tpl_imgmap']['europe']['density'] = true;
+$_BO['tpl_imgmap']['europe']['density_blocksize'] = 10;
+$_BO['tpl_imgmap']['europe']['density_colors'] = $_BO['tpl_density_colors'];
+$_BO['tpl_imgmap']['europe']['density_darken'] = 40;
 
 //Germany (mini)
 $_BO['tpl_imgmap']['germany_mini']['name'] = 'Germany (mini)';
@@ -114,7 +151,7 @@ $_BO['tpl_imgmap']['germany_lkr']['footer'] = '';
 $_BO['tpl_imgmap']['germany_lkr']['menu'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['archive'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['file'] = 'map_deutschland_landkreise_grau.png';
-$_BO['tpl_imgmap']['germany_lkr']['coord'] = array(55.044, 15.155, 47.249, 5.833); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['germany_lkr']['coord'] = array(55.055, 15.155, 47.040, 5.833); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['germany_lkr']['trange'] = 2; //hours!
 $_BO['tpl_imgmap']['germany_lkr']['upd_intv'] = 5; //minutes
 $_BO['tpl_imgmap']['germany_lkr']['textcolor'] = array(255,255,255);
@@ -128,32 +165,10 @@ $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 150, 0);
 $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 100, 0);
 $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255,   0, 0);
 $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(225,   0, 0);
+$_BO['tpl_imgmap']['germany_lkr']['density'] = true;
+$_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 4;
+$_BO['tpl_imgmap']['germany_lkr']['density_colors'] = $_BO['tpl_density_colors'];
+$_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 50;
 
-
-
-/**************************************/
-/* Calculation settings for density   */
-/**************************************/
-
-$_BO['tpl_density_colors'][] = array(0, 0, 0, 120);
-$_BO['tpl_density_colors'][] = array(128, 128, 255, 90);
-$_BO['tpl_density_colors'][] = array(128, 255, 128, 80);
-$_BO['tpl_density_colors'][] = array(200, 128, 0, 60);
-$_BO['tpl_density_colors'][] = array(255, 0, 0, 40);
-
-//Europe
-$_BO['tpl_density']['europe']['name'] 	= 'Europe';
-$_BO['tpl_density']['europe']['coord'] 	= array(70, 52, 20, -22); //North, East, South, West (Degrees)
-$_BO['tpl_density']['europe']['length']	= 10; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
-$_BO['tpl_density']['europe']['bps'] 	= 2; // bytes per area 
-$_BO['tpl_density']['europe']['col'] 	= $_BO['tpl_density_colors']; 
-
-
-//Germany
-$_BO['tpl_density']['germany']['name'] 		= 'Germany';
-$_BO['tpl_density']['germany']['coord'] 	= array(56, 16, 46, 5); //North, East, South, West (Degrees)
-$_BO['tpl_density']['germany']['length']	= 2; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
-$_BO['tpl_density']['germany']['bps'] 		= 2; // bytes per area 
-$_BO['tpl_density']['germany']['col'] 		= $_BO['tpl_density_colors'];
 
 ?>

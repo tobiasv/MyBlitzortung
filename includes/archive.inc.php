@@ -22,25 +22,49 @@
 
 function bo_show_archive()
 {
-	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'maps';
+	$maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || (bo_user_get_level() & BO_PERM_ARCHIVE);
+	
+	$densities_enabled = defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES
+							&& ((defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES) || (bo_user_get_level() & BO_PERM_ARCHIVE));
 
+	
+	if ($_GET['bo_show'])
+		$show = $_GET['bo_show'];
+	else if ($maps_enabled)
+		$show = 'maps';
+	else
+		$show = 'search';
+
+	if (!$maps_enabled && $show == 'maps')
+		$show = 'search';
+		
 	echo '<ul id="bo_menu">';
 
-	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'maps').'" class="bo_navi'.($show == 'maps' ? '_active' : '').'">'._BL('arch_navi_maps').'</a></li>';
+	if ($maps_enabled)
+		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'maps').'" class="bo_navi'.($show == 'maps' ? '_active' : '').'">'._BL('arch_navi_maps').'</a></li>';
+
+	if ($densities_enabled)
+		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'density').'" class="bo_navi'.($show == 'density' ? '_active' : '').'">'._BL('arch_navi_density').'</a></li>';
+		
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'search').'" class="bo_navi'.($show == 'search' ? '_active' : '').'">'._BL('arch_navi_search').'</a></li>';
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'signals').'" class="bo_navi'.($show == 'signals' ? '_active' : '').'">'._BL('arch_navi_signals').'</a></li>';
 
 	echo '</ul>';
 
-
 	switch($show)
 	{
-		default:
+		
 		case 'maps':
 			echo '<h3>'._BL('h3_arch_maps').' </h3>';
 			bo_show_archive_map();
 			break;
 
+		case 'density':
+			echo '<h3>'._BL('h3_arch_density').' </h3>';
+			bo_show_archive_density();
+			break;
+		
+		default:
 		case 'search':
 			echo '<h3>'._BL('h3_arch_search').' </h3>';
 			bo_show_archive_search();
@@ -89,12 +113,10 @@ function bo_show_archive_map()
 	$start_time = strtotime($row['mintime'].' UTC');
 	$end_time = strtotime($row['maxtime'].' UTC');
 	
-	//if (defined('BO_PURGE_STR_ALL') && BO_PURGE_STR_ALL)
-	
 	echo '<div id="bo_arch_maps">';
 
 	echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
-	echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add'));
+	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add'));
 
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_arch_strikes').'</legend>';
@@ -136,7 +158,6 @@ function bo_show_archive_map()
 	echo '<input type="submit" name="bo_animation" value="'._BL('Animation').'" id="bo_archive_maps_animation" class="bo_form_submit">';
 	
 	echo '</fieldset>';
-	
 	echo '</form>';
 	
 	if ($_BO['mapimg'][$map]['archive'])
@@ -244,6 +265,126 @@ window.setTimeout("bo_maps_load();", 500);
 	
 	echo '</div>';
 	
+}
+
+function bo_show_archive_density()
+{
+	global $_BO;
+
+	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
+	$year = intval($_GET['bo_year']) ? intval($_GET['bo_year']) : date('Y');
+	$month = intval($_GET['bo_month']);
+	$station_id = intval($_GET['bo_station']);
+	$ratio = isset($_GET['bo_ratio']);
+
+	// Map infos
+	$cfg = $_BO['mapimg'][$map];
+	$latN = $cfg['coord'][0];
+	$lonE = $cfg['coord'][1];
+	$latS = $cfg['coord'][2];
+	$lonW = $cfg['coord'][3];
+
+	
+	$sql = "SELECT MIN(date_start) mindate, MAX(date_start) maxdate, MAX(date_end) maxdate_end FROM ".BO_DB_PREF."densities ";
+	$res = bo_db($sql);
+	$row = $res->fetch_assoc();
+	$start_time = strtotime($row['mindate']);
+	$end_time = strtotime($row['maxdate_end']);
+	
+	$station_infos = bo_stations();
+	$station_infos[0]['city'] = _BL('All', false);
+
+	$stations = array();
+	$stations[0] = 0;
+	$stations[bo_station_id()] = bo_station_id();
+	
+	if (defined('BO_DENSITY_STATIONS') && BO_DENSITY_STATIONS)
+	{
+		$tmp = explode(',', BO_DENSITY_STATIONS);
+		foreach($tmp as $station_id)
+			$stations[$station_id] = $station_id;
+	}
+	
+	echo '<div id="bo_dens_maps">';
+
+	echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
+	echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_map', 'bo_station', 'bo_ratio'));
+
+	echo '<fieldset>';
+	echo '<legend>'._BL('legend_arch_densities').'</legend>';
+
+	
+	echo '<span class="bo_form_descr">'._BL('Map').':</span> ';
+	
+	ksort($_BO['mapimg']);
+	echo '<select name="bo_map" id="bo_arch_dens_select_map" onchange="submit();">';
+	foreach($_BO['mapimg'] as $id => $d)
+	{
+		if (!$d['name'] || !$d['density'])
+			continue;
+			
+		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
+		
+		if ($map < 0)
+			$map = $id;
+	}
+	echo '</select>';
+	
+	echo '<span class="bo_form_descr">'._BL('Year').':</span> ';
+	echo '<select name="bo_year" id="bo_arch_dens_select_year" onchange="submit();">';
+	for($i=date('Y', $start_time); $i<=date('Y');$i++)
+		echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$i.'</option>';
+	echo '</select>';
+
+	echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
+	echo '<select name="bo_station" id="bo_arch_dens_select_station" onchange="submit();">';
+	foreach ($stations as $id )
+		echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>'._BC($station_infos[$id]['city']).'</option>';
+	echo '</select>';
+	
+	echo '<input type="checkbox" name="bo_ratio" value="1" '.($ratio && $station_id ? 'checked="checked"' : '').' '.($station_id ? '' : 'disabled').' onchange="submit();" onclick="submit();" id="bo_arch_dens_ratio">';
+	echo '<label for="bo_arch_dens_ratio"> '._BL('Strike ratio').'</label> &nbsp; ';
+	
+	echo '<input type="submit" name="bo_ok" value="'._BL('Ok').'" id="bo_archive_density_submit" class="bo_form_submit">';
+	
+	echo '<div id="bo_archive_density_yearmonth_container">';
+	echo ' <a href="'.bo_insert_url(array('bo_year', 'bo_month'), $year).'" class="bo_archive_density_yearurl';
+	echo !$month ? ' bo_archive_density_active' : '';
+	echo '">';
+	echo date('Y', strtotime($year."-01-01"));
+	echo '</a> &nbsp; ';
+
+	for($i=1;$i<=12;$i++)
+	{
+		if ($year == date('Y', $end_time) && $i > date('m', $end_time))
+		{
+			echo '<span class="bo_archive_density_monthurl">';
+			echo _BL(date('M', strtotime("2000-$i-01")));
+			echo '</span>';
+		}
+		else
+		{
+			echo ' <a href="'.bo_insert_url('bo_month', $i).'" class="bo_archive_density_monthurl';
+			echo $month == $i ? ' bo_archive_density_active' : '';
+			echo '">';
+			echo _BL(date('M', strtotime("2000-$i-01")));
+			echo '</a> ';
+		}
+	}
+
+	echo '</div>';
+	
+	echo '</fieldset>';
+
+	echo '</form>';
+
+	
+	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
+	
+	$img_file = BO_FILE.'?density&map='.$map.'&bo_year='.$year.'&bo_month='.$month.'&id='.$station_id.($ratio ? '&ratio' : '');
+	echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
+
+	echo '</div>';
 }
 
 function bo_show_archive_search()

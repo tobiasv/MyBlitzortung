@@ -488,7 +488,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 						$Y[$data_id]['str_ratio'][$index] = $row['astr'] / intval($Y[0]['astr'][$index]) * 100;
 
 					//Signal Ratio
-					if ($row['sig'])
+					if (intval($row['sig']))
 						$Y[$data_id]['sig_ratio'][$index] = $row['astr'] / $row['sig'] * 100;
 				}
 

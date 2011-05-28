@@ -23,7 +23,7 @@ if (!defined("BO_VER"))
 {
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.3.1');
+	define("BO_VER", '0.4-dev');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -32,7 +32,8 @@ if (!defined("BO_VER"))
 	define("BO_PERM_ALERT_ALL",		16);
 	define("BO_PERM_ALERT_SMS",		32);
 	define("BO_PERM_ALERT_URL",		64);
-	define("BO_PERM_COUNT",	7);
+	define("BO_PERM_ARCHIVE", 		128);
+	define("BO_PERM_COUNT",	8);
 
 	//Do not change these values (needed for auto linking stations)
 	define('BO_LINK_HOST', 'www.wetter-rosstal.de');

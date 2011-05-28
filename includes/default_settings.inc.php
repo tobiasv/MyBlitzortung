@@ -64,8 +64,11 @@
 //Show GPS Info
 @define("BO_SHOW_GPS_INFO", true);
 
-//Calculate Densities
-@define("BO_CALC_DENSITIES", false);
+//Archive
+@define("BO_ENABLE_ARCHIVE_MAPS", false); //Enables archive (maps by date and animations) for guests
+@define("BO_ENABLE_DENSITIES", false); //Enables densities for guests (set the also next option to true)
+@define("BO_CALC_DENSITIES", false); //Calculates Densities 
+@define("BO_CALC_DENSITIES_CURRENT", true); //Calculates Densities for current year/month
 
 /*** Graphs ***/
 @define("BO_GRAPH_ANTIALIAS", false);
@@ -160,7 +163,7 @@
 @define("BO_GRAPH_STAT_RATIO_DIST_LINE", false);
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_L1", '#00f@1');
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_F1", '#ada@0');
-@define("BO_GRAPH_STAT_RATIO_DIST_WIDTH1",  1);
+@define("BO_GRAPH_STAT_RATIO_DIST_WIDTH1",  0.6);
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_L2", '#22f@0.8');
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_F2", '#22f@0.95');
 @define("BO_GRAPH_STAT_RATIO_DIST_WIDTH2",  1);

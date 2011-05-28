@@ -11,6 +11,16 @@ color: #666;
 color: #fd5;
 }
 
+.bo_my {
+color: #db3;
+font-weight: bold;
+}
+
+.bo_mybo {
+color: #666;
+font-weight: bold;
+}
+
 #mybo_head h2 {
 margin: 20px 0px 5px 12px;
 padding: 1px;
@@ -359,6 +369,38 @@ margin-bottom: 2px;
 #myblitzortung #bo_arch_maps #bo_arch_strikes_select_map {
 margin-right: 20px;
 }
+
+/*** Archive densities ***/
+#myblitzortung #bo_archive_density_yearmonth_container {
+border-top: 1px dotted #e4e4e4;
+text-align: center;
+margin: 5px 0 1px 0;
+padding: 5px 0 0 0;
+font-size: 13px;
+}
+#myblitzortung #bo_dens_maps select {
+margin-right: 20px;
+}
+
+#myblitzortung #bo_archive_density_submit {
+float: right;
+margin: -3px 3px 0 0;
+}
+
+#myblitzortung #bo_archive_density_yearmonth_container a {
+text-decoration: none;
+}
+
+#myblitzortung #bo_archive_density_yearmonth_container .bo_archive_density_monthurl {
+display: inline-block;
+padding: 0 5px 0 5px;
+}
+
+#myblitzortung .bo_archive_density_active {
+font-weight: bold;
+}
+
+/*** login ***/
 
 #myblitzortung .bo_login_fieldset {
 width: 200px;

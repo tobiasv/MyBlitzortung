@@ -224,6 +224,11 @@ function bo_station_city($force_name = '')
 //return info-array of a station
 function bo_station_info($id = 0)
 {
+	static $info = array();
+	
+	if (isset($info[$id]))
+		return $info[$id];
+	
 	if ($id)
 	{
 		$tmp = bo_stations('id', $id);
@@ -239,7 +244,9 @@ function bo_station_info($id = 0)
 		$ret = $tmp[BO_USER];
 	}
 
-	return $ret;
+	$info[$id] = $ret;
+	
+	return $info[$id];
 }
 
 //insert HTML-hidden tags of actual GET-Request

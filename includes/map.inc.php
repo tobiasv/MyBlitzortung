@@ -233,14 +233,17 @@ function bo_show_lightning_map()
 
 	if ($no_google)
 	{	
-		$footer= $_BO['mapimg'][$static_map_id]['footer'];
-		
+		$footer = $_BO['mapimg'][$static_map_id]['footer'];
+		$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
 		
 		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
-		
-		echo '<div class="bo_arch_map_links">';
-		echo '<a href="'.BO_ARCHIVE_URL.'&bo_map='.$static_map_id.'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
-		echo '</div>';
+
+		if ($archive_maps_enabled)
+		{
+			echo '<div class="bo_arch_map_links">';
+			echo '<a href="'.BO_ARCHIVE_URL.'&bo_map='.$static_map_id.'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
+			echo '</div>';
+		}
 		
 		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
 		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'">';
@@ -351,7 +354,7 @@ function bo_show_lightning_map()
 
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="3" name="bo_map_station" id="bo_map_station2">';
-	echo '<label for="bo_map_station2">'._BL('MyBlitzortung stations').'</label> &nbsp ';
+	echo '<label for="bo_map_station2">'._BL('MyBlitzortung').' '._BL('stations').'</label> &nbsp ';
 	echo '</span>';
 
 	echo '</div>';
