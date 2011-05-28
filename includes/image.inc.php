@@ -716,8 +716,17 @@ function bo_get_density_image()
 	if (!is_array($cfg) || !$cfg['density'])
 		exit('Missing image data!');
 
+	//todo: needs adjustments
+	$last_update = strtotime('today - 12 hours');
+	$expire = time() + 3600 * 24;
+		
+	header("Pragma: ");
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
+	header("Cache-Control: public, max-age=".($expire - time()));
+
 	//Caching
-	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true) && BO_LOCALE == _BL();
 	$cache_file = BO_DIR.'cache/density_map'.sprintf('%d_station%d_%d_%04d%02d.png', $map_id, $station_id, $ratio ? 1 : 0, $year, $month);
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{

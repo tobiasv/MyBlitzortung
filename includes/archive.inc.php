@@ -185,7 +185,7 @@ function bo_show_archive_map()
 		}
 		else if ($ani)
 		{
-			$img_file = BO_FILE.'?map='.$map.'&blank';
+			$img_file = BO_FILE.'?map='.$map.'&blank&bo_lang='._BL().'';
 			$bo_file_url = BO_FILE.'?map='.$map.'&transparent&date=';
 			
 			
@@ -202,7 +202,7 @@ function bo_show_archive_map()
 			}
 			
 			echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
-			echo '<img style="position:absolute;top:0;left:0;" id="bo_arch_map_img_ani" src="'.BO_FILE.'?map='.$map.'&transparent&date='.sprintf('%04d%02d%02d0000-%d', $year, $month, $day, $ani_pic_interval).'">';
+			echo '<img style="position:absolute;top:0;left:0;" id="bo_arch_map_img_ani" src="'.BO_FILE.'?map='.$map.'&transparent&date='.sprintf('%04d%02d%02d0000-%d', $year, $month, $day, $ani_pic_interval).'&bo_lang='._BL().'">';
 		}
 		else
 		{
@@ -301,8 +301,8 @@ function bo_show_archive_density()
 	if (defined('BO_DENSITY_STATIONS') && BO_DENSITY_STATIONS)
 	{
 		$tmp = explode(',', BO_DENSITY_STATIONS);
-		foreach($tmp as $station_id)
-			$stations[$station_id] = $station_id;
+		foreach($tmp as $id)
+			$stations[$id] = $id;
 	}
 	
 	echo '<div id="bo_dens_maps">';
@@ -381,7 +381,7 @@ function bo_show_archive_density()
 	
 	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 	
-	$img_file = BO_FILE.'?density&map='.$map.'&bo_year='.$year.'&bo_month='.$month.'&id='.$station_id.($ratio ? '&ratio' : '');
+	$img_file = BO_FILE.'?density&map='.$map.'&bo_year='.$year.'&bo_month='.$month.'&id='.$station_id.($ratio ? '&ratio' : '').'&bo_lang='._BL();
 	echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
 
 	echo '</div>';
@@ -474,7 +474,7 @@ function bo_show_archive_search()
 			$description .= '</ul>';
 
 			if ($row['raw_id'])
-				$description .= '<img src=\''.BO_FILE.'?graph='.$row['raw_id'].'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\'>';
+				$description .= '<img src=\''.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\'>';
 
 			$description .= '</div>';
 
@@ -801,7 +801,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 
 		echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 		if ($row['raw_id'])
-			echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px">';
+			echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px">';
 		else
 			echo _BL('No signal recieved.');
 		echo '</td>';
