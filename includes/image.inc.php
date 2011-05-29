@@ -706,7 +706,7 @@ function bo_get_density_image()
 	$month = intval($_GET['bo_month']);
 	$map_id = intval($_GET['map']);
 	$station_id = intval($_GET['id']);
-	$ratio = isset($_GET['ratio']);
+	$ratio = isset($_GET['ratio']) && $station_id;
 	
 	set_time_limit(30);
 	
