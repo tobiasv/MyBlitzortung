@@ -1063,6 +1063,7 @@ function bo_update_densities($max_time)
 	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$min_strike_time = strtotime($row['mintime'].' UTC');
 	$max_strike_time = strtotime($row['maxtime'].' UTC');
+	$delete_time = 0;
 	
 	//Which time ranges to create
 	$ranges = array();
@@ -1081,7 +1082,12 @@ function bo_update_densities($max_time)
 		$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), mktime(0,0,0,date('m'),date('d'),date('Y')), -2 );
 		
 		//year
-		$ranges[] = array(mktime(0,0,0,1,1,date('Y')), mktime(0,0,0,date('m'),date('d'),date('Y')), -3 ); 
+		$ranges[] = array(mktime(0,0,0,1,1,date('Y')), mktime(0,0,0,date('m'),date('d'),date('Y')), -3 );
+		
+		//delete old data, if it's not the end day of the month
+		$delete_time = mktime(0,0,0,date('m'),date('d')-2,date('Y'));
+		if (date('t', $delete_time) == date('d', $delete_time))
+			$delete_time = 0;
 	}
 	
 	//insert the ranges
@@ -1104,7 +1110,7 @@ function bo_update_densities($max_time)
 		{
 			foreach($_BO['density'] as $type_id => $d)
 			{
-				if (!isset($d) || !is_array($d))
+				if (!isset($d) || !is_array($d) || empty($d))
 					continue;
 				
 				$lat_min = $d['coord'][2];
@@ -1144,11 +1150,8 @@ function bo_update_densities($max_time)
 	$timeout = false;
 	foreach($_BO['density'] as $type_id => $a)
 	{
-		if (!isset($pending[$type_id]))
+		if (!isset($pending[$type_id]) || empty($a))
 			continue;
-		
-		echo "\n<h3>".$a['name']."</h3>\n";
-		flush();
 		
 		// length in meters of an element
 		$length = $a['length'] * 1000;
@@ -1162,7 +1165,9 @@ function bo_update_densities($max_time)
 		//zero strikes
 		$zero = str_repeat('00', $bps);
 		
-		echo "\n<p>Length: $length m / Area: $area square meters / Bytes per Area: $bps</p>\n";
+		echo "\n<h3>".$a['name'].": Length: $length m / Area: $area square meters / Bytes per Area: $bps</h3>\n";
+		flush();
+
 		
 		//calculate densities for every pending database entry
 		foreach($pending[$type_id] as $id => $b)
@@ -1172,14 +1177,36 @@ function bo_update_densities($max_time)
 				continue;
 		
 			$info = unserialize($b['info']);
+
+			echo '<p>Station: #'.$b['station_id'];
+			echo ' *** Range: '.$b['date_start'].' to '.$b['date_end'].' ';
+			flush();
 			
 			//with status -1/-3 ==> calculate from other density data
 			if ($b['status'] == -1 || $b['status'] == -3)
 			{
 				$max_count = 0;
-				$DATA = '';
-				$date_start_add = 0;
 				
+				echo ' Calculate from month data! ';
+				
+				if ($info['calc_date_start']) // there was a timeout the last run
+				{
+					$date_start_add = $info['calc_date_start'];
+					$b['date_start'] = $info['calc_date_start'];
+					
+					echo ' Starting at '.$b['date_start'];
+					
+					$sql = "SELECT data FROM ".BO_DB_PREF."densities WHERE id='$id'";
+					$row = bo_db($sql)->fetch_assoc();
+					$DATA = $row['data'] ? gzinflate($row['data']) : '';
+
+				}
+				else
+				{
+					$date_start_add = 0;
+					$DATA = '';
+				}
+				flush();
 				$sql = "SELECT data, date_start, date_end
 						FROM ".BO_DB_PREF."densities 
 						WHERE 1
@@ -1224,6 +1251,15 @@ function bo_update_densities($max_time)
 						}
 						
 					}
+					
+					//Check for timeout
+					if (time() - $start_time > $max_time - 1)
+					{
+						$info['calc_date_start'] = $date_start_add;
+						$timeout = true;
+						break;
+					}
+					
 				}
 				
 			}
@@ -1235,18 +1271,24 @@ function bo_update_densities($max_time)
 					// get start position from var settings (begin southwest)
 					$lat = $info['last_lat'];
 					$lon = $info['last_lon'];
+					
+					//collect old data and decompress
+					$sql = "SELECT data FROM ".BO_DB_PREF."densities WHERE id='$id'";
+					$row = bo_db($sql)->fetch_assoc();
+					$OLDDATA = $row['data'] ? gzinflate($row['data']) : '';
 				}
 				else
 				{
 					//start positions from database
 					$lat = $a['coord'][2];
 					$lon = $a['coord'][3];
+					$OLDDATA = '';
 				}
 
 				$lat_end = $a['coord'][0];
 				$lon_end = $a['coord'][1];
 
-				echo '<p>Station: #'.$b['station_id'];
+		
 				echo " *** Start: $lat&deg; / $lon&deg; *** End: $lat_end&deg; / $lon_end&deg; *** <em>... Calculating ...</em>";
 				flush();
 				
@@ -1302,10 +1344,6 @@ function bo_update_densities($max_time)
 						$DATA .= sprintf("%0".(2*$bps)."d", dechex($row['cnt']));
 						
 						$last_lon_id = $row['lon_id'] + 1;
-						
-						//Check for timeout
-						if (time() - $start_time > $max_time - 1)
-							$timeout = true;
 					
 					}
 
@@ -1317,24 +1355,18 @@ function bo_update_densities($max_time)
 
 					$lat += $dlat;
 					
-					if ($i-- <= 0 || $timeout)
+					if ($i-- <= 0 || time() - $start_time > $max_time - 1)
 					{
+						echo " *** Stopped at $lat&deg / $lon_end&deg (delta: $dlat&deg / $dlon&deg) ";
 						$timeout = true;
 						break;
 					}
-					
 				}
 				
 				echo " New data collected: ".(strlen($DATA) / 2).'bytes ';
 				
-				//collect old data and decompress
-				$sql = "SELECT data FROM ".BO_DB_PREF."densities WHERE id='$id'";
-				$row = bo_db($sql)->fetch_assoc();
-				$OLDDATA = $row['data'] ? gzinflate($row['data']) : '';
-				
 				//new data string
 				$DATA = $OLDDATA.$DATA;
-				
 			}
 			
 			echo ' *** Whole data: '.(strlen($DATA)).'bytes ';
@@ -1375,6 +1407,15 @@ function bo_update_densities($max_time)
 			
 			if ($timeout)
 				return;
+			
+			if ($delete_time)
+			{
+				$cnt = bo_db("DELETE FROM ".BO_DB_PREF."densities WHERE date_end='".date('Y-m-d', $delete_time)."'");
+				
+				if ($cnt)
+					echo "<p>Deleted $cnt entries</p>";
+			}
+			
 			
 		}
 	}

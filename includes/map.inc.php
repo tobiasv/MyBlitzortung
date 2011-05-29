@@ -297,6 +297,18 @@ function bo_show_lightning_map()
 	
 	$radius = $_BO['radius'] * 1000;
 	$zoom = BO_DEFAULT_ZOOM;
+	
+	if ((bo_user_get_level() & BO_PERM_NOLIMIT)) //allow all zoom levels on logged in users with access rights
+	{
+		$max_zoom = 999;
+		$min_zoom = 0;
+	}
+	else
+	{
+		$max_zoom = defined('BO_MAX_ZOOM_IN') ? intval(BO_MAX_ZOOM_IN) : 999;
+		$min_zoom = defined('BO_MIN_ZOOM_IN') ? intval(BO_MIN_ZOOM_IN) : 0;
+	}
+
 	$lat = BO_LAT;
 	$lon = BO_LON;
 
@@ -643,8 +655,10 @@ function bo_show_lightning_map()
 		});
 
 		google.maps.event.addListener(bo_map, 'zoom_changed', function() {
-			if (this.getZoom() < <?php echo BO_MIN_ZOOM_OUT ?>)
-				 this.setZoom(<?php echo BO_MIN_ZOOM_OUT ?>);
+			if (this.getZoom() < <?php echo $min_zoom ?>)
+				 this.setZoom(<?php echo $min_zoom ?>);
+			if (this.getZoom() > <?php echo $max_zoom ?>)
+				 this.setZoom(<?php echo $max_zoom ?>);
 			else
 				bo_setcookie('bo_map_zoom', bo_map.getZoom());
 			

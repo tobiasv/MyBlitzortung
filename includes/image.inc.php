@@ -812,7 +812,7 @@ function bo_get_density_image()
 	
 	//dates 
 	$date_end = $row['date_end'];
-	$time_string = $row['date_start'].' - '.$row['date_end'];
+	$time_string = date(_BL('_date'), strtotime($row['date_start'])).' - '.date(_BL('_date'), strtotime($row['date_end']));
 	
 	//coordinates
 	$lat       = $row['lat_min'];
@@ -981,7 +981,8 @@ function bo_get_density_image()
 		imageline($I, $x, $y-$size, $x, $y+$size, $color);
 
 	}
-	else
+	
+	if (!$ratio)
 	{
 		//Strike density
 		$text = _BL('Max strikes density', true).': '.number_format($max_density, 1, _BL('.'), _BL(',')).'/km^2';

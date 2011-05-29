@@ -168,7 +168,7 @@ $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(225,   0, 0);
 $_BO['tpl_imgmap']['germany_lkr']['density'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 4;
 $_BO['tpl_imgmap']['germany_lkr']['density_colors'] = $_BO['tpl_density_colors'];
-$_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 50;
+$_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 10;
 
 
 ?>

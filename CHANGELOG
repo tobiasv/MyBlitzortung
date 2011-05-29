@@ -3,8 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4-dev2 (2011-05-29)
+-----------------------------
+- added warning if settings.php exists
+- overall maximum zoom level
+
 Version 0.4-dev1 (2011-05-28)
-----------------------------
+-----------------------------
 - corrected Germany map
 - some more README entries
 

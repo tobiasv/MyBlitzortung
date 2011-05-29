@@ -79,12 +79,19 @@ background: #fff7e7;
 border-top: 0px solid #ddd;
 border-bottom: 1px solid #ddd;
 margin: -10px -10px 20px -15px;
-padding: 5px 0 0 20px;
-height: 22px;
+padding: 5px 0 5px 20px;
 font-size: 14px;
 background: #fffaf5;
 list-style-image: none;
 list-style-type: none;
+}
+
+#myblitzortung ul#bo_menu:after {
+content: "."; 
+display: block; 
+height: 0; 
+clear: both; 
+visibility: hidden;
 }
 
 #myblitzortung ul#bo_menu li {

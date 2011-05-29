@@ -52,6 +52,7 @@ function bo_show_login()
 	if (bo_user_get_id())
 	{
 		$level = bo_user_get_level();
+		$show = $_GET['bo_action'];
 		
 		if (bo_user_get_id() == 1)
 		{
@@ -64,23 +65,23 @@ function bo_show_login()
 	
 		echo '<ul id="bo_menu">';
 
-		echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=">'._BL('Start').'</a>';
+		echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=" class="bo_navi'.($show == '' ? '_active' : '').'">'._BL('Start').'</a>';
 		if (bo_user_get_id() > 1)
-			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=password">'._BL('Password').'</a>';
+			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=password" class="bo_navi'.($show == 'password' ? '_active' : '').'">'._BL('Password').'</a>';
 		
 		if (BO_PERM_ADMIN & $level)
-			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=user_settings">'._BL('Add/Remove User').'</a>';
+			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=user_settings" class="bo_navi'.($show == 'user_settings' ? '_active' : '').'">'._BL('Add/Remove User').'</a>';
 		
 		if (BO_PERM_SETTINGS & $level)
-			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=calibrate">'._BL('Calibrate Antennas').'</a>';
+			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=calibrate" class="bo_navi'.($show == 'calibrate' ? '_active' : '').'">'._BL('Calibrate Antennas').'</a>';
 
 
 		if (defined('BO_ALERTS') && BO_ALERTS && ($level & BO_PERM_ALERT))
-			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=alert" class="bo_navi'.($show == 'alert' ? '_active' : '').'">'._BL('Strike alert').'</a></li>';
+			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=alert" class="bo_navi'.($show == 'alert' ? '_active' : '').'" class="bo_navi'.($show == 'alert' ? '_active' : '').'">'._BL('Strike alert').'</a></li>';
 		
 		echo '</ul>';
 
-		switch($_GET['bo_action'])
+		switch($show)
 		{
 
 			case 'user_settings':
@@ -128,7 +129,7 @@ function bo_show_login()
 				break;
 			
 			default:
-				echo '<h4>'._BL('Welcome to MyBlitzortung user area').'!</h4>';
+				echo '<h3>'._BL('Welcome to MyBlitzortung user area').'!</h3>';
 				echo '<ul class="bo_login_info">
 						<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>';
 				echo '</ul>';
@@ -140,8 +141,11 @@ function bo_show_login()
 					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=update">'._BL('Do manual update').'</a></li>';
 					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=mybo_station_update">'._BL('Update MyBlitzortung Stations').'</a></li>';
 					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=cache_info">'._BL('File cache info').'</a></li>';
+					echo '<li><a href="'.dirname(BO_FILE).'/README" target="_blank">README</a></li>';
 					echo '</ul>';
-
+					
+					if (file_exists(BO_DIR.'settings.php'))
+						echo '<p style="color:red"><strong>Warning: File <u>settings.php</u> found!</strong><br>Since version 0.3.1 standard values and settings are saved internally. For individual setting edit config.php and enter your individual settings there. Delete settings.php to hide this message.</p>';
 				}
 				
 				echo '<h4>'._BL('Version information').'</h4>';
