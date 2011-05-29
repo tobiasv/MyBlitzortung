@@ -39,7 +39,6 @@ $_BO['tpl_density']['europe']['name'] 	= 'Europe';
 $_BO['tpl_density']['europe']['coord'] 	= array(70, 52, 20, -22); //North, East, South, West (Degrees)
 $_BO['tpl_density']['europe']['length']	= 10; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
 $_BO['tpl_density']['europe']['bps'] 	= 2; // bytes per area 
-$_BO['tpl_density']['europe']['col'] 	= $_BO['tpl_density_colors']; 
 
 
 //Germany
@@ -47,7 +46,6 @@ $_BO['tpl_density']['germany']['name'] 		= 'Germany';
 $_BO['tpl_density']['germany']['coord'] 	= array(56, 16, 46, 5); //North, East, South, West (Degrees)
 $_BO['tpl_density']['germany']['length']	= 2; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
 $_BO['tpl_density']['germany']['bps'] 		= 2; // bytes per area 
-$_BO['tpl_density']['germany']['col'] 		= $_BO['tpl_density_colors'];
 
 
 

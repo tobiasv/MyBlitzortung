@@ -585,7 +585,7 @@ function bo_show_statistics_longtime()
 function bo_show_statistics_other()
 {
 	$D = array();
-	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'user');
+	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'user', 'densities');
 
 	$res = bo_db("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
 	while($row = $res->fetch_assoc())

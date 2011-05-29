@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4 (2011-05-29)
+------------------------
+- New Release
+- small fixes
+
 Version 0.4-dev2 (2011-05-29)
 -----------------------------
 - added warning if settings.php exists

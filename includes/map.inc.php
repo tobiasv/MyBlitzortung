@@ -319,7 +319,7 @@ function bo_show_lightning_map()
 	$min_upd_interval = null;
 	foreach ($_BO['mapcfg'] as $mapid => $cfg)
 	{
-		if ($cfg['only_loggedin'] && !bo_user_get_level())
+		if (!is_array($cfg) || empty($cfg) || ($cfg['only_loggedin'] && !bo_user_get_level()) )
 			continue;
 		
 		if ($min_upd_interval == null || $min_upd_interval > $cfg['upd_intv'])
@@ -608,7 +608,7 @@ function bo_show_lightning_map()
 		
 		foreach($_BO['mapcfg'] as $mapid => $cfg)
 		{
-			if ($cfg['only_loggedin'] && !bo_user_get_level())
+			if (!is_array($cfg) || empty($cfg) || ($cfg['only_loggedin'] && !bo_user_get_level()) )
 				continue;
 				
 			echo '
