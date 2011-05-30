@@ -61,7 +61,7 @@ function bo_icon($icon)
 
 function bo_tile()
 {
-	set_time_limit(3);
+	@set_time_limit(3);
 
 	global $_BO;
 
@@ -413,7 +413,7 @@ function bo_purge_images($min_age, $dir)
 function bo_get_map_image()
 {
 	session_write_close();
-	set_time_limit(10);
+	@set_time_limit(10);
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	
 	
@@ -708,7 +708,7 @@ function bo_get_density_image()
 	$station_id = intval($_GET['id']);
 	$ratio = isset($_GET['ratio']) && $station_id;
 	
-	set_time_limit(30);
+	@set_time_limit(30);
 	
 	global $_BO;
 

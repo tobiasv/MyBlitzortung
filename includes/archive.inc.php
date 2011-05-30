@@ -224,7 +224,7 @@ function bo_show_archive_map()
 	
 <script type="text/javascript">
 
-var bo_maps_pics   = new Array(<?= $images ?>);
+var bo_maps_pics   = new Array(<?php echo $images ?>);
 var bo_maps_img    = new Array();
 var bo_maps_loaded = 0;
 
@@ -265,7 +265,7 @@ function bo_maps_animation_start()
 window.setTimeout("bo_maps_load();", 500);
 </script>
 
-<?
+<?php
 	
 	
 	echo '</div>';

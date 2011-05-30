@@ -321,11 +321,11 @@ function bo_copyright_footer()
 
 		if (bo_user_get_name())
 		{
-			echo '<a href="'.$file.'&bo_login">'._BC(bo_user_get_name()).'</a>';
+			echo '<a href="'.$file.'&bo_login" rel="nofollow">'._BC(bo_user_get_name()).'</a>';
 			echo ' (<a href="'.$file.'&bo_logout">'._BL('Logout').'</a>)';
 		}
 		else
-			echo '<a href="'.$file.'&bo_login">'._BL('Login').'</a>';
+			echo '<a href="'.$file.'&bo_login" rel="nofollow">'._BL('Login').'</a>';
 
 		echo '</div>';
 

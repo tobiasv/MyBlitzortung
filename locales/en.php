@@ -197,7 +197,7 @@ $_BL['en']['graph_legend_stations_active'] = 'Active stations';
 $_BL['en']['graph_stat_title_ratio_distance'] = 'Strike ratio by distance';
 $_BL['en']['graph_legend_ratio_distance'] = 'Strike ratio station {STATION}';
 $_BL['en']['graph_stat_title_ratio_bearing'] = 'Strike ratio by bearing';
-$_BL['en']['graph_legend_stations_max_active'] = 'Biggest station count ever';
+$_BL['en']['graph_legend_stations_max_active'] = 'Highest station count ever';
 $_BL['en']['graph_legend_count_distance'] = 'Whole strike count';
 $_BL['en']['graph_legend_ratio_bearing'] = 'Locating ratio station {STATION}';
 $_BL['en']['graph_legend_count_bearing'] = 'Whole strike count';
@@ -282,9 +282,9 @@ $_BL['en']['Station active'] = 'Station active';
 $_BL['en']['Last update strikes'] = 'Last update of strike data';
 $_BL['en']['Last update stations'] = 'Last update station data';
 $_BL['en']['Last update signals'] = 'Last update signal data';
-$_BL['en']['Active Stations'] = 'Active Stations';
-$_BL['en']['Sum of Signals'] = 'Sum of Signals';
-$_BL['en']['Sum of Strikes'] = 'Sum of Strikes';
+$_BL['en']['Active Stations'] = 'Active stations';
+$_BL['en']['Sum of Signals'] = 'Sum of signals';
+$_BL['en']['Sum of Strikes'] = 'Sum of strikes';
 $_BL['en']['Strikes detected'] = 'Strikes detected';
 $_BL['en']['of the last'] = 'of the last';
 $_BL['en']['Currently no GPS coordinates available!'] = 'Currently no GPS coordinates available!';
@@ -321,7 +321,7 @@ $_BL['en']['Max Age (Days)'] = 'Max Age (Days)';
 $_BL['en']['Calculate'] = 'Calculate';
 $_BL['en']['Level'] = 'Level';
 $_BL['en']['admin_user_legend'] = 'User settings';
-$_BL['en']['Add/Remove User'] = 'User';
+$_BL['en']['Add/Remove User'] = 'Users';
 $_BL['en']['Results'] = 'Results';
 $_BL['en']['Analyzed'] = 'Analyzed';
 $_BL['en']['random datasets'] = 'random datasets';
@@ -385,7 +385,7 @@ $_BL['en']['user_perm7'] = 'Archive';
 /*************************************************************/
 $_BL['en']['stat_navi_station'] = 'Station';
 $_BL['en']['stat_navi_other'] = 'Other';
-$_BL['en']['stat_navi_network'] = 'Netzwerk';
+$_BL['en']['stat_navi_network'] = 'Network';
 $_BL['en']['arch_navi_search'] = 'Strike search';
 $_BL['en']['arch_navi_signals'] = 'Signals';
 $_BL['en']['stat_navi_longtime'] = 'Long time statistics';
@@ -399,20 +399,25 @@ $_BL['en']['h3_info_general'] = 'General';
 $_BL['en']['h4_info_accuracy'] = 'Precision';
 $_BL['en']['h4_info_participate'] = 'Participate';
 $_BL['en']['h3_info_usage'] = 'Data usage';
-$_BL['en']['h3_info_hint'] = 'Important noted';
+$_BL['en']['h3_info_hint'] = 'Important notice';
 
 $_BL['en']['info_general_warning'] = '
 		We are not liable for the completeness, timeliness, quality and accuracy of the information on our website. 
 		We are not responsible for damages, resulting from trusting the content of our website or its use. ';
 $_BL['en']['info_general_text'] = '
-		Blitzortung.org is a private network of lightning tracker station.
+		Blitzortung.org is a private network of lightning tracker stations. They catch the electromagnetic signals of strikes, and a with
+		that data the time and position can be calculated (TOA - time of arrival method).
+
+		You will find more information on zhe main site of the project: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
 
 									';
 $_BL['en']['info_accuracy_text'] = '
-		Accuracy can be lower than 1 kilometer.
+		Accuracy is quite good and is sometimes lower than 1 kilometer. This is equal to commercial strike detection companies.
 ';
 $_BL['en']['info_participate_text'] = '
-		Build your own receiver (costs about 150 Euro). More information here: 
+		You have to uild your own receiver (costs about 150 Euro). With that, you can participate in the network and you
+		will get access to all strike data.
+		More information here: 
 		<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>.
 		See also:
 		<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a> 
@@ -420,7 +425,7 @@ $_BL['en']['info_participate_text'] = '
 
 $_BL['en']['info_usage_text'] = '
 		The data provided on this page and by Blitzortung.org is only used for private and entertainment purposes.
-		We are not a commercial information service for lightning data! See mor information on
+		We are not a commercial information service for lightning data! See more information on
 		<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=5" target="_blank">Blitzortung.org</a>
 		';
 $_BL['en']['info_myblitzortung_text'] = '
@@ -465,7 +470,7 @@ $_BL['en']['bo_graph_descr_strikes_time_radius'] = 'Same as above, but only stri
 /*************************************************************/
 /* Alerts                                                    */
 /*************************************************************/
-$_BL['en']['Strike alert'] = 'Strike alert';
+$_BL['en']['Strike alert'] = 'Strike alerts';
 $_BL['en']['New alert'] = 'New alert';
 $_BL['en']['Alert settings for user '] = 'Alert settings for user';
 $_BL['en']['alert_settings_legend1'] = 'General';
@@ -597,6 +602,3 @@ $_BL['en']['No data available!'] = 'No data available!';
 $_BL['en']['Signals detected'] = 'Signals detected';
 $_BL['en']['Signal ratio'] = 'Locating ratio';
 
-
-
-		

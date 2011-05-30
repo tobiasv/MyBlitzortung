@@ -23,7 +23,7 @@ if (!defined("BO_VER"))
 {
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.4.3');
+	define("BO_VER", '0.4.4');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -38,7 +38,6 @@ if (!defined("BO_VER"))
 	//Do not change these values (needed for auto linking stations)
 	define('BO_LINK_HOST', 'www.wetter-rosstal.de');
 	define('BO_LINK_URL',  '/blitzortung/bo.php');
-
 
 	//Some default PHP-Options
 	ini_set('magic_quotes_runtime', 0);
@@ -56,8 +55,6 @@ if (!defined("BO_VER"))
 	require_once 'config.php';
 	require_once 'includes/default_settings.inc.php';
 
-	date_default_timezone_set(BO_TIMEZONE);
-
 	if (defined('BO_DEBUG') && BO_DEBUG)
 	{
 		error_reporting(E_ALL & ~E_NOTICE);
@@ -68,6 +65,8 @@ if (!defined("BO_VER"))
 		ini_set('display_errors', 0);
 	}
 
+	date_default_timezone_set(BO_TIMEZONE);
+	
 	//Session handling
 	@session_start();
 

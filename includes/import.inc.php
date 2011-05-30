@@ -821,7 +821,7 @@ function bo_update_all($force)
 	$start_time = time();
 	$max_time = 50;
 	
-	set_time_limit($max_time+10);
+	@set_time_limit($max_time+10);
 
 	if (!$force)
 		sleep(rand(0,30)); // to avoid to much connections from different stations to blitzortung.org at the same time
