@@ -306,7 +306,7 @@ function bo_show_lightning_map()
 	else
 	{
 		$max_zoom = defined('BO_MAX_ZOOM_IN') ? intval(BO_MAX_ZOOM_IN) : 999;
-		$min_zoom = defined('BO_MIN_ZOOM_IN') ? intval(BO_MIN_ZOOM_IN) : 0;
+		$min_zoom = defined('BO_MIN_ZOOM_OUT') ? intval(BO_MIN_ZOOM_OUT) : 0;
 	}
 
 	$lat = BO_LAT;
