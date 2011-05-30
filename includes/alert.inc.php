@@ -577,7 +577,7 @@ function bo_alert_send()
 								$ret = mail($d['address'], 
 											'MyBlitzortung: '._BL('Strikes detected', true).' ('.$d['name'].')', 
 											$text,
-											$header
+											$headers
 											);
 								
 								$log[$alert_dbname]['text']   = $text;
