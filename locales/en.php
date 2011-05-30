@@ -1,11 +1,549 @@
 <?php
 
+/* 
+ * English translation for MyBlitzortung
+ */
+
 $_BL['locale'] = 'en';
+
+/*************************************************************/
+/* General                                                   */
+/*************************************************************/
 
 $_BL['en']['.'] = '.';
 $_BL['en'][','] = ',';
 $_BL['en']['_date'] = 'Y-m-d';
 $_BL['en']['_datetime'] = 'Y-m-d H:i:s';
+
+$_BL['en']['_before'] = false;
+$_BL['en']['_minutes_ago'] = 'minutes ago';
+$_BL['en']['_minute_ago'] = 'minute ago';
+$_BL['en']['unit_meters'] = 'm';
+$_BL['en']['unit_minutes'] = 'minutes';
+$_BL['en']['unit_hours'] = 'hours';
+
+$_BL['en']['Jan'] = 'Jan';
+$_BL['en']['Feb'] = 'Feb';
+$_BL['en']['Mar'] = 'Mar';
+$_BL['en']['Apr'] = 'Apr';
+$_BL['en']['May'] = 'May';
+$_BL['en']['Jun'] = 'Jun';
+$_BL['en']['Jul'] = 'Jul';
+$_BL['en']['Aug'] = 'Aug';
+$_BL['en']['Sep'] = 'Sep';
+$_BL['en']['Oct'] = 'Oct';
+$_BL['en']['Nov'] = 'Nov';
+$_BL['en']['Dec'] = 'Dez';
+
+$_BL['en']['All'] = 'All';
+$_BL['en']['Day'] = 'Day';
+$_BL['en']['Date'] = 'Date';
+$_BL['en']['Picture'] = 'Picture';
+$_BL['en']['Animation'] = 'Animation';
+$_BL['en']['Today'] = 'Today';
+$_BL['en']['Yesterday'] = 'Yesterday';
+$_BL['en']['settings'] = 'Settings';
+$_BL['en']['time'] = 'Time';
+$_BL['en']['timeclock'] = 'Time';
+$_BL['en']['day'] = 'Day';
+$_BL['en']['no'] = 'no';
+$_BL['en']['yes'] = 'yes';
+$_BL['en']['distance'] = 'Distance';
+$_BL['en']['unit_kilometers'] = 'km';
+$_BL['en']['Bearing'] = 'Bearing';
+$_BL['en']['Deviation'] = 'Deviation';
+$_BL['en']['copyright_footer'] = 'Powered by <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
+$_BL['en']['for_station'] = 'for station';
+$_BL['en']['Entries'] = 'Entries';
+$_BL['en']['days'] = 'Days';
+$_BL['en']['unit_days'] = 'Tage';
+
+$_BL['en']['Home'] = 'Home';
+$_BL['en']['lightning data'] = 'lightning data';
+$_BL['en']['Latitude'] = 'Latitude';
+$_BL['en']['Longitude'] = 'Longitude';
+$_BL['en']['Distance'] = 'Distance';
+$_BL['en']['Height'] = 'Height';
+$_BL['en']['Map'] = 'Map';
+$_BL['en']['Strikes'] = 'Strikes';
+$_BL['en']['found'] = 'found';
+$_BL['en']['Oldest'] = 'Oldest';
+$_BL['en']['Newest'] = 'Newest';
+$_BL['en']['Lightning map'] = 'Lightning map';
+$_BL['en']['Signals'] = 'Signals';
+
+$_BL['en']['N'] = 'N';
+$_BL['en']['NNE'] = 'NNE';
+$_BL['en']['NE'] = 'NE';
+$_BL['en']['ENE'] = 'ENE';
+$_BL['en']['E'] = 'E';
+$_BL['en']['ESE'] = 'ESE';
+$_BL['en']['SE'] = 'SE';
+$_BL['en']['SSE'] = 'SSE';
+$_BL['en']['S'] = 'S';
+$_BL['en']['SSW'] = 'SSW';
+$_BL['en']['SW'] = 'SW';
+$_BL['en']['WSW'] = 'WSW';
+$_BL['en']['W'] = 'W';
+$_BL['en']['WNW'] = 'WNW';
+$_BL['en']['NW'] = 'NW';
+$_BL['en']['NNW'] = 'NNW';
+
+$_BL['en']['Station'] = 'Station';
+$_BL['en']['Year'] = 'Year';
+$_BL['en']['Month'] = 'Month';
+$_BL['en']['more'] = 'More';
+$_BL['en']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
+$_BL['en']['stations'] = 'stations';
+$_BL['en']['Blitzortung.org'] = 'Blitzortung.org';
+$_BL['en']['Result'] = 'Result';
+$_BL['en']['Time'] = 'Time';
+$_BL['en']['Current'] = 'Current';
+$_BL['en']['Polarity'] = 'Polarity';
+$_BL['en']['Strike'] = 'Strike';
+$_BL['en']['experimental'] = 'experimental';
+$_BL['en']['Deviation'] = 'Deviation';
+$_BL['en']['Participated'] = 'Participated';
+$_BL['en']['Recieved'] = 'Recieved';
+$_BL['en']['positive'] = 'positive';
+$_BL['en']['negative'] = 'negative';
+$_BL['en']['Exact'] = 'Exact';
+$_BL['en']['Count per hour'] = 'Count per hour';
+$_BL['en']['Position'] = 'Position';
+$_BL['en']['City'] = 'City';
+$_BL['en']['Country'] = 'Country';
+$_BL['en']['Strikes/h'] = 'Strikes/h';
+$_BL['en']['Signals/h'] = 'Signals/h';
+$_BL['en']['Efficiency'] = 'Efficiency';
+$_BL['en']['Ratio'] = 'Ratio';
+$_BL['en']['Pos.'] = 'Pos.';
+$_BL['en']['Stations'] = 'Stations';
+$_BL['en']['Search Options'] = 'Search Options';
+$_BL['en']['no strike detected'] = 'No strike detected';
+$_BL['en']['Runtime'] = 'Runtime';
+$_BL['en']['unit_millisec'] = 'ms';
+$_BL['en']['Older'] = 'Older';
+$_BL['en']['Newer'] = 'Newer';
+$_BL['en']['Strikes'] = 'Strikes';
+$_BL['en']['Count'] = 'Count';
+$_BL['en']['More than'] = 'More than';
+$_BL['en']['Percent'] = 'Percent';
+$_BL['en']['Degrees'] = 'Degrees';
+$_BL['en']['Coordinates'] = 'Coordinates';
+$_BL['en']['Locating ratio'] = 'Locating ratio';
+$_BL['en']['Last update'] = 'Last update';
+$_BL['en']['Strike ratio'] = 'Strike ratio';
+$_BL['en']['Type'] = 'Type';
+$_BL['en']['Text'] = 'Text';
+$_BL['en']['Error'] = 'Error';
+$_BL['en']['Back'] = 'Back';
+$_BL['en']['Participants'] = 'Participants';
+
+$_BL['en']['Europe'] = 'Europe';
+$_BL['en']['Germany'] = 'Germany';
+
+/*************************************************************/
+/* Main Menu (Standalone)                                    */
+/*************************************************************/
+
+
+$_BL['en']['main_title_map'] = 'Strike map';
+$_BL['en']['main_title_statistics'] = 'Statistics';
+$_BL['en']['main_title_info'] = 'Information';
+$_BL['en']['main_title_archive'] = 'Archive';
+$_BL['en']['main_title_login'] = 'User area';
+
+$_BL['en']['main_menu_map'] = 'Strike map';
+$_BL['en']['main_menu_archive'] = 'Archive';
+$_BL['en']['main_menu_statistics'] = 'Statistics';
+$_BL['en']['main_menu_info'] = 'Information';
+$_BL['en']['main_menu_login'] = 'User area';
+
+
+/*************************************************************/
+/* Main Map                                                  */
+/*************************************************************/
+$_BL['en']['map_options'] = 'Options';
+$_BL['en']['only own strikes'] = 'Only strikes detected by station {STATION}';
+$_BL['en']['tile not available'] = "In this zoom level\nat this position\nno strike data available!";
+$_BL['en']['update map'] = 'Update';
+$_BL['en']['Click to set the map to Home'] = 'Click to set the map to Home.';
+$_BL['en']['Dynamic map'] = 'Dynamic map';
+$_BL['en']['Show Stations'] = 'Show Stations';
+$_BL['en']['None'] = 'None';
+$_BL['en']['Active stations'] = 'Active stations';
+$_BL['en']['auto update'] = 'Auto Update';
+
+/*************************************************************/
+/* Graphs                                                    */
+/*************************************************************/
+
+$_BL['en']['graph_stat_title_strikes'] = 'Strike statistics';
+$_BL['en']['graph_legend_strikes_sum'] = 'Whole strike cound';
+$_BL['en']['graph_legend_strikes_avg_all'] = 'Mean of all stations';
+$_BL['en']['graph_legend_strikes_own'] = 'Detected strikes station {STATION}';
+$_BL['en']['graph_stat_title_signals'] = 'Signal statistics';
+$_BL['en']['graph_legend_signals_avg_all'] = 'Mean signals per station';
+$_BL['en']['graph_legend_signals_own'] = 'Signals station {STATION}';
+$_BL['en']['graph_stat_title_ratio'] = 'Locating and strike ratios';
+$_BL['en']['graph_legend_ratio_sig_all'] = 'Whole locating ratio';
+$_BL['en']['graph_legend_ratio_sig_own'] = 'Locating ratio station {STATION}';
+$_BL['en']['graph_legend_ratio_str_all'] = 'Whole strike ratio';
+$_BL['en']['graph_legend_ratio_str_own'] = 'Strike ratio station {STATION}';
+$_BL['en']['graph_stat_title_stations'] = 'Stations count';
+$_BL['en']['graph_legend_stations_active'] = 'Active stations';
+$_BL['en']['graph_stat_title_ratio_distance'] = 'Strike ratio by distance';
+$_BL['en']['graph_legend_ratio_distance'] = 'Strike ratio station {STATION}';
+$_BL['en']['graph_stat_title_ratio_bearing'] = 'Strike ratio by bearing';
+$_BL['en']['graph_legend_stations_max_active'] = 'Biggest station count ever';
+$_BL['en']['graph_legend_count_distance'] = 'Whole strike count';
+$_BL['en']['graph_legend_ratio_bearing'] = 'Locating ratio station {STATION}';
+$_BL['en']['graph_legend_count_bearing'] = 'Whole strike count';
+
+$_BL['en']['h3_graphs'] = 'Graphs';
+$_BL['en']['h4_graph_strikes'] = 'Strike count';
+$_BL['en']['h4_graph_signals'] = 'Signal count';
+$_BL['en']['h4_graph_ratio'] = 'Ratios';
+$_BL['en']['h4_graph_ratio_distance'] = 'Strike ratio by distance';
+$_BL['en']['h4_graph_ratio_bearing'] = 'Strike ratio by bearing';
+$_BL['en']['h4_graph_stations'] = 'Active stations count';
+$_BL['en']['h4_graph_ratio_distance_longtime'] = 'Strike ratio by distance';
+$_BL['en']['h4_graph_ratio_bearing_longtime'] = 'Strike ratio by bearing';
+
+
+/*************************************************************/
+/* Archive                                                   */
+/*************************************************************/
+$_BL['en']['check_only_strikes'] = 'with detected strikes only';
+$_BL['en']['rawgraph'] = 'Signal graph';
+$_BL['en']['lightning_info'] = 'Strike info';
+$_BL['en']['strikedetected'] = 'Blitz detected';
+$_BL['en']['button_search'] = 'Search';
+$_BL['en']['h3_arch_search'] = 'Searching for strikes in an area';
+$_BL['en']['h3_arch_last_signals'] = 'Last recieved signals';
+$_BL['en']['You have to place the pointer inside the red circle!'] = 'You have to place the pointer inside the red circle!';
+$_BL['en']['archive_legend'] = 'Search options';
+$_BL['en']['No strikes found!'] = 'No strikes found!';
+$_BL['en']['arch_navi_maps'] = 'Maps';
+$_BL['en']['h3_arch_maps'] = 'Strike archive: Maps and animations';
+$_BL['en']['legend_arch_strikes'] = 'Options';
+$_BL['en']['arch_navi_density'] = 'Strike densities';
+$_BL['en']['h3_arch_density'] = 'Strike densities';
+$_BL['en']['legend_arch_densities'] = 'Options';
+$_BL['en']['arch_select_dates_beween'] = 'Only data from {START} to {END} available!';
+$_BL['en']['Max strikes density'] = 'Max. strike density';
+
+/*************************************************************/
+/* Statistics                                                */
+/*************************************************************/
+$_BL['en']['h3_stat_last_signals'] = 'The last recieved signals ';
+$_BL['en']['h3_stat_station'] = 'Statistics of station {STATION_CITY}';
+$_BL['en']['h3_stat_graphs'] = 'Statistics: Graphs';
+$_BL['en']['h3_stat_other'] = 'More statistics';
+$_BL['en']['h4_stat_longtime_myblitzortung'] = 'MyBlitzortung';
+$_BL['en']['h4_stat_longtime_network'] = 'Lightning network';
+$_BL['en']['h4_stat_other_database'] = 'Database statistics';
+$_BL['en']['h4_stat_other_gps'] = 'GPS';
+$_BL['en']['h4_stat_other_updates'] = 'Updates';
+$_BL['en']['h4_stat_longtime_station'] = 'Station {STATION}';
+$_BL['en']['h4_table_network'] = 'Table view';
+$_BL['en']['h3_stat_network'] = 'Lightning network statistics';
+$_BL['en']['h3_stat_longtime'] = 'Longtime statistics';
+$_BL['en']['h3_stat_database'] = 'Statistics from the local database';
+$_BL['en']['h4_stat_other_antennas'] = 'Antenna bearing';
+$_BL['en']['h3_stat_strikes'] = 'Monthly and yearly strike count';
+$_BL['en']['h4_graph_strikes_time'] = 'All strikes';
+$_BL['en']['h4_graph_strikes_time_radius'] = 'Strikes with a max. distance to Station {STATION}';
+
+$_BL['en']['since begin of data logging'] = 'since begin of data logging';
+$_BL['en']['update every'] = 'Update every';
+$_BL['en']['Direction antenna 1'] = 'Bearing antenna 1';
+$_BL['en']['Direction antenna 2'] = 'Bearing antenne 2';
+$_BL['en']['Max participants per strike'] = 'Max participants per strike';
+$_BL['en']['Mean participants per strike'] = 'Mean participants per strike';
+$_BL['en']['Mean locating ratio'] = 'Mean locating ratio';
+$_BL['en']['Mean strike ratio'] = 'Mean strike ratio';
+$_BL['en']['Active'] = 'Station active';
+$_BL['en']['Inactive'] = 'Station inactive';
+$_BL['en']['Min dist'] = 'Minimum distance';
+$_BL['en']['Max dist'] = 'Maximum distance';
+$_BL['en']['Max strikes per hour'] = 'Max strike count per hour';
+$_BL['en']['Max strikes per day'] = 'Max strike count per day';
+$_BL['en']['Max signals per hour'] = 'Max signal count per hour';
+$_BL['en']['Max active stations'] = 'Max active stations';
+$_BL['en']['Max active stations (sending signals)'] = 'Max active stations (sending signals)';
+$_BL['en']['First data'] = 'Begin of data collection';
+$_BL['en']['Memory usage'] = 'Memory usage';
+$_BL['en']['for keys'] = 'for keys';
+$_BL['en']['Entries (all data)'] = 'Entries (all data)';
+$_BL['en']['Station active'] = 'Station active';
+$_BL['en']['Last update strikes'] = 'Last update of strike data';
+$_BL['en']['Last update stations'] = 'Last update station data';
+$_BL['en']['Last update signals'] = 'Last update signal data';
+$_BL['en']['Active Stations'] = 'Active Stations';
+$_BL['en']['Sum of Signals'] = 'Sum of Signals';
+$_BL['en']['Sum of Strikes'] = 'Sum of Strikes';
+$_BL['en']['Strikes detected'] = 'Strikes detected';
+$_BL['en']['of the last'] = 'of the last';
+$_BL['en']['Currently no GPS coordinates available!'] = 'Currently no GPS coordinates available!';
+$_BL['en']['stat_navi_strikes'] = 'Strikes';
+$_BL['en']['graph_legend_strikes_time_all'] = 'Alle strikes of the lightning network';
+$_BL['en']['graph_legend_strikes_time_own'] = 'Only strikes detected by Station {STATION}';
+$_BL['en']['total strikes'] = 'Total strikes:';
+$_BL['en']['total strikes station'] = 'Total strikes station {STATION}';
+$_BL['en']['legend_stat_strikes'] = 'Time range';
+$_BL['en']['Strikes station'] = 'Strikes station {STATION}';
+$_BL['en']['_in_radius'] = ' (max. {RADIUS}km) ';
+$_BL['en']['graph_stat_title_strikes_time'] = 'Strikes';
+
+
+/*************************************************************/
+/* User                                                     */
+/*************************************************************/
+$_BL['en']['Login'] = 'Login';
+$_BL['en']['Password'] = 'Password';
+$_BL['en']['Login fail!'] = 'Login failed!';
+$_BL['en']['Logout'] = 'Logout';
+$_BL['en']['Login not allowed'] = 'Login not allowed!';
+$_BL['en']['OK'] = 'Ok';
+$_BL['en']['E-Mail'] = 'E-Mail';
+$_BL['en']['Add/Edit'] = 'Add/Edit';
+$_BL['en']['Delete'] = 'Delete';
+$_BL['en']['Sure?'] = 'Sure?';
+$_BL['en']['Calibrate Antennas'] = 'Calibrate Antennas';
+$_BL['en']['login_legend'] = 'Login';
+$_BL['en']['admin_calibrate_legend'] = 'Settings for Calibration';
+$_BL['en']['Limit'] = 'Limit';
+$_BL['en']['Max Distance (Kilometers)'] = 'Max Distance (Kilometers)';
+$_BL['en']['Max Age (Days)'] = 'Max Age (Days)';
+$_BL['en']['Calculate'] = 'Calculate';
+$_BL['en']['Level'] = 'Level';
+$_BL['en']['admin_user_legend'] = 'User settings';
+$_BL['en']['Add/Remove User'] = 'User';
+$_BL['en']['Results'] = 'Results';
+$_BL['en']['Analyzed'] = 'Analyzed';
+$_BL['en']['random datasets'] = 'random datasets';
+$_BL['en']['Direction'] = 'Direction';
+$_BL['en']['Difference'] = 'Difference';
+$_BL['en']['Very experimental'] = 'Very experimental';
+$_BL['en']['Antenna'] = 'Antenna';
+$_BL['en']['Positive'] = 'Positive';
+$_BL['en']['Negative'] = 'Negative';
+$_BL['en']['Positive electrical direction'] = 'Positive electrical direction';
+$_BL['en']['Not definite'] = 'Not definite';
+$_BL['en']['No signal recieved.'] = 'No signal recieved';
+$_BL['en']['stat_navi_alarm'] = 'Strike alerts';
+$_BL['en']['user_welcome_text'] = 'You are logged in as ';
+$_BL['en']['MyBlitzortung version'] = 'MyBlitzortung version';
+$_BL['en']['No permisson for saving to DB!'] = 'No permisson for saving to DB!';
+$_BL['en']['User list'] = 'User list';
+$_BL['en']['Alert'] = 'Alert';
+$_BL['en']['new'] = 'new';
+$_BL['en']['Do manual update'] = 'Do manual import of blitzortung.org data';
+$_BL['en']['Antenna directions saved to database'] = 'Antenna directions saved to database';
+$_BL['en']['Saved to DB'] = 'Saved to DB';
+$_BL['en']['admin_calibrate_manual_legend'] = 'Settings';
+$_BL['en']['Antenna 1 bearing'] = 'Antenna 1 bearing';
+$_BL['en']['Antenna 2 bearing'] = 'Antenna 2 bearing';
+$_BL['en']['Antenna 1 electrical bearing'] = 'Antenna 1 electrical bearing';
+$_BL['en']['Antenna 2 electrical bearing'] = 'Antenna 2 electrical bearing';
+$_BL['en']['Automatic antenna calibration'] = 'Automatic antenna calibration';
+$_BL['en']['Manual antenna calibration'] = 'Manual antenna calibration';
+$_BL['en']['Change password'] = 'Change password';
+$_BL['en']['user_change_passw_legend'] = 'Change password';
+$_BL['en']['New password'] = 'New password';
+$_BL['en']['Repeat password'] = 'Repeat password';
+$_BL['en']['Change'] = 'Change';
+$_BL['en']['Password changed!'] = 'Password changed!';
+$_BL['en']['No permission!'] = 'No permission!';
+$_BL['en']['Password was not changed!'] = 'Password was not changed!';
+$_BL['en']['Welcome to MyBlitzortung user area'] = 'Welcome to <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> user area!';
+$_BL['en']['Admin tools'] = 'Admin tools';
+$_BL['en']['File cache info'] = 'File cache info';
+$_BL['en']['Version information'] = 'Version information';
+$_BL['en']['PHP version'] = 'PHP Version';
+$_BL['en']['Show PHP info'] = 'Show PHP info';
+$_BL['en']['MySQL version'] = 'MySQL version';
+$_BL['en']['Files'] = 'Files';
+$_BL['en']['Click here to delete all files'] = 'Click here to delete all files';
+$_BL['en']['Clear all files'] = 'Clear all files.';
+
+$_BL['en']['user_perm0'] = 'User settings';
+$_BL['en']['user_perm1'] = 'Other settings';
+$_BL['en']['user_perm2'] = 'No limits';
+$_BL['en']['user_perm3'] = 'Manage alerts';
+$_BL['en']['user_perm4'] = 'Alerts: everywhere';
+$_BL['en']['user_perm5'] = 'Alerts: SMS';
+$_BL['en']['user_perm6'] = 'Alerts: URL';
+$_BL['en']['user_perm7'] = 'Archive';
+
+
+/*************************************************************/
+/* Menu                                                      */
+/*************************************************************/
+$_BL['en']['stat_navi_station'] = 'Station';
+$_BL['en']['stat_navi_other'] = 'Other';
+$_BL['en']['stat_navi_network'] = 'Netzwerk';
+$_BL['en']['arch_navi_search'] = 'Strike search';
+$_BL['en']['arch_navi_signals'] = 'Signals';
+$_BL['en']['stat_navi_longtime'] = 'Long time statistics';
+
+
+
+/*************************************************************/
+/* Info                                                     */
+/*************************************************************/
+$_BL['en']['h3_info_general'] = 'General';
+$_BL['en']['h4_info_accuracy'] = 'Precision';
+$_BL['en']['h4_info_participate'] = 'Participate';
+$_BL['en']['h3_info_usage'] = 'Data usage';
+$_BL['en']['h3_info_hint'] = 'Important noted';
+
+$_BL['en']['info_general_warning'] = '
+		We are not liable for the completeness, timeliness, quality and accuracy of the information on our website. 
+		We are not responsible for damages, resulting from trusting the content of our website or its use. ';
+$_BL['en']['info_general_text'] = '
+		Blitzortung.org is a private network of lightning tracker station.
+
+									';
+$_BL['en']['info_accuracy_text'] = '
+		Accuracy can be lower than 1 kilometer.
+';
+$_BL['en']['info_participate_text'] = '
+		Build your own receiver (costs about 150 Euro). More information here: 
+		<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>.
+		See also:
+		<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a> 
+		';
+
+$_BL['en']['info_usage_text'] = '
+		The data provided on this page and by Blitzortung.org is only used for private and entertainment purposes.
+		We are not a commercial information service for lightning data! See mor information on
+		<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=5" target="_blank">Blitzortung.org</a>
+		';
+$_BL['en']['info_myblitzortung_text'] = '
+		Visualisation on this page is done by a software called 
+		<em><span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span></em>. 
+		Nobody can guarantee, that this software shows always the correct information!
+		The responsibility is on your side!
+		<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> ist free software. You can find
+		more information here: 
+		<a href="http://www.wetter-rosstal.de/myblitzortung" target="_blank">www.wetter-rosstal.de/myblitzortung</a>.
+		';
+
+		
+/*************************************************************/
+/* Statistics: Descriptions                                  */
+/*************************************************************/
+		
+$_BL['en']['bo_graph_descr_ratio'] = 'Strike and locating ratios are important parameters for the correct adjustment
+									of the station. Calculations: 
+									<br>locating ratio = (detected strikes of the station) / (signals of the station)
+									<br>strike ratio = (detected strikes of the station) / (network strike count)
+									';
+
+$_BL['en']['bo_stat_network_descr_lasth'] = 'All information applies to the time range 60 minutes before the last update.';
+$_BL['en']['bo_stat_network_descr_table'] = 'Here you can see all active stations of the lightning detection network. You can sort the table by clicking on the links in the first row.';
+$_BL['en']['bo_graph_descr_bear'] = 'Own locating ratio over the geographic direction. For better comparision, there is also the whole strike count visible.';
+$_BL['en']['bo_stat_longtime_descr'] = 'All information here is updated since begin of the recording of <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>. The distances refer to the location of station {STATION}.';
+$_BL['en']['bo_stat_other_database_descr'] = 'All strike, signal and station data is saved in a local database on this page:';
+$_BL['en']['bo_stat_other_updates_descr'] = 'New data is collected from blitzortung.org in defined time intervals:';
+$_BL['en']['bo_stat_other_gps_descr'] = 'Some information about the GPS receiver, which is used for receiving the exact time an position. If known, the antenna bearings are also displayed (red, green).';
+$_BL['en']['bo_stat_network_descr_lasth'] = 'Alle Angaben beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung.';
+$_BL['en']['bo_graph_descr_radi'] = 'Overview about the own locating ratio over distance from stations. Whole strike count over distance is also visible.';
+$_BL['en']['bo_graph_descr_strikes'] = 'Here you can see the whole strike count per hous detected by the lightning network, the count of detected strikes/h of the station {STATION_CITY} and the mean strike count for all stations';
+$_BL['en']['bo_graph_descr_signals'] = 'The count of recieved signals per hour of the station {STATION_CITY} and also mean value of all stations.';
+$_BL['en']['bo_stat_other_antennas_descr'] = 'The bearing of the antennas can be detected automatically by <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>. This is useful for determining the polarity of a strike (very experimental!).';
+$_BL['en']['bo_graph_descr_radi_longtime'] = 'This graph shows the strike ratio over distance since start of data collecting.';
+$_BL['en']['bo_graph_descr_bear_longtime'] = 'This graph shows the strike ratio over geographic direction since start of data collecting.';
+$_BL['en']['bo_graph_descr_strikes_time'] = 'Graph of strike count of the lightning detection network respectively of the station {STATION}';
+$_BL['en']['bo_graph_descr_strikes_time_radius'] = 'Same as above, but only strikes within a range around {RADIUS}km of the station {STATION} are counted.';
+
+
+/*************************************************************/
+/* Alerts                                                    */
+/*************************************************************/
+$_BL['en']['Strike alert'] = 'Strike alert';
+$_BL['en']['New alert'] = 'New alert';
+$_BL['en']['Alert settings for user '] = 'Alert settings for user';
+$_BL['en']['alert_settings_legend1'] = 'General';
+$_BL['en']['alert_name'] = 'Name / Description';
+$_BL['en']['alert_type'] = 'Type';
+$_BL['en']['alert_mail'] = 'E-Mail';
+$_BL['en']['alert_sms'] = 'SMS';
+$_BL['en']['Number'] = 'Number';
+$_BL['en']['alert_url'] = 'URL';
+$_BL['en']['URL'] = 'URL';
+$_BL['en']['alert_settings_legend2'] = 'Trigger';
+$_BL['en']['alert_lat'] = 'Lat';
+$_BL['en']['alert_lon'] = 'Lon';
+$_BL['en']['alert_distance'] = 'Max. distance (km)';
+$_BL['en']['alert_count'] = 'Min. count';
+$_BL['en']['alert_interval'] = 'Search time';
+$_BL['en']['Ok'] = 'Ok';
+$_BL['en']['Cancel'] = 'Cancel';
+$_BL['en']['alert_settings_legend_table'] = 'Options';
+$_BL['en']['show other users'] = 'Show settings of other users';
+$_BL['en']['User'] = 'User';
+$_BL['en']['Alert name'] = 'Name';
+$_BL['en']['Send to'] = 'Send to';
+$_BL['en']['Lat/Lon'] = 'Coodinates';
+$_BL['en']['Max. Distance'] = 'Max. Distance';
+$_BL['en']['Min. strike rate'] = 'Min. strike rate';
+$_BL['en']['Last alert'] = 'Last alert';
+$_BL['en']['Alert count'] = 'Alert count';
+$_BL['en']['Create new alert'] = 'Create new alert';
+$_BL['en']['Change settings'] = 'Change settings';
+$_BL['en']['SMS'] = 'SMS';
+$_BL['en']['URL'] = 'URL';
+$_BL['en']['alert_mail_description']  = 'The following information was automatically determined and send to you by MyBlitzortung of the station {STATION}. No guarantee!';
+$_BL['en']['alert_mail_time range']   = 'Examined time range   ';
+$_BL['en']['alert_mail_strikes']      = 'Strike count          ';
+$_BL['en']['alert_mail_distance']     = 'Distance              ';
+$_BL['en']['alert_mail_last_strike']  = 'Last strike           ';
+$_BL['en']['alert_mail_first_strike'] = 'First Strike          ';
+$_BL['en']['alert_sms_last_strike']   = 'Last strike';
+$_BL['en']['alert_sms_distance']      = 'Distance';
+$_BL['en']['alert_sms_description']   = 'MyBlitzortung station {STATION}';
+$_BL['en']['No alerts available. Create one yourself!'] = 'No alerts available. Create one yourself!';
+$_BL['en']['You must fill all fields!'] = 'You must fill all fields!';
+$_BL['en']['Wrong format of E-Mail address'] = 'Wrong format of E-Mail address';
+$_BL['en']['Wrong format of telephone number'] = 'Wrong format of telephone number';
+$_BL['en']['You have to stay in the area around the station!'] = 'You have to stay in the area around the station {STATION}!';
+$_BL['en']['Enter URL like this'] = 'Enter URL like this';
+$_BL['en']['Show log'] = 'Show log';
+$_BL['en']['Return value'] = 'Return value';
+$_BL['en']['Alert name'] = 'Alert name';
+$_BL['en']['Name of your alert'] = 'Name of your alert';
+$_BL['en']['Strike count'] = 'Strike count';
+$_BL['en']['Time of last strike'] = 'Time of last strike';
+$_BL['en']['Time of first strike in time range'] = 'Time of first strike in time range';
+$_BL['en']['Distance of last strike to selected position'] = 'Distance of last strike to selected position';
+$_BL['en']['Bearing of last strike to selected position'] = 'Bearing of last strike to selected position';
+$_BL['en']['For usage with "URL"'] = 'For usage with "URL"';
+$_BL['en']['To'] = 'Deliver to';
+$_BL['en']['Start'] = 'Start';
+$_BL['en']['No log entries'] = 'No log entries';
+
+
+/*************************************************************/
+/* MyBo station linking                                      */
+/*************************************************************/
+$_BL['en']['Link with the MyBlitzortung network'] = 'Link with the MyBlitzortung network';
+$_BL['en']['URL of your website'] = 'URL of your website';
+$_BL['en']['Leave blank to remove your station from the list'] = 'Leave blank to remove your station from the list';
+$_BL['en']['Do an auto update every 24h to retrieve new stations'] = 'Do an auto update every 24h to retrieve new stations';
+$_BL['en']['Agree and Send'] = 'Agree and Send';
+$_BL['en']['Update MyBlitzortung Stations'] = 'Update MyBlitzortung Stations';
+$_BL['en']['Linking with other MyBlitzortung stations'] = 'Linking with other MyBlitzortung stations';
+$_BL['en']['Getting Login string'] = 'Getting Login string';
+$_BL['en']['String is'] = 'Login string is';
+$_BL['en']['Requesting data'] = 'Requesting data';
+$_BL['en']['Connecting to '] = 'Connecting to ';
+$_BL['en']['Received urls'] = 'Received urls';
+$_BL['en']['DONE'] = 'DONE';
+$_BL['en']['Really continue?'] = 'Really continue?';
+$_BL['en']['Couldn\'t get login id'] = 'Couldn\'t get login id';
 
 
 $_BL['en']['mybo_station_update_info'] = '
@@ -34,5 +572,29 @@ $_BL['en']['mybo_station_update_info'] = '
 		The id will not be saved! Your password will never be sent to other websites than blitzortung.org!
 		Your stations must have sended at least one signal in the last 2 hours, otherwise authentication won\'t work.
 		</p>';
+
+/*************************************************************/
+/* Update                                                    */
+/*************************************************************/
+$_BL['en']['Updating version'] = 'Updating version';
+$_BL['en']['Database version changed!'] = 'Database version changed!';
+$_BL['en']['FAIL'] = 'Failure!';
+$_BL['en']['Update done!'] = 'Update done!';
+$_BL['en']['Update-Info: Setting version number to'] = 'Update info: Setting version number to';
+$_BL['en']['Click to update'] = 'Click to update!';
+
+
+/*************************************************************/
+/* Images                                                    */
+/*************************************************************/
+$_BL['en']['Not enough data available!'] = 'Not enough data available!';
+$_BL['en']['Lightning data from Blitzortung.org'] = 'Lightning data from Blitzortung.org';
+$_BL['en']['No data available!'] = 'No data available!';
+
+
+$_BL['en']['Signals detected'] = 'Signals detected';
+$_BL['en']['Signal ratio'] = 'Locating ratio';
+
+
 
 		

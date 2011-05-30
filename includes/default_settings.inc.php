@@ -28,8 +28,12 @@
 /******************************************************/
 
 @define("BO_FILE", 'blitzortung.php');
-@define("BO_LOCALE", 'en');
 @define("BO_UTF8", true);
+
+//Language settings
+@define("BO_LOCALE", 'en');
+@define("BO_LANGUAGES", 'de,en');
+@define("BO_SHOW_LANGUAGES", true);
 
 
 //User / Login

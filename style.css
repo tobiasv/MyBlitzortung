@@ -156,6 +156,7 @@ font-size: 12px;
 
 #myblitzortung #bo_copyright, 
 #myblitzortung #bo_copyright_extra, 
+#myblitzortung #bo_lang_links,
 #myblitzortung #bo_login_link {
 font-size: 10px;
 }
@@ -195,6 +196,13 @@ margin: 5px;
 position: relative;
 float: left;
 top: -20px;
+}
+
+#myblitzortung #bo_lang_links {
+position: relative;
+float: left;
+top: -20px;
+clear: left;
 }
 
 

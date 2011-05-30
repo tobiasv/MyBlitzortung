@@ -233,7 +233,7 @@ function bo_alert_settings_form()
 		{
 			echo '<div class="bo_info_fail">'._BL('You must fill all fields!').'</div>';
 		}
-		else if ($A['type'] == 1 && !preg_match("/[\.a-z0-9_-]+@[a-z0-9-]{2,}\.[a-z]{2,6}$/i",$A['address']))
+		else if ($A['type'] == 1 && !preg_match("/[\.a-z0-9_-]+@[a-z0-9-\.]{3,}$/i",$A['address']))
 		{
 			echo '<div class="bo_info_fail">'._BL('Wrong format of E-Mail address').'</div>';
 		}
@@ -566,7 +566,9 @@ function bo_alert_send()
 										_BL('alert_mail_distance', true).': '.$dist." "._BL('unit_kilometers', true)." (".$bear.")\n".
 										_BL('alert_mail_first_strike', true).': '.date('H:i:s', strtotime($row2['mintime'].' UTC'))."\n".
 										_BL('alert_mail_last_strike', true).': '.date('H:i:s', strtotime($row2['maxtime'].' UTC'))."\n\n";
-										
+								
+								$text = preg_replace("#(?<!\r)\n#si", "\r\n", $text); 								
+								
 								$ret = mail($d['address'], 
 											'MyBlitzortung: '._BL('Strikes detected', true).' ('.$d['name'].')', 
 											$text

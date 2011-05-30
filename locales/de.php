@@ -2,8 +2,6 @@
 
 /* 
  * German translation for MyBlitzortung
- * Version 0.1
- * by Tobias Volgnandt
  */
 
 $_BL['locale'] = 'de';
@@ -16,7 +14,7 @@ $_BL['de']['.'] = ',';
 $_BL['de'][','] = '.';
 $_BL['de']['_date'] = 'd.m.Y';
 $_BL['de']['_datetime'] = 'd.m.Y H:i:s';
-$_BL['de']['_before'] = 'vor';
+$_BL['de']['_before'] = 'vor ';
 $_BL['de']['_minutes_ago'] = 'Minuten';
 $_BL['de']['_minute_ago'] = 'Minute';
 $_BL['de']['unit_meters'] = 'm';
@@ -57,6 +55,7 @@ $_BL['de']['copyright_footer'] = 'Powered by <span class="bo_my">My</span><span 
 $_BL['de']['for_station'] = 'für die Station';
 $_BL['de']['Entries'] = 'Einträge';
 $_BL['de']['days'] = 'Tage';
+$_BL['de']['unit_days'] = 'Tage';
 
 $_BL['de']['Home'] = 'Home';
 $_BL['de']['lightning data'] = 'Blitzdaten';
@@ -300,7 +299,6 @@ $_BL['de']['graph_stat_title_strikes_time'] = 'Blitze';
 /*************************************************************/
 /* User                                                     */
 /*************************************************************/
-$_BL['de']['Add/Remove User'] = '';
 $_BL['de']['Login'] = 'Login';
 $_BL['de']['Password'] = 'Passwort';
 $_BL['de']['Login fail!'] = 'Anmeldung fehlgeschlagen!';
@@ -469,7 +467,7 @@ $_BL['de']['bo_stat_other_gps_descr'] = 'Informationen zum GPS-Empfänger, welche
 $_BL['de']['bo_stat_station_descr_lasth'] = 'Alle Angaben beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung.';
 $_BL['de']['bo_graph_descr_radi'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Entfernung zur Station {STATION_CITY}. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
 $_BL['de']['bo_graph_descr_strikes'] = 'Zu sehen ist die Gesamtanzahl an Blitzen pro Stunde aus dem Ortungsnetzwerk, die Anzahl der detektierten Blitze der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
-$_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der gesendeten Signale pro Stunde der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
+$_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der empfangenen Signale pro Stunde der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
 $_BL['de']['bo_stat_other_antennas_descr'] = 'Die Ausrichtung der Antennen kann durch <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> automatisch bestimmt werden. Sie kann u.a. zur Bestimmung der Polarität eines Blitzes herangezogen werden.';
 $_BL['de']['bo_graph_descr_radi_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt und gibt evtl. wertvolle Hinweise auf die Empfindlichkeit der Station. ';
 $_BL['de']['bo_graph_descr_bear_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt.';
@@ -513,7 +511,7 @@ $_BL['de']['Create new alert'] = 'Neuen Alarm erstellen';
 $_BL['de']['Change settings'] = 'Einstellungen ändern';
 $_BL['de']['SMS'] = 'SMS';
 $_BL['de']['URL'] = 'URL';
-$_BL['de']['alert_mail_description'] = 'Die folgenden Angaben wurden von <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> der Station {STATION} automatisch ermittelt und versendet. Ohne Gewähr!';
+$_BL['de']['alert_mail_description'] = 'Die folgenden Angaben wurden von MyBlitzortung der Station {STATION} automatisch ermittelt und versendet. Ohne Gewähr!';
 $_BL['de']['alert_mail_time range']   = 'Untersuchter Zeitraum ';
 $_BL['de']['alert_mail_strikes']      = 'Anzahl an Blitzen     ';
 $_BL['de']['alert_mail_distance']     = 'Entfernung            ';
@@ -521,7 +519,7 @@ $_BL['de']['alert_mail_last_strike']  = 'Letzter Blitz         ';
 $_BL['de']['alert_mail_first_strike'] = 'Erster Blitz          ';
 $_BL['de']['alert_sms_last_strike']   = 'Letzter Blitz';
 $_BL['de']['alert_sms_distance']      = 'Entfernung';
-$_BL['de']['alert_sms_description']   = '<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> Station {STATION}';
+$_BL['de']['alert_sms_description']   = 'MyBlitzortung Station {STATION}';
 $_BL['de']['No alerts available. Create one yourself!'] = 'Noch keine Alarme vorhanden.';
 $_BL['de']['You must fill all fields!'] = 'Es müssen alle Felder ausgefüllt werden!';
 $_BL['de']['Wrong format of E-Mail address'] = 'Falsches Format der E-Mail-Adresse';

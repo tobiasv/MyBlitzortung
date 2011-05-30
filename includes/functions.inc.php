@@ -331,6 +331,22 @@ function bo_copyright_footer()
 
 
 	}
+	
+	if (BO_SHOW_LANGUAGES === true)
+	{
+		$languages = explode(',', BO_LANGUAGES);
+		
+		echo '<div id="bo_lang_links">';
+
+		echo _BL('Languages').': ';
+		foreach($languages as $lang)
+		{
+			echo '<a href="'.bo_insert_url('bo_lang', trim($lang)).'">'.trim($lang).'</a> ';
+		}
+		
+		echo '</div>';
+	
+	}
 
 }
 
@@ -348,7 +364,11 @@ function _BL($msgid='', $noutf = false)
 
 	$utf = defined('BO_UTF8') && BO_UTF8 && !$noutf;
 	
-	if (!$msg)
+	if ($msg === false)
+	{
+		return '';
+	}	
+	else if (!$msg)
 	{
 		if (defined('BO_LANG_AUTO_ADD') && BO_LANG_AUTO_ADD)
 		{
