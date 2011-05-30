@@ -569,9 +569,15 @@ function bo_alert_send()
 								
 								$text = preg_replace("#(?<!\r)\n#si", "\r\n", $text); 								
 								
+								if (defined('BO_EMAIL_HEADERS') && BO_EMAIL_HEADERS)
+									$headers = BO_EMAIL_HEADERS;
+								else
+									$headers = '';
+								
 								$ret = mail($d['address'], 
 											'MyBlitzortung: '._BL('Strikes detected', true).' ('.$d['name'].')', 
-											$text
+											$text,
+											$header
 											);
 								
 								$log[$alert_dbname]['text']   = $text;

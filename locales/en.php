@@ -35,6 +35,8 @@ $_BL['en']['Oct'] = 'Oct';
 $_BL['en']['Nov'] = 'Nov';
 $_BL['en']['Dec'] = 'Dez';
 
+$_BL['en']['Language'] = 'Language';
+$_BL['en']['Languages'] = 'Languages';
 $_BL['en']['All'] = 'All';
 $_BL['en']['Day'] = 'Day';
 $_BL['en']['Date'] = 'Date';

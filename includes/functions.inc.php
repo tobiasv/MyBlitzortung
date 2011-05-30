@@ -341,7 +341,10 @@ function bo_copyright_footer()
 		echo _BL('Languages').': ';
 		foreach($languages as $lang)
 		{
-			echo '<a href="'.bo_insert_url('bo_lang', trim($lang)).'">'.trim($lang).'</a> ';
+			if (trim($lang) == _BL())
+				echo ' <strong>'.trim($lang).'</strong> ';
+			else
+				echo ' <a href="'.bo_insert_url('bo_lang', trim($lang)).'">'.trim($lang).'</a> ';
 		}
 		
 		echo '</div>';

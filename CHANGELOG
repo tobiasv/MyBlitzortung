@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4.3 (2011-05-30)
+--------------------------
+- you can add additional E-Mail headers for strike alerts with BO_EMAIL_HEADERS
+
+
 Version 0.4.2 (2011-05-30)
 --------------------------
 - english language support added
