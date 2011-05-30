@@ -610,3 +610,5 @@ $_BL['de']['Lightning data from Blitzortung.org'] = 'Blitzdaten von Blitzortung.
 $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 
 
+$_BL['de']['Signals detected'] = 'Signale empfangen';
+$_BL['de']['Signal ratio'] = 'Ortungsquote';

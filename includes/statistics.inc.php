@@ -493,7 +493,8 @@ function bo_show_statistics_longtime()
 	$max_sig_own 		= (double)bo_get_conf('longtime_max_signalsh_own');
 	$max_str_day_own	= unserialize(bo_get_conf('longtime_max_strikes_day_own'));
 	$max_str_dayrad_own	= unserialize(bo_get_conf('longtime_max_strikes_day_own_rad'));
-
+	$signals 			= bo_get_conf('count_raw_signals');
+	
 	//Global
 	$min_dist_all 		= bo_get_conf('longtime_min_dist_all') / 1000;
 	$max_dist_all 		= bo_get_conf('longtime_max_dist_all') / 1000;
@@ -516,7 +517,12 @@ function bo_show_statistics_longtime()
 		$max_str_day_own[1] = 0;
 	if (!$max_str_dayrad_own[0])
 		$max_str_dayrad_own[1] = 0;
-		
+	
+	if (intval($signals))
+		$signal_ratio = number_format($str_own / $signals * 100, 1, _BL('.'), _BL(',')).'%';
+	else
+		$signal_ratio = '-';
+	
 	echo '<div id="bo_stat_network">';
 
 	echo '<p class="bo_stat_description" id="bo_stat_longtime_descr">';
@@ -535,6 +541,8 @@ function bo_show_statistics_longtime()
 	echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_own[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_own[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_own[1])).')' : '').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'.number_format($min_dist_own, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'.number_format($max_dist_own, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Signals detected').': </span><span class="bo_value">'.number_format($signals, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Signal ratio').': </span><span class="bo_value">'.$signal_ratio.'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'.number_format($max_sig_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '</ul>';
 
