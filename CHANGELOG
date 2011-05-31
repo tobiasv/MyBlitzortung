@@ -3,6 +3,10 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4.5 (2011-05-31)
+--------------------------
+- fix: Picture footer UTF8
+- added new germany template in real mercator projection (without picture)
 
 Version 0.4.4a (2011-05-31)
 ---------------------------

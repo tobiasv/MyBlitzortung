@@ -168,12 +168,12 @@ function bo_show_archive_map()
 
 		echo '<div class="bo_arch_map_links">';
 		echo _BL('Yesterday').': &nbsp; ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=0" >'._BL('Picture').'</a> ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=0&bo_animation" >'._BL('Animation').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=0" >'._BL('Picture').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=0&bo_animation" >'._BL('Animation').'</a> ';
 		echo '  &nbsp;  &nbsp; &nbsp; ';
 		echo _BL('Today').': &nbsp; ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=1" >'._BL('Picture').'</a> ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation')).'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=1" >'._BL('Picture').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
 		echo '</div>';
 
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
@@ -213,7 +213,7 @@ function bo_show_archive_map()
 		}
 		
 		$footer = $_BO['mapimg'][$map]['footer'];
-		echo '<div class="bo_map_footer">'.$footer.'</div>';
+		echo '<div class="bo_map_footer">'._BC($footer).'</div>';
 		
 		echo '</div>';
 		echo '</div>';
@@ -390,7 +390,7 @@ function bo_show_archive_density()
 	echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
 
 	$footer = $_BO['mapimg'][$map]['footer'];
-	echo '<div class="bo_map_footer">'.$footer.'</div>';
+	echo '<div class="bo_map_footer">'._BC($footer).'</div>';
 
 	echo '</div>';
 }

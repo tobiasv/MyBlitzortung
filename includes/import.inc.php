@@ -1079,10 +1079,10 @@ function bo_update_densities($max_time)
 	if (defined('BO_CALC_DENSITIES_CURRENT') && BO_CALC_DENSITIES_CURRENT)
 	{
 		//month
-		$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), mktime(0,0,0,date('m'),date('d'),date('Y')), -2 );
+		$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), mktime(0,0,0,date('m'),date('d'),date('Y'))-1, -2 );
 		
 		//year
-		$ranges[] = array(mktime(0,0,0,1,1,date('Y')), mktime(0,0,0,date('m'),date('d'),date('Y')), -3 );
+		$ranges[] = array(mktime(0,0,0,1,1,date('Y')), mktime(0,0,0,date('m'),date('d'),date('Y'))-1, -3 );
 		
 		//delete old data, if it's not the end day of the month
 		$delete_time = mktime(0,0,0,date('m'),date('d')-2,date('Y'));
@@ -1099,6 +1099,9 @@ function bo_update_densities($max_time)
 		$date_start = date('Y-m-d', $r[0]);
 		$date_end   = date('Y-m-d', $r[1]);
 		$status  = intval($r[2]);
+		
+		if ($date_start == $date_end || $r[0] >= $r[1])
+			continue;
 		
 		//check if rows already exists
 		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities 

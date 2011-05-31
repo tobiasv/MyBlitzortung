@@ -143,7 +143,7 @@ $_BO['tpl_imgmap']['germany_mini']['col'][] = array(255,   0, 0);
 $_BO['tpl_imgmap']['germany_mini']['col'][] = array(225,   0, 0);
 
 
-//Germany (Landkreise)
+//Germany (Landkreise) no exact merator prjection!
 $_BO['tpl_imgmap']['germany_lkr']['name'] = 'Germany';
 $_BO['tpl_imgmap']['germany_lkr']['footer'] = 'Kartenmaterial: <a href="http://de.wikipedia.org/w/index.php?title=Datei:Landkreise,_Kreise_und_kreisfreie_St%C3%A4dte_in_Deutschland.svg" target="_blank">Wikipedia</a>';
 $_BO['tpl_imgmap']['germany_lkr']['menu'] = true;
@@ -167,6 +167,14 @@ $_BO['tpl_imgmap']['germany_lkr']['density'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 4;
 $_BO['tpl_imgmap']['germany_lkr']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 10;
+
+//Germany (Landkreise) Geodatenzentrum
+//see http://www.geodatenzentrum.de/geodaten/gdz_rahmen.gdz_div?gdz_spr=deu&gdz_akt_zeile=5&gdz_anz_zeile=4&gdz_user_id=0
+$_BO['tpl_imgmap']['germany_lkr_gdz'] = $_BO['tpl_imgmap']['germany_lkr'];
+$_BO['tpl_imgmap']['germany_lkr_gdz']['file'] = 'map_germany_lkr_gdz.png';
+$_BO['tpl_imgmap']['germany_lkr_gdz']['coord'] = array(55.22, 15.59, 47.05, 5.23); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['germany_lkr_gdz']['footer'] = '© Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, 2011<br>
+	Vervielfältigung, Verbreitung und öffentliche Zugänglichmachung, auch auszugsweise, mit Quellenangabe gestattet.';
 
 /*
 //Germany NRW

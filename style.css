@@ -222,6 +222,11 @@ font-weight: normal;
 font-size: 12px;
 }
 
+#myblitzortung .bo_map_footer {
+font-size: 11px;
+color: #666;
+}
+
 /*** Raw-Signals ***/
 
 #myblitzortung .bo_sig_navi {

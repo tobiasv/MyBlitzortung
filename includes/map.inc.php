@@ -247,7 +247,7 @@ function bo_show_lightning_map()
 		
 		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
 		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'">';
-		echo '<div class="bo_map_footer">'.$footer.'</div>';
+		echo '<div class="bo_map_footer">'._BC($footer).'</div>';
 		echo '</div>';
 
 		echo '</div>';
