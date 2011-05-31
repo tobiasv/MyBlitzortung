@@ -145,7 +145,7 @@ $_BO['tpl_imgmap']['germany_mini']['col'][] = array(225,   0, 0);
 
 //Germany (Landkreise)
 $_BO['tpl_imgmap']['germany_lkr']['name'] = 'Germany';
-$_BO['tpl_imgmap']['germany_lkr']['footer'] = '';
+$_BO['tpl_imgmap']['germany_lkr']['footer'] = 'Kartenmaterial: <a href="http://de.wikipedia.org/w/index.php?title=Datei:Landkreise,_Kreise_und_kreisfreie_St%C3%A4dte_in_Deutschland.svg" target="_blank">Wikipedia</a>';
 $_BO['tpl_imgmap']['germany_lkr']['menu'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['archive'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['file'] = 'map_germany_lkr.png';
@@ -168,8 +168,10 @@ $_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 4;
 $_BO['tpl_imgmap']['germany_lkr']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 10;
 
+/*
 //Germany NRW
 $_BO['tpl_imgmap']['NRW']['name'] = 'NRW';
+$_BO['tpl_imgmap']['NRW']['footer'] = 'Kartenmaterial: <a href="http://commons.wikimedia.org/wiki/File:North_Rhine-Westphalia_location_map_03.svg" target="_blank">Wikipedia</a>';
 $_BO['tpl_imgmap']['NRW']['menu'] = true;
 $_BO['tpl_imgmap']['NRW']['archive'] = true;
 $_BO['tpl_imgmap']['NRW']['file'] = 'map_germany_nrw_color.png';
@@ -192,8 +194,9 @@ $_BO['tpl_imgmap']['NRW']['density_blocksize'] = 10;
 $_BO['tpl_imgmap']['NRW']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['NRW']['density_darken'] = 40;
 
+
 //Germany NRW black&white
 $_BO['tpl_imgmap']['NRW_bw'] = $_BO['tpl_imgmap']['NRW'];
 $_BO['tpl_imgmap']['NRW_bw']['file'] = 'map_germany_nrw_dark.png';
-
+*/
 ?>

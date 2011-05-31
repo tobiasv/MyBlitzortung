@@ -3,6 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
+
+Version 0.4.4a (2011-05-31)
+---------------------------
+- fix: temporarily removed NRW, because it's not mercator
+- fix: english locale
+- added footer to germany map
+
 Version 0.4.4 (2011-05-30)
 --------------------------
 - added two Germany NRW templates (thanks to Royi)

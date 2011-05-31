@@ -23,7 +23,7 @@ if (!defined("BO_VER"))
 {
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.4.4');
+	define("BO_VER", '0.4.4a');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
