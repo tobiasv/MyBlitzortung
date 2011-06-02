@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+
+Version 0.4.6a (2011-06-02)
+--------------------------
+- fix: month selection in statistics -> strikes works now
+
 Version 0.4.6 (2011-06-02)
 --------------------------
 - new: show all strikes in signals table (login!)

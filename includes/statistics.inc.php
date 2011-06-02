@@ -78,7 +78,7 @@ function bo_show_statistics_strikes()
 	$year = intval($_GET['bo_year']);
 	$month = intval($_GET['bo_month']);
 	
-	$time = mktime(0,0,0,date('m')-1, date('d'), date('Y'));
+	$time = mktime(0,0,0,date('m'), date('d'), date('Y'));
 	
 	if (!$year)
 		$year = date('Y', $time);
@@ -99,8 +99,8 @@ function bo_show_statistics_strikes()
 					ORDER BY time");
 	while($row = $res->fetch_assoc())
 	{
-		$y = substr($row['time'], 0, 4);
-		$m = substr($row['time'], 4, 2);
+		$y = (int)substr($row['time'], 0, 4);
+		$m = (int)substr($row['time'], 4, 2);
 		
 		$years[$y] = $y;
 		$months[$m] = _BL(date('M', strtotime("$y-$m-01")));
