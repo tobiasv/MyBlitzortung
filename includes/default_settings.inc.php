@@ -163,6 +163,11 @@
 @define("BO_GRAPH_STAT_STA_WIDTH_1",  1);
 @define("BO_GRAPH_STAT_STA_COLOR_L2", '#fa0@0.1');
 @define("BO_GRAPH_STAT_STA_WIDTH_2",  1);
+@define("BO_GRAPH_STAT_STA_COLOR_L3", '#0cc@0.90');
+@define("BO_GRAPH_STAT_STA_COLOR_F3", '#0cc@0.85');
+@define("BO_GRAPH_STAT_STA_WIDTH_3",  1);
+@define("BO_GRAPH_STAT_STA_COLOR_L4", '#0ac@0.1');
+@define("BO_GRAPH_STAT_STA_WIDTH_4",  1);
 
 //Statistics-Graph: Distance-Ratio
 @define("BO_GRAPH_STAT_RATIO_DIST_DIV", 20);

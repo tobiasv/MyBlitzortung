@@ -34,6 +34,18 @@ $_BL['de']['Oct'] = 'Okt';
 $_BL['de']['Nov'] = 'Nov';
 $_BL['de']['Dec'] = 'Dez';
 
+$_BL['de']['January'] = 'Januar';
+$_BL['de']['February'] = 'Februar';
+$_BL['de']['March'] = 'März';
+$_BL['de']['April'] = 'April';
+$_BL['de']['June'] = 'Juni';
+$_BL['de']['July'] = 'Juli';
+$_BL['de']['August'] = 'August';
+$_BL['de']['September'] = 'September';
+$_BL['de']['October'] = 'Oktober';
+$_BL['de']['November'] = 'November';
+$_BL['de']['December'] = 'Dezember';
+
 $_BL['de']['Language'] = 'Sprache';
 $_BL['de']['Languages'] = 'Sprachen';
 $_BL['de']['All'] = 'Alle';
@@ -193,6 +205,8 @@ $_BL['de']['graph_legend_ratio_str_all'] = 'Gesamtblitzquote';
 $_BL['de']['graph_legend_ratio_str_own'] = 'Blitzquote Station {STATION}';
 $_BL['de']['graph_stat_title_stations'] = 'Anzahl Stationen';
 $_BL['de']['graph_legend_stations_active'] = 'Aktive Stationen';
+$_BL['de']['graph_legend_stations_active_signals'] = 'Stationen mit Signalen';
+$_BL['de']['graph_legend_stations_max_active_signal'] = 'Größte jemals gemessene Anzahl';
 $_BL['de']['graph_stat_title_ratio_distance'] = 'Blitzquote nach Entfernung';
 $_BL['de']['graph_legend_ratio_distance'] = 'Blitzquote Station {STATION}';
 $_BL['de']['graph_stat_title_ratio_bearing'] = 'Blitzquote nach Himmelsrichtung';
@@ -233,6 +247,7 @@ $_BL['de']['h3_arch_density'] = 'Blitzdichten';
 $_BL['de']['legend_arch_densities'] = 'Optionen';
 $_BL['de']['arch_select_dates_beween'] = 'Daten sind nur von {START} bis {END} vorhanden!';
 $_BL['de']['Max strikes density'] = 'Max. Blitzdichte';
+$_BL['de']['check_all_strikes_network'] = 'Alle Blitze des Ortungsnetzwerks';
 
 /*************************************************************/
 /* Statistics                                                */
@@ -612,3 +627,6 @@ $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 
 $_BL['de']['Signals detected'] = 'Signale empfangen';
 $_BL['de']['Signal ratio'] = 'Ortungsquote';
+
+
+

@@ -687,10 +687,13 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 {
 	$per_page = 10;
 
-	$only_strikes = isset($_GET['only_strikes']);
+	$only_strikes = isset($_GET['bo_only_strikes']);
 	$page = intval($_GET['bo_action']);
 	$page = $page < 0 ? 0 : $page;
 
+	$show_empty_sig = (bo_user_get_level() & BO_PERM_ARCHIVE) && isset($_GET['bo_all_strikes']);
+	
+	
 	if ($lat !== null && $lon !== null)
 	{
 		if (!$fuzzy)
@@ -712,14 +715,23 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 
 		echo '<form action="" method="GET">';
 
-		echo bo_insert_html_hidden(array('only_strikes', 'bo_action'));
+		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes'));
 
 		echo '<fieldset>';
 		echo '<legend>'._BL('settings').'</legend>';
 
-		echo '<input type="checkbox" name="only_strikes" value="1" '.($only_strikes ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_strikes">';
-		echo '<label for="check_only_strikes"> '._BL('check_only_strikes').'</label> &nbsp; ';
-
+		if (!$show_empty_sig)
+		{
+			echo '<input type="checkbox" name="bo_only_strikes" value="1" '.($only_strikes ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_strikes">';
+			echo '<label for="check_only_strikes"> '._BL('check_only_strikes').'</label> &nbsp; ';
+		}
+		
+		if (bo_user_get_level() & BO_PERM_ARCHIVE)
+		{
+			echo '<input type="checkbox" name="bo_all_strikes" value="1" '.($show_empty_sig ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="all_strikes">';
+			echo '<label for="all_strikes"> '._BL('check_all_strikes_network').'</label> &nbsp; ';
+		}
+		
 		echo '</fieldset>';
 
 		$hours_back = 24;
@@ -812,6 +824,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px">';
 		else
 			echo _BL('No signal recieved.');
+
 		echo '</td>';
 
 		echo '</tr><tr>';

@@ -35,6 +35,19 @@ $_BL['en']['Oct'] = 'Oct';
 $_BL['en']['Nov'] = 'Nov';
 $_BL['en']['Dec'] = 'Dez';
 
+$_BL['en']['January'] = 'January';
+$_BL['en']['February'] = 'February';
+$_BL['en']['March'] = 'March';
+$_BL['en']['April'] = 'April';
+$_BL['en']['June'] = 'June';
+$_BL['en']['July'] = 'July';
+$_BL['en']['August'] = 'August';
+$_BL['en']['September'] = 'September';
+$_BL['en']['October'] = 'October';
+$_BL['en']['November'] = 'November';
+$_BL['en']['December'] = 'December';
+
+
 $_BL['en']['Language'] = 'Language';
 $_BL['en']['Languages'] = 'Languages';
 $_BL['en']['All'] = 'All';
@@ -194,6 +207,8 @@ $_BL['en']['graph_legend_ratio_str_all'] = 'Whole strike ratio';
 $_BL['en']['graph_legend_ratio_str_own'] = 'Strike ratio station {STATION}';
 $_BL['en']['graph_stat_title_stations'] = 'Stations count';
 $_BL['en']['graph_legend_stations_active'] = 'Active stations';
+$_BL['en']['graph_legend_stations_active_signals'] = 'Stations with signals';
+$_BL['en']['graph_legend_stations_max_active_signal'] = 'Highest station count ever';
 $_BL['en']['graph_stat_title_ratio_distance'] = 'Strike ratio by distance';
 $_BL['en']['graph_legend_ratio_distance'] = 'Strike ratio station {STATION}';
 $_BL['en']['graph_stat_title_ratio_bearing'] = 'Strike ratio by bearing';
@@ -234,6 +249,7 @@ $_BL['en']['h3_arch_density'] = 'Strike densities';
 $_BL['en']['legend_arch_densities'] = 'Options';
 $_BL['en']['arch_select_dates_beween'] = 'Only data from {START} to {END} available!';
 $_BL['en']['Max strikes density'] = 'Max. strike density';
+$_BL['en']['check_all_strikes_network'] = 'All strikes of the network';
 
 /*************************************************************/
 /* Statistics                                                */
@@ -359,7 +375,7 @@ $_BL['en']['Change'] = 'Change';
 $_BL['en']['Password changed!'] = 'Password changed!';
 $_BL['en']['No permission!'] = 'No permission!';
 $_BL['en']['Password was not changed!'] = 'Password was not changed!';
-$_BL['en']['Welcome to MyBlitzortung user area'] = 'Welcome to <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> user area!';
+$_BL['en']['Welcome to MyBlitzortung user area'] = 'Welcome to <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> user area';
 $_BL['en']['Admin tools'] = 'Admin tools';
 $_BL['en']['File cache info'] = 'File cache info';
 $_BL['en']['Version information'] = 'Version information';

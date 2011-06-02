@@ -106,7 +106,7 @@ function bo_show_statistics_strikes()
 		$months[$m] = _BL(date('M', strtotime("$y-$m-01")));
 	}
 	
-	if (!$years[$year] || !$months[$month])
+	if (!$years[(int)$year] || !$months[(int)$month])
 	{
 		$year = $y;
 		$month = $m;

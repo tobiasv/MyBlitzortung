@@ -165,7 +165,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	$hours_back = intval($hours_back) ? intval($hours_back) : 24;
 	$hours_back = !bo_user_get_level() && $hours_back > 96 ? 96 : $hours_back;
 
-	$interval = BO_UP_INTVL_STATIONS;
 	$stId = bo_station_id();
 
 	$date_end = gmdate('Y-m-d H:i:s', bo_get_conf('uptime_stations'));
@@ -448,14 +447,22 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 	}
 	else
 	{
+		$interval = BO_UP_INTVL_STATIONS;
 		$ticks = ($time_end - $time_start) / 60 / $interval;
 
 		$stId = $station_id ? $station_id : $stId;
 
-		$sql_where[0] = " station_id  = 0 "; // first!
-		$sql_where[1] = " station_id  = '$stId' ";
-		$sql_where[2] = " station_id != 0 ";
-
+		if ($type == 'stations')
+		{
+			$sql_where[0] = " station_id != 0 ";
+			$sql_where[1] = " station_id != 0 AND (signalsh > 0 OR strikesh > 0) ";
+		}
+		else
+		{
+			$sql_where[0] = " station_id  = 0 "; // first!
+			$sql_where[1] = " station_id  = '$stId' ";
+			$sql_where[2] = " station_id != 0 ";
+		}
 
 		foreach($sql_where as $data_id => $sqlw)
 		{
@@ -464,7 +471,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$sql = "SELECT time, AVG(signalsh) sig, AVG(strikesh) astr, MAX(strikesh) mstr, COUNT(time) / COUNT(DISTINCT time) cnt
 					FROM ".BO_DB_PREF."stations_stat
 					WHERE time BETWEEN '$date_start' AND '$date_end' AND $sqlw
-							-- AND (signalsh > 0 OR strikesh > 0)
 					GROUP BY DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())
@@ -704,7 +710,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 			$graph->title->Set(_BL('graph_stat_title_stations').$add_title);
 
-			$plot=new LinePlot($Y[2]['cnt'], $X);
+			$plot=new LinePlot($Y[0]['cnt'], $X);
 			$plot->SetColor(BO_GRAPH_STAT_STA_COLOR_L1);
 			if (BO_GRAPH_STAT_STA_COLOR_F1)
 				$plot->SetFillColor(BO_GRAPH_STAT_STA_COLOR_F1);
@@ -712,6 +718,13 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$plot->SetLegend(_BL('graph_legend_stations_active'));
 			$graph->Add($plot);
 
+			$plot=new LinePlot($Y[1]['cnt'], $X);
+			$plot->SetColor(BO_GRAPH_STAT_STA_COLOR_L3);
+			if (BO_GRAPH_STAT_STA_COLOR_F3)
+				$plot->SetFillColor(BO_GRAPH_STAT_STA_COLOR_F3);
+			$plot->SetWeight(BO_GRAPH_STAT_STA_WIDTH_3);
+			$plot->SetLegend(_BL('graph_legend_stations_active_signals'));
+			$graph->Add($plot);
 
 			$max_stations = bo_get_conf('longtime_count_max_active_stations');
 			if ($max_stations)
@@ -724,6 +737,15 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 				$graph->yscale->SetAutoMax($max_stations + 1);
 			}
 
+			$max_stations = bo_get_conf('longtime_count_max_active_stations_sig');
+			if ($max_stations)
+			{
+				$sline  = new PlotLine(HORIZONTAL, $max_stations, BO_GRAPH_STAT_STA_COLOR_L4, 1);
+				$sline->SetWeight(BO_GRAPH_STAT_STA_WIDTH_4);
+				$sline->SetLegend(_BL('graph_legend_stations_max_active_signal'));
+				$graph->AddLine($sline);
+			}
+			
 			$graph->xaxis->title->Set(_BL('Time'));
 			$graph->yaxis->title->Set(_BL('Count'));
 

@@ -3,6 +3,15 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4.6 (2011-06-02)
+--------------------------
+- new: show all strikes in signals table (login!)
+- new: stations with signals in stations graph
+- new: now saving longtime signals per day and month in database (for later usage)
+- fix: actual month now selected in statistics -> strikes
+- fix: display translated month name in statistics -> strikes graphs
+- fix: densities not collected on first day of month
+
 Version 0.4.5 (2011-05-31)
 --------------------------
 - fix: Picture footer UTF8

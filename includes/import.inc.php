@@ -755,51 +755,6 @@ function bo_update_stations($force = false)
 			bo_set_conf('longtime_station_inactive_time', $time_interval);
 		}
 
-		//Update strike-count per day
-		$ytime = mktime(date("H"),date("i"),date("s"),date("n"),date('j')-1);
-		$day_id = gmdate('Ymd', $ytime);
-		$yesterday_count = bo_get_conf('strikes_'.$day_id);
-		$radius = BO_RADIUS * 1000;
-
-		// Daily Statistics and longtime strike-count
-		if (!$yesterday_count)
-		{
-			$yesterday = gmdate('Y-m-d', $ytime);
-			$sql = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes WHERE {where} time BETWEEN '$yesterday 00:00:00' AND '$yesterday 23:59:59'";
-
-			//whole strike count
-			$row_all = bo_db(strtr($sql,array('{where}' => '')))->fetch_assoc();
-			//own strike count
-			$row_own = bo_db(strtr($sql,array('{where}' => 'part=1 AND ')))->fetch_assoc();
-			//whole strike count (in radius)
-			$row_all_rad = bo_db(strtr($sql,array('{where}' => 'distance < "'.$radius.'" AND ')))->fetch_assoc();
-			//own strike count (in radius)
-			$row_own_rad = bo_db(strtr($sql,array('{where}' => 'part=1 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
-
-			$strikes_day = array(0 => $row_all['cnt'], 1 => $row_own['cnt'], 2 => $row_all_rad['cnt'], 3 => $row_own_rad['cnt']);
-
-			bo_set_conf('strikes_'.$day_id, serialize($strikes_day));
-
-
-			$D = unserialize(bo_get_conf('longtime_max_strikes_day_all'));
-			if ($D[0] < $row_all['cnt'])
-				bo_set_conf('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $yesterday)));
-
-			$D = unserialize(bo_get_conf('longtime_max_strikes_day_all_rad'));
-			if ($D[0] < $row_all_rad['cnt'])
-				bo_set_conf('longtime_max_strikes_day_all_rad', serialize(array($row_all_rad['cnt'], $yesterday)));
-
-			$D = unserialize(bo_get_conf('longtime_max_strikes_day_own'));
-			if ($D[0] < $row_own['cnt'])
-				bo_set_conf('longtime_max_strikes_day_own', serialize(array($row_own['cnt'], $yesterday)));
-
-			$D = unserialize(bo_get_conf('longtime_max_strikes_day_own_rad'));
-			if ($D[0] < $row_own_rad['cnt'])
-				bo_set_conf('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $yesterday)));
-
-
-		}
-
 		$updated = true;
 	}
 	else
@@ -811,6 +766,115 @@ function bo_update_stations($force = false)
 	return $updated;
 }
 
+// Daily and longtime strike counts
+function bo_update_daily_stat()
+{
+	$ret = false;
+	
+	//Update strike-count per day
+	$ytime = mktime(date('H')-1,0,0,date("n"),date('j')-1);
+	$day_id = gmdate('Ymd', $ytime);
+	$yesterday_count = bo_get_conf('strikes_'.$day_id);
+	
+	// Daily Statistics and longtime strike-count
+	if (!$yesterday_count)
+	{
+		$radius = BO_RADIUS * 1000;
+		
+		$yesterday = gmdate('Y-m-d', $ytime);
+		$sql = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes WHERE {where} time BETWEEN '$yesterday 00:00:00' AND '$yesterday 23:59:59'";
+
+		/*** Strikes ***/
+		//whole strike count
+		$row_all = bo_db(strtr($sql,array('{where}' => '')))->fetch_assoc();
+		//own strike count
+		$row_own = bo_db(strtr($sql,array('{where}' => 'part=1 AND ')))->fetch_assoc();
+		//whole strike count (in radius)
+		$row_all_rad = bo_db(strtr($sql,array('{where}' => 'distance < "'.$radius.'" AND ')))->fetch_assoc();
+		//own strike count (in radius)
+		$row_own_rad = bo_db(strtr($sql,array('{where}' => 'part=1 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
+
+		/*** Signals ***/
+		//own exact value
+		$signals_exact = bo_db("SELECT COUNT(id) cnt FROM ".BO_DB_PREF."raw WHERE time BETWEEN '$yesterday 00:00:00' AND '$yesterday 23:59:59'")->fetch_assoc();
+		//all from station statistics
+		$sql = "SELECT SUM(signalsh) cnt, COUNT(DISTINCT time) entries, station_id=".bo_station_id()." own
+						FROM ".BO_DB_PREF."stations_stat 
+						WHERE time BETWEEN '$yesterday 01:00:00' AND '$yesterday 23:59:59' AND station_id != 0
+						GROUP BY own, HOUR(time)";
+		$res = bo_db($sql);
+		while ($row = $res->fetch_assoc())
+		{
+			if (intval($row['entries']))
+				$signals[(int)$row['own']] += $row['cnt'] / $row['entries'];
+		}
+		
+		$data = array(	0 => $row_all['cnt'], 
+						1 => $row_own['cnt'], 
+						2 => $row_all_rad['cnt'], 
+						3 => $row_own_rad['cnt'],
+						4 => $signals_exact['cnt'],
+						5 => round($signals[0]),
+						6 => round($signals[1]));
+
+		bo_set_conf('strikes_'.$day_id, serialize($data));
+
+		$D = unserialize(bo_get_conf('longtime_max_strikes_day_all'));
+		if ($D[0] < $row_all['cnt'])
+			bo_set_conf('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $yesterday)));
+
+		$D = unserialize(bo_get_conf('longtime_max_strikes_day_all_rad'));
+		if ($D[0] < $row_all_rad['cnt'])
+			bo_set_conf('longtime_max_strikes_day_all_rad', serialize(array($row_all_rad['cnt'], $yesterday)));
+
+		$D = unserialize(bo_get_conf('longtime_max_strikes_day_own'));
+		if ($D[0] < $row_own['cnt'])
+			bo_set_conf('longtime_max_strikes_day_own', serialize(array($row_own['cnt'], $yesterday)));
+
+		$D = unserialize(bo_get_conf('longtime_max_strikes_day_own_rad'));
+		if ($D[0] < $row_own_rad['cnt'])
+			bo_set_conf('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $yesterday)));
+
+		$D = unserialize(bo_get_conf('longtime_max_signals_day_own'));
+		if ($D[0] < $signals_exact['cnt'])
+			bo_set_conf('longtime_max_signals_day_own', serialize(array($signals_exact['cnt'], $yesterday)));
+
+			
+		$ret = true;
+	}
+
+	//Update strike-count per month
+	$ytime = mktime(date('H')-1,0,0,date("n")-1,date('j'));
+	$month_id = gmdate('Ym', $ytime);
+	$last_month_count = bo_get_conf('strikes_month_'.$month_id);
+	
+	// Monthly Statistics 
+	if (!$last_month_count)
+	{
+		$data = array();
+		$data['daycount'] = 0;
+		
+		$sql = "SELECT data
+				FROM ".BO_DB_PREF."conf
+				WHERE name LIKE 'strikes_".$month_id."%'";
+		$res = bo_db($sql);
+		while($row = $res->fetch_assoc())
+		{
+			$d = unserialize($row['data']);
+			
+			foreach($d as $id => $cnt)
+				$data[$id] += $cnt;
+			
+			$data['daycount']++;
+		}
+
+		bo_set_conf('strikes_month_'.$month_id, serialize($data));
+		
+		$ret = true;
+	}
+	
+	return $ret;
+}
 
 function bo_update_all($force)
 {
@@ -869,7 +933,9 @@ function bo_update_all($force)
 		flush();
 		$signals_imported = bo_update_raw_signals($force);
 		
-
+		if ($signals_imported)
+			bo_update_daily_stat();
+		
 		/*** Check and send strike alerts ***/
 		if (defined('BO_ALERTS') && BO_ALERTS)
 		{
@@ -1078,18 +1144,20 @@ function bo_update_densities($max_time)
 	//current month and year
 	if (defined('BO_CALC_DENSITIES_CURRENT') && BO_CALC_DENSITIES_CURRENT)
 	{
-		//month
-		$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), mktime(0,0,0,date('m'),date('d'),date('Y'))-1, -2 );
+		$end_time = mktime(0,0,0,date('m'),date('d'),date('Y'))-1;
 		
-		//year
-		$ranges[] = array(mktime(0,0,0,1,1,date('Y')), mktime(0,0,0,date('m'),date('d'),date('Y'))-1, -3 );
+		if (date('t', $end_time) != date('d', $end_time))
+		{
+			$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), $end_time, -2 ); //month
+			$ranges[] = array(mktime(0,0,0,1,1,date('Y')),         $end_time, -3 ); //year
+		}
 		
 		//delete old data, if it's not the end day of the month
 		$delete_time = mktime(0,0,0,date('m'),date('d')-2,date('Y'));
 		if (date('t', $delete_time) == date('d', $delete_time))
 			$delete_time = 0;
 	}
-	
+
 	//insert the ranges
 	foreach($ranges as $r)
 	{
@@ -1100,7 +1168,7 @@ function bo_update_densities($max_time)
 		$date_end   = date('Y-m-d', $r[1]);
 		$status  = intval($r[2]);
 		
-		if ($date_start == $date_end || $r[0] >= $r[1])
+		if ($r[0] >= $r[1])
 			continue;
 		
 		//check if rows already exists
@@ -1151,6 +1219,7 @@ function bo_update_densities($max_time)
 	
 	//create densities by type
 	$timeout = false;
+	$calc_count = 0;
 	foreach($_BO['density'] as $type_id => $a)
 	{
 		if (!isset($pending[$type_id]) || empty($a))
@@ -1178,6 +1247,8 @@ function bo_update_densities($max_time)
 			//create entries with higher status first
 			if ($b['status'] != $max_status)
 				continue;
+		
+			$calc_count++;
 		
 			$info = unserialize($b['info']);
 
@@ -1328,7 +1399,7 @@ function bo_update_densities($max_time)
 								$sql_join
 							WHERE 1
 								AND NOT (s.lat < ".($lat)." OR s.lat > ".($lat+$dlat)." OR s.lon < ".$lon." OR s.lon > ".$lon_end.") 
-								AND s.time BETWEEN '".$b['date_start']."' AND '".$b['date_end']."'
+								AND s.time BETWEEN '".$b['date_start']." 00:00:00' AND '".$b['date_end']." 23:59:59'
 								$sql_where
 							GROUP BY lon_id
 							";
@@ -1406,7 +1477,6 @@ function bo_update_densities($max_time)
 			//Check again for timeout
 			if (time() - $start_time > $max_time - 1)
 				$timeout = true;
-
 			
 			if ($timeout)
 				return;
@@ -1418,10 +1488,12 @@ function bo_update_densities($max_time)
 				if ($cnt)
 					echo "<p>Deleted $cnt entries</p>";
 			}
-			
-			
+		
 		}
 	}
+	
+	if (!$calc_count)
+		echo '<p>Nothing to do</p>';
 	
 	return;
 }
