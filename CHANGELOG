@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4.8 (2011-06-06)
+--------------------------
+- improved: europe map now shows north of europe (for our Finnish participants) and some color changes
+- changed density area for the new map, so you should clear the density table (you will be asked on update)
+
 Version 0.4.7 (2011-06-06)
 --------------------------
 - removed BO_UTF8 and BO_FILE from the example config.php 

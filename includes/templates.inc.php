@@ -36,7 +36,7 @@ $_BO['tpl_density_colors'][] = array(255, 190, 255, 15);
 
 //Europe
 $_BO['tpl_density']['europe']['name'] 	= 'Europe';
-$_BO['tpl_density']['europe']['coord'] 	= array(70, 52, 20, -22); //North, East, South, West (Degrees)
+$_BO['tpl_density']['europe']['coord'] 	= array(72, 52, 20, -22); //North, East, South, West (Degrees)
 $_BO['tpl_density']['europe']['length']	= 10; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
 $_BO['tpl_density']['europe']['bps'] 	= 2; // bytes per area 
 
@@ -100,11 +100,12 @@ $_BO['tpl_gmap']['1-10d']['only_loggedin'] = true;
 /**************************************/
 
 //Europe
+//MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=71.3&map_generator_west=-22&map_generator_east=52&map_generator_south=24.3&map_generator_min_area=50&map_generator_shorelines=0.1p%2F30%2F30%2F30&map_generator_boundaries=a%2F0.1p%2F30%2F30%2F30&map_generator_rivers=-&map_generator_lakes=31%2F31%2F160&map_generator_dry_area=-&map_generator_wet_area=31%2F31%2F160&map_generator_color_map=-200+100+195+100+0+100+195+100+%0D%0A0+100+188+100+100+100+188+100+%0D%0A100+100+177+100+200+100+177+100+%0D%0A200+100+166+100+500+100+166+100+%0D%0A500+100+155+100+1000+100+155+100+%0D%0A1000+90+144+90+1500+90+144+90%0D%0A1500+80+140+80+2000+80+140+80%0D%0A2000+75+135+75+2500+75+135+75%0D%0A2500+70+130+70+3000+70+130+70%0D%0A3000+65+120+65+5000+65+120+65%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.01
 $_BO['tpl_imgmap']['europe']['name'] = 'Europe';
 $_BO['tpl_imgmap']['europe']['menu'] = true;
 $_BO['tpl_imgmap']['europe']['archive'] = true;
 $_BO['tpl_imgmap']['europe']['file'] = 'map_europe.png';
-$_BO['tpl_imgmap']['europe']['coord'] = array(68, 50, 23, -20); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['europe']['coord'] = array(71.3, 52, 24.3, -22); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['europe']['trange'] = 2; //hours!
 $_BO['tpl_imgmap']['europe']['upd_intv'] = 15; //minutes
 $_BO['tpl_imgmap']['europe']['textcolor'] = array(255,255,255);
@@ -163,7 +164,7 @@ $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 150, 0);
 $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 100, 0);
 $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255,   0, 0);
 $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(225,   0, 0);
-$_BO['tpl_imgmap']['germany_lkr']['show_station'] = array(5, 155,155,255,true);
+$_BO['tpl_imgmap']['germany_lkr']['show_station'] = array(5, 155,80,155,true);
 $_BO['tpl_imgmap']['germany_lkr']['density'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 8;
 $_BO['tpl_imgmap']['germany_lkr']['density_colors'] = $_BO['tpl_density_colors'];

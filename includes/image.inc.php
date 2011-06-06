@@ -732,6 +732,7 @@ function bo_get_density_image()
 	$station_id = intval($_GET['id']);
 	$ratio = isset($_GET['ratio']) && $station_id;
 	
+	
 	@set_time_limit(30);
 	
 	global $_BO;
@@ -741,6 +742,8 @@ function bo_get_density_image()
 	if (!is_array($cfg) || !$cfg['density'])
 		exit('Missing image data!');
 
+	$min_block_size = max($cfg['density_blocksize'], intval($_GET['bo_blocksize']), 1);	
+		
 	//todo: needs adjustments
 	$last_update = strtotime('today +  4 hours');
 	$expire      = strtotime('today + 28 hours');
@@ -752,7 +755,7 @@ function bo_get_density_image()
 
 	//Caching
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true) && BO_LOCALE == _BL();
-	$cache_file = BO_DIR.'cache/density_map_'._BL().'_'.sprintf('%d_station%d_%d_%04d%02d.png', $map_id, $station_id, $ratio ? 1 : 0, $year, $month);
+	$cache_file = BO_DIR.'cache/density_map_'._BL().'_'.sprintf('%d_station%d_%d_b%d_%04d%02d.png', $map_id, $station_id, $ratio ? 1 : 0, $min_block_size, $year, $month);
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
 		header("Content-Type: image/png");
@@ -765,7 +768,6 @@ function bo_get_density_image()
 	$lonE = $cfg['coord'][1];
 	$latS = $cfg['coord'][2];
 	$lonW = $cfg['coord'][3];
-	$min_block_size = max($cfg['density_blocksize'], intval($_GET['bo_blocksize']), 1);
 	$colors = is_array($cfg['density_colors']) ? $cfg['density_colors'] : $_BO['tpl_density_colors'];
 
 	$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$file);

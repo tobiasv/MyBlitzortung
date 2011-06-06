@@ -24,7 +24,7 @@
 function bo_check_for_update()
 {
 	
-	$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301);
+	$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301, '0.4.8' => 408);
 	$cur_version = bo_get_conf('version');
 
 	preg_match('/([0-9]+)(\.([0-9]+)(\.([0-9]+))?)?/', $cur_version, $r);
@@ -93,6 +93,32 @@ function bo_check_for_update()
 				
 				$ok = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				break;
+			
+			case '0.4.8':
+			
+				switch ($_GET['bo_action2'])
+				{
+					default:
+						echo '<li>Should the densities be cleaned? Due to some major changes, the old data cannot be used any more. 
+							<a href="'.bo_insert_url(array('bo_action', 'bo_action2')).'&bo_action=do_update&bo_action2=clear_dens_yes">Yes, clear!</a> 
+							<a href="'.bo_insert_url(array('bo_action', 'bo_action2')).'&bo_action=do_update&bo_action2=clear_dens_no">No, do not clear!</a> 
+							</li></ul>';
+						return true;
+						break;
+					
+					case 'clear_dens_yes':
+						$sql = 'TRUNCATE TABLE `'.BO_DB_PREF.'densities`';
+						$ok = bo_db($sql, false);
+						echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+						break;
+						
+					case 'clear_dens_no':
+						$ok = true;
+						break;
+				
+				}
+				break;
 		}
 		
 		echo '</ul>';
@@ -117,7 +143,7 @@ function bo_check_for_update()
 		echo '<h4>'._BL('Update-Info: Setting version number to').' '.BO_VER.'</h4>';
 	}
 	
-		
+	return $ok;
 	
 }
 

@@ -883,10 +883,16 @@ function bo_update_all($force)
 	echo "<h2>Getting lightning data from blitzortung.org</h2>\n";
 
 	$start_time = time();
-	$max_time = 50;
+	
+	$max_time = intval(ini_get('max_execution_time')) - 10;
+
+	if ($max_time < 20 || !defined('BO_DEBUG') || !BO_DEBUG) //allow infinite exec time in debug mode
+	{
+		$max_time = 50;
+	}
 	
 	@set_time_limit($max_time+10);
-
+	
 	if (!$force)
 		sleep(rand(0,30)); // to avoid to much connections from different stations to blitzortung.org at the same time
 
