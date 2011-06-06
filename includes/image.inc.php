@@ -117,22 +117,22 @@ function bo_tile()
 	{
 		$w = 80;
 		$h = 25;
-		$col_height = 10;
+		$coLegendHeight = 10;
 
 		$I = imagecreate($w, $h);
 		$col = imagecolorallocate($I, 50, 50, 50);
 		imagefill($I, 0, 0, $col);
 
-		$col_width = $w / count($c);
+		$coLegendWidth = $w / count($c);
 		foreach($c as $i => $rgb)
 		{
 			$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
-			imagefilledrectangle($I, (count($c)-$i-1)*$col_width, 0, (count($c)-$i)*$col_width, $col_height, $color[$i]);
+			imagefilledrectangle($I, (count($c)-$i-1)*$coLegendWidth, 0, (count($c)-$i)*$coLegendWidth, $coLegendHeight, $color[$i]);
 		}
 
 		$time_max = min(bo_get_conf('uptime_strikes'), $time_max);
 		$col = imagecolorallocate($I, 255,255,255);
-		imagestring($I, 2, 1, $col_height + 1, date('H:i', $time_min).' - '.date('H:i', $time_max), $col);
+		imagestring($I, 2, 1, $coLegendHeight + 1, date('H:i', $time_min).' - '.date('H:i', $time_max), $col);
 
 		
 		header("Content-Type: image/png");
@@ -449,7 +449,7 @@ function bo_get_map_image()
 		exit;
 	}
 
-	$cache_file = BO_DIR.'cache/maps/'.$cache_file;
+	$cache_file = BO_DIR.'cache/maps/'._BL();
 	
 	if ($transparent)
 		$cache_file .= 'transp_';
@@ -620,12 +620,36 @@ function bo_get_map_image()
 		}
 	}
 
+	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
+	
+	//Show station pos
+	if ($cfg['show_station'][0])
+	{
+		$stinfo = bo_station_info();
+		
+		list($px, $py) = bo_latlon2mercator($stinfo['lat'], $stinfo['lon']);
+		$x =      ($px - $x1) * $w_x;
+		$y = $h - ($py - $y1) * $h_y;
+		
+		$size = $cfg['show_station'][0];
+		
+		if (isset($cfg['show_station'][1]))
+			$stat_color = imagecolorallocate($I, $cfg['show_station'][1],$cfg['show_station'][2],$cfg['show_station'][3]);
+		else
+			$stat_color = $text_col;
+			
+		imageline($I, $x-$size, $y, $x+$size, $y, $stat_color);
+		imageline($I, $x, $y-$size, $x, $y+$size, $stat_color);
+		
+		if ($cfg['show_station'][4])
+			imagestring($I, 3, $x+2, $y-12, $stinfo['city'], $stat_color);
+	}
+	
 	//Date/Time/Strikes
 	$fontsize = $w / 100;
 	$time_max = min($last_update, $time_max);
 	$time_max = intval($time_max / 60 / BO_UP_INTVL_STRIKES) * 60 * BO_UP_INTVL_STRIKES;
 	$time_min = intval($time_min / 60 / BO_UP_INTVL_STRIKES) * 60 * BO_UP_INTVL_STRIKES;
-	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
 	imagestring($I, $fontsize, 1, 1, $time_string, $text_col);
 
 	//Strikes
@@ -641,7 +665,7 @@ function bo_get_map_image()
 		$cx = $cfg['legend'][3];
 		$cy = $cfg['legend'][4];
 
-		$col_width = $cw / count($color);
+		$coLegendWidth = $cw / count($color);
 		$cx = $w - $cw - $cx;
 		$cy = $h - $ch - $cy;
 
@@ -652,8 +676,8 @@ function bo_get_map_image()
 			else
 				$height = 0;
 
-			$px1 = $cx + (count($color)-$i-1) * $col_width;
-			$px2 = $cx + (count($color)-$i) * $col_width - 1;
+			$px1 = $cx + (count($color)-$i-1) * $coLegendWidth;
+			$px2 = $cx + (count($color)-$i) * $coLegendWidth - 1;
 			$py1 = $cy + $ch;
 			$py2 = $cy + $ch - $height;
 
@@ -718,9 +742,9 @@ function bo_get_density_image()
 		exit('Missing image data!');
 
 	//todo: needs adjustments
-	$last_update = strtotime('today - 12 hours');
-	$expire = time() + 3600 * 24;
-		
+	$last_update = strtotime('today +  4 hours');
+	$expire      = strtotime('today + 28 hours');
+	
 	header("Pragma: ");
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
@@ -728,7 +752,7 @@ function bo_get_density_image()
 
 	//Caching
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true) && BO_LOCALE == _BL();
-	$cache_file = BO_DIR.'cache/density_map'.sprintf('%d_station%d_%d_%04d%02d.png', $map_id, $station_id, $ratio ? 1 : 0, $year, $month);
+	$cache_file = BO_DIR.'cache/density_map_'._BL().'_'.sprintf('%d_station%d_%d_%04d%02d.png', $map_id, $station_id, $ratio ? 1 : 0, $year, $month);
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
 		header("Content-Type: image/png");
@@ -741,14 +765,23 @@ function bo_get_density_image()
 	$lonE = $cfg['coord'][1];
 	$latS = $cfg['coord'][2];
 	$lonW = $cfg['coord'][3];
-	$min_block_size = max($cfg['density_blocksize'], intval($_GET['blocksize']), 1);
+	$min_block_size = max($cfg['density_blocksize'], intval($_GET['bo_blocksize']), 1);
 	$colors = is_array($cfg['density_colors']) ? $cfg['density_colors'] : $_BO['tpl_density_colors'];
 
 	$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$file);
 	$w = imagesx($tmpImage);
 	$h = imagesy($tmpImage);
+
+	//Legend
+	$LegendWidth = 150;
+	$ColorBarWidth  = 10;
+	$ColorBarHeight = $h - 70;
+	$ColorBarX = $w + 10;
+	$ColorBarY = 50;
+	$ColorBarStep = 15;
 	
-	$I = imagecreatetruecolor($w, $h);
+	//create new image
+	$I = imagecreatetruecolor($w+$LegendWidth, $h);
 	imagecopy($I,$tmpImage,0,0,0,0,$w,$h);
 	imagedestroy($tmpImage);
 	imagealphablending($I, true);
@@ -780,7 +813,7 @@ function bo_get_density_image()
 	//find density to image
 	$sql = "SELECT 	id, station_id, type, info, data, 
 					lat_max, lon_max, lat_min, lon_min, length,
-					date_start, date_end
+					date_start, date_end, status
 					FROM ".BO_DB_PREF."densities 
 					WHERE 1 
 						AND status >= 1 
@@ -809,8 +842,11 @@ function bo_get_density_image()
 	$DATA = gzinflate($row['data']);
 	$info = unserialize($row['info']);
 	$bps = $info['bps'];
+	$type = $row['type'];
+	$max_real_count = $info['max']; //max strike count for area elements
 	
 	//dates 
+	$date_start = $row['date_start'];
 	$date_end = $row['date_end'];
 	$time_string = date(_BL('_date'), strtotime($row['date_start'])).' - '.date(_BL('_date'), strtotime($row['date_end']));
 	
@@ -821,15 +857,28 @@ function bo_get_density_image()
 	$lon_end   = $row['lon_max'];
 	$length    = $row['length'];
 	$area      = pow($length, 2);
-
+	$distance = $length * sqrt(2) * 1000;
+	
 	if ($ratio)
 	{
-		$row = $res->fetch_assoc();
-		if ($station_id != $row['station_id'] || $date_end != $row['date_end'])
+		$row_own = $res->fetch_assoc();
+		if ($station_id != $row_own['station_id'] || $date_end != $row_own['date_end'] || $type != $row_own['type'])
+		{
 			$exit_msg = _BL('Not enough data available!', true);	
-
-		$OWN_DATA = gzinflate($row['data']);
+		}
+		else
+		{
+			$OWN_DATA = gzinflate($row_own['data']);
+			$info = unserialize($row_own['info']);
+			$max_real_own_count = $info['max']; //max strike count
+		}
 	}
+	
+	unset($row['data']);
+	unset($row_own['data']);
+
+	if ($station_id)
+		$stinfo = bo_station_info($station_id);
 	
 	// Exit if not enough data
 	if ($exit_msg)
@@ -841,10 +890,6 @@ function bo_get_density_image()
 		exit;
 	}
 	
-	
-	//max strike count
-	$max_density = $info['max'] / $area;
-
 	//pointer on current part of string
 	$string_pos = 0;
 	
@@ -853,14 +898,18 @@ function bo_get_density_image()
 	$lonN = $lat_end;
 	$lonS = $lat;
 	
-	$PIC_DATA = array();
+	$STRIKE_COUNT = array();
+	$VAL_COUNT = array();
 	$strike_count = 0;
+	$strike_count_own = 0;
+	$max_count_block = 0;
+	$max_count_pos = 0;
 	
 	$last_y = $h;
 	while ($lat < $lat_end)
 	{
 		//density: difference to current lat/lon
-		list($dlat, $dlon) = bo_distbearing2latlong($length * sqrt(2) * 1000, 45, $lat, $lon);
+		list($dlat, $dlon) = bo_distbearing2latlong($distance, 45, $lat, $lon);
 		$dlat -= $lat;
 		$dlon -= $lon;
 	
@@ -873,13 +922,16 @@ function bo_get_density_image()
 		
 			$lon_data = substr($DATA, $string_pos + $lon_start_pos, $lon_string_len);
 			
-			if ($ratio)
-				$lon_data_own = substr($OWN_DATA, $string_pos + $lon_start_pos, $lon_string_len);
-			
 			//image coordinates (left side of image, height is current latitude)
 			list($px, $py) = bo_latlon2mercator($lat, $lonE);
 			$y  = $h - ($py - $y1) * $h_y; //image y
-			$dx = $dlon / ($lonE - $lonW) * $w;
+			$ay = round(($y / $min_block_size)); //block number y
+			$dx = $dlon / ($lonE - $lonW) * $w; //delta x
+			
+			if ($ratio)
+			{
+				$lon_data_own = substr($OWN_DATA, $string_pos + $lon_start_pos, $lon_string_len);
+			}
 			
 			//get the data!
 			for($j=0; $j<$lon_string_len/2/$bps; $j++)
@@ -890,21 +942,25 @@ function bo_get_density_image()
 				if (!intval($value))
 					continue;
 
-				if ($ratio)
-					$value = hexdec(substr($lon_data_own, $j * 2 * $bps, 2 * $bps)) / $value;
+				$strike_count += $value;
 					
-				//color
-				$oldcolor = $colors[0];
-				
+				if ($ratio)
+				{
+					$own_value = hexdec(substr($lon_data_own, $j * 2 * $bps, 2 * $bps));
+					$strike_count_own += $own_value;
+					$value = $own_value / $value;
+				}
+
 				//image x
 				$x = $j * $dx;
 				
-				//x,y coordinates to picture "blocks"
+				//x coordinates to picture "block-numbers"
 				$ax = round(($x / $min_block_size));
-				$ay = round(($y / $min_block_size));
+				$pos_id = $ax+$ay*$w;
 				
-				//Data array
-				$PIC_DATA[$ax+$ay*$w] += $value;
+				//Save to Data array
+				$STRIKE_COUNT[$pos_id] += $value;
+				$VAL_COUNT[$pos_id]++;
 			}
 		}
 
@@ -917,59 +973,159 @@ function bo_get_density_image()
 	
 	}
 
-	$max = !empty($PIC_DATA) ? max($PIC_DATA) : 0;
-
-	if ($max)
+	if ($ratio)
 	{
-		$color_count = count($colors)-1;
-		foreach($PIC_DATA as $no => $value)
+		$max_count_block = 1; //always 100%
+	}
+	else
+	{
+		//find max strikes per block
+		foreach($STRIKE_COUNT as $pos_id => $value)
 		{
-			$value = $value / $max; //to relative count
+			if ($STRIKE_COUNT[$pos_id]/$VAL_COUNT[$pos_id] > $max_count_block)
+			{
+				$max_count_pos = $pos_id;
+				$max_count_block = $STRIKE_COUNT[$pos_id]/$VAL_COUNT[$pos_id];
+			}
+		}
+	}
+	
+	if ($max_count_block)
+	{
+		foreach($STRIKE_COUNT as $pos_id => $value)
+		{
+			$x = ($pos_id % $w);
+			$y = ($pos_id-$x) / $w;
 
-			$x = ($no % $w);
-			$y = ($no-$x) / $w;
-
+			//mean value of a block
+			$value /= $VAL_COUNT[$pos_id];
+			
+			if (!$ratio)
+			{
+				//strike count to relative count 0 to 1 for colors
+				$value /= $max_count_block;
+			}
+			
 			$x *= $min_block_size;
 			$y *= $min_block_size;
 			
-			$oldcolor = $colors[0];
-			foreach($colors as $color_index => $c)
-			{
-				$color_value = ($color_index) / $color_count;
-				
-				if ($value <= $color_value)
-				{
-					//find "position" between the two colors
-					$color_pos = $value * $color_count - $color_value * $color_count + 1;
-					
-					$red   = $oldcolor[0] + ($c[0] - $oldcolor[0]) * $color_pos;
-					$green = $oldcolor[1] + ($c[1] - $oldcolor[1]) * $color_pos;
-					$blue  = $oldcolor[2] + ($c[2] - $oldcolor[2]) * $color_pos;
-					$alpha = $oldcolor[3] + ($c[3] - $oldcolor[3]) * $color_pos;
-					break;
-				}
-				
-				$oldcolor = $c;
-			}
-
+			list($red, $green, $blue, $alpha) = bo_value2color($value, $colors);
 			$color = imagecolorallocatealpha($I, $red, $green, $blue, $alpha);
 			imagefilledrectangle($I, $x, $y, $x+$min_block_size-1, $y+$min_block_size-1, $color);
 
 		}
 	}
 
+	//Legend
+	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
+	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
+
+	//Legend: Text
+	$PosX = $w + 5;
+	$PosY = 10;
+	$MarginX = 8;
+
+	//Strike count
+	$PosY = bo_imagestring($I, 2, $PosX, $PosY, _BL('Strikes', true).':', $text_col, $LegendWidth);
+	$PosY = bo_imagestring($I, 3, $PosX+$MarginX, $PosY, $strike_count, $text_col, $LegendWidth);
+	$PosY += 10;
+	
+	
+	if ($ratio && intval($strike_count))
+	{
+		$PosY = bo_imagestring($I, 2, $PosX, $PosY, strtr(_BL('densities_strikes_station', true), array('{STATION_CITY}' => $stinfo['city'])).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring($I, 3, $PosX+$MarginX, $PosY, $strike_count_own, $text_col, $LegendWidth);
+		$PosY += 10;
+	
+		$PosY = bo_imagestring($I, 2, $PosX, $PosY, _BL('Mean strike ratio', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring($I, 3, $PosX+$MarginX, $PosY, number_format($strike_count_own / $strike_count * 100, 1, _BL('.'), _BL(',')).'%', $text_col, $LegendWidth);
+		$PosY += 25;
+	}
+	else
+		$PosY += 15;
+	
+	/*
+	//Area elements (calculation)
+	$length_text = number_format($length, 1, _BL('.'), _BL(','));
+	$PosY = bo_imagestring($I, 2, $PosX, $PosY, _BL("Calculation basis are elements with area", true).':', $text_col, $LegendWidth);
+	$PosY = bo_imagestring($I, 3, $PosX+$MarginX, $PosY, " ".$length_text.'km x '.$length_text.'km', $text_col, $LegendWidth);
+	$PosY += 10;
+
+	if (!$ratio && $area)
+	{
+		$max_real_density = $max_real_count / $area;
+		
+		//Strike density
+		$PosY = bo_imagestring($I, 2, $PosX, $PosY, _BL('Maximum strike density calculated', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring($I, 3, $PosX+$MarginX, $PosY, " ".number_format($max_real_density, 1, _BL('.'), _BL(',')).'/km^2', $text_col, $LegendWidth);
+		$PosY += 10;
+	}
+	
+	$PosY += 15;
+	*/
+	
+	if (!$ratio)
+	{
+		//Max. density per block
+		$max_density = $max_count_block / $area;
+		$PosY = bo_imagestring($I, 2, $PosX, $PosY, _BL('Maximum mean strike density displayed', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring($I, 3, $PosX+$MarginX, $PosY, number_format($max_density, 3, _BL('.'), _BL(',')).'/km^2', $text_col, $LegendWidth);
+		$PosY += 15;
+	}
+	
+	$PosY += 10;
+	$PosY = bo_imagestring($I, 5, $PosX, $PosY, _BL('Legend', true), $text_col, $LegendWidth);
+	if ($ratio)
+		$PosY = bo_imagestring($I, 2, $PosX+$MarginX, $PosY, '('._BL('Strike ratio', true).')', $text_col, $LegendWidth);
+	else
+		$PosY = bo_imagestring($I, 2, $PosX+$MarginX, $PosY, '('._BL('Strikes per square kilometer', true).')', $text_col, $LegendWidth);
+	
+	if ($PosY + 15 > $ColorBarY)
+	{
+		$ColorBarHeight -= $PosY+15 - $ColorBarY;
+		$ColorBarY = $PosY+15;
+	}
+	
+	//Legend: Colorbar
+	for ($i=$ColorBarY; $i<= $ColorBarHeight+$ColorBarY; $i += $ColorBarStep)
+	{
+		$value = 1-($i-$ColorBarY)/$ColorBarHeight;
+		
+		list($red, $green, $blue, $alpha) = bo_value2color($value, $colors);
+		$color = imagecolorallocatealpha($I, $red, $green, $blue, $alpha);	
+		imagefilledrectangle($I, $ColorBarX, $i, $ColorBarX+$ColorBarWidth, $i+$ColorBarStep-1, $color);
+	}
+	
+	//Legend: Colorbar Text
+	if ($ratio)
+	{
+		$max_ratio = $max_count_block;
+		$text_top = number_format($max_ratio*100, 1, _BL('.'), _BL(',')).'%';
+		$text_middle = '50%';
+		$text_bottom = '0%';
+	}
+	else
+	{
+		$max_density = $max_count_block / $area;
+		$text_top = number_format($max_density, 3, _BL('.'), _BL(','));
+		$text_middle = number_format($max_density/2, 3, _BL('.'), _BL(','));
+		$text_bottom = '0';
+	}
+	
+	imagestring($I, 3, $ColorBarX+$ColorBarWidth+6, $ColorBarY+3, $text_top, $text_col);
+	imagestring($I, 3, $ColorBarX+$ColorBarWidth+6, $ColorBarY-8+$ColorBarHeight/2, $text_middle, $text_col);
+	imagestring($I, 3, $ColorBarX+$ColorBarWidth+6, $ColorBarY-5+$ColorBarHeight, $text_bottom, $text_col);
+	
+	
 	//Date/Time
 	imagestring($I, $fontsize, 1, 1, $time_string, $text_col);
 
 	//Station Name
 	if ($station_id)
 	{
-		$stinfo = bo_station_info($station_id);
-		$text = $stinfo['city'];
+		$text .= _BL('Station', true).': '.$stinfo['city'].($ratio ? ' ('._BL('Strike ratio').')' : '');
 		
-		$text .= $ratio ? ' ('._BL('Strike ratio').')' : '';
-		
-		imagestring($I, $fontsize, 1, 1 + $fontsize * 3, _BL('Station', true).': '.$text, $text_col);
+		imagestring($I, $fontsize, 1, 1 + $fontsize * 3, $text, $text_col);
 		
 		list($px, $py) = bo_latlon2mercator($stinfo['lat'], $stinfo['lon']);
 		$x =      ($px - $x1) * $w_x;
@@ -979,22 +1135,8 @@ function bo_get_density_image()
 		$color = imagecolorallocate($I, 255,255,255);
 		imageline($I, $x-$size, $y, $x+$size, $y, $color);
 		imageline($I, $x, $y-$size, $x, $y+$size, $color);
-
 	}
 	
-	if (!$ratio)
-	{
-		//Strike density
-		$text = _BL('Max strikes density', true).': '.number_format($max_density, 1, _BL('.'), _BL(',')).'/km^2';
-		$fw = imagefontwidth($fontsize) * strlen($text);
-		imagestring($I, $fontsize, $w - $fw - 1, 1, $text, $text_col);
-
-		//Strike density
-		$text = _BL('Strikes', true).': '.array_sum($PIC_DATA).'';
-		$fw = imagefontwidth($fontsize) * strlen($text);
-		imagestring($I, $fontsize, $w - $fw - 1, 1 + $fontsize * 3, $text, $text_col);
-		
-	}
 	
 	//Copyright
 	$text = _BL('Lightning data from Blitzortung.org', true);
@@ -1015,6 +1157,39 @@ function bo_get_density_image()
 
 	exit;
 	
+}
+
+//writes text with line automatic line brakes into an image
+function bo_imagestring(&$I, $size, $x, $y, $text, $textcol, $maxwidth)
+{
+	$line_height = imagefontheight($size) * 1.2;
+	$breaks = explode("\n", $text);
+	
+	foreach($breaks as $text2)
+	{
+		$width = 0;
+		$lines = explode(" ", $text2);
+		$fw = imagefontwidth($size);
+		$x2 = $x;
+		
+		foreach($lines as $i=>$line)
+		{
+			$width = $fw*(strlen($line)+1);
+			
+			if ($x2+$width+3 > $x+$maxwidth)
+			{
+				$y += $line_height;
+				$x2 = $x;
+			}
+			
+			imagestring($I, $size, $x2, $y, $line, $textcol);
+			
+			$x2 += $width;
+		}
+		
+		$y += $line_height;
+	}
+	return $y;
 }
 
 //get an image from /images directory
@@ -1051,6 +1226,40 @@ function bo_get_image($img)
 
 	readfile($file);
 	exit;
+}
+
+// for density images: value (from 0 to 1) to color
+function bo_value2color($value, &$colors)
+{
+	$color_count = count($colors)-1;
+	
+	if ($value > 1) //this shouldn't happen!
+	{
+		$red = $green = $blue = 255;
+		$alpha = 0;
+	}
+	else if ($value == 1)
+	{
+		$red   = $colors[$color_count][0];
+		$green = $colors[$color_count][1];
+		$blue  = $colors[$color_count][2];
+		$alpha = $colors[$color_count][3];
+	}
+	else
+	{
+		$color_index = floor($value * ($color_count));
+		$color_pos   = $value * ($color_count) - floor($value * ($color_count)); //find "position" between the two colors
+		
+		$col1 = $colors[$color_index];
+		$col2 = $colors[$color_index+1];
+		
+		$red   = $col1[0] + ($col2[0] - $col1[0]) * $color_pos;
+		$green = $col1[1] + ($col2[1] - $col1[1]) * $color_pos;
+		$blue  = $col1[2] + ($col2[2] - $col1[2]) * $color_pos;
+		$alpha = $col1[3] + ($col2[3] - $col1[3]) * $color_pos;
+	}
+	
+	return array($red, $green, $blue, $alpha);
 }
 
 

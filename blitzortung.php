@@ -23,7 +23,7 @@ if (!defined("BO_VER"))
 {
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.4.6a');
+	define("BO_VER", '0.4.7');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -154,18 +154,8 @@ if (!defined("BO_VER"))
 		exit;
 	}
 
-	//graphics, login...
-	if (isset($_GET['density']))
-	{
-		bo_get_density_image();
-		exit;
-	}
-	elseif (isset($_GET['map']))
-	{
-		bo_get_map_image();
-		exit;
-	}
-	else if (isset($_GET['icon']))
+	//images part 1
+	if (isset($_GET['icon']))
 	{
 		bo_icon($_GET['icon']);
 		exit;
@@ -181,7 +171,7 @@ if (!defined("BO_VER"))
 		exit;
 	}
 	
-	// include extra language (after images with caching machanism!)
+	// include extra language (after images without text)
 	$locale = '';
 	if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
 	{
@@ -202,13 +192,23 @@ if (!defined("BO_VER"))
 			include $locdir.'own.php';
 	}
 
-	// these graphs have a lot of text and no caching --> translate them individually
+	// images part 2
 	if (isset($_GET['graph_statistics']))
 	{
 		bo_graph_statistics($_GET['graph_statistics'], intval($_GET['id']), intval($_GET['hours']));
 		exit;
 	}
-
+	else if (isset($_GET['density']))
+	{
+		bo_get_density_image();
+		exit;
+	}
+	elseif (isset($_GET['map']))
+	{
+		bo_get_map_image();
+		exit;
+	}
+	
 	//workaround when no special login-url is specified
 	if (!defined('BO_LOGIN_URL') || !BO_LOGIN_URL)
 	{

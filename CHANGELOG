@@ -3,6 +3,16 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4.7 (2011-06-06)
+--------------------------
+- removed BO_UTF8 and BO_FILE from the example config.php 
+- new: logged in users with user level "setting" can see GPS info even it is disabled with BO_SHOW_GPS_INFO = false
+- new: circles around MyBo stations
+- new: added BO_DB_PORT to change port of MySQL
+- new: changing language now affects text in strike maps too
+- new: display station position and name in image strike map
+- fix: density calculation was wrong! please CLEAN the density table so that densities can be recalculated
+- improved: density map with legend (may be incorrect)
 
 Version 0.4.6a (2011-06-02)
 --------------------------

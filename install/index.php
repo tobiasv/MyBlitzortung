@@ -65,6 +65,7 @@ define("BO_LAT", "###Latitude of your Station###");
 define("BO_LON", "###Longitude of your Station###");
 define("BO_STATION_NAME", "###Name of your station (i.e. city name)###");
 
+
 /*** Update secret  ***/
 /*   For importing the skrike data. You can leave it blank,   */
 /*   but then everybody can trigger a data import!            */
@@ -72,25 +73,15 @@ define("BO_STATION_NAME", "###Name of your station (i.e. city name)###");
 define("BO_UPDATE_SECRET", "'.uniqid().'");
 
 
-/*** Main File and path for creating graphs and images   ***/
-/*   You can use relative or absolute (with leading "/") paths:                                      */
-/*   Example: http://myhomepage.com/strikes/blitzortung.php ==> BO_FILE = /strikes/blitzortung.php   */
-
-define("BO_FILE", "'.$url_path.'blitzortung.php");
-
-
 /*** Default language ***/
 
 define("BO_LOCALE", "de");
+
 
 /*** Time Zone setting ***/
 
 define("BO_TIMEZONE", "Europe/Berlin");
 
-/*** UTF8-Encoding ***/
-/*   Most Content-Management-Systems use UTF8-encoding */
-
-define("BO_UTF8", false);
 
 ?>';
 

@@ -76,7 +76,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 		  position: myLatlng, 
 		  map: bo_map, 
 		  title:"<?php echo _BC($station_text) ?>",
-		  icon: 'http://labs.google.com/ridefinder/images/mm_20_red.png'
+		  icon: '<?php echo BO_MAP_STATION_ICON ?>' 
 		});
 		
 <?php
@@ -247,7 +247,7 @@ function bo_show_lightning_map()
 		
 		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
 		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'">';
-		echo '<div class="bo_map_footer">'._BC($footer).'</div>';
+		echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 		echo '</div>';
 
 		echo '</div>';
@@ -380,6 +380,7 @@ function bo_show_lightning_map()
 	<script type="text/javascript">
 	var bo_show_only_own = 0;
 	var bo_mybo_markers = [];
+	var bo_mybo_circles = [];
 	var bo_station_markers = [];
 	var bo_stations_display = 1;
 	var bo_mybo_stations = [ <?php echo $js_mybo_stations ?> ];
@@ -424,9 +425,12 @@ function bo_show_lightning_map()
 		for (i in bo_mybo_markers)
 			bo_mybo_markers[i].setMap(null);
 
+		for (i in bo_mybo_circles)
+			bo_mybo_circles[i].setMap(null);
+
 		for (i in bo_station_markers)
 			bo_station_markers[i].setMap(null);
-			
+
 		if (display == 0 && bo_map.getZoom() > 10)
 		{
 			document.getElementById('bo_map_station1').disabled = true;
@@ -452,7 +456,7 @@ function bo_show_lightning_map()
 					  position: new google.maps.LatLng(bo_stations[i].lat,bo_stations[i].lon), 
 					  map: bo_map, 
 					  title:bo_stations[i].city,
-					  icon: 'http://maps.google.com/mapfiles/kml/pal4/icon24.png'
+					  icon: '<?php echo  BO_MAP_STATIONS_ICON ?>'
 					});
 				}
 			}
@@ -468,12 +472,26 @@ function bo_show_lightning_map()
 			{
 				for (i in bo_mybo_stations)
 				{
+					var latlon = new google.maps.LatLng(bo_mybo_stations[i].lat,bo_mybo_stations[i].lon);
+					
 					bo_mybo_markers[i] = new google.maps.Marker({
-					  position: new google.maps.LatLng(bo_mybo_stations[i].lat,bo_mybo_stations[i].lon), 
+					  position: latlon, 
 					  map: bo_map, 
-					  title:bo_mybo_stations[i].city,
-					  icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png',
+					  title: bo_mybo_stations[i].city,
+					  icon: '<?php echo  BO_MAP_MYBO_ICON ?>',
 					  content: '<a href="'+bo_mybo_stations[i].url+'" target="_blank">' + bo_mybo_stations[i].city + '</a>'
+					});
+					
+					bo_mybo_circles[i] = new google.maps.Circle({
+					  clickable: false,
+					  strokeColor: "<?php echo  BO_MAP_MYBO_CIRCLE_COLOR_LINE ?>",
+  					  strokeOpacity: <?php echo  BO_MAP_MYBO_CIRCLE_OPAC_LINE ?>,
+	  				  strokeWeight: 1,
+					  fillColor: "<?php echo  BO_MAP_MYBO_CIRCLE_COLOR_FILL ?>",
+					  fillOpacity: <?php echo  BO_MAP_MYBO_CIRCLE_OPAC_FILL ?>,
+					  map: bo_map,
+					  center: latlon,
+					  radius: bo_mybo_stations[i].rad * 1000
 					});
 					
 					google.maps.event.addListener(bo_mybo_markers[i], 'click', function() {
@@ -487,6 +505,9 @@ function bo_show_lightning_map()
 			{
 				for (i in bo_mybo_markers)
 					bo_mybo_markers[i].setMap(bo_map);
+				
+				for (i in bo_mybo_circles)
+					bo_mybo_circles[i].setMap(bo_map);
 			}
 		}
 		

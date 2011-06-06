@@ -248,8 +248,14 @@ $_BL['en']['arch_navi_density'] = 'Strike densities';
 $_BL['en']['h3_arch_density'] = 'Strike densities';
 $_BL['en']['legend_arch_densities'] = 'Options';
 $_BL['en']['arch_select_dates_beween'] = 'Only data from {START} to {END} available!';
-$_BL['en']['Max strikes density'] = 'Max. strike density';
+$_BL['en']['Max strikes density'] = 'Max strike density';
 $_BL['en']['check_all_strikes_network'] = 'All strikes of the network';
+$_BL['de']['Calculation basis are elements with area'] = 'Calculation basis are elements with area';
+$_BL['de']['Maximum strike density calculated'] = 'Maximum strike density calculated';
+$_BL['de']['Maximum mean strike density displayed'] = 'Maximum mean strike density displayed';
+$_BL['de']['densities_strikes_station'] = 'Strikes station {STATION_CITY}';
+$_BL['de']['Legend'] = 'Legend';
+$_BL['de']['Strikes per square kilometer'] = 'Strikes per square kilometer';
 
 /*************************************************************/
 /* Statistics                                                */
@@ -307,7 +313,7 @@ $_BL['en']['Currently no GPS coordinates available!'] = 'Currently no GPS coordi
 $_BL['en']['stat_navi_strikes'] = 'Strikes';
 $_BL['en']['graph_legend_strikes_time_all'] = 'Alle strikes of the lightning network';
 $_BL['en']['graph_legend_strikes_time_own'] = 'Only strikes detected by Station {STATION}';
-$_BL['en']['total strikes'] = 'Total strikes:';
+$_BL['en']['total strikes'] = 'Total strikes';
 $_BL['en']['total strikes station'] = 'Total strikes station {STATION}';
 $_BL['en']['legend_stat_strikes'] = 'Time range';
 $_BL['en']['Strikes station'] = 'Strikes station {STATION}';

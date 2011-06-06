@@ -922,7 +922,7 @@ function bo_update_all($force)
 	
 	flush();
 	$t = time();
-	
+
 	$strikes_imported = bo_update_strikes($force);
 	
 	if ($strikes_imported !== false || $async || $force)
@@ -1318,7 +1318,7 @@ function bo_update_densities($max_time)
 								
 								$max_count = max($max_count, $val);
 					
-								$val = sprintf("%0".(2*$bps)."d", dechex($val));
+								$val = sprintf("%0".(2*$bps)."s", dechex($val));
 							}
 							
 							$DATA .= $val;
@@ -1369,7 +1369,7 @@ function bo_update_densities($max_time)
 				$sql_where = '';
 				$sql_join  = '';
 				
-				if ($b['station_id'] == bo_station_id())
+				if (intval($b['station_id']) && $b['station_id'] == bo_station_id())
 				{
 					$sql_where = " AND s.part=1 ";
 				}
@@ -1415,10 +1415,9 @@ function bo_update_densities($max_time)
 							$row['cnt'] = pow(2, $bps * 8)-2;
 						
 						//add strike count
-						$DATA .= sprintf("%0".(2*$bps)."d", dechex($row['cnt']));
+						$DATA .= sprintf("%0".(2*$bps)."s", dechex($row['cnt']));
 						
 						$last_lon_id = $row['lon_id'] + 1;
-					
 					}
 
 					// fill rest of the string

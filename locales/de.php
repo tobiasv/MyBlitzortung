@@ -248,6 +248,13 @@ $_BL['de']['legend_arch_densities'] = 'Optionen';
 $_BL['de']['arch_select_dates_beween'] = 'Daten sind nur von {START} bis {END} vorhanden!';
 $_BL['de']['Max strikes density'] = 'Max. Blitzdichte';
 $_BL['de']['check_all_strikes_network'] = 'Alle Blitze des Ortungsnetzwerks';
+$_BL['de']['Calculation basis are elements with area'] = 'Berechnungsgrundlage sind Elemente mit einer Fläche von';
+$_BL['de']['Maximum strike density calculated'] = 'Maximale berechnete Blitzdichte';
+$_BL['de']['Maximum mean strike density displayed'] = 'Maximale mittlere Blitzdichte';
+$_BL['de']['densities_strikes_station'] = 'Blitze Station {STATION_CITY}';
+$_BL['de']['Legend'] = 'Legende';
+$_BL['de']['Strikes per square kilometer'] = 'Blitze pro Quadratmeter';
+
 
 /*************************************************************/
 /* Statistics                                                */
@@ -627,6 +634,4 @@ $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 
 $_BL['de']['Signals detected'] = 'Signale empfangen';
 $_BL['de']['Signal ratio'] = 'Ortungsquote';
-
-
 

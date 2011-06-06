@@ -68,7 +68,10 @@ class BoDb
 			return self::$dbh;
 		}
 
-		self::$dbh = mysql_connect(BO_DB_HOST, BO_DB_USER, BO_DB_PASS) or die("Database: Connect ERROR ");
+		$host  = BO_DB_HOST;
+		$host .= intval(BO_DB_PORT) ? ':'.intval(BO_DB_PORT) : '';
+		
+		self::$dbh = mysql_connect($host, BO_DB_USER, BO_DB_PASS) or die("Database: Connect ERROR ");
 
 		if ($prepare_all)
 		{

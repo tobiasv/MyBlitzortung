@@ -399,10 +399,12 @@ function _BL($msgid='', $noutf = false)
 }
 
 //charset
-function _BC($text)
+function _BC($text, $nospecialchars=false)
 {
 	if (defined('BO_UTF8') && BO_UTF8)
 		return utf8_encode($text);
+	else if ($nospecialchars)
+		return $text;
 	else
 		return htmlspecialchars($text);
 }

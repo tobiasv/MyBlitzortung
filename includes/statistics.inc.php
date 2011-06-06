@@ -680,7 +680,7 @@ function bo_show_statistics_other()
 	}
 	
 	//Show GPS Info
-	if (defined("BO_SHOW_GPS_INFO") && BO_SHOW_GPS_INFO)
+	if ( (defined("BO_SHOW_GPS_INFO") && BO_SHOW_GPS_INFO) || (bo_user_get_level() & BO_PERM_SETTINGS) )
 	{
 		echo '<h4>'._BL('h4_stat_other_gps').'</h4>';
 		echo '<p class="bo_stat_description" id="bo_stat_other_descr_gps">';

@@ -26,12 +26,12 @@
 /* Calculation settings for density   */
 /**************************************/
 
-$_BO['tpl_density_colors'][] = array(150, 150, 250, 110);
-$_BO['tpl_density_colors'][] = array(50, 150, 155, 0);
-$_BO['tpl_density_colors'][] = array(205, 205, 50, 0);
-$_BO['tpl_density_colors'][] = array(255, 0, 0, 0);
-$_BO['tpl_density_colors'][] = array(255, 0, 128, 0);
-$_BO['tpl_density_colors'][] = array(255, 128, 255, 0);
+$_BO['tpl_density_colors'][] = array(150, 150, 250, 105);
+$_BO['tpl_density_colors'][] = array(50, 150, 155, 15);
+$_BO['tpl_density_colors'][] = array(205, 205, 50, 15);
+$_BO['tpl_density_colors'][] = array(230, 0, 0, 15);
+$_BO['tpl_density_colors'][] = array(255, 0, 255, 15);
+$_BO['tpl_density_colors'][] = array(255, 190, 255, 15);
 
 
 //Europe
@@ -145,7 +145,7 @@ $_BO['tpl_imgmap']['germany_mini']['col'][] = array(225,   0, 0);
 
 //Germany (Landkreise) no exact merator prjection!
 $_BO['tpl_imgmap']['germany_lkr']['name'] = 'Germany';
-$_BO['tpl_imgmap']['germany_lkr']['footer'] = 'Kartenmaterial: <a href="http://de.wikipedia.org/w/index.php?title=Datei:Landkreise,_Kreise_und_kreisfreie_St%C3%A4dte_in_Deutschland.svg" target="_blank">Wikipedia</a>';
+$_BO['tpl_imgmap']['germany_lkr']['footer'] = 'Kartenmaterial: <a href="http://de.wikipedia.org/w/index.php?title=Datei:Landkreise,_Kreise_und_kreisfreie_St%C3%A4dte_in_Deutschland.svg" target="_blank">Wikipedia</a> &bull; Achtung: Positionen sind nicht exakt (nur bei dieser Karte!)';
 $_BO['tpl_imgmap']['germany_lkr']['menu'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['archive'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['file'] = 'map_germany_lkr.png';
@@ -163,8 +163,9 @@ $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 150, 0);
 $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 100, 0);
 $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255,   0, 0);
 $_BO['tpl_imgmap']['germany_lkr']['col'][] = array(225,   0, 0);
+$_BO['tpl_imgmap']['germany_lkr']['show_station'] = array(5, 155,155,255,true);
 $_BO['tpl_imgmap']['germany_lkr']['density'] = true;
-$_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 4;
+$_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 8;
 $_BO['tpl_imgmap']['germany_lkr']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 10;
 

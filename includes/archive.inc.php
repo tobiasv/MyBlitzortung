@@ -208,12 +208,12 @@ function bo_show_archive_map()
 		}
 		else
 		{
-			$img_file = BO_FILE.'?map='.$map.'&date='.sprintf('%04d%02d%02d', $year, $month, $day);
+			$img_file = BO_FILE.'?map='.$map.'&date='.sprintf('%04d%02d%02d', $year, $month, $day).'&bo_lang='._BL();
 			echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
 		}
 		
 		$footer = $_BO['mapimg'][$map]['footer'];
-		echo '<div class="bo_map_footer">'._BC($footer).'</div>';
+		echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 		
 		echo '</div>';
 		echo '</div>';
@@ -390,7 +390,7 @@ function bo_show_archive_density()
 	echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
 
 	$footer = $_BO['mapimg'][$map]['footer'];
-	echo '<div class="bo_map_footer">'._BC($footer).'</div>';
+	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 
 	echo '</div>';
 }
