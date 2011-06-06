@@ -793,6 +793,10 @@ function bo_get_density_image()
 		$color = imagecolorallocatealpha($I, 0, 0, 0, (1 - $cfg['density_darken'] / 100) * 127);
 		imagefilledrectangle($I, 0,0, $w, $h, $color);
 	}
+
+	//Legend
+	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
+	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
 	
 	list($x1, $y1) = bo_latlon2mercator($latS, $lonW);
 	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
@@ -1015,10 +1019,6 @@ function bo_get_density_image()
 
 		}
 	}
-
-	//Legend
-	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
-	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
 
 	//Legend: Text
 	$PosX = $w + 5;

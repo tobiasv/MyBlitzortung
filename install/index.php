@@ -25,6 +25,8 @@ if (!class_exists('mysqli'))
 else
 	require_once '../includes/db_mysqli.inc.php';
 
+include $path.'includes/default_settings.inc.php';
+	
 error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 1);
 
@@ -67,7 +69,7 @@ define("BO_STATION_NAME", "###Name of your station (i.e. city name)###");
 
 
 /*** Update secret  ***/
-/*   For importing the skrike data. You can leave it blank,   */
+/*   For importing the strike data. You can leave it blank,   */
 /*   but then everybody can trigger a data import!            */
 
 define("BO_UPDATE_SECRET", "'.uniqid().'");
