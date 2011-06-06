@@ -253,7 +253,7 @@ $_BL['de']['Maximum strike density calculated'] = 'Maximale berechnete Blitzdich
 $_BL['de']['Maximum mean strike density displayed'] = 'Maximale mittlere Blitzdichte';
 $_BL['de']['densities_strikes_station'] = 'Blitze Station {STATION_CITY}';
 $_BL['de']['Legend'] = 'Legende';
-$_BL['de']['Strikes per square kilometer'] = 'Blitze pro Quadratmeter';
+$_BL['de']['Strikes per square kilometer'] = 'Blitze pro Quadratkilometer';
 
 
 /*************************************************************/
