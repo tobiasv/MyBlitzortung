@@ -942,6 +942,16 @@ function bo_get_density_image()
 			//get the data!
 			for($j=0; $j<$lon_string_len/2/$bps; $j++)
 			{
+				//image x
+				$x = $j * $dx;
+				
+				//x coordinates to picture "block-numbers"
+				$ax = round(($x / $min_block_size));
+				$pos_id = $ax+$ay*$w;
+
+				//number of calculated values in block
+				$VAL_COUNT[$pos_id]++;
+
 				//strikes per square kilometer
 				$value = hexdec(substr($lon_data, $j * 2 * $bps, 2 * $bps));
 				
@@ -957,16 +967,9 @@ function bo_get_density_image()
 					$value = $own_value / $value;
 				}
 
-				//image x
-				$x = $j * $dx;
-				
-				//x coordinates to picture "block-numbers"
-				$ax = round(($x / $min_block_size));
-				$pos_id = $ax+$ay*$w;
-				
 				//Save to Data array
 				$STRIKE_COUNT[$pos_id] += $value;
-				$VAL_COUNT[$pos_id]++;
+				
 			}
 		}
 

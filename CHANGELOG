@@ -3,6 +3,10 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4.8a (2011-06-07)
+---------------------------
+- fix: corrected density value on density maps 
+
 Version 0.4.8 (2011-06-06)
 --------------------------
 - improved: europe map now shows north of europe (for our Finnish participants) and some color changes
