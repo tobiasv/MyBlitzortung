@@ -1022,6 +1022,10 @@ function bo_get_density_image()
 		}
 	}
 
+	//Legend (again!)
+	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
+	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
+
 	//Legend: Text
 	$PosX = $w + 5;
 	$PosY = 10;
