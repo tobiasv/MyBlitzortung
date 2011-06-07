@@ -64,7 +64,7 @@ function bo_alert_settings()
 	
 	echo '<div id="bo_alert_settings">';
 	
-	if (($level & BO_PERM_ALERT_ALL))
+	if (($level & BO_PERM_ADMIN))
 	{
 		echo '<form action="?" method="GET">';
 		echo bo_insert_html_hidden(array('bo_all', 'bo_action2'));
