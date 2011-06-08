@@ -52,6 +52,15 @@ class BoDb
 		return self::$dbh;
 	}
 
+	public static function close()
+	{
+		if (!is_null(self::$dbh))
+		{
+			self::$dbh->close();
+			self::$dbh = null;
+		}
+	}
+	
 	public static function select_db($die_on_error = true)
 	{
 		$ok = self::$dbh->select_db(BO_DB_NAME);

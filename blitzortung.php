@@ -35,6 +35,8 @@ if (!defined("BO_VER"))
 	define("BO_PERM_ARCHIVE", 		128);
 	define("BO_PERM_COUNT",	8);
 
+	define("BO_TILE_SIZE", 256);
+	
 	//Do not change these values (needed for auto linking stations)
 	define('BO_LINK_HOST', 'www.myblitzortung.de');
 	define('BO_LINK_URL',  '/blitzortung/bo.php');
@@ -70,7 +72,6 @@ if (!defined("BO_VER"))
 	//Session handling
 	@session_start();
 
-
 	//Very simple locale support
 	$locdir = BO_DIR.'locales/';
 	if (file_exists($locdir.BO_LOCALE.'.php'))
@@ -95,7 +96,6 @@ if (!defined("BO_VER"))
 	else
 		require_once 'includes/db_mysqli.inc.php';
 
-	define("BO_TILE_SIZE", 256);
 	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
 
 	//creating tiles should be very fast
@@ -113,7 +113,6 @@ if (!defined("BO_VER"))
 		phpinfo();
 		exit;
 	}
-
 
 	// includes #2
 	require_once 'includes/statistics.inc.php';

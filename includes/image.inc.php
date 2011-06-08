@@ -278,6 +278,8 @@ function bo_tile()
 
 		$points[] = array($px, $py, $col, $row['polarity']);
 	}
+	
+	BoDb::close();
 
 	//no points --> blank tile
 	if (count($points) == 0)
@@ -704,6 +706,8 @@ function bo_get_map_image()
 		$text = _BL('Blitzortung.org', true);
 	imagestring($I, $fontsize, 4, $h - 9 - $fontsize, $text, $text_col);
 
+	BoDb::close();
+	
 	header("Content-Type: image/png");
 	if ($caching)
 	{
@@ -906,6 +910,8 @@ function bo_get_density_image()
 	$max_count_block = 0;
 	$max_count_pos = 0;
 	$last_y = $h;
+	
+	BoDb::close();
 	
 	while ($DensLat < $DensLat_end)
 	{
