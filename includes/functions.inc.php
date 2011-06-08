@@ -309,7 +309,9 @@ function bo_copyright_footer()
 	echo '</div>';
 
 	echo '<div id="bo_copyright_extra">';
+	echo '<a href="http://'.BO_LINK_HOST.'/" target="_blank">';
 	echo _BL('copyright_footer');
+	echo '</a>';
 	echo '</div>';
 
 	if (BO_LOGIN_SHOW === true)

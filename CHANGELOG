@@ -3,9 +3,12 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.4.8a (2011-06-07)
+Version 0.4.8a (2011-06-08)
 ---------------------------
 - fix: corrected density display and values on density maps 
+- other minor improvments
+- README revised
+- MyBo site is now www.myblitzortung.de
 
 Version 0.4.8 (2011-06-06)
 --------------------------

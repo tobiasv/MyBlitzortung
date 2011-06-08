@@ -189,6 +189,10 @@ padding-top: 3px;
 margin: 0px 0 0 0;
 }
 
+#myblitzortung #bo_copyright_extra a {
+text-decoration: none;
+}
+
 #myblitzortung #bo_copyright_logo {
 float: right;
 height: 50px;

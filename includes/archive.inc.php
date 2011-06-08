@@ -604,7 +604,7 @@ function bo_show_archive_search()
 				fillOpacity: 0.1,
 				map: bo_map,
 				center: new google.maps.LatLng(<?php echo  "$lat,$lon" ?>),
-				radius: <?php echo $delta_dist + 1000 ?>
+				radius: <?php echo $delta_dist ?>
 			};
 
 			new google.maps.Circle(boDistCircle);
@@ -948,9 +948,5 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	echo '</form>';
 
 }
-
-
-
-
 
 ?>
