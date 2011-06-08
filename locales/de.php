@@ -466,7 +466,7 @@ $_BL['de']['info_myblitzortung_text'] = '
 		Verantwortung! Weder der Betreiber der Internetseite noch der/die Ersteller des Programms 
 		können für fehlerfreihe Funktion Garantieren. <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> ist freie Software. Mehr
 		Informationen dazu unter 
-		<a href="http://www.wetter-rosstal.de/myblitzortung" target="_blank">www.wetter-rosstal.de/myblitzortung</a>.
+		<a href="http://www.myblitzortung.de" target="_blank">myblitzortung.de</a>.
 		';
 
 		

@@ -36,7 +36,7 @@ if (!defined("BO_VER"))
 	define("BO_PERM_COUNT",	8);
 
 	//Do not change these values (needed for auto linking stations)
-	define('BO_LINK_HOST', 'www.wetter-rosstal.de');
+	define('BO_LINK_HOST', 'www.myblitzortung.de');
 	define('BO_LINK_URL',  '/blitzortung/bo.php');
 
 	//Some default PHP-Options

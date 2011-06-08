@@ -764,10 +764,10 @@ function bo_get_density_image()
 	}
 		
 	$file = $cfg['file'];
-	$latN = $cfg['coord'][0];
-	$lonE = $cfg['coord'][1];
-	$latS = $cfg['coord'][2];
-	$lonW = $cfg['coord'][3];
+	$PicLatN = $cfg['coord'][0];
+	$PicLonE = $cfg['coord'][1];
+	$PicLatS = $cfg['coord'][2];
+	$PicLonW = $cfg['coord'][3];
 	$colors = is_array($cfg['density_colors']) ? $cfg['density_colors'] : $_BO['tpl_density_colors'];
 
 	$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$file);
@@ -800,8 +800,8 @@ function bo_get_density_image()
 	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
 	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
 	
-	list($x1, $y1) = bo_latlon2mercator($latS, $lonW);
-	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
+	list($x1, $y1) = bo_latlon2mercator($PicLatS, $PicLonW);
+	list($x2, $y2) = bo_latlon2mercator($PicLatN, $PicLonE);
 	$w_x = $w / ($x2 - $x1);
 	$h_y = $h / ($y2 - $y1);
 
@@ -829,10 +829,10 @@ function bo_get_density_image()
 							(station_id = $station_id
 							".($ratio ? " OR station_id=0 " : "")."
 							)
-						AND lat_max >= '$latN'
-						AND lon_max >= '$lonE'
-						AND lat_min <= '$latS'
-						AND lon_min <= '$lonW'
+						AND lat_max >= '$PicLatN'
+						AND lon_max >= '$PicLonE'
+						AND lat_min <= '$PicLatS'
+						AND lon_min <= '$PicLonW'
 					ORDER BY length ASC, date_end DESC, station_id ASC
 					LIMIT 2
 						";
@@ -857,10 +857,10 @@ function bo_get_density_image()
 	$time_string = date(_BL('_date'), strtotime($row['date_start'])).' - '.date(_BL('_date'), strtotime($row['date_end']));
 	
 	//coordinates
-	$lat       = $row['lat_min'];
-	$lon       = $row['lon_min'];
-	$lat_end   = $row['lat_max'];
-	$lon_end   = $row['lon_max'];
+	$DensLat       = $row['lat_min'];
+	$DensLon       = $row['lon_min'];
+	$DensLat_end   = $row['lat_max'];
+	$DensLon_end   = $row['lon_max'];
 	$length    = $row['length'];
 	$area      = pow($length, 2);
 	$distance = $length * sqrt(2) * 1000;
@@ -899,40 +899,36 @@ function bo_get_density_image()
 	//pointer on current part of string
 	$string_pos = 0;
 	
-	$lonW = $lon;
-	$lonE = $lon_end;
-	$lonN = $lat_end;
-	$lonS = $lat;
-	
 	$STRIKE_COUNT = array();
 	$VAL_COUNT = array();
 	$strike_count = 0;
 	$strike_count_own = 0;
 	$max_count_block = 0;
 	$max_count_pos = 0;
-	
 	$last_y = $h;
-	while ($lat < $lat_end)
-	{
-		//density: difference to current lat/lon
-		list($dlat, $dlon) = bo_distbearing2latlong($distance, 45, $lat, $lon);
-		$dlat -= $lat;
-		$dlon -= $lon;
 	
+	while ($DensLat < $DensLat_end)
+	{
+		
+		//density: difference to current lat/lon
+		list($dlat, $dlon) = bo_distbearing2latlong($distance, 45, $DensLat, $DensLon);
+		$dlat -= $DensLat;
+		$dlon -= $DensLon;
+		
 		// check if latitude lies in picture
-		if ($lat + $dlat >= $latS)
+		if ($DensLat + $dlat >= $PicLatS)
 		{
 			//select correct data segment from data string
-			$lon_start_pos  = floor(($lonW-$lon)/$dlon) * 2 * $bps;
-			$lon_string_len = floor(($lonE-$lon)/$dlon) * 2 * $bps - $lon_start_pos;
+			$lon_start_pos  = floor(($PicLonW-$DensLon)/$dlon) * 2 * $bps;
+			$lon_string_len = floor(($PicLonE-$DensLon)/$dlon) * 2 * $bps - $lon_start_pos;
 		
 			$lon_data = substr($DATA, $string_pos + $lon_start_pos, $lon_string_len);
 			
 			//image coordinates (left side of image, height is current latitude)
-			list($px, $py) = bo_latlon2mercator($lat, $lonE);
+			list($px, $py) = bo_latlon2mercator($DensLat, $PicLonE);
 			$y  = $h - ($py - $y1) * $h_y; //image y
 			$ay = round(($y / $min_block_size)); //block number y
-			$dx = $dlon / ($lonE - $lonW) * $w; //delta x
+			$dx = $dlon / ($PicLonE - $PicLonW) * $w; //delta x
 			
 			if ($ratio)
 			{
@@ -980,13 +976,12 @@ function bo_get_density_image()
 			}
 		}
 
-		$string_pos += (floor(($lon_end-$lon)/$dlon)+2) * 2 * $bps;
-		$lat += $dlat;
+		$string_pos += (floor(($DensLon_end-$DensLon)/$dlon)+2) * 2 * $bps;
+		$DensLat += $dlat;
 		
 		// stop if picture is full
-		if ($lat > $latN)
+		if ($DensLat > $PicLatN)
 			break;
-	
 	}
 
 	if ($ratio)

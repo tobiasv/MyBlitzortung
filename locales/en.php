@@ -457,7 +457,7 @@ $_BL['en']['info_myblitzortung_text'] = '
 		The responsibility is on your side!
 		<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> ist free software. You can find
 		more information here: 
-		<a href="http://www.wetter-rosstal.de/myblitzortung" target="_blank">www.wetter-rosstal.de/myblitzortung</a>.
+		<a href="http://www.myblitzortung.de" target="_blank">www.myblitzortung.de</a>.
 		';
 
 		
@@ -517,8 +517,8 @@ $_BL['en']['show other users'] = 'Show settings of other users';
 $_BL['en']['User'] = 'User';
 $_BL['en']['Alert name'] = 'Name';
 $_BL['en']['Send to'] = 'Send to';
-$_BL['en']['Lat/Lon'] = 'Coodinates';
-$_BL['en']['Max. Distance'] = 'Max. Distance';
+$_BL['en']['Lat/Lon'] = 'Coordinates';
+$_BL['en']['Max. Distance'] = 'Max. distance';
 $_BL['en']['Min. strike rate'] = 'Min. strike rate';
 $_BL['en']['Last alert'] = 'Last alert';
 $_BL['en']['Alert count'] = 'Alert count';

@@ -685,14 +685,20 @@ function bo_show_archive_search()
 //Last raw data and strikes table
 function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 {
+	$perm = bo_user_get_level() & BO_PERM_ARCHIVE;
+
 	$per_page = 10;
+	$max_pages = $perm ? 1E9 : 10;
 
 	$only_strikes = isset($_GET['bo_only_strikes']);
 	$page = intval($_GET['bo_action']);
-	$page = $page < 0 ? 0 : $page;
-
-	$show_empty_sig = (bo_user_get_level() & BO_PERM_ARCHIVE) && isset($_GET['bo_all_strikes']);
 	
+	if ($page < 0)
+		$page = 0;
+	else if ($page > $max_pages)
+		$page = $max_pages;
+	
+	$show_empty_sig = $perm && isset($_GET['bo_all_strikes']);
 	
 	if ($lat !== null && $lon !== null)
 	{
@@ -777,10 +783,10 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 
 	echo '<div class="bo_sig_navi">';
 
-	if ($res->num_rows > $per_page)
-		echo '<a href="'.bo_insert_url('bo_action', $page+1).'" class="bo_sig_prev" index="nofollow">&lt; '._BL('Older').'</a>';
+	if ($res->num_rows > $per_page && $page < $max_pages)
+		echo '<a href="'.bo_insert_url('bo_action', $page+1).'" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
 	if ($page)
-		echo '<a href="'.bo_insert_url('bo_action', $page-1).'" class="bo_sig_next" index="nofollow">'._BL('Newer').' &gt;</a>';
+		echo '<a href="'.bo_insert_url('bo_action', $page-1).'" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
 	echo '</div>';
 
 	echo '<table class="bo_sig_table">';
@@ -932,10 +938,10 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	if ($count)
 	{
 		echo '<div class="bo_sig_navi">';
-		if ($count == $per_page)
-			echo '<a href="'.bo_insert_url('bo_action', $page+1).'" class="bo_sig_prev" index="nofollow">&lt; '._BL('Older').'</a>';
+		if ($count == $per_page && $page < $max_pages)
+			echo '<a href="'.bo_insert_url('bo_action', $page+1).'" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
 		if ($page)
-			echo '<a href="'.bo_insert_url('bo_action', $page-1).'" class="bo_sig_next" index="nofollow">'._BL('Newer').' &gt;</a>';
+			echo '<a href="'.bo_insert_url('bo_action', $page-1).'" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
 		echo '</div>';
 	}
 

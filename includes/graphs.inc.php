@@ -790,10 +790,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$graph->xaxis->title->Set(_BL('Distance').'   [km]');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
 
-			if ($type == 'ratio_distance_longtime')
-				$graph->ynaxis[0]->title->Set(_BL('Count'));
-			else
-				$graph->ynaxis[0]->title->Set(_BL('Count per hour'));
+			$graph->ynaxis[0]->title->Set(_BL('Count'));
 
 			break;
 
@@ -834,10 +831,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$graph->xaxis->title->Set(_BL('Bearing').'   [°]');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
 
-			if ($type == 'ratio_bearing_longtime')
-				$graph->ynaxis[0]->title->Set(_BL('Count'));
-			else
-				$graph->ynaxis[0]->title->Set(_BL('Count per hour'));
+			$graph->ynaxis[0]->title->Set(_BL('Count'));
 
 			break;
 
