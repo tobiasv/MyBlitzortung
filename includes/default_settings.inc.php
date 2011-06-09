@@ -207,14 +207,14 @@
 
 /*** Automatic Data-Purging ***/
 // min-age in hours, 0 disables
-@define("BO_PURGE_SIG_NS", 300);
-@define("BO_PURGE_SIG_ALL", 0);
-@define("BO_PURGE_STR_NP", 0);
-@define("BO_PURGE_STR_ALL", 0);
-@define("BO_PURGE_STR_DIST", 0);
-@define("BO_PURGE_STRSTA_ALL", 100);
-@define("BO_PURGE_STA_OTHER",  300);
-@define("BO_PURGE_STA_ALL", 0);
+@define("BO_PURGE_SIG_NS", 24);     //signals with no strike assigned        
+@define("BO_PURGE_SIG_ALL", 192);   //all signals
+@define("BO_PURGE_STR_NP", 0);      //strikes not participated
+@define("BO_PURGE_STR_ALL", 0);     //all strikes
+@define("BO_PURGE_STR_DIST", 0);    //strikes farther than BO_PURGE_STR_DIST_KM
+@define("BO_PURGE_STRSTA_ALL", 24); //strike <-> stations table (very important!)
+@define("BO_PURGE_STA_OTHER",  96); //station statistics: other (not yours)
+@define("BO_PURGE_STA_ALL", 0);     //station statistics: all
 @define("BO_PURGE_STR_DIST_KM", 2000);
 
 //global purge settings

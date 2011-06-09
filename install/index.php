@@ -20,19 +20,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-if (!class_exists('mysqli'))
-	require_once '../includes/db_mysql.inc.php';
-else
-	require_once '../includes/db_mysqli.inc.php';
-
-include $path.'includes/default_settings.inc.php';
-	
 error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 1);
-
 ini_set('magic_quotes_runtime', 0); 
 
+
 $path = realpath(dirname(__FILE__).'/../').'/';
+
+if (file_exists($path.'config.php'))
+	require_once $path.'config.php';
+
+require_once $path.'includes/default_settings.inc.php';
+
+if (!class_exists('mysqli'))
+	require_once $path.'includes/db_mysql.inc.php';
+else
+	require_once $path.'includes/db_mysqli.inc.php';
 
 if ($_SERVER['HTTP_HOST'])
 {
@@ -41,6 +44,7 @@ if ($_SERVER['HTTP_HOST'])
 }
 
 $config_example = '<?php
+
 /****************************************/
 /*  Main Config file for MyBlitzortung  */
 /****************************************/
@@ -99,8 +103,6 @@ if (!file_exists($path.'config.php'))
 }
 else
 {
-	include $path.'config.php';
-
 	$contents = file_get_contents($path.'config.php');
 	
 	if (!defined('BO_DB_HOST') || !defined('BO_DB_USER') || !defined('BO_DB_PASS') || !defined('BO_DB_NAME'))
@@ -173,8 +175,13 @@ echo '
 <head>
 <title>MyBlitzortung installation</title>
 <link rel="stylesheet" href="../style.css" type="text/css">
+<style>
+	body { font-size: 100.01%; font-family: Arial,Helvetica,sans-serif; margin: 0;  padding: 0 0 10px 0; background: #f6f6f9; }
+	#mybo_head h2 { display: block; margin-left:0 }
+</style>
 </head>
 <body>
+<div id="mybo_head">
 <h1><span class="bo_my">My</span>Blitzortung installation</h1> 
 
 <div style="margin-left: 20px">
@@ -228,7 +235,7 @@ switch($step)
 		echo '<p><a href="?step=1">Continue to next step &gt;</a></p>';
 
 
-		echo '<div style="width: 900px; font-family: Courier; border: 1px solid #999; padding: 1px 10px; font-size: 10pt;">';
+		echo '<div style="width: 900px; font-family: Courier; border: 1px solid #999; padding: 1px 10px; font-size: 10pt; background: #fff;">';
 		echo nl2br($code);
 		echo '</div>';
 
@@ -309,7 +316,7 @@ switch($step)
 
 	case 3:
 
-		include '../blitzortung.php';
+		include $path.'blitzortung.php';
 
 		echo '<h2>Testing data collection</h2>';
 
@@ -386,7 +393,14 @@ switch($step)
 					</ul>
 			';
 		echo '<h3>Change your individual configuration</h3>
-				<p>Perhaps you want to add some settings to config.php. See README or <em>includes/default_settings.inc.php</em> for details.</p>';
+				<p>Perhaps you want to add some settings to config.php. See README or <em>includes/default_settings.inc.php</em> for details.
+				German users should try those links:</p>
+				<ul>
+				<li><a target="_blank" href="http://www.wetter-ybbs.at/blitzortung-faq/index.php?action=artikel&cat=20&id=143&artlang=de">Konfiguration (Allgemein)</a></li>
+				<li><a target="_blank" href="http://www.wetter-ybbs.at/blitzortung-faq/index.php?action=artikel&cat=20&id=156&artlang=de">Konfiguration (Karten)</a></li>
+				<li><a target="_blank" href="http://www.wetter-ybbs.at/blitzortung-faq/index.php?action=artikel&cat=20&id=157&artlang=de">Konfiguration (Beispiel)</a></li>
+				</ul>
+				';
 				
 		echo '<h3>Copy JpGraph files.</h3>
 			<p>JpGraph is used for creating the graphs.
@@ -409,6 +423,8 @@ switch($step)
 }
 
 echo '
+</div>
+</div>
 </div>
 </body>
 </html>
