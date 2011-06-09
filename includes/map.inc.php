@@ -364,11 +364,14 @@ function bo_show_lightning_map()
 	echo '<label for="bo_map_station1">'._BL('Active stations').'</label> &nbsp ';
 	echo '</span>';
 
-	echo '<span class="bo_form_checkbox_text">';
-	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="3" name="bo_map_station" id="bo_map_station2">';
-	echo '<label for="bo_map_station2">'._BL('MyBlitzortung').' '._BL('stations').'</label> &nbsp ';
-	echo '</span>';
-
+	if (count($mybo_info) > 1)
+	{
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="3" name="bo_map_station" id="bo_map_station2">';
+		echo '<label for="bo_map_station2">'._BL('MyBlitzortung').' '._BL('stations').'</label> &nbsp ';
+		echo '</span>';
+	}
+	
 	echo '</div>';
 	
 	echo '</div>';

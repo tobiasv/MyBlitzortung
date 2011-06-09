@@ -154,6 +154,7 @@ $_BL['de']['Participants'] = 'Teilnehmer';
 
 $_BL['de']['Europe'] = 'Europa';
 $_BL['de']['Germany'] = 'Deutschland';
+$_BL['de']['Bavaria'] = 'Bayern';
 
 /*************************************************************/
 /* Main Menu (Standalone)                                    */
@@ -461,7 +462,7 @@ $_BL['de']['info_usage_text'] = '
 		<a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=5" target="_blank">Blitzortung.org</a>
 		';
 $_BL['de']['info_myblitzortung_text'] = '
-		Die Aufbereitung und Visualisierung der Daten auf dieser Homepage
+		Die Aufbereitung und Visualisierung der Daten auf dieser Internetseite
 		erfolgt durch das Programm <em><span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span></em>. Die Verwendung von <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> erfolgt auf eigene
 		Verantwortung! Weder der Betreiber der Internetseite noch der/die Ersteller des Programms 
 		können für fehlerfreihe Funktion Garantieren. <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> ist freie Software. Mehr
@@ -485,7 +486,7 @@ $_BL['de']['bo_stat_network_descr_lasth'] = 'Alle Angaben beziehen sich auf eine
 $_BL['de']['bo_stat_network_descr_table'] = 'Hier sind alle aktiven Stationen des Ortungsnetzwerks aufgelistet. Durch Anklicken der Spaltenüberschriften kann die Tabelle entsprechend sortiert werden.';
 $_BL['de']['bo_graph_descr_bear'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Himmelsrichtung. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
 $_BL['de']['bo_stat_longtime_descr'] = 'Die hier dargestellten Angaben werden seit Beginn der Aufzeichnung von <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> auf dieser Seite fortgeführt. Die Distanzen beziehen sich immer auf den Standort der Station {STATION}.';
-$_BL['de']['bo_stat_other_database_descr'] = 'Alle Blitze, Signal- und Stationsdaten uvm. auf dieser werden in einer Datenbank gespeichert. Hier sind einige Angaben dazu:';
+$_BL['de']['bo_stat_other_database_descr'] = 'Alle Blitze, Signal- und Stationsdaten uvm. auf dieser Internetseite werden in einer Datenbank gespeichert. Hier sind einige Angaben dazu:';
 $_BL['de']['bo_stat_other_updates_descr'] = 'In bestimmten Zeitintervallen werden alle notwendigen Daten von blitzortung.org geholt und auf dieser Seite gespeichert. Hier sind die Zeitpunkte der letzten Aktualisierung zu sehen:';
 $_BL['de']['bo_stat_other_gps_descr'] = 'Informationen zum GPS-Empfänger, welcher zur exakten Ermittlung der aktuellen Uhrzeit benötigt wird. Die Positionsdaten der letzten 24 Stunden sind in der Karte eingezeichnet. Falls die Antennenausrichtungen bekannt sind, so sind diese ebenfalls sichtbar.';
 $_BL['de']['bo_stat_station_descr_lasth'] = 'Alle Angaben beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung.';

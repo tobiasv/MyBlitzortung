@@ -178,6 +178,32 @@ $_BO['tpl_imgmap']['germany_lkr_gdz']['coord'] = array(55.22, 15.59, 47.05, 5.23
 $_BO['tpl_imgmap']['germany_lkr_gdz']['footer'] = '© Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, 2011<br>
 	Vervielfältigung, Verbreitung und öffentliche Zugänglichmachung, auch auszugsweise, mit Quellenangabe gestattet.';
 
+//Germany (Bavaria) * don't know wether mercator, but border overlap really good in google earth
+$_BO['tpl_imgmap']['germany_bavaria']['name'] = 'Bavaria';
+$_BO['tpl_imgmap']['germany_bavaria']['footer'] = 'Kartenmaterial: <a href="http://commons.wikimedia.org/wiki/File:Bavaria_relief_location_map.jpg?uselang=de">Wikimedia Commons</a> &bull; GNU-Lizenz für freie Dokumentation ';
+$_BO['tpl_imgmap']['germany_bavaria']['menu'] = true;
+$_BO['tpl_imgmap']['germany_bavaria']['archive'] = true;
+$_BO['tpl_imgmap']['germany_bavaria']['file'] = 'map_germany_bavaria.png';
+$_BO['tpl_imgmap']['germany_bavaria']['coord'] = array(50.62, 14.059753, 47.25, 8.897552); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['germany_bavaria']['trange'] = 2; //hours!
+$_BO['tpl_imgmap']['germany_bavaria']['upd_intv'] = 5; //minutes
+$_BO['tpl_imgmap']['germany_bavaria']['textcolor'] = array(255,255,255);
+$_BO['tpl_imgmap']['germany_bavaria']['textsize'] = 5;
+$_BO['tpl_imgmap']['germany_bavaria']['point_type'] = 2;
+$_BO['tpl_imgmap']['germany_bavaria']['point_size'] = 2;
+$_BO['tpl_imgmap']['germany_bavaria']['legend'] = array(5, 100, 80, 4, 4, 1);
+$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255, 255, 0);
+$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255, 200, 0);
+$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255, 150, 0);
+$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255, 100, 0);
+$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255,   0, 0);
+$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(225,   0, 0);
+$_BO['tpl_imgmap']['germany_bavaria']['show_station'] = array(5, 155,80,155,true);
+$_BO['tpl_imgmap']['germany_bavaria']['density'] = true;
+$_BO['tpl_imgmap']['germany_bavaria']['density_blocksize'] = 8;
+$_BO['tpl_imgmap']['germany_bavaria']['density_colors'] = $_BO['tpl_density_colors'];
+$_BO['tpl_imgmap']['germany_bavaria']['density_darken'] = 20;
+	
 /*
 //Germany NRW
 $_BO['tpl_imgmap']['NRW']['name'] = 'NRW';

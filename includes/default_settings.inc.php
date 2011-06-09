@@ -43,6 +43,9 @@
 /*   own page and wrong characters appear                          */
 @define("BO_UTF8", true);
 
+//Update secret
+@define("BO_UPDATE_SECRET", '');
+
 //Default timezone
 @define("BO_TIMEZONE", "Europe/Berlin");
 
