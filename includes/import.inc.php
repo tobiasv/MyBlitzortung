@@ -1159,7 +1159,7 @@ function bo_update_densities($max_time)
 		}
 		
 		//delete old data, if it's not the end day of the month
-		$delete_time = mktime(0,0,0,date('m'),date('d')-2,date('Y'));
+		$delete_time = mktime(0,0,0,date('m'),date('d')-3,date('Y'));
 		if (date('t', $delete_time) == date('d', $delete_time))
 			$delete_time = 0;
 	}

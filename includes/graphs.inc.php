@@ -510,9 +510,25 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 				if (!isset($Y[$data_id]['sig'][$i])) $Y[$data_id]['sig'][$i] = $Y[$data_id]['sig'][$i-1];
 				if (!isset($Y[$data_id]['astr'][$i])) $Y[$data_id]['astr'][$i] = $Y[$data_id]['astr'][$i-1];
 				if (!isset($Y[$data_id]['mstr'][$i])) $Y[$data_id]['mstr'][$i] = $Y[$data_id]['mstr'][$i-1];
-				if (!isset($Y[$data_id]['cnt'][$i])) $Y[$data_id]['cnt'][$i] = $Y[$data_id]['cnt'][$i-1];
-				if (!isset($Y[$data_id]['sig_ratio'][$i])) $Y[$data_id]['sig_ratio'][$i] = $Y[$data_id]['sig_ratio'][$i-1];
-				if (!isset($Y[$data_id]['str_ratio'][$i])) $Y[$data_id]['str_ratio'][$i] = $Y[$data_id]['str_ratio'][$i-1];
+				
+				//special treatment for the following vars
+				if (!isset($Y[$data_id]['sig_ratio'][$i]) && !isset($Y[$data_id]['str_ratio'][$i]) && $data_id > 0)
+					$no_data_count++;
+				else
+					$no_data_count = 0;
+				
+				if ($no_data_count > 3)
+				{
+					$Y[$data_id]['cnt'][$i] = null;
+					$Y[$data_id]['sig_ratio'][$i] = null;
+					$Y[$data_id]['str_ratio'][$i] = null;
+				}
+				else
+				{
+					if (!isset($Y[$data_id]['cnt'][$i])) $Y[$data_id]['cnt'][$i] = $Y[$data_id]['cnt'][$i-1];
+					if (!isset($Y[$data_id]['sig_ratio'][$i])) $Y[$data_id]['sig_ratio'][$i] = $Y[$data_id]['sig_ratio'][$i-1];
+					if (!isset($Y[$data_id]['str_ratio'][$i])) $Y[$data_id]['str_ratio'][$i] = $Y[$data_id]['str_ratio'][$i-1];
+				}
 			}
 		}
 
