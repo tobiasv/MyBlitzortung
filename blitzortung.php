@@ -21,6 +21,8 @@
 
 if (!defined("BO_VER"))
 {
+	//Session handling
+	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
 	define("BO_VER", '0.4.8c');
@@ -69,9 +71,6 @@ if (!defined("BO_VER"))
 
 	date_default_timezone_set(BO_TIMEZONE);
 	
-	//Session handling
-	@session_start();
-
 	//Very simple locale support
 	$locdir = BO_DIR.'locales/';
 	if (file_exists($locdir.BO_LOCALE.'.php'))
