@@ -445,6 +445,55 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 		$graph_type = 'textlin';
 
 	}
+	else if ($type == 'distance')
+	{
+		//Mean strike distance to station by time of all strikes and own strikes
+		
+		$interval = $hours_back / 24 * 15;
+		$ticks = ($time_end - $time_start) / 60 / $interval;
+
+		$tmp = array();
+		
+		$sql = "SELECT SUM(distance) sum_dist, COUNT(distance) cnt_dist, part, time
+				FROM ".BO_DB_PREF."strikes
+				WHERE time BETWEEN '$date_start' AND '$date_end'
+				GROUP BY part, DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
+		$res = bo_db($sql);
+		while($row = $res->fetch_assoc())
+		{
+			$time = strtotime($row['time'].' UTC');
+			$index = floor( ($time - time() + 3600 * $hours_back) / 60 / $interval);
+
+			if ($index < 0)
+				continue;
+
+			$tmp['all_sum'][$index] += $row['sum_dist'];  //distance sum
+			$tmp['all_cnt'][$index] += $row['cnt_dist'];  //distance count
+			
+			if ($row['part'])
+			{
+				$tmp['own_sum'][$index] += $row['sum_dist'];  //own distance sum
+				$tmp['own_cnt'][$index] += $row['cnt_dist'];  //own distance count
+			}
+		}
+
+		for($i=0;$i<$ticks;$i++)
+		{
+			$X[$i] = $time_start + $i * $interval * 60;
+			$Y[$i] = null;
+			$Y2[$i] = null;
+			
+			if (intval($tmp['all_cnt'][$i]) != 0)
+				$Y[$i] = $tmp['all_sum'][$i] / $tmp['all_cnt'][$i] / 1000;
+
+			if (intval($tmp['own_cnt'][$i]) != 0)
+				$Y2[$i] = $tmp['own_sum'][$i] / $tmp['own_cnt'][$i] / 1000;
+
+		}
+		
+		$graph_type = 'datlin';
+		
+	}
 	else
 	{
 		$interval = BO_UP_INTVL_STATIONS;
@@ -476,7 +525,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			while($row = $res->fetch_assoc())
 			{
 				$time = strtotime($row['time'].' UTC');
-
 				$index = floor( ($time - time() + 3600 * $hours_back) / 60 / $interval);
 
 				if ($index < 0)
@@ -722,6 +770,31 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 			break;
 
+		case 'distance':
+
+			$graph->title->Set(_BL('graph_stat_title_distance').$add_title);
+
+			$plot=new LinePlot($Y, $X);
+			$plot->SetColor(BO_GRAPH_STAT_DIST_COLOR_L1);
+			if (BO_GRAPH_STAT_DIST_COLOR_F1)
+				$plot->SetFillColor(BO_GRAPH_STAT_DIST_COLOR_F1);
+			$plot->SetWeight(BO_GRAPH_STAT_DIST_WIDTH_1);
+			$plot->SetLegend(_BL('graph_legend_distance_all'));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y2, $X);
+			$plot->SetColor(BO_GRAPH_STAT_DIST_COLOR_L2);
+			if (BO_GRAPH_STAT_DIST_COLOR_F2)
+				$plot->SetFillColor(BO_GRAPH_STAT_DIST_COLOR_F2);
+			$plot->SetWeight(BO_GRAPH_STAT_DIST_WIDTH_2);
+			$plot->SetLegend(_BL('graph_legend_distance_own'));
+			$graph->Add($plot);
+
+			$graph->xaxis->title->Set(_BL('Time'));
+			$graph->yaxis->title->Set(_BL('Distance').'   [km]');
+
+			break;
+
 		case 'stations':
 
 			$graph->title->Set(_BL('graph_stat_title_stations').$add_title);
@@ -903,18 +976,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 function bo_graph_error($w, $h)
 {
-	$I = imagecreate($w, $h);
-	$back  = imagecolorallocate($I, 255, 150, 150);
-	$black = imagecolorallocate($I, 0, 0, 0);
-
-	imagestring($I, 2, $w / 2 - 90, $h/2-25, 'File', $black);
-	imagestring($I, 2, $w / 2 - 90, $h/2-10, '"includes/jpgraph/jpgraph.php"', $black);
-	imagestring($I, 2, $w / 2 - 90, $h/2+5, 'not found!', $black);
-
-	imagerectangle($I, 0,0,$w-1,$h-1,$black);
-	Header("Content-type: image/png");
-	Imagepng($I);
-	exit;
+	$text = 'File "includes/jpgraph/jpgraph.php" not found!';
+	bo_image_error($w, $h, $text);
 }
+
 
 ?>

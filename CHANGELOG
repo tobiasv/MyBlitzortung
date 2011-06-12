@@ -3,6 +3,15 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4.8d (2011-06-12)
+---------------------------
+- new: map of Bavaria included
+- new: internal graph average strike distance by time (url: blitzortung.php?graph_statistics=distance)
+- new: error message when cache dir is not writeable
+- fix: installation
+- fix: no error when database port defined as empty string or zero
+- other minor fixes
+
 Version 0.4.8a (2011-06-08)
 ---------------------------
 - fix: corrected density display and values on density maps 

@@ -194,7 +194,7 @@ function bo_tile()
 					$box_bg  = imagecolorallocate($I, 210, 210, 255);
 					$box_line  = imagecolorallocate($I, 255, 255, 255);
 
-					imagefilledrectangle( $I, 0, 0, imagesx($I), imagesy($I), $blank);
+					imagefilledrectangle( $I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
 
 					$text = _BL('tile not available', true);
 					$lines = explode("\n", $text);
@@ -218,7 +218,10 @@ function bo_tile()
 						exit;
 					}
 					
-					imagepng($I, $dir.'na.png');
+					$ok = @imagepng($I, $dir.'na.png');
+					
+					if (!$ok)
+						bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
 
 				}
 
@@ -285,7 +288,10 @@ function bo_tile()
 	if (count($points) == 0)
 	{
 		$img = file_get_contents(BO_DIR.'images/blank_tile.png');
-		file_put_contents($file, $img);
+		$ok = @file_put_contents($file, $img);
+		
+		if (!$ok && $caching)
+			bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
 		
 		header("Content-Type: image/png");
 		echo $img;
@@ -384,7 +390,11 @@ function bo_tile()
 	header("Content-Type: image/png");
 	if ($caching)
 	{
-		imagepng($I, $file);
+		$ok = @imagepng($I, $file);
+		
+		if (!$ok)
+			bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
+		
 		readfile($file);
 	}
 	else
@@ -711,7 +721,11 @@ function bo_get_map_image()
 	header("Content-Type: image/png");
 	if ($caching)
 	{
-		imagepng($I, $cache_file);
+		$ok = @imagepng($I, $cache_file);
+		
+		if (!$ok)
+			bo_image_cache_error($w, $h);
+		
 		readfile($cache_file);
 	}
 	else
@@ -1166,7 +1180,11 @@ function bo_get_density_image()
 	header("Content-Type: image/png");
 	if ($caching)
 	{
-		imagepng($I, $cache_file);
+		$ok = @imagepng($I, $cache_file);
+		
+		if (!$ok)
+			bo_image_cache_error($w, $h);
+
 		readfile($cache_file);
 	}
 	else
@@ -1209,6 +1227,25 @@ function bo_imagestring(&$I, $size, $x, $y, $text, $textcol, $maxwidth)
 	return $y;
 }
 
+//error output
+function bo_image_error($w, $h, $text, $size=2)
+{
+	$I = imagecreate($w, $h);
+	imagefill($I, 0, 0, imagecolorallocate($I, 255, 150, 150));
+	$black = imagecolorallocate($I, 0, 0, 0);
+	bo_imagestring($I, $size, 10, $h/2-25, $text, $black, $w-20);
+	imagerectangle($I, 0,0,$w-1,$h-1,$black);
+	
+	Header("Content-type: image/png");
+	Imagepng($I);
+	exit;
+}
+
+function bo_image_cache_error($w, $h)
+{
+	bo_image_error($w, $h, 'Creating image failed! Please check if your cache-dirs are writeable!', 3);
+}
+
 //get an image from /images directory
 //we need this for easy integration of MyBlitzortung in other projects
 function bo_get_image($img)
@@ -1217,12 +1254,10 @@ function bo_get_image($img)
 	switch($img)
 	{
 		case 'logo':
-		default:
 			$file = 'blitzortung_logo.jpg';
 			break;
 
 		case 'my':
-		default:
 			$file = 'myblitzortung.png';
 			break;
 	}

@@ -216,6 +216,12 @@ $_BL['en']['graph_legend_stations_max_active'] = 'Highest station count ever';
 $_BL['en']['graph_legend_count_distance'] = 'Whole strike count';
 $_BL['en']['graph_legend_ratio_bearing'] = 'Locating ratio station {STATION}';
 $_BL['en']['graph_legend_count_bearing'] = 'Whole strike count';
+$_BL['en']['graph_stat_title_distance'] = 'Average strike distance';
+$_BL['en']['graph_legend_distance_all'] = 'All Strikes';
+$_BL['en']['graph_legend_distance_own'] = 'Strikes of station {STATION}';
+$_BL['en']['graph_stat_title_strikes_time'] = 'Strikes';
+$_BL['en']['graph_legend_strikes_time_all'] = 'Alle strikes of the lightning network';
+$_BL['en']['graph_legend_strikes_time_own'] = 'Only strikes detected by Station {STATION}';
 
 $_BL['en']['h3_graphs'] = 'Graphs';
 $_BL['en']['h4_graph_strikes'] = 'Strike count';
@@ -311,14 +317,11 @@ $_BL['en']['Strikes detected'] = 'Strikes detected';
 $_BL['en']['of the last'] = 'of the last';
 $_BL['en']['Currently no GPS coordinates available!'] = 'Currently no GPS coordinates available!';
 $_BL['en']['stat_navi_strikes'] = 'Strikes';
-$_BL['en']['graph_legend_strikes_time_all'] = 'Alle strikes of the lightning network';
-$_BL['en']['graph_legend_strikes_time_own'] = 'Only strikes detected by Station {STATION}';
 $_BL['en']['total strikes'] = 'Total strikes';
 $_BL['en']['total strikes station'] = 'Total strikes station {STATION}';
 $_BL['en']['legend_stat_strikes'] = 'Time range';
 $_BL['en']['Strikes station'] = 'Strikes station {STATION}';
 $_BL['en']['_in_radius'] = ' (max. {RADIUS}km) ';
-$_BL['en']['graph_stat_title_strikes_time'] = 'Strikes';
 
 
 /*************************************************************/

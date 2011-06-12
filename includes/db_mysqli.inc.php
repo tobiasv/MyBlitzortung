@@ -38,7 +38,12 @@ class BoDb
 			return self::$dbh;
 		}
 
-		self::$dbh = new mysqli(BO_DB_HOST, BO_DB_USER, BO_DB_PASS, "", BO_DB_PORT);
+		$port = (int)BO_DB_PORT;
+
+		if (!$port)
+			$port = null;
+		
+		self::$dbh = new mysqli(BO_DB_HOST, BO_DB_USER, BO_DB_PASS, "", $port);
 
 		if (mysqli_connect_error() && $die_on_error)
 			die('Database: Connect ERROR (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());

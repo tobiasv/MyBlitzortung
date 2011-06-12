@@ -161,6 +161,14 @@
 @define("BO_GRAPH_STAT_SIG_COLOR_F2", false);
 @define("BO_GRAPH_STAT_SIG_WIDTH_2",  2);
 
+//Statistics-Graph: Signals
+@define("BO_GRAPH_STAT_DIST_COLOR_L1", '#fa0@1');
+@define("BO_GRAPH_STAT_DIST_COLOR_F1", '#fa0@0.8');
+@define("BO_GRAPH_STAT_DIST_WIDTH_1",  1);
+@define("BO_GRAPH_STAT_DIST_COLOR_L2", '#fc3@0.2');
+@define("BO_GRAPH_STAT_DIST_COLOR_F2", false);
+@define("BO_GRAPH_STAT_DIST_WIDTH_2",  2);
+
 //Statistics-Graph: Ratio
 @define("BO_GRAPH_STAT_RAT_COLOR_L1", '#fa0@0.9');
 @define("BO_GRAPH_STAT_RAT_COLOR_F1", '#fa0@0.7');

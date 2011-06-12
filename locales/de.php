@@ -215,6 +215,11 @@ $_BL['de']['graph_legend_stations_max_active'] = 'Größte jemals gemessene Anzahl
 $_BL['de']['graph_legend_count_distance'] = 'Gesamte Blitzanzahl';
 $_BL['de']['graph_legend_ratio_bearing'] = 'Ortungsquote Station {STATION}';
 $_BL['de']['graph_legend_count_bearing'] = 'Gesamte Blitzanzahl';
+$_BL['de']['graph_legend_strikes_time_all'] = 'Alle Blitze des Ortungsnetzwerks';
+$_BL['de']['graph_legend_strikes_time_own'] = 'Nur von Station {STATION} registrierte Blitze';
+$_BL['de']['graph_stat_title_distance'] = 'Mittlere Entfernung der Blitze';
+$_BL['de']['graph_legend_distance_all'] = 'Alle Blitze';
+$_BL['de']['graph_legend_distance_own'] = 'Blitze Station {STATION}';
 
 $_BL['de']['h3_graphs'] = 'Diagramme';
 $_BL['de']['h4_graph_strikes'] = 'Blitzanzahl';
@@ -311,8 +316,6 @@ $_BL['de']['Strikes detected'] = 'Blitze registriert';
 $_BL['de']['of the last'] = 'der letzten';
 $_BL['de']['Currently no GPS coordinates available!'] = 'Momentan sind keine GPS Koordinaten verfügbar';
 $_BL['de']['stat_navi_strikes'] = 'Blitze';
-$_BL['de']['graph_legend_strikes_time_all'] = 'Alle Blitze des Ortungsnetzwerks';
-$_BL['de']['graph_legend_strikes_time_own'] = 'Nur von Station {STATION} registrierte Blitze';
 $_BL['de']['total strikes'] = 'Blitze gesamt';
 $_BL['de']['total strikes station'] = 'Blitze gesamt Station {STATION}';
 $_BL['de']['legend_stat_strikes'] = 'Zeitraum';
@@ -635,4 +638,3 @@ $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 
 $_BL['de']['Signals detected'] = 'Signale empfangen';
 $_BL['de']['Signal ratio'] = 'Ortungsquote';
-
