@@ -451,7 +451,7 @@ $_BL['de']['info_participate_text'] = '
 		mit dem Lötkolben. Für das Zusammenbauen der Platinen, anschließen der Antennen und des GPS-Empfängers
 		und die anschließende Inbetriebnahme sollte man ein paar Abende einplanen. Bei Problemen
 		bekommt man im 
-		<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a> 
+		<a href="http://www.wetter-board.de/index.php?page=Board&boardID=381" target="_blank">Wetter-Board</a> 
 		recht schnell Hilfestellungen von den andern Teilnehmern.
 		Die Gesamtkosten betragen um die 150 Euro. Weitere Infos dazu unter 
 		<a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=2" target="_blank">Blitzortung &gt; Mitmachen</a>.';
@@ -638,3 +638,6 @@ $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 
 $_BL['de']['Signals detected'] = 'Signale empfangen';
 $_BL['de']['Signal ratio'] = 'Ortungsquote';
+$_BL['de']['Extra overlays'] = 'Weitere Einblendungen';
+$_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
+

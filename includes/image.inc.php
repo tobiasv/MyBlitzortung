@@ -657,6 +657,15 @@ function bo_get_map_image()
 			imagestring($I, 3, $x+2, $y-12, $stinfo['city'], $stat_color);
 	}
 	
+	//Borders
+	if (!$transparent && $cfg['borders'][0] && file_exists(BO_DIR.'images/'.$cfg['borders'][0]))
+	{
+		$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$cfg['borders'][0]);
+		if ($tmpImage)
+			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
+	}
+
+	
 	//Date/Time/Strikes
 	$fontsize = $w / 100;
 	$time_max = min($last_update, $time_max);
@@ -1047,6 +1056,14 @@ function bo_get_density_image()
 		}
 	}
 
+	//Borders
+	if ($cfg['borders'][0] && file_exists(BO_DIR.'images/'.$cfg['borders'][0]))
+	{
+		$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$cfg['borders'][0]);
+		if ($tmpImage)
+			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
+	}
+	
 	//Legend (again!)
 	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
 	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);

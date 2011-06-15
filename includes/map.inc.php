@@ -42,7 +42,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	
 ?>
 
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3.4&sensor=false"></script>
 	<script type="text/javascript">
 
 	var bo_map;
@@ -295,6 +295,20 @@ function bo_show_lightning_map()
 		}
 	}
 	
+	//Get extra map overlays
+	$Overlays = array();
+	foreach ($_BO['mapovl'] as $id => $data)
+	{
+		if ( !((bo_user_get_level() & BO_PERM_NOLIMIT) && $data['only_loggedin'])
+		     || empty($data)
+			)
+			continue;
+		
+		$Overlays[$id] = $data;
+	}
+	
+	ksort($Overlays);
+	
 	$radius = $_BO['radius'] * 1000;
 	$zoom = BO_DEFAULT_ZOOM;
 	
@@ -330,7 +344,7 @@ function bo_show_lightning_map()
 		echo '<input type="checkbox" onclick="bo_map_toggle_overlay(this.checked, '.$mapid.');" ';
 		echo $cfg['default_show'] ? ' checked="checked" ' : '';
 		echo ' id="bo_map_opt'.$mapid.'"> ';
-		echo '<label for="bo_map_opt'.$mapid.'">'.$name.'</label> &nbsp ';
+		echo '<label for="bo_map_opt'.$mapid.'">'.$name.'</label> &nbsp; ';
 		echo '</span>';
 	}
 
@@ -356,23 +370,41 @@ function bo_show_lightning_map()
 	
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="1" name="bo_map_station" id="bo_map_station0" checked>';
-	echo '<label for="bo_map_station0">'._BL('None').'</label> &nbsp ';
+	echo '<label for="bo_map_station0">'._BL('None').'</label> &nbsp; ';
 	echo '</span>';
 
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="2" name="bo_map_station" id="bo_map_station1">';
-	echo '<label for="bo_map_station1">'._BL('Active stations').'</label> &nbsp ';
+	echo '<label for="bo_map_station1">'._BL('Active stations').'</label> &nbsp; ';
 	echo '</span>';
 
 	if (count($mybo_info) > 1)
 	{
 		echo '<span class="bo_form_checkbox_text">';
 		echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="3" name="bo_map_station" id="bo_map_station2">';
-		echo '<label for="bo_map_station2">'._BL('MyBlitzortung').' '._BL('stations').'</label> &nbsp ';
+		echo '<label for="bo_map_station2">'._BL('MyBlitzortung').' '._BL('stations').'</label> &nbsp; ';
 		echo '</span>';
 	}
 	
 	echo '</div>';
+	
+	if (count($Overlays))
+	{
+		echo '<div class="bo_input_container">';
+		echo '<span class="bo_form_descr">'._BL('Extra overlays').':</span> ';
+
+		foreach($Overlays as $id => $cfg)
+		{
+			echo '<span class="bo_form_checkbox_text">';
+			echo '<input type="checkbox" onclick="bo_map_toggle_extraoverlay(this.checked, this.value);" value="'.$id.'" name="bo_map_overlay" id="bo_map_overlay'.$id.'" ';
+			echo $cfg['default_show'] ? ' checked="checked" ' : '';
+			echo '>';
+			echo '<label for="bo_map_overlay'.$id.'">'._BL($cfg['sel_name']).'</label> &nbsp; ';
+			echo '</span>';
+		}
+		
+		echo '</div>';
+	}
 	
 	echo '</div>';
 	echo '</fieldset>';
@@ -391,6 +423,8 @@ function bo_show_lightning_map()
 	var bo_infowindow;
 	var bo_autoupdate = false;
 	var bo_autoupdate_running = false;
+	var bo_ExtraOverlay = [];
+	var bo_ExtraOverlayMaps = [];
 	
 	function bo_toggle_autoupdate(auto)
 	{
@@ -529,10 +563,38 @@ function bo_show_lightning_map()
 		bo_show_only_own = show_only_own ? 1 : 0;
 		bo_map_reload_overlays();
 	}
+
+	function bo_map_toggle_extraoverlay(checked, type)
+	{
+		bo_setcookie('bo_show_extraovl'+type, checked ? 1 : -1);
+		bo_ExtraOverlay[type].bo_show = checked;
+		bo_map_reload_overlays();
+	}
 	
 	function bo_map_reload_overlays()
 	{
 		var i;
+
+		if (bo_ExtraOverlayMaps.length == 0)
+		{
+			for (i in bo_ExtraOverlay)
+			{
+				bo_ExtraOverlayMaps[i] = new google.maps.GroundOverlay(bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds);
+				bo_ExtraOverlayMaps[i].clickable = false;
+			}
+		}
+		
+		for (i in bo_ExtraOverlay)
+		{
+			for (i in bo_ExtraOverlay)
+			{
+				if (bo_ExtraOverlay[i].bo_show)
+					bo_ExtraOverlayMaps[i].setMap(bo_map);
+				else
+					bo_ExtraOverlayMaps[i].setMap(null);
+			}
+		}
+		
 		
 		while (bo_map.overlayMapTypes.length)
 			bo_map.overlayMapTypes.pop();
@@ -646,6 +708,20 @@ function bo_show_lightning_map()
 			';
 		}
 		
+		foreach($Overlays as $ovlid => $cfg)
+		{
+			echo '
+            bo_ExtraOverlay['.$ovlid.'] = {
+			    bo_image: "'.$cfg['img'].'",
+			    bo_bounds: new google.maps.LatLngBounds(
+                               new google.maps.LatLng('.$cfg['coord'][2].','.$cfg['coord'][3].'),
+                               new google.maps.LatLng('.$cfg['coord'][0].','.$cfg['coord'][1].')),
+			    bo_show: '.($cfg['default_show'] ? 'true' : 'false').'
+			};
+			';
+		}
+		
+
 ?>		
 
 		var c = bo_getcookie('bo_show_only_own');
@@ -654,7 +730,6 @@ function bo_show_lightning_map()
 			bo_show_only_own = c == -1 ? 0 : 1;
 			document.getElementById('bo_map_opt_own').checked = c == -1 ? false : true;
 		}
-
 		
 		for (i=0;i<boOvlMap.length;i++)
 		{
@@ -666,6 +741,16 @@ function bo_show_lightning_map()
 			}
 		}
 
+		for (i=0;i<bo_ExtraOverlay.length;i++)
+		{
+			var c = bo_getcookie('bo_show_extraovl'+i);
+			if (c)
+			{
+				bo_ExtraOverlay[i].bo_show = c == -1 ? false : true;
+				document.getElementById('bo_map_overlay' + i).checked = c == -1 ? false : true;
+			}
+		}
+		
 		bo_infobox = document.createElement('DIV');
 		bo_infobox.index = 1;
 		bo_map.controls[google.maps.ControlPosition.RIGHT_TOP].push(bo_infobox);

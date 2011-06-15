@@ -60,11 +60,27 @@
 
 //Map display
 @define("BO_RADIUS", 50);             // (kilometers) limits strike display to radius around station
-@define("BO_DEFAULT_ZOOM", 7);        // default zoom level
+                                      // Do not raise this value, otherwise autolinking will not work!
+
 @define("BO_MAX_ZOOM_LIMIT", 8);      // when zoom reaches this level, strike display is limited to max. distance around station (BO_RADIUS)
+                                      // Do not lower this value, otherwise autolinking will not work!
+
+
+
+//Google Map: General settings
+@define('BO_MAP_DISABLE', false);
+@define("BO_DEFAULT_ZOOM", 7);        // default zoom level
 @define("BO_MAX_ZOOM_IN", 15);        // max. zoom level, even in the area of you station
 @define("BO_MIN_ZOOM_OUT", 4);        // minimal zoom level
 @define("BO_DEFAULT_MAP", 'TERRAIN'); 
+@define('BO_MAP_CIRCLE_COLOR_LINE', '#FF0000');
+@define('BO_MAP_CIRCLE_OPAC_LINE', '0.8');
+@define('BO_MAP_CIRCLE_COLOR_FILL', '#FF0000');
+@define('BO_MAP_CIRCLE_OPAC_FILL', '0.05');
+@define('BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM', 9);
+@define('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM', 12);
+@define('BO_MAP_STATION_ICON', 'http://labs.google.com/ridefinder/images/mm_20_red.png');
+
 
 //Update intervals (Minutes!)
 @define("BO_UP_INTVL_STRIKES", 5);
@@ -233,18 +249,9 @@
 @define("BO_PURGE_MAIN_INTVL", 6);
 
 
-/*** Google Map ***/
-@define('BO_MAP_DISABLE', false);
-@define('BO_MAP_CIRCLE_COLOR_LINE', '#FF0000');
-@define('BO_MAP_CIRCLE_OPAC_LINE', '0.8');
-@define('BO_MAP_CIRCLE_COLOR_FILL', '#FF0000');
-@define('BO_MAP_CIRCLE_OPAC_FILL', '0.05');
-@define('BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM', 9);
-@define('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM', 12);
-@define('BO_MAP_STATION_ICON', 'http://labs.google.com/ridefinder/images/mm_20_red.png');
-
 //Stations
 @define('BO_MAP_STATIONS_ICON', 'http://maps.google.com/mapfiles/kml/pal4/icon24.png');
+
 
 //MyBo Stations
 @define('BO_MAP_MYBO_CIRCLE_COLOR_LINE', '#0000FF');
@@ -254,6 +261,35 @@
 @define('BO_MAP_MYBO_ICON', 'http://labs.google.com/ridefinder/images/mm_20_blue.png');
 
 
+// ALERTS
+@define("BO_ALERTS", true);
+@define("BO_ALERT_CHECK_INTERVAL", 15);
+@define("BO_ALERT_SEND_INTERVAL", 45);
+
+
+// SMS-Gateway URL
+// Leave it blank, if you don't want to use that feature.
+// {text} will be replaced by the message text
+// {tel}  will be replaced by the telephone number
+/* Some examples. Of course you have to register yourself at the gateway provider and change USER/PASS to your values!         */
+/*  http://gateway.smstrade.de/?key=PASS&to={tel}&message={text}&from=MyBO&route=gold                         */
+/*  http://gateway.sms77.de/?u=USER&p=PASS&to={tel}&text={text}&type=quality&from=MyBO                        */
+/*  http://www.innosend.de/gateway/sms.php?id=USER&pw=PASS&absender=MyBO&empfaenger={tel}&text={text}&type=4  */
+@define("BO_SMS_GATEWAY_URL", ''); //do not edit here, put it in config.php file!!!
+
+
+//Settings for Developers
+@define("BO_DEBUG", false);
+@define("BO_LANG_AUTO_ADD", false);
+@define("BO_CACHE_DISABLE", false);
+
+
+
+/************************************************************************/
+/* Variables for Maps, Images, Densities ..                             */
+/************************************************************************/
+
+//GoogleMaps: Strike Overlays
 if (!isset($_BO['mapcfg'][0]))
 	$_BO['mapcfg'][0] = $_BO['tpl_gmap']['0-15'];
 
@@ -263,6 +299,10 @@ if (!isset($_BO['mapcfg'][1]))
 if (!isset($_BO['mapcfg'][2]))
 	$_BO['mapcfg'][2] = $_BO['tpl_gmap']['2-24h'];
 
+//GoogleMaps: Extra Overlays
+if (!isset($_BO['mapovl'][0]))
+	$_BO['mapovl'][0] = $_BO['tpl_overlay']['meteox_radar'];
+	
 /*** Image Maps ***/
 if (!isset($_BO['mapimg'][0]))
 	$_BO['mapimg'][0] = $_BO['tpl_imgmap']['europe'];
@@ -280,27 +320,5 @@ if (!isset($_BO['density'][0]))
 
 if (!isset($_BO['density'][1]))
 	$_BO['density'][1] = $_BO['tpl_density']['germany'];
-	
-
-// ALERTS
-@define("BO_ALERTS", true);
-@define("BO_ALERT_CHECK_INTERVAL", 15);
-@define("BO_ALERT_SEND_INTERVAL", 45);
-
-// SMS-Gateway URL
-// Leave it blank, if you don't want to use that feature.
-// {text} will be replaced by the message text
-// {tel}  will be replaced by the telephone number
-/* Some examples. Of course you have to register yourself at the gateway provider and change USER/PASS to your values!         */
-/*  http://gateway.smstrade.de/?key=PASS&to={tel}&message={text}&from=MyBO&route=gold                         */
-/*  http://gateway.sms77.de/?u=USER&p=PASS&to={tel}&text={text}&type=quality&from=MyBO                        */
-/*  http://www.innosend.de/gateway/sms.php?id=USER&pw=PASS&absender=MyBO&empfaenger={tel}&text={text}&type=4  */
-@define("BO_SMS_GATEWAY_URL", ''); //do not edit here, put it in config.php file!!!
-
-//Settings for Developers
-@define("BO_DEBUG", false);
-@define("BO_LANG_AUTO_ADD", false);
-@define("BO_CACHE_DISABLE", false);
-
 
 ?>

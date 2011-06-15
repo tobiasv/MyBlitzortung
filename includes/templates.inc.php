@@ -21,6 +21,12 @@
 */
 
 
+$_BO['mapcfg'] = array();
+$_BO['mapovl'] = array();
+$_BO['mapimg'] = array();
+$_BO['density'] = array();
+
+
 
 /**************************************/
 /* Calculation settings for density   */
@@ -94,6 +100,26 @@ $_BO['tpl_gmap']['1-10d']['default_show'] = false;
 $_BO['tpl_gmap']['1-10d']['sel_name'] = '1-10 days';
 $_BO['tpl_gmap']['1-10d']['only_loggedin'] = true;
 
+/**************************************/
+/* Extra Overlays for dynamic Map     */
+/**************************************/
+
+//Meteox Radar Overlay
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['meteox_radar']['img'] = 'http://www2.meteox.com/radareu.php';
+$_BO['tpl_overlay']['meteox_radar']['coord'] = array(59.9934, 20.4106, 41.4389, -14.9515); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['meteox_radar']['default_show'] = false;
+$_BO['tpl_overlay']['meteox_radar']['sel_name'] = 'Meteox rain radar';
+$_BO['tpl_overlay']['meteox_radar']['only_loggedin'] = true;
+
+/*
+//Europe map: Does not work, because Google translates maps to mercator, but this is already mercator projection
+$_BO['tpl_overlay']['europe']['img'] = 'blitzortung.php?map=0';
+$_BO['tpl_overlay']['europe']['coord'] = array(71.3, 52, 24.3, -22); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['europe']['default_show'] = false;
+$_BO['tpl_overlay']['europe']['sel_name'] = 'Europe static map';
+$_BO['tpl_overlay']['europe']['only_loggedin'] = true;
+*/
 
 /**************************************/
 /* Image Maps (PNG)                   */
@@ -105,6 +131,7 @@ $_BO['tpl_imgmap']['europe']['name'] = 'Europe';
 $_BO['tpl_imgmap']['europe']['menu'] = true;
 $_BO['tpl_imgmap']['europe']['archive'] = true;
 $_BO['tpl_imgmap']['europe']['file'] = 'map_europe.png';
+$_BO['tpl_imgmap']['europe']['borders'] = array('map_europe_borders.png', 60);
 $_BO['tpl_imgmap']['europe']['coord'] = array(71.3, 52, 24.3, -22); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['europe']['trange'] = 2; //hours!
 $_BO['tpl_imgmap']['europe']['upd_intv'] = 15; //minutes
@@ -174,6 +201,7 @@ $_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 10;
 //see http://www.geodatenzentrum.de/geodaten/gdz_rahmen.gdz_div?gdz_spr=deu&gdz_akt_zeile=5&gdz_anz_zeile=4&gdz_user_id=0
 $_BO['tpl_imgmap']['germany_lkr_gdz'] = $_BO['tpl_imgmap']['germany_lkr'];
 $_BO['tpl_imgmap']['germany_lkr_gdz']['file'] = 'map_germany_lkr_gdz.png';
+$_BO['tpl_imgmap']['germany_lkr_gdz']['borders'] = array('map_germany_lkr_gdz_borders.png', 60);
 $_BO['tpl_imgmap']['germany_lkr_gdz']['coord'] = array(55.22, 15.59, 47.05, 5.23); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['germany_lkr_gdz']['footer'] = '© Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, 2011<br>
 	Vervielfältigung, Verbreitung und öffentliche Zugänglichmachung, auch auszugsweise, mit Quellenangabe gestattet.';

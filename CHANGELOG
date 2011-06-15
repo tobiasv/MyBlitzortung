@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.4.9 (2011-06-15)
+--------------------------
+- new: custom overlays for google map (not perfect: it lies over the strike overlay)
+- new: border overlays for static maps, to see the borders even if there's much lightning
+
 Version 0.4.8d (2011-06-12)
 ---------------------------
 - new: map of Bavaria included

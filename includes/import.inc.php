@@ -1545,7 +1545,7 @@ function bo_my_station_update($url)
 		echo '<h3>'._BL('Requesting data').'</h3>';
 		echo '<p>'._BL('Connecting to ').' <em>'.BO_LINK_HOST.'</em></p>';
 		
-		$request = 'id='.bo_station_id().'&login='.$login_id.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS);
+		$request = 'id='.bo_station_id().'&login='.$login_id.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
 		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
 		
 		$content = file_get_contents($data_url);
