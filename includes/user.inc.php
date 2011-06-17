@@ -828,6 +828,10 @@ function bo_cache_info()
 		$depth = $d[1];
 		$delete_dir_depth = $d[2] ? $d[2] : false;
 		
+		echo '<h4>'.$name.' <em>'.$dir.'</em></h4>';
+		
+		$dir = BO_DIR.$dir;
+		
 		if ($_GET['bo_action2'] == 'unlink')
 		{
 			bo_delete_files($dir, 0, $depth, $delete_dir_depth);
@@ -835,9 +839,7 @@ function bo_cache_info()
 			clearstatcache();
 		}
 		
-		echo '<h4>'.$name.' <em>'.$dir.'</em></h4>';
 		
-		$dir = BO_DIR.$dir;
 		
 		$files = glob($dir.'*');
 		
