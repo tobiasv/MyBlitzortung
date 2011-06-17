@@ -811,41 +811,63 @@ function bo_show_calibrate_antennas()
 
 function bo_cache_info()
 {
-	$dirs['Tiles'] = 'cache/tiles/';
-	$dirs['Icons'] = 'cache/icons/';
-	$dirs['Maps'] = 'cache/maps/';
-	$dirs['Other'] = 'cache/';
+	$dirs['Tiles'] = array('cache/tiles/', 3);
+	$dirs['Icons'] = array('cache/icons/', 0);
+	$dirs['Maps']  = array('cache/maps/', 3, 1);
+	
+	if (BO_CACHE_SUBDIRS === true)
+		$dirs['Density maps'] = array('cache/densitymap/', 2);
+		
+	$dirs['Other'] = array('cache/', 0);
 	
 	echo '<h3>'._BL('File cache info').'</h3>';
 	
-	foreach($dirs as $name => $dir)
+	foreach($dirs as $name => $d)
 	{
+		$dir = $d[0];
+		$depth = $d[1];
+		$delete_dir_depth = $d[2] ? $d[2] : false;
+		
+		if ($_GET['bo_action2'] == 'unlink')
+		{
+			bo_delete_files($dir, 0, $depth, $delete_dir_depth);
+			flush();
+			clearstatcache();
+		}
+		
 		echo '<h4>'.$name.' <em>'.$dir.'</em></h4>';
 		
 		$dir = BO_DIR.$dir;
-		$files = scandir($dir);
+		
+		$files = glob($dir.'*');
+		
+		if ($depth)
+		{
+			for ($i = 0; $i < count($files); $i++) 
+			{
+				if (is_dir($files[$i])) 
+				{
+					$add = glob($files[$i].'/*');
+					$files = array_merge($files, $add);
+				}
+			}
+		}
 		
 		$size = 0;
 		$count = 0;
 		foreach($files as $file)
 		{
-			$file = $dir.$file;
+			$file = $file;
 			if (!is_dir($file))
 			{
-				if ($_GET['bo_action2'] == 'unlink')
-					$ok = @unlink($file);
-				else
-					$ok = false;
-				
-				if (!$ok)
-				{
-					$size += filesize($file);
-					$count++;
-				}
+				$size += filesize($file);
+				$count++;
 			}
 		}
 		
 		echo '<p>'._BL('Files').': <strong>'.$count.'</strong> ('.number_format($size / 1024, 1, _BL('.'), _BL(',')).' kB)</p>';
+		
+		flush();
 	}
 
 	

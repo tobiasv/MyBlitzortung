@@ -282,8 +282,10 @@
 //Settings for Developers
 @define("BO_DEBUG", false);
 @define("BO_LANG_AUTO_ADD", false);
-@define("BO_CACHE_DISABLE", false);
 
+//Cache
+@define("BO_CACHE_DISABLE", false);
+@define("BO_CACHE_SUBDIRS", true);
 
 
 /************************************************************************/

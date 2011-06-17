@@ -98,18 +98,24 @@ function bo_show_archive_map()
 	$day_add = intval($_GET['bo_day_add']);
 	$ani = isset($_GET['bo_animation']);
 	
-	$time = mktime(0,0,0,date('m'), date('d')-1+$day_add, date('Y'));
-	
-	if (!$year || $year < 0 || $day_add)
-		$year = date('Y', $time);
+	if (!$year || $year < 0)
+		$year = date('Y');
 
-	if (!$month || $month < 0 || $day_add)
-		$month = date('m', $time);
+	if (!$month || $month < 0)
+		$month = date('m');
 
-	if (!$day || $day_add)
-		$day = date('d', $time);
-	
-	$time = strtotime("$year-$month-$day 00:00:00 UTC");
+	if (!$day)
+		$day = date('d') - 1;
+
+	if ($_GET['bo_prev'])
+		$day_add = -1;
+	else if ($_GET['bo_next'])
+		$day_add = +1;
+		
+	$time  = mktime(0,0,0,$month,$day+$day_add,$year);
+	$year  = date('Y', $time);
+	$month = date('m', $time);
+	$day   = date('d', $time);
 	
 	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$start_time = strtotime($row['mintime'].' UTC');
@@ -118,7 +124,7 @@ function bo_show_archive_map()
 	echo '<div id="bo_arch_maps">';
 
 	echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
-	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add'));
+	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev'));
 
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_arch_strikes').'</legend>';
@@ -151,11 +157,15 @@ function bo_show_archive_map()
 		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').'>'._BL(date('M', strtotime("2000-$i-01"))).'</option>';
 	echo '</select>';
 
-	echo '<select name="bo_day" id="bo_arch_strikes_select_day">';
+	echo '<select name="bo_day" id="bo_arch_strikes_select_day" onchange="submit()">';
 	for($i=1;$i<=31;$i++)
 		echo '<option value="'.$i.'" '.($i == $day ? 'selected' : '').'>'.$i.'</option>';
 	echo '</select>';
 
+	echo '&nbsp;<input type="submit" name="bo_prev" value=" &lt; " id="bo_archive_maps_prevday" class="bo_form_submit">';
+	echo '&nbsp;<input type="submit" name="bo_next" value=" &gt; " id="bo_archive_maps_nextday" class="bo_form_submit">';
+	
+	
 	echo '<input type="submit" name="bo_ok" value="'._BL('Picture').'" id="bo_archive_maps_submit" class="bo_form_submit">';
 	echo '<input type="submit" name="bo_animation" value="'._BL('Animation').'" id="bo_archive_maps_animation" class="bo_form_submit">';
 	
@@ -182,7 +192,7 @@ function bo_show_archive_map()
 		{
 			$text = _BL('arch_select_dates_beween');
 			echo '<p>';
-			echo strtr($text, array('{START}' => date(_BL('_date'), $start_time), '{END}' => date(_BL('_date'), $end_time) ));
+			echo strtr($text, array('{START}' => date(_BL('_date'), $start_time + 3600 * 26), '{END}' => date(_BL('_date'), $end_time) ));
 			echo '</p>';
 		}
 		else if ($ani)

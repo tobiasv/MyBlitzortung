@@ -66,8 +66,12 @@ function bo_tile()
 	global $_BO;
 
 	session_write_close();
-	register_shutdown_function('bo_purge_images', 24, BO_DIR.'cache/tiles/');
-
+	
+	if (rand(0, 3000) == 1)
+	{
+		register_shutdown_function('bo_delete_files', BO_DIR.'cache/tiles/', 24, 3);
+	}
+	
 	$x = intval($_GET['x']);
 	$y = intval($_GET['y']);
 	$zoom = intval($_GET['zoom']);
@@ -194,7 +198,11 @@ function bo_tile()
 
 	//Caching
 	$dir = BO_DIR.'cache/tiles/';
-	$filename = 'tile_'.$type.'_'.$x.'x'.$y.'_'.$zoom.'_'.$only_own.'_'.(bo_user_get_level() ? 1 : 0).'.png';
+	$filename = $type.'_'.$zoom.'_'.$x.'x'.$y.'-'.$only_own.'-'.(bo_user_get_level() ? 1 : 0).'.png';
+	
+	if (BO_CACHE_SUBDIRS === true)
+		$filename = strtr($filename, array('_' => '/'));
+
 	$file = $dir.$filename;
 
 	if (file_exists($file) && $caching)
@@ -505,6 +513,15 @@ function bo_tile()
 
 function bo_tile_output($file='', $caching=false, &$I=null)
 {
+
+	if ($caching && BO_CACHE_SUBDIRS === true)
+	{
+		$dir = dirname($file);
+		if (!file_exists($dir))
+			mkdir($dir, 0777, true);
+	}
+
+
 	if ($I === null)
 	{
 		$img = file_get_contents(BO_DIR.'images/blank_tile.png');
@@ -538,22 +555,6 @@ function bo_tile_output($file='', $caching=false, &$I=null)
 	exit;
 }
 
-//automaticaly purge old tiles
-function bo_purge_images($min_age, $dir)
-{
-	if (rand(0, 1000) == 1)
-	{
-		$files = scandir($dir);
-
-		foreach($files as $file)
-		{
-			if (!is_dir($dir.$file) && fileatime($dir.$file) < time() - 3600 * $min_age)
-				@unlink($dir.$file);
-		}
-	}
-
-}
-
 //render a map with strike positions and strike-bar-plot
 function bo_get_map_image()
 {
@@ -561,8 +562,10 @@ function bo_get_map_image()
 	@set_time_limit(10);
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	
-	
-	register_shutdown_function('bo_purge_images', 96, BO_DIR.'cache/maps/');
+	if (rand(0, 500) == 1)
+	{	
+		register_shutdown_function('bo_delete_files', BO_DIR.'cache/maps/', 96, 3);
+	}
 	
 	global $_BO;
 
@@ -594,12 +597,14 @@ function bo_get_map_image()
 		exit;
 	}
 
-	$cache_file = BO_DIR.'cache/maps/'._BL();
+	$cache_file = BO_DIR.'cache/maps/';
+	$cache_file .= _BL().'_';
+	
+	if (BO_CACHE_SUBDIRS === true)
+		$cache_file .= $id.'/';
 	
 	if ($transparent)
 		$cache_file .= 'transp_';
-	
-
 		
 	$last_update = bo_get_conf('uptime_strikes');
 	
@@ -649,7 +654,11 @@ function bo_get_map_image()
 		
 		$time_string = date('d.m.Y H:i - ', $time_min).date('H:i', $time_max);
 		
+		if (BO_CACHE_SUBDIRS === true)
+			$cache_file .= date('dmY', $time_min).'/';
+		
 		$cache_file .= $id.'_'.$date.'.png';
+		
 	}
 	else
 	{
@@ -823,6 +832,10 @@ function bo_get_map_image()
 		$cx = $w - $cw - $cx;
 		$cy = $h - $ch - $cy;
 
+		$legend_text_drawn = false;
+
+		ksort($count);
+		
 		foreach($count as $i => $cnt)
 		{
 			if (max($count))
@@ -837,9 +850,14 @@ function bo_get_map_image()
 
 			imagefilledrectangle($I, $px1, $py1, $px2, $py2, $color[$i]);
 
-			if ($i == count($color)-1 && $cfg['legend'][0])
+			if (!$legend_text_drawn && $cfg['legend'][0] &&
+					(    ($transparent  && $i == count($color)-1)
+					  || (!$transparent && $cnt == max($count))
+					) 
+			   )
 			{
 				imagestringup($I, $cfg['legend'][0], $px1+1, $py1 - 4, $cnt, $text_col);
+				$legend_text_drawn = true;
 			}
 
 		}
@@ -863,6 +881,13 @@ function bo_get_map_image()
 	header("Content-Type: image/png");
 	if ($caching)
 	{
+		if (BO_CACHE_SUBDIRS === true)
+		{
+			$dir = dirname($cache_file);
+			if (!file_exists($dir))
+				mkdir($dir, 0777, true);
+		}
+		
 		$ok = @imagepng($I, $cache_file);
 		
 		if (!$ok)
@@ -886,6 +911,14 @@ function bo_get_density_image()
 	if (!$densities_enabled)
 		exit('Forbidden');
 
+	if (rand(0, 50) == 1)
+	{
+		if (BO_CACHE_SUBDIRS === true)
+			register_shutdown_function('bo_delete_files', BO_DIR.'cache/densitymap', 0, 3);
+		else
+			register_shutdown_function('bo_delete_files', BO_DIR.'cache', 0, 0);
+	}
+		
 	$year = intval($_GET['bo_year']);
 	$month = intval($_GET['bo_month']);
 	$map_id = intval($_GET['map']);
@@ -914,8 +947,18 @@ function bo_get_density_image()
 	header("Cache-Control: public, max-age=".($expire - time()));
 
 	//Caching
-	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true) && BO_LOCALE == _BL();
-	$cache_file = BO_DIR.'cache/density_map_'._BL().'_'.sprintf('%d_station%d_%d_b%d_%04d%02d.png', $map_id, $station_id, $ratio ? 1 : 0, $min_block_size, $year, $month);
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+	$cache_file = BO_DIR.'cache/';
+	
+	if (BO_CACHE_SUBDIRS === true)
+		$cache_file .= 'densitymap/'.$map_id.'/';
+	else
+		$cache_file .= 'densitymap_'.$map_id.'_';
+		
+	$cache_file .= _BL().'_'.sprintf('station%d_%d_b%d_%04d%02d.png', $station_id, $ratio ? 1 : 0, $min_block_size, $year, $month);
+	
+	
+	
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
 		header("Content-Type: image/png");
@@ -1330,6 +1373,13 @@ function bo_get_density_image()
 	header("Content-Type: image/png");
 	if ($caching)
 	{
+		if (BO_CACHE_SUBDIRS === true)
+		{
+			$dir = dirname($cache_file);
+			if (!file_exists($dir))
+				mkdir($dir, 0777, true);
+		}
+
 		$ok = @imagepng($I, $cache_file);
 		
 		if (!$ok)

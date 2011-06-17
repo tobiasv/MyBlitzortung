@@ -580,4 +580,31 @@ function bo_gpc_prepare($text)
 
 }
 
+
+//recursive delete function
+function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
+{
+	$dir .= '/';
+	
+	if ($delete_dir_depth === false)
+		$delete_dir_depth = 9999;
+		
+	$files = @scandir($dir);
+
+	foreach($files as $file)
+	{
+		if (!is_dir($dir.$file) && ($min_age == 0 || fileatime($dir.$file) < time() - 3600 * $min_age) )
+		{
+			@unlink($dir.$file);
+		}
+		else if (is_dir($dir.$file) && $file != '.' && $file != '..' && $depth > 0)
+		{
+			bo_delete_files($dir.$file.'/', $min_age, $depth-1,$delete_dir_depth-1);
+
+			if ($delete_dir_depth <= 0)
+				@rmdir($dir.$file.'/');
+		}
+	}
+}
+
 ?>
