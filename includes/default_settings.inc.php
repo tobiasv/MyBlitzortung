@@ -57,6 +57,7 @@
 //User / Login
 @define("BO_LOGIN_SHOW", true);
 @define("BO_LOGIN_ALLOW", 2); //0=nobody, 1=you, 2=all
+@define("BO_LOGIN_COOKIE_TIME", 60); // days where automatic login cookie is valid. set to false to disable auto login
 
 //Map display
 @define("BO_RADIUS", 50);             // (kilometers) limits strike display to radius around station

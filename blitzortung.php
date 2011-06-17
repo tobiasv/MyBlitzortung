@@ -84,7 +84,28 @@ if (!defined("BO_VER"))
 
 	if (file_exists($locdir.'own.php'))
 		include $locdir.'own.php';
+		
+	$locale = '';
+	if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
+	{
+		$locale = strtolower($_GET['bo_lang']);
+		$_SESSION['bo_locale'] = $locale;
+		@setcookie("bo_locale", $locale, time()+3600*24*365*10,'/');
+	}
+	else if (isset($_COOKIE['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_COOKIE['bo_locale']))
+		$locale = $_COOKIE['bo_locale'];
+	else if (isset($_SESSION['bo_locale']))
+		$locale = $_SESSION['bo_locale'];
 
+	if ($locale && file_exists($locdir.$locale.'.php') && $locale != BO_LOCALE)
+	{
+		include $locdir.$locale.'.php';
+
+		if (file_exists($locdir.'own.php')) //include this 2nd time (must overwrite the manual specified language!)
+			include $locdir.'own.php';
+	}
+
+		
 	//includes #1
 	require_once 'includes/functions.inc.php';
 	require_once 'includes/image.inc.php';
@@ -122,6 +143,8 @@ if (!defined("BO_VER"))
 	require_once 'includes/info.inc.php';
 	require_once 'includes/alert.inc.php';
 
+	//Save info wether headers where sent
+	$_BO['headers_sent'] = headers_sent();
 
 	//Update with new data from blitzortung.org
 	$do_update = false;
@@ -152,6 +175,34 @@ if (!defined("BO_VER"))
 		exit;
 	}
 
+	//Cookie login
+	if (isset($_POST['bo_do_login']))
+	{
+		$login_name   = BoDb::esc(bo_gpc_prepare($_POST['bo_user']));
+		$login_pass   = BoDb::esc(bo_gpc_prepare($_POST['bo_pass']));
+		$login_cookie = $_POST['bo_login_cookie'] ? true : false;
+
+		if (!bo_user_do_login($login_name, $login_pass, $login_cookie))
+			$_BO['login_fail'] = true;
+	}
+	else if (isset($_GET['bo_logout']))
+	{
+		bo_user_do_logout();
+	}
+	else if (!bo_user_get_id() && intval(BO_LOGIN_COOKIE_TIME) && preg_match('/^([0-9]+)_([0-9a-z]+)$/i', trim($_COOKIE['bo_login']), $r) )
+	{
+		$cookie_user = $r[1];
+		$cookie_uid = $r[2];
+		
+		$data = unserialize(bo_get_conf('user_cookie'.$cookie_user));
+		
+		if ($cookie_uid == $data['uid'] && trim($data['uid']))
+		{
+			bo_user_do_login_byid($cookie_user, $data['pass']);
+		}
+
+	}
+	
 	//images part 1
 	if (isset($_GET['icon']))
 	{
@@ -168,30 +219,7 @@ if (!defined("BO_VER"))
 		bo_get_image($_GET['image']);
 		exit;
 	}
-	
-	// include extra language (after images without text)
-	$locale = '';
-	if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
-	{
-		$locale = strtolower($_GET['bo_lang']);
-		$_SESSION['bo_locale'] = $locale;
-		setcookie("bo_locale", $locale, time()+3600*24*365*10);
-	}
-	else if (isset($_COOKIE['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_COOKIE['bo_locale']))
-		$locale = $_COOKIE['bo_locale'];
-	else if (isset($_SESSION['bo_locale']))
-		$locale = $_SESSION['bo_locale'];
-
-	if ($locale && file_exists($locdir.$locale.'.php') && $locale != BO_LOCALE)
-	{
-		include $locdir.$locale.'.php';
-
-		if (file_exists($locdir.'own.php')) //include this 2nd time
-			include $locdir.'own.php';
-	}
-
-	// images part 2
-	if (isset($_GET['graph_statistics']))
+	else if (isset($_GET['graph_statistics']))
 	{
 		bo_graph_statistics($_GET['graph_statistics'], intval($_GET['id']), intval($_GET['hours']));
 		exit;

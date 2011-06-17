@@ -13,7 +13,9 @@ $_BL['locale'] = 'de';
 $_BL['de']['.'] = ',';
 $_BL['de'][','] = '.';
 $_BL['de']['_date'] = 'd.m.Y';
+$_BL['de']['_dateshort'] = 'd.m';
 $_BL['de']['_datetime'] = 'd.m.Y H:i:s';
+
 $_BL['de']['_before'] = 'vor ';
 $_BL['de']['_minutes_ago'] = 'Minuten';
 $_BL['de']['_minute_ago'] = 'Minute';
@@ -640,4 +642,6 @@ $_BL['de']['Signals detected'] = 'Signale empfangen';
 $_BL['de']['Signal ratio'] = 'Ortungsquote';
 $_BL['de']['Extra overlays'] = 'Weitere Einblendungen';
 $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
-
+$_BL['de']['Advanced'] = 'Erweitert';
+$_BL['de']['show strike counter'] = 'Blitzzähler';
+$_BL['de']['stay logged in'] = 'Speichern';

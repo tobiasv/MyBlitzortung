@@ -71,31 +71,71 @@ function bo_tile()
 	$x = intval($_GET['x']);
 	$y = intval($_GET['y']);
 	$zoom = intval($_GET['zoom']);
-	$type = intval($_GET['type']);
 	$only_own = intval($_GET['own']);
 	$only_info = isset($_GET['info']);
 
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$time = time();
 
 	//get config
-	$cfg = $_BO['mapcfg'][$type];
-	$time_start = $time - 60 * $cfg['tstart'];
-	$time_range = $cfg['trange'];
-	$update_interval = $cfg['upd_intv'];
-	$c = $cfg['col'];
+	if (isset($_GET['count'])) // display strike count
+	{
+		$count_types = explode(',',$_GET['count']);
 
-	if (!$time_start)
-		exit;
+		$type = 0;
+		$time_range = 0;
+		$time_start = 0;
+		$update_interval = 0;
+		
+		$time_min = array();
+		$time_max = array();
+		$update_interval = array();
+		
+		foreach($count_types as $i)
+		{
+			$type += pow(2, $i);
+			
+			$cfg = $_BO['mapcfg'][$i];
+			
+			if (!is_array($cfg) || !$cfg['upd_intv'])
+				continue;
+			
+			$time_start = $time - 60 * $cfg['tstart'];
+			
+			$update_intervals[$i] = $cfg['upd_intv'];
+			$times_min[$i]        = mktime(date('H', $time_start), ceil(date('i', $time_start) / $cfg['upd_intv']) * $cfg['upd_intv'], 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
+			$times_max[$i]        = $times_min[$i] + 60 * $cfg['trange'] + 59;
+		}
+		
+		$update_interval = count($update_intervals) ? min($update_intervals) : 0;
+		$time_min        = count($times_min) ? min($times_min) : 0;
+		$time_max        = count($times_max) ? max($times_max) : 0;
+		
+		$type = 'count_'.$type;
+		
+	}
+	else //normal strike display
+	{
+		$type = intval($_GET['type']);
+		
+		$cfg = $_BO['mapcfg'][$type];
+		$time_start = $time - 60 * $cfg['tstart'];
+		$time_range = $cfg['trange'];
+		$update_interval = $cfg['upd_intv'];
+		$c = $cfg['col'];
+		$time_min   = mktime(date('H', $time_start), ceil(date('i', $time_start) / $update_interval) * $update_interval, 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
+		$time_max   = $time_min + 60 * $time_range + 59;
+	}
+	
+	if (!$time_start || !$time_min || !$time_max)
+		bo_tile_output();
 
 	//calculate some time information
-	$time_min = mktime(date('H', $time_start), ceil(date('i', $time_start) / $update_interval) * $update_interval, 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
-	$time_max = $time_min + 60 * $time_range + 59;
-	$cur_minute  = intval(intval(date('i')) / $update_interval);
-	$mod_time = mktime(date('H'), $cur_minute * $update_interval , 0);
-	$exp_time = $mod_time + 60 * $update_interval + 59;
-	$age      = $exp_time - time();
+	$cur_minute = intval(intval(date('i')) / $update_interval);
+	$mod_time   = mktime(date('H'), $cur_minute * $update_interval , 0);
+	$exp_time   = $mod_time + 60 * $update_interval + 59;
+	$age        = $exp_time - time();
 
-	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	
 	//Headers
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");
@@ -112,12 +152,16 @@ function bo_tile()
 		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
 	}
 
-	//send only the info image (colors, time)
+	//send only the info/color-legend image (colors, time)
 	if ($only_info)
 	{
+		$time_max = min(bo_get_conf('uptime_strikes'), $time_max);
+		$show_date = $time_max - $time_min > 3600 * 12 ? true : false;
+		
 		$w = 80;
-		$h = 25;
+		$h = $show_date ? 40 : 25;
 		$coLegendHeight = 10;
+		
 
 		$I = imagecreate($w, $h);
 		$col = imagecolorallocate($I, 50, 50, 50);
@@ -130,9 +174,16 @@ function bo_tile()
 			imagefilledrectangle($I, (count($c)-$i-1)*$coLegendWidth, 0, (count($c)-$i)*$coLegendWidth, $coLegendHeight, $color[$i]);
 		}
 
-		$time_max = min(bo_get_conf('uptime_strikes'), $time_max);
+		
 		$col = imagecolorallocate($I, 255,255,255);
-		imagestring($I, 2, 1, $coLegendHeight + 1, date('H:i', $time_min).' - '.date('H:i', $time_max), $col);
+		
+		if ($show_date)
+		{
+			imagestring($I, 2, 1, $coLegendHeight + 1,  '  '.date(_BL('_dateshort').' H:i', $time_min), $col);
+			imagestring($I, 2, 1, $coLegendHeight + 16, '- '.date(_BL('_dateshort').' H:i', $time_max), $col);
+		}
+		else
+			imagestring($I, 2, 1, $coLegendHeight + 1, date('H:i', $time_min).' - '.date('H:i', $time_max), $col);
 
 		
 		header("Content-Type: image/png");
@@ -159,13 +210,10 @@ function bo_tile()
 		}
 	}
 
-	$date_min = gmdate('Y-m-d H:i:s', $time_min);
-	$date_max = gmdate('Y-m-d H:i:s', $time_max);
-
 	list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($x, $y, $zoom);
-	//max. Distance
-	$radius = $_BO['radius'] * 1000;
-
+	
+	//Check if zoom or position is in limit
+	$radius = $_BO['radius'] * 1000; //max. Distance
 	if ($radius)
 	{
 		if ($zoom < BO_MAX_ZOOM_LIMIT) //set max. distance to 0 (no limit) for small zoom levels
@@ -234,6 +282,78 @@ function bo_tile()
 		}
 	}
 
+	//Display only strike count
+	if (isset($_GET['count'])) 
+	{
+		$sql = '';
+		foreach($count_types as $i)
+		{
+			$date_min = gmdate('Y-m-d H:i:s', $times_min[$i]);
+			$date_max = gmdate('Y-m-d H:i:s', $times_max[$i]);
+			
+			$sql .= " OR time BETWEEN '$date_min' AND '$date_max' ";
+		}
+		
+		$strike_count = 0;
+		$whole_strike_count = 0;
+		
+		$sql = "SELECT COUNT(time) cnt ".($only_own ? ", part " : "")."
+			FROM ".BO_DB_PREF."strikes
+			USE INDEX (time_dist)
+			WHERE 1
+				".($radius ? "AND distance < $radius" : "")."
+				AND NOT (lat < $lat1 OR lat > $lat2 OR lon < $lon1 OR lon > $lon2)
+				AND (0 $sql)
+				".($only_own ? " GROUP BY part " : "")."
+			-- ORDER BY time ASC";
+		$erg = bo_db($sql);
+		while ($row = $erg->fetch_assoc())
+		{
+			if ($only_own)
+			{
+				if ($row['part'])
+					$strike_count += $row['cnt'];
+				
+				$whole_strike_count += $row['cnt'];
+			}
+			else
+				$strike_count += $row['cnt'];
+		}
+		
+	
+		//create Image
+		$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
+		$blank = imagecolorallocate($I, 0, 0, 0);
+		imagefilledrectangle( $I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
+		
+		//border
+		$col = imagecolorallocatealpha($I, 100,100,100, 60);
+		imagerectangle( $I, 0, 0, BO_TILE_SIZE-1, BO_TILE_SIZE-1, $col);
+		
+		//number
+		$font = 3;
+		$len = strlen($strike_count);
+		$white = imagecolorallocatealpha($I, 255,255,255, 10);
+		imagefilledrectangle( $I, 0, 0, imagefontwidth($font)*$len+2, imagefontheight($font), $col);
+		imagestring($I, $font, 2, 0, $strike_count, $white);
+		
+		if ($only_own && intval($whole_strike_count))
+		{
+			$ratio = round($strike_count / $whole_strike_count * 100).'%';
+			$len = strlen($ratio);
+			imagefilledrectangle( $I, 0, imagefontheight($font)+1, imagefontwidth($font)*$len+2, 2*imagefontheight($font), $col);
+			imagestring($I, $font, 2, imagefontheight($font)+1, $ratio, $white);
+		
+		}
+		
+		bo_tile_output($file, $caching, $I);
+		
+		exit;
+	}
+	
+	
+	/****** The main part: Get the data and display the strikes ******/
+	
 	$zoom_show_deviation = defined('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM') ? intval(BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM) : 12;
 	
 	//add some space around
@@ -250,6 +370,11 @@ function bo_tile()
 	//color handling
 	$color_intvl = ($time_max - $time_min) / count($c);
 
+	//date range
+	$date_min = gmdate('Y-m-d H:i:s', $time_min);
+	$date_max = gmdate('Y-m-d H:i:s', $time_max);
+
+	//get the data!
 	$points = array();
 	$deviation = array();
 	$sql = "SELECT id, time, lat, lon, deviation, polarity
@@ -287,22 +412,14 @@ function bo_tile()
 	//no points --> blank tile
 	if (count($points) == 0)
 	{
-		$img = file_get_contents(BO_DIR.'images/blank_tile.png');
-		$ok = @file_put_contents($file, $img);
-		
-		if (!$ok && $caching)
-			bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
-		
-		header("Content-Type: image/png");
-		echo $img;
-		exit;
+		bo_tile_output($file, $caching);
 	}
 
 
 	//create Image
 	$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
 	$blank = imagecolorallocate($I, 0, 0, 0);
-	imagefilledrectangle( $I, 0, 0, imagesx($I), imagesy($I), $blank);
+	imagefilledrectangle( $I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
 
 
 	foreach($c as $i => $rgb)
@@ -377,14 +494,30 @@ function bo_tile()
 		}
 	}
 
-
-
 	/*
 	$col = imagecolorallocate($I, 70, 70, 70);
 	imagestring($I, 5, 10, 10 + $type * 18, date('Y-m-d H:i:s'), $col);
 	imagerectangle( $I, 0, 0, imagesx($I), imagesy($I), $col);
 	*/
+	
+	bo_tile_output($file, $caching, $I);
+}
 
+function bo_tile_output($file='', $caching=false, &$I=null)
+{
+	if ($I === null)
+	{
+		$img = file_get_contents(BO_DIR.'images/blank_tile.png');
+		$ok = @file_put_contents($file, $img);
+		
+		if (!$ok && $caching)
+			bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
+		
+		header("Content-Type: image/png");
+		echo $img;
+		exit;
+	}
+		
 	imagecolortransparent($I, $blank);
 
 	header("Content-Type: image/png");
@@ -1267,16 +1400,17 @@ function bo_image_cache_error($w, $h)
 //we need this for easy integration of MyBlitzortung in other projects
 function bo_get_image($img)
 {
-
 	switch($img)
 	{
 		case 'logo':
 			$file = 'blitzortung_logo.jpg';
 			break;
-
+		
+		default: //default image
 		case 'my':
 			$file = 'myblitzortung.png';
 			break;
+		
 	}
 
 	$ext = strtr(substr($file, -3), array('jpg' => 'jpeg'));

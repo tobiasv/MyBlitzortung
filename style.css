@@ -335,6 +335,7 @@ border: 1px solid #ccc;
 margin-left: 10px;
 }
 
+
 #myblitzortung #bo_map_more, 
 #myblitzortung #bo_map_reload {
 float: right;
@@ -351,6 +352,12 @@ width: auto;
 border-top: 1px dotted #e4e4e4;
 padding: 6px 0 0 0;
 }
+
+#myblitzortung #bo_map_more_container .bo_form_descr {
+width: 130px;
+display: inline-block;
+}
+
 
 /*** Archive ***/
 
@@ -479,7 +486,6 @@ text-decoration: none;
 }
 
 #myblitzortung .bo_form_descr {
-width: 200px;
 font-weight: bold;
 color: #666;
 }
@@ -598,4 +604,8 @@ margin-right: 10px;
 
 #myblitzortung .bo_map_alert {
 margin-right: 10px;
+}
+
+#myblitzortung #bo_login_submit {
+display: block;
 }

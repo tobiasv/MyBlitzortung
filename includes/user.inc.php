@@ -27,6 +27,8 @@ if (!isset($_SESSION['bo_user']))
 
 function bo_show_login()
 {
+	global $_BO;
+	
 	if (!defined('BO_LOGIN_ALLOW') || (BO_LOGIN_ALLOW != 1 && BO_LOGIN_ALLOW != 2))
 	{
 		echo _BL('Login not allowed');
@@ -34,18 +36,6 @@ function bo_show_login()
 	}
 
 	$login_fail = false;
-
-	if (isset($_POST['bo_do_login']))
-	{
-		$login_name = BoDb::esc(bo_gpc_prepare($_POST['bo_user']));
-		$login_pass = BoDb::esc(bo_gpc_prepare($_POST['bo_pass']));
-
-		if (!bo_user_do_login($login_name, $login_pass))
-			$login_fail = true;
-	}
-
-	if (isset($_GET['bo_logout']))
-		bo_user_do_logout();
 
 	$remove_vars = array('bo_*','login','id');
 	
@@ -170,7 +160,7 @@ function bo_show_login()
 	}
 	else
 	{
-		bo_show_login_form($login_fail);
+		bo_show_login_form($_BO['login_fail']);
 	}
 
 	bo_copyright_footer();
@@ -180,6 +170,8 @@ function bo_show_login()
 
 function bo_show_login_form($fail = false)
 {
+	global $_BO;
+	
 	echo '<div id="bo_login">';
 
 	if ($fail)
@@ -196,6 +188,14 @@ function bo_show_login_form($fail = false)
 	echo '<span class="bo_form_descr">'._BL('Password').':</span>';
 	echo '<input type="password" name="bo_pass" id="bo_login_pass" class="bo_form_text bo_login_input">';
 
+	if (!$_BO['headers_sent'] && intval(BO_LOGIN_COOKIE_TIME))
+	{
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="checkbox" value="1" name="bo_login_cookie" id="bo_login_cookie_check" class="bo_form_checkbox">';
+		echo '<label for="bo_login_cookie_check" class="bo_form_descr_checkbox">'._BL('stay logged in').'</label>';
+		echo '</span>';
+	}
+	
 	echo '<input type="submit" name="ok" value="'._BL('Login').'" id="bo_login_submit" class="bo_form_submit">';
 
 	echo '<input type="hidden" name="bo_do_login" value="1">';
@@ -208,26 +208,31 @@ function bo_show_login_form($fail = false)
 
 }
 
-function bo_user_do_login($user, $pass)
+function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 {
+	if (!$user || !$pass)
+		return false;
+		
 	if (BO_LOGIN_ALLOW > 0 && $user == BO_USER && defined('BO_USER') && strlen(BO_USER))
 	{
 		if ($pass == BO_PASS && defined('BO_PASS') && strlen(BO_PASS))
 		{
-			bo_user_set_session(1, pow(2, BO_PERM_COUNT) - 1);
+			bo_user_set_session(1, pow(2, BO_PERM_COUNT) - 1, $cookie, $pass);
 			return true;
 		}
 	}
 
 	if (BO_LOGIN_ALLOW == 2)
 	{
-		$pass = md5($pass);
+		if ($md5pass == false)
+			$pass = md5($pass);
+			
 		$res = bo_db("SELECT id, login, level FROM ".BO_DB_PREF."user WHERE login='$user' AND password='$pass'");
 
 		if ($res->num_rows == 1)
 		{
 			$row = $res->fetch_assoc();
-			bo_user_set_session($row['id'], $row['level']);
+			bo_user_set_session($row['id'], $row['level'], $cookie, $pass);
 			return true;
 		}
 
@@ -236,16 +241,55 @@ function bo_user_do_login($user, $pass)
 	return false;
 }
 
-function bo_user_do_logout()
+function bo_user_do_login_byid($id, $pass)
 {
-	$_SESSION['bo_user'] = 0;
-	$_SESSION['bo_user_level'] = 0;
+	$id = intval($id);
+	
+	if ($id == 1)
+	{
+		$user = BO_USER;
+	}
+	else
+	{
+		$row = bo_db("SELECT login FROM ".BO_DB_PREF."user WHERE id='$id'")->fetch_assoc();
+		$user = $row['login'];
+	}
+
+	bo_user_do_login($user, $pass, false, true);
 }
 
-function bo_user_set_session($user, $level)
+function bo_user_do_logout()
+{
+	if ($_COOKIE['bo_login'] && !$_BO['headers_sent'])
+		setcookie("bo_login", '', time()+3600*24*9999,'/');
+	
+	bo_set_conf('user_cookie'.$_SESSION['bo_user'], '');
+
+	$_SESSION['bo_user'] = 0;
+	$_SESSION['bo_user_level'] = 0;
+	$_SESSION['bo_logged_out'] = true;
+}
+
+function bo_user_set_session($user, $level, $cookie, $pass='')
 {
 	$_SESSION['bo_user'] = $user;
 	$_SESSION['bo_user_level'] = $level;
+	$_SESSION['bo_logged_out'] = false;
+	
+	$cookie_days = intval(BO_LOGIN_COOKIE_TIME);
+	
+	if ($cookie && !$_BO['headers_sent'] && $cookie_days)
+	{
+		$data = unserialize(bo_get_conf('user_cookie'.$cookie_user));
+		
+		if (!$data['uid'])
+			$data['uid'] = md5(uniqid('', true));
+
+		$data['pass'] = $pass;
+		bo_set_conf('user_cookie'.$user, serialize($data));
+		
+		setcookie("bo_login", $user.'_'.$data['uid'], time()+3600*24*$cookie_days,'/');
+	}
 }
 
 function bo_user_get_id()

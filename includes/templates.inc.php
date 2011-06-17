@@ -93,7 +93,7 @@ $_BO['tpl_gmap']['2-24h']['sel_name'] = '2-24 h';
 // Example for 1 to 10 days. Be careful: can cause high database load!
 $_BO['tpl_gmap']['1-10d']['tstart'] = 60 * 24 * 10;
 $_BO['tpl_gmap']['1-10d']['trange'] = 60 * 24 * 9;
-$_BO['tpl_gmap']['1-10d']['upd_intv'] = 1;
+$_BO['tpl_gmap']['1-10d']['upd_intv'] = 60;
 for ($i=0;$i<20;$i++)
 	$_BO['tpl_gmap']['1-10d']['col'][] = array(80 + 2*$i/20, 50   +200*$i/20, 230   -200*$i/20);
 $_BO['tpl_gmap']['1-10d']['default_show'] = false;

@@ -13,6 +13,7 @@ $_BL['locale'] = 'en';
 $_BL['en']['.'] = '.';
 $_BL['en'][','] = ',';
 $_BL['en']['_date'] = 'Y-m-d';
+$_BL['en']['_dateshort'] = 'm/d';
 $_BL['en']['_datetime'] = 'Y-m-d H:i:s';
 
 $_BL['en']['_before'] = false;
@@ -627,4 +628,8 @@ $_BL['en']['No data available!'] = 'No data available!';
 
 $_BL['en']['Signals detected'] = 'Signals detected';
 $_BL['en']['Signal ratio'] = 'Locating ratio';
-
+$_BL['en']['Extra overlays'] = 'Extra overlays';
+$_BL['en']['Meteox rain radar'] = 'Rain radar (meteox.com)';
+$_BL['en']['Advanced'] = 'Advanced';
+$_BL['en']['show strike counter'] = 'Strike counter';
+$_BL['en']['stay logged in'] = 'Stay logged in';
