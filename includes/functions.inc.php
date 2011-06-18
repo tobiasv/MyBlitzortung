@@ -302,7 +302,8 @@ function bo_copyright_footer()
 	echo '<a href="http://www.blitzortung.org/" target="_blank">';
 	echo '<img src="'.BO_FILE.'?image=logo" id="bo_copyright_logo">';
 	echo '</a>';
-	echo '&copy; 2003-'.date('Y ');
+	echo _BL('Lightning data');
+	echo ' &copy; 2003-'.date('Y ');
 	echo '<a href="http://www.blitzortung.org/" target="_blank">';
 	echo 'www.Blitzortung.org';
 	echo '</a>';

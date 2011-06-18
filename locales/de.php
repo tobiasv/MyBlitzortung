@@ -646,3 +646,4 @@ $_BL['de']['Advanced'] = 'Erweitert';
 $_BL['de']['show strike counter'] = 'Blitzzähler';
 $_BL['de']['stay logged in'] = 'Speichern';
 $_BL['de']['show tracks'] = 'Zugrichtung (experimentell!)';
+$_BL['de']['Lightning data'] = 'Blitzdaten';
