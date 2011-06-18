@@ -957,8 +957,13 @@ function bo_update_all($force)
 		return;
 	}
 
+	/*** Update strike tracks ***/
+	if ($strikes_imported)
+	{
+		bo_update_tracks($force);
+	}
 	/*** Update MyBlitzortung stations ***/
-	if (!$strikes_imported && !$stations_imported && !$signals_imported)
+	else if (!$strikes_imported && !$stations_imported && !$signals_imported)
 	{
 		bo_my_station_autoupdate($force);
 	}
@@ -1604,6 +1609,231 @@ function bo_my_station_update($url)
 	}
 
 	return $ret;
+}
+
+function bo_update_tracks($force = false)
+{
+	/**
+	/*  Warning: "Quick and dirty" calculation of lightning/cell tracks
+	/*  This calculation is currently a bit confusing and I'm sure there
+	/*  are better (faster and more accurate) ways to calculate that.
+	/*  The calculation time raises exponentially with scanning tim
+	/*  and strike count. 
+	 */
+	 
+	$scantime = intval(BO_TRACKS_SCANTIME);
+	$divisor = intval(BO_TRACKS_DIVISOR);
+	$cellsize = 10;
+	$cellsize2 = 30;
+	$cellsize3 = 20;
+	$MinStrikeCount = 3;
+	
+	if (!$scantime || !$divisor)
+		return;
+
+	$last = bo_get_conf('uptime_tracks');
+
+	echo "<h3>Tracks</h3>\n";
+
+	if (time() - $last > BO_UP_INTVL_TRACKS * 60 - 30 || $force)
+	{
+		bo_set_conf('uptime_tracks', time());
+		$time = time();
+		
+		//Debug
+		//$time = strtotime('2011-06-16 17:00:00 UTC');
+		
+		//divide time range 
+		for ($i=1;$i<=$divisor;$i++)
+			$stime[] = $time - $scantime * 60 / $i;
+
+		$stime[] = $time;
+
+		for ($i = 0; $i < count($stime)-1; $i++)
+		{
+			$cells[$i] = array();
+
+			$date_start = gmdate('Y-m-d H:i:s', $stime[$i]);
+			$date_end   = gmdate('Y-m-d H:i:s', $stime[$i+1]);
+			
+			$cells_time[$i] = array('start' => $stime[$i], 'end' => $stime[$i+1]);
+			
+			$sql = "SELECT id, time, lat, lon
+					FROM ".BO_DB_PREF."strikes
+					WHERE time BETWEEN '$date_start' AND '$date_end'
+					";
+			$res = bo_db($sql);
+			while($row = $res->fetch_assoc())
+			{
+				$time_strike = strtotime($row['time']." UTC");
+				
+				//for weighting the strike time
+				$time_weight = ($time_strike - $stime[$i]) / ($stime[$i+1] - $stime[$i]);
+				
+				$found = false;
+				
+				//search for cells
+				foreach($cells[$i] as $cellid => $cell)
+				{
+					if (!is_array($cell['strikes']))
+						break;
+						
+					//search for point in cell close to strike
+					foreach($cell['strikes'] as $points)
+					{
+						$dist = bo_latlon2dist($points[0], $points[1], $row['lat'], $row['lon']);
+						
+						if ($dist < $cellsize * 1000)
+						{
+							//add strike to cell
+							$cells[$i][$cellid]['strikes'][] = array($row['lat'], $row['lon'], $time_weight);
+							
+							$found = true;
+							break;
+						}
+					}
+				}
+				
+				//create new cell
+				if (!$found)
+				{
+					$cells[$i][] = array('strikes' => array(array($row['lat'], $row['lon'], $time_weight)));
+				}
+			}
+			
+			//consider only cells with enough strikes
+			$realcells[$i] = array();
+			foreach($cells[$i] as $cell)
+			{
+				if (count($cell['strikes']) > $MinStrikeCount)
+				{
+					$lat = 0;
+					$lon = 0;
+					$count = 0;
+					
+					//calculate the "gravity center" of each cell
+					//mathematically not correct, but a good approximation for small areas
+					foreach($cell['strikes'] as $data)
+					{
+						$weight = $data[2] / 2 + 0.5; //newer strikes have more "weight" than older ones
+						//$weight = 1;
+						
+						$lat += $data[0] * $weight;
+						$lon += $data[1] * $weight;
+						$count += $weight;
+					}
+					
+					$lat /= $count;
+					$lon /= $count;
+					
+					$lat = round($lat, 3);
+					$lon = round($lon, 3);
+					
+					//dimensions - ToDo: (cell "borders") missing
+					$realcells[$i][] = array( 'lat'     => $lat, 'lon' => $lon, 
+					                          'count'   => count($cell['strikes']), 
+											  'strikes' => $cell['strikes']);
+				}
+			}
+			
+			$cells[$i] = $realcells[$i];
+
+						
+			//combine splitted cells
+			$realcells[$i] = array();
+			ksort($cells[$i]);
+			foreach($cells[$i] as $cellid1=>$cell)
+			{
+				$center1 = $cell;
+				for ($cellid2=$cellid1+1; $cellid2<count($cells[$i]); $cellid2++)
+				{
+					$center2 = $cells[$i][$cellid2];
+					$dist = bo_latlon2dist($center1['lat'], $center1['lon'], $center2['lat'], $center2['lon']);
+					if ($dist < $cellsize2 * 1000)
+					{
+						$cells[$i][$cellid1]['sameid'][] = $cellid2;
+						$cells[$i][$cellid2]['sameid'][] = $cellid1;
+					}
+				}
+			}
+
+			$realcells[$i] = array();
+			$done = array();
+			krsort($cells[$i]);
+			foreach($cells[$i] as $cellid=>$cell)
+			{
+				if (isset($done[$cellid]))
+					continue;
+
+				$count = $cell['count'];
+				$lat   = $cell['lat'] * $count;
+				$lon   = $cell['lon'] * $count;
+				
+				if (isset($cell['sameid']))
+				{
+					foreach($cell['sameid'] as $cellid2)
+					{
+						if (isset($done[$cellid2]))
+							continue;
+							
+						$cell2 = $cells[$i][$cellid2];
+						$lat   += $cell2['lat'] * $cell2['count'];
+						$lon   += $cell2['lon'] * $cell2['count'];
+						$count += $cell2['count'];
+						
+						$done[$cellid2] = 1;
+					}
+				}
+				
+				$realcells[$i][] = array(
+											'lat'   => $lat / $count, 
+											'lon'   => $lon / $count, 
+											'count' => $count);
+			}
+			
+			$cells[$i] = $realcells[$i];
+			
+			//connect the cells
+			if ($i > 0)
+			{
+				foreach($cells[$i] as $cellid1 => $newcell)
+				{
+				
+					foreach($cells[$i-1] as $cellid2 => $oldcell)
+					{
+						$dist = bo_latlon2dist($oldcell['lat'], $oldcell['lon'], $newcell['lat'], $newcell['lon']);
+						
+						if ($dist < $cellsize3 * 1000)
+						{
+							// found the old cell --> assing movement values
+							
+							// Bearing
+							$bear = bo_latlon2bearing($newcell['lat'], $newcell['lon'], $oldcell['lat'], $oldcell['lon']);
+							$cells[$i][$cellid1]['bear'][] = $bear;
+							
+							// "Speed"
+							$cells[$i][$cellid1]['dist'][] = $dist;
+							
+							// Old cell connection
+							$cells[$i][$cellid1]['old'][] = $cellid2;
+						
+						}
+
+					
+					}
+				
+				}
+			}
+		}
+
+		$data = array('time' => $time, 'cells_time' => $cells_time, 'cells' => $cells);
+		
+		echo '<pre>';
+		print_r($data);
+		echo '</pre>';
+		
+		bo_set_conf('strike_cells', gzdeflate(serialize($data)));
+	}
 }
 
 

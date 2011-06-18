@@ -151,6 +151,25 @@ $_BO['tpl_imgmap']['europe']['density_blocksize'] = 10;
 $_BO['tpl_imgmap']['europe']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['europe']['density_darken'] = 40;
 
+//Europe (mini)
+$_BO['tpl_imgmap']['europe_mini']['name'] = 'Europe (mini)';
+$_BO['tpl_imgmap']['europe_mini']['menu'] = false;
+$_BO['tpl_imgmap']['europe_mini']['file'] = 'map_europe_mini.png';
+$_BO['tpl_imgmap']['europe_mini']['coord'] = array(71.1, 43.6, 32.2, -12.9); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['europe_mini']['trange'] = 2; //hours!
+$_BO['tpl_imgmap']['europe_mini']['upd_intv'] = 15; //minutes
+$_BO['tpl_imgmap']['europe_mini']['textcolor'] = array(255,255,255);
+$_BO['tpl_imgmap']['europe_mini']['textsize'] = 1;
+$_BO['tpl_imgmap']['europe_mini']['point_type'] = 1;
+$_BO['tpl_imgmap']['europe_mini']['point_size'] = 1;
+$_BO['tpl_imgmap']['europe_mini']['legend'] = array(0, 54, 26, 0, 0, 0);
+$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255, 255, 0);
+$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255, 200, 0);
+$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255, 150, 0);
+$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255, 100, 0);
+$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255,   0, 0);
+$_BO['tpl_imgmap']['europe_mini']['col'][] = array(225,   0, 0);
+
 //Germany (mini)
 $_BO['tpl_imgmap']['germany_mini']['name'] = 'Germany (mini)';
 $_BO['tpl_imgmap']['germany_mini']['menu'] = false;

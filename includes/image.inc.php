@@ -80,7 +80,10 @@ function bo_tile()
 
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$time = time();
-
+	
+	//Debug
+	//$time = strtotime('2011-06-16 17:00:00 UTC');
+	
 	//get config
 	if (isset($_GET['count'])) // display strike count
 	{
@@ -354,6 +357,7 @@ function bo_tile()
 		
 		}
 		
+		imagecolortransparent($I, $blank);
 		bo_tile_output($file, $caching, $I);
 		
 		exit;
@@ -427,69 +431,66 @@ function bo_tile()
 	//create Image
 	$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
 	$blank = imagecolorallocate($I, 0, 0, 0);
+	$white = imagecolorallocate($I, 255, 255, 255);
 	imagefilledrectangle( $I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
-
 
 	foreach($c as $i => $rgb)
 		$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
 
-	if ($zoom >= BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM)
+	
+	if ($zoom >= BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM) //circle (grows with zoom)
 	{
-		$cradius = floor((4+0.5*$zoom)/2)*2-1;
+		$s = floor((BO_MAP_STRIKE_CIRCLE_SIZE+BO_MAP_STRIKE_CIRCLE_GROW*$zoom)/2)*2-1;
 	}
 	else if ($zoom >= BO_EXPERIMENTAL_POLARITY_ZOOM && BO_EXPERIMENTAL_POLARITY_CHECK === true)
 	{
+		$s = BO_MAP_STRIKE_POLARITY_SIZE;
 		$style = 2; //with polarity
-		$cradius = 5;
 	}
 	else
 	{
-		$cradius = 5;
+		$s = BO_MAP_STRIKE_SIZE;
 		$style = 1;
 	}
 
-
-	$white = imagecolorallocate($I, 255, 255, 255);
 	foreach($points as $i => $p)
 	{
 		switch($style)
 		{
 			case 1: // plot a "+"
-				$s = 3;
+				
 				imagesetthickness($I, 2);
 				imageline($I, $p[0]-$s, $p[1], $p[0]+$s-1, $p[1], $color[$p[2]]);
 				imageline($I, $p[0], $p[1]-$s, $p[0], $p[1]+$s-1, $color[$p[2]]);
 				break;
 
 			case 2:
-				$s = 3;
-
 				if ($p[3] == null) //plot circle (no polarity known)
 				{
 					imagesetthickness($I, 1);
-					imagefilledellipse($I, $p[0], $p[1], $cradius, $cradius, $color[$p[2]]);
+					imagefilledellipse($I, $p[0], $p[1], $s, $s, $color[$p[2]]);
 				}
 				else //plot "+" or "-"
 				{
+					$t = $s - 2;
 					imagesetthickness($I, 2);
-					imageline($I, $p[0]-$s, $p[1], $p[0]+$s-1, $p[1], $color[$p[2]]);
+					imageline($I, $p[0]-$t, $p[1], $p[0]+$t-1, $p[1], $color[$p[2]]);
 					if ($p[3] > 0)
-						imageline($I, $p[0], $p[1]-$s, $p[0], $p[1]+$s-1, $color[$p[2]]);
+						imageline($I, $p[0], $p[1]-$t, $p[0], $p[1]+$t-1, $color[$p[2]]);
 				}
 
 				break;
 
 			default: // plot circle
 				imagesetthickness($I, 1);
-				imagefilledellipse($I, $p[0], $p[1], $cradius, $cradius, $color[$p[2]]);
+				imagefilledellipse($I, $p[0], $p[1], $s, $s, $color[$p[2]]);
 
 				if ($p[3] != null && BO_EXPERIMENTAL_POLARITY_CHECK == true)
 				{
-					imagesetthickness($I, 1);
-					$s = intval($cradius / 2);
-					imageline($I, $p[0]-$s+1, $p[1], $p[0]+$s-1, $p[1], $white);
+					$t = intval($s / 2);
+					imageline($I, $p[0]-$t+1, $p[1], $p[0]+$t-1, $p[1], $white);
 					if ($p[3] > 0)
-						imageline($I, $p[0], $p[1]-$s+1, $p[0], $p[1]+$s-1, $white);
+						imageline($I, $p[0], $p[1]-$t+1, $p[0], $p[1]+$t-1, $white);
 				}
 
 				break;
@@ -507,6 +508,147 @@ function bo_tile()
 	imagestring($I, 5, 10, 10 + $type * 18, date('Y-m-d H:i:s'), $col);
 	imagerectangle( $I, 0, 0, imagesx($I), imagesy($I), $col);
 	*/
+	
+	imagecolortransparent($I, $blank);
+	bo_tile_output($file, $caching, $I);
+}
+
+function bo_tile_tracks()
+{
+	global $_BO;
+	session_write_close();
+
+	if (!intval(BO_TRACKS_SCANTIME)) //disabled
+		exit;
+	
+	if (rand(0, 3000) == 1)
+	{
+		register_shutdown_function('bo_delete_files', BO_DIR.'cache/tiles/', 24, 3);
+	}
+	
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+	$x = intval($_GET['x']);
+	$y = intval($_GET['y']);
+	$zoom = intval($_GET['zoom']);
+
+	$file = BO_DIR.'cache/tiles/tracks_'.$zoom.'_'.$x.'x'.$y.'.png';
+	
+	if (BO_CACHE_SUBDIRS === true)
+		$file = strtr($file, array('_' => '/'));
+
+	if (file_exists($file) && $caching)
+	{
+		if (file_exists($file) && filemtime($file) + intval(BO_UP_INTVL_TRACKS) > time())
+		{
+			header("Content-Type: image/png");
+			readfile($file);
+			exit;
+		}
+	}
+	
+	//create Image
+	$I = imagecreatetruecolor(BO_TILE_SIZE, BO_TILE_SIZE);
+	$blank = imagecolorallocatealpha($I, 255, 255, 255, 127);
+	imagefill($I, 0, 0, $blank);
+
+	imagesavealpha($I, true);
+	imagealphablending($I, true);
+	
+
+	if ($zoom > 6)
+	{
+	
+		$data = unserialize(gzinflate(bo_get_conf('strike_cells')));
+
+		
+		$size = 30 + 20 * ($zoom-7);
+
+		
+		
+		if (is_array($data['cells']))
+		{
+			$linecolor = imagecolorallocatealpha($I, 100, 100, 100, 50 );
+			$textcolor = imagecolorallocatealpha($I, 0, 0, 0, 30 );
+
+			$count = count($data['cells']) - 1;
+			for ($i=0; $i<=$count; $i++)
+				$color[$i] = imagecolorallocatealpha($I, 
+															100 - 100*($i/$count), 
+															255, 
+															200 - 200*($i/$count), 
+															70 - 10*($i/$count));
+		
+			foreach($data['cells'] as $i => $cells)
+			{
+				if ($i == 0)
+					continue;
+				
+				$time_range = $data['cells_time'][$i]['end'] - $data['cells_time'][$i]['start'];
+
+				
+				foreach($data['cells'][$i] as $cell)
+				{
+					list($px, $py) = bo_latlon2tile($cell['lat'], $cell['lon'], $zoom);
+					$px -= (BO_TILE_SIZE * $x);
+					$py -= (BO_TILE_SIZE * $y);
+					imagefilledellipse($I, $px, $py, $size, $size, $color[$i]);
+					imageellipse($I, $px, $py, $size+1, $size+1, $linecolor);
+					
+					if (isset($cell['dist']))
+					{
+						foreach($cell['dist'] as $did => $dist)
+						{
+							//$distance to specified time range
+							$dist = $cell['dist'][$did] / $time_range * 1800;
+							
+							list($lat, $lon) = bo_distbearing2latlong($dist, $cell['bear'][$did], $cell['lat'], $cell['lon']);
+							list($px2, $py2) = bo_latlon2tile($lat, $lon, $zoom);
+							$px2 -= (BO_TILE_SIZE * $x);
+							$py2 -= (BO_TILE_SIZE * $y);
+
+							imageline($I, $px, $py, $px2, $py2, $linecolor);
+							
+							//data (speed...)
+							if ($size > 30)
+							{
+								//old cell
+								$old = $cell['old'][$did];
+								$oldcount = $data['cells'][$i-1][$old]['count'];
+								
+								$strikechange = round(($cell['count'] - $oldcount) / $oldcount * 100);
+								if ($strikechange > 0)
+									$strikechange = '+'.$strikechange;
+								
+								$strikepermin = number_format($cell['count'] / $time_range * 60, 1, _BL('.'), _BL(','));
+								
+								//speed
+								$speed = $cell['dist'][$did] / $time_range * 3.6;
+								
+								
+								
+								$textsize = $size > 50 ? 3 : 1;
+								$height = imagefontheight($textsize);
+								
+								//Speed
+								imagestring($I, $textsize, $px - $size / 3, $py - $size / 3, round($speed).'km/h', $textcolor);
+
+								//Strikes
+								imagestring($I, $textsize, $px - $size / 3, $py - $size / 3 + $height, $cell['count'], $textcolor);
+								
+								//Strikes per minute
+								imagestring($I, $textsize, $px - $size / 3, $py - $size / 3 + $height*2, $strikepermin.'/min', $textcolor);
+								
+								//Strike count change
+								imagestring($I, $textsize, $px - $size / 3, $py - $size / 3 + $height*3, $strikechange.'%', $textcolor);
+							}
+							
+							break; //currently only the first dataset
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	bo_tile_output($file, $caching, $I);
 }
@@ -535,8 +677,6 @@ function bo_tile_output($file='', $caching=false, &$I=null)
 		exit;
 	}
 		
-	imagecolortransparent($I, $blank);
-
 	header("Content-Type: image/png");
 	if ($caching)
 	{
@@ -762,7 +902,11 @@ function bo_get_map_image()
 			$x =      ($px - $x1) * $w_x;
 			$y = $h - ($py - $y1) * $h_y;
 
-			if ($cfg['point_type'] == 1)
+			if ($size == 1)
+			{
+				imagesetpixel($I, $x, $y, $color[$col]);
+			}
+			else if ($cfg['point_type'] == 1)
 			{
 				imagefilledellipse($I, $x, $y, $size, $size, $color[$col]);
 			}

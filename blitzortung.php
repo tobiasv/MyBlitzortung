@@ -25,7 +25,7 @@ if (!defined("BO_VER"))
 	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.4.9');
+	define("BO_VER", '0.5');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -124,7 +124,11 @@ if (!defined("BO_VER"))
 		if (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !(bo_user_get_level() & BO_PERM_NOLIMIT))
 			exit('Google Maps disabled');
 
-		bo_tile();
+		if (isset($_GET['tracks']))
+			bo_tile_tracks();
+		else
+			bo_tile();
+		
 		exit;
 	}
 	//phpinfo for admin

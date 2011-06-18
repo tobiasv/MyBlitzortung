@@ -60,13 +60,9 @@
 @define("BO_LOGIN_COOKIE_TIME", 60); // days where automatic login cookie is valid. set to false to disable auto login
 
 //Map display
+//Do not raise these values, otherwise autolinking will not work!
 @define("BO_RADIUS", 50);             // (kilometers) limits strike display to radius around station
-                                      // Do not raise this value, otherwise autolinking will not work!
-
 @define("BO_MAX_ZOOM_LIMIT", 8);      // when zoom reaches this level, strike display is limited to max. distance around station (BO_RADIUS)
-                                      // Do not lower this value, otherwise autolinking will not work!
-
-
 
 //Google Map: General settings
 @define('BO_MAP_DISABLE', false);
@@ -80,8 +76,10 @@
 @define('BO_MAP_CIRCLE_OPAC_FILL', '0.05');
 @define('BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM', 9);
 @define('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM', 12);
+@define('BO_MAP_STRIKE_SIZE', 3);
+@define('BO_MAP_STRIKE_CIRCLE_SIZE', 4);
+@define('BO_MAP_STRIKE_CIRCLE_GROW', 0.5);
 @define('BO_MAP_STATION_ICON', 'http://labs.google.com/ridefinder/images/mm_20_red.png');
-
 
 //Update intervals (Minutes!)
 @define("BO_UP_INTVL_STRIKES", 5);
@@ -101,6 +99,13 @@
 //Experimental Polarity
 @define("BO_EXPERIMENTAL_POLARITY_CHECK", true);
 @define("BO_EXPERIMENTAL_POLARITY_ZOOM", 8);
+@define("BO_MAP_STRIKE_POLARITY_SIZE", 5);
+
+//Calculate tracks
+//WARNING: This is currently very expermintal. It may slow down you server!
+@define("BO_UP_INTVL_TRACKS", 5);  //update tracks every x minutes
+@define("BO_TRACKS_SCANTIME", 0); //scan time in minutes (set to 0 to disable tracks)
+@define("BO_TRACKS_DIVISOR",  2); 
 
 //Show GPS Info
 @define("BO_SHOW_GPS_INFO", true);
@@ -315,6 +320,9 @@ if (!isset($_BO['mapimg'][1]))
 
 if (!isset($_BO['mapimg'][2]))
 	$_BO['mapimg'][2] = $_BO['tpl_imgmap']['germany_lkr'];
+
+if (!isset($_BO['mapimg'][3]))
+	$_BO['mapimg'][3] = $_BO['tpl_imgmap']['europe_mini'];
 
 	
 /*** Densities ***/

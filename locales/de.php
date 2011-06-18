@@ -645,3 +645,4 @@ $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
 $_BL['de']['Advanced'] = 'Erweitert';
 $_BL['de']['show strike counter'] = 'Blitzzähler';
 $_BL['de']['stay logged in'] = 'Speichern';
+$_BL['de']['show tracks'] = 'Zugrichtung (experimentell!)';

@@ -369,6 +369,15 @@ function bo_show_lightning_map()
 	echo '<input type="checkbox" onclick="bo_map_toggle_count(this.checked);" id="bo_map_opt_count"> ';
 	echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label>';
 	echo '</span> &nbsp; ';
+
+	if (intval(BO_TRACKS_SCANTIME))
+	{
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="checkbox" onclick="bo_map_toggle_tracks(this.checked);" id="bo_map_opt_tracks"> ';
+		echo '<label for="bo_map_opt_tracks">'._BL("show tracks").'</label>';
+		echo '</span> &nbsp; ';
+	}
+	
 	echo '</div>';
 
 	
@@ -422,10 +431,12 @@ function bo_show_lightning_map()
 	<script type="text/javascript">
 	var bo_OverlayMaps = new Array();
 	var bo_OverlayCount;
+	var bo_OverlayTracks;
 	var bo_ExtraOverlay = [];
 	var bo_ExtraOverlayMaps = [];
 	var bo_show_only_own = 0;
 	var bo_show_count = 0;
+	var bo_show_tracks = 0;
 	var bo_mybo_markers = [];
 	var bo_mybo_circles = [];
 	var bo_station_markers = [];
@@ -587,6 +598,13 @@ function bo_show_lightning_map()
 		bo_show_count = checked ? 1 : 0;
 		bo_map_reload_overlays();
 	}
+
+	function bo_map_toggle_tracks(checked)
+	{
+		bo_setcookie('bo_show_tracks', checked ? 1 : -1);
+		bo_show_tracks = checked ? 1 : 0;
+		bo_map_reload_overlays();
+	}
 	
 	function bo_map_reload_overlays()
 	{
@@ -625,10 +643,13 @@ function bo_show_lightning_map()
 				overlay_count++;
 			}
 		}
+
+		if (bo_show_tracks)
+			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayTracks));
 		
 		if (bo_show_count && overlay_count)
 			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayCount));
-		
+
 		bo_reload_mapinfo();
 	}
 	
@@ -660,6 +681,16 @@ function bo_show_lightning_map()
 		var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
 		
 		return "<?php echo BO_FILE ?>?tile&count="+types+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
+	}
+	
+	function bo_get_tile_tracks(zoom, coord)
+	{
+		var interval=<?php echo intval(BO_UP_INTVL_TRACKS) ?>;
+
+		var now = new Date();
+		var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
+		
+		return "<?php echo BO_FILE ?>?tile&tracks&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
 	}
 	
 	function bo_reload_mapinfo() 
@@ -772,10 +803,16 @@ function bo_show_lightning_map()
 			getTileUrl: function (coord, zoom) { return bo_get_tile_counts(zoom, coord); },
 			tileSize: new google.maps.Size(256,256), 
 			isPng:true, 
-			bo_show:false,
-			bo_interval:1
+			bo_show:false
 		};
 
+		bo_OverlayTracks = {
+			getTileUrl: function (coord, zoom) { return bo_get_tile_tracks(zoom, coord); },
+			tileSize: new google.maps.Size(256,256), 
+			isPng:true, 
+			bo_show:false
+		};
+		
 		var c = bo_getcookie('bo_show_only_own');
 		if (c)
 		{
@@ -788,6 +825,13 @@ function bo_show_lightning_map()
 		{
 			bo_show_count = c == -1 ? 0 : 1;
 			document.getElementById('bo_map_opt_count').checked = c == -1 ? false : true;
+		}
+
+		var c = bo_getcookie('bo_show_tracks');
+		if (c)
+		{
+			bo_show_tracks = c == -1 ? 0 : 1;
+			document.getElementById('bo_map_opt_tracks').checked = c == -1 ? false : true;
 		}
 		
 		for (i=0;i<bo_OverlayMaps.length;i++)

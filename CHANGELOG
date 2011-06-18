@@ -3,13 +3,15 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.4.9 (2011-06-17)
+Version 0.5 (2011-06-xx)
 --------------------------
 - new: custom overlays for google map (not perfect: it lies over the strike overlay)
 - new: border overlays for static maps, to see the borders even if there's much lightning
 - new: strike counter in dynamic map
 - new: auto login with cookie
 - new: caching now with subdirectories (disable with BO_CACHE_SUBDIRS --> false)
+- new: mini europe map
+- new: strike tracks (very experimental)
 - small enhancements and fixes
 
 Version 0.4.8d (2011-06-12)
