@@ -547,36 +547,54 @@ function bo_tile_tracks()
 	}
 	
 	//create Image
-	$I = imagecreatetruecolor(BO_TILE_SIZE, BO_TILE_SIZE);
+	$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
 	$blank = imagecolorallocatealpha($I, 255, 255, 255, 127);
 	imagefill($I, 0, 0, $blank);
 
 	imagesavealpha($I, true);
-	imagealphablending($I, true);
+	imagealphablending($I, false);
+	
 	
 
-	if ($zoom > 6)
+	if ($zoom >= BO_TRACKS_MAP_ZOOM_MIN && $zoom <= BO_TRACKS_MAP_ZOOM_MAX)
 	{
-	
 		$data = unserialize(gzinflate(bo_get_conf('strike_cells')));
-
-		
-		$size = 30 + 20 * ($zoom-7);
-
-		
 		
 		if (is_array($data['cells']))
 		{
-			$linecolor = imagecolorallocatealpha($I, 100, 100, 100, 50 );
-			$textcolor = imagecolorallocatealpha($I, 0, 0, 0, 30 );
+			$size = 5 + (pow(2,$zoom-BO_TRACKS_MAP_ZOOM_MIN+3));
+			
+			if ($size > 70)
+			{
+				$rsizex = 30;
+				$rsizey = 27;
+				$textsize = 3;
+			}
+			else
+			{
+				$rsizex = 20;
+				$rsizey = 17;
+				$textsize = 1;
+			}
+			$linecolor = imagecolorallocatealpha($I, 50, 150, 50, 0 );
+			$textcolor = imagecolorallocatealpha($I, 0, 0, 0, 0 );
+			$rectcolorfill = imagecolorallocatealpha($I, 230, 230, 230, 10 );
+			$rectcolorline = imagecolorallocatealpha($I, 50, 100, 50, 0 );
 
+			//forecast style
+			$col1 = imagecolorallocatealpha($I, 255, 0, 0, 127);
+			$col2 = imagecolorallocatealpha($I, 255, 0, 0, 0);
+			$style = array($col1, $col1, $col1, $col1, $col2, $col2, $col2, $col2);
+			imagesetstyle($I, $style);
+			$forecastcolorfill = imagecolorallocatealpha($I, 255, 0, 0, 80 );
+			
 			$count = count($data['cells']) - 1;
 			for ($i=0; $i<=$count; $i++)
 				$color[$i] = imagecolorallocatealpha($I, 
 															100 - 100*($i/$count), 
 															255, 
 															200 - 200*($i/$count), 
-															70 - 10*($i/$count));
+															0);
 		
 			foreach($data['cells'] as $i => $cells)
 			{
@@ -588,18 +606,22 @@ function bo_tile_tracks()
 				
 				foreach($data['cells'][$i] as $cell)
 				{
+					if (!isset($cell['dist']) && BO_TRACKS_SHOW_UNTRACKED === false)
+						continue;
+						
 					list($px, $py) = bo_latlon2tile($cell['lat'], $cell['lon'], $zoom);
 					$px -= (BO_TILE_SIZE * $x);
 					$py -= (BO_TILE_SIZE * $y);
-					imagefilledellipse($I, $px, $py, $size, $size, $color[$i]);
-					imageellipse($I, $px, $py, $size+1, $size+1, $linecolor);
 					
+					if ($px/BO_TILE_SIZE > 4 || $px/BO_TILE_SIZE < -4 || $py/BO_TILE_SIZE > 4 || $py/BO_TILE_SIZE < -4)
+						continue;
+						
 					if (isset($cell['dist']))
 					{
 						foreach($cell['dist'] as $did => $dist)
 						{
 							//$distance to specified time range
-							$dist = $cell['dist'][$did] / $time_range * 1800;
+							$dist = $cell['dist'][$did] / $time_range * 60 * BO_TRACKS_MAP_TIME_FORCAST;
 							
 							list($lat, $lon) = bo_distbearing2latlong($dist, $cell['bear'][$did], $cell['lat'], $cell['lon']);
 							list($px2, $py2) = bo_latlon2tile($lat, $lon, $zoom);
@@ -607,9 +629,11 @@ function bo_tile_tracks()
 							$py2 -= (BO_TILE_SIZE * $y);
 
 							imageline($I, $px, $py, $px2, $py2, $linecolor);
+							imagefilledellipse($I, $px2, $py2, $size/1.2, $size/1.2, $forecastcolorfill);
+							imageellipse($I, $px2, $py2, $size/1.2, $size/1.2, IMG_COLOR_STYLED);
 							
-							//data (speed...)
-							if ($size > 30)
+							//show info data (speed...)
+							if ($zoom > BO_TRACKS_MAP_ZOOM_INFO)
 							{
 								//old cell
 								$old = $cell['old'][$did];
@@ -625,26 +649,31 @@ function bo_tile_tracks()
 								$speed = $cell['dist'][$did] / $time_range * 3.6;
 								
 								
+								imagefilledrectangle($I, $px2 - $rsizex, $py2 - $rsizey, $px2 + $rsizex, $py2 + $rsizey, $rectcolorfill);
+								imagerectangle($I, $px2 - $rsizex, $py2 - $rsizey, $px2 + $rsizex, $py2 + $rsizey, $rectcolorline);
 								
-								$textsize = $size > 50 ? 3 : 1;
 								$height = imagefontheight($textsize);
 								
 								//Speed
-								imagestring($I, $textsize, $px - $size / 3, $py - $size / 3, round($speed).'km/h', $textcolor);
+								imagestring($I, $textsize, $px2 - $rsizex+2, $py2 - $rsizey + 2, round($speed).'km/h', $textcolor);
 
 								//Strikes
-								imagestring($I, $textsize, $px - $size / 3, $py - $size / 3 + $height, $cell['count'], $textcolor);
+								imagestring($I, $textsize, $px2 - $rsizex+2, $py2 - $rsizey + 2 + $height, $cell['count'], $textcolor);
 								
 								//Strikes per minute
-								imagestring($I, $textsize, $px - $size / 3, $py - $size / 3 + $height*2, $strikepermin.'/min', $textcolor);
+								imagestring($I, $textsize, $px2 - $rsizex+2, $py2 - $rsizey + 2 + $height*2, $strikepermin.'/min', $textcolor);
 								
 								//Strike count change
-								imagestring($I, $textsize, $px - $size / 3, $py - $size / 3 + $height*3, $strikechange.'%', $textcolor);
+								imagestring($I, $textsize, $px2 - $rsizex+2, $py2 - $rsizey + 2 + $height*3, $strikechange.'%', $textcolor);
 							}
 							
 							break; //currently only the first dataset
 						}
 					}
+					
+					imagefilledellipse($I, $px, $py, $size, $size, $color[$i]);
+					imageellipse($I, $px, $py, $size+1, $size+1, $linecolor);
+
 				}
 			}
 		}
@@ -1600,6 +1629,10 @@ function bo_get_image($img)
 {
 	switch($img)
 	{
+		case 'bt':
+			$file = 'blank_tile.png';
+			break;
+
 		case 'logo':
 			$file = 'blitzortung_logo.jpg';
 			break;

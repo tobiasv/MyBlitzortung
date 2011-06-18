@@ -685,6 +685,9 @@ function bo_show_lightning_map()
 	
 	function bo_get_tile_tracks(zoom, coord)
 	{
+		if (zoom < <?php echo (int)BO_TRACKS_MAP_ZOOM_MIN; ?> || zoom > <?php echo (int)BO_TRACKS_MAP_ZOOM_MAX; ?>)
+			return "<?php echo BO_FILE ?>?image=bt";
+		
 		var interval=<?php echo intval(BO_UP_INTVL_TRACKS) ?>;
 
 		var now = new Date();
@@ -810,6 +813,9 @@ function bo_show_lightning_map()
 			getTileUrl: function (coord, zoom) { return bo_get_tile_tracks(zoom, coord); },
 			tileSize: new google.maps.Size(256,256), 
 			isPng:true, 
+			opacity:<?php echo (double)BO_TRACKS_MAP_OPACITY; ?>,
+			minZoom:<?php echo (int)BO_TRACKS_MAP_ZOOM_MIN; ?>,
+			maxZoom:<?php echo (int)BO_TRACKS_MAP_ZOOM_MAX; ?>,
 			bo_show:false
 		};
 		

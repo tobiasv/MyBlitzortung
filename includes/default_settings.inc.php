@@ -106,6 +106,16 @@
 @define("BO_UP_INTVL_TRACKS", 5);  //update tracks every x minutes
 @define("BO_TRACKS_SCANTIME", 0); //scan time in minutes (set to 0 to disable tracks)
 @define("BO_TRACKS_DIVISOR",  2); 
+@define("BO_TRACKS_MAP_OPACITY", 0.7); 
+@define("BO_TRACKS_MAP_ZOOM_MIN", 6); 
+@define("BO_TRACKS_MAP_ZOOM_MAX", 12); 
+@define("BO_TRACKS_MAP_ZOOM_INFO", 7);
+@define("BO_TRACKS_MAP_TIME_FORCAST", 30); 
+@define("BO_TRACKS_SHOW_UNTRACKED", false); 
+@define("BO_TRACKS_RADIUS_SEARCH_STRIKES", 10);
+@define("BO_TRACKS_RADIUS_SEARCH_NGBR_CELLS", 30);
+@define("BO_TRACKS_RADIUS_SEARCH_OLD_CELLS", 30);
+
 
 //Show GPS Info
 @define("BO_SHOW_GPS_INFO", true);

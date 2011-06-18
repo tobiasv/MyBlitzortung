@@ -1623,9 +1623,9 @@ function bo_update_tracks($force = false)
 	 
 	$scantime = intval(BO_TRACKS_SCANTIME);
 	$divisor = intval(BO_TRACKS_DIVISOR);
-	$cellsize = 10;
-	$cellsize2 = 30;
-	$cellsize3 = 20;
+	$cellsize  = intval(BO_TRACKS_RADIUS_SEARCH_STRIKES);
+	$cellsize2 = intval(BO_TRACKS_RADIUS_SEARCH_NGBR_CELLS);
+	$cellsize3 = intval(BO_TRACKS_RADIUS_SEARCH_OLD_CELLS);
 	$MinStrikeCount = 3;
 	
 	if (!$scantime || !$divisor)

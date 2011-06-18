@@ -728,7 +728,7 @@ function bo_alert_log($all = false)
 			echo '<tr>';
 			echo '<td>'.date(_BL('_datetime'), $time).'</td>';
 			echo '<td>'.bo_user_get_name($user_id).'</td>';
-			echo '<td><a href="'.bo_insert_url('bo_action2', 'alert_form,'.$user_id.','.$alert_id).'">'.$d['name'].'</a></td>';
+			echo '<td><a href="'.bo_insert_url('bo_action2', 'alert_form,'.$user_id.','.$alert_id).'">'._BC($d['name']).'</a></td>';
 			echo '<td>';
 			switch ($d['type'])
 			{
