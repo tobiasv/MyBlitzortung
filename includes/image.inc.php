@@ -902,9 +902,13 @@ function bo_get_map_image()
 			$x =      ($px - $x1) * $w_x;
 			$y = $h - ($py - $y1) * $h_y;
 
-			if ($size == 1)
+			if ($cfg['point_type'] == 1 && $size == 1)
 			{
 				imagesetpixel($I, $x, $y, $color[$col]);
+			}
+			else if ($cfg['point_type'] == 1 && $size == 2)
+			{
+				imagerectangle($I, $x, $y, $x+1, $y+1, $color[$col]);
 			}
 			else if ($cfg['point_type'] == 1)
 			{
