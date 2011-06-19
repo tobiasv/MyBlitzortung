@@ -104,7 +104,6 @@ if (!defined("BO_VER"))
 		if (file_exists($locdir.'own.php')) //include this 2nd time (must overwrite the manual specified language!)
 			include $locdir.'own.php';
 	}
-
 		
 	//includes #1
 	require_once 'includes/functions.inc.php';
@@ -115,6 +114,22 @@ if (!defined("BO_VER"))
 		require_once 'includes/db_mysql.inc.php';
 	else
 		require_once 'includes/db_mysqli.inc.php';
+
+	//Check for stored login in cookie
+	if (!bo_user_get_id() && intval(BO_LOGIN_COOKIE_TIME) && isset($_COOKIE['bo_login']) && preg_match('/^([0-9]+)_([0-9a-z]+)$/i', trim($_COOKIE['bo_login']), $r) )
+	{
+		$cookie_user = $r[1];
+		$cookie_uid = $r[2];
+		
+		$data = unserialize(bo_get_conf('user_cookie'.$cookie_user));
+		
+		if ($cookie_uid == $data['uid'] && trim($data['uid']))
+		{
+			bo_user_do_login_byid($cookie_user, $data['pass']);
+		}
+
+	}
+	
 
 	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
 
@@ -179,7 +194,7 @@ if (!defined("BO_VER"))
 		exit;
 	}
 
-	//Cookie login
+	//Login
 	if (isset($_POST['bo_do_login']))
 	{
 		$login_name   = BoDb::esc(bo_gpc_prepare($_POST['bo_user']));
@@ -192,19 +207,6 @@ if (!defined("BO_VER"))
 	else if (isset($_GET['bo_logout']))
 	{
 		bo_user_do_logout();
-	}
-	else if (!bo_user_get_id() && intval(BO_LOGIN_COOKIE_TIME) && preg_match('/^([0-9]+)_([0-9a-z]+)$/i', trim($_COOKIE['bo_login']), $r) )
-	{
-		$cookie_user = $r[1];
-		$cookie_uid = $r[2];
-		
-		$data = unserialize(bo_get_conf('user_cookie'.$cookie_user));
-		
-		if ($cookie_uid == $data['uid'] && trim($data['uid']))
-		{
-			bo_user_do_login_byid($cookie_user, $data['pass']);
-		}
-
 	}
 	
 	//images part 1

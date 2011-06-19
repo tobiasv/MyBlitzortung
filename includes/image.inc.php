@@ -562,13 +562,14 @@ function bo_tile_tracks()
 		
 		if (is_array($data['cells']))
 		{
-			$size = 5 + (pow(2,$zoom-BO_TRACKS_MAP_ZOOM_MIN+3));
+			$size = 10 + (pow(1.5,$zoom-BO_TRACKS_MAP_ZOOM_MIN+8));
 			
-			if ($size > 70)
+			if ($size >= 67)
 			{
 				$rsizex = 30;
 				$rsizey = 27;
-				$textsize = 3;
+				$textsize = 2;
+				$size = 70;
 			}
 			else
 			{
@@ -576,50 +577,63 @@ function bo_tile_tracks()
 				$rsizey = 17;
 				$textsize = 1;
 			}
+			
 			$linecolor = imagecolorallocatealpha($I, 50, 150, 50, 0 );
 			$textcolor = imagecolorallocatealpha($I, 0, 0, 0, 0 );
 			$rectcolorfill = imagecolorallocatealpha($I, 230, 230, 230, 10 );
 			$rectcolorline = imagecolorallocatealpha($I, 50, 100, 50, 0 );
 
 			//forecast style
-			$col1 = imagecolorallocatealpha($I, 255, 0, 0, 127);
-			$col2 = imagecolorallocatealpha($I, 255, 0, 0, 0);
+			$col1 = imagecolorallocatealpha($I, 0, 155, 0, 127);
+			$col2 = imagecolorallocatealpha($I, 0, 155, 0, 0);
 			$style = array($col1, $col1, $col1, $col1, $col2, $col2, $col2, $col2);
 			imagesetstyle($I, $style);
-			$forecastcolorfill = imagecolorallocatealpha($I, 255, 0, 0, 80 );
+			$forecastcolorfill = imagecolorallocatealpha($I, 160, 255, 160, 20 );
 			
 			$count = count($data['cells']) - 1;
 			for ($i=0; $i<=$count; $i++)
 				$color[$i] = imagecolorallocatealpha($I, 
-															100 - 100*($i/$count), 
+															100 - 50*($i/$count), 
 															255, 
-															200 - 200*($i/$count), 
+															250 - 150*($i/$count), 
 															0);
 		
 			foreach($data['cells'] as $i => $cells)
 			{
-				if ($i == 0)
+				if ($i == 0 && BO_TRACKS_SHOW_UNTRACKED === false)
 					continue;
 				
 				$time_range = $data['cells_time'][$i]['end'] - $data['cells_time'][$i]['start'];
 
 				
-				foreach($data['cells'][$i] as $cell)
+				foreach($data['cells'][$i] as $cellid => $cell)
 				{
 					if (!isset($cell['dist']) && BO_TRACKS_SHOW_UNTRACKED === false)
 						continue;
-						
+					
+					if ($cell['count'] < intval(BO_TRACKS_MAP_MIN_STRIKES_DISPLAY))
+						continue;
+					
 					list($px, $py) = bo_latlon2tile($cell['lat'], $cell['lon'], $zoom);
 					$px -= (BO_TILE_SIZE * $x);
 					$py -= (BO_TILE_SIZE * $y);
 					
 					if ($px/BO_TILE_SIZE > 4 || $px/BO_TILE_SIZE < -4 || $py/BO_TILE_SIZE > 4 || $py/BO_TILE_SIZE < -4)
 						continue;
-						
+					
+					$circle_drawn = false;
+					
 					if (isset($cell['dist']))
 					{
 						foreach($cell['dist'] as $did => $dist)
 						{
+							//old cell
+							$old = $cell['old'][$did];
+							$oldcount = $data['cells'][$i-1][$old]['count'];
+							
+							if ($oldcount < intval(BO_TRACKS_MAP_MIN_STRIKES_DISPLAY))
+								continue 2;
+
 							//$distance to specified time range
 							$dist = $cell['dist'][$did] / $time_range * 60 * BO_TRACKS_MAP_TIME_FORCAST;
 							
@@ -632,48 +646,61 @@ function bo_tile_tracks()
 							imagefilledellipse($I, $px2, $py2, $size/1.2, $size/1.2, $forecastcolorfill);
 							imageellipse($I, $px2, $py2, $size/1.2, $size/1.2, IMG_COLOR_STYLED);
 							
+							
+							
 							//show info data (speed...)
-							if ($zoom > BO_TRACKS_MAP_ZOOM_INFO)
+							if ($zoom >= BO_TRACKS_MAP_ZOOM_INFO)
 							{
-								//old cell
-								$old = $cell['old'][$did];
-								$oldcount = $data['cells'][$i-1][$old]['count'];
+								imagestring($I, $textsize, $px2-5, $py2-8, '+'.intval(BO_TRACKS_MAP_TIME_FORCAST), $textcolor);
+								imagestring($I, $textsize, $px2-5, $py2+2, 'min', $textcolor);
 								
 								$strikechange = round(($cell['count'] - $oldcount) / $oldcount * 100);
 								if ($strikechange > 0)
 									$strikechange = '+'.$strikechange;
 								
 								$strikepermin = number_format($cell['count'] / $time_range * 60, 1, _BL('.'), _BL(','));
-								
+
 								//speed
 								$speed = $cell['dist'][$did] / $time_range * 3.6;
 								
+								//Position
+								$pxr = $px;
+								$pyr = $py;
 								
-								imagefilledrectangle($I, $px2 - $rsizex, $py2 - $rsizey, $px2 + $rsizex, $py2 + $rsizey, $rectcolorfill);
-								imagerectangle($I, $px2 - $rsizex, $py2 - $rsizey, $px2 + $rsizex, $py2 + $rsizey, $rectcolorline);
+								//imagefilledrectangle($I, $pxr - $rsizex, $pyr - $rsizey, $pxr + $rsizex, $pyr + $rsizey, $rectcolorfill);
+								//imagerectangle($I, $pxr - $rsizex, $pyr - $rsizey, $pxr + $rsizex, $pyr + $rsizey, $rectcolorline);
+								
+								imagefilledellipse($I, $px, $py, $size, $size, $color[$i]);
+								imageellipse($I, $px, $py, $size+1, $size+1, $linecolor);
+								$circle_drawn = true;
 								
 								$height = imagefontheight($textsize);
 								
+								$pxr += 4;
+								$pyr += 2;
+								
 								//Speed
-								imagestring($I, $textsize, $px2 - $rsizex+2, $py2 - $rsizey + 2, round($speed).'km/h', $textcolor);
+								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey, round($speed).'km/h', $textcolor);
 
 								//Strikes
-								imagestring($I, $textsize, $px2 - $rsizex+2, $py2 - $rsizey + 2 + $height, $cell['count'], $textcolor);
+								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey + $height, $cell['count'], $textcolor);
 								
 								//Strikes per minute
-								imagestring($I, $textsize, $px2 - $rsizex+2, $py2 - $rsizey + 2 + $height*2, $strikepermin.'/min', $textcolor);
+								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey + $height*2, $strikepermin.'/min', $textcolor);
 								
 								//Strike count change
-								imagestring($I, $textsize, $px2 - $rsizex+2, $py2 - $rsizey + 2 + $height*3, $strikechange.'%', $textcolor);
+								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey + $height*3, $strikechange.'%', $textcolor);
 							}
 							
 							break; //currently only the first dataset
 						}
 					}
-					
-					imagefilledellipse($I, $px, $py, $size, $size, $color[$i]);
-					imageellipse($I, $px, $py, $size+1, $size+1, $linecolor);
 
+					if (!$circle_drawn)
+					{
+						imagefilledellipse($I, $px, $py, $size, $size, $color[$i]);
+						imageellipse($I, $px, $py, $size+1, $size+1, $linecolor);
+					}
 				}
 			}
 		}

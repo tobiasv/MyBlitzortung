@@ -1644,8 +1644,8 @@ function bo_update_tracks($force = false)
 		//$time = strtotime('2011-06-16 17:00:00 UTC');
 		
 		//divide time range 
-		for ($i=1;$i<=$divisor;$i++)
-			$stime[] = $time - $scantime * 60 / $i;
+		for ($i=0;$i<$divisor;$i++)
+			$stime[] = $time + $scantime * 60 * ($i / $divisor - 1);
 
 		$stime[] = $time;
 
@@ -1655,7 +1655,7 @@ function bo_update_tracks($force = false)
 
 			$date_start = gmdate('Y-m-d H:i:s', $stime[$i]);
 			$date_end   = gmdate('Y-m-d H:i:s', $stime[$i+1]);
-			
+
 			$cells_time[$i] = array('start' => $stime[$i], 'end' => $stime[$i+1]);
 			
 			$sql = "SELECT id, time, lat, lon
@@ -1715,8 +1715,8 @@ function bo_update_tracks($force = false)
 					//mathematically not correct, but a good approximation for small areas
 					foreach($cell['strikes'] as $data)
 					{
-						$weight = $data[2] / 2 + 0.5; //newer strikes have more "weight" than older ones
-						//$weight = 1;
+						$wfactor = 0.5;
+						$weight = $data[2] * $wfactor + $wfactor; //newer strikes have more "weight" than older ones
 						
 						$lat += $data[0] * $weight;
 						$lon += $data[1] * $weight;
