@@ -319,8 +319,8 @@ if (!isset($_BO['mapcfg'][2]))
 	$_BO['mapcfg'][2] = $_BO['tpl_gmap']['2-24h'];
 
 //GoogleMaps: Extra Overlays
-if (!isset($_BO['mapovl'][0]))
-	$_BO['mapovl'][0] = $_BO['tpl_overlay']['meteox_radar'];
+//if (!isset($_BO['mapovl'][0]))
+//	$_BO['mapovl'][0] = $_BO['tpl_overlay']['meteox_radar'];
 	
 /*** Image Maps ***/
 if (!isset($_BO['mapimg'][0]))
