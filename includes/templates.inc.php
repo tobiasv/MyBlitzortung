@@ -101,27 +101,6 @@ $_BO['tpl_gmap']['1-10d']['sel_name'] = '1-10 days';
 $_BO['tpl_gmap']['1-10d']['only_loggedin'] = true;
 
 /**************************************/
-/* Extra Overlays for dynamic Map     */
-/**************************************/
-
-//Meteox Radar Overlay
-//WARNING: Copyright! Only internal private usage!
-$_BO['tpl_overlay']['meteox_radar']['img'] = 'http://www2.meteox.com/radareu.php';
-$_BO['tpl_overlay']['meteox_radar']['coord'] = array(59.9934, 20.4106, 41.4389, -14.9515); //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['meteox_radar']['default_show'] = false;
-$_BO['tpl_overlay']['meteox_radar']['sel_name'] = 'Meteox rain radar';
-$_BO['tpl_overlay']['meteox_radar']['only_loggedin'] = true;
-
-/*
-//Europe map: Does not work, because Google translates maps to mercator, but this is already mercator projection
-$_BO['tpl_overlay']['europe']['img'] = 'blitzortung.php?map=0';
-$_BO['tpl_overlay']['europe']['coord'] = array(71.3, 52, 24.3, -22); //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['europe']['default_show'] = false;
-$_BO['tpl_overlay']['europe']['sel_name'] = 'Europe static map';
-$_BO['tpl_overlay']['europe']['only_loggedin'] = true;
-*/
-
-/**************************************/
 /* Image Maps (PNG)                   */
 /**************************************/
 
@@ -155,7 +134,7 @@ $_BO['tpl_imgmap']['europe']['density_darken'] = 40;
 $_BO['tpl_imgmap']['europe_mini']['name'] = 'Europe (mini)';
 $_BO['tpl_imgmap']['europe_mini']['menu'] = false;
 $_BO['tpl_imgmap']['europe_mini']['file'] = 'map_europe_mini.png';
-$_BO['tpl_imgmap']['europe_mini']['coord'] = array(71.1, 43.6, 32.2, -12.9); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['europe_mini']['coord'] = array(71.1, 44.5, 31.8, -14.0); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['europe_mini']['trange'] = 2; //hours!
 $_BO['tpl_imgmap']['europe_mini']['upd_intv'] = 15; //minutes
 $_BO['tpl_imgmap']['europe_mini']['textcolor'] = array(255,255,255);
@@ -282,4 +261,32 @@ $_BO['tpl_imgmap']['NRW']['density_darken'] = 40;
 $_BO['tpl_imgmap']['NRW_bw'] = $_BO['tpl_imgmap']['NRW'];
 $_BO['tpl_imgmap']['NRW_bw']['file'] = 'map_germany_nrw_dark.png';
 */
+
+
+
+/**************************************/
+/* Extra Overlays for dynamic Map     */
+/**************************************/
+
+//Meteox Radar Overlay
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['meteox_radar']['img'] = 'http://www2.meteox.com/radareu.php';
+$_BO['tpl_overlay']['meteox_radar']['coord'] = array(59.9934, 20.4106, 41.4389, -14.9515); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['meteox_radar']['default_show'] = false;
+$_BO['tpl_overlay']['meteox_radar']['sel_name'] = 'Meteox rain radar';
+$_BO['tpl_overlay']['meteox_radar']['only_loggedin'] = true;
+$_BO['tpl_overlay']['meteox_radar']['to_mercator'] = true;
+
+//EUCLID (you can check strike polarity with this map)
+//WARNING: Copyright! Only internal private usage!
+//It's calibrated only for germany!
+$_BO['tpl_overlay']['euclid']['img'] = 'http://www.meteorage.fr/euclid/euclid_last_lightnings.gif';
+$_BO['tpl_overlay']['euclid']['coord'] = array(68, 43, 33.7, -22); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['euclid']['default_show'] = false;
+$_BO['tpl_overlay']['euclid']['sel_name'] = 'EUCLID';
+$_BO['tpl_overlay']['euclid']['only_loggedin'] = true;
+$_BO['tpl_overlay']['euclid']['to_mercator'] = false;
+$_BO['tpl_overlay']['europe']['opacity'] = 50;
+
+
 ?>

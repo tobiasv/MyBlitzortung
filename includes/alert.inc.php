@@ -551,7 +551,8 @@ function bo_alert_send()
 									'{time}'	=> date(_BL('_datetime', true), strtotime($row2['maxtime'].' UTC')),
 									'{first}'	=> date(_BL('_datetime', true), strtotime($row2['mintime'].' UTC')),
 									'{dist}'	=> $dist,
-									'{bear}'	=> $bear
+									'{bear}'	=> $bear,
+									'{userid}'	=> $user_id
 										);
 						
 						$log[$alert_dbname] = array();

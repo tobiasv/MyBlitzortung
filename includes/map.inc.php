@@ -293,6 +293,24 @@ function bo_show_lightning_map()
 			}
 		}
 	}
+
+
+	//Static maps for admin (for testing)
+	if ((bo_user_get_level() & BO_PERM_ADMIN))
+	{
+		foreach($_BO['mapimg'] as $id => $data)
+		{
+			$_BO['mapovl'][] = array(
+				'img' => 'blitzortung.php?map='.$id,
+				'coord' => $data['coord'],
+				'default_show' => false,
+				'sel_name' => $data['name'],
+				'only_loggedin' => true,
+				'to_mercator' => false,
+				'opacity' => 50
+				);
+		}
+	}
 	
 	//Get extra map overlays
 	$Overlays = array();
@@ -305,7 +323,8 @@ function bo_show_lightning_map()
 		
 		$Overlays[$id] = $data;
 	}
-	
+
+
 	ksort($Overlays);
 	
 	$radius = $_BO['radius'] * 1000;
@@ -445,7 +464,288 @@ function bo_show_lightning_map()
 	var bo_stations      = [ <?php echo $js_stations ?> ];
 	var bo_infowindow;
 	var bo_autoupdate = false;
-	var bo_autoupdate_running = false;
+	var bo_autoupdate_running = false; 
+
+	//ProjectedOverlay
+	//Source: http://www.usnaviguide.com/v3maps/js/ProjectedOverlay.js
+	var ProjectedOverlay = function(map, imageUrl, bounds, opts)
+	{
+	 google.maps.OverlayView.call(this);
+	 this.url_ = imageUrl ;
+	 this.bounds_ = bounds ;
+	 this.addZ_ = opts.addZoom || '' ;				// Add the zoom to the image as a parameter
+	 this.id_ = opts.id || this.url_ ;				// Added to allow for multiple images
+	 this.percentOpacity_ = opts.opacity || 50 ;
+	 this.map_ = map;
+	}
+
+	function bo_gmap_init2()
+	{ 
+
+		ProjectedOverlay.prototype = new google.maps.OverlayView();	
+		
+		// Remove the main DIV from the map pane
+		ProjectedOverlay.prototype.remove = function()
+		{
+			 if (this.div_) 
+			 {
+			  this.div_.parentNode.removeChild(this.div_);
+			  this.div_ = null;
+			 }
+		}
+
+		ProjectedOverlay.prototype.onAdd = function() 
+		{
+			  // Note: an overlay's receipt of onAdd() indicates that
+			  // the map's panes are now available for attaching
+			  // the overlay to the map via the DOM.
+
+			  // Create the DIV and set some basic attributes.
+			  var div = document.createElement('DIV');
+			  div.style.border = "none";
+			  div.style.borderWidth = "0px";
+			  div.style.position = "absolute";
+
+			  // Create an IMG element and attach it to the DIV.
+			  var img = document.createElement("img");
+			  img.src = this.url_;
+			  img.style.width = "100%";
+			  img.style.height = "100%";
+			  div.appendChild(img);
+
+			  // Set the overlay's div_ property to this DIV
+			  this.div_ = div;
+				  
+			  if( this.percentOpacity_ )
+			  {
+			   this.setOpacity(this.percentOpacity_) ;
+			  }
+			  
+			  // We add an overlay to a map via one of the map's panes.
+			  // We'll add this overlay to the overlayImage pane.
+			  var panes = this.getPanes();
+			  panes.overlayLayer.appendChild(div);
+			  //panes.mapPane.appendChild(div); //map pane = same as strikes
+		}
+		
+		// Redraw based on the current projection and zoom level...
+		ProjectedOverlay.prototype.draw = function(firstTime)
+		{
+			 if (!this.div_)
+			 {
+			  return ;
+			 }
+
+			 var c1 = this.get('projection').fromLatLngToDivPixel(this.bounds_.getSouthWest());
+			 var c2 = this.get('projection').fromLatLngToDivPixel(this.bounds_.getNorthEast());
+
+			 if (!c1 || !c2) return;
+
+			 // Now position our DIV based on the DIV coordinates of our bounds
+			 this.div_.style.width = Math.abs(c2.x - c1.x) + "px";
+			 this.div_.style.height = Math.abs(c2.y - c1.y) + "px";
+			 this.div_.style.left = Math.min(c2.x, c1.x) + "px";
+			 this.div_.style.top = Math.min(c2.y, c1.y) + "px";
+
+			 // Do the rest only if the zoom has changed...
+			 if ( this.lastZoom_ == this.map_.getZoom() )
+			 {
+			  return ;
+			 }
+
+			 this.lastZoom_ = this.map_.getZoom() ;
+
+			 var url = this.url_ ;
+
+			 if ( this.addZ_ )
+			 {
+			  url += this.addZ_ + this.map_.getZoom() ;
+			 }
+
+			 this.div_.innerHTML = '<img src="' + url + '"  width=' + this.div_.style.width + ' height=' + this.div_.style.height + ' >' ;
+		}
+
+		ProjectedOverlay.prototype.setOpacity=function(opacity)
+		{
+			 if (opacity < 0)
+			 {
+			  opacity = 0 ;
+			 }
+			 if(opacity > 100)
+			 {
+			  opacity = 100 ;
+			 }
+			 var c = opacity/100 ;
+
+			 if (typeof(this.div_.style.filter) =='string')
+			 {
+			  this.div_.style.filter = 'alpha(opacity:' + opacity + ')' ;
+			 }
+			 if (typeof(this.div_.style.KHTMLOpacity) == 'string' )
+			 {
+			  this.div_.style.KHTMLOpacity = c ;
+			 }
+			 if (typeof(this.div_.style.MozOpacity) == 'string')
+			 {
+			  this.div_.style.MozOpacity = c ;
+			 }
+			 if (typeof(this.div_.style.opacity) == 'string')
+			 {
+			  this.div_.style.opacity = c ;
+			 }
+		}
+
+
+
+	
+		bo_infowindow = new google.maps.InfoWindow({content: ''});
+<?php
+		
+		foreach($_BO['mapcfg'] as $mapid => $cfg)
+		{
+			if (!is_array($cfg) || empty($cfg) || ($cfg['only_loggedin'] && !bo_user_get_level()) )
+				continue;
+				
+			echo '
+			bo_OverlayMaps['.$mapid.'] = {
+				getTileUrl: function (coord, zoom) { return bo_get_tile(zoom, coord, '.$mapid.', '.$cfg['upd_intv'].'); },
+				tileSize: new google.maps.Size(256,256), 
+				isPng:true, 
+				bo_show:'.($cfg['default_show'] ? 'true' : 'false').',
+				bo_interval:'.$cfg['upd_intv'].'
+			};
+			';
+		}
+		
+		foreach($Overlays as $ovlid => $cfg)
+		{
+			echo '
+            bo_ExtraOverlay['.$ovlid.'] = {
+			    bo_image: "'.$cfg['img'].'",
+			    bo_bounds: new google.maps.LatLngBounds(
+                               new google.maps.LatLng('.$cfg['coord'][2].','.$cfg['coord'][3].'),
+                               new google.maps.LatLng('.$cfg['coord'][0].','.$cfg['coord'][1].')),
+			    bo_show: '.($cfg['default_show'] ? 'true' : 'false').',
+			    bo_opacity: '.((double)$cfg['opacity']).',
+				bo_tomercator: '.($cfg['to_mercator'] ? 'true' : 'false').'
+
+			};
+			';
+		}
+		
+
+?>		
+
+		bo_OverlayCount = {
+			getTileUrl: function (coord, zoom) { return bo_get_tile_counts(zoom, coord); },
+			tileSize: new google.maps.Size(256,256), 
+			isPng:true, 
+			bo_show:false
+		};
+
+		bo_OverlayTracks = {
+			getTileUrl: function (coord, zoom) { return bo_get_tile_tracks(zoom, coord); },
+			tileSize: new google.maps.Size(256,256), 
+			isPng:true, 
+			opacity:<?php echo (double)BO_TRACKS_MAP_OPACITY; ?>,
+			minZoom:<?php echo (int)BO_TRACKS_MAP_ZOOM_MIN; ?>,
+			maxZoom:<?php echo (int)BO_TRACKS_MAP_ZOOM_MAX; ?>,
+			bo_show:false
+		};
+		
+		var c = bo_getcookie('bo_show_only_own');
+		if (c)
+		{
+			bo_show_only_own = c == -1 ? 0 : 1;
+			document.getElementById('bo_map_opt_own').checked = c == -1 ? false : true;
+		}
+
+		var c = bo_getcookie('bo_show_count');
+		if (c)
+		{
+			bo_show_count = c == -1 ? 0 : 1;
+			document.getElementById('bo_map_opt_count').checked = c == -1 ? false : true;
+		}
+
+		var c = bo_getcookie('bo_show_tracks');
+		if (c)
+		{
+			bo_show_tracks = c == -1 ? 0 : 1;
+			document.getElementById('bo_map_opt_tracks').checked = c == -1 ? false : true;
+		}
+		
+		for (i=0;i<bo_OverlayMaps.length;i++)
+		{
+			var c = bo_getcookie('bo_show_ovl'+i);
+			if (c && bo_OverlayMaps[i] != null)
+			{
+				bo_OverlayMaps[i].bo_show = c == -1 ? false : true;
+				document.getElementById('bo_map_opt' + i).checked = c == -1 ? false : true;
+			}
+		}
+
+		for (i=0;i<bo_ExtraOverlay.length;i++)
+		{
+			var c = bo_getcookie('bo_show_extraovl'+i);
+			if (c && bo_ExtraOverlay[i] != null)
+			{
+				bo_ExtraOverlay[i].bo_show = c == -1 ? false : true;
+				document.getElementById('bo_map_overlay' + i).checked = c == -1 ? false : true;
+			}
+		}
+		
+		bo_infobox = document.createElement('DIV');
+		bo_infobox.index = 1;
+		bo_map.controls[google.maps.ControlPosition.RIGHT_TOP].push(bo_infobox);
+		
+		bo_map_reload_overlays();
+		
+		google.maps.event.addListener(bo_map, 'dragend', function() {
+			bo_setcookie('bo_map_lat', bo_map.getCenter().lat());
+			bo_setcookie('bo_map_lon', bo_map.getCenter().lng());
+			bo_setcookie('bo_map_zoom', bo_map.getZoom());
+		});
+
+		google.maps.event.addListener(bo_map, 'zoom_changed', function() {
+			if (this.getZoom() < <?php echo $min_zoom ?>)
+				 this.setZoom(<?php echo $min_zoom ?>);
+			if (this.getZoom() > <?php echo $max_zoom ?>)
+				 this.setZoom(<?php echo $max_zoom ?>);
+			else
+				bo_setcookie('bo_map_zoom', bo_map.getZoom());
+			
+			bo_map_toggle_stations(0);
+		});
+		
+		
+
+		var map_lat = bo_getcookie('bo_map_lat');
+		var map_lon = bo_getcookie('bo_map_lon');
+		var map_zoom = bo_getcookie('bo_map_zoom');
+		
+		if (map_lat > 0 && map_lon > 0 && map_zoom > 0)
+		{
+			var mapOptions = {
+			  zoom: parseInt(map_zoom),
+			  center: new google.maps.LatLng(map_lat,map_lon)
+			}
+			bo_map.setOptions(mapOptions);
+		}
+
+<?php  if (bo_user_get_level()) { ?>
+		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
+		if (bo_map.getZoom() > 7)
+		{
+			var newWindow = window.open("<?php echo bo_insert_url() ?>&lat="+event.latLng.lat()+"&lon="+event.latLng.lng()+"&zoom="+bo_map.getZoom(), '_blank');
+			newWindow.focus();
+		}
+});
+
+
+<?php  } ?>
+
+	}	
+		
 	
 	function bo_toggle_autoupdate(auto)
 	{
@@ -614,8 +914,15 @@ function bo_show_lightning_map()
 		{
 			for (i in bo_ExtraOverlay)
 			{
-				bo_ExtraOverlayMaps[i] = new google.maps.GroundOverlay(bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds);
-				bo_ExtraOverlayMaps[i].clickable = false;
+				if (bo_ExtraOverlay[i].bo_tomercator)
+				{
+					bo_ExtraOverlayMaps[i] = new google.maps.GroundOverlay(bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds);
+					bo_ExtraOverlayMaps[i].clickable = false;
+				}
+				else
+				{
+					bo_ExtraOverlayMaps[i] = new ProjectedOverlay(bo_map, bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds, {opacity: bo_ExtraOverlay[i].bo_opacity}) ;
+				}
 			}
 		}
 		
@@ -629,7 +936,6 @@ function bo_show_lightning_map()
 					bo_ExtraOverlayMaps[i].setMap(null);
 			}
 		}
-		
 		
 		while (bo_map.overlayMapTypes.length)
 			bo_map.overlayMapTypes.pop();
@@ -763,155 +1069,9 @@ function bo_show_lightning_map()
 		});
 
 	}
+
 	
-	function bo_gmap_init2()
-	{
-	
-		bo_infowindow = new google.maps.InfoWindow({content: ''});
-<?php
 		
-		foreach($_BO['mapcfg'] as $mapid => $cfg)
-		{
-			if (!is_array($cfg) || empty($cfg) || ($cfg['only_loggedin'] && !bo_user_get_level()) )
-				continue;
-				
-			echo '
-			bo_OverlayMaps['.$mapid.'] = {
-				getTileUrl: function (coord, zoom) { return bo_get_tile(zoom, coord, '.$mapid.', '.$cfg['upd_intv'].'); },
-				tileSize: new google.maps.Size(256,256), 
-				isPng:true, 
-				bo_show:'.($cfg['default_show'] ? 'true' : 'false').',
-				bo_interval:'.$cfg['upd_intv'].'
-			};
-			';
-		}
-		
-		foreach($Overlays as $ovlid => $cfg)
-		{
-			echo '
-            bo_ExtraOverlay['.$ovlid.'] = {
-			    bo_image: "'.$cfg['img'].'",
-			    bo_bounds: new google.maps.LatLngBounds(
-                               new google.maps.LatLng('.$cfg['coord'][2].','.$cfg['coord'][3].'),
-                               new google.maps.LatLng('.$cfg['coord'][0].','.$cfg['coord'][1].')),
-			    bo_show: '.($cfg['default_show'] ? 'true' : 'false').'
-			};
-			';
-		}
-		
-
-?>		
-
-		bo_OverlayCount = {
-			getTileUrl: function (coord, zoom) { return bo_get_tile_counts(zoom, coord); },
-			tileSize: new google.maps.Size(256,256), 
-			isPng:true, 
-			bo_show:false
-		};
-
-		bo_OverlayTracks = {
-			getTileUrl: function (coord, zoom) { return bo_get_tile_tracks(zoom, coord); },
-			tileSize: new google.maps.Size(256,256), 
-			isPng:true, 
-			opacity:<?php echo (double)BO_TRACKS_MAP_OPACITY; ?>,
-			minZoom:<?php echo (int)BO_TRACKS_MAP_ZOOM_MIN; ?>,
-			maxZoom:<?php echo (int)BO_TRACKS_MAP_ZOOM_MAX; ?>,
-			bo_show:false
-		};
-		
-		var c = bo_getcookie('bo_show_only_own');
-		if (c)
-		{
-			bo_show_only_own = c == -1 ? 0 : 1;
-			document.getElementById('bo_map_opt_own').checked = c == -1 ? false : true;
-		}
-
-		var c = bo_getcookie('bo_show_count');
-		if (c)
-		{
-			bo_show_count = c == -1 ? 0 : 1;
-			document.getElementById('bo_map_opt_count').checked = c == -1 ? false : true;
-		}
-
-		var c = bo_getcookie('bo_show_tracks');
-		if (c)
-		{
-			bo_show_tracks = c == -1 ? 0 : 1;
-			document.getElementById('bo_map_opt_tracks').checked = c == -1 ? false : true;
-		}
-		
-		for (i=0;i<bo_OverlayMaps.length;i++)
-		{
-			var c = bo_getcookie('bo_show_ovl'+i);
-			if (c)
-			{
-				bo_OverlayMaps[i].bo_show = c == -1 ? false : true;
-				document.getElementById('bo_map_opt' + i).checked = c == -1 ? false : true;
-			}
-		}
-
-		for (i=0;i<bo_ExtraOverlay.length;i++)
-		{
-			var c = bo_getcookie('bo_show_extraovl'+i);
-			if (c)
-			{
-				bo_ExtraOverlay[i].bo_show = c == -1 ? false : true;
-				document.getElementById('bo_map_overlay' + i).checked = c == -1 ? false : true;
-			}
-		}
-		
-		bo_infobox = document.createElement('DIV');
-		bo_infobox.index = 1;
-		bo_map.controls[google.maps.ControlPosition.RIGHT_TOP].push(bo_infobox);
-		
-		bo_map_reload_overlays();
-		
-		google.maps.event.addListener(bo_map, 'dragend', function() {
-			bo_setcookie('bo_map_lat', bo_map.getCenter().lat());
-			bo_setcookie('bo_map_lon', bo_map.getCenter().lng());
-			bo_setcookie('bo_map_zoom', bo_map.getZoom());
-		});
-
-		google.maps.event.addListener(bo_map, 'zoom_changed', function() {
-			if (this.getZoom() < <?php echo $min_zoom ?>)
-				 this.setZoom(<?php echo $min_zoom ?>);
-			if (this.getZoom() > <?php echo $max_zoom ?>)
-				 this.setZoom(<?php echo $max_zoom ?>);
-			else
-				bo_setcookie('bo_map_zoom', bo_map.getZoom());
-			
-			bo_map_toggle_stations(0);
-		});
-		
-		
-
-		var map_lat = bo_getcookie('bo_map_lat');
-		var map_lon = bo_getcookie('bo_map_lon');
-		var map_zoom = bo_getcookie('bo_map_zoom');
-		
-		if (map_lat > 0 && map_lon > 0 && map_zoom > 0)
-		{
-			var mapOptions = {
-			  zoom: parseInt(map_zoom),
-			  center: new google.maps.LatLng(map_lat,map_lon)
-			}
-			bo_map.setOptions(mapOptions);
-		}
-
-<?php  if (bo_user_get_level()) { ?>
-		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
-		if (bo_map.getZoom() > 7)
-		{
-			var newWindow = window.open("<?php echo bo_insert_url() ?>&lat="+event.latLng.lat()+"&lon="+event.latLng.lng()+"&zoom="+bo_map.getZoom(), '_blank');
-			newWindow.focus();
-		}
-});
-
-
-<?php  } ?>
-
-	}
-	
 	</script>
 	
 	<?php
