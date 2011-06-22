@@ -286,7 +286,18 @@ $_BO['tpl_overlay']['euclid']['default_show'] = false;
 $_BO['tpl_overlay']['euclid']['sel_name'] = 'EUCLID';
 $_BO['tpl_overlay']['euclid']['only_loggedin'] = true;
 $_BO['tpl_overlay']['euclid']['to_mercator'] = false;
-$_BO['tpl_overlay']['europe']['opacity'] = 50;
+$_BO['tpl_overlay']['euclid']['opacity'] = 50;
+
+//BLIDS Lightning Overlay
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['blids_de']['img'] = 'http://www.blids.de/spion/bilder/aktkartegergrau.jpg';
+$_BO['tpl_overlay']['blids_de']['coord'] = array(55.11, 15.53, 47.13, 4.97);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['blids_de']['default_show'] = false;
+$_BO['tpl_overlay']['blids_de']['sel_name'] = 'BLIDS Germany';
+$_BO['tpl_overlay']['blids_de']['only_loggedin'] = true;
+$_BO['tpl_overlay']['blids_de']['to_mercator'] = false;
+$_BO['tpl_overlay']['blids_de']['opacity'] = 50;
+
 
 
 ?>

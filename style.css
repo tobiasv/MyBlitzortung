@@ -355,6 +355,7 @@ width: auto;
 width: 160px;
 /* display: inline-block;*/
 float: left;
+clear: left;
 margin: 8px 0px;
 padding-top:6px;
 }
