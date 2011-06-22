@@ -200,7 +200,7 @@ $_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 10;
 $_BO['tpl_imgmap']['germany_lkr_gdz'] = $_BO['tpl_imgmap']['germany_lkr'];
 $_BO['tpl_imgmap']['germany_lkr_gdz']['file'] = 'map_germany_lkr_gdz.png';
 $_BO['tpl_imgmap']['germany_lkr_gdz']['borders'] = array('map_germany_lkr_gdz_borders.png', 60);
-$_BO['tpl_imgmap']['germany_lkr_gdz']['coord'] = array(55.22, 15.59, 47.05, 5.23); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['germany_lkr_gdz']['coord'] = array(55.22, 15.64, 47.05, 5.21); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['germany_lkr_gdz']['footer'] = '© Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, 2011<br>
 	Vervielfältigung, Verbreitung und öffentliche Zugänglichmachung, auch auszugsweise, mit Quellenangabe gestattet.';
 

@@ -301,13 +301,14 @@ function bo_show_lightning_map()
 		foreach($_BO['mapimg'] as $id => $data)
 		{
 			$_BO['mapovl'][] = array(
-				'img' => 'blitzortung.php?map='.$id,
+				'img' => BO_FILE.'?map='.$id,
 				'coord' => $data['coord'],
 				'default_show' => false,
 				'sel_name' => $data['name'],
 				'only_loggedin' => true,
 				'to_mercator' => false,
-				'opacity' => 50
+				'opacity' => 50,
+				'is_map' => true
 				);
 		}
 	}
@@ -366,7 +367,7 @@ function bo_show_lightning_map()
 		echo '</span>';
 	}
 
-	echo ' <input type="submit" value="'._BL('more').' &dArr;" onclick="document.getElementById(\'bo_map_more_container\').style.display=\'block\'; return false;" id="bo_map_more">';
+	echo ' <input type="submit" value="'._BL('more').' &dArr;" onclick="return bo_show_more();" id="bo_map_more">';
 	echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_overlays(); return false;" id="bo_map_reload">';
 
 	echo '<span class="bo_form_checkbox_text">';
@@ -376,9 +377,9 @@ function bo_show_lightning_map()
 	
 	echo '<div id="bo_map_more_container" style="display: none">';
 
-	echo '<div class="bo_input_container">';
 	echo '<span class="bo_form_descr">'._BL('Advanced').':</span> ';
-	
+
+	echo '<div class="bo_input_container">';
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="checkbox" onclick="bo_map_toggle_own(this.checked);" id="bo_map_opt_own"> ';
 	echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label>';
@@ -400,9 +401,8 @@ function bo_show_lightning_map()
 	echo '</div>';
 
 	
-	echo '<div class="bo_input_container">';
 	echo '<span class="bo_form_descr">'._BL('Show Stations').':</span> ';
-	
+	echo '<div class="bo_input_container">';
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="1" name="bo_map_station" id="bo_map_station0" checked>';
 	echo '<label for="bo_map_station0">'._BL('None').'</label> &nbsp; ';
@@ -425,11 +425,20 @@ function bo_show_lightning_map()
 	
 	if (count($Overlays))
 	{
-		echo '<div class="bo_input_container">';
 		echo '<span class="bo_form_descr">'._BL('Extra overlays').':</span> ';
+		echo '<div class="bo_input_container">';
 
+		$ovl_maps_showed = false;
+		
 		foreach($Overlays as $id => $cfg)
 		{
+			if (!$ovl_maps_showed && $cfg['is_map'])
+			{
+				echo '<a href="#" onclick="javascript:document.getElementById(\'bo_extra_ovl_maps\').style.display=\'inline\';this.style.display=\'none\';">'._BL('Own maps').'</a>';
+				echo '<span style="display:none" id="bo_extra_ovl_maps">';
+				$ovl_maps_showed = true;
+			}
+			
 			echo '<span class="bo_form_checkbox_text">';
 			echo '<input type="checkbox" onclick="bo_map_toggle_extraoverlay(this.checked, this.value);" value="'.$id.'" name="bo_map_overlay" id="bo_map_overlay'.$id.'" ';
 			echo $cfg['default_show'] ? ' checked="checked" ' : '';
@@ -437,6 +446,9 @@ function bo_show_lightning_map()
 			echo '<label for="bo_map_overlay'.$id.'">'._BL($cfg['sel_name']).'</label> &nbsp; ';
 			echo '</span>';
 		}
+		
+		if ($ovl_maps_showed)
+			echo '</span>';
 		
 		echo '</div>';
 	}
@@ -658,6 +670,7 @@ function bo_show_lightning_map()
 		{
 			bo_show_only_own = c == -1 ? 0 : 1;
 			document.getElementById('bo_map_opt_own').checked = c == -1 ? false : true;
+			if (c != -1) bo_show_more();
 		}
 
 		var c = bo_getcookie('bo_show_count');
@@ -665,6 +678,7 @@ function bo_show_lightning_map()
 		{
 			bo_show_count = c == -1 ? 0 : 1;
 			document.getElementById('bo_map_opt_count').checked = c == -1 ? false : true;
+			if (c != -1) bo_show_more();
 		}
 
 		var c = bo_getcookie('bo_show_tracks');
@@ -672,6 +686,7 @@ function bo_show_lightning_map()
 		{
 			bo_show_tracks = c == -1 ? 0 : 1;
 			document.getElementById('bo_map_opt_tracks').checked = c == -1 ? false : true;
+			if (c != -1) bo_show_more();
 		}
 		
 		for (i=0;i<bo_OverlayMaps.length;i++)
@@ -691,6 +706,7 @@ function bo_show_lightning_map()
 			{
 				bo_ExtraOverlay[i].bo_show = c == -1 ? false : true;
 				document.getElementById('bo_map_overlay' + i).checked = c == -1 ? false : true;
+				if (c != -1) bo_show_more();
 			}
 		}
 		
@@ -745,7 +761,13 @@ function bo_show_lightning_map()
 <?php  } ?>
 
 	}	
-		
+	
+	function bo_show_more()
+	{
+		document.getElementById('bo_map_more_container').style.display='block';
+		document.getElementById('bo_map_more').style.display='none';
+		return false;
+	}
 	
 	function bo_toggle_autoupdate(auto)
 	{

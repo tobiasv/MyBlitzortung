@@ -349,15 +349,20 @@ max-width: none;
 
 #myblitzortung #bo_map_more_container {
 width: auto;
-border-top: 1px dotted #e4e4e4;
-padding: 6px 0 0 0;
 }
 
 #myblitzortung #bo_map_more_container .bo_form_descr {
-width: 130px;
-display: inline-block;
+width: 160px;
+/* display: inline-block;*/
+float: left;
+margin: 8px 0px;
+padding-top:6px;
 }
-
+#myblitzortung #bo_map_more_container .bo_input_container {
+padding-left: 165px;
+border-top: 1px dotted #e4e4e4;
+padding-top:8px;
+}
 
 /*** Archive ***/
 
