@@ -61,7 +61,7 @@ function bo_icon($icon)
 
 function bo_tile()
 {
-	@set_time_limit(3);
+	@set_time_limit(5);
 
 	global $_BO;
 
@@ -316,7 +316,7 @@ function bo_tile()
 				AND NOT (lat < $lat1 OR lat > $lat2 OR lon < $lon1 OR lon > $lon2)
 				AND (0 $sql)
 				".($only_own ? " GROUP BY part " : "")."
-			-- ORDER BY time ASC";
+			";
 		$erg = bo_db($sql);
 		while ($row = $erg->fetch_assoc())
 		{
@@ -399,8 +399,22 @@ function bo_tile()
 				AND time BETWEEN '$date_min' AND '$date_max'
 			-- ORDER BY time ASC";
 	$erg = bo_db($sql);
+	
+	//Max. strikes per tile
+	$num = $erg->num_rows;
+	$max = intval(BO_MAP_MAX_STRIKES_PER_TILE);
+	
 	while ($row = $erg->fetch_assoc())
 	{
+		//Max. strikes per tile handling
+		//This random thing is quick&easy but needs no further strike calculation (position/time/color)
+		//Problem: tile borders
+		if ($max && $num > $max)
+		{
+			if (rand(0, $num) > $max)
+				continue;
+		}
+		
 		list($px, $py) = bo_latlon2tile($row['lat'], $row['lon'], $zoom);
 
 		if ($zoom >= $zoom_show_deviation)
@@ -415,7 +429,7 @@ function bo_tile()
 
 		$strike_time = strtotime($row['time'].' UTC');
 		$col = floor(($time_max - $strike_time) / $color_intvl);
-
+		
 		$points[] = array($px, $py, $col, $row['polarity']);
 	}
 	
@@ -1291,7 +1305,12 @@ function bo_get_density_image()
 	unset($row_own['data']);
 
 	if ($station_id)
+	{
 		$stinfo = bo_station_info($station_id);
+		list($px, $py) = bo_latlon2mercator($stinfo['lat'], $stinfo['lon']);
+		$StX =      ($px - $x1) * $w_x;
+		$StY = $h - ($py - $y1) * $h_y;
+	}
 	
 	// Exit if not enough data
 	if ($exit_msg)
@@ -1443,6 +1462,29 @@ function bo_get_density_image()
 		if ($tmpImage)
 			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
 	}
+
+
+	//Antennas
+	if ($ratio && $station_id == bo_station_id() && isset($info['antennas']) && is_array($info['antennas']))
+	{
+		$color = imagecolorallocatealpha($I, 255,255,255, 40);
+		$size = 0.3 * ($w + $h) / 2;
+		
+		foreach($info['antennas'] as $bear)
+		{
+			list($lat, $lon) = bo_distbearing2latlong(100000, $bear, $stinfo['lat'], $stinfo['lon']);
+			list($px, $py) = bo_latlon2mercator($lat, $lon);
+			$ant_x =      ($px - $x1) * $w_x - $StX;
+			$ant_y = $h - ($py - $y1) * $h_y - $StY;
+			
+			$ant_xn = $ant_x / sqrt(pow($ant_x,2) + pow($ant_y,2)) * $size;
+			$ant_yn = $ant_y / sqrt(pow($ant_x,2) + pow($ant_y,2)) * $size;
+			
+			imagedashedline($I, $StX, $StY, $StX + $ant_xn *  1, $StY + $ant_yn *  1, $color);
+			imagedashedline($I, $StX, $StY, $StX + $ant_xn * -1, $StY + $ant_yn * -1, $color);
+		}
+	}
+
 	
 	//Legend (again!)
 	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
@@ -1555,14 +1597,11 @@ function bo_get_density_image()
 		
 		imagestring($I, $fontsize, 1, 1 + $fontsize * 3, $text, $text_col);
 		
-		list($px, $py) = bo_latlon2mercator($stinfo['lat'], $stinfo['lon']);
-		$x =      ($px - $x1) * $w_x;
-		$y = $h - ($py - $y1) * $h_y;
-		
 		$size = 6;
 		$color = imagecolorallocate($I, 255,255,255);
-		imageline($I, $x-$size, $y, $x+$size, $y, $color);
-		imageline($I, $x, $y-$size, $x, $y+$size, $color);
+		imageline($I, $StX-$size, $StY, $StX+$size, $StY, $color);
+		imageline($I, $StX, $StY-$size, $StX, $StY+$size, $color);
+		
 	}
 	
 	

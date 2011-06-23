@@ -960,11 +960,13 @@ function bo_update_all($force)
 	/*** Update strike tracks ***/
 	if ($strikes_imported)
 	{
+		flush();
 		bo_update_tracks($force);
 	}
 	/*** Update MyBlitzortung stations ***/
 	else if (!$strikes_imported && !$stations_imported && !$signals_imported)
 	{
+		flush();
 		bo_my_station_autoupdate($force);
 	}
 
@@ -1469,6 +1471,20 @@ function bo_update_densities($max_time)
 			$info['last_lon'] = $lon; // currently no change from start value
 			$info['bps'] = $bps;
 			$info['max'] = max($max_count, $info['max']);
+			
+			//for displaying antenna direction in ratio map
+			if ($b['station_id'] == bo_station_id())
+			{
+				$ant[0] = bo_get_conf('antenna1_bearing');
+				$ant[1] = bo_get_conf('antenna2_bearing');
+	
+				if ($ant[0] !== '' && $ant[0] !== null && $ant[1] !== '' && $ant[1] !== null)
+				{
+					$info['antennas']['bearing'] = $ant;
+					$info['antennas']['bearing_elec'][0] = bo_get_conf('antenna1_bearing_elec');
+					$info['antennas']['bearing_elec'][1] = bo_get_conf('antenna2_bearing_elec');
+				}
+			}
 
 			$sql = "UPDATE ".BO_DB_PREF."densities 
 							SET data='$DATA', info='".serialize($info)."', status='$status'

@@ -80,6 +80,7 @@
 @define('BO_MAP_STRIKE_CIRCLE_SIZE', 4);
 @define('BO_MAP_STRIKE_CIRCLE_GROW', 0.5);
 @define('BO_MAP_STATION_ICON', 'http://labs.google.com/ridefinder/images/mm_20_red.png');
+@define('BO_MAP_MAX_STRIKES_PER_TILE', 20000);
 
 //Update intervals (Minutes!)
 @define("BO_UP_INTVL_STRIKES", 5);

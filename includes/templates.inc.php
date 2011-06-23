@@ -26,11 +26,16 @@ $_BO['mapovl'] = array();
 $_BO['mapimg'] = array();
 $_BO['density'] = array();
 
-
-
 /**************************************/
-/* Calculation settings for density   */
+/* Some predefined colors             */
 /**************************************/
+
+$_BO['tpl_color']['standard'][] = array(255, 255, 0);
+$_BO['tpl_color']['standard'][] = array(255, 200, 0);
+$_BO['tpl_color']['standard'][] = array(255, 150, 0);
+$_BO['tpl_color']['standard'][] = array(255, 100, 0);
+$_BO['tpl_color']['standard'][] = array(255,   0, 0);
+$_BO['tpl_color']['standard'][] = array(225,   0, 0);
 
 $_BO['tpl_density_colors'][] = array(150, 150, 250, 105);
 $_BO['tpl_density_colors'][] = array(50, 150, 155, 15);
@@ -39,6 +44,10 @@ $_BO['tpl_density_colors'][] = array(230, 0, 0, 15);
 $_BO['tpl_density_colors'][] = array(255, 0, 255, 15);
 $_BO['tpl_density_colors'][] = array(255, 190, 255, 15);
 
+
+/**************************************/
+/* Calculation settings for density   */
+/**************************************/
 
 //Europe
 $_BO['tpl_density']['europe']['name'] 	= 'Europe';
@@ -117,14 +126,9 @@ $_BO['tpl_imgmap']['europe']['upd_intv'] = 15; //minutes
 $_BO['tpl_imgmap']['europe']['textcolor'] = array(255,255,255);
 $_BO['tpl_imgmap']['europe']['textsize'] = 5;
 $_BO['tpl_imgmap']['europe']['point_type'] = 2;
-$_BO['tpl_imgmap']['europe']['point_size'] = 2;
+$_BO['tpl_imgmap']['europe']['point_size'] = 1;
 $_BO['tpl_imgmap']['europe']['legend'] = array(5, 100, 80, 4, 4, 1);
-$_BO['tpl_imgmap']['europe']['col'][] = array(255, 255, 0);
-$_BO['tpl_imgmap']['europe']['col'][] = array(255, 200, 0);
-$_BO['tpl_imgmap']['europe']['col'][] = array(255, 150, 0);
-$_BO['tpl_imgmap']['europe']['col'][] = array(255, 100, 0);
-$_BO['tpl_imgmap']['europe']['col'][] = array(255,   0, 0);
-$_BO['tpl_imgmap']['europe']['col'][] = array(225,   0, 0);
+$_BO['tpl_imgmap']['europe']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap']['europe']['density'] = true;
 $_BO['tpl_imgmap']['europe']['density_blocksize'] = 10;
 $_BO['tpl_imgmap']['europe']['density_colors'] = $_BO['tpl_density_colors'];
@@ -142,12 +146,7 @@ $_BO['tpl_imgmap']['europe_mini']['textsize'] = 1;
 $_BO['tpl_imgmap']['europe_mini']['point_type'] = 1;
 $_BO['tpl_imgmap']['europe_mini']['point_size'] = 2;
 $_BO['tpl_imgmap']['europe_mini']['legend'] = array(0, 54, 26, 0, 0, 0);
-$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255, 255, 0);
-$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255, 200, 0);
-$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255, 150, 0);
-$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255, 100, 0);
-$_BO['tpl_imgmap']['europe_mini']['col'][] = array(255,   0, 0);
-$_BO['tpl_imgmap']['europe_mini']['col'][] = array(225,   0, 0);
+$_BO['tpl_imgmap']['europe_mini']['col'] = $_BO['tpl_color']['standard'];
 
 //Germany (mini)
 $_BO['tpl_imgmap']['germany_mini']['name'] = 'Germany (mini)';
@@ -161,13 +160,7 @@ $_BO['tpl_imgmap']['germany_mini']['textsize'] = 1;
 $_BO['tpl_imgmap']['germany_mini']['point_type'] = 2;
 $_BO['tpl_imgmap']['germany_mini']['point_size'] = 1;
 $_BO['tpl_imgmap']['germany_mini']['legend'] = array(0, 54, 26, 0, 0, 0);
-$_BO['tpl_imgmap']['germany_mini']['col'][] = array(255, 255, 0);
-$_BO['tpl_imgmap']['germany_mini']['col'][] = array(255, 200, 0);
-$_BO['tpl_imgmap']['germany_mini']['col'][] = array(255, 150, 0);
-$_BO['tpl_imgmap']['germany_mini']['col'][] = array(255, 100, 0);
-$_BO['tpl_imgmap']['germany_mini']['col'][] = array(255,   0, 0);
-$_BO['tpl_imgmap']['germany_mini']['col'][] = array(225,   0, 0);
-
+$_BO['tpl_imgmap']['germany_mini']['col'] = $_BO['tpl_color']['standard'];
 
 //Germany (Landkreise) no exact merator prjection!
 $_BO['tpl_imgmap']['germany_lkr']['name'] = 'Germany';
@@ -183,12 +176,7 @@ $_BO['tpl_imgmap']['germany_lkr']['textsize'] = 5;
 $_BO['tpl_imgmap']['germany_lkr']['point_type'] = 2;
 $_BO['tpl_imgmap']['germany_lkr']['point_size'] = 2;
 $_BO['tpl_imgmap']['germany_lkr']['legend'] = array(5, 100, 80, 4, 4, 1);
-$_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 255, 0);
-$_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 200, 0);
-$_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 150, 0);
-$_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255, 100, 0);
-$_BO['tpl_imgmap']['germany_lkr']['col'][] = array(255,   0, 0);
-$_BO['tpl_imgmap']['germany_lkr']['col'][] = array(225,   0, 0);
+$_BO['tpl_imgmap']['germany_lkr']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap']['germany_lkr']['show_station'] = array(5, 155,80,155,true);
 $_BO['tpl_imgmap']['germany_lkr']['density'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 8;
@@ -218,49 +206,37 @@ $_BO['tpl_imgmap']['germany_bavaria']['textsize'] = 5;
 $_BO['tpl_imgmap']['germany_bavaria']['point_type'] = 2;
 $_BO['tpl_imgmap']['germany_bavaria']['point_size'] = 2;
 $_BO['tpl_imgmap']['germany_bavaria']['legend'] = array(5, 100, 80, 4, 4, 1);
-$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255, 255, 0);
-$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255, 200, 0);
-$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255, 150, 0);
-$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255, 100, 0);
-$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(255,   0, 0);
-$_BO['tpl_imgmap']['germany_bavaria']['col'][] = array(225,   0, 0);
+$_BO['tpl_imgmap']['germany_bavaria']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap']['germany_bavaria']['show_station'] = array(5, 155,80,155,true);
 $_BO['tpl_imgmap']['germany_bavaria']['density'] = true;
 $_BO['tpl_imgmap']['germany_bavaria']['density_blocksize'] = 8;
 $_BO['tpl_imgmap']['germany_bavaria']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['germany_bavaria']['density_darken'] = 20;
 	
-/*
-//Germany NRW
-$_BO['tpl_imgmap']['NRW']['name'] = 'NRW';
-$_BO['tpl_imgmap']['NRW']['footer'] = 'Kartenmaterial: <a href="http://commons.wikimedia.org/wiki/File:North_Rhine-Westphalia_location_map_03.svg" target="_blank">Wikipedia</a>';
-$_BO['tpl_imgmap']['NRW']['menu'] = true;
-$_BO['tpl_imgmap']['NRW']['archive'] = true;
-$_BO['tpl_imgmap']['NRW']['file'] = 'map_germany_nrw_color.png';
-$_BO['tpl_imgmap']['NRW']['coord'] = array(52.552,5.834 , 50.315 , 9.481); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['NRW']['trange'] = 2; //hours!
-$_BO['tpl_imgmap']['NRW']['upd_intv'] = 3; //minutes
-$_BO['tpl_imgmap']['NRW']['textcolor'] = array(255,255,255);
-$_BO['tpl_imgmap']['NRW']['textsize'] = 5;
-$_BO['tpl_imgmap']['NRW']['point_type'] = 2;
-$_BO['tpl_imgmap']['NRW']['point_size'] = 2;
-$_BO['tpl_imgmap']['NRW']['legend'] = array(5, 100, 80, 4, 4, 1);
-$_BO['tpl_imgmap']['NRW']['col'][] = array(255, 255, 0);
-$_BO['tpl_imgmap']['NRW']['col'][] = array(255, 200, 0);
-$_BO['tpl_imgmap']['NRW']['col'][] = array(255, 150, 0);
-$_BO['tpl_imgmap']['NRW']['col'][] = array(255, 100, 0);
-$_BO['tpl_imgmap']['NRW']['col'][] = array(255, 0, 0);
-$_BO['tpl_imgmap']['NRW']['col'][] = array(225, 0, 0);
-$_BO['tpl_imgmap']['NRW']['density'] = true;
-$_BO['tpl_imgmap']['NRW']['density_blocksize'] = 10;
-$_BO['tpl_imgmap']['NRW']['density_colors'] = $_BO['tpl_density_colors'];
-$_BO['tpl_imgmap']['NRW']['density_darken'] = 40;
 
+//Germany NRW: not exact, maximum deviation about 2km
+$_BO['tpl_imgmap']['germany_nrw']['name'] = 'NRW';
+$_BO['tpl_imgmap']['germany_nrw']['footer'] = 'Kartenmaterial: <a href="http://commons.wikimedia.org/wiki/File:North_Rhine-Westphalia_location_map_03.svg" target="_blank">Wikipedia</a>';
+$_BO['tpl_imgmap']['germany_nrw']['menu'] = true;
+$_BO['tpl_imgmap']['germany_nrw']['archive'] = true;
+$_BO['tpl_imgmap']['germany_nrw']['file'] = 'map_germany_nrw_color.png';
+$_BO['tpl_imgmap']['germany_nrw']['coord'] = array(52.552, 5.84 , 50.295 , 9.481); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['germany_nrw']['trange'] = 2; //hours!
+$_BO['tpl_imgmap']['germany_nrw']['upd_intv'] = 3; //minutes
+$_BO['tpl_imgmap']['germany_nrw']['textcolor'] = array(255,255,255);
+$_BO['tpl_imgmap']['germany_nrw']['textsize'] = 5;
+$_BO['tpl_imgmap']['germany_nrw']['point_type'] = 2;
+$_BO['tpl_imgmap']['germany_nrw']['point_size'] = 2;
+$_BO['tpl_imgmap']['germany_nrw']['legend'] = array(5, 100, 80, 4, 4, 1);
+$_BO['tpl_imgmap']['germany_nrw']['col'] = $_BO['tpl_color']['standard'];
+$_BO['tpl_imgmap']['germany_nrw']['density'] = true;
+$_BO['tpl_imgmap']['germany_nrw']['density_blocksize'] = 10;
+$_BO['tpl_imgmap']['germany_nrw']['density_colors'] = $_BO['tpl_density_colors'];
+$_BO['tpl_imgmap']['germany_nrw']['density_darken'] = 40;
 
 //Germany NRW black&white
-$_BO['tpl_imgmap']['NRW_bw'] = $_BO['tpl_imgmap']['NRW'];
-$_BO['tpl_imgmap']['NRW_bw']['file'] = 'map_germany_nrw_dark.png';
-*/
+$_BO['tpl_imgmap']['germany_nrw_dark'] = $_BO['tpl_imgmap']['germany_nrw'];
+$_BO['tpl_imgmap']['germany_nrw_dark']['file'] = 'map_germany_nrw_dark.png';
 
 
 
@@ -298,6 +274,20 @@ $_BO['tpl_overlay']['blids_de']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_de']['to_mercator'] = false;
 $_BO['tpl_overlay']['blids_de']['opacity'] = 50;
 
+//T-Online/wetter.info Radar
+//WARNING: Copyright! Only internal private usage!
+$time = time() - 300;
+$i = sprintf('%02d', (string)intval(date('i', $time) / 15) * 15);
+$time = strtotime(gmdate('Y-m-d H:'.$i.':00', $time).' UTC');
+$date = gmdate('YmdHi', $time);
+
+$_BO['tpl_overlay']['tonline_radar']['img'] = "http://data.wetter.info//data/layers/xxlradar-de/xxlradar-de_radar_$date.gif"; //'http://data.wetter.info//data/maps/basemaps/xxlradar-de.jpg';
+$_BO['tpl_overlay']['tonline_radar']['coord'] = array(55.5, 16.6, 46.2, 4.5);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['tonline_radar']['default_show'] = false;
+$_BO['tpl_overlay']['tonline_radar']['sel_name'] = 'T-Online Radar ('.date('H:i', $time).')';
+$_BO['tpl_overlay']['tonline_radar']['only_loggedin'] = true;
+$_BO['tpl_overlay']['tonline_radar']['to_mercator'] = true;
+$_BO['tpl_overlay']['tonline_radar']['opacity'] = 40;
 
 
 ?>
