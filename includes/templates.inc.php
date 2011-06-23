@@ -253,6 +253,15 @@ $_BO['tpl_overlay']['meteox_radar']['sel_name'] = 'Meteox rain radar';
 $_BO['tpl_overlay']['meteox_radar']['only_loggedin'] = true;
 $_BO['tpl_overlay']['meteox_radar']['to_mercator'] = true;
 
+//Meteox Radar Overlay (Scandinavia)
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['img'] = 'http://www.vaderradar.se/image.ashx';
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['coord'] = array(71.546744,35.110422,53.879462,2.865478); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['default_show'] = false;
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['sel_name'] = 'Meteox rain radar (Scandinavia)';
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['only_loggedin'] = true;
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['to_mercator'] = true;
+
 //EUCLID (you can check strike polarity with this map)
 //WARNING: Copyright! Only internal private usage!
 //It's calibrated only for germany!
