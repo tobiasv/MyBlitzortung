@@ -1465,12 +1465,12 @@ function bo_get_density_image()
 
 
 	//Antennas
-	if ($ratio && $station_id == bo_station_id() && isset($info['antennas']) && is_array($info['antennas']))
+	if ($ratio && $station_id == bo_station_id() && isset($info['antennas']) && is_array($info['antennas']['bearing']))
 	{
 		$color = imagecolorallocatealpha($I, 255,255,255, 40);
 		$size = 0.3 * ($w + $h) / 2;
-		
-		foreach($info['antennas'] as $bear)
+
+		foreach($info['antennas']['bearing'] as $bear)
 		{
 			list($lat, $lon) = bo_distbearing2latlong(100000, $bear, $stinfo['lat'], $stinfo['lon']);
 			list($px, $py) = bo_latlon2mercator($lat, $lon);
