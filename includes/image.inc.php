@@ -582,7 +582,7 @@ function bo_tile_tracks()
 			{
 				$rsizex = 30;
 				$rsizey = 27;
-				$textsize = 2;
+				$textsize = 3;
 				$size = 70;
 			}
 			else
@@ -665,8 +665,8 @@ function bo_tile_tracks()
 							//show info data (speed...)
 							if ($zoom >= BO_TRACKS_MAP_ZOOM_INFO)
 							{
-								imagestring($I, $textsize, $px2-5, $py2-8, '+'.intval(BO_TRACKS_MAP_TIME_FORCAST), $textcolor);
-								imagestring($I, $textsize, $px2-5, $py2+2, 'min', $textcolor);
+								imagestring($I, $textsize, $px2-8, $py2-8, '+'.intval(BO_TRACKS_MAP_TIME_FORCAST), $textcolor);
+								imagestring($I, $textsize, $px2-8, $py2+2, 'min', $textcolor);
 								
 								$strikechange = round(($cell['count'] - $oldcount) / $oldcount * 100);
 								if ($strikechange > 0)
@@ -688,22 +688,26 @@ function bo_tile_tracks()
 								imageellipse($I, $px, $py, $size+1, $size+1, $linecolor);
 								$circle_drawn = true;
 								
-								$height = imagefontheight($textsize);
+								$height = imagefontheight($textsize)+1;
 								
-								$pxr += 4;
-								$pyr += 2;
+								$pxr += 2;
+								$pyr += 6;
 								
 								//Speed
 								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey, round($speed).'km/h', $textcolor);
-
+								$pyr += $height;
+								
 								//Strikes
-								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey + $height, $cell['count'], $textcolor);
+								//Doesn't make too much sense, because the scantime isn't displayed
+								//imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey, $cell['count'], $textcolor);
+								//$pyr += $height;
 								
 								//Strikes per minute
-								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey + $height*2, $strikepermin.'/min', $textcolor);
+								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey, $strikepermin.'/min', $textcolor);
+								$pyr += $height;
 								
 								//Strike count change
-								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey + $height*3, $strikechange.'%', $textcolor);
+								imagestring($I, $textsize, $pxr - $rsizex, $pyr - $rsizey, $strikechange.'%', $textcolor);
 							}
 							
 							break; //currently only the first dataset

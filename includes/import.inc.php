@@ -961,7 +961,7 @@ function bo_update_all($force)
 	if ($strikes_imported)
 	{
 		flush();
-		bo_update_tracks($force);
+		bo_update_tracks($force, $max_time + $start_time - time());
 	}
 	/*** Update MyBlitzortung stations ***/
 	else if (!$strikes_imported && !$stations_imported && !$signals_imported)
@@ -1627,14 +1627,16 @@ function bo_my_station_update($url)
 	return $ret;
 }
 
-function bo_update_tracks($force = false)
+function bo_update_tracks($force = false, $max_time = 0)
 {
 	/**
 	/*  Warning: "Quick and dirty" calculation of lightning/cell tracks
 	/*  This calculation is currently a bit confusing and I'm sure there
 	/*  are better (faster and more accurate) ways to calculate that.
+	/*
+	/*  WARNING! WARNING! WARNING! WARNING! WARNING! 
 	/*  The calculation time raises exponentially with scanning tim
-	/*  and strike count. 
+	/*  and strike count!
 	 */
 	 
 	$scantime = intval(BO_TRACKS_SCANTIME);
@@ -1647,6 +1649,8 @@ function bo_update_tracks($force = false)
 	if (!$scantime || !$divisor)
 		return;
 
+	$start_time = time();
+		
 	$last = bo_get_conf('uptime_tracks');
 
 	echo "<h3>Tracks</h3>\n";
@@ -1681,6 +1685,10 @@ function bo_update_tracks($force = false)
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())
 			{
+				//End this ugly calculation to prevent running in php-timeout
+				if (time() - $start_time > $max_time - 3)
+					break;
+
 				$time_strike = strtotime($row['time']." UTC");
 				
 				//for weighting the strike time

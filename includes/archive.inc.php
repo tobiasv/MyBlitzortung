@@ -403,6 +403,8 @@ function bo_show_archive_density()
 	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 
 	echo '</div>';
+	
+	echo '</div>';
 }
 
 function bo_show_archive_search()

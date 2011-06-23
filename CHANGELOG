@@ -3,6 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.5.1 (2011-06-23)
+--------------------------
+- added some overlay templates (radar, blids, euclid - for private internal usage only!)
+- new: antenna bearing on ratio map
+- maximum strike per tile setting
+- added timout in track detection to prevent php-failure
+
 Version 0.5 (2011-06-19)
 --------------------------
 - new: custom overlays for google map (not perfect: it lies over the strike overlay)
