@@ -705,16 +705,33 @@ function bo_show_statistics_other()
 			$lon[] = $row['lon'];
 		}
 
-		if (count($height))
-			$st_height = round(array_sum($height) / count($height));
-		
 		if (count($lat))
+		{
 			$st_lat = array_sum($lat) / count($lat);
-		
-		if (count($lon))
 			$st_lon = array_sum($lon) / count($lon);
+			$st_height = round(array_sum($height) / count($height));
+			
+			//distance: mean deviation
+			$dist_dev = 0;
+			foreach($lat as $id => $val)
+			{
+				$dist_dev += bo_latlon2dist($st_lat, $st_lon, $lat[$id], $lon[$id]);
+			}  
+			$dist_dev /= count($lat); 
 
-		if (!$st_lat && !$st_lon)
+			//height: standard deviation
+			$height_dev = 0;
+			if (count($height) > 1)
+			{
+				foreach($height as $val)
+				{
+					$height_dev += pow($val-$st_height,2);
+				}  
+				$height_dev = sqrt($height_dev/(count($height)-1)); 
+			}
+						
+		}
+		else
 		{
 			$st_lat = BO_LAT;
 			$st_lon = BO_LON;
@@ -758,8 +775,8 @@ function bo_show_statistics_other()
 		if ($lat[0] && $lon[0])
 		{
 			
-			echo '<li><span class="bo_descr">'._BL('Coordinates').': </span><span class="bo_value">'.$lat[0].'&deg; / '.$lon[0].'&deg'.'</span>';
-			echo '<li><span class="bo_descr">'._BL('Height').': </span><span class="bo_value">'.$height[0].'m</span>';
+			echo '<li><span class="bo_descr">'._BL('Coordinates').': </span><span class="bo_value">'.number_format($st_lat,6,_BL('.'), _BL(',')).'&deg; / '.number_format($st_lon,6,_BL('.'), _BL(',')).'&deg (&plusmn;'.number_format($dist_dev, 1, _BL('.'), _BL(',')).'m)</span>';
+			echo '<li><span class="bo_descr">'._BL('Height').': </span><span class="bo_value">'.$st_height.'m (&plusmn;'.number_format($height_dev, 1, _BL('.'), _BL(',')).'m)</span>';
 			
 		}
 		else
