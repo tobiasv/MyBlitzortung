@@ -317,7 +317,7 @@ function bo_show_lightning_map()
 	$Overlays = array();
 	foreach ($_BO['mapovl'] as $id => $data)
 	{
-		if ( !((bo_user_get_level() & BO_PERM_NOLIMIT) && $data['only_loggedin'])
+		if ( (!(bo_user_get_level() & BO_PERM_NOLIMIT) && $data['only_loggedin'])
 		     || empty($data)
 			)
 			continue;
@@ -731,22 +731,25 @@ function bo_show_lightning_map()
 				bo_setcookie('bo_map_zoom', bo_map.getZoom());
 			
 			bo_map_toggle_stations(0);
+		}); 
+
+		google.maps.event.addListener(bo_map, 'maptypeid_changed', function() {
+			bo_setcookie('bo_map_type', bo_map.getMapTypeId());
 		});
 		
-		
-
 		var map_lat = bo_getcookie('bo_map_lat');
 		var map_lon = bo_getcookie('bo_map_lon');
 		var map_zoom = bo_getcookie('bo_map_zoom');
+		var map_type = bo_getcookie('bo_map_type');
 		
-		if (map_lat > 0 && map_lon > 0 && map_zoom > 0)
-		{
-			var mapOptions = {
-			  zoom: parseInt(map_zoom),
-			  center: new google.maps.LatLng(map_lat,map_lon)
-			}
-			bo_map.setOptions(mapOptions);
-		}
+		if (map_lat > 0 && map_lon > 0)
+			bo_map.setOptions({ center: new google.maps.LatLng(map_lat,map_lon) });
+		
+		if (map_zoom > 0)
+			bo_map.setOptions({ zoom: parseInt(map_zoom) }); 
+
+		if (map_type != '')
+			bo_map.setOptions({ mapTypeId: map_type });
 
 <?php  if (bo_user_get_level()) { ?>
 		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
