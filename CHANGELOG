@@ -3,6 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.5.1a (2011-06-24)
+---------------------------
+- fix: Javascript error when logged in as admin (More button not working)
+- fix: login with userid 1 was possible with different user/password from database userid 1
+- improvement: loading map through google callback method
+- improvement: show user levels in user table
+
 Version 0.5.1 (2011-06-23)
 --------------------------
 - new: added some overlay templates (radar, blids, euclid - for private internal usage only!)
