@@ -397,7 +397,7 @@ $_BL['de']['Files'] = 'Dateien';
 $_BL['de']['Click here to delete all files'] = 'Hier klicken um alle Dateien zu löschen';
 $_BL['de']['Clear all files'] = 'Dateien bereinigen.';
 
-$_BL['de']['user_perm0'] = 'Benutzereinstellungen';
+$_BL['de']['user_perm0'] = 'Administration';
 $_BL['de']['user_perm1'] = 'Andere Einstellungen';
 $_BL['de']['user_perm2'] = 'Beschränkungen aufheben';
 $_BL['de']['user_perm3'] = 'Alarme definieren';

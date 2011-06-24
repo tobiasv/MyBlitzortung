@@ -396,7 +396,7 @@ $_BL['en']['Files'] = 'Files';
 $_BL['en']['Click here to delete all files'] = 'Click here to delete all files';
 $_BL['en']['Clear all files'] = 'Clear all files.';
 
-$_BL['en']['user_perm0'] = 'User settings';
+$_BL['en']['user_perm0'] = 'Administration';
 $_BL['en']['user_perm1'] = 'Other settings';
 $_BL['en']['user_perm2'] = 'No limits';
 $_BL['en']['user_perm3'] = 'Manage alerts';

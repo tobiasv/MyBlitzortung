@@ -232,8 +232,11 @@ function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 		if ($res->num_rows == 1)
 		{
 			$row = $res->fetch_assoc();
-			bo_user_set_session($row['id'], $row['level'], $cookie, $pass);
-			return true;
+			if ($row['id'] > 1)
+			{
+				bo_user_set_session($row['id'], $row['level'], $cookie, $pass);
+				return true;
+			}
 		}
 
 	}
@@ -413,16 +416,23 @@ function bo_user_show_admin()
 			
 			$new_user_pass = BoDb::esc(bo_gpc_prepare($_POST['bo_user_pass']));
 			$new_user_mail = BoDb::esc(bo_gpc_prepare($_POST['bo_user_mail']));
-			//$new_user_level = BoDb::esc($_POST['bo_user_level']);
 			
-			$sql = " ".BO_DB_PREF."user SET login='$new_user_login', mail='$new_user_mail', level='$new_user_level' ";
+			$sql = " ".BO_DB_PREF."user SET mail='$new_user_mail' ";
 
-			if (strlen(trim($new_user_pass)))
+			if ($user_id != 1)
 			{
-				$new_user_pass = md5($new_user_pass);
-				$sql .= ", password='$new_user_pass'";
+				$sql .= ", login='$new_user_login', level='$new_user_level' ";
+			
+				if (strlen(trim($new_user_pass)))
+				{
+					$new_user_pass = md5($new_user_pass);
+					$sql .= ", password='$new_user_pass'";
+				}
 			}
-
+			
+			//To be sure, if creation of main user during install failed
+			bo_db("INSERT IGNORE INTO ".BO_DB_PREF."user SET id=1", false);
+			
 			if ($user_id)
 				$ok = bo_db("UPDATE $sql WHERE id='$user_id'");
 			else
@@ -445,17 +455,22 @@ function bo_user_show_admin()
 	echo '<h3>'._BL('User list').'</h3>';
 	echo '<table class="bo_table" id="bo_user_table">';
 	echo '<tr>
-			<th>ID</th>
-			<th>'._BL('Login').'</th>
-			<th>'._BL('Level').'</th>
-			<th>'._BL('E-Mail').'</th>
-			<th>'._BL('Delete').'</th>
-			<th>'._BL('Alert').'</th>
+			<th rowspan="2">ID</th>
+			<th rowspan="2">'._BL('Login').'</th>
+			<th rowspan="2">'._BL('E-Mail').'</th>
+			<th colspan="'.BO_PERM_COUNT.'">'._BL('Level').'</th>
+			<th rowspan="2">'._BL('Delete').'</th>
+			<th rowspan="2">'._BL('Alert').'</th>
 			</tr>';
 
+	for ($i=0; $i<BO_PERM_COUNT;$i++)
+	{
+		echo '<th>'.($i+1).'</th>';
+	}
+			
 	$sql = "SELECT id, login, password, level, mail
 			FROM ".BO_DB_PREF."user
-			ORDER BY login
+			ORDER BY id
 			";
 	$res = bo_db($sql);
 	while ($row = $res->fetch_assoc())
@@ -464,16 +479,22 @@ function bo_user_show_admin()
 		{
 			$row['login'] = BO_USER;
 			$row['pass'] = BO_PASS;
-			$row['level'] = 1;
+			$row['level'] = pow(2, BO_PERM_COUNT) - 1;
 		}
 
 		echo '<tr>
 			<td><a href="'.bo_insert_url(array('bo_action2', 'id')).'&id='.$row['id'].'">'.$row['id'].'</a></td>
 			<td>'._BC($row['login']).'</td>
-			<td>'._BC($row['level']).'</td>
-			<td>'._BC($row['mail']).'</td>
-			<td>';
+			<td>'._BC($row['mail']).'</td>';
 
+		for ($i=0; $i<BO_PERM_COUNT;$i++)
+		{
+			$l = pow(2, $i);
+			echo '<td>'.(($row['level'] & $l) ? 'X' : '-').'</td>';
+		}
+		
+		echo '<td>';
+			
 		if ($row['id'] > 1)
 			echo '<a href="'.bo_insert_url(array('bo_action2')).'&bo_action2=delete&id='.$row['id'].'" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
 
@@ -497,7 +518,6 @@ function bo_user_show_admin()
 	if ($user_id == 1)
 	{
 		$disabled = ' disabled="disabled"';
-		$user_level = pow(2, BO_PERM_COUNT) - 1;
 	}
 
 	echo '<form action="'.bo_insert_url(array('bo_logout', 'id', 'bo_action2')).'" method="POST" class="bo_admin_user_form">';
@@ -525,7 +545,7 @@ function bo_user_show_admin()
 		
 		echo '<span class="bo_form_checkbox_text">';
 		echo '<input type="checkbox" value="1" name="bo_user_perm['.$l.']" id="bo_user_perm'.$i.'" class="bo_form_checkbox" '.$disabled.(($user_level & $l) ? ' checked="checked"' : '').'>';
-		echo '<label for="bo_user_perm'.$i.'" class="bo_form_descr_checkbox">'._BL('user_perm'.$i).'</label>';
+		echo '<label for="bo_user_perm'.$i.'" class="bo_form_descr_checkbox">'._BL('user_perm'.$i).'&nbsp;('.($i+1).')</label>';
 		echo '</span>';
 	}
 	echo '</div>';
