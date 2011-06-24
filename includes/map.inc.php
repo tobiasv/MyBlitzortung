@@ -113,26 +113,46 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 		document.cookie = name+'='+value+'; expires='+now.toGMTString()+';';
 	}
 
-	function bo_getcookie(name)
-	{
-		var value = '';
-		var c;
-		if(document.cookie)
-		{
-			c = document.cookie;
-			if (c.indexOf(name+'=') >= 0)
-			{
-				c = c.substring(c.indexOf(name+'='));
-				c = c.substring(name.length);
-				if (c.indexOf(';'))
-					value = c.substring(1, c.indexOf(';'));
-				else
-					value = c;
-			}
-		}
-		return value;
-	}
 	
+	function bo_getcookie( check_name ) 
+	{
+		// first we'll split this cookie up into name/value pairs
+		// note: document.cookie only returns name=value, not the other components
+		var a_all_cookies = document.cookie.split( ';' );
+		var a_temp_cookie = '';
+		var cookie_name = '';
+		var cookie_value = '';
+		var b_cookie_found = false; // set boolean t/f default f
+
+		for ( i = 0; i < a_all_cookies.length; i++ )
+		{
+			// now we'll split apart each name=value pair
+			a_temp_cookie = a_all_cookies[i].split( '=' );
+
+			// and trim left/right whitespace while we're at it
+			cookie_name = a_temp_cookie[0].replace(/^\s+|\s+$/g, '');
+
+			// if the extracted name matches passed check_name
+			if ( cookie_name == check_name )
+			{
+				b_cookie_found = true;
+				// we need to handle case where cookie has no value but exists (no = sign, that is):
+				if ( a_temp_cookie.length > 1 )
+				{
+					cookie_value = unescape( a_temp_cookie[1].replace(/^\s+|\s+$/g, '') );
+				}
+				// note that in cases where cookie is initialized but no value, null is returned
+				return cookie_value;
+				break;
+			}
+			a_temp_cookie = null;
+			cookie_name = '';
+		}
+		if ( !b_cookie_found )
+		{
+			return '';
+		}
+	}
 
 
 </script>
@@ -564,7 +584,7 @@ function bo_show_lightning_map()
 		}
 
 
-
+		var i;
 	
 		bo_infowindow = new google.maps.InfoWindow({content: ''});
 <?php
@@ -670,8 +690,22 @@ function bo_show_lightning_map()
 		bo_infobox.index = 1;
 		bo_map.controls[google.maps.ControlPosition.RIGHT_TOP].push(bo_infobox);
 		
-		bo_map_reload_overlays(); 
+		bo_map_reload_overlays();  
 
+		var map_lat = bo_getcookie('bo_map_lat');
+		var map_lon = bo_getcookie('bo_map_lon');
+		var map_zoom = bo_getcookie('bo_map_zoom');
+		var map_type = bo_getcookie('bo_map_type');
+		
+		if (map_lat > 0 && map_lon > 0)
+			bo_map.setOptions({ center: new google.maps.LatLng(map_lat,map_lon) });
+		
+		if (map_zoom > 0)
+			bo_map.setOptions({ zoom: parseInt(map_zoom) });
+
+		if (map_type.match(/[a-z]+/i))
+			bo_map.setOptions({ mapTypeId: map_type });
+		
 <?php  if (bo_user_get_level()) { ?>
 		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
 		if (bo_map.getZoom() > 7)
@@ -703,19 +737,6 @@ function bo_show_lightning_map()
 			bo_setcookie('bo_map_type', bo_map.getMapTypeId());
 		});
 		
-		var map_lat = bo_getcookie('bo_map_lat');
-		var map_lon = bo_getcookie('bo_map_lon');
-		var map_zoom = bo_getcookie('bo_map_zoom');
-		var map_type = bo_getcookie('bo_map_type');
-		
-		if (map_lat > 0 && map_lon > 0)
-			bo_map.setOptions({ center: new google.maps.LatLng(map_lat,map_lon) });
-		
-		if (map_zoom > 0)
-			bo_map.setOptions({ zoom: parseInt(map_zoom) }); 
-
-		if (map_type != '')
-			bo_map.setOptions({ mapTypeId: map_type });
 	}	
 	
 	function bo_show_more()

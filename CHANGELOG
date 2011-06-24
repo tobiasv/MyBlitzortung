@@ -3,6 +3,10 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.5.1b (2011-06-24)
+---------------------------
+- fix: cookie issue on dynamic map (map not displayed on second visit)
+
 Version 0.5.1a (2011-06-24)
 ---------------------------
 - fix: Javascript error when logged in as admin (More button not working)
