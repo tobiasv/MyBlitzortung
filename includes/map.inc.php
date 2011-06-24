@@ -42,9 +42,11 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	
 ?>
 
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3.4&sensor=false"></script>
-	<script type="text/javascript">
+	<script type="text/javascript" id="bo_script_google" src="http://maps.google.com/maps/api/js?v=3.4&sensor=false&callback=bo_gmap_init">
+	</script>
 
+	<script type="text/javascript" id="bo_script_map">
+	
 	var bo_map;
 	var bo_home;
 	var bo_home_zoom;
@@ -52,7 +54,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	var bo_loggedin = <?php echo intval(bo_user_get_level()) ?>;
 	
 	function bo_gmap_init() 
-	{
+	{ 
 		bo_home = new google.maps.LatLng(<?php echo  $lat ?>, <?php echo  $lon ?>);
 		bo_home_zoom = <?php echo  $zoom ?>;
 		
@@ -84,7 +86,6 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	if (($show_station & 2) && $radius)
 	{
 ?>
-
 		var boDistCircle = {
 			clickable: false,
 			strokeColor: "<?php echo  BO_MAP_CIRCLE_COLOR_LINE ?>",
@@ -104,21 +105,6 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 		bo_gmap_init2();
 	}
-
-	function bo_init() 
-	{
-		if (arguments.callee.done) return; 
-		arguments.callee.done = true;   
-		if (_timer) clearInterval(_timer);
-
-		bo_gmap_init();
-		
-		if (bo_load_body)
-			bo_load_body();
-
-		
-		
-	};
 
 	function bo_setcookie(name, value)
 	{
@@ -147,37 +133,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 		return value;
 	}
 	
-	/*** emulate <body onload="..."> ***/
-	
-	// Mozilla/Opera9
-	if (document.addEventListener) {
-	  document.addEventListener("DOMContentLoaded", bo_init, false);
-	}
 
-	// IE
-	/*@cc_on @*/
-	/*@if (@_win32)
-	  document.write("<script id=__ie_onload defer src=javascript:void(0)><\/script>");
-	  var script = document.getElementById("__ie_onload");
-	  script.onreadystatechange = function() {
-		if (this.readyState == "complete") {
-		  bo_init(); 
-		}
-	  };
-	/*@end @*/
-
-	//Safari
-	if (/WebKit/i.test(navigator.userAgent)) {
-	  var _timer = setInterval(function() {
-		if (/loaded|complete/.test(document.readyState)) {
-		  bo_init();
-		}
-	  }, 10);
-	}
-
-	//other browsers
-	var bo_load_body = window.onload;
-	window.onload = bo_init();
 
 </script>
 
@@ -635,8 +591,8 @@ function bo_show_lightning_map()
             bo_ExtraOverlay['.$ovlid.'] = {
 			    bo_image: "'.$cfg['img'].'",
 			    bo_bounds: new google.maps.LatLngBounds(
-                               new google.maps.LatLng('.$cfg['coord'][2].','.$cfg['coord'][3].'),
-                               new google.maps.LatLng('.$cfg['coord'][0].','.$cfg['coord'][1].')),
+                               new google.maps.LatLng('.(double)$cfg['coord'][2].','.(double)$cfg['coord'][3].'),
+                               new google.maps.LatLng('.(double)$cfg['coord'][0].','.(double)$cfg['coord'][1].')),
 			    bo_show: '.($cfg['default_show'] ? 'true' : 'false').',
 			    bo_opacity: '.((double)$cfg['opacity']).',
 				bo_tomercator: '.($cfg['to_mercator'] ? 'true' : 'false').'
@@ -714,7 +670,17 @@ function bo_show_lightning_map()
 		bo_infobox.index = 1;
 		bo_map.controls[google.maps.ControlPosition.RIGHT_TOP].push(bo_infobox);
 		
-		bo_map_reload_overlays();
+		bo_map_reload_overlays(); 
+
+<?php  if (bo_user_get_level()) { ?>
+		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
+		if (bo_map.getZoom() > 7)
+		{
+			var newWindow = window.open("<?php echo bo_insert_url() ?>&lat="+event.latLng.lat()+"&lon="+event.latLng.lng()+"&zoom="+bo_map.getZoom(), '_blank');
+			newWindow.focus();
+		}
+		});
+<?php  } ?>
 		
 		google.maps.event.addListener(bo_map, 'dragend', function() {
 			bo_setcookie('bo_map_lat', bo_map.getCenter().lat());
@@ -750,19 +716,6 @@ function bo_show_lightning_map()
 
 		if (map_type != '')
 			bo_map.setOptions({ mapTypeId: map_type });
-
-<?php  if (bo_user_get_level()) { ?>
-		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
-		if (bo_map.getZoom() > 7)
-		{
-			var newWindow = window.open("<?php echo bo_insert_url() ?>&lat="+event.latLng.lat()+"&lon="+event.latLng.lng()+"&zoom="+bo_map.getZoom(), '_blank');
-			newWindow.focus();
-		}
-});
-
-
-<?php  } ?>
-
 	}	
 	
 	function bo_show_more()

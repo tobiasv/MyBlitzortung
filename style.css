@@ -499,14 +499,14 @@ color: #666;
 #myblitzortung .bo_my_logo {
 width: 300px;
 float: right;
-display: box;
+display: block;
 margin: 1px 0px 5px 5px;
 }
 
 #myblitzortung .bo_bo_logo {
 width: 150px;
 float: right;
-display: box;
+display: block;
 margin: 1px 0px 5px 5px;
 }
 

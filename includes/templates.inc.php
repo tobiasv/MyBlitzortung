@@ -21,6 +21,52 @@
 */
 
 
+
+
+/**
+/*    !!!!!!!  W A R N I N G !!!!!!!
+/*
+/*    D O   N O T   E D I T   T H I S   F I L E!
+/*
+/*    !!!!!!!  W A R N I N G !!!!!!!
+/*
+/*
+/*    You can define ALL your own settings in config.php!
+/*    You can use these templates to easyily add pre defined maps and settings.
+/*
+/*    ****** Examples (config.php!!!): *******
+/*    
+/*      1. Add predefined map of bavaria as map id 123
+/*
+/*         $_BO['mapimg'][123] = $_BO['tpl_imgmap']['germany_bavaria'];
+/*         
+/*         Hint: You can choose the map-id individual. You shoul avoid smaller values,
+/*         as they are predefined for the standard maps (0 = Europe, 1 = Germany small...).
+/*
+/*      2. Add predefined overlay
+/*
+/*         $_BO['mapovl'][100] = $_BO['tpl_overlay']['meteox_radar'];
+/*
+/*      3. Add your own overlay
+/*
+/*          $_BO['mapovl'][101]['img'] = '/grafiken/webcam_sicht.png';
+/*          $_BO['mapovl'][101]['coord'] = array(49.452, 10.8985, 49.3759, 10.77);
+/*          $_BO['mapovl'][101]['default_show'] = false;
+/*          $_BO['mapovl'][101]['sel_name'] = 'Webcam Sicht';
+/*          $_BO['mapovl'][101]['only_loggedin'] = false;
+/*          $_BO['mapovl'][101]['to_mercator'] = false;
+/*          $_BO['mapovl'][101]['opacity'] = 100;
+/*
+/*      4. Disable the internally defined europe map (mapid=0)
+/*
+/*          $_BO['mapimg'][0] = array();
+/*
+ */
+
+ 
+ 
+ 
+ 
 $_BO['mapcfg'] = array();
 $_BO['mapovl'] = array();
 $_BO['mapimg'] = array();
