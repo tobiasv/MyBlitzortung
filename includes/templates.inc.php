@@ -176,7 +176,7 @@ $_BO['tpl_imgmap']['europe']['point_size'] = 1;
 $_BO['tpl_imgmap']['europe']['legend'] = array(5, 100, 80, 4, 4, 1);
 $_BO['tpl_imgmap']['europe']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap']['europe']['density'] = true;
-$_BO['tpl_imgmap']['europe']['density_blocksize'] = 10;
+$_BO['tpl_imgmap']['europe']['density_blocksize'] = 5;
 $_BO['tpl_imgmap']['europe']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['europe']['density_darken'] = 40;
 
@@ -225,7 +225,7 @@ $_BO['tpl_imgmap']['germany_lkr']['legend'] = array(5, 100, 80, 4, 4, 1);
 $_BO['tpl_imgmap']['germany_lkr']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap']['germany_lkr']['show_station'] = array(5, 155,80,155,true);
 $_BO['tpl_imgmap']['germany_lkr']['density'] = true;
-$_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 8;
+$_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 4;
 $_BO['tpl_imgmap']['germany_lkr']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 10;
 
@@ -255,10 +255,15 @@ $_BO['tpl_imgmap']['germany_bavaria']['legend'] = array(5, 100, 80, 4, 4, 1);
 $_BO['tpl_imgmap']['germany_bavaria']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap']['germany_bavaria']['show_station'] = array(5, 155,80,155,true);
 $_BO['tpl_imgmap']['germany_bavaria']['density'] = true;
-$_BO['tpl_imgmap']['germany_bavaria']['density_blocksize'] = 8;
+$_BO['tpl_imgmap']['germany_bavaria']['density_blocksize'] = 4;
 $_BO['tpl_imgmap']['germany_bavaria']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['germany_bavaria']['density_darken'] = 20;
-	
+
+//Germany Bavaria dark
+$_BO['tpl_imgmap']['germany_bavaria_dark'] = $_BO['tpl_imgmap']['germany_bavaria'];
+$_BO['tpl_imgmap']['germany_bavaria_dark']['file'] = 'map_germany_bavaria_dark.png';
+$_BO['tpl_imgmap']['germany_bavaria_dark']['show_station'] = array(5, 255,100,100,true);
+
 
 //Germany NRW: not exact, maximum deviation about 2km
 $_BO['tpl_imgmap']['germany_nrw']['name'] = 'NRW';
@@ -280,7 +285,7 @@ $_BO['tpl_imgmap']['germany_nrw']['density_blocksize'] = 10;
 $_BO['tpl_imgmap']['germany_nrw']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['germany_nrw']['density_darken'] = 40;
 
-//Germany NRW black&white
+//Germany NRW dark
 $_BO['tpl_imgmap']['germany_nrw_dark'] = $_BO['tpl_imgmap']['germany_nrw'];
 $_BO['tpl_imgmap']['germany_nrw_dark']['file'] = 'map_germany_nrw_dark.png';
 

@@ -1467,13 +1467,16 @@ function bo_get_density_image()
 			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
 	}
 
-
 	//Antennas
 	if ($ratio && $station_id == bo_station_id() && isset($info['antennas']) && is_array($info['antennas']['bearing']))
 	{
-		$color = imagecolorallocatealpha($I, 255,255,255, 40);
+		$col1 = imagecolorallocatealpha($I, 255, 255, 255, 127);
+		$col2 = imagecolorallocatealpha($I, 255, 255, 255, 30);
+		$style = array($col1, $col1, $col1, $col1, $col2, $col2, $col2, $col2);
+		imagesetstyle($I, $style);
+		
 		$size = 0.3 * ($w + $h) / 2;
-
+		
 		foreach($info['antennas']['bearing'] as $bear)
 		{
 			list($lat, $lon) = bo_distbearing2latlong(100000, $bear, $stinfo['lat'], $stinfo['lon']);
@@ -1484,8 +1487,8 @@ function bo_get_density_image()
 			$ant_xn = $ant_x / sqrt(pow($ant_x,2) + pow($ant_y,2)) * $size;
 			$ant_yn = $ant_y / sqrt(pow($ant_x,2) + pow($ant_y,2)) * $size;
 			
-			imagedashedline($I, $StX, $StY, $StX + $ant_xn *  1, $StY + $ant_yn *  1, $color);
-			imagedashedline($I, $StX, $StY, $StX + $ant_xn * -1, $StY + $ant_yn * -1, $color);
+			imageline($I, $StX, $StY, $StX + $ant_xn *  1, $StY + $ant_yn *  1, IMG_COLOR_STYLED);
+			imageline($I, $StX, $StY, $StX + $ant_xn * -1, $StY + $ant_yn * -1, IMG_COLOR_STYLED);
 		}
 	}
 

@@ -273,6 +273,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 		{
 			foreach($own as $dist => $cnt)
 			{
+				if ($cnt < 3) //don't display ratios with low strike counts
+					continue;
+					
 				$X[$dist] = $dist * 10;
 
 				if ($all[$dist])
@@ -322,6 +325,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 		{
 			foreach($own as $bear => $cnt)
 			{
+				if ($cnt < 3) //don't display ratios with low strike counts
+					continue;
+
 				$X[$bear] = $bear * 10;
 
 				if ($all[$bear])
