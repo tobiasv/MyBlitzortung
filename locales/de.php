@@ -594,11 +594,14 @@ $_BL['de']['mybo_station_update_info'] = '
 		<p>
 		Hier hast Du die Möglichkeit Deine MyBlitzortung-Webseite mit anderen Stationen 
 		zu verknüpfen, die ebenfalls MyBlitzortung einsetzen.
+		</p>
+		
+		<p>
 		Die folgenden Dinge werden passieren wenn Du fortfährst:
 		</p>
 		
 		<ul>
-		<li>1. Deine Stations-ID, Deine Website-Adresse sowie die von Dir hinterlegten Koordinaten werden zu einem Server gesendet.
+		<li>1. Deine Stations-ID, Deine Website-Adresse sowie die von Dir hinterlegten Koordinaten werden zu <em>{LINK_HOST}</em> gesendet.
 		</li>
 		<li>2. Gleichzeitig bekommst Du eine Liste von Stationen, die dies ebenfalls getan haben zurück.
 		</li>
@@ -606,16 +609,17 @@ $_BL['de']['mybo_station_update_info'] = '
 		
 		<p>
 		Du solltest diese Daten von Zeit zu Zeit erneuern bzw. die automatische Aktualisierung aktivieren.
-		Momentan sind die verlinkten Stationen nur in der Stationstabelle auf der Statistikseite zu sehen.
 		</p>
 		
 		<p>
 		Wichtiger HINWEIS:
-		Um Dich als Teilnehmer zu authentifizieren wird mit Deinen Zugangsdaten eine Login-Kennung bei blitzortung.org abgefragt.
-		Diese wird an <em>{LINK_HOST}</em> gesendet und dort wiederrum bei blitzortung.org überprüft.
+		Um Dich als Teilnehmer zu authentifizieren, wird mit Deinen Zugangsdaten erst einmal 
+		eine Login-Kennung bei blitzortung.org abgefragt, so wie es auch automatisch beim Hohlen
+		neuer Blitzdaten geschieht.
+		Diese wird (ohne das Passwort!) an <em>{LINK_HOST}</em> gesendet und dort wiederrum bei blitzortung.org überprüft.
 		Somit ist sichergestellt, dass nur Teilnehmer diesen Mechanismus benutzen können.
 		Die Login-Kennung wird nicht gespeichert. Sie wird sofort wieder unbrauchbar gemacht.
-		Dein Passwort wird niemals an andere Webseiten außer blitzortung.org gesendet!
+		Dein Passwort selbst wird <strong>niemals an andere Webseiten</strong> außer blitzortung.org gesendet!
 		Um dieses Feature nutzen zu können, muss Deine Station in den letzten zwei Stunden Signale gesendet haben.
 		</p>';
 

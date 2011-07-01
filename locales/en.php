@@ -588,16 +588,15 @@ $_BL['en']['mybo_station_update_info'] = '
 		</p>
 		
 		<ul>
-		<li>1. Your station id and the url of this website will be send to a server.
+		<li>1. Your station id and the url of this website will be send to <em>{LINK_HOST}</em>.
 		</li>
 		<li>2. You will get all urls of the other stations that are currently in the list.
 		</li>
 		</ul>
 		
 		<p>
-		You have to update the data from time to time, so that new stations will appear
-		or use the auto-update feature.
-		Currently, you can see the linked stations only in the statistics table.
+		You have to update the data from time to time, so that new stations will appear,
+		or you can use the auto-update feature.
 		</p>
 		
 		<p>

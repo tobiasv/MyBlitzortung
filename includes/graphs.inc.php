@@ -546,10 +546,14 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 					//Strike Ratio
 					if (intval($Y[0]['astr'][$index]))
 						$Y[$data_id]['str_ratio'][$index] = $row['astr'] / intval($Y[0]['astr'][$index]) * 100;
+					else
+						$Y[$data_id]['str_ratio'][$index] = 0;
 
 					//Signal Ratio
 					if (intval($row['sig']))
 						$Y[$data_id]['sig_ratio'][$index] = $row['astr'] / $row['sig'] * 100;
+					else
+						$Y[$data_id]['sig_ratio'][$index] = 0;
 				}
 
 				//Active stations

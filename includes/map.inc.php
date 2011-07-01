@@ -657,6 +657,11 @@ function bo_show_lightning_map()
 			if (c != -1) bo_show_more();
 		}
 
+		
+<?php	
+	if (intval(BO_TRACKS_SCANTIME)) 
+	{
+?>
 		var c = bo_getcookie('bo_show_tracks');
 		if (c)
 		{
@@ -664,7 +669,10 @@ function bo_show_lightning_map()
 			document.getElementById('bo_map_opt_tracks').checked = c == -1 ? false : true;
 			if (c != -1) bo_show_more();
 		}
-		
+<?php
+	}
+?>
+
 		for (i=0;i<bo_OverlayMaps.length;i++)
 		{
 			var c = bo_getcookie('bo_show_ovl'+i);
