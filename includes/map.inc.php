@@ -42,8 +42,6 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	
 ?>
 
-	<script type="text/javascript" id="bo_script_google" src="http://maps.google.com/maps/api/js?v=3.4&sensor=false&callback=bo_gmap_init">
-	</script>
 
 	<script type="text/javascript" id="bo_script_map">
 	
@@ -155,7 +153,12 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	}
 
 
-</script>
+	</script>
+
+        <script type="text/javascript" id="bo_script_google" src="http://maps.google.com/maps/api/js?v=3.4&sensor=false&callback=bo_gmap_init">
+        </script>
+
+
 
 <?php
 
