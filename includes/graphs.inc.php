@@ -981,25 +981,25 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 	}
 
-
 	$graph->xaxis->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
 	$graph->yaxis->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
 	$graph->yaxis->SetLabelMargin(1);
 	$graph->yaxis->SetTitleMargin(35);
-	//$graph->xaxis->SetLabelAngle(45);
-
 
 	if ($graph_type == 'datlin')
 	{
-		if ($X[count($X)-1] - $X[0] > 3600 * 24 * 3)
+		if ($X[count($X)-1] - $X[0] > 3600 * 36)
 		{
 			$graph->xaxis->title->Set(_BL('day'));
 			$graph->xaxis->scale->SetDateFormat('d.m');
+			$graph->xaxis->scale->SetDateAlign(DAYADJ_1);
+			$graph->xaxis->scale->ticks->Set(3600*24,3600*6);
 		}
 		else
 		{
 			$graph->xaxis->title->Set(_BL('timeclock'));
 			$graph->xaxis->scale->SetDateFormat('H:i');
+			$graph->xaxis->scale->ticks->Set(3600 * 2,1800);
 		}
 	}
 

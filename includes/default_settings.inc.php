@@ -103,7 +103,7 @@
 @define("BO_MAP_STRIKE_POLARITY_SIZE", 5);
 
 //Calculate tracks
-//WARNING: This is currently very expermintal. It may slow down you server!
+//WARNING: This is currently very expermintal. It may slow down your server!
 @define("BO_UP_INTVL_TRACKS", 5);  //update tracks every x minutes
 @define("BO_TRACKS_SCANTIME", 0); //scan time in minutes (set to 0 to disable tracks)
 @define("BO_TRACKS_DIVISOR",  2); 
@@ -310,6 +310,8 @@
 /* Variables for Maps, Images, Densities ..                             */
 /************************************************************************/
 
+
+
 //GoogleMaps: Strike Overlays
 if (!isset($_BO['mapcfg'][0]))
 	$_BO['mapcfg'][0] = $_BO['tpl_gmap']['0-15'];
@@ -320,9 +322,6 @@ if (!isset($_BO['mapcfg'][1]))
 if (!isset($_BO['mapcfg'][2]))
 	$_BO['mapcfg'][2] = $_BO['tpl_gmap']['2-24h'];
 
-//GoogleMaps: Extra Overlays
-//if (!isset($_BO['mapovl'][0]))
-//	$_BO['mapovl'][0] = $_BO['tpl_overlay']['meteox_radar'];
 	
 /*** Image Maps ***/
 if (!isset($_BO['mapimg'][0]))
