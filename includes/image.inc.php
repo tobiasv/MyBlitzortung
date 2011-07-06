@@ -310,7 +310,7 @@ function bo_tile()
 		
 		$sql = "SELECT COUNT(time) cnt ".($only_own ? ", part " : "")."
 			FROM ".BO_DB_PREF."strikes
-			USE INDEX (time_dist)
+			USE INDEX (time)
 			WHERE 1
 				".($radius ? "AND distance < $radius" : "")."
 				AND NOT (lat < $lat1 OR lat > $lat2 OR lon < $lon1 OR lon > $lon2)
@@ -391,7 +391,7 @@ function bo_tile()
 	$deviation = array();
 	$sql = "SELECT id, time, lat, lon, deviation, polarity
 			FROM ".BO_DB_PREF."strikes
-			USE INDEX (time_dist)
+			USE INDEX (time)
 			WHERE 1
 				".($radius ? "AND distance < $radius" : "")."
 				".($only_own ? " AND part=1 " : "")."
@@ -957,7 +957,7 @@ function bo_get_map_image()
 	$color_intvl = ($time_max - $time_min) / count($c);
 	$sql = "SELECT id, time, lat, lon
 			FROM ".BO_DB_PREF."strikes
-			USE INDEX (time_dist)
+			USE INDEX (time)
 			WHERE 1
 				".($only_own ? " AND part=1 " : "")."
 				AND NOT (lat < '$latS' OR lat > '$latN' OR lon < '$lonW' OR lon > '$lonE')

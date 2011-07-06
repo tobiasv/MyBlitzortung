@@ -127,6 +127,7 @@
 @define("BO_ENABLE_DENSITIES", false); //Enables densities for guests (set the also next option to true)
 @define("BO_CALC_DENSITIES", false); //Calculates Densities 
 @define("BO_CALC_DENSITIES_CURRENT", true); //Calculates Densities for current year/month
+@define("BO_ARCHIVE_SEARCH_STRIKECOUNT", 10);
 
 /*** Graphs ***/
 @define("BO_GRAPH_ANTIALIAS", false);

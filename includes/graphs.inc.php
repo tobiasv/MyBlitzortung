@@ -33,6 +33,18 @@ function bo_graph_raw($id)
 			FROM ".BO_DB_PREF."raw
 			WHERE id='$id'";
 	$erg = bo_db($sql);
+	
+	if (!$erg->num_rows)
+	{
+		$I = imagecreate(BO_GRAPH_RAW_W,BO_GRAPH_RAW_H);
+		$color = imagecolorallocate($I, 255, 150, 150);
+		imagefill($I, 0, 0, $color);
+		imagecolortransparent($I, $color);
+		Header("Content-type: image/png");
+		Imagepng($I);
+		exit;
+	}
+	
 	$row = $erg->fetch_assoc();
 
 	$data[0] = array();
@@ -154,7 +166,7 @@ function bo_graph_raw($id)
 	exit;
 }
 
-function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 24)
+function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = null)
 {
 
 	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
@@ -162,6 +174,15 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 	session_write_close();
 
+	if (!$hours_back)
+	{
+		if ($type == 'stations')
+			$hours_back = 96;
+		else
+			$hours_back = 24;
+	}
+		
+	
 	$hours_back = intval($hours_back) ? intval($hours_back) : 24;
 	$hours_back = !bo_user_get_level() && $hours_back > 96 ? 96 : $hours_back;
 
@@ -509,8 +530,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 		if ($type == 'stations')
 		{
-			$sql_where[0] = " station_id != 0 ";
-			$sql_where[1] = " station_id != 0 AND (signalsh > 0 OR strikesh > 0) ";
+			//$sql_where[0] = " station_id != 0 ";
+			$sql_where[0] = " station_id != 0 AND (signalsh > 0 OR strikesh > 0) ";
 		}
 		else
 		{
@@ -817,6 +838,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 			$plot->SetLegend(_BL('graph_legend_stations_active'));
 			$graph->Add($plot);
 
+			/*
 			$plot=new LinePlot($Y[1]['cnt'], $X);
 			$plot->SetColor(BO_GRAPH_STAT_STA_COLOR_L3);
 			if (BO_GRAPH_STAT_STA_COLOR_F3)
@@ -835,7 +857,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 
 				$graph->yscale->SetAutoMax($max_stations + 1);
 			}
-
+			*/
+			
 			$max_stations = bo_get_conf('longtime_count_max_active_stations_sig');
 			if ($max_stations)
 			{
@@ -844,6 +867,27 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = 2
 				$sline->SetLegend(_BL('graph_legend_stations_max_active_signal'));
 				$graph->AddLine($sline);
 			}
+
+			// currently available stations
+			$sql = "SELECT COUNT(*) cnt
+					FROM ".BO_DB_PREF."stations
+					WHERE status != '-'";
+			$res = bo_db($sql);
+			$row = $res->fetch_assoc();
+			$available = $row['cnt'];
+
+			if ($available)
+			{
+				$sline  = new PlotLine(HORIZONTAL, $available, BO_GRAPH_STAT_STA_COLOR_L2, 1);
+				$sline->SetWeight(BO_GRAPH_STAT_STA_WIDTH_4);
+				$sline->SetLegend(_BL('graph_legend_stations_available'));
+				$graph->AddLine($sline);
+			}
+			
+			
+			$max = max($max_stations, $available);
+			$graph->yscale->SetAutoMax($max+1);
+			$graph->yscale->SetAutoMin($max/2);
 			
 			$graph->xaxis->title->Set(_BL('Time'));
 			$graph->yaxis->title->Set(_BL('Count'));

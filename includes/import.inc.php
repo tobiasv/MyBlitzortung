@@ -297,11 +297,14 @@ function bo_update_strikes($force = false)
 				$part = strpos($r[8], BO_USER) !== false ? 1 : 0;
 				$dist = bo_latlon2dist($lat, $lon);
 				$bear = bo_latlon2bearing($lat, $lon);
+				$lat2 = floor($lat);
+				$lon2 = floor($lon/180 * 128);
 
 				$sql = "
 							time='$date $time',
 							time_ns='$time_ns',
 							lat='$lat',lon='$lon',
+							lat2='$lat2',lon2='$lon2',
 							distance='$dist',
 							bearing='$bear',
 							deviation='$deviation',
@@ -629,10 +632,15 @@ function bo_update_stations($force = false)
 			$stTimeMs 	= substr($cols[7], 25);
 			$stStatus 	= $cols[8];
 			$stDist 	= bo_latlon2dist($stLat, $stLon);
-
-			$Count[$stId]['sig'] = $cols[10];
-			$Count[$stId]['active'] = $stStatus == 'A';
-
+			$stSignals	= (int)$cols[10];
+			
+			$Count[$stId]['sig'] = $stSignals;
+			$Count[$stId]['active'] = $stStatus == 'A'; //GPS is (or was) active
+			$Count[$stId]['available'] = $stStatus != '-'; //has sent some data some time ago
+			
+			if ($stStatus != '-' && $stSignals == 0) //Special offline status
+				$stStatus = 'O';
+			
 			$sql = " 	id='$stId',
 						user='$stUser',
 						city='$stCity',
@@ -682,23 +690,26 @@ function bo_update_stations($force = false)
 		
 		$active_stations = 0;
 		$active_sig_stations = 0;
+		$active_avail_stations = 0;
 		foreach($Count as $id => $data)
 		{
 			if ($only_own && $only_own != $id)
 				continue;
 			
-			if ($id && $data['active']) 
+			if ($id && $data['sig'])
 			{
 				bo_db("INSERT INTO ".BO_DB_PREF."stations_stat
 					SET station_id='$id', time='$datetime', signalsh='".intval($data['sig'])."', strikesh='".intval($data['strikes'])."'");
 			}
 
-			if ($data['active'])
+			if ($data['active']) //GPS is/was active
 				$active_stations++;
 
-			if ($data['sig'])
+			if ($data['sig']) //Station is sending (really active)
 				$active_sig_stations++;
 
+			if ($data['available']) //Station is available (no dummy entry, has sent some data some time ago)
+				$active_avail_stations++;
 		}
 
 		//Update whole strike count for dummy station "0"
@@ -719,6 +730,10 @@ function bo_update_stations($force = false)
 		//max active stations (sending signals) ever
 		$max = bo_get_conf('longtime_count_max_active_stations_sig');
 		bo_set_conf('longtime_count_max_active_stations_sig', max($max, $active_sig_stations));
+
+		//max available stations (had sent some signales, no matter when)
+		$max = bo_get_conf('longtime_count_max_avail_stations');
+		bo_set_conf('longtime_count_max_avail_stations', max($max, $active_avail_stations));
 
 		//max signals/h
 		$max = bo_get_conf('longtime_max_signalsh');
@@ -742,7 +757,7 @@ function bo_update_stations($force = false)
 
 		//Activity/inactivity counter for own station
 		$time_interval = $last ? time() - $last : 0;
-		if ($Count[$own_id]['active'])
+		if ($Count[$own_id]['sig'])
 		{
 			bo_set_conf('station_last_active', time());
 			$time_interval += bo_get_conf('longtime_station_active_time');

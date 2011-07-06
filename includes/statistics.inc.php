@@ -180,7 +180,6 @@ function bo_show_statistics_station()
 	$time = strtotime($row['time'].' UTC');
 
 	$act_time = bo_get_conf('station_last_active');
-	$act_time = bo_get_conf('station_last_active');
 	$inact_time = bo_get_conf('station_last_inactive');
 	$active = $act_time > $inact_time;
 
@@ -262,6 +261,14 @@ function bo_show_statistics_network()
 	$strikesh = $row['strikesh'];
 	$time = strtotime($row['time'].' UTC');
 
+	// currently available stations
+	$sql = "SELECT COUNT(*) cnt
+			FROM ".BO_DB_PREF."stations
+			WHERE status != '-'";
+	$res = bo_db($sql);
+	$row = $res->fetch_assoc();
+	$available = $row['cnt'];
+	
 	$last_update = round((time()-$time)/60);
 
 	$whole_sig_count = 0;
@@ -361,7 +368,7 @@ function bo_show_statistics_network()
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before')."$last_update ".($last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).(' ('._BL('available_of').' '.number_format($available, 0, _BL('.'), _BL(',')).' '._BL('available_stations').')').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikesh, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.number_format($avg_part, 1, _BL('.'), _BL(',')).'</span>';
@@ -504,6 +511,7 @@ function bo_show_statistics_longtime()
 	$max_str_dayrad_all	= unserialize(bo_get_conf('longtime_max_strikes_day_all_rad'));
 	$max_active 		= (double)bo_get_conf('longtime_count_max_active_stations');
 	$max_active_sig		= (double)bo_get_conf('longtime_count_max_active_stations_sig');
+	$max_available		= (double)bo_get_conf('longtime_count_max_avail_stations');
 	$max_part			= (double)bo_get_conf('longtime_max_participants');
 
 	//MyBO
@@ -557,8 +565,8 @@ function bo_show_statistics_longtime()
 	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'.number_format($max_dist_all, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'.number_format($max_sig_all, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max active stations').': </span><span class="bo_value">'.number_format($max_active, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max active stations (sending signals)').': </span><span class="bo_value">'.number_format($max_active_sig, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max active stations').': </span><span class="bo_value">'.number_format($max_active_sig, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max available stations').': </span><span class="bo_value">'.number_format($max_available, 0, _BL('.'), _BL(',')).'</span>';
 	echo '</ul>';
 
 	echo '<a name="longtime_network"></a>';

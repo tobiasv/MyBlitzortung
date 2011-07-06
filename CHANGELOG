@@ -3,6 +3,19 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.5.2 (2011-07-06)
+---------------------------
+IMPORTANT: You have to update the database (log in), otherwise strike import won't work anymore
+- improved: strike search (faster, unlimitied for users with permission)
+- improved: behaviour on active station count changed ("available stations" added, offline = no signals)
+- fix: dynamic map not working on very fast internet connections (race condition)
+- added wetterinfo overlay
+
+Version 0.5.1c (2011-06-27)
+---------------------------
+- fixes
+- dark map of bavaria
+
 Version 0.5.1b (2011-06-24)
 ---------------------------
 - fix: cookie issue on dynamic map (map not displayed on second visit)

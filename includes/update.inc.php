@@ -24,7 +24,7 @@
 function bo_check_for_update()
 {
 	
-	$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301, '0.4.8' => 408);
+	$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301, '0.4.8' => 408, '0.5.2' => 502);
 	$cur_version = bo_get_conf('version');
 
 	preg_match('/([0-9]+)(\.([0-9]+)(\.([0-9]+))?)?/', $cur_version, $r);
@@ -32,8 +32,10 @@ function bo_check_for_update()
 
 	if ($cur_version_num < max($updates) && $_GET['bo_action'] != 'do_update')
 	{
-		echo _BL('Database version changed!');
+		echo '<h4>'._BL('Database version changed!').'</h4>';
+		echo '<p>';
 		echo ' <a href="'.bo_insert_url('bo_action', 'do_update').'">'._BL('Click to update').'</a>';
+		echo '</p>';
 		bo_copyright_footer();
 		return true;
 	}
@@ -119,9 +121,39 @@ function bo_check_for_update()
 				
 				}
 				break;
+			
+			case '0.5.2':
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP INDEX `time_dist`';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD INDEX `time` (`time`)';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `lat2` TINYINT NOT NULL AFTER `lon`, ADD `lon2` TINYINT NOT NULL AFTER `lat2`';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+
+				$sql = 'UPDATE `'.BO_DB_PREF.'strikes` SET lat2=FLOOR(lat), lon2=FLOOR(lon/180 * 128)';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD INDEX `latlon2` (`lat2`,`lon2`)';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+
 		}
 		
 		echo '</ul>';
+		
+		flush();
 		
 		if ($ok)
 		{

@@ -411,7 +411,9 @@ function bo_show_archive_search()
 {
 	global $_BO;
 	$radius = $_BO['radius'] * 1000;
-
+	$max_count = intval(BO_ARCHIVE_SEARCH_STRIKECOUNT);
+	$select_count = $max_count;
+	
 	if ($_GET['bo_lat'])
 	{
 		$lat = (double)$_GET['bo_lat'];
@@ -420,6 +422,12 @@ function bo_show_archive_search()
 		$map_lon = (double)$_GET['bo_map_lon'];
 		$zoom = (int)$_GET['bo_map_zoom'];
 		$delta_dist = (int)$_GET['bo_dist'];
+		
+		if ( (bo_user_get_level() & BO_PERM_NOLIMIT) && (int)$_GET['bo_count'])
+		{
+			$select_count = (int)$_GET['bo_count'];
+		}
+		
 	}
 	else
 	{
@@ -429,30 +437,35 @@ function bo_show_archive_search()
 		$delta_dist = 10000;
 	}
 
-	$getit = isset($_GET['ok']);
+	$getit = isset($_GET['bo_ok']);
 
 	if ($radius && $delta_dist > $radius)
 		$delta_dist = $radius;
 
 	echo '<div id="bo_archive">';
 
+	echo '<p class="bo_stat_description" id="bo_archive_search_info">';
+	echo strtr(_BL('archive_search_info'), array('{COUNT}' => (bo_user_get_level() & BO_PERM_NOLIMIT) ? '' : $max_count));
+	echo '</p>';
+	
 	echo '<h4>'._BL('Map').'</h4>';
 
 	echo '<div id="bo_gmap" class="bo_map_archive"></div>';
-
-
+	
 	/*** Get data from Database ***/
 
 	if ($getit)
 	{
-
-		//distance for faster search (uses database index)
-		$dist = bo_latlon2dist($lat, $lon);
-
 		//max and min latitude for strikes
 		list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($delta_dist * sqrt(2), 225, $lat, $lon);
 		list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($delta_dist * sqrt(2), 45, $lat, $lon);
 
+		//for database index
+		$lat2min = floor($str_lat_min);
+		$lon2min = floor($str_lon_min/180 * 128);
+		$lat2max = ceil($str_lat_max);
+		$lon2max = ceil($str_lon_max/180 * 128);
+		
 		$time_min = 0;
 		$time_max = 0;
 		$count = 0;
@@ -462,11 +475,11 @@ function bo_show_archive_search()
 						s.current current, s.deviation deviation, s.current current, s.polarity polarity, s.part part, s.raw_id raw_id
 				FROM ".BO_DB_PREF."strikes s
 				WHERE 1
-					AND distance BETWEEN '".($dist - $delta_dist)."' AND '".($dist + $delta_dist)."'
 					".($radius ? "AND distance < $radius" : "")."
 					AND NOT (lat < $str_lat_min OR lat > $str_lat_max OR lon < $str_lon_min OR lon > $str_lon_max)
+					AND NOT (lat2 < $lat2min OR lat2 > $lat2max OR lon2 < $lon2min OR lon2 > $lon2max)
 				ORDER BY s.time DESC
-				LIMIT 100";
+				LIMIT ".intval($select_count * 5);
 
 		$res = bo_db($sql);
 		while($row = $res->fetch_assoc())
@@ -475,7 +488,7 @@ function bo_show_archive_search()
 			if (bo_latlon2dist($lat, $lon, $row['lat'], $row['lon']) > $delta_dist)
 				continue;
 
-			if ($count >= 10)
+			if ($count >= $select_count)
 			{
 				$more_found = true;
 				break;
@@ -559,13 +572,18 @@ function bo_show_archive_search()
 
 	echo '<span class="bo_form_descr">'._BL('Distance').' '.'('._BL('unit_meters').'):</span>';
 	echo '<input type="text" name="bo_dist" value="'._BC($delta_dist).'" id="bo_archive_dist" class="bo_form_text bo_archive_dist">';
-
-
+		
+	if (bo_user_get_level() & BO_PERM_NOLIMIT)
+	{
+		echo '<span class="bo_form_descr">'._BL('Count').' :</span>';
+		echo '<input type="text" name="bo_count" value="'._BC($select_count).'" id="bo_archive_count" class="bo_form_text bo_archive_count">';
+	}
+	
 	echo '<input type="hidden" name="bo_map_zoom" id="bo_map_zoom">';
 	echo '<input type="hidden" name="bo_map_lat" id="bo_map_lat">';
 	echo '<input type="hidden" name="bo_map_lon" id="bo_map_lon">';
 
-	echo '<input type="submit" name="ok" value="'._BL('button_search').'" id="bo_archive_submit" class="bo_form_submit">';
+	echo '<input type="submit" name="bo_ok" value="'._BL('button_search').'" id="bo_archive_submit" class="bo_form_submit">';
 
 	echo '</fieldset>';
 
