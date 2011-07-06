@@ -177,7 +177,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	if (!$hours_back)
 	{
 		if ($type == 'stations')
-			$hours_back = 96;
+			$hours_back = 72 + (int)date('H');
 		else
 			$hours_back = 24;
 	}
