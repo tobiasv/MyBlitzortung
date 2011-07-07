@@ -170,7 +170,7 @@ function bo_show_statistics_station()
 	$tmp = bo_station_info($station_id);
 	$city = _BC($tmp['city']);
 	
-	$row = bo_db("SELECT signalsh, strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
+	$row = bo_db("SELECT signalsh, strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id')")->fetch_assoc();
 	$strikesh_own = $row['strikesh'];
 	$signalsh_own = $row['signalsh'];
 	$time_own = strtotime($row['time'].' UTC');
@@ -183,7 +183,8 @@ function bo_show_statistics_station()
 	$inact_time = bo_get_conf('station_last_inactive');
 	$active = $act_time > $inact_time;
 
-	$last_update = round((time()-$time_own)/60);
+	$last_update = round((time()-$time)/60);
+	$last_active = round((time()-$time_own)/60);
 
 	echo '<h3>'.strtr(_BL('h3_stat_station'), array('{STATION_CITY}' => $city)).'</h3>';
 	
@@ -196,6 +197,10 @@ function bo_show_statistics_station()
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Station active').': </span><span class="bo_value">'.($active ? _BL('yes') : _BL('no')).'</span>';
+
+	if (!$active)
+		echo '<li><span class="bo_descr">'._BL('Last active').': </span><span class="bo_value">'._BL('_before')."$last_active ".($last_active == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
+
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before')."$last_update ".($last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.number_format($strikesh_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.number_format($signalsh_own, 0, _BL('.'), _BL(',')).'</span>';

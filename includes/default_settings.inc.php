@@ -168,6 +168,8 @@
 @define("BO_GRAPH_STAT_COLOR_LEGEND_FILL", '#fff');
 @define("BO_GRAPH_STAT_COLOR_LEGEND_TEXT", '#666');
 @define("BO_GRAPH_STAT_COLOR_LEGEND_FRAME", '#fff');
+@define("BO_GRAPH_STAT_HOURS_BACK", 24);
+@define("BO_GRAPH_STAT_HOURS_BACK_STATIONS", 72);
 
 //Statistics-Graph: Strikes (Month, Year)
 @define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_L1", '#00f@0.9');

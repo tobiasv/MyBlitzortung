@@ -637,3 +637,4 @@ $_BL['en']['Max available stations'] = 'Max available stations';
 $_BL['en']['graph_legend_stations_available'] = 'Available stations';
 $_BL['en']['available_of'] = 'of';
 $_BL['en']['available_stations'] = 'available stations';
+$_BL['en']['Last active'] = 'Last active';

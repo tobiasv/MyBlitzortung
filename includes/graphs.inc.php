@@ -177,9 +177,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	if (!$hours_back)
 	{
 		if ($type == 'stations')
-			$hours_back = 72 + (int)date('H');
+			$hours_back = intval(BO_GRAPH_STAT_HOURS_BACK_STATIONS) + (int)date('H');
 		else
-			$hours_back = 24;
+			$hours_back = intval(BO_GRAPH_STAT_HOURS_BACK);
 	}
 		
 	
@@ -547,7 +547,11 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$sql = "SELECT time, AVG(signalsh) sig, AVG(strikesh) astr, MAX(strikesh) mstr, COUNT(time) / COUNT(DISTINCT time) cnt
 					FROM ".BO_DB_PREF."stations_stat
 					WHERE time BETWEEN '$date_start' AND '$date_end' AND $sqlw
-					GROUP BY DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
+					GROUP BY DAYOFMONTH(time)";
+					
+			if ($hours_back < 7 * 24)
+					$sql .= ", HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
+
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())
 			{
@@ -887,7 +891,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 			$max = max($max_stations, $available);
 			$graph->yscale->SetAutoMax($max+1);
-			$graph->yscale->SetAutoMin($max/2);
+			
+			if ($max/2 < min($Y[0]['cnt']))
+				$graph->yscale->SetAutoMin($max/2);
 			
 			$graph->xaxis->title->Set(_BL('Time'));
 			$graph->yaxis->title->Set(_BL('Count'));
