@@ -23,29 +23,39 @@
 
 function bo_check_for_update()
 {
-	
-	$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301, '0.4.8' => 408, '0.5.2' => 502);
-	$cur_version = bo_get_conf('version');
-
-	preg_match('/([0-9]+)(\.([0-9]+)(\.([0-9]+))?)?/', $cur_version, $r);
-	$cur_version_num = $r[1] * 10000 + $r[3] * 100 + $r[5];
-
-	if ($cur_version_num < max($updates) && $_GET['bo_action'] != 'do_update')
-	{
-		echo '<h4>'._BL('Database version changed!').'</h4>';
-		echo '<p>';
-		echo ' <a href="'.bo_insert_url('bo_action', 'do_update').'">'._BL('Click to update').'</a>';
-		echo '</p>';
-		bo_copyright_footer();
-		return true;
-	}
-	
 	$updated = false;
+	$db_update = false;
+
+	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
+	{
+		$cur_version = $_GET['bo_update_from'];
+		$cur_version_num = bo_version2number($_GET['bo_update_from']);
+		$updates = array($_GET['bo_update_to'] => bo_version2number($_GET['bo_update_to']));
+		$updated = true;
+	}
+	else
+	{
+		$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301, '0.4.8' => 408, '0.5.2' => 502);
+		$cur_version = bo_get_conf('version');
+		$cur_version_num = bo_version2number($cur_version);
+		
+		if ($cur_version_num < max($updates) && $_GET['bo_action'] != 'do_update')
+		{
+			echo '<h4>'._BL('Database version changed!').'</h4>';
+			echo '<p>';
+			echo ' <a href="'.bo_insert_url('bo_action', 'do_update').'">'._BL('Click to update').'</a>';
+			echo '</p>';
+			bo_copyright_footer();
+			return true;
+		}
+	}
 	
 	foreach($updates as $new_version => $number)
 	{
 		if ($cur_version_num >= $number)
 			continue;
+		
+		$db_update = true;
 		
 		echo '<h4>'._BL('Updating version').' '.$cur_version.' -&gt; '.$new_version.'</h4>';
 		echo '<ul>';
@@ -140,8 +150,8 @@ function bo_check_for_update()
 				flush();
 
 				$sql = 'UPDATE `'.BO_DB_PREF.'strikes` SET lat2=FLOOR(lat), lon2=FLOOR(lon/180 * 128)';
-				$ok = bo_db($sql, false);
-				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				$ok = bo_db($sql);
+				echo '<li><em>'.$sql.'</em>: <b>'.$ok.' rows affected</b></li>';
 				flush();
 				
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD INDEX `latlon2` (`lat2`,`lon2`)';
@@ -169,7 +179,7 @@ function bo_check_for_update()
 		echo '<h4>'._BL('Update done!').'</h4>';
 	}
 	
-	if ($cur_version != BO_VER)
+	if ($cur_version != BO_VER && (!$db_update || $updated))
 	{
 		bo_set_conf('version', BO_VER);
 		echo '<h4>'._BL('Update-Info: Setting version number to').' '.BO_VER.'</h4>';
@@ -177,6 +187,12 @@ function bo_check_for_update()
 	
 	return $ok;
 	
+}
+
+function bo_version2number($version)
+{
+	preg_match('/([0-9]+)(\.([0-9]+)(\.([0-9]+))?)?/', $version, $r);
+	return $r[1] * 10000 + $r[3] * 100 + $r[5];
 }
 
 

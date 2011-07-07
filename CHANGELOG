@@ -3,6 +3,12 @@
    MyBlitzortung Changelog
 *****************************
 
+Version xxx
+-----------
+- new: added default graph times (BO_GRAPH_STAT_HOURS_BACK, BO_GRAPH_STAT_HOURS_BACK_STATIONS)
+- fix: wrong time on "station statistics" displayed when station is offline
+- fix: updating
+
 Version 0.5.2 (2011-07-06)
 ---------------------------
 IMPORTANT: You have to update the database (log in), otherwise strike import won't work anymore
