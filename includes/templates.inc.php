@@ -289,6 +289,26 @@ $_BO['tpl_imgmap']['germany_nrw']['density_darken'] = 40;
 $_BO['tpl_imgmap']['germany_nrw_dark'] = $_BO['tpl_imgmap']['germany_nrw'];
 $_BO['tpl_imgmap']['germany_nrw_dark']['file'] = 'map_germany_nrw_dark.png';
 
+//Switzerland
+$_BO['tpl_imgmap']['switzerland']['name'] = 'Switzerland';
+$_BO['tpl_imgmap']['switzerland']['menu'] = true;
+$_BO['tpl_imgmap']['switzerland']['archive'] = true;
+$_BO['tpl_imgmap']['switzerland']['file'] = 'map_switzerland.png';
+$_BO['tpl_imgmap']['switzerland']['coord'] = array(48.7, 11, 44.85, 5.4); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['switzerland']['trange'] = 2; //hours!
+$_BO['tpl_imgmap']['switzerland']['upd_intv'] = 5; //minutes
+$_BO['tpl_imgmap']['switzerland']['textcolor'] = array(255,255,255);
+$_BO['tpl_imgmap']['switzerland']['textsize'] = 5;
+$_BO['tpl_imgmap']['switzerland']['point_type'] = 2;
+$_BO['tpl_imgmap']['switzerland']['point_size'] = 2;
+$_BO['tpl_imgmap']['switzerland']['legend'] = array(5, 100, 80, 4, 4, 1);
+$_BO['tpl_imgmap']['switzerland']['col'] = $_BO['tpl_color']['standard'];
+$_BO['tpl_imgmap']['switzerland']['show_station'] = array(5, 155,80,155,true);
+$_BO['tpl_imgmap']['switzerland']['density'] = true;
+$_BO['tpl_imgmap']['switzerland']['density_blocksize'] = 4;
+$_BO['tpl_imgmap']['switzerland']['density_colors'] = $_BO['tpl_density_colors'];
+$_BO['tpl_imgmap']['switzerland']['density_darken'] = 10;
+
 
 
 /**************************************/

@@ -157,6 +157,7 @@ $_BL['de']['Participants'] = 'Teilnehmer';
 $_BL['de']['Europe'] = 'Europa';
 $_BL['de']['Germany'] = 'Deutschland';
 $_BL['de']['Bavaria'] = 'Bayern';
+$_BL['de']['Switzerland'] = 'Schweiz';
 
 /*************************************************************/
 /* Main Menu (Standalone)                                    */

@@ -3,7 +3,7 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.5.3 (2011-07-xx)
+Version 0.5.3 (2011-07-13)
 ---------------------------
 - new: added default graph times (BO_GRAPH_STAT_HOURS_BACK, BO_GRAPH_STAT_HOURS_BACK_STATIONS)
 - new: search strike by date/time-range for users with permission
@@ -41,7 +41,7 @@ Version 0.5.1 (2011-06-23)
 - new: antenna bearing on ratio map
 - new: show mean GPS deviation
 - new: maximum strike per tile setting
-- added timout in track detection to prevent php-failure
+- added timeout in track detection to prevent php-failure
 
 Version 0.5 (2011-06-19)
 --------------------------
