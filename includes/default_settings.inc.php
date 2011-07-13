@@ -133,6 +133,9 @@
 //Mark stations offline after specified time with no signals
 @define("BO_STATION_OFFLINE_HOURS", 24);
 
+//Images
+@define("BO_IMAGE_PALETTE_COLORS", 0);
+
 /*** Graphs ***/
 @define("BO_GRAPH_ANTIALIAS", false);
 

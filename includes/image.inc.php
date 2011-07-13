@@ -147,7 +147,8 @@ function bo_tile()
 	//Headers
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
-
+	header("Content-Disposition: inline; filename=\"MyBlitzortungTile.png\"");
+	
 	if ($caching)
 	{
 		header("Pragma: ");
@@ -806,6 +807,7 @@ function bo_get_map_image()
 		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");
 		header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
 		header("Cache-Control: public, max-age=".$age);
+		header("Content-Disposition: inline; filename=\"MyBlitzortungMap.png\"");
 		
 		readfile(BO_DIR.'images/'.$file);
 		exit;
@@ -893,6 +895,7 @@ function bo_get_map_image()
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
 	header("Cache-Control: public, max-age=".($expire - time()));
+	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.png\"");
 
 	//Caching
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
@@ -1167,6 +1170,7 @@ function bo_get_density_image()
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
 	header("Cache-Control: public, max-age=".($expire - time()));
+	header("Content-Disposition: inline; filename=\"MyBlitzortungDensity.png\"");
 
 	//Caching
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
@@ -1617,7 +1621,8 @@ function bo_get_density_image()
 		$text = _BL('Blitzortung.org', true);
 	imagestring($I, $fontsize, 4, $h - 9 - $fontsize, $text, $text_col);
 
-	
+	bo_image_reduce_colors($I);
+
 	header("Content-Type: image/png");
 	if ($caching)
 	{
@@ -1628,7 +1633,7 @@ function bo_get_density_image()
 				mkdir($dir, 0777, true);
 		}
 
-		$ok = @imagepng($I, $cache_file);
+		$ok = @imagepng($I, $cache_file, 9, PNG_ALL_FILTERS);
 		
 		if (!$ok)
 			bo_image_cache_error($w, $h);
@@ -1636,7 +1641,7 @@ function bo_get_density_image()
 		readfile($cache_file);
 	}
 	else
-		imagepng($I);
+		imagepng($I, null, 9, PNG_ALL_FILTERS);
 
 	exit;
 	
@@ -1770,4 +1775,28 @@ function bo_value2color($value, &$colors)
 }
 
 
+function bo_image_reduce_colors(&$I)
+{
+	if ($colors = intval(BO_IMAGE_PALETTE_COLORS))
+	{
+		if (imagecolorstotal($I) && imagecolorstotal($I) <= 256)
+			return;
+
+		if ($colors)
+		{
+			if (function_exists('imagecolormatch'))
+			{
+				$width = imagesx($I);
+				$height = imagesy($I);
+				$colors_handle = ImageCreateTrueColor($width, $height);
+				ImageCopyMerge($colors_handle, $I, 0, 0, 0, 0, $width, $height, 100 );
+				ImageTrueColorToPalette($I, false, $colors);
+				ImageColorMatch($colors_handle, $I);
+				ImageDestroy($colors_handle);
+			}
+			else
+				imagetruecolortopalette($I, false, $colors);
+		}
+	}
+}
 ?>
