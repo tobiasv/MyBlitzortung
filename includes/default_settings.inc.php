@@ -67,6 +67,7 @@
 //Google Map: General settings
 @define('BO_MAP_DISABLE', false);
 @define("BO_DEFAULT_ZOOM", 7);        // default zoom level
+@define("BO_DEFAULT_ZOOM_ARCHIVE", 10);        // default zoom level for archive
 @define("BO_MAX_ZOOM_IN", 15);        // max. zoom level, even in the area of you station
 @define("BO_MIN_ZOOM_OUT", 4);        // minimal zoom level
 @define("BO_DEFAULT_MAP", 'TERRAIN'); 
@@ -128,6 +129,9 @@
 @define("BO_CALC_DENSITIES", false); //Calculates Densities 
 @define("BO_CALC_DENSITIES_CURRENT", true); //Calculates Densities for current year/month
 @define("BO_ARCHIVE_SEARCH_STRIKECOUNT", 10);
+
+//Mark stations offline after specified time with no signals
+@define("BO_STATION_OFFLINE_HOURS", 24);
 
 /*** Graphs ***/
 @define("BO_GRAPH_ANTIALIAS", false);

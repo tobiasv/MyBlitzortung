@@ -407,8 +407,17 @@ font-size: 11px;
 text-align:center;
 margin-bottom: 2px;
 }
+
 #myblitzortung #bo_arch_maps #bo_arch_strikes_select_map {
 margin-right: 20px;
+}
+
+#myblitzortung input#bo_archive_time_from, #myblitzortung input#bo_archive_time_to {
+width: 130px;
+}
+
+#myblitzortung p.bo_enter_time_hint {
+width: 550px;
 }
 
 /*** Archive densities ***/
@@ -421,6 +430,7 @@ font-size: 13px;
 }
 #myblitzortung #bo_dens_maps select {
 margin-right: 20px;
+max-width: 180px;
 }
 
 #myblitzortung #bo_archive_density_submit {
@@ -494,6 +504,7 @@ text-decoration: none;
 #myblitzortung .bo_form_descr {
 font-weight: bold;
 color: #666;
+white-space:nowrap;
 }
 
 #myblitzortung .bo_my_logo {

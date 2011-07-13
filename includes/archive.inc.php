@@ -426,6 +426,19 @@ function bo_show_archive_search()
 		if ( (bo_user_get_level() & BO_PERM_NOLIMIT) && (int)$_GET['bo_count'])
 		{
 			$select_count = (int)$_GET['bo_count'];
+			$time_from = trim($_GET['bo_time_from']);
+			$time_to = trim($_GET['bo_time_to']);
+
+			if (preg_match('/([0-9]{2,4})(-([0-9]{2}))?(-([0-9]{2}))? *([0-9]{2})?(:([0-9]{2}))?(:([0-9]{2}))?/', $time_from, $r))
+				$utime_from = mktime($r[6], $r[8], $r[10], $r[3], $r[5], $r[1]);
+			else
+				$time_from = '';
+				
+			if (preg_match('/([0-9]{2,4})(-([0-9]{2}))?(-([0-9]{2}))? *([0-9]{2})?(:([0-9]{2}))?(:([0-9]{2}))?/', $time_to, $r))
+				$utime_to = mktime($r[6], $r[8], $r[10], $r[3], $r[5], $r[1]);
+			else
+				$time_to = '';
+				
 		}
 		
 	}
@@ -433,7 +446,7 @@ function bo_show_archive_search()
 	{
 		$map_lat = $lat = BO_LAT;
 		$map_lon = $lon = BO_LON;
-		$zoom = BO_DEFAULT_ZOOM;
+		$zoom = BO_DEFAULT_ZOOM_ARCHIVE;
 		$delta_dist = 10000;
 	}
 
@@ -471,6 +484,15 @@ function bo_show_archive_search()
 		$count = 0;
 		$text = '';
 		$more_found = false;
+		
+		$sql_time = '';
+		
+		if ($utime_from)
+			$sql_time .= " AND s.time >= '".gmdate('Y-m-d H:i:s', $utime_from)."' ";
+
+		if ($utime_to)
+			$sql_time .= " AND s.time <= '".gmdate('Y-m-d H:i:s', $utime_to)."' ";
+			
 		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
 						s.current current, s.deviation deviation, s.current current, s.polarity polarity, s.part part, s.raw_id raw_id
 				FROM ".BO_DB_PREF."strikes s
@@ -478,6 +500,7 @@ function bo_show_archive_search()
 					".($radius ? "AND distance < $radius" : "")."
 					AND NOT (lat < $str_lat_min OR lat > $str_lat_max OR lon < $str_lon_min OR lon > $str_lon_max)
 					AND NOT (lat2 < $lat2min OR lat2 > $lat2max OR lon2 < $lon2min OR lon2 > $lon2max)
+					$sql_time
 				ORDER BY s.time DESC
 				LIMIT ".intval($select_count * 5);
 
@@ -530,6 +553,19 @@ function bo_show_archive_search()
 		echo '<h4>'._BL('Result').'</h4>';
 		echo '<ul>';
 
+		if ($utime_from || $utime_to)
+		{
+			echo '<li><span class="bo_descr">'._BL('Time range').': </span> ';
+			
+			if ($utime_from)
+				echo _BL('time_from').' '.date(_BL('_datetime'), $utime_from).' ';
+				
+			if ($utime_to)
+				echo _BL('time_to').' '.date(_BL('_datetime'), $utime_to);
+			
+			echo '</li>';
+		}
+		
 		if ($radius && $dist > $radius)
 		{
 			echo '<li>'._BL('You have to place the pointer inside the red circle!').'</li>';
@@ -575,8 +611,18 @@ function bo_show_archive_search()
 		
 	if (bo_user_get_level() & BO_PERM_NOLIMIT)
 	{
-		echo '<span class="bo_form_descr">'._BL('Count').' :</span>';
+		echo '<span class="bo_form_descr">'._BL('Count').':';
 		echo '<input type="text" name="bo_count" value="'._BC($select_count).'" id="bo_archive_count" class="bo_form_text bo_archive_count">';
+		echo '</span>';
+		
+		echo '<span class="bo_form_descr">'._BL('Min time').':';
+		echo '<input type="text" name="bo_time_from" value="'._BC($time_from).'" id="bo_archive_time_from" class="bo_form_text bo_archive_time_from">';
+		echo '</span>';
+		
+		echo '<span class="bo_form_descr">'._BL('Max time').':';
+		echo '<input type="text" name="bo_time_to" value="'._BC($time_to).'" id="bo_archive_time_to" class="bo_form_text bo_archive_time_to">';
+		echo '</span>';
+		
 	}
 	
 	echo '<input type="hidden" name="bo_map_zoom" id="bo_map_zoom">';
@@ -587,6 +633,11 @@ function bo_show_archive_search()
 
 	echo '</fieldset>';
 
+	if (bo_user_get_level() & BO_PERM_NOLIMIT)
+	{
+		echo '<p class="bo_enter_time_hint">'._BL('enter_time_hint').'</p>';
+	}
+	
 	echo '</form>';
 
 	echo '</div>';

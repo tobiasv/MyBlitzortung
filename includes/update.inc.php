@@ -26,18 +26,20 @@ function bo_check_for_update()
 	$updated = false;
 	$db_update = false;
 
+	$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301, '0.4.8' => 408, '0.5.2' => 502);
+
 	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
 	{
 		$cur_version = $_GET['bo_update_from'];
 		$cur_version_num = bo_version2number($_GET['bo_update_from']);
-		$updates = array($_GET['bo_update_to'] => bo_version2number($_GET['bo_update_to']));
+		$bo_version = $_GET['bo_update_to'];
 		$updated = true;
 	}
 	else
 	{
-		$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301, '0.4.8' => 408, '0.5.2' => 502);
 		$cur_version = bo_get_conf('version');
 		$cur_version_num = bo_version2number($cur_version);
+		$bo_version = BO_VER;
 		
 		if ($cur_version_num < max($updates) && $_GET['bo_action'] != 'do_update')
 		{
@@ -179,10 +181,10 @@ function bo_check_for_update()
 		echo '<h4>'._BL('Update done!').'</h4>';
 	}
 	
-	if ($cur_version != BO_VER && (!$db_update || $updated))
+	if ($cur_version != $bo_version && (!$db_update || $updated))
 	{
-		bo_set_conf('version', BO_VER);
-		echo '<h4>'._BL('Update-Info: Setting version number to').' '.BO_VER.'</h4>';
+		bo_set_conf('version', $bo_version);
+		echo '<h4>'._BL('Update-Info: Setting version number to').' '.$bo_version.'</h4>';
 	}
 	
 	return $ok;

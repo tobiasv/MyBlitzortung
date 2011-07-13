@@ -658,3 +658,10 @@ $_BL['de']['graph_legend_stations_available'] = 'Verfügbare Stationen';
 $_BL['de']['available_of'] = 'von';
 $_BL['de']['available_stations'] = 'verfügbaren Stationen';
 $_BL['de']['Last active'] = 'Zuletzt aktiv';
+$_BL['de']['Min time'] = 'Min Zeit';
+$_BL['de']['Max time'] = 'Max Zeit';
+$_BL['de']['enter_time_hint'] = 'Zeitangaben im Format "JJJJ-MM-TT HH:MM:SS", wobei kleinere Zeiteinheiten auch weggelassen werden können, z.B. "JJJJ-MM".';
+$_BL['de']['Time range'] = 'Zeitbereich';
+$_BL['de']['time_from'] = 'von';
+$_BL['de']['time_to'] = 'bis';
+

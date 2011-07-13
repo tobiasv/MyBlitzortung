@@ -638,8 +638,10 @@ function bo_update_stations($force = false)
 			$Count[$stId]['active'] = $stStatus == 'A'; //GPS is (or was) active
 			$Count[$stId]['available'] = $stStatus != '-'; //has sent some data some time ago
 			
-			if ($stStatus != '-' && $stSignals == 0) //Special offline status
-				$stStatus = 'O';
+			//mark Offline?
+			$stTimeU = strtotime($stTime);
+			if ($stStatus != '-' && $stSignals == 0 && time() - $stTime > intval(BO_STATION_OFFLINE_HOURS) * 3600)
+				$stStatus = 'O';  //Special offline status
 			
 			$sql = " 	id='$stId',
 						user='$stUser',
@@ -1163,26 +1165,26 @@ function bo_update_densities($max_time)
 	$ranges = array();
 	
 	//last month
-	$ranges[] = array(mktime(0,0,0,date('m')-1,1,date('Y')), mktime(0,0,0,date('m'),0,date('Y')), 0);
+	$ranges[] = array(gmmktime(0,0,0,gmdate('m')-1,1,gmdate('Y')), gmmktime(0,0,0,date('m'),0,gmdate('Y')), 0);
 	
 	//last year 
-	if (date('Y', $min_strike_time) <= date('Y') - 1)
-		$ranges[] = array(strtotime( (date('Y')-1).'-01-01'), strtotime( (date('Y')-1).'-12-31'), -1 ); 
+	if (gmdate('Y', $min_strike_time) <= gmdate('Y') - 1)
+		$ranges[] = array(strtotime( (gmdate('Y')-1).'-01-01'), strtotime( (gmdate('Y')-1).'-12-31'), -1 ); 
 
 	//current month and year
 	if (defined('BO_CALC_DENSITIES_CURRENT') && BO_CALC_DENSITIES_CURRENT)
 	{
-		$end_time = mktime(0,0,0,date('m'),date('d'),date('Y'))-1;
+		$end_time = gmmktime(0,0,0,gmdate('m'),gmdate('d'),gmdate('Y'))-1;
 		
-		if (date('t', $end_time) != date('d', $end_time))
+		if (gmdate('t', $end_time) != gmdate('d', $end_time))
 		{
-			$ranges[] = array(mktime(0,0,0,date('m'),1,date('Y')), $end_time, -2 ); //month
-			$ranges[] = array(mktime(0,0,0,1,1,date('Y')),         $end_time, -3 ); //year
+			$ranges[] = array(gmmktime(0,0,0,gmdate('m'),1,gmdate('Y')), $end_time, -2 ); //month
+			$ranges[] = array(gmmktime(0,0,0,1,1,gmdate('Y')),         $end_time, -3 ); //year
 		}
 		
 		//delete old data, if it's not the end day of the month
-		$delete_time = mktime(0,0,0,date('m'),date('d')-3,date('Y'));
-		if (date('t', $delete_time) == date('d', $delete_time))
+		$delete_time = gmmktime(0,0,0,gmdate('m'),gmdate('d')-3,gmdate('Y'));
+		if (gmdate('t', $delete_time) == gmdate('d', $delete_time))
 			$delete_time = 0;
 	}
 
@@ -1192,8 +1194,8 @@ function bo_update_densities($max_time)
 		if ($max_strike_time < $date_end)
 			continue;
 		
-		$date_start = date('Y-m-d', $r[0]);
-		$date_end   = date('Y-m-d', $r[1]);
+		$date_start = gmdate('Y-m-d', $r[0]);
+		$date_end   = gmdate('Y-m-d', $r[1]);
 		$status  = intval($r[2]);
 		
 		if ($r[0] >= $r[1])

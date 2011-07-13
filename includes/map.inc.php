@@ -236,17 +236,20 @@ function bo_show_lightning_map()
 	//Get Stations
 	$sid = bo_station_id();
 	$js_stations = '';
-	$res = bo_db("SELECT id, city, lat, lon
+	$res = bo_db("SELECT id, city, lat, lon, status
 					FROM ".BO_DB_PREF."stations a
-					WHERE status='A' AND id != '$sid'");
+					WHERE id != '$sid'");
 	while($row = $res->fetch_assoc())
 	{
-		$js_stations .= $js_stations ? ",\n" : '';
-		$js_stations .= '{';
-		$js_stations .= 'lat:'.round($row['lat'],1).', lon:'.round($row['lon'], 1).', city:"'._BC($row['city']).'"';
-		$js_stations .= '}';
-	
-		$st_cities[$row['id']] = $row['city'];
+		if ($row['status'] == 'A')
+		{
+			$js_stations .= $js_stations ? ",\n" : '';
+			$js_stations .= '{';
+			$js_stations .= 'lat:'.round($row['lat'],1).', lon:'.round($row['lon'], 1).', city:"'._BC($row['city']).'"';
+			$js_stations .= '}';
+		}
+		
+		$st_cities[$row['id']] = $row['city'].($row['status'] != 'A' ? ' (Offline)' : '');
 	}
 	
 	//Get MyBo Stations
@@ -258,7 +261,7 @@ function bo_show_lightning_map()
 		
 		foreach($mybo_info['lats'] as $id => $dummy)
 		{
-			if ($id == $sid)
+			if ($id == $sid || !trim($st_cities[$id]))
 				continue;
 			
 			if ($mybo_info['lats'][$id] && $mybo_info['lons'][$id])

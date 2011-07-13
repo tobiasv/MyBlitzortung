@@ -3,11 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
-Version xxx
------------
+Version 0.5.3 (2011-07-xx)
+---------------------------
 - new: added default graph times (BO_GRAPH_STAT_HOURS_BACK, BO_GRAPH_STAT_HOURS_BACK_STATIONS)
+- new: search strike by date/time-range for users with permission
 - fix: wrong time on "station statistics" displayed when station is offline
-- fix: updating
+- fix: update-code improved
+- fixed a some other small bugs
 
 Version 0.5.2 (2011-07-06)
 ---------------------------

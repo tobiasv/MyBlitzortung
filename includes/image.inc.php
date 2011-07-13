@@ -1396,7 +1396,6 @@ function bo_get_density_image()
 				{
 					//sum up here, so $value == 0 doesn't affect the calculation (ratio is a relative value)
 					$VAL_COUNT[$pos_id]++;
-					
 					$own_value = hexdec(substr($lon_data_own, $j * 2 * $bps, 2 * $bps));
 					$strike_count_own += $own_value;
 					$value = $own_value / $value;
@@ -1404,7 +1403,6 @@ function bo_get_density_image()
 
 				//Save to Data array
 				$STRIKE_COUNT[$pos_id] += $value;
-				
 			}
 		}
 
@@ -1647,6 +1645,8 @@ function bo_get_density_image()
 //writes text with line automatic line brakes into an image
 function bo_imagestring(&$I, $size, $x, $y, $text, $textcol, $maxwidth)
 {
+	$text = strtr($text, array(chr(160) => ' '));
+	
 	$line_height = imagefontheight($size) * 1.2;
 	$breaks = explode("\n", $text);
 	
