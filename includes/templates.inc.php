@@ -244,6 +244,7 @@ $_BO['tpl_imgmap']['germany_bavaria']['footer'] = 'Kartenmaterial: <a href="http
 $_BO['tpl_imgmap']['germany_bavaria']['menu'] = true;
 $_BO['tpl_imgmap']['germany_bavaria']['archive'] = true;
 $_BO['tpl_imgmap']['germany_bavaria']['file'] = 'map_germany_bavaria.png';
+$_BO['tpl_imgmap']['germany_bavaria']['borders'] = array('map_germany_bavaria_borders.png', 50);
 $_BO['tpl_imgmap']['germany_bavaria']['coord'] = array(50.62, 14.059753, 47.25, 8.897552); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['germany_bavaria']['trange'] = 2; //hours!
 $_BO['tpl_imgmap']['germany_bavaria']['upd_intv'] = 5; //minutes
@@ -262,6 +263,7 @@ $_BO['tpl_imgmap']['germany_bavaria']['density_darken'] = 20;
 //Germany Bavaria dark
 $_BO['tpl_imgmap']['germany_bavaria_dark'] = $_BO['tpl_imgmap']['germany_bavaria'];
 $_BO['tpl_imgmap']['germany_bavaria_dark']['file'] = 'map_germany_bavaria_dark.png';
+$_BO['tpl_imgmap']['germany_bavaria_dark']['borders'] = array('map_germany_bavaria_dark_borders.png', 50);
 $_BO['tpl_imgmap']['germany_bavaria_dark']['show_station'] = array(5, 255,100,100,true);
 
 
@@ -294,6 +296,7 @@ $_BO['tpl_imgmap']['switzerland']['name'] = 'Switzerland';
 $_BO['tpl_imgmap']['switzerland']['menu'] = true;
 $_BO['tpl_imgmap']['switzerland']['archive'] = true;
 $_BO['tpl_imgmap']['switzerland']['file'] = 'map_switzerland.png';
+$_BO['tpl_imgmap']['switzerland']['borders'] = array('map_switzerland_borders.png', 70);
 $_BO['tpl_imgmap']['switzerland']['coord'] = array(48.7, 11, 44.85, 5.4); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['switzerland']['trange'] = 2; //hours!
 $_BO['tpl_imgmap']['switzerland']['upd_intv'] = 5; //minutes
@@ -305,9 +308,9 @@ $_BO['tpl_imgmap']['switzerland']['legend'] = array(5, 100, 80, 4, 4, 1);
 $_BO['tpl_imgmap']['switzerland']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap']['switzerland']['show_station'] = array(5, 155,80,155,true);
 $_BO['tpl_imgmap']['switzerland']['density'] = true;
-$_BO['tpl_imgmap']['switzerland']['density_blocksize'] = 4;
+$_BO['tpl_imgmap']['switzerland']['density_blocksize'] = 20;
 $_BO['tpl_imgmap']['switzerland']['density_colors'] = $_BO['tpl_density_colors'];
-$_BO['tpl_imgmap']['switzerland']['density_darken'] = 10;
+$_BO['tpl_imgmap']['switzerland']['density_darken'] = 0;
 
 
 

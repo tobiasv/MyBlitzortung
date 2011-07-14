@@ -1411,11 +1411,12 @@ function bo_get_density_image()
 		}
 
 		$string_pos += (floor(($DensLon_end-$DensLon)/$dlon)+2) * 2 * $bps;
-		$DensLat += $dlat;
 		
 		// stop if picture is full
 		if ($DensLat > $PicLatN)
 			break;
+			
+		$DensLat += $dlat;
 	}
 
 	if ($ratio)
