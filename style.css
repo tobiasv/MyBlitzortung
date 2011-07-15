@@ -324,7 +324,16 @@ line-height: 15px;
 white-space: nowrap;
 }
 
+#myblitzortung #bo_arch_map_img {
+border: 1px solid #eee;
+}
 
+#myblitzortung #bo_arch_map_img,
+#myblitzortung .bo_graph_img {
+background-repeat:no-repeat;
+background-position:center;
+background-color:#fff;
+}
 
 /*** Google Strike Map ***/
 
@@ -430,7 +439,7 @@ font-size: 13px;
 }
 #myblitzortung #bo_dens_maps select {
 margin-right: 20px;
-max-width: 180px;
+max-width: 140px;
 }
 
 #myblitzortung #bo_archive_density_submit {

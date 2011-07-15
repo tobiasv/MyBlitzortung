@@ -145,6 +145,13 @@ function bo_show_archive_map()
 			$map = $id;
 	}
 	echo '</select>';
+
+	//image dimensions
+	$file = BO_DIR.'images/'.$_BO['mapimg'][$map]['file'];
+	if (file_exists($file) && !is_dir($file))
+	{
+		list(,,,$img_dim) = getimagesize($file);
+	}
 	
 	echo '<span class="bo_form_descr">'._BL('Date').':</span> ';
 	echo '<select name="bo_year" id="bo_arch_strikes_select_year">';
@@ -213,13 +220,13 @@ function bo_show_archive_map()
 				$images .= ($images ? ',' : '').'"'.date('YmdHi', $time).'-'.$ani_pic_interval.'"';
 			}
 			
-			echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
-			echo '<img style="position:absolute;top:0;left:0;" id="bo_arch_map_img_ani" src="'.BO_FILE.'?map='.$map.'&transparent&date='.sprintf('%04d%02d%02d0000-%d', $year, $month, $day, $ani_pic_interval).'&bo_lang='._BL().'">';
+			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
+			echo '<img style="position:absolute;top:0;left:0;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.BO_FILE.'?map='.$map.'&transparent&date='.sprintf('%04d%02d%02d0000-%d', $year, $month, $day, $ani_pic_interval).'&bo_lang='._BL().'">';
 		}
 		else
 		{
 			$img_file = BO_FILE.'?map='.$map.'&date='.sprintf('%04d%02d%02d', $year, $month, $day).'&bo_lang='._BL();
-			echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
+			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
 		}
 		
 		$footer = $_BO['mapimg'][$map]['footer'];
@@ -345,6 +352,16 @@ function bo_show_archive_density()
 	}
 	echo '</select>';
 	
+	
+	//image dimensions
+	$file = BO_DIR.'images/'.$_BO['mapimg'][$map]['file'];
+	if (file_exists($file) && !is_dir($file))
+	{
+		list($w,$h,,$img_dim) = getimagesize($file);
+		$img_dim = ' width="'.($w+150).'" height="'.$h.'" ';
+	}
+	
+	
 	echo '<span class="bo_form_descr">'._BL('Year').':</span> ';
 	echo '<select name="bo_year" id="bo_arch_dens_select_year" onchange="submit();">';
 	for($i=date('Y', $start_time); $i<=date('Y');$i++)
@@ -397,7 +414,7 @@ function bo_show_archive_density()
 	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 	
 	$img_file = BO_FILE.'?density&map='.$map.'&bo_year='.$year.'&bo_month='.$month.'&id='.$station_id.($ratio ? '&ratio' : '').'&bo_lang='._BL();
-	echo '<img style="position:relative;" id="bo_arch_map_img" src="'.$img_file.'">';
+	echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
 
 	$footer = $_BO['mapimg'][$map]['footer'];
 	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';

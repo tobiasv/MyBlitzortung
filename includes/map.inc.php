@@ -214,6 +214,13 @@ function bo_show_lightning_map()
 		$footer = $_BO['mapimg'][$static_map_id]['footer'];
 		$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
 		
+		//image dimensions
+		$file = BO_DIR.'images/'.$_BO['mapimg'][$static_map_id]['file'];
+		if (file_exists($file) && !is_dir($file))
+		{
+			list(,,,$img_dim) = getimagesize($file);
+		}
+		
 		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 
 		if ($archive_maps_enabled)
@@ -224,7 +231,7 @@ function bo_show_lightning_map()
 		}
 		
 		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
-		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'">';
+		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.BO_FILE.'?image=wait\');">';
 		echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 		echo '</div>';
 
@@ -288,7 +295,7 @@ function bo_show_lightning_map()
 				'default_show' => false,
 				'sel_name' => $data['name'],
 				'only_loggedin' => true,
-				'to_mercator' => false,
+				'to_mercator' => $data['to_mercator'] ? true : false,
 				'opacity' => 50,
 				'is_map' => true
 				);

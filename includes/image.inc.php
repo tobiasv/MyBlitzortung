@@ -1003,6 +1003,14 @@ function bo_get_map_image()
 	}
 
 	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
+
+	//Borders
+	if (!$transparent && $cfg['borders'][0] && file_exists(BO_DIR.'images/'.$cfg['borders'][0]))
+	{
+		$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$cfg['borders'][0]);
+		if ($tmpImage)
+			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
+	}
 	
 	//Show station pos
 	if ($cfg['show_station'][0])
@@ -1026,15 +1034,6 @@ function bo_get_map_image()
 		if ($cfg['show_station'][4])
 			imagestring($I, 3, $x+2, $y-12, $stinfo['city'], $stat_color);
 	}
-	
-	//Borders
-	if (!$transparent && $cfg['borders'][0] && file_exists(BO_DIR.'images/'.$cfg['borders'][0]))
-	{
-		$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$cfg['borders'][0]);
-		if ($tmpImage)
-			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
-	}
-
 	
 	//Date/Time/Strikes
 	$fontsize = $w / 100;
@@ -1717,6 +1716,10 @@ function bo_get_image($img)
 
 		case 'logo':
 			$file = 'blitzortung_logo.jpg';
+			break;
+
+		case 'wait':
+			$file = 'wait.gif';
 			break;
 		
 		default: //default image
