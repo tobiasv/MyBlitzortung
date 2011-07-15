@@ -50,9 +50,10 @@
 @define("BO_TIMEZONE", "Europe/Berlin");
 
 //Language settings
-@define("BO_LOCALE", 'en');
-@define("BO_LANGUAGES", 'de,en');
-@define("BO_SHOW_LANGUAGES", true);
+@define("BO_LOCALE", 'en');         //main locale
+@define("BO_LOCALE2", '');          //shows translation in this language, if main language doesn't exist
+@define("BO_LANGUAGES", 'de,en');   //available locales
+@define("BO_SHOW_LANGUAGES", true); //show links in the footer
 
 //User / Login
 @define("BO_LOGIN_SHOW", true);

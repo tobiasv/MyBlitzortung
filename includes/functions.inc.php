@@ -608,4 +608,56 @@ function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 	}
 }
 
+//loads the needed locales
+function bo_load_locale()
+{
+	global $_BL;
+	$locdir = BO_DIR.'locales/';
+	
+	if (BO_LOCALE2 && file_exists($locdir.BO_LOCALE2.'.php')) // 2nd locale -> include first
+	{
+		include $locdir.BO_LOCALE2.'.php';
+	}
+	
+	if (file_exists($locdir.BO_LOCALE.'.php')) //main locale -> overwrites 2nd
+	{
+		include $locdir.BO_LOCALE.'.php';
+	}
+	elseif (BO_LOCALE2 != 'en')
+	{
+		include $locdir.'en.php';
+	}
+
+	if (file_exists($locdir.'own.php')) //own translation (language independent)
+		include $locdir.'own.php';
+	
+	
+	//individual locale for user (link, session, cookie)
+	
+	$locale = '';
+	if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
+	{
+		$locale = strtolower($_GET['bo_lang']);
+		$_SESSION['bo_locale'] = $locale;
+		@setcookie("bo_locale", $locale, time()+3600*24*365*10,'/');
+	}
+	else if (isset($_SESSION['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_SESSION['bo_locale']))
+	{
+		$locale = $_SESSION['bo_locale'];
+	}
+	else if (isset($_COOKIE['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_COOKIE['bo_locale']))
+	{
+		$locale = $_COOKIE['bo_locale'];
+	}
+
+	if ($locale && file_exists($locdir.$locale.'.php') && $locale != BO_LOCALE)
+	{
+		include $locdir.$locale.'.php';
+
+		if (file_exists($locdir.'own.php')) //include this 2nd time (must overwrite the manual specified language!)
+			include $locdir.'own.php';
+	}
+
+}
+
 ?>

@@ -22,6 +22,8 @@ $_BL['en']['_minute_ago'] = 'minute ago';
 $_BL['en']['unit_meters'] = 'm';
 $_BL['en']['unit_minutes'] = 'minutes';
 $_BL['en']['unit_hours'] = 'hours';
+$_BL['en']['time_from'] = 'from';
+$_BL['en']['time_to'] = 'to';
 
 $_BL['en']['Jan'] = 'Jan';
 $_BL['en']['Feb'] = 'Feb';
@@ -71,8 +73,9 @@ $_BL['en']['Deviation'] = 'Deviation';
 $_BL['en']['copyright_footer'] = 'Powered by <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
 $_BL['en']['for_station'] = 'for station';
 $_BL['en']['Entries'] = 'Entries';
-$_BL['en']['days'] = 'Days';
-$_BL['en']['unit_days'] = 'Tage';
+$_BL['en']['days'] = 'days';
+$_BL['en']['unit_days'] = 'days';
+$_BL['en']['Time range'] = 'Time range';
 
 $_BL['en']['Home'] = 'Home';
 $_BL['en']['lightning data'] = 'lightning data';
@@ -154,9 +157,7 @@ $_BL['en']['Text'] = 'Text';
 $_BL['en']['Error'] = 'Error';
 $_BL['en']['Back'] = 'Back';
 $_BL['en']['Participants'] = 'Participants';
-
-$_BL['en']['Europe'] = 'Europe';
-$_BL['en']['Germany'] = 'Germany';
+$_BL['en']['Advanced'] = 'Advanced';
 
 /*************************************************************/
 /* Main Menu (Standalone)                                    */
@@ -189,6 +190,9 @@ $_BL['en']['Show Stations'] = 'Show Stations';
 $_BL['en']['None'] = 'None';
 $_BL['en']['Active stations'] = 'Active stations';
 $_BL['en']['auto update'] = 'Auto Update';
+$_BL['en']['Extra overlays'] = 'Extra overlays';
+$_BL['en']['show strike counter'] = 'Strike counter';
+$_BL['en']['show tracks'] = 'Show tracks (experimental!)';
 
 /*************************************************************/
 /* Graphs                                                    */
@@ -223,6 +227,7 @@ $_BL['en']['graph_legend_distance_own'] = 'Strikes of station {STATION}';
 $_BL['en']['graph_stat_title_strikes_time'] = 'Strikes';
 $_BL['en']['graph_legend_strikes_time_all'] = 'Alle strikes of the lightning network';
 $_BL['en']['graph_legend_strikes_time_own'] = 'Only strikes detected by Station {STATION}';
+$_BL['en']['graph_legend_stations_available'] = 'Available stations';
 
 $_BL['en']['h3_graphs'] = 'Graphs';
 $_BL['en']['h4_graph_strikes'] = 'Strike count';
@@ -257,12 +262,14 @@ $_BL['en']['legend_arch_densities'] = 'Options';
 $_BL['en']['arch_select_dates_beween'] = 'Only data from {START} to {END} available!';
 $_BL['en']['Max strikes density'] = 'Max strike density';
 $_BL['en']['check_all_strikes_network'] = 'All strikes of the network';
-$_BL['de']['Calculation basis are elements with area'] = 'Calculation basis are elements with area';
-$_BL['de']['Maximum strike density calculated'] = 'Maximum strike density calculated';
-$_BL['de']['Maximum mean strike density displayed'] = 'Maximum mean strike density displayed';
-$_BL['de']['densities_strikes_station'] = 'Strikes station {STATION_CITY}';
-$_BL['de']['Legend'] = 'Legend';
-$_BL['de']['Strikes per square kilometer'] = 'Strikes per square kilometer';
+$_BL['en']['Calculation basis are elements with area'] = 'Calculation basis are elements with area';
+$_BL['en']['Maximum strike density calculated'] = 'Maximum strike density calculated';
+$_BL['en']['Maximum mean strike density displayed'] = 'Maximum mean strike density displayed';
+$_BL['en']['densities_strikes_station'] = 'Strikes station {STATION_CITY}';
+$_BL['en']['Legend'] = 'Legend';
+$_BL['en']['Strikes per square kilometer'] = 'Strikes per square kilometer';
+$_BL['en']['enter_time_hint'] = 'Enter time values like "YYYY-MM-DD HH:MM:SS". You can omit the smaller time units, for example "YYYY-MM" is also possible.';
+$_BL['en']['archive_search_info'] = 'Here you search for the last {COUNT} strikes in an area. To define that area, move the marker on the map and enter a radius to search within. Strikes will be visualized as colored dots on the map. You can click on it to see more information about that strike. You can only search for strikes in the red colored area around the station.';
 
 /*************************************************************/
 /* Statistics                                                */
@@ -323,6 +330,14 @@ $_BL['en']['total strikes station'] = 'Total strikes station {STATION}';
 $_BL['en']['legend_stat_strikes'] = 'Time range';
 $_BL['en']['Strikes station'] = 'Strikes station {STATION}';
 $_BL['en']['_in_radius'] = ' (max. {RADIUS}km) ';
+$_BL['en']['Signals detected'] = 'Signals detected';
+$_BL['en']['Signal ratio'] = 'Locating ratio';
+$_BL['en']['Max available stations'] = 'Max available stations';
+$_BL['en']['available_of'] = 'of';
+$_BL['en']['available_stations'] = 'available stations';
+$_BL['en']['Last active'] = 'Last active';
+$_BL['en']['Min time'] = 'Min time';
+$_BL['en']['Max time'] = 'Max time';
 
 
 /*************************************************************/
@@ -395,6 +410,7 @@ $_BL['en']['MySQL version'] = 'MySQL version';
 $_BL['en']['Files'] = 'Files';
 $_BL['en']['Click here to delete all files'] = 'Click here to delete all files';
 $_BL['en']['Clear all files'] = 'Clear all files.';
+$_BL['en']['stay logged in'] = 'Stay logged in';
 
 $_BL['en']['user_perm0'] = 'Administration';
 $_BL['en']['user_perm1'] = 'Other settings';
@@ -434,7 +450,7 @@ $_BL['en']['info_general_text'] = '
 		Blitzortung.org is a private network of lightning tracker stations. They catch the electromagnetic signals of strikes, and a with
 		that data the time and position can be calculated (TOA - time of arrival method).
 
-		You will find more information on zhe main site of the project: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
+		You will find more information on the main site of the project: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
 
 									';
 $_BL['en']['info_accuracy_text'] = '
@@ -624,23 +640,14 @@ $_BL['en']['Not enough data available!'] = 'Not enough data available!';
 $_BL['en']['Lightning data from Blitzortung.org'] = 'Lightning data from Blitzortung.org';
 $_BL['en']['No data available!'] = 'No data available!';
 
+/*************************************************************/
+/* Translations for templates                                */
+/*************************************************************/
+$_BL['en']['Europe'] = 'Europe';
+$_BL['en']['Germany'] = 'Germany';
+$_BL['en']['Bavaria'] = 'Bavaria';
+$_BL['en']['Switzerland'] = 'Switzerland';
+$_BL['en']['Hungary'] = 'Hungary';
 
-$_BL['en']['Signals detected'] = 'Signals detected';
-$_BL['en']['Signal ratio'] = 'Locating ratio';
-$_BL['en']['Extra overlays'] = 'Extra overlays';
 $_BL['en']['Meteox rain radar'] = 'Rain radar (meteox.com)';
-$_BL['en']['Advanced'] = 'Advanced';
-$_BL['en']['show strike counter'] = 'Strike counter';
-$_BL['en']['stay logged in'] = 'Stay logged in';
-$_BL['en']['archive_search_info'] = 'Here you search for the last {COUNT} strikes in an area. To define that area, move the marker on the map and enter a radius to search within. Strikes will be visualized as colored dots on the map. You can click on it to see more information about that strike. You can only search for strikes in the red colored area around the station.';
-$_BL['en']['Max available stations'] = 'Max available stations';
-$_BL['en']['graph_legend_stations_available'] = 'Available stations';
-$_BL['en']['available_of'] = 'of';
-$_BL['en']['available_stations'] = 'available stations';
-$_BL['en']['Last active'] = 'Last active';
-$_BL['en']['Min time'] = 'Min time';
-$_BL['en']['Max time'] = 'Max time';
-$_BL['en']['enter_time_hint'] = 'Enter time values like "YYYY-MM-DD HH:MM:SS". You can omit the smaller time units, for example "YYYY-MM" is also possible.';
-$_BL['en']['Time range'] = 'Time range';
-$_BL['en']['time_from'] = 'from';
-$_BL['en']['time_to'] = 'to';
+

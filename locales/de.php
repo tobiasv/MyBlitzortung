@@ -73,6 +73,8 @@ $_BL['de']['Entries'] = 'Einträge';
 $_BL['de']['days'] = 'Tage';
 $_BL['de']['unit_days'] = 'Tage';
 
+$_BL['de']['Advanced'] = 'Erweitert';
+$_BL['de']['Lightning data'] = 'Blitzdaten';
 $_BL['de']['Home'] = 'Home';
 $_BL['de']['lightning data'] = 'Blitzdaten';
 $_BL['de']['Latitude'] = 'Breitengrad';
@@ -154,10 +156,6 @@ $_BL['de']['Error'] = 'Fehler';
 $_BL['de']['Back'] = 'Zurück';
 $_BL['de']['Participants'] = 'Teilnehmer';
 
-$_BL['de']['Europe'] = 'Europa';
-$_BL['de']['Germany'] = 'Deutschland';
-$_BL['de']['Bavaria'] = 'Bayern';
-$_BL['de']['Switzerland'] = 'Schweiz';
 
 /*************************************************************/
 /* Main Menu (Standalone)                                    */
@@ -190,6 +188,10 @@ $_BL['de']['Show Stations'] = 'Zeige Stationen';
 $_BL['de']['None'] = 'Keine';
 $_BL['de']['Active stations'] = 'Aktive Stationen';
 $_BL['de']['auto update'] = 'Automatisch aktualisieren';
+$_BL['de']['show tracks'] = 'Zugrichtung (experimentell!)';
+$_BL['de']['Own maps'] = 'Eigene Karten';
+$_BL['de']['Extra overlays'] = 'Weitere Einblendungen';
+$_BL['de']['show strike counter'] = 'Blitzzähler';
 
 /*************************************************************/
 /* Graphs                                                    */
@@ -223,6 +225,8 @@ $_BL['de']['graph_legend_strikes_time_own'] = 'Nur von Station {STATION} registr
 $_BL['de']['graph_stat_title_distance'] = 'Mittlere Entfernung der Blitze';
 $_BL['de']['graph_legend_distance_all'] = 'Alle Blitze';
 $_BL['de']['graph_legend_distance_own'] = 'Blitze Station {STATION}';
+$_BL['de']['graph_stat_title_strikes_time'] = 'Blitze';
+$_BL['de']['graph_legend_stations_available'] = 'Verfügbare Stationen';
 
 $_BL['de']['h3_graphs'] = 'Diagramme';
 $_BL['de']['h4_graph_strikes'] = 'Blitzanzahl';
@@ -263,6 +267,11 @@ $_BL['de']['Maximum mean strike density displayed'] = 'Maximale mittlere Blitzdi
 $_BL['de']['densities_strikes_station'] = 'Blitze Station {STATION_CITY}';
 $_BL['de']['Legend'] = 'Legende';
 $_BL['de']['Strikes per square kilometer'] = 'Blitze pro Quadratkilometer';
+$_BL['de']['Min time'] = 'Min Zeit';
+$_BL['de']['Max time'] = 'Max Zeit';
+$_BL['de']['enter_time_hint'] = 'Zeitangaben im Format "JJJJ-MM-TT HH:MM:SS", wobei kleinere Zeiteinheiten auch weggelassen werden können, z.B. "JJJJ-MM".';
+$_BL['de']['Time range'] = 'Zeitbereich';
+$_BL['de']['archive_search_info'] = 'Hier können die letzten {COUNT} Blitze für einen bestimmten Bereich auf der Karte abgefragt werden. Dazu den Marker an die gewünschte Stelle ziehen um die Koordinaten zu setzen, einen Radius angeben und auf Suchen klicken. Die Blitze werden anschließend in der Karte als farbige Punkte angezeigt. Durch Klick auf einen Punkt lassen sich weitere Informationen abrufen. Die Suche ist nur innerhalb des rot markierten Kreises um die Station möglich!';
 
 
 /*************************************************************/
@@ -324,7 +333,14 @@ $_BL['de']['total strikes station'] = 'Blitze gesamt Station {STATION}';
 $_BL['de']['legend_stat_strikes'] = 'Zeitraum';
 $_BL['de']['Strikes station'] = 'Blitze Station {STATION}';
 $_BL['de']['_in_radius'] = ' (max. {RADIUS}km) ';
-$_BL['de']['graph_stat_title_strikes_time'] = 'Blitze';
+$_BL['de']['available_of'] = 'von';
+$_BL['de']['available_stations'] = 'verfügbaren Stationen';
+$_BL['de']['time_from'] = 'von';
+$_BL['de']['time_to'] = 'bis';
+$_BL['de']['Max available stations'] = 'Max. verfügbare Stationen';
+$_BL['de']['Last active'] = 'Zuletzt aktiv';
+$_BL['de']['Signals detected'] = 'Signale empfangen';
+$_BL['de']['Signal ratio'] = 'Ortungsquote';
 
 
 /*************************************************************/
@@ -397,6 +413,7 @@ $_BL['de']['MySQL version'] = 'MySQL Version';
 $_BL['de']['Files'] = 'Dateien';
 $_BL['de']['Click here to delete all files'] = 'Hier klicken um alle Dateien zu löschen';
 $_BL['de']['Clear all files'] = 'Dateien bereinigen.';
+$_BL['de']['stay logged in'] = 'Speichern';
 
 $_BL['de']['user_perm0'] = 'Administration';
 $_BL['de']['user_perm1'] = 'Andere Einstellungen';
@@ -642,27 +659,15 @@ $_BL['de']['Not enough data available!'] = 'Nicht genügend Daten vorhanden!';
 $_BL['de']['Lightning data from Blitzortung.org'] = 'Blitzdaten von Blitzortung.org';
 $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 
+/*************************************************************/
+/* Translations for templates                                */
+/*************************************************************/
+$_BL['de']['Europe'] = 'Europa';
+$_BL['de']['Germany'] = 'Deutschland';
+$_BL['de']['Bavaria'] = 'Bayern';
+$_BL['de']['Switzerland'] = 'Schweiz';
+$_BL['de']['Hungary'] = 'Ungarn';
 
-$_BL['de']['Signals detected'] = 'Signale empfangen';
-$_BL['de']['Signal ratio'] = 'Ortungsquote';
-$_BL['de']['Extra overlays'] = 'Weitere Einblendungen';
 $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
-$_BL['de']['Advanced'] = 'Erweitert';
-$_BL['de']['show strike counter'] = 'Blitzzähler';
-$_BL['de']['stay logged in'] = 'Speichern';
-$_BL['de']['show tracks'] = 'Zugrichtung (experimentell!)';
-$_BL['de']['Lightning data'] = 'Blitzdaten';
-$_BL['de']['Own maps'] = 'Eigene Karten';
-$_BL['de']['archive_search_info'] = 'Hier können die letzten {COUNT} Blitze für einen bestimmten Bereich auf der Karte abgefragt werden. Dazu den Marker an die gewünschte Stelle ziehen um die Koordinaten zu setzen, einen Radius angeben und auf Suchen klicken. Die Blitze werden anschließend in der Karte als farbige Punkte angezeigt. Durch Klick auf einen Punkt lassen sich weitere Informationen abrufen. Die Suche ist nur innerhalb des rot markierten Kreises um die Station möglich!';
-$_BL['de']['Max available stations'] = 'Max. verfügbare Stationen';
-$_BL['de']['graph_legend_stations_available'] = 'Verfügbare Stationen';
-$_BL['de']['available_of'] = 'von';
-$_BL['de']['available_stations'] = 'verfügbaren Stationen';
-$_BL['de']['Last active'] = 'Zuletzt aktiv';
-$_BL['de']['Min time'] = 'Min Zeit';
-$_BL['de']['Max time'] = 'Max Zeit';
-$_BL['de']['enter_time_hint'] = 'Zeitangaben im Format "JJJJ-MM-TT HH:MM:SS", wobei kleinere Zeiteinheiten auch weggelassen werden können, z.B. "JJJJ-MM".';
-$_BL['de']['Time range'] = 'Zeitbereich';
-$_BL['de']['time_from'] = 'von';
-$_BL['de']['time_to'] = 'bis';
+
 

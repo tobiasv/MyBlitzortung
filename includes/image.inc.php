@@ -163,6 +163,9 @@ function bo_tile()
 	//send only the info/color-legend image (colors, time)
 	if ($only_info)
 	{
+		
+		bo_load_locale();
+		
 		$time_max = min(bo_get_conf('uptime_strikes'), $time_max);
 		$show_date = $time_max - $time_min > 3600 * 12 ? true : false;
 		

@@ -71,40 +71,6 @@ if (!defined("BO_VER"))
 
 	date_default_timezone_set(BO_TIMEZONE);
 	
-	//Very simple locale support
-	$locdir = BO_DIR.'locales/';
-	if (file_exists($locdir.BO_LOCALE.'.php'))
-	{
-		include $locdir.BO_LOCALE.'.php';
-	}
-	else
-	{
-		include $locdir.'en.php';
-	}
-
-	if (file_exists($locdir.'own.php'))
-		include $locdir.'own.php';
-		
-	$locale = '';
-	if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
-	{
-		$locale = strtolower($_GET['bo_lang']);
-		$_SESSION['bo_locale'] = $locale;
-		@setcookie("bo_locale", $locale, time()+3600*24*365*10,'/');
-	}
-	else if (isset($_COOKIE['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_COOKIE['bo_locale']))
-		$locale = $_COOKIE['bo_locale'];
-	else if (isset($_SESSION['bo_locale']))
-		$locale = $_SESSION['bo_locale'];
-
-	if ($locale && file_exists($locdir.$locale.'.php') && $locale != BO_LOCALE)
-	{
-		include $locdir.$locale.'.php';
-
-		if (file_exists($locdir.'own.php')) //include this 2nd time (must overwrite the manual specified language!)
-			include $locdir.'own.php';
-	}
-		
 	//includes #1
 	require_once 'includes/functions.inc.php';
 	require_once 'includes/image.inc.php';
@@ -133,7 +99,7 @@ if (!defined("BO_VER"))
 
 	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
 
-	//creating tiles should be very fast
+	//creating tiles should be very fast, other include files not needed
 	if (isset($_GET['tile']))
 	{
 		if (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !(bo_user_get_level() & BO_PERM_NOLIMIT))
@@ -165,6 +131,9 @@ if (!defined("BO_VER"))
 	//Save info wether headers where sent
 	$_BO['headers_sent'] = headers_sent();
 
+	//load locale after tiles
+	bo_load_locale();
+	
 	//Update with new data from blitzortung.org
 	$do_update = false;
 	$force_update = false;
@@ -187,16 +156,17 @@ if (!defined("BO_VER"))
 		}
 	}
 
+	
+	//decisions what to do begins...
 	if ($do_update)
 	{
 		ini_set('allow_url_fopen', 'on'); //doesnt work
 		bo_update_all($force_update);
 		exit;
 	}
-
-	//Login
-	if (isset($_POST['bo_do_login']))
+	else if (isset($_POST['bo_do_login']))
 	{
+		//Login
 		$login_name   = BoDb::esc(bo_gpc_prepare($_POST['bo_user']));
 		$login_pass   = BoDb::esc(bo_gpc_prepare($_POST['bo_pass']));
 		$login_cookie = $_POST['bo_login_cookie'] ? true : false;
@@ -206,11 +176,16 @@ if (!defined("BO_VER"))
 	}
 	else if (isset($_GET['bo_logout']))
 	{
+		//Logout
 		bo_user_do_logout();
 	}
-	
-	//images part 1
-	if (isset($_GET['icon']))
+	else if (isset($_GET['bo_login']) && (!defined('BO_LOGIN_URL') || !BO_LOGIN_URL))
+	{
+		//login-screen: workaround when no special login-url is specified
+		bo_show_login();
+		exit;
+	}
+	else if (isset($_GET['icon']))
 	{
 		bo_icon($_GET['icon']);
 		exit;
@@ -240,20 +215,6 @@ if (!defined("BO_VER"))
 		bo_get_map_image();
 		exit;
 	}
-	
-	//workaround when no special login-url is specified
-	if (!defined('BO_LOGIN_URL') || !BO_LOGIN_URL)
-	{
-		if (isset($_GET['bo_login']))
-		{
-			bo_show_login();
-			exit;
-		}
-
-		if (isset($_GET['bo_logout']))
-			bo_user_do_logout();
-	}
-
 }
 
 ?>
