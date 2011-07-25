@@ -23,7 +23,7 @@
 // Login to blitzortung.org an return login-string
 function bo_get_login_str()
 {
-	$file = file_get_contents('http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&username='.BO_USER.'&password='.BO_PASS);
+	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&username='.BO_USER.'&password='.BO_PASS);
 
 	if ($file === false)
 		return false;
@@ -47,7 +47,7 @@ function bo_get_archive($args='', $bo_login_id=false)
 		$auto_id = true;
 	}
 
-	$file = file_get_contents('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&'.$args);
+	$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&'.$args);
 
 	if ($file === false)
 		return false;
@@ -221,7 +221,7 @@ function bo_update_strikes($force = false)
 		$max_dist_own = 0;
 		$min_dist_own = 9E12;
 		
-		$file = file_get_contents('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt');
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt');
 
 		if ($file === false)
 			return false;
@@ -605,7 +605,7 @@ function bo_update_stations($force = false)
 		$Count = array();
 		$signal_count = 0;
 
-		$file = file_get_contents('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt');
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt');
 
 		if ($file === false)
 			return false;
@@ -1586,7 +1586,7 @@ function bo_my_station_update($url)
 		$request = 'id='.bo_station_id().'&login='.$login_id.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
 		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
 		
-		$content = file_get_contents($data_url);
+		$content = bo_get_file($data_url);
 		
 		$R = unserialize($content);
 		

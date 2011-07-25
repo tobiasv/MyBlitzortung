@@ -660,4 +660,55 @@ function bo_load_locale()
 
 }
 
+function bo_get_file($url)
+{
+	if (BO_USE_PHPURLWRAPPER === true)
+	{
+		return file_get_contents($url);
+	}
+	
+	$parsedurl = @parse_url($url); 
+	$host = $parsedurl['host'];
+	$user = $parsedurl['user'];
+	$pass = $parsedurl['pass'];
+	$path = $parsedurl['path'];
+	$query = $parsedurl['query'];
+	
+	$fp = fsockopen($host, 80, $errno, $errstr, 60);
+	
+	if (!$fp)
+	{
+		//echo "$errstr ($errno)<br />\n";
+		return false;
+	}
+	else
+	{
+		$out =  "GET ".$path."?".$query." HTTP/1.1\r\n";
+		$out .= "Host: ".$host."\r\n";
+		$out .= "User-Agent: MyBlitzortung ".BO_VER."\r\n";
+		
+		if ($user && $pass)
+			$out .= "Authorization: Basic ".base64_encode($user.':'.$pass)."\r\n";
+		
+		$out .= "Connection: Close\r\n\r\n";
+		
+		fwrite($fp, $out);		 
+		$content = ''; 
+		
+		//Header überlesen 
+		do { 
+			$header = chop(fgets($fp)); 
+		} while (!empty($header) and !feof($fp)); 
+			
+		//Daten übernehmen
+		while (!feof($fp)) { 
+			$content .= fgets($fp); 
+		} 
+		
+		fclose($fp);
+	}
+
+	return $content; 	 
+}
+
 ?>

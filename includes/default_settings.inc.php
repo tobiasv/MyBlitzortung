@@ -89,6 +89,9 @@
 @define("BO_UP_INTVL_STATIONS", 15);
 @define("BO_UP_INTVL_RAW", 60);
 
+//set to true, if you want to use "file_get_contents"
+@define("BO_USE_PHPURLWRAPPER", false);
+
 //Disable station statistics
 @define("BO_STATION_STAT_DISABLE", false);
 
