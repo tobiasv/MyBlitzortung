@@ -160,7 +160,6 @@ if (!defined("BO_VER"))
 	//decisions what to do begins...
 	if ($do_update)
 	{
-		ini_set('allow_url_fopen', 'on'); //doesnt work
 		bo_update_all($force_update);
 		exit;
 	}

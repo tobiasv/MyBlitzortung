@@ -994,7 +994,14 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 	if ($graph_type == 'datlin')
 	{
-		if ($X[count($X)-1] - $X[0] > 3600 * 36)
+		if ($X[count($X)-1] - $X[0] > 3600 * 350)
+		{
+			$graph->xaxis->title->Set(_BL('day'));
+			$graph->xaxis->scale->SetDateFormat('d.m');
+			$graph->xaxis->scale->SetDateAlign(DAYADJ_1);
+			$graph->xaxis->scale->ticks->Set(3600*24*7,3600*24);
+		}
+		else if ($X[count($X)-1] - $X[0] > 3600 * 36)
 		{
 			$graph->xaxis->title->Set(_BL('day'));
 			$graph->xaxis->scale->SetDateFormat('d.m');

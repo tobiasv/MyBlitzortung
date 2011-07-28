@@ -371,20 +371,20 @@ function bo_show_lightning_map()
 	echo '<div class="bo_input_container">';
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="checkbox" onclick="bo_map_toggle_own(this.checked);" id="bo_map_opt_own"> ';
-	echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label>';
-	echo '</span> &nbsp; ';
+	echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label> &nbsp; ';
+	echo '</span>';
 
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="checkbox" onclick="bo_map_toggle_count(this.checked);" id="bo_map_opt_count"> ';
-	echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label>';
-	echo '</span> &nbsp; ';
+	echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
+	echo '</span>';
 
 	if (intval(BO_TRACKS_SCANTIME))
 	{
 		echo '<span class="bo_form_checkbox_text">';
 		echo '<input type="checkbox" onclick="bo_map_toggle_tracks(this.checked);" id="bo_map_opt_tracks"> ';
-		echo '<label for="bo_map_opt_tracks">'._BL("show tracks").'</label>';
-		echo '</span> &nbsp; ';
+		echo '<label for="bo_map_opt_tracks">'._BL("show tracks").'</label> &nbsp; ';
+		echo '</span>';
 	}
 	
 	echo '</div>';
