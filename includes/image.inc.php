@@ -42,11 +42,11 @@ function bo_icon($icon)
 		$col = ImageColorAllocate ($im, hexdec(substr($icon,0,2)), hexdec(substr($icon,2,2)), hexdec(substr($icon,4,2)));
 		imagefilledellipse( $im, $c, $c, $c+2, $c+2, $col );
 
-		$tag = substr($icon,6,1);
-		if ($tag == 1)
+		$tag = intval(substr($icon,6,1));
+		if ($tag >= 1)
 		{
 			$col = ImageColorAllocate ($im, 0,0,0);
-			imageellipse( $im, $c, $c, $c+2, $c+2, $col );
+			imageellipse( $im, $c, $c, $c+$tag, $c+$tag, $col );
 		}
 		
 		Imagepng($im, $file);
@@ -312,21 +312,21 @@ function bo_tile()
 		$strike_count = 0;
 		$whole_strike_count = 0;
 		
-		$sql = "SELECT COUNT(time) cnt ".($only_own ? ", part " : "")."
+		$sql = "SELECT COUNT(time) cnt ".($only_own ? ", part>0 participated " : "")."
 			FROM ".BO_DB_PREF."strikes
 			USE INDEX (time)
 			WHERE 1
 				".($radius ? "AND distance < $radius" : "")."
 				AND NOT (lat < $lat1 OR lat > $lat2 OR lon < $lon1 OR lon > $lon2)
 				AND (0 $sql)
-				".($only_own ? " GROUP BY part " : "")."
+				".($only_own ? " GROUP BY participated " : "")."
 			";
 		$erg = bo_db($sql);
 		while ($row = $erg->fetch_assoc())
 		{
 			if ($only_own)
 			{
-				if ($row['part'])
+				if ($row['participated'])
 					$strike_count += $row['cnt'];
 				
 				$whole_strike_count += $row['cnt'];
@@ -398,7 +398,7 @@ function bo_tile()
 			USE INDEX (time)
 			WHERE 1
 				".($radius ? "AND distance < $radius" : "")."
-				".($only_own ? " AND part=1 " : "")."
+				".($only_own ? " AND part>0 " : "")."
 				AND NOT (lat < $lat1 OR lat > $lat2 OR lon < $lon1 OR lon > $lon2)
 				AND time BETWEEN '$date_min' AND '$date_max'
 			-- ORDER BY time ASC";
@@ -791,6 +791,7 @@ function bo_get_map_image()
 	$date 			= $_GET['date'];
 	$transparent 	= isset($_GET['transparent']);
 	$blank 			= isset($_GET['blank']);
+	$region			= $_GET['mark'];
 	
 	$cfg = $_BO['mapimg'][$id];
 	if (!is_array($cfg))
@@ -824,6 +825,9 @@ function bo_get_map_image()
 	
 	if ($transparent)
 		$cache_file .= 'transp_';
+	
+	if (preg_match('/[0-9a-z]+/i', $region) && isset($_BO['region'][$region]['rect_add']))
+		$cache_file .= 'region'.$region.'_';
 		
 	$last_update = bo_get_conf('uptime_strikes');
 	
@@ -965,9 +969,10 @@ function bo_get_map_image()
 			FROM ".BO_DB_PREF."strikes
 			USE INDEX (time)
 			WHERE 1
-				".($only_own ? " AND part=1 " : "")."
+				".($only_own ? " AND part>0 " : "")."
 				AND NOT (lat < '$latS' OR lat > '$latN' OR lon < '$lonW' OR lon > '$lonE')
 				AND time BETWEEN '$date_min' AND '$date_max'
+				".bo_region2sql($region)."
 			-- ORDER BY time ASC";
 	$erg = bo_db($sql);
 	while ($row = $erg->fetch_assoc())
@@ -1033,6 +1038,36 @@ function bo_get_map_image()
 		
 		if ($cfg['show_station'][4])
 			imagestring($I, 3, $x+2, $y-12, $stinfo['city'], $stat_color);
+	}
+	
+	//Regions
+	if ($region && isset($_BO['region'][$region]['rect_add']))
+	{
+		$rect_col['rect_add'] = imagecolorallocate($I, 0, 255, 0);
+		$rect_col['rect_rem'] = imagecolorallocate($I, 255, 100, 0);
+		
+		foreach(array('rect_add', 'rect_rem') as $rect_type)
+		{
+			$reg = $_BO['region'][$region][$rect_type];
+			
+			while ($r = @each($reg))
+			{
+				$lat1 = $r[1];
+				list(,$lon1) = @each($reg);
+				list(,$lat2) = @each($reg);
+				list(,$lon2) = @each($reg);
+				
+				list($px, $py) = bo_latlon2mercator($lat1, $lon1);
+				$rx1 =      ($px - $x1) * $w_x;
+				$ry1 = $h - ($py - $y1) * $h_y;
+
+				list($px, $py) = bo_latlon2mercator($lat2, $lon2);
+				$rx2 =      ($px - $x1) * $w_x;
+				$ry2 = $h - ($py - $y1) * $h_y;
+				
+				imagerectangle($I, $rx1, $ry1, $rx2, $ry2, $rect_col[$rect_type]);
+			}
+		}
 	}
 	
 	//Date/Time/Strikes

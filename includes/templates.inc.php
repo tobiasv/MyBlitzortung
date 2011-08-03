@@ -205,7 +205,7 @@ $_BO['tpl_imgmap']['germany_mini']['textcolor'] = array(255,255,255);
 $_BO['tpl_imgmap']['germany_mini']['textsize'] = 1;
 $_BO['tpl_imgmap']['germany_mini']['point_type'] = 2;
 $_BO['tpl_imgmap']['germany_mini']['point_size'] = 1;
-$_BO['tpl_imgmap']['germany_mini']['legend'] = array(0, 54, 26, 0, 0, 0);
+$_BO['tpl_imgmap']['germany_mini']['legend'] = array(0, 42, 26, 0, 0, 0);
 $_BO['tpl_imgmap']['germany_mini']['col'] = $_BO['tpl_color']['standard'];
 
 //Germany (Landkreise) no exact merator prjection!
@@ -380,4 +380,39 @@ $_BO['tpl_overlay']['wetterinfo_radar_small']['only_loggedin'] = true;
 $_BO['tpl_overlay']['wetterinfo_radar_small']['to_mercator'] = false;
 $_BO['tpl_overlay']['wetterinfo_radar_small']['opacity'] = 60;
 
+
+/**************************************/
+/* Regions                            */
+/**************************************/
+
+//Germany
+$_BO['tpl_region']['germany']['name']   = 'Germany';
+$_BO['tpl_region']['germany']['visible']= true;
+$_BO['tpl_region']['germany']['rect_add'] = array(	55.02, 12.08, 47.2, 5.87,
+													54.8, 15.08, 50.2, 12.08,
+													50.2, 13.08, 47.4, 12.08,
+													49.3, 13.9, 48.2, 13.08,
+												);
+$_BO['tpl_region']['germany']['rect_rem'] = array(	56, 8.2, 53.9, 5,   
+													56, 6.7, 52, 5,
+													49.1, 7.5, 47, 5,
+													49.1, 7.5, 47, 5,
+													56, 13, 54.6, 10.3,
+													54.8, 15.08, 52.8, 14.5,
+													50.6, 15.08, 50.2, 13.35,
+													);
+
+//Bavaria
+$_BO['tpl_region']['bavaria']['name']   = 'Bavaria';
+$_BO['tpl_region']['bavaria']['visible']= true;
+$_BO['tpl_region']['bavaria']['rect_add'] = array(	50.6, 12.08, 47.2, 9.5,
+													50.15, 9.5, 49.55, 9,
+													50.2, 13.08, 47.4, 12.08,
+													49.3, 13.9, 48.2, 13.08,
+												);
+$_BO['tpl_region']['bavaria']['rect_rem'] = array(	49.4, 9.5, 47.7, 10,
+													50.2, 13.08, 49.4, 12.7,
+													);
+
+													
 ?>

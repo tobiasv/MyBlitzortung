@@ -44,15 +44,6 @@ function bo_show_login()
 		$level = bo_user_get_level();
 		$show = $_GET['bo_action'];
 		
-		if (bo_user_get_id() == 1)
-		{
-			include 'update.inc.php';
-			
-			if (bo_check_for_update() == true)
-				return;
-		}
-		
-	
 		echo '<ul id="bo_menu">';
 
 		echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=" class="bo_navi'.($show == '' ? '_active' : '').'">'._BL('Start').'</a>';
@@ -71,6 +62,14 @@ function bo_show_login()
 		
 		echo '</ul>';
 
+		if (bo_user_get_id() == 1)
+		{
+			include 'update.inc.php';
+			
+			if (bo_check_for_update() == true)
+				return;
+		}
+		
 		switch($show)
 		{
 
@@ -400,7 +399,10 @@ function bo_user_show_admin()
 	if (isset($_POST['bo_admin_user']) && (bo_user_get_level() & BO_PERM_ADMIN) )
 	{
 		$user_id = intval($_POST['user_id']);
+
 		$new_user_login = BoDb::esc(bo_gpc_prepare($_POST['bo_user_login']));
+		$new_user_pass = BoDb::esc(bo_gpc_prepare($_POST['bo_user_pass']));
+		$new_user_mail = BoDb::esc(bo_gpc_prepare($_POST['bo_user_mail']));
 
 		if ($user_id == 1 || $new_user_login)
 		{
@@ -413,9 +415,6 @@ function bo_user_show_admin()
 						$new_user_level += $perm; 
 				}
 			}
-			
-			$new_user_pass = BoDb::esc(bo_gpc_prepare($_POST['bo_user_pass']));
-			$new_user_mail = BoDb::esc(bo_gpc_prepare($_POST['bo_user_mail']));
 			
 			$sql = " ".BO_DB_PREF."user SET mail='$new_user_mail' ";
 
@@ -439,6 +438,12 @@ function bo_user_show_admin()
 				bo_db("INSERT IGNORE INTO $sql");
 
 			$user_id = 0;
+		}
+		else
+		{
+			$user_login = $new_user_login;
+			$user_pass = $new_user_pass;
+			$user_mail = $new_user_mail;
 		}
 	}
 
@@ -529,7 +534,7 @@ function bo_user_show_admin()
 	echo '<input type="text" name="bo_user_login" value="'._BC($user_login).'" id="bo_user_login" class="bo_form_text bo_admin_input" '.$disabled.'>';
 
 	echo '<span class="bo_form_descr">'._BL('Password').':</span>';
-	echo '<input type="password" name="bo_user_pass" id="bo_user_login" class="bo_form_text bo_admin_input" '.$disabled.'>';
+	echo '<input type="password" name="bo_user_pass" value="'._BC($user_pass).'" id="bo_user_login" class="bo_form_text bo_admin_input" '.$disabled.'>';
 
 	//echo '<span class="bo_form_descr">'._BL('Level').':</span>';
 	//echo '<input type="text" name="bo_user_level" value="'._BC($user_level).'" id="bo_user_level" class="bo_form_text bo_admin_input" '.$disabled.'>';

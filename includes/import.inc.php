@@ -110,7 +110,7 @@ function bo_update_raw_signals($force = false)
 		$lines = explode("\n", $file);
 		foreach($lines as $l)
 		{
-			if (preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+)(( [0-9\.]+){4}) ([A-F0-9]+)/', $l, $r))
+			if (preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $l, $r))
 			{
 				$date = $r[1];
 				$time = $r[2];
@@ -148,17 +148,31 @@ function bo_update_raw_signals($force = false)
 				$lat = $r[4];
 				$lon = $r[5];
 				$height = $r[6];
-				$data = $r[9];
+				$channels = $r[7];
+				$values = $r[8];
+				$bpv = $r[9];
+				$ntime = $r[10];
+				$data = $r[11];
 
-				$sql = "
-							time='$date $time',
+
+				/*** signal examinations ***/
+				//from hex to binary
+				$bdata = '';
+				for ($j=0;$j < strlen($data);$j+=2)
+				{
+					$bdata .= chr(substr($data,$j,2));
+				}
+		
+				$sql = "	time='$date $time',
 							time_ns='$time_ns',
 							lat='$lat',lon='$lon',
 							height='$height',
 							strike_id='0',
 							data=x'$data'
 							";
-							
+				
+				$sql .= ",".bo_examine_signal($bdata);
+				
 				$id = array_search("$date $time.$time_ns", $old_data['time']);
 				
 				if ($id)
@@ -176,6 +190,14 @@ function bo_update_raw_signals($force = false)
 
 		echo "\n<p>Lines: ".count($lines)." *** New Raw Data: $i *** Updated: $u *** Already read: $a</p>\n";
 
+		if ($channels && $values && $bpv)
+		{
+			bo_set_conf('raw_channels', $channels);
+			bo_set_conf('raw_values', $values);
+			bo_set_conf('raw_bitspervalue', $bpv);
+			bo_set_conf('raw_ntime', $ntime);
+		}
+		
 		//Longtime
 		$count = bo_get_conf('count_raw_signals');
 		bo_set_conf('count_raw_signals', $count + $i);
@@ -461,30 +483,37 @@ function bo_update_strikes($force = false)
 	return $updated;
 }
 
-
+// Update strike_id <-> raw_id
 function bo_match_strike2raw()
 {
-	// Update strike_id <-> raw_id
 	$c = 299792458;
-	$fuzz = 0.0006;
+	$fuzz = 0.0008;
+	$amp_trigger = (BO_TRIGGER_VOLTAGE / BO_MAX_VOLTAGE) * 256;
 
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 	$row = bo_db($sql)->fetch_assoc();
-	$mtime = $row['mtime'];
-
+	$maxtime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC'));
+	$mintime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC') - 3600 * 24);
+	
 	$u = array();
 	$n = array();
 	$m = array();
+	$polarity = array();
+	$part = array();
+	$own_found = 0;
+	$own_strikes = 0;
 
-	$sql = "SELECT id, time, time_ns, distance, bearing
+	$sql = "SELECT id, time, time_ns, distance, bearing, polarity, part
 			FROM ".BO_DB_PREF."strikes
-			WHERE part=1 AND raw_id IS NULL
-					AND time < '$mtime'
-			ORDER BY time DESC
+			WHERE raw_id IS NULL
+					AND time BETWEEN '$mintime' AND '$maxtime'
 			";
 	$res = bo_db($sql);
 	while($row = $res->fetch_assoc())
 	{
+		if ($row['part'] > 0)
+			$own_strikes++;
+		
 		$time_strike  = strtotime($row['time']." UTC");
 		$ntime_strike = 1E-9 * $row['time_ns'];
 
@@ -520,9 +549,9 @@ function bo_match_strike2raw()
 		else
 			$nsql = " time_ns > '$nsearch_from' AND time_ns < '$nsearch_to' ";
 
-		$sql = "SELECT id, time, time_ns, data
+		$sql = "SELECT id, time, time_ns, data, amp1, amp2, amp1_max, amp2_max
 				FROM ".BO_DB_PREF."raw
-				WHERE 	time    BETWEEN '$search_date_from' AND '$search_date_to'
+				WHERE 	time BETWEEN '$search_date_from' AND '$search_date_to'
 						AND $nsql
 				LIMIT 2";
 		$res2 = bo_db($sql);
@@ -531,14 +560,33 @@ function bo_match_strike2raw()
 
 		switch($num)
 		{
-			case 0:  $n[$row2['id']] = $row['id']; break; //no raw data found
-			default: $m[$row2['id']] = $row['id']; break; //too much lines matched
+			case 0:  $n[] = $row['id']; break; //no raw data found
+			default: $m[] = $row['id']; break; //too much lines matched
 
 			case 1:  //exact match
 
 				$u[$row2['id']] = $row['id'];
-
-				if (BO_EXPERIMENTAL_POLARITY_CHECK === true) //experimental polarity checking
+				$polarity[$row['id']] = $row['polarity'];
+				$part[$row['id']] = abs($row['part']);
+				
+				//channel examination
+				$trigger1_first = $row2['amp1']     >= $amp_trigger;
+				$trigger2_first = $row2['amp2']     >= $amp_trigger;
+				$trigger1_later = $row2['amp1_max'] >= $amp_trigger;
+				$trigger2_later = $row2['amp2_max'] >= $amp_trigger;
+				
+				$part[$row['id']] += $trigger1_first ? pow(2, 1) : 0;
+				$part[$row['id']] += $trigger2_first ? pow(2, 2) : 0;
+				$part[$row['id']] += $trigger1_later ? pow(2, 3) : 0;
+				$part[$row['id']] += $trigger2_later ? pow(2, 4) : 0;
+				
+				if (!($part[$row['id']] & 1)) //mark negative --> got strike but not tracked by blitzortung
+					$part[$row['id']] = $part[$row['id']] * -1;
+				else
+					$own_found++;
+					
+				//experimental polarity checking
+				if (BO_EXPERIMENTAL_POLARITY_CHECK === true) 
 				{
 					$polarity[$row['id']] = bo_strike2polarity($row2['data'], $row['bearing']);
 
@@ -555,18 +603,18 @@ function bo_match_strike2raw()
 
 	echo "\n<p>Assign raw data to strikes: ".
 			(count($u) + count($n) + count($m))." strikes analyzed".
-			" *** Unique: ".count($u)." *** Not found: ".count($n)." *** Multiple: ".count($m)."</p>";
+			" *** Own strikes: ".$own_strikes." *** Unique found: ".count($u)." *** Own found: ".$own_found." *** Not found: ".count($n)." *** Multiple: ".count($m)."</p>";
 
 	//Update matched
 	foreach($u as $raw_id => $strike_id)
 	{
-		if (BO_EXPERIMENTAL_POLARITY_CHECK === true)
-		{
-			$sql = "UPDATE ".BO_DB_PREF."strikes SET raw_id='$raw_id', polarity=".$polarity[$strike_id]."  WHERE id='$strike_id'";
-			bo_db($sql);
-		}
-		else
-			bo_db("UPDATE ".BO_DB_PREF."strikes SET raw_id='$raw_id'   WHERE id='$strike_id'");
+		$sql = "UPDATE ".BO_DB_PREF."strikes 
+				SET 
+					raw_id='$raw_id', 
+					polarity=".$polarity[$strike_id].",
+					part=".$part[$strike_id]."
+				WHERE id='$strike_id'";
+		bo_db($sql);
 
 		bo_db("UPDATE ".BO_DB_PREF."raw SET strike_id='$strike_id' WHERE id='$raw_id'");
 	}
@@ -576,7 +624,8 @@ function bo_match_strike2raw()
 	$sql = '';
 	foreach($d as $strike_id)
 		$sql .= " OR id='$strike_id' ";
-	bo_db("UPDATE ".BO_DB_PREF."strikes SET raw_id='0' WHERE 1=0 $sql");
+	$sql = "UPDATE ".BO_DB_PREF."strikes SET raw_id='0' WHERE 1=0 $sql";
+	bo_db($sql);
 
 	return true;
 }
@@ -805,11 +854,11 @@ function bo_update_daily_stat()
 		//whole strike count
 		$row_all = bo_db(strtr($sql,array('{where}' => '')))->fetch_assoc();
 		//own strike count
-		$row_own = bo_db(strtr($sql,array('{where}' => 'part=1 AND ')))->fetch_assoc();
+		$row_own = bo_db(strtr($sql,array('{where}' => 'part > 0 AND ')))->fetch_assoc();
 		//whole strike count (in radius)
 		$row_all_rad = bo_db(strtr($sql,array('{where}' => 'distance < "'.$radius.'" AND ')))->fetch_assoc();
 		//own strike count (in radius)
-		$row_own_rad = bo_db(strtr($sql,array('{where}' => 'part=1 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
+		$row_own_rad = bo_db(strtr($sql,array('{where}' => 'part > 0 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
 
 		/*** Signals ***/
 		//own exact value
@@ -1401,7 +1450,7 @@ function bo_update_densities($max_time)
 				
 				if (intval($b['station_id']) && $b['station_id'] == bo_station_id())
 				{
-					$sql_where = " AND s.part=1 ";
+					$sql_where = " AND s.part > 0 ";
 				}
 				elseif ($b['station_id'])
 				{

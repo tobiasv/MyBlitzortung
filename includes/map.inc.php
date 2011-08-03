@@ -252,7 +252,7 @@ function bo_show_lightning_map()
 		{
 			$js_stations .= $js_stations ? ",\n" : '';
 			$js_stations .= '{';
-			$js_stations .= 'lat:'.round($row['lat'],1).', lon:'.round($row['lon'], 1).', city:"'._BC($row['city']).'"';
+			$js_stations .= 'stid:'.$row['id'].', lat:'.round($row['lat'],1).', lon:'.round($row['lon'], 1).', city:"'._BC($row['city']).'"';
 			$js_stations .= '}';
 		}
 		
@@ -834,7 +834,12 @@ function bo_show_lightning_map()
 					  position: new google.maps.LatLng(bo_stations[i].lat,bo_stations[i].lon), 
 					  map: bo_map, 
 					  title:bo_stations[i].city,
-					  icon: '<?php echo  BO_MAP_STATIONS_ICON ?>'
+					  icon: '<?php echo  BO_MAP_STATIONS_ICON ?>',
+					  stid: bo_stations[i].stid
+					});
+					
+					google.maps.event.addListener(bo_station_markers[i], 'click', function() {
+						window.open('<?php echo BO_STATISTICS_URL ?>&bo_show=station&bo_station_id=' + this.stid, '_blank');
 					});
 				}
 			}

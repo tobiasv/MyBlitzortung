@@ -542,7 +542,7 @@ function bo_show_archive_search()
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Deviation').':</span><span class=\'bo_value\'> '.number_format($row['deviation'] / 1000, 1, _BL('.'), _BL(',')).'km</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Current').':</span><span class=\'bo_value\'> '.number_format($row['current'], 1, _BL('.'), _BL(',')).'kA ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Polarity').':</span><span class=\'bo_value\'> '.($row['polarity'] === null ? '?' : ($row['polarity'] < 0 ? _BL('negative') : _BL('positive'))).' ('._BL('experimental').')</span></li>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Participated').':</span><span class=\'bo_value\'> '.($row['part'] ? _BL('yes') : _BL('no')).'</span></li>';
+			$description .= '<li><span class=\'bo_descr\'>'._BL('Participated').':</span><span class=\'bo_value\'> '.($row['part'] > 0 ? _BL('yes') : _BL('no')).'</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participants').':</span><span class=\'bo_value\'> '.intval($row['users']).'</span></li>';
 			$description .= '</ul>';
 
@@ -713,21 +713,26 @@ function bo_show_archive_search()
 			<?php echo  $text ?>
 
 			var images = new Array();
+			var img_count = 10;
 			var d;
 			var time_min=<?php echo intval($time_min) ?>;
 			var time_int=<?php echo intval($time_int) ?>;
-			for (var i=0;i<10;i++)
+			
+			for (var j=0;j<2;j++)
 			{
-				d = i * 25;
-				d = d.toString(16);
-				d = d.length == 1 ? '0'+d : d;
+				for (var i=0;i<img_count;i++)
+				{
+					d = i * 25;
+					d = d.toString(16);
+					d = d.length == 1 ? '0'+d : d;
 
-				images[i] = new google.maps.MarkerImage("<?php echo  BO_FILE ?>?icon=ff"+d+"00",
-								new google.maps.Size(11,11),
-								new google.maps.Point(0,0),
-								new google.maps.Point(5, 5));
+					images[i+j*img_count] = new google.maps.MarkerImage("<?php echo  BO_FILE ?>?icon=ff"+d+"00"+(j ? '1' : ''),
+									new google.maps.Size(11,11),
+									new google.maps.Point(0,0),
+									new google.maps.Point(5, 5));
+				}
 			}
-
+			
 			var color;
 			var lmarker = Array();
 			var infowindow = new google.maps.InfoWindow({
@@ -741,6 +746,10 @@ function bo_show_archive_search()
 				else
 					color = 0;
 
+				if (lightnings[lightning].participated > 0)
+					color = color + img_count;
+				
+					
 				markerOptions = {
 				  map: bo_map,
 				  position: lightnings[lightning].center,
@@ -798,6 +807,8 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	
 	$show_empty_sig = $perm && isset($_GET['bo_all_strikes']);
 	
+	$sql_where = '';
+	
 	if ($lat !== null && $lon !== null)
 	{
 		if (!$fuzzy)
@@ -808,7 +819,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 		$lonW = $lon - $fuzzy;
 		$lonE = $lon + $fuzzy;
 
-		$latlon_sql = " AND NOT (s.lat < '$latS' OR s.lat > '$latN' OR s.lon < '$lonW' OR s.lon > '$lonE') ";
+		$sql_where = " AND NOT (s.lat < '$latS' OR s.lat > '$latN' OR s.lon < '$lonW' OR s.lon > '$lonE') ";
 		$only_strikes = true;
 		$show_empty_sig = true;
 
@@ -857,10 +868,11 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	{
 		$sql_join = BO_DB_PREF."raw r JOIN ".BO_DB_PREF."strikes s ON s.raw_id=r.id ";
 		$table = 'r';
+		$sql_where = " AND s.part > 0 ";
 	}
 	else
 	{
-		$date_end   = gmdate('Y-m-d H:i:s', $time_end - 120); // strike data my be older
+		$date_end   = gmdate('Y-m-d H:i:s', $time_end - 180); // strike data may be older
 		
 		$sql_join = BO_DB_PREF."raw r LEFT OUTER JOIN ".BO_DB_PREF."strikes s ON s.raw_id=r.id ";
 		$table = 'r';
@@ -869,12 +881,12 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	$count = 0;
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
 					s.deviation deviation, s.current current,
-					s.time stime, s.time_ns stimens, s.users users, 
+					s.time stime, s.time_ns stimens, s.users users, s.part part,
 					r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data
 			FROM $sql_join
 			WHERE 1
 					AND $table.time BETWEEN '$date_start' AND '$date_end'
-					$latlon_sql
+					$sql_where
 			ORDER BY $table.time DESC, $table.time_ns DESC
 			LIMIT ".($page * $per_page).", ".($per_page+1)."";
 	$res = bo_db($sql);
@@ -887,7 +899,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 		echo '<a href="'.bo_insert_url('bo_action', $page-1).'" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
 	echo '</div>';
 
-	echo '<table class="bo_sig_table">';
+	echo '<table class="bo_sig_table'.(BO_ARCHIVE_SHOW_SPECTRUM ? ' bo_sig_table_spectrum' : '').'">';
 
 
 	while($row = $res->fetch_assoc())
@@ -928,9 +940,18 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px">';
 		else
 			echo _BL('No signal recieved.');
-
 		echo '</td>';
 
+		if (BO_ARCHIVE_SHOW_SPECTRUM)
+		{
+			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
+			if ($row['raw_id'])
+				echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px">';
+			else
+				echo _BL('No signal recieved.');
+			echo '</td>';
+		}
+		
 		echo '</tr><tr>';
 
 		echo '<td class="bo_sig_table_strikeinfo">';
@@ -991,21 +1012,24 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			echo '</span>';
 			echo '</li>';
 
-			echo '<li>';
-			echo '<span class="bo_descr">';
-			echo _BL('Polarity').': ';
-			echo '</span>';
-			echo '<span class="bo_value">';
-
-			if ($pol === null)
-				echo '?';
-			elseif ($pol > 0)
-				echo _BL('positive');
-			elseif ($pol < 0)
-				echo _BL('negative');
-			echo '</span>';
-			echo '</li>';
-
+			if (BO_EXPERIMENTAL_POLARITY_CHECK === true)
+			{
+				echo '<li>';
+				echo '<span class="bo_descr">';
+				echo _BL('Polarity').': ';
+				echo '</span>';
+				echo '<span class="bo_value">';
+			
+				if ($pol === null)
+					echo '?';
+				elseif ($pol > 0)
+					echo _BL('positive');
+				elseif ($pol < 0)
+					echo _BL('negative');
+				echo '</span>';
+				echo '</li>';
+			}
+			
 			echo '<li>';
 			echo '<span class="bo_descr">';
 			echo _BL('Participants').': ';
@@ -1015,6 +1039,18 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			echo '</span>';
 			echo '</li>';
 
+			if ($row['raw_id'] && !$only_strikes)
+			{
+				echo '<li>';
+				echo '<span class="bo_descr">';
+				echo _BL('Evaluated').': ';
+				echo '</span>';
+				echo '<span class="bo_value">';
+				echo $row['part'] > 0 ? _BL('yes') : '<span class="bo_archive_not_evaluated">'._BL('no').'</span>';
+				echo '</span>';
+				echo '</li>';
+			}
+			
 			echo '</ul>';
 
 		}

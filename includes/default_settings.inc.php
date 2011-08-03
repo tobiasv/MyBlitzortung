@@ -133,6 +133,7 @@
 @define("BO_CALC_DENSITIES", false); //Calculates Densities 
 @define("BO_CALC_DENSITIES_CURRENT", true); //Calculates Densities for current year/month
 @define("BO_ARCHIVE_SEARCH_STRIKECOUNT", 10);
+@define("BO_ARCHIVE_SHOW_SPECTRUM", true);
 
 //Mark stations offline after specified time with no signals
 @define("BO_STATION_OFFLINE_HOURS", 24);
@@ -157,6 +158,9 @@
 @define("BO_GRAPH_RAW_COLOR_YGRID", '#eee');
 @define("BO_GRAPH_RAW_COLOR_XAXIS", '#666');
 @define("BO_GRAPH_RAW_COLOR_YAXIS", '#666');
+@define("BO_GRAPH_RAW_SPEC_WIDTH", 1);
+@define("BO_GRAPH_RAW_SPEC_MAX_X", 160); //kHz
+@define("BO_GRAPH_RAW_SPEC_MAX_Y", 7);
 
 // Statistics Graph
 @define("BO_GRAPH_STAT_W", 550);
@@ -182,15 +186,35 @@
 @define("BO_GRAPH_STAT_HOURS_BACK", 24);
 @define("BO_GRAPH_STAT_HOURS_BACK_STATIONS", 72);
 
+//Statistics-Graph: Strikes (now)
+@define("BO_GRAPH_STAT_STRIKES_NOW_COLOR_L1", '#f99@0.4');
+@define("BO_GRAPH_STAT_STRIKES_NOW_COLOR_F1", '#f99@0.7');
+@define("BO_GRAPH_STAT_STRIKES_NOW_WIDTH_1",  1);
+@define("BO_GRAPH_STAT_STRIKES_NOW_COLOR_L2", '#99f@0.4');
+@define("BO_GRAPH_STAT_STRIKES_NOW_COLOR_F2", '#99f@0.7');
+@define("BO_GRAPH_STAT_STRIKES_NOW_WIDTH_2",  1);
+@define("BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES",  5);
+
+//Statistics-Graph: Strikes with participants
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_L1", '#f99@0.4');
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_F1", '#f99@0.7');
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_WIDTH_1",  1);
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_L2", '#99f@0.4');
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_F2", '#99f@0.7');
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_WIDTH_2",  1);
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_L3", '#0f0@0.7');
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_F3", false);
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_WIDTH_3",  2);
+@define("BO_GRAPH_STAT_STRIKES_PARTICIPANTS_GROUP_MINUTES",  15);
+
 //Statistics-Graph: Strikes (Month, Year)
-@define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_L1", '#00f@0.9');
+@define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_L1", '#00f@1');
 @define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1", '#f99@0.4');
-@define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_L2", '#00f@0.9');
+@define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_L2", '#00f@1');
 @define("BO_GRAPH_STAT_STRIKES_TIME_COLOR_F2", '#99f@0.4');
-@define("BO_GRAPH_STAT_STRIKES_TIME_WIDTH", 0.98);
+@define("BO_GRAPH_STAT_STRIKES_TIME_WIDTH", 0.5);
 
-
-//Statistics-Graph: Strikes
+//Statistics-Graph: Strikes (Station)
 @define("BO_GRAPH_STAT_STR_COLOR_L1", '#99f@1');
 @define("BO_GRAPH_STAT_STR_COLOR_F1", '#99f@0.7');
 @define("BO_GRAPH_STAT_STR_WIDTH_1",  1);
@@ -248,7 +272,7 @@
 @define("BO_GRAPH_STAT_RATIO_DIST_LINE", false);
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_L1", '#00f@1');
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_F1", '#ada@0');
-@define("BO_GRAPH_STAT_RATIO_DIST_WIDTH1",  0.6);
+@define("BO_GRAPH_STAT_RATIO_DIST_WIDTH1",  1.001);
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_L2", '#22f@0.8');
 @define("BO_GRAPH_STAT_RATIO_DIST_COLOR_F2", '#22f@0.95');
 @define("BO_GRAPH_STAT_RATIO_DIST_WIDTH2",  1);
@@ -262,6 +286,17 @@
 @define("BO_GRAPH_STAT_RATIO_BEAR_COLOR_L2", '#22f@0.8');
 @define("BO_GRAPH_STAT_RATIO_BEAR_COLOR_F2", '#22f@0.95');
 @define("BO_GRAPH_STAT_RATIO_BEAR_WIDTH2",  1);
+
+//Statistics-Graph: Strikes by no. of participants
+@define("BO_GRAPH_STAT_PARTICIPANTS_COLOR_L1", '#00f@1');
+@define("BO_GRAPH_STAT_PARTICIPANTS_COLOR_F1", '#f99@0.4');
+@define("BO_GRAPH_STAT_PARTICIPANTS_COLOR_L2", '#00f@1');
+@define("BO_GRAPH_STAT_PARTICIPANTS_COLOR_F2", '#99f@0.4');
+@define("BO_GRAPH_STAT_PARTICIPANTS_WIDTH", 0.5);
+@define("BO_GRAPH_STAT_PARTICIPANTS_COLOR_L3", '#0a0@0.9');
+@define("BO_GRAPH_STAT_PARTICIPANTS_COLOR_F3", '#4f4@0.8');
+@define("BO_GRAPH_STAT_PARTICIPANTS_WIDTH2",  1);
+@define("BO_GRAPH_STAT_PARTICIPANTS_LOG", true);
 
 
 /*** Automatic Data-Purging ***/
@@ -357,4 +392,8 @@ if (!isset($_BO['density'][0]))
 if (!isset($_BO['density'][1]))
 	$_BO['density'][1] = $_BO['tpl_density']['germany'];
 
+/*** Regions ***/
+if (!isset($_BO['region']['germany']))
+	$_BO['region']['germany'] = $_BO['tpl_region']['germany'];
+	
 ?>

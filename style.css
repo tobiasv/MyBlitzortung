@@ -241,7 +241,7 @@ color: #666;
 width: 560px;
 text-align: center;
 margin: 20px 0 5px 10px;
-font-size: 9px;
+font-size: 11px;
 height: 20px;
 }
 
@@ -266,6 +266,10 @@ border-top: 1px solid #ccd;
 margin-left: 10px;
 border-collapse: collapse;
 width: 560px;
+}
+
+#myblitzortung .bo_sig_table_spectrum {
+width: 800px;
 }
 
 #myblitzortung .bo_sig_table td {
@@ -457,6 +461,11 @@ padding: 0 5px 0 5px;
 
 #myblitzortung .bo_archive_density_active {
 font-weight: bold;
+}
+
+#myblitzortung .bo_archive_not_evaluated {
+font-weight: bold;
+color: red;
 }
 
 /*** login ***/

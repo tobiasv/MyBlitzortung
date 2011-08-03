@@ -22,7 +22,7 @@
 
 
 // Graph from raw dataset
-function bo_graph_raw($id)
+function bo_graph_raw($id, $spec = false)
 {
 	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
 		bo_graph_error(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
@@ -47,52 +47,22 @@ function bo_graph_raw($id)
 	
 	$row = $erg->fetch_assoc();
 
-	$data[0] = array();
-	$data[1] = array();
+	require_once 'jpgraph/jpgraph.php';
+	require_once 'jpgraph/jpgraph_line.php';
+	require_once 'jpgraph/jpgraph_bar.php';
+	require_once 'jpgraph/jpgraph_plotline.php';
+	
 	$tickLabels = array();
 	$tickMajPositions = array();
 	$tickPositions = array();
 
-	for ($i=0;$i<strlen($row['data']);$i++)
-	{
-		if (!($i%2))
-		{
-			$x = floor($i / 0.357000 / 2 / 50) * 50;
-
-			if (!($i%4))
-			{
-				if (!($i%36))
-				{
-					$tickMajPositions[] = $i/2;
-					$tickLabels[] = $x.'µs';
-				}
-				elseif (!($i%6))
-				{
-					$tickPositions[] = $i/2;
-				}
-			}
-
-			$datax[] = $i/2;
-		}
-
-		$datay[$i%2][] = (ord(substr($row['data'],$i,1)) - 128) / 128 * 2.5;
-	}
-
-	$n = count($datax);
-	$xmin = $datax[0];
-	$xmax = $datax[$n-1];
-
-	require_once 'jpgraph/jpgraph.php';
-	require_once 'jpgraph/jpgraph_line.php';
-	require_once 'jpgraph/jpgraph_plotline.php';
-
+	$channels = bo_get_conf('raw_channels');
+	
 	$graph = new Graph(BO_GRAPH_RAW_W,BO_GRAPH_RAW_H,"auto");
 	$graph->ClearTheme();
 
 	if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
 		$graph->img->SetAntiAliasing();
-
-	$graph->SetScale("linlin",-2.5,2.5,$xmin,$xmax);
 
 	if (BO_GRAPH_RAW_COLOR_BACK)
 		$graph->SetColor(BO_GRAPH_RAW_COLOR_BACK);
@@ -110,65 +80,170 @@ function bo_graph_raw($id)
 	else
 		$graph->SetBox(false);
 
-	$plot=new LinePlot($datay[0], $datax);
-	$plot->SetColor(BO_GRAPH_RAW_COLOR1);
-	$graph->Add($plot);
-
-	$plot=new LinePlot($datay[1], $datax);
-	$plot->SetColor(BO_GRAPH_RAW_COLOR2);
-	$graph->Add($plot);
-
-	$graph->xaxis->SetPos('min');
-	$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
-
-	$graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
-	$graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
-
-	if (BO_GRAPH_RAW_COLOR_XGRID)
-	{
-		$graph->xgrid->SetColor(BO_GRAPH_RAW_COLOR_XGRID);
-		$graph->xgrid->Show(true,true);
-	}
-	else
-		$graph->xgrid->Show(false);
-
-	if (BO_GRAPH_RAW_COLOR_YGRID)
-	{
-		$graph->ygrid->SetColor(BO_GRAPH_RAW_COLOR_YGRID);
-		$graph->ygrid->Show(true,true);
-	}
-	else
-		$graph->ygrid->Show(false,false);
-
-
-	$graph->yaxis->SetTextTickInterval(0.5);
-
-	for($i=-2.5;$i<=2.5;$i+=0.5)
-	{
-		if (abs($i) != 0.5)
-			$yt[] = $i;
-	}
-
-	$graph->yaxis->SetTickPositions(array(-2,-1,0,1,2),$yt,array('-2V','-1V','0V','1V','2V'));
-
-	$sline  = new PlotLine(HORIZONTAL,  0.45, BO_GRAPH_RAW_COLOR3, 1);
-	$graph->AddLine($sline);
-
-	$sline  = new PlotLine(HORIZONTAL, -0.45, BO_GRAPH_RAW_COLOR3, 1);
-	$graph->AddLine($sline);
-
-	$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-	$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-
 	$graph->SetMargin(24,1,1,1);
 
-	$graph->Stroke();
+	
+	if ($spec)
+	{
+		$data = raw2array($row['data'], true);
+		$step = 5;
+		
+		foreach ($data['spec_freq'] as $i => $khz)
+		{
+			$tickLabels[$i] = (round($khz / 5) * 5).'kHz';
+		}
+
+		$utime    = bo_get_conf('raw_ntime') / 1000;
+		$values   = bo_get_conf('raw_values');
+		
+		$graph->SetScale("textlin", 0, BO_GRAPH_RAW_SPEC_MAX_Y, 0, BO_GRAPH_RAW_SPEC_MAX_X * $values * $utime / 1000);
+		
+		if ($channels == 1)
+		{
+			$plot=new BarPlot($data['spec'][0]);
+			$plot->SetColor('#fff@1');
+			$plot->SetFillColor(BO_GRAPH_RAW_COLOR1);
+			$plot->SetWidth(BO_GRAPH_RAW_SPEC_WIDTH);
+			$graph->Add($plot);
+		}
+		else if ($channels == 2)
+		{
+			$plot1=new BarPlot($data['spec'][0]);
+			$plot1->SetFillColor(BO_GRAPH_RAW_COLOR1);
+			$plot1->SetColor('#fff@1');
+			$plot1->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
+
+			$plot2=new BarPlot($data['spec'][1]);
+			$plot2->SetFillColor(BO_GRAPH_RAW_COLOR2);
+			$plot2->SetColor('#fff@1');
+			$plot2->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
+
+			$plot = new GroupBarPlot(array($plot1, $plot2));
+			$graph->Add($plot);
+			$plot2->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH);
+		}
+		
+		if (BO_GRAPH_RAW_COLOR_XGRID)
+		{
+			$graph->xgrid->SetColor(BO_GRAPH_RAW_COLOR_XGRID);
+			$graph->xgrid->Show(true,true);
+		}
+		else
+			$graph->xgrid->Show(false);
+
+		if (BO_GRAPH_RAW_COLOR_YGRID)
+		{
+			$graph->ygrid->SetColor(BO_GRAPH_RAW_COLOR_YGRID);
+			$graph->ygrid->Show(true,true);
+		}
+		else
+			$graph->ygrid->Show(false,false);
+		
+		$graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
+		$graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
+		$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
+		$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
+		$graph->yaxis->HideLabels();
+		
+		$graph->xaxis->SetTickLabels($tickLabels);
+		$graph->xaxis->SetTextLabelInterval(2);
+		$graph->xaxis->SetTextTickInterval(2);
+		$graph->Stroke();
+		
+	}
+	else
+	{
+		$data = raw2array($row['data']);
+		
+		$ustep = 50;
+		foreach ($data['signal_time'] as $i => $time_us)
+		{
+			$datax[] = $i;
+			$time_us = round($time_us / $ustep, 1) * $ustep;
+
+			if (!($i%12))
+			{
+				if (!($i%18))
+				{
+					$tickMajPositions[] = $i;
+					$tickLabels[] = $time_us.'µs';
+				}
+				elseif (!($i%6))
+				{
+					$tickPositions[] = $i;
+				}
+			}
+		}
+
+		
+		$n = count($datax);
+		$xmin = $datax[0];
+		$xmax = $datax[$n-1];
+
+		$graph->SetScale("linlin",-BO_MAX_VOLTAGE,BO_MAX_VOLTAGE,$xmin,$xmax);
+			
+		$plot=new LinePlot($data['signal'][0], $datax);
+		$plot->SetColor(BO_GRAPH_RAW_COLOR1);
+		$graph->Add($plot);
+
+		if ($channels == 2)
+		{
+			$plot=new LinePlot($data['signal'][1], $datax);
+			$plot->SetColor(BO_GRAPH_RAW_COLOR2);
+			$graph->Add($plot);
+		}
+		
+		$graph->xaxis->SetPos('min');
+		$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+
+		$graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
+		$graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
+
+		if (BO_GRAPH_RAW_COLOR_XGRID)
+		{
+			$graph->xgrid->SetColor(BO_GRAPH_RAW_COLOR_XGRID);
+			$graph->xgrid->Show(true,true);
+		}
+		else
+			$graph->xgrid->Show(false);
+
+		if (BO_GRAPH_RAW_COLOR_YGRID)
+		{
+			$graph->ygrid->SetColor(BO_GRAPH_RAW_COLOR_YGRID);
+			$graph->ygrid->Show(true,true);
+		}
+		else
+			$graph->ygrid->Show(false,false);
+
+
+		$graph->yaxis->SetTextTickInterval(0.5);
+
+		for($i=-BO_MAX_VOLTAGE;$i<=BO_MAX_VOLTAGE;$i+=0.5)
+		{
+			if (abs($i) != 0.5)
+				$yt[] = $i;
+		}
+
+		$graph->yaxis->SetTickPositions(array(-2,-1,0,1,2),$yt,array('-2V','-1V','0V','1V','2V'));
+
+		$sline  = new PlotLine(HORIZONTAL,  BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR3, 1);
+		$graph->AddLine($sline);
+
+		$sline  = new PlotLine(HORIZONTAL, -BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR3, 1);
+		$graph->AddLine($sline);
+
+		$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
+		$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
+		$graph->Stroke();
+	}
+	
 	exit;
 }
 
 function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = null)
 {
-
+	global $_BO;
+	
 	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
 		bo_graph_error(BO_GRAPH_STAT_W, BO_GRAPH_STAT_H);
 
@@ -181,7 +256,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		else
 			$hours_back = intval(BO_GRAPH_STAT_HOURS_BACK);
 	}
-		
 	
 	$hours_back = intval($hours_back) ? intval($hours_back) : 24;
 	$hours_back = !bo_user_get_level() && $hours_back > 96 ? 96 : $hours_back;
@@ -193,14 +267,73 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$date_start = gmdate('Y-m-d H:i:s', time() - 3600 * $hours_back);
 	$time_start = strtotime($date_start." UTC");
 
-	$X = $Y = array(); //data array
+	$X = $Y = $Y2 = $Y3 = array(); //data array
 	$tickLabels = array();
 	$tickMajPositions = array();
 	$tickPositions = array();
 	$xmin = null;
 	$xmax = null;
+	$ymin = null;
+	$ymax = null;
+	$add_title = '';
+
+	$region = $_GET['region'];
 	
-	if ($type == 'strikes_time')
+	if ($_BO['region'][$region]['name'])
+		$add_title = ' ('._BL($_BO['region'][$region]['name']).')';
+
+	
+	if ($type == 'strikes_now')
+	{
+		$last_uptime = bo_get_conf('uptime_strikes') - 60;
+		$group_minutes = BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES;
+
+		if ($hours_back > 24)
+			$group_minutes *= ceil($hours_back / 24);
+		
+		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+		
+		if ($station_id)
+		{
+			$sql_select = " , ss.station_id IS NOT NULL participated ";
+			$sql_join   = "LEFT JOIN ".BO_DB_PREF."stations_strikes ss
+							ON s.id=ss.strike_id AND ss.station_id='$station_id'";
+		}
+		else
+		{
+			$sql_select = ", s.part>0 participated";
+			$sql_join   = "";
+		}
+		
+		$sql = "SELECT s.time time, COUNT(s.id) cnt $sql_select
+			FROM ".BO_DB_PREF."strikes s
+			$sql_join
+			WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+			".bo_region2sql($region)."
+			GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated";
+		$res = bo_db($sql);
+		while ($row = $res->fetch_assoc())
+		{
+			$time = strtotime($row['time'].' UTC');
+			$index = floor( ($time - $last_uptime + $hours_back * 3600) / 60 / $group_minutes);
+			
+			$tmp[$index][$row['participated']] = $row['cnt'] / $group_minutes;
+		}
+		
+		for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)
+		{
+			$X[$i] = $last_uptime + ($i * $group_minutes - $hours_back * 60) * 60;
+			$Y[$i] = (double)($tmp[$i][0] + $tmp[$i][1]);
+			$Y2[$i] = (double)$tmp[$i][1];
+		}
+
+		$graph_type = 'datlin';
+		
+		$caption  = (array_sum($Y) * $group_minutes).' '._BL('total strikes');
+		$caption .= "\n";
+		$caption .= (array_sum($Y2) * $group_minutes).' '._BL('total strikes station2');
+	}
+	else if ($type == 'strikes_time')
 	{
 		$station_id = 0;
 		
@@ -234,7 +367,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$xtitle = 'Day';
 			$add_title .= ' '._BL(date('F', $time_begin)).' '.$year;
 		}
-
+		
 		$day_offset = date('z', $time_begin);
 
 		for ($i=0;$i<$days;$i++)
@@ -252,7 +385,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$tickMajPositions[] = $i;
 			}
 			
-			$Y1[$i] = 0;
+			$Y[$i] = 0;
 			$Y2[$i] = 0;
 		}
 
@@ -274,12 +407,32 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$d = unserialize($row['data']);
 
 			$Y2[$i] = $d[0 + $rad] - $d[1 + $rad];
-			$Y1[$i] = $d[1 + $rad];
+			$Y[$i] = $d[1 + $rad];
 		}
 
-		$caption  = (array_sum($Y1) + array_sum($Y2)).' '._BL('total strikes');
+		
+		//count for today
+		if ($year == gmdate('Y') && ($month == -1 || $month == gmdate('m')))
+		{
+			$i = gmdate('z') - $day_offset;
+			$sql = "SELECT COUNT(id) cnt, part>0 participated
+						FROM ".BO_DB_PREF."strikes
+						WHERE time BETWEEN '".gmdate('Y-m-d 00:00:00')."' AND '".gmdate('Y-m-d 23:59:59')."'
+						".($radius ? " AND distance < '".(BO_RADIUS * 1000)."'" : "")."
+						GROUP BY participated";
+			$res = bo_db($sql);
+			while($row = $res->fetch_assoc())
+			{
+				if ($row['participated'])
+					$Y[$i] = $row['cnt'];
+				else
+					$Y2[$i] = $row['cnt'];
+			}
+		}
+		
+		$caption  = (array_sum($Y) + array_sum($Y2)).' '._BL('total strikes');
 		$caption .= "\n";
-		$caption .= array_sum($Y1).' '._BL('total strikes station');
+		$caption .= array_sum($Y).' '._BL('total strikes station');
 		
 		$graph_type = 'textlin';
 	}
@@ -333,6 +486,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		}
 
 		$graph_type = 'textlin';
+		$title_no_hours = true;
 		$add_title = ' '._BL('since begin of data logging');
 	}
 	else if($type == 'ratio_bearing_longtime')
@@ -382,6 +536,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 		$graph_type = 'linlin';
 		$add_title = ' '._BL('since begin of data logging');
+		$title_no_hours = true;
 		$xmin = 0;
 		$xmax = 360;
 	}
@@ -429,14 +584,14 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$sql = " CEIL(distance/$dist_div/1000) val ";
 
 			//strike ratio for own station
-			$sql = "SELECT COUNT(id) cnt, part, $sql
+			$sql = "SELECT COUNT(id) cnt, part>0 participated, $sql
 					FROM ".BO_DB_PREF."strikes
 					WHERE time BETWEEN '$date_start' AND '$date_end'
-					GROUP BY part, val";
+					GROUP BY participated, val";
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())
 			{
-				$tmp[$row['part']][$row['val']] = $row['cnt'];
+				$tmp[$row['participated']][$row['val']] = $row['cnt'];
 				$x += $row['cnt'];
 				$ticks = max($ticks, $row['val']);
 			}
@@ -481,10 +636,11 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 		$tmp = array();
 		
-		$sql = "SELECT SUM(distance) sum_dist, COUNT(distance) cnt_dist, part, time
+		$sql = "SELECT SUM(distance) sum_dist, COUNT(distance) cnt_dist, part>0 participated, time
 				FROM ".BO_DB_PREF."strikes
 				WHERE time BETWEEN '$date_start' AND '$date_end'
-				GROUP BY part, DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
+				".bo_region2sql($region)."
+				GROUP BY participated, DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
 		$res = bo_db($sql);
 		while($row = $res->fetch_assoc())
 		{
@@ -497,7 +653,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$tmp['all_sum'][$index] += $row['sum_dist'];  //distance sum
 			$tmp['all_cnt'][$index] += $row['cnt_dist'];  //distance count
 			
-			if ($row['part'])
+			if ($row['participated'])
 			{
 				$tmp['own_sum'][$index] += $row['sum_dist'];  //own distance sum
 				$tmp['own_cnt'][$index] += $row['cnt_dist'];  //own distance count
@@ -520,6 +676,160 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		
 		$graph_type = 'datlin';
 		
+	}
+	else if ($type == 'participants')
+	{
+		$interval = $hours_back / 24 * 15;
+
+		$tmp = array();
+		
+		if ($station_id)
+		{
+			$sql = "SELECT COUNT(s.id) cnt, ss.station_id spart, s.users users
+					FROM ".BO_DB_PREF."strikes s
+					LEFT JOIN ".BO_DB_PREF."stations_strikes ss
+					ON s.id=ss.strike_id AND ss.station_id='$station_id'
+					WHERE time BETWEEN '$date_start' AND '$date_end'
+					".bo_region2sql($region)."
+					GROUP BY spart, users";
+		}
+		else
+		{
+			$sql = "SELECT COUNT(id) cnt, part>0 spart, users
+					FROM ".BO_DB_PREF."strikes
+					WHERE time BETWEEN '$date_start' AND '$date_end'
+					".bo_region2sql($region)."
+					GROUP BY spart, users";
+		}
+		
+		$res = bo_db($sql);
+		while($row = $res->fetch_assoc())
+		{
+			$index = $row['users'];
+			$max_users = max($row['users'], $max_users);
+			
+			if ($row['spart'])
+				$tmp['own_users'][$index] = $row['cnt'];
+			else
+				$tmp['all_users'][$index] = $row['cnt'];
+		}
+
+		for($i=0;$i<$max_users;$i++)
+		{
+			$X[$i] = $i;
+			$Y[$i] = intval($tmp['own_users'][$i]);
+			$Y2[$i] = intval($tmp['all_users'][$i]);
+			
+			if (BO_GRAPH_STAT_PARTICIPANTS_LOG === true)
+			{
+				$Y[$i] = $Y[$i] ? $Y[$i] + 0.1 : $Y[$i];
+				$Y2[$i] = $Y2[$i] ? $Y2[$i] + 0.1 : $Y2[$i];
+			}
+			
+			if ($Y[$i] + $Y2[$i])
+				$Y3[$i] = $Y[$i] / ($Y[$i] + $Y2[$i]) * 100;
+			else
+				$Y3[$i] = null;
+			
+			$max = max($ymax, $Y[$i] + $Y2[$i]);
+		}
+	
+		if (BO_GRAPH_STAT_PARTICIPANTS_LOG === true)
+		{
+			$graph_type = 'linlog';
+		}
+		else
+		{
+			$graph_type = 'linlin';
+		}
+	
+		$xmin = BO_MIN_PARTICIPANTS;
+		$xmax = $max_users;
+	}
+	else if ($type == 'participants_time')
+	{
+		$participants = isset($_GET['participants']) ? intval($_GET['participants']) : 0;
+		$participants_max = isset($_GET['participants_max']) ? intval($_GET['participants_max']) : 0;
+
+		if (!$participants)
+			$participants = BO_MIN_PARTICIPANTS;
+
+		if (!$participants_max || $participants_max <= $participants)
+			$participants_max = 0;
+			
+		$last_uptime = bo_get_conf('uptime_strikes') - 60;
+		$group_minutes = BO_GRAPH_STAT_STRIKES_PARTICIPANTS_GROUP_MINUTES;
+
+		if ($hours_back > 24)
+			$group_minutes *= ceil($hours_back / 24);
+		
+		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+		
+		if ($station_id)
+		{
+			$sql_select = " , ss.station_id IS NOT NULL participated ";
+			$sql_join   = "LEFT JOIN ".BO_DB_PREF."stations_strikes ss
+							ON s.id=ss.strike_id AND ss.station_id='$station_id'";
+		}
+		else
+		{
+			$sql_select = " , part>0 participated ";
+			$sql_join   = "";
+		}
+		
+		if ($participants_max)
+		{
+			$participants_text = $participants.'-'.$participants_max;
+			$sql_select .= ", s.users BETWEEN '$participants' AND '$participants_max' extra ";
+		}
+		else
+		{
+			$participants_text = $participants;
+			$sql_select .= ", s.users='$participants' extra ";
+		}
+		
+		$sql = "SELECT s.time time, COUNT(s.id) cnt $sql_select
+				FROM ".BO_DB_PREF."strikes s
+				$sql_join
+				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+				".bo_region2sql($region)."
+				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated, extra";
+		$res = bo_db($sql);
+		while ($row = $res->fetch_assoc())
+		{
+			$time = strtotime($row['time'].' UTC');
+			$index = floor( ($time - $last_uptime + $hours_back * 3600) / 60 / $group_minutes);
+			$tmp[$index][$row['participated']][$row['extra']] = $row['cnt'];
+		}
+
+		$count_own = 0;
+		$count_all = 0;
+		
+		for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)
+		{
+			$X[$i] = $last_uptime + ($i * $group_minutes - $hours_back * 60) * 60;
+			
+			$all_all   = (double)(@array_sum($tmp[$i][0]) + @array_sum($tmp[$i][1]));
+			$all_users = (double)($tmp[$i][0][1] + $tmp[$i][1][1]);
+			$own_all   = (double)(@array_sum($tmp[$i][1]));
+			$own_users = (double)$tmp[$i][1][1];
+			
+			$count_own += $own_all;
+			$count_all += $all_all;
+			
+			$Y[$i]  = $all_all ? $all_users / $all_all * 100 : 0;
+			$Y2[$i] = $own_all ? $own_users / $own_all * 100 : 0;
+			$Y3[$i] = $all_all;
+		}
+		
+		$graph_type = 'datlin';
+		
+		$caption  = $count_all.' '._BL('total strikes');
+		$caption .= "\n";
+		$caption .= $count_own.' '._BL('total strikes station2');
+		
+		$ymin = 0;
+		$ymax = 105;
 	}
 	else
 	{
@@ -620,25 +930,28 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 	$info_station_id = $station_id ? $station_id : $stId;
 
-	if (!$add_title)
-		$add_title = ' '._BL('of the last').' '.$hours_back.'h';
+	if (!$title_no_hours)
+		$add_title .= ' '._BL('of the last').' '.$hours_back.'h';
 
+	$stInfo = bo_station_info($station_id);
+	$city = $stInfo['city'];
 	if ($station_id)
 	{
-		$stInfo = bo_station_info($station_id);
-		$add_title .= ' '._BL('for_station').': '.$stInfo['city'];
+		$add_title .= ' '._BL('for_station').': '.$city;
 		bo_station_city($stInfo['city'], false);
 	}
+	$caption = strtr($caption, array('{STATION_CITY}' => $city));
 
 	require_once 'jpgraph/jpgraph.php';
 	require_once 'jpgraph/jpgraph_line.php';
 	require_once 'jpgraph/jpgraph_bar.php';
 	require_once 'jpgraph/jpgraph_plotline.php';
 	require_once 'jpgraph/jpgraph_date.php';
+	require_once 'jpgraph/jpgraph_log.php';
 
 	$graph = new Graph(BO_GRAPH_STAT_W,BO_GRAPH_STAT_H,"auto");
 	$graph->ClearTheme();
-	$graph->SetScale($graph_type, null, null, $xmin, $xmax);
+	$graph->SetScale($graph_type, $ymin, $ymax, $xmin, $xmax);
 
 	if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
 		$graph->img->SetAntiAliasing();
@@ -679,10 +992,64 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	switch($type)
 	{
 
+		case 'strikes_now':
+			$plot=new LinePlot($Y, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_NOW_COLOR_L1);
+			if (BO_GRAPH_STAT_STRIKES_NOW_COLOR_F1)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_NOW_COLOR_F1);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_NOW_WIDTH_1);
+			$plot->SetLegend(_BL('graph_legend_strikes_now_all'));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y2, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_NOW_COLOR_L2);
+			if (BO_GRAPH_STAT_STRIKES_NOW_COLOR_F2)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_NOW_COLOR_F2);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_NOW_WIDTH_2);
+			$plot->SetLegend(_BL('graph_legend_strikes_now_own'));
+			$graph->Add($plot);
+
+			$graph->yaxis->title->Set(_BL('Strike count per minute'));
+			$graph->title->Set(_BL('graph_stat_title_strikes_now').$add_title);
+			
+			break;
+
+			
+		case 'participants_time':
+
+			$plot=new LinePlot($Y, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_L1);
+			if (BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_F1)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_F1);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_WIDTH_1);
+			$plot->SetLegend(_BL('graph_legend_participants_time_all'));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y2, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_L2);
+			if (BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_F2)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_F2);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_WIDTH_2);
+			$plot->SetLegend(strtr(_BL('graph_legend_participants_time_own'), array('{STATION_CITY}' => $city)));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y3, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_L3);
+			if (BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_F3)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_COLOR_F3);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_WIDTH_3);
+			$plot->SetLegend(_BL('Strikes'));
+			$graph->SetYScale(0,'lin');
+			$graph->AddY(0,$plot);
+			
+			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
+			$graph->title->Set(strtr(_BL('graph_stat_title_strikes_participants'), array('{PARTICIPANTS}' => $participants_text)).$add_title);
+			
+			break;
 
 		case 'strikes_time':
 
-			$plot1=new BarPlot($Y1);
+			$plot1=new BarPlot($Y);
 			$plot1->SetColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_L1);
 			if (BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1)
 				$plot1->SetFillColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1);
@@ -983,6 +1350,42 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->ynaxis[0]->title->Set(_BL('Count'));
 
 			break;
+		
+		case 'participants':
+
+			$plot1=new BarPlot($Y);
+			$plot1->SetColor(BO_GRAPH_STAT_PARTICIPANTS_COLOR_L1);
+			if (BO_GRAPH_STAT_PARTICIPANTS_COLOR_F1)
+				$plot1->SetFillColor(BO_GRAPH_STAT_PARTICIPANTS_COLOR_F1);
+			$plot1->SetLegend(_BL('graph_legend_participants_own'));
+
+			$plot2=new BarPlot($Y2);
+			$plot2->SetColor(BO_GRAPH_STAT_PARTICIPANTS_COLOR_L2);
+			if (BO_GRAPH_STAT_PARTICIPANTS_COLOR_F2)
+				$plot2->SetFillColor(BO_GRAPH_STAT_PARTICIPANTS_COLOR_F2);
+			$plot2->SetLegend(_BL('graph_legend_participants_all'));
+
+			$plot = new AccBarPlot(array($plot1,$plot2), $X);
+			if (BO_GRAPH_STAT_PARTICIPANTS_WIDTH)
+				$plot->SetWidth(BO_GRAPH_STAT_PARTICIPANTS_WIDTH);
+				
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y3);
+			$plot->SetColor(BO_GRAPH_STAT_PARTICIPANTS_COLOR_L3);
+			if (BO_GRAPH_STAT_PARTICIPANTS_COLOR_F3)
+				$plot->SetFillColor(BO_GRAPH_STAT_PARTICIPANTS_COLOR_F3);
+			$plot->SetWeight(BO_GRAPH_STAT_PARTICIPANTS_WIDTH2);
+			$plot->SetLegend(_BL('graph_legend_participants_ratio'));
+			$graph->SetYScale(0,'lin', 0, 110);
+			$graph->AddY(0,$plot);
+
+			$graph->yaxis->title->Set(_BL('Count'));
+			$graph->xaxis->title->Set(_BL('Participants'));
+			$graph->ynaxis[0]->title->Set(_BL('Ratio').' [%]');
+			$graph->title->Set(_BL('graph_stat_title_participants').$add_title);
+		
+			break;
 
 
 	}
@@ -1013,6 +1416,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->xaxis->title->Set(_BL('timeclock'));
 			$graph->xaxis->scale->SetDateFormat('H:i');
 			$graph->xaxis->scale->ticks->Set(3600 * 2,1800);
+			$graph->xaxis->scale->SetTimeAlign(MINADJ_15);
 		}
 	}
 

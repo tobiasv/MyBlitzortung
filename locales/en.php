@@ -226,7 +226,7 @@ $_BL['en']['graph_legend_distance_all'] = 'All Strikes';
 $_BL['en']['graph_legend_distance_own'] = 'Strikes of station {STATION}';
 $_BL['en']['graph_stat_title_strikes_time'] = 'Strikes';
 $_BL['en']['graph_legend_strikes_time_all'] = 'Alle strikes of the lightning network';
-$_BL['en']['graph_legend_strikes_time_own'] = 'Only strikes detected by Station {STATION}';
+$_BL['en']['graph_legend_strikes_time_own'] = 'Only strikes detected by station {STATION}';
 $_BL['en']['graph_legend_stations_available'] = 'Available stations';
 
 $_BL['en']['h3_graphs'] = 'Graphs';
@@ -289,7 +289,6 @@ $_BL['en']['h3_stat_network'] = 'Lightning network statistics';
 $_BL['en']['h3_stat_longtime'] = 'Longtime statistics';
 $_BL['en']['h3_stat_database'] = 'Statistics from the local database';
 $_BL['en']['h4_stat_other_antennas'] = 'Antenna bearing';
-$_BL['en']['h3_stat_strikes'] = 'Monthly and yearly strike count';
 $_BL['en']['h4_graph_strikes_time'] = 'All strikes';
 $_BL['en']['h4_graph_strikes_time_radius'] = 'Strikes with a max. distance to Station {STATION}';
 
@@ -325,8 +324,8 @@ $_BL['en']['Strikes detected'] = 'Strikes detected';
 $_BL['en']['of the last'] = 'of the last';
 $_BL['en']['Currently no GPS coordinates available!'] = 'Currently no GPS coordinates available!';
 $_BL['en']['stat_navi_strikes'] = 'Strikes';
-$_BL['en']['total strikes'] = 'Total strikes';
-$_BL['en']['total strikes station'] = 'Total strikes station {STATION}';
+$_BL['en']['total strikes'] = 'total strikes';
+$_BL['en']['total strikes station'] = 'total strikes station {STATION}';
 $_BL['en']['legend_stat_strikes'] = 'Time range';
 $_BL['en']['Strikes station'] = 'Strikes station {STATION}';
 $_BL['en']['_in_radius'] = ' (max. {RADIUS}km) ';
@@ -447,8 +446,8 @@ $_BL['en']['info_general_warning'] = '
 		We are not liable for the completeness, timeliness, quality and accuracy of the information on our website. 
 		We are not responsible for damages, resulting from trusting the content of our website or its use. ';
 $_BL['en']['info_general_text'] = '
-		Blitzortung.org is a private network of lightning tracker stations. They catch the electromagnetic signals of strikes, and a with
-		that data the time and position can be calculated (TOA - time of arrival method).
+		Blitzortung.org is a private network of lightning tracker stations. They catch the electromagnetic signals of strikes. 
+		Together with the timestamp the position of a strike can be calculated out of the signals (TOA - time of arrival method).
 
 		You will find more information on the main site of the project: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
 
@@ -457,7 +456,7 @@ $_BL['en']['info_accuracy_text'] = '
 		Accuracy is quite good and is sometimes lower than 1 kilometer. This is equal to commercial strike detection companies.
 ';
 $_BL['en']['info_participate_text'] = '
-		You have to uild your own receiver (costs about 150 Euro). With that, you can participate in the network and you
+		You have to build your own receiver (costs about 150 Euro). With that, you can participate in the network and you
 		will get access to all strike data.
 		More information here: 
 		<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>.
@@ -651,3 +650,29 @@ $_BL['en']['Hungary'] = 'Hungary';
 
 $_BL['en']['Meteox rain radar'] = 'Rain radar (meteox.com)';
 
+$_BL['en']['h3_stat_strikes_now'] = 'Current lightning';
+$_BL['en']['bo_descr_strikes_now'] = 'The informations displayed here are not live, because lightning data is downloaded every {UPDATE_INTERVAL} minutes from
+	Blitzortung.org. The interval for the calculation of the strike rate is {RATE_INTERVAL} minutes. ';
+$_BL['en']['Last detected strike'] = 'Last detected strike';
+$_BL['en']['Current strike rate'] = 'Current strike rate';
+$_BL['en']['unit_strikesperminute'] = ' strikes per minute';
+$_BL['en']['Thunder cells'] = 'Thunder cells';
+$_BL['en']['legend_stat_strikes_now'] = 'Region';
+$_BL['en']['No limit'] = 'No limit';
+$_BL['en']['h3_stat_strikes_time'] = 'Monthly and yearly strike count';
+$_BL['en']['Lightning data'] = 'Lightning data';
+$_BL['en']['timezone_is'] = 'Current date/time and default timezone:';
+$_BL['en']['CEST'] = 'CEST';
+$_BL['en']['graph_legend_strikes_now_all'] = 'All strikes';
+$_BL['en']['graph_legend_strikes_now_own'] = 'Strikes of station {STATION}';
+$_BL['en']['Strike count per minute'] = 'Strike count per minute';
+$_BL['en']['graph_stat_title_strikes_now'] = 'Strike rate';
+$_BL['en']['bo_graph_stations'] = 'Active stations are sending signales and participate actively in the lightning detection network. Available stations are currently offline, because of technical difficulties and so on.';
+
+$_BL['de']['bo_graph_stations'] = 'Aktive Stationen senden Signale und nehmen somit an Blitzortungen teil. Verfügbare Stationen sind dagegen offline, z. B. wegen Wartungsarbeiten, Defekten.';
+$_BL['en']['Strikes station min participants'] = '';
+$_BL['en']['Score'] = 'Score';
+$_BL['en']['NRW'] = '';
+$_BL['en']['Test'] = '';
+$_BL['en']['Evaluated'] = 'Evaluated';
+$_BL['en']['total strikes station2'] = 'Total strikes station {STATION_CITY}';

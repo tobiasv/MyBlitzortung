@@ -307,12 +307,14 @@ function bo_copyright_footer()
 	echo '<a href="http://www.blitzortung.org/" target="_blank">';
 	echo 'www.Blitzortung.org';
 	echo '</a>';
+	echo ' &bull; ';
+	echo '<a href="http://'.BO_LINK_HOST.'/" target="_blank" id="mybo_copyright">';
+	echo _BL('copyright_footer');
+	echo '</a>';
 	echo '</div>';
 
 	echo '<div id="bo_copyright_extra">';
-	echo '<a href="http://'.BO_LINK_HOST.'/" target="_blank">';
-	echo _BL('copyright_footer');
-	echo '</a>';
+	echo _BL('timezone_is').' <strong>'.date('H:i:s').' '._BL(date('T')).'</strong>';
 	echo '</div>';
 
 	if (BO_LOGIN_SHOW === true)
@@ -710,5 +712,263 @@ function bo_get_file($url)
 
 	return $content; 	 
 }
+
+function bo_latlon2sql($lat1, $lat2, $lon1, $lon2, $with_indexed_values = false)
+{
+	$sql = " (lat BETWEEN  '$lat2'     AND '$lat1'     AND lon  BETWEEN '$lon2'     AND '$lon1' ";
+	
+	if ($with_indexed_values)
+	{
+		$lat2min = floor($lat2);
+		$lat1max = ceil($lat1);
+		$lon2min = floor($lon2/180 * 128);
+		$lon1max = ceil($lon1/180 * 128);
+
+		$sql .= " AND lat2 BETWEEN '$lat2min' AND '$lat1max' AND lon2 BETWEEN '$lon2min' AND '$lon1max' ";
+	}
+
+	$sql .= ") ";
+	
+	return $sql;
+}
+
+function bo_region2sql($region)
+{
+	global $_BO;
+	
+	if (!isset($_BO['region'][$region]['rect_add']))
+		return '';
+	
+	$reg = $_BO['region'][$region]['rect_add'];
+	$sql .= ' AND ( 0 ';
+	
+	while ($r = @each($reg))
+	{
+		$lat1 = $r[1];
+		list(,$lon1) = @each($reg);
+		list(,$lat2) = @each($reg);
+		list(,$lon2) = @each($reg);
+		
+		$sql .= " OR ".bo_latlon2sql($lat1, $lat2, $lon1, $lon2, true);
+	}
+	
+	$sql .= ' ) ';
+
+	if (isset($_BO['region'][$region]['rect_rem']))
+	{
+		$reg = $_BO['region'][$region]['rect_rem'];
+		$sql .= ' AND NOT ( 0 ';
+		
+		while ($r = @each($reg))
+		{
+			$lat1 = $r[1];
+			list(,$lon1) = @each($reg);
+			list(,$lat2) = @each($reg);
+			list(,$lon2) = @each($reg);
+			
+			$sql .= " OR ".bo_latlon2sql($lat1, $lat2, $lon1, $lon2, true);
+
+		}
+		
+		$sql .= ' ) ';
+	}
+	
+	return $sql;
+}
+
+
+	
+// FFT
+// Fast Fourier Trasforn according "Numerical Recipies"
+// bo_fft($sign, $ar, $ai)
+// $sign = -1 for inverse FFT, 1 otherwise 
+// $ar = array of real parts
+// $ar = array of imaginary parts
+// count($ar) must be power of 2
+function bo_fft($sign, &$ar, &$ai)
+{
+	$n = count($ar);
+	
+	// n must be positive and power of 2: 2^n & (2^n-1) == 0
+	if (($n<2) or ($n & ($n-1)))
+	  return false;
+	
+	$scale = sqrt(1.0/$n);
+	
+	for ($i=$j=0; $i<$n; ++$i) {
+		if ($j>=$i) {
+			$tempr = $ar[$j]*$scale;           
+			$tempi = $ai[$j]*$scale;           
+			$ar[$j] = $ar[$i]*$scale;
+			$ai[$j] = $ai[$i]*$scale;
+			$ar[$i] = $tempr;
+			$ai[$i] = $tempi;
+		}
+		$m = $n >> 1;
+		while ($m>=1 && $j>=$m) {
+			$j -= $m;
+			$m /= 2;
+		}
+		$j += $m;
+	}
+	
+	for ($mmax=1,$istep=2*$mmax; $mmax<$n; $mmax=$istep,$istep=2*$mmax) 
+	{
+		$delta = $sign*pi()/$mmax;
+		for ($m=0; $m<$mmax; ++$m) 
+		{
+			$w = $m*$delta;             
+			$wr = cos($w);
+			$wi = sin($w);
+			for ($i=$m; $i<$n; $i+=$istep) 
+			{
+				$j = $i+$mmax;
+				$tr = $wr*$ar[$j]-$wi*$ai[$j];
+				$ti = $wr*$ai[$j]+$wi*$ar[$j];
+				$ar[$j] = $ar[$i]-$tr;
+				$ai[$j] = $ai[$i]-$ti;
+				$ar[$i] += $tr;
+				$ai[$i] += $ti;
+			}
+		}
+		$mmax = $istep;
+	}
+	
+	return true;
+}
+
+// transform from time domine to frequency domine using FFT
+if (!function_exists('hypot')) 
+{
+	function hypot($x, $y) 
+	{
+	  return sqrt($x*$x + $y*$y);
+	}
+}
+
+// transform from time domine to frequency domine using FFT
+function bo_time2freq($d)
+{
+	$n = count($d);
+
+	// check if n is a power of 2: 2^n & (2^n-1) == 0
+	if ($n & ($n-1)) 
+	{
+	  // eval the minimum power of 2 >= $n
+	  $p = pow(2, ceil(log($n, 2)));
+	  $d += array_fill($n, $p-$n, 0);
+	  $n = $p;
+	}  
+
+	$im = array_fill(0, $n, 0);
+
+	bo_fft(1, $d, $im);
+	
+	for ($i=0; $i<=$n/2; $i++) 
+	{
+	  // Calculate the modulus (as length of the hypotenuse)
+	  $h[$i] = hypot($d[$i], $im[$i]);
+	} 
+	
+	return $h; 
+}
+
+//Raw hexadecimal signal to array
+function raw2array($raw, $calc_spec = false)
+{
+	static $channels = -1, $bpv = -1, $values = -1, $utime = -1;
+	
+	if ($channels == -1 && $bpv == -1 && $utime == -1)
+	{
+		$channels = bo_get_conf('raw_channels');
+		$bpv      = bo_get_conf('raw_bitspervalue');
+		$utime    = bo_get_conf('raw_ntime') / 1000;
+	}
+	
+	$data = array();
+	$data['signal_raw'] = array();
+	$data['signal'] = array();
+	$data['spec'] = array();
+	$data['spec_freq'] = array();
+	
+	$ymax = pow(2,$bpv-1);
+	
+	for ($i=0;$i<strlen($raw);$i++)
+	{
+		$byte = ord(substr($raw,$i,1));
+		$data['signal_raw'][$i%$channels][] = $byte;
+		$data['signal'][$i%$channels][] = ($byte - $ymax) / $ymax * BO_MAX_VOLTAGE;	
+	}
+
+	foreach($data['signal'][0] as $i => $dummy)
+	{
+		$data['signal_time'][$i] = $i * $utime;
+	}
+
+	if ($calc_spec)
+	{
+		if ($values == -1)
+		{
+			$values   = bo_get_conf('raw_values');
+		}
+
+		foreach($data['signal'] as $channel => $d)
+		{
+			$data['spec'][$channel] = bo_time2freq($d);
+		}
+		
+		foreach ($data['spec'][0] as $i => $dummy)
+		{
+			$data['spec_freq'][$i] = round($i / ($values * $utime) * 1000);
+		}
+	}
+	
+	return $data;
+}
+
+		
+function bo_examine_signal($data, &$amp = array(), &$amp_max = array(), &$freq = array(), &$freq_amp = array())
+{
+	$sig_data = raw2array($data, true);
+	
+	$amp = array();
+	$amp_max = array();
+	$freq = array();
+	$freq_amp = array();
+	
+	foreach($sig_data['signal_raw'] as $channel => $dummy)
+	{
+		//amplitude of first value
+		$amp[$channel] = $sig_data['signal_raw'][$channel][0];
+		
+		//max. amplitude
+		$max = 0;
+		foreach($sig_data['signal_raw'][$channel] as $signal)
+		{
+			$amp_max[$channel] = max($amp_max[$channel], abs($signal));
+		}
+		
+		//main frequency
+		$max = 0;
+		$freq_id_max = 0;
+		foreach($sig_data['spec'][$channel] as $freq_id => $famp)
+		{
+			if ($freq_id > 0 && $max < $famp)
+			{
+				$max = $famp;
+				$freq[$channel] = $sig_data['spec_freq'][$freq_id];
+			}
+		}
+		
+		$freq_amp[$channel] = $max * 100;
+	}
+
+	$sql = "amp1='$amp[0]', amp2='$amp[1]', 
+			amp1_max='$amp_max[0]', amp2_max='$amp_max[1]', 
+			freq1='$freq[0]', freq2='$freq[1]', 
+			freq1_amp='$freq_amp[0]', freq2_amp='$freq_amp[1]' ";
+
+	return $sql;
+}	
 
 ?>

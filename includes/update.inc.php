@@ -26,7 +26,12 @@ function bo_check_for_update()
 	$updated = false;
 	$db_update = false;
 
-	$updates = array('0.2.2' => 202, '0.3' => 300, '0.3.1' => 301, '0.4.8' => 408, '0.5.2' => 502);
+	$updates = array(	'0.2.2' => 202, 
+						'0.3' 	=> 300, 
+						'0.3.1' => 301, 
+						'0.4.8' => 408, 
+						'0.5.2' => 502,
+						'0.5.5' => 505);
 
 	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
 	{
@@ -37,20 +42,28 @@ function bo_check_for_update()
 	}
 	else
 	{
-		$cur_version = bo_get_conf('version');
+		if ($_GET['bo_update_from'])
+			$cur_version = $_GET['bo_update_from'];
+		else
+			$cur_version = bo_get_conf('version');
+			
 		$cur_version_num = bo_version2number($cur_version);
 		$bo_version = BO_VER;
 		
 		if ($cur_version_num < max($updates) && $_GET['bo_action'] != 'do_update')
 		{
+			echo '<div id="bo_update_info">';
 			echo '<h4>'._BL('Database version changed!').'</h4>';
 			echo '<p>';
 			echo ' <a href="'.bo_insert_url('bo_action', 'do_update').'">'._BL('Click to update').'</a>';
 			echo '</p>';
+			echo '</div>';
 			bo_copyright_footer();
 			return true;
 		}
 	}
+	
+	echo '<div id="bo_update_info">';
 	
 	foreach($updates as $new_version => $number)
 	{
@@ -160,6 +173,30 @@ function bo_check_for_update()
 				$ok = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
+				
+				break;
+			
+			case '0.5.5':
+			
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'raw` 
+							ADD `amp1` TINYINT UNSIGNED NOT NULL AFTER `strike_id`, 
+							ADD `amp2` TINYINT UNSIGNED NOT NULL AFTER `amp1`,
+							ADD `amp1_max` TINYINT UNSIGNED NOT NULL AFTER `amp2`,
+							ADD `amp2_max` TINYINT UNSIGNED NOT NULL AFTER `amp1_max`,
+							ADD `freq1` SMALLINT UNSIGNED NOT NULL AFTER `amp2_max`,
+							ADD `freq1_amp` TINYINT UNSIGNED NOT NULL AFTER `freq1`,
+							ADD `freq2` SMALLINT UNSIGNED NOT NULL AFTER `freq1_amp`,
+							ADD `freq2_amp` TINYINT UNSIGNED NOT NULL AFTER `freq2`
+							';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+				
+				break;
+			
+			default:
+				$ok = true;
+				break;
 
 		}
 		
@@ -174,6 +211,18 @@ function bo_check_for_update()
 			$cur_version_num = $number;
 			$updated = true;
 		}
+		else
+		{
+			echo '<p>';
+			echo _BL('Update failed!');
+			echo ' <a href="'.bo_insert_url('bo_action', 'do_update').'">'._BL('Retry').'</a>';
+			echo ' <a href="'.bo_insert_url(array('bo_action','bo_update_from','bo_update_to'), 'do_update').'&bo_update_from='.$new_version.'">'._BL('Continue').'</a>';
+			echo '</p>';
+			
+			$ok = true;
+			
+			break;
+		}
 	}
 	
 	if ($updated)
@@ -181,11 +230,35 @@ function bo_check_for_update()
 		echo '<h4>'._BL('Update done!').'</h4>';
 	}
 	
-	if ($cur_version != $bo_version && (!$db_update || $updated))
+	if ($cur_version != $bo_version && (!$db_update || $updated) || $_GET['bo_update_from'])
 	{
 		bo_set_conf('version', $bo_version);
 		echo '<h4>'._BL('Update-Info: Setting version number to').' '.$bo_version.'</h4>';
 	}
+	
+	if (isset($_GET['bo_update_signals']))
+	{
+		$limit = intval($_GET['bo_update_signals']);
+		if (!$limit)
+			$limit = 1000;
+		
+		echo '<p>Updating!</p>';
+		flush();
+		
+		$res = bo_db("SELECT id, data FROM ".BO_DB_PREF."raw WHERE amp1=0 AND freq1=0 ORDER BY id DESC LIMIT $limit");
+		$i = 0;
+		while ($row = $res->fetch_assoc())
+		{
+			$sql = bo_examine_signal($row['data']);
+			bo_db("UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='".$row['id']."'");
+			$i++;
+			$last_id = $row['id'];
+		}
+		
+		echo '<p>Examined '.$i.' signals. Last ID was '.$last_id.'. <a href="'.bo_insert_url('bo_action', 'do_update').'&bo_update_signals='.$limit.'">'._BL('Update more...').'</a></p>';
+	}
+	
+	echo '</div>';
 	
 	return $ok;
 	

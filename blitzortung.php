@@ -25,7 +25,7 @@ if (!defined("BO_VER"))
 	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.5.4');
+	define("BO_VER", '0.5.5');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -38,6 +38,9 @@ if (!defined("BO_VER"))
 	define("BO_PERM_COUNT",	8);
 
 	define("BO_TILE_SIZE", 256);
+	define("BO_MIN_PARTICIPANTS", 7);
+	define("BO_MAX_VOLTAGE", 2.5);
+	define("BO_TRIGGER_VOLTAGE", 0.45);
 	
 	//Do not change these values (needed for auto linking stations)
 	define('BO_LINK_HOST', 'www.myblitzortung.de');
@@ -191,7 +194,7 @@ if (!defined("BO_VER"))
 	}
 	else if (isset($_GET['graph']))
 	{
-		bo_graph_raw($_GET['graph']);
+		bo_graph_raw($_GET['graph'], isset($_GET['spectrum']));
 		exit;
 	}
 	else if (isset($_GET['image']))
