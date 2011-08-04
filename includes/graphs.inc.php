@@ -277,11 +277,27 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$ymax = null;
 	$add_title = '';
 
+	//Value
+	$value = isset($_GET['value']) ? intval($_GET['value']) : 0;
+	
+	//Region
 	$region = $_GET['region'];
 	
 	if ($_BO['region'][$region]['name'])
-		$add_title = ' ('._BL($_BO['region'][$region]['name']).')';
+		$add_title .= ' ('._BL($_BO['region'][$region]['name']).')';
 
+	//Channel
+	$channel = intval($_GET['channel']);
+	
+	if ($channel)
+	{
+		$sql_part = ' ( (s.part&'.(1<<$channel).')>0 AND s.part>0  ) ';
+		$add_title .= ' ('._BL('Channel').' '.($channel).')';
+	}
+	else
+	{
+		$sql_part = ' (s.part>0) ';
+	}
 	
 	if ($type == 'strikes_now')
 	{
@@ -301,7 +317,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		}
 		else
 		{
-			$sql_select = ", s.part>0 participated";
+			$sql_select = ", $sql_part participated";
 			$sql_join   = "";
 		}
 		
@@ -415,8 +431,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		if ($year == gmdate('Y') && ($month == -1 || $month == gmdate('m')))
 		{
 			$i = gmdate('z') - $day_offset;
-			$sql = "SELECT COUNT(id) cnt, part>0 participated
-						FROM ".BO_DB_PREF."strikes
+			$sql = "SELECT COUNT(id) cnt, $sql_part participated
+						FROM ".BO_DB_PREF."strikes s
 						WHERE time BETWEEN '".gmdate('Y-m-d 00:00:00')."' AND '".gmdate('Y-m-d 23:59:59')."'
 						".($radius ? " AND distance < '".(BO_RADIUS * 1000)."'" : "")."
 						GROUP BY participated";
@@ -584,8 +600,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$sql = " CEIL(distance/$dist_div/1000) val ";
 
 			//strike ratio for own station
-			$sql = "SELECT COUNT(id) cnt, part>0 participated, $sql
-					FROM ".BO_DB_PREF."strikes
+			$sql = "SELECT COUNT(id) cnt, $sql_part participated, $sql
+					FROM ".BO_DB_PREF."strikes s
 					WHERE time BETWEEN '$date_start' AND '$date_end'
 					GROUP BY participated, val";
 			$res = bo_db($sql);
@@ -631,13 +647,15 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	{
 		//Mean strike distance to station by time of all strikes and own strikes
 		
+		$station_id = 0;
+		
 		$interval = $hours_back / 24 * 15;
 		$ticks = ($time_end - $time_start) / 60 / $interval;
 
 		$tmp = array();
 		
-		$sql = "SELECT SUM(distance) sum_dist, COUNT(distance) cnt_dist, part>0 participated, time
-				FROM ".BO_DB_PREF."strikes
+		$sql = "SELECT SUM(distance) sum_dist, COUNT(distance) cnt_dist, $sql_part participated, time
+				FROM ".BO_DB_PREF."strikes s
 				WHERE time BETWEEN '$date_start' AND '$date_end'
 				".bo_region2sql($region)."
 				GROUP BY participated, DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
@@ -677,50 +695,76 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$graph_type = 'datlin';
 		
 	}
-	else if ($type == 'participants')
+	else if ($type == 'participants' || $type == 'deviations')
 	{
 		$interval = $hours_back / 24 * 15;
+	
+		switch($type)
+		{
+			case 'participants':
+				$groupby = "s.users";
+				$xmin = BO_MIN_PARTICIPANTS;
+				$is_logarithmic = BO_GRAPH_STAT_PARTICIPANTS_LOG === true;
+				break;
 
-		$tmp = array();
+			case 'deviations':
+				$groupby = " ROUND(s.deviation / 100)";
+				$xmin = 0;
+				$is_logarithmic = BO_GRAPH_STAT_DEVIATIONS_LOG === true;
+				break;
+		}
+			
 		
 		if ($station_id)
 		{
-			$sql = "SELECT COUNT(s.id) cnt, ss.station_id spart, s.users users
+			$sql = "SELECT COUNT(s.id) cnt, ss.station_id spart, $groupby groupby
 					FROM ".BO_DB_PREF."strikes s
 					LEFT JOIN ".BO_DB_PREF."stations_strikes ss
 					ON s.id=ss.strike_id AND ss.station_id='$station_id'
 					WHERE time BETWEEN '$date_start' AND '$date_end'
 					".bo_region2sql($region)."
-					GROUP BY spart, users";
+					GROUP BY spart, groupby";
 		}
 		else
 		{
-			$sql = "SELECT COUNT(id) cnt, part>0 spart, users
-					FROM ".BO_DB_PREF."strikes
-					WHERE time BETWEEN '$date_start' AND '$date_end'
+			$sql = "SELECT COUNT(s.id) cnt, $sql_part spart, $groupby groupby
+					FROM ".BO_DB_PREF."strikes s
+					WHERE s.time BETWEEN '$date_start' AND '$date_end'
 					".bo_region2sql($region)."
-					GROUP BY spart, users";
+					GROUP BY spart, groupby";
 		}
 		
+		$tmp = array();
 		$res = bo_db($sql);
 		while($row = $res->fetch_assoc())
 		{
-			$index = $row['users'];
-			$max_users = max($row['users'], $max_users);
+			$index = $row['groupby'];
+			$xmax = max($row['groupby'], $max);
 			
 			if ($row['spart'])
-				$tmp['own_users'][$index] = $row['cnt'];
+				$tmp['own'][$index] = $row['cnt'];
 			else
-				$tmp['all_users'][$index] = $row['cnt'];
+				$tmp['all'][$index] = $row['cnt'];
 		}
 
-		for($i=0;$i<$max_users;$i++)
+		for($i=0;$i<$xmax;$i++)
 		{
-			$X[$i] = $i;
-			$Y[$i] = intval($tmp['own_users'][$i]);
-			$Y2[$i] = intval($tmp['all_users'][$i]);
+			switch($type)
+			{
+				case 'participants':
+					$X[$i] = $i;				
+					break;
+
+				case 'deviations':
+					$tickLabels[$i] = number_format($i/10, 1, _BL('.'), _BL(','));
+					$X[$i] = $i/10;
+					break;
+			}
 			
-			if (BO_GRAPH_STAT_PARTICIPANTS_LOG === true)
+			$Y[$i] = intval($tmp['own'][$i]);
+			$Y2[$i] = intval($tmp['all'][$i]);
+			
+			if ($is_logarithmic)
 			{
 				$Y[$i] = $Y[$i] ? $Y[$i] + 0.1 : $Y[$i];
 				$Y2[$i] = $Y2[$i] ? $Y2[$i] + 0.1 : $Y2[$i];
@@ -734,7 +778,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$max = max($ymax, $Y[$i] + $Y2[$i]);
 		}
 	
-		if (BO_GRAPH_STAT_PARTICIPANTS_LOG === true)
+		if ($is_logarithmic)
 		{
 			$graph_type = 'linlog';
 		}
@@ -742,20 +786,38 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		{
 			$graph_type = 'linlin';
 		}
-	
-		$xmin = BO_MIN_PARTICIPANTS;
-		$xmax = $max_users;
+		
+		$tickLabels[] = '';
 	}
-	else if ($type == 'participants_time')
+	else if ($type == 'participants_time' || $type == 'deviations_time')
 	{
-		$participants = isset($_GET['participants']) ? intval($_GET['participants']) : 0;
-		$participants_max = isset($_GET['participants_max']) ? intval($_GET['participants_max']) : 0;
+		$value_max = isset($_GET['value_max']) ? intval($_GET['value_max']) : 0;
+		$average = isset($_GET['average']);
 
-		if (!$participants)
-			$participants = BO_MIN_PARTICIPANTS;
+		switch($type)
+		{
+			case 'participants_time':
 
-		if (!$participants_max || $participants_max <= $participants)
-			$participants_max = 0;
+				if (!$value)
+					$value = BO_MIN_PARTICIPANTS;
+
+				if (!$value_max || $value_max <= $value)
+					$value_max = 0;
+
+				break;
+
+			case 'deviations_time':
+			
+				if (!$value)
+					$value = 1;
+				
+				if (!$value_max || $value_max <= $value)
+					$value_max = $value + 1000;
+
+				break;
+				
+		}
+		
 			
 		$last_uptime = bo_get_conf('uptime_strikes') - 60;
 		$group_minutes = BO_GRAPH_STAT_STRIKES_PARTICIPANTS_GROUP_MINUTES;
@@ -773,19 +835,54 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		}
 		else
 		{
-			$sql_select = " , part>0 participated ";
+			$sql_select = " , $sql_part participated ";
 			$sql_join   = "";
 		}
 		
-		if ($participants_max)
+		switch($type)
 		{
-			$participants_text = $participants.'-'.$participants_max;
-			$sql_select .= ", s.users BETWEEN '$participants' AND '$participants_max' extra ";
-		}
-		else
-		{
-			$participants_text = $participants;
-			$sql_select .= ", s.users='$participants' extra ";
+			case 'participants_time':
+				
+				if ($average)
+				{
+					$participants_text = '';
+					$sql_select .= ", 0 extra, SUM(s.users) extra_sum ";
+				
+				}
+				else if ($value_max)
+				{
+					$participants_text = $value.'-'.$value_max;
+					$sql_select .= ", s.users BETWEEN '$value' AND '$value_max' extra ";
+				}
+				else
+				{
+					$participants_text = $value;
+					$sql_select .= ", s.users='$value' extra ";
+				}
+				
+				break;
+
+				
+			case 'deviations_time':
+				
+				if ($average)
+				{
+					$participants_text = '';
+					$sql_select .= ", 0 extra, SUM(s.deviation) extra_sum ";
+				}
+				else if ($value_max)
+				{
+					$deviations_text = number_format($value / 1000, 1, _BL('.'), _BL(',')).'-'.number_format($value_max / 1000, 1, _BL('.'), _BL(',')).'km';
+					$sql_select .= ", s.deviation BETWEEN '$value' AND '$value_max' extra ";
+				}
+				else
+				{
+					$deviations_text = number_format($value / 1000, 1, _BL('.'), _BL(',')).'km';
+					$sql_select .= ", s.deviation='$value' extra ";
+				}
+				
+				break;
+				
 		}
 		
 		$sql = "SELECT s.time time, COUNT(s.id) cnt $sql_select
@@ -800,6 +897,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$time = strtotime($row['time'].' UTC');
 			$index = floor( ($time - $last_uptime + $hours_back * 3600) / 60 / $group_minutes);
 			$tmp[$index][$row['participated']][$row['extra']] = $row['cnt'];
+			
+			if ($average)
+				$extra_sum[$index][$row['participated']] = $row['extra_sum'];
 		}
 
 		$count_own = 0;
@@ -817,8 +917,17 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$count_own += $own_all;
 			$count_all += $all_all;
 			
-			$Y[$i]  = $all_all ? $all_users / $all_all * 100 : 0;
-			$Y2[$i] = $own_all ? $own_users / $own_all * 100 : 0;
+			if ($average)
+			{
+				$Y[$i]  = $all_all ? (double)(@array_sum($extra_sum[$i]) / $all_all) : 0;
+				$Y2[$i] = $own_all ? (double)($extra_sum[$i][1] / $own_all) : 0;
+			}
+			else
+			{
+				$Y[$i]  = $all_all ? $all_users / $all_all * 100 : 0;
+				$Y2[$i] = $own_all ? $own_users / $own_all * 100 : 0;
+			}
+			
 			$Y3[$i] = $all_all;
 		}
 		
@@ -828,8 +937,179 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$caption .= "\n";
 		$caption .= $count_own.' '._BL('total strikes station2');
 		
+		if (!$average)
+		{
+			$ymin = 0;
+			$ymax = 105;
+		}
+		else
+			$type .= '_average';
+		
+	}
+	else if ($type == 'evaluated_signals')
+	{
+		$station_id = 0;
+		
+		$last_uptime = bo_get_conf('uptime_raw') - 60; //RAW-update time!!!!
+		$group_minutes = BO_GRAPH_STAT_STRIKES_PARTICIPANTS_GROUP_MINUTES;
+
+		if ($hours_back > 24)
+			$group_minutes *= ceil($hours_back / 24);
+		
+		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+		
+		
+		$sql = "SELECT s.time time, COUNT(s.id) cnt, SIGN(".($channel ? ' ((s.part&'.(1<<$channel).')>0)*s.part' : 's.part').") participated
+				FROM ".BO_DB_PREF."strikes s
+				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+				".bo_region2sql($region)."
+				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated";
+		$res = bo_db($sql);
+		while ($row = $res->fetch_assoc())
+		{
+			$time = strtotime($row['time'].' UTC');
+			$index = floor( ($time - $last_uptime + $hours_back * 3600) / 60 / $group_minutes);
+			$tmp[$index][$row['participated']] = $row['cnt'];
+		}
+
+		for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)
+		{
+			$X[$i] = $last_uptime + ($i * $group_minutes - $hours_back * 60) * 60;
+			
+			$all_strikes   = (double)@array_sum($tmp[$i]);
+			$participated  = (double)$tmp[$i][1];
+			$not_evaluated = (double)$tmp[$i][-1];
+			
+			$Y[$i]  = $all_strikes ? $participated / $all_strikes * 100 : 0;
+			$Y2[$i] = $all_strikes ? ($participated+$not_evaluated) / $all_strikes * 100 : 0;
+			$Y3[$i] = $all_strikes;
+		}
+		
+		$graph_type = 'datlin';
+		
 		$ymin = 0;
 		$ymax = 105;
+	}
+	else if ($type == 'spectrum' || $type == 'amplitudes' || $type == 'amplitudes_max')
+	{
+		$station_id = 0;
+		
+		$channels = bo_get_conf('raw_channels');
+		$last_uptime = bo_get_conf('uptime_raw') - 60; //RAW-update time!!!!
+		$group_minutes = BO_GRAPH_STAT_STRIKES_PARTICIPANTS_GROUP_MINUTES;
+
+		if ($hours_back > 24)
+			$group_minutes *= ceil($hours_back / 24);
+		
+		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+		
+		if ($value > 0)
+		{
+			$sql_join = "
+					JOIN ".BO_DB_PREF."strikes s
+					ON s.raw_id=r.id ";
+			
+			$add_title .= ' '._BL('with strikes');
+			
+			if ($value == 2)
+			{
+				$sql_join .= " AND $sql_part ";
+				$add_title .= '+'._BL('participation');
+			}
+			
+			$sql_join .= strtr(bo_region2sql($region), array('lat' => 's.lat', 'lon' => 's.lon'));
+		}
+		else if ($value < 0)
+		{
+			$sql_join = "
+					LEFT JOIN ".BO_DB_PREF."strikes s
+					ON s.raw_id=r.id ";
+			$sql_where = " AND s.id IS NULL ";
+			
+			$add_title .= ' '._BL('without strikes');
+		}
+		
+		if ($type == 'spectrum')
+		{
+			$tmp = raw2array();
+			$freqs = $tmp['spec_freq'];
+			unset($freqs[0]);
+
+			foreach($freqs as $freq_id => $freq)
+				$f2id[$freq] = $freq_id;
+			
+			for ($channel=1;$channel<=$channels;$channel++)
+			{
+				foreach($freqs as $freq_id => $freq)
+				{
+					$Y[$channel][$freq_id] = 0;
+					$Y2[$channel][$freq_id] = 0;
+				}
+				
+				$sql = "SELECT r.freq".$channel." freq, SUM(r.freq".$channel."_amp) amp_sum, COUNT(r.id) cnt
+						FROM ".BO_DB_PREF."raw r
+						$sql_join
+						WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+						$sql_where
+						GROUP BY freq";
+				$res = bo_db($sql);
+				while ($row = $res->fetch_assoc())
+				{
+					$freq_id = (int)$f2id[$row['freq']];
+					$Y[$channel][$freq_id]  = $row['amp_sum'] / $row['cnt'];
+					$Y2[$channel][$freq_id] = $row['cnt'];
+				}
+			}
+			
+			foreach($freqs as $freq_id => $freq)
+			{
+				$X[$freq_id] = $freq;
+				$tickLabels[$freq_id] = $freq.'kHz';
+			}
+			
+			$xmin = 0;
+			$xmax = count($X);
+		}
+		else
+		{
+			$amp_divisor = 10;
+			
+			if ($type == 'amplitudes_max')
+			{
+				$ampmax = '_max';
+				$type = 'amplitudes';
+			}
+	
+			for ($channel=1;$channel<=$channels;$channel++)
+			{
+				for ($i=0;$i<pow(2,8)/$amp_divisor;$i++)
+				{
+					$Y[$channel][$i] = 0;
+				}
+				
+				$sql = "SELECT ROUND(amp".$channel."$ampmax / $amp_divisor) amp, COUNT(r.id) cnt
+						FROM ".BO_DB_PREF."raw r
+						$sql_join
+						WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+						$sql_where
+						GROUP BY amp";
+				$res = bo_db($sql);
+				while ($row = $res->fetch_assoc())
+				{
+					$Y[$channel][$row['amp']] = $row['cnt'];
+					$row['amp'].' ';
+				}
+			}
+			
+			foreach($Y[1] as $amp_id => $dummy)
+			{
+				$tickLabels[$amp_id] = number_format(($amp_id * $amp_divisor) / 255 * BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V';
+				$X[$amp_id] = $amp_id;
+			}
+		}
+
+		$graph_type = 'linlin';
+		$tickLabels[] = '';
 	}
 	else
 	{
@@ -938,8 +1218,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	if ($station_id)
 	{
 		$add_title .= ' '._BL('for_station').': '.$city;
-		bo_station_city($stInfo['city'], false);
+		bo_station_city(0, $stInfo['city']);
 	}
+	
 	$caption = strtr($caption, array('{STATION_CITY}' => $city));
 
 	require_once 'jpgraph/jpgraph.php';
@@ -953,42 +1234,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$graph->ClearTheme();
 	$graph->SetScale($graph_type, $ymin, $ymax, $xmin, $xmax);
 
-	if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
-		$graph->img->SetAntiAliasing();
-
-	if (BO_GRAPH_STAT_COLOR_BACK)
-		$graph->SetColor(BO_GRAPH_STAT_COLOR_BACK);
-
-	if (BO_GRAPH_STAT_COLOR_BACK)
-		$graph->SetMarginColor(BO_GRAPH_STAT_COLOR_MARGIN);
-
-	if (BO_GRAPH_STAT_COLOR_FRAME)
-		$graph->SetFrame(true, BO_GRAPH_STAT_COLOR_FRAME);
-	else
-		$graph->SetFrame(false);
-
-	if (BO_GRAPH_STAT_COLOR_BOX)
-		$graph->SetBox(true, BO_GRAPH_STAT_COLOR_BOX);
-	else
-		$graph->SetBox(false);
-
-	$graph->SetMargin(50,50,20,70);
-	
-	$graph->legend->SetPos(0.5,0.99,"center","bottom");
-	$graph->legend->SetColumns(2);
-	$graph->legend->SetFillColor(BO_GRAPH_STAT_COLOR_LEGEND_FILL);
-	$graph->legend->SetColor(BO_GRAPH_STAT_COLOR_LEGEND_TEXT, BO_GRAPH_STAT_COLOR_LEGEND_FRAME);
-	$graph->legend->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-	
-	if ($caption)
-	{
-		$caption=new Text($caption,60,30); 
-		$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 7);
-		$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
-		$graph->AddText($caption);
-
-	}
-	
 	switch($type)
 	{
 
@@ -1043,10 +1288,110 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->AddY(0,$plot);
 			
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
+			$graph->ynaxis[0]->title->Set(_BL('Strikes'));
 			$graph->title->Set(strtr(_BL('graph_stat_title_strikes_participants'), array('{PARTICIPANTS}' => $participants_text)).$add_title);
 			
 			break;
 
+	case 'participants_time_average':
+
+			$plot=new LinePlot($Y, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_COLOR_L1);
+			if (BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_COLOR_F1)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_COLOR_F1);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_WIDTH_1);
+			$plot->SetLegend(_BL('graph_legend_participants_time_avg_all'));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y2, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_COLOR_L2);
+			if (BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_COLOR_F2)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_COLOR_F2);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_WIDTH_2);
+			$plot->SetLegend(strtr(_BL('graph_legend_participants_time_avg_own'), array('{STATION_CITY}' => $city)));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y3, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_COLOR_L3);
+			if (BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_COLOR_F3)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_COLOR_F3);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_PARTICIPANTS_AVG_WIDTH_3);
+			$plot->SetLegend(_BL('Strikes'));
+			$graph->SetYScale(0,'lin');
+			$graph->AddY(0,$plot);
+			
+			$graph->yaxis->title->Set(_BL('Count'));
+			$graph->ynaxis[0]->title->Set(_BL('Strikes'));
+			$graph->title->Set(strtr(_BL('graph_stat_title_strikes_participants_avg'), array('{PARTICIPANTS}' => $participants_text)).$add_title);
+			
+			break;
+			
+		case 'deviations_time':
+
+			$plot=new LinePlot($Y, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_COLOR_L1);
+			if (BO_GRAPH_STAT_STRIKES_DEVIATIONS_COLOR_F1)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_COLOR_F1);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_DEVIATIONS_WIDTH_1);
+			$plot->SetLegend(_BL('graph_legend_deviatinons_time_all'));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y2, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_COLOR_L2);
+			if (BO_GRAPH_STAT_STRIKES_DEVIATIONS_COLOR_F2)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_COLOR_F2);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_DEVIATIONS_WIDTH_2);
+			$plot->SetLegend(strtr(_BL('graph_legend_deviations_time_own'), array('{STATION_CITY}' => $city)));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y3, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_COLOR_L3);
+			if (BO_GRAPH_STAT_STRIKES_DEVIATIONS_COLOR_F3)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_COLOR_F3);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_DEVIATIONS_WIDTH_3);
+			$plot->SetLegend(_BL('Strikes'));
+			$graph->SetYScale(0,'lin');
+			$graph->AddY(0,$plot);
+			
+			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
+			$graph->ynaxis[0]->title->Set(_BL('Strikes'));
+			$graph->title->Set(strtr(_BL('graph_stat_title_strikes_deviations'), array('{DEVIATIONS}' => $deviations_text)).$add_title);
+			
+			break;
+			
+		case 'deviations_time_average':
+
+			$plot=new LinePlot($Y, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_COLOR_L1);
+			if (BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_COLOR_F1)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_COLOR_F1);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_WIDTH_1);
+			$plot->SetLegend(_BL('graph_legend_deviatinons_time_avg_all'));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y2, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_COLOR_L2);
+			if (BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_COLOR_F2)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_COLOR_F2);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_WIDTH_2);
+			$plot->SetLegend(strtr(_BL('graph_legend_deviations_time_avg_own'), array('{STATION_CITY}' => $city)));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y3, $X);
+			$plot->SetColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_COLOR_L3);
+			if (BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_COLOR_F3)
+				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_COLOR_F3);
+			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_DEVIATIONS_AVG_WIDTH_3);
+			$plot->SetLegend(_BL('Strikes'));
+			$graph->SetYScale(0,'lin');
+			$graph->AddY(0,$plot);
+			
+			$graph->yaxis->title->Set(_BL('Deviation').'  [m]');
+			$graph->ynaxis[0]->title->Set(_BL('Strikes'));
+			$graph->title->Set(strtr(_BL('graph_stat_title_strikes_deviations_avg'), array('{DEVIATIONS}' => $deviations_text)).$add_title);
+			
+			break;
+			
 		case 'strikes_time':
 
 			$plot1=new BarPlot($Y);
@@ -1387,14 +1732,252 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		
 			break;
 
+	case 'deviations':
 
+			$plot1=new BarPlot($Y);
+			$plot1->SetColor(BO_GRAPH_STAT_DEVIATIONS_COLOR_L1);
+			if (BO_GRAPH_STAT_DEVIATIONS_COLOR_F1)
+				$plot1->SetFillColor(BO_GRAPH_STAT_DEVIATIONS_COLOR_F1);
+			$plot1->SetLegend(_BL('graph_legend_deviations_own'));
+
+			$plot2=new BarPlot($Y2);
+			$plot2->SetColor(BO_GRAPH_STAT_DEVIATIONS_COLOR_L2);
+			if (BO_GRAPH_STAT_DEVIATIONS_COLOR_F2)
+				$plot2->SetFillColor(BO_GRAPH_STAT_DEVIATIONS_COLOR_F2);
+			$plot2->SetLegend(_BL('graph_legend_deviations_all'));
+
+			$plot = new AccBarPlot(array($plot1,$plot2), $X);
+			if (BO_GRAPH_STAT_DEVIATIONS_WIDTH)
+				$plot->SetWidth(BO_GRAPH_STAT_DEVIATIONS_WIDTH);
+				
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y3);
+			$plot->SetColor(BO_GRAPH_STAT_DEVIATIONS_COLOR_L3);
+			if (BO_GRAPH_STAT_DEVIATIONS_COLOR_F3)
+				$plot->SetFillColor(BO_GRAPH_STAT_DEVIATIONS_COLOR_F3);
+			$plot->SetWeight(BO_GRAPH_STAT_DEVIATIONS_WIDTH2);
+			$plot->SetLegend(_BL('graph_legend_deviations_ratio'));
+			$graph->SetYScale(0,'lin', 0, 110);
+			$graph->AddY(0,$plot);
+
+			$graph->yaxis->title->Set(_BL('Count'));
+			$graph->xaxis->title->Set(_BL('Deviations'));
+			$graph->ynaxis[0]->title->Set(_BL('Ratio').' [%]');
+			$graph->title->Set(_BL('graph_stat_title_deviations').$add_title);
+
+			$graph->xaxis->SetTickLabels($tickLabels);
+			$graph->xaxis->SetTextLabelInterval(2);
+			$graph->xaxis->SetTextTickInterval(2);
+			
+			break;
+
+		case 'evaluated_signals';
+			
+			$plot=new LinePlot($Y, $X);
+			$plot->SetColor(BO_GRAPH_STAT_EVALUATED_SIGNALS_COLOR_L1);
+			if (BO_GRAPH_STAT_EVALUATED_SIGNALS_COLOR_F1)
+				$plot->SetFillColor(BO_GRAPH_STAT_EVALUATED_SIGNALS_COLOR_F1);
+			$plot->SetWeight(BO_GRAPH_STAT_EVALUATED_SIGNALS_WIDTH_1);
+			$plot->SetLegend(_BL('graph_legend_evaluated_signals_part_ratio'));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y2, $X);
+			$plot->SetColor(BO_GRAPH_STAT_EVALUATED_SIGNALS_COLOR_L2);
+			if (BO_GRAPH_STAT_EVALUATED_SIGNALS_COLOR_F2)
+				$plot->SetFillColor(BO_GRAPH_STAT_EVALUATED_SIGNALS_COLOR_F2);
+			$plot->SetWeight(BO_GRAPH_STAT_EVALUATED_SIGNALS_WIDTH_2);
+			$plot->SetLegend(_BL('graph_legend_evaluated_signals_part_all_ratio'));
+			$graph->Add($plot);
+
+			$plot=new LinePlot($Y3, $X);
+			$plot->SetColor(BO_GRAPH_STAT_EVALUATED_SIGNALS_COLOR_L3);
+			if (BO_GRAPH_STAT_EVALUATED_SIGNALS_COLOR_F3)
+				$plot->SetFillColor(BO_GRAPH_STAT_EVALUATED_SIGNALS_COLOR_F3);
+			$plot->SetWeight(BO_GRAPH_STAT_EVALUATED_SIGNALS_WIDTH_3);
+			$plot->SetLegend(_BL('Strikes'));
+			$graph->SetYScale(0,'lin');
+			$graph->AddY(0,$plot);
+			
+			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
+			$graph->title->Set(_BL('graph_stat_title_evaluated_signals').$add_title);
+				
+		
+			break;
+		
+		case 'spectrum':
+		
+			if ($channels == 1)
+			{
+				//Bars
+				$plot=new BarPlot($Y[1]);
+				$plot->SetColor('#fff@1');
+				$plot->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR1);
+				$plot->SetLegend(_BL('Channel').' 1');
+				$plot->SetWidth(BO_GRAPH_STAT_SPECTRUM_WIDTH1);
+				$graph->Add($plot);
+				
+				//lines (count)
+				$plot=new LinePlot($Y2[1]);
+				$plot->SetColor(BO_GRAPH_STAT_SPECTRUM_COLOR3);
+				$plot->SetWeight(BO_GRAPH_STAT_SPECTRUM_WIDTH3);
+				$plot->SetLegend(_BL('Channel').' 1 ('._BL('Count').')');
+				$graph->AddY(0,$plot);
+			}
+			else if ($channels == 2)
+			{
+				//Bars
+				$plot1=new BarPlot($Y[1]);
+				$plot1->SetColor('#fff@1');
+				$plot1->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR1);
+				$plot1->SetLegend(_BL('Channel').' 1');
+				$plot1->SetWidth(BO_GRAPH_STAT_SPECTRUM_WIDTH1);
+				
+				$plot2=new BarPlot($Y[2]);
+				$plot2->SetColor('#fff@1');
+				$plot2->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR2);
+				$plot2->SetLegend(_BL('Channel').' 2');
+				$plot2->SetWidth(BO_GRAPH_STAT_SPECTRUM_WIDTH1);
+
+				$plot = new GroupBarPlot(array($plot1,$plot2), $X);
+				$plot->SetWidth(BO_GRAPH_STAT_SPECTRUM_WIDTH2);
+				$graph->Add($plot);
+				
+				//lines (count)
+				$plot3=new LinePlot($Y2[1]);
+				$plot3->SetColor(BO_GRAPH_STAT_SPECTRUM_COLOR3);
+				$plot3->SetWeight(BO_GRAPH_STAT_SPECTRUM_WIDTH3);
+				$plot3->SetLegend(_BL('Channel').' 1 ('._BL('Count').')');
+				$graph->AddY(0,$plot3);
+
+				$plot4=new LinePlot($Y2[2]);
+				$plot4->SetColor(BO_GRAPH_STAT_SPECTRUM_COLOR4);
+				$plot4->SetWeight(BO_GRAPH_STAT_SPECTRUM_WIDTH4);
+				$plot4->SetLegend(_BL('Channel').' 2 ('._BL('Count').')');
+				$graph->AddY(0,$plot4);
+			}
+			
+			$graph->SetYScale(0,'lin');
+			$graph->yaxis->HideLabels();
+			$graph->yaxis->title->Set(_BL('graph_stat_spectrum_yaxis_title'));
+			$graph->xaxis->title->Set(_BL('Frequency').'  [kHz]');
+			$graph->ynaxis[0]->title->Set(_BL('Count'));
+			$graph->title->Set(_BL('graph_stat_title_spectrum').$add_title);
+
+			$graph->xaxis->SetTickLabels($tickLabels);
+			$graph->xaxis->SetTextLabelInterval(1);
+			$graph->xaxis->SetTextTickInterval(1);
+			
+			break;
+		
+		
+		case 'amplitudes':
+
+			if ($channels == 1)
+			{
+				//Bars
+				$plot=new BarPlot($Y[1]);
+				$plot->SetColor('#fff@1');
+				$plot->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR1);
+				$plot->SetLegend(_BL('Channel').' 1');
+				$plot->SetWidth(BO_GRAPH_STAT_SPECTRUM_WIDTH1);
+				$graph->Add($plot);
+				
+				//lines (count)
+				$plot=new LinePlot($Y2[1]);
+				$plot->SetColor(BO_GRAPH_STAT_SPECTRUM_COLOR3);
+				$plot->SetWeight(BO_GRAPH_STAT_SPECTRUM_WIDTH3);
+				$plot->SetLegend(_BL('Channel').' 1 ('._BL('Count').')');
+				$graph->AddY(0,$plot);
+			}
+			else if ($channels == 2)
+			{
+				//Bars
+				$plot1=new BarPlot($Y[1]);
+				$plot1->SetColor('#fff@1');
+				$plot1->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR1);
+				$plot1->SetLegend(_BL('Channel').' 1');
+				$plot1->SetWidth(BO_GRAPH_STAT_SPECTRUM_WIDTH1);
+				
+				$plot2=new BarPlot($Y[2]);
+				$plot2->SetColor('#fff@1');
+				$plot2->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR2);
+				$plot2->SetLegend(_BL('Channel').' 2');
+				$plot2->SetWidth(BO_GRAPH_STAT_SPECTRUM_WIDTH1);
+
+				$plot = new GroupBarPlot(array($plot1,$plot2), $X);
+				$plot->SetWidth(BO_GRAPH_STAT_SPECTRUM_WIDTH2);
+				$graph->Add($plot);
+
+			}
+			
+			$graph->yaxis->title->Set(_BL('Count'));
+			$graph->xaxis->title->Set(_BL('Amplitude').'  [V]');
+			$graph->title->Set(_BL('graph_stat_title_amplitude').$add_title);
+
+			$graph->xaxis->SetTickLabels($tickLabels);
+			$graph->xaxis->SetTextLabelInterval(1);
+			$graph->xaxis->SetTextTickInterval(1);
+			
+			break;
 	}
 
+	
+	if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
+		$graph->img->SetAntiAliasing();
+
+	if (BO_GRAPH_STAT_COLOR_BACK)
+		$graph->SetColor(BO_GRAPH_STAT_COLOR_BACK);
+
+	if (BO_GRAPH_STAT_COLOR_BACK)
+		$graph->SetMarginColor(BO_GRAPH_STAT_COLOR_MARGIN);
+
+	if (BO_GRAPH_STAT_COLOR_FRAME)
+		$graph->SetFrame(true, BO_GRAPH_STAT_COLOR_FRAME);
+	else
+		$graph->SetFrame(false);
+
+	if (BO_GRAPH_STAT_COLOR_BOX)
+		$graph->SetBox(true, BO_GRAPH_STAT_COLOR_BOX);
+	else
+		$graph->SetBox(false);
+
+	$graph->SetMargin(50,50,20,70);
+	
+	$graph->title->SetFont(FF_DV_SANSSERIF, FS_BOLD, BO_GRAPH_STAT_FONTSIZE_TITLE);
+	$graph->title->SetColor(BO_GRAPH_STAT_COLOR_TITLE);
+	
+	$graph->legend->SetPos(0.5,0.99,"center","bottom");
+	$graph->legend->SetColumns(2);
+	$graph->legend->SetFillColor(BO_GRAPH_STAT_COLOR_LEGEND_FILL);
+	$graph->legend->SetColor(BO_GRAPH_STAT_COLOR_LEGEND_TEXT, BO_GRAPH_STAT_COLOR_LEGEND_FRAME);
+	$graph->legend->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
+	
+	if ($caption)
+	{
+		$caption=new Text($caption,60,30); 
+		$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 7);
+		$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
+		$graph->AddText($caption);
+
+	}
+	
 	$graph->xaxis->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
 	$graph->yaxis->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
 	$graph->yaxis->SetLabelMargin(1);
 	$graph->yaxis->SetTitleMargin(35);
+	$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,BO_GRAPH_STAT_FONTSIZE_XAXIS);
+	$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,BO_GRAPH_STAT_FONTSIZE_YAXIS);
 
+	if (is_object($graph->ynaxis[0]))
+	{
+		$graph->ynaxis[0]->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
+		$graph->ynaxis[0]->SetLabelMargin(3);
+		$graph->ynaxis[0]->SetTitleMargin(30);
+		$graph->ynaxis[0]->SetFont(FF_DV_SANSSERIF,FS_NORMAL,BO_GRAPH_STAT_FONTSIZE_YAXIS);
+		$graph->ynaxis[0]->SetTitleMargin(45);
+	}
+	
 	if ($graph_type == 'datlin')
 	{
 		if ($X[count($X)-1] - $X[0] > 3600 * 350)
@@ -1420,17 +2003,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		}
 	}
 
-	$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-	$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-
-	if (is_object($graph->ynaxis[0]))
-	{
-		$graph->ynaxis[0]->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
-		$graph->ynaxis[0]->SetLabelMargin(3);
-		$graph->ynaxis[0]->SetTitleMargin(30);
-		$graph->ynaxis[0]->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-		$graph->ynaxis[0]->SetTitleMargin(45);
-	}
 
 	header("Content-Type: image/png");
 	header("Pragma: ");

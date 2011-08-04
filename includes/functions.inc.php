@@ -205,20 +205,20 @@ function bo_station_id()
 }
 
 //returns your station name
-function bo_station_city($force_name = '')
+function bo_station_city($id=0, $force_name = '')
 {
-	static $name = null;
+	static $name = array();
 
 	if ($force_name)
-		$name = $force_name;
+		$name[$id] = $force_name;
 
-	if ($name)
-		return $name;
+	if ($name[$id])
+		return $name[$id];
 
-	$tmp = bo_station_info(0, true);
-	$name = $tmp['city'];
+	$tmp = bo_station_info($id);
+	$name[$id] = $tmp['city'];
 
-	return $name;
+	return $name[$id];
 }
 
 //return info-array of a station
@@ -480,9 +480,11 @@ function bo_strike2polarity($data, $bearing)
 		$cache = 1;
 	}
 
+	$channels = bo_get_conf('raw_channels');
+	
 	$ant_arc = 80;
 
-	for ($i=0;$i<2;$i++)
+	for ($i=0;$i<$channels;$i++)
 	{
 		$signal[$i] = (ord(substr($data,$i,1)) - 128) / 128;
 
@@ -507,6 +509,9 @@ function bo_strike2polarity($data, $bearing)
 
 	}
 
+	if ($channels == 1)
+		$strike_pol[1] = $strike_pol[0];
+	
 	if (!$strike_pol[0] && !$strike_pol[1])
 		$polarity = null;
 	else if ($strike_pol[0] && $strike_pol[1] && $strike_pol[0] != $strike_pol[1])
@@ -874,15 +879,23 @@ function bo_time2freq($d)
 }
 
 //Raw hexadecimal signal to array
-function raw2array($raw, $calc_spec = false)
+function raw2array($raw = false, $calc_spec = false)
 {
 	static $channels = -1, $bpv = -1, $values = -1, $utime = -1;
 	
-	if ($channels == -1 && $bpv == -1 && $utime == -1)
+	if ($channels == -1 && $bpv == -1 && $utime == -1 && $values == -1)
 	{
 		$channels = bo_get_conf('raw_channels');
 		$bpv      = bo_get_conf('raw_bitspervalue');
 		$utime    = bo_get_conf('raw_ntime') / 1000;
+		$values   = bo_get_conf('raw_values');
+	}
+	
+	//dummy signal
+	if ($raw === false)
+	{
+		$calc_spec = true;
+		$raw = str_repeat(chr(0), $values * $channels);
 	}
 	
 	$data = array();
@@ -907,11 +920,6 @@ function raw2array($raw, $calc_spec = false)
 
 	if ($calc_spec)
 	{
-		if ($values == -1)
-		{
-			$values   = bo_get_conf('raw_values');
-		}
-
 		foreach($data['signal'] as $channel => $d)
 		{
 			$data['spec'][$channel] = bo_time2freq($d);

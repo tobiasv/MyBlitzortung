@@ -37,9 +37,9 @@ function bo_alert_settings()
 	}
 	
 	if ($show_all)
-		$like = 'alert_%';
+		$like = 'alert\_%';
 	else
-		$like = 'alert_'.bo_user_get_id().'_%';
+		$like = 'alert\_'.bo_user_get_id().'\_%';
 	
 	$Alerts = array();
 	
@@ -96,7 +96,6 @@ function bo_alert_settings()
 			foreach($user_alerts as $alert_id => $d)
 			{
 				echo '<tr>';
-				
 				echo '<td>'.bo_user_get_name($user_id).'</td>';
 				echo '<td>';
 				echo '<a href="'.bo_insert_url('bo_action2', 'alert_form,'.$user_id.','.$alert_id).'">';
@@ -261,7 +260,7 @@ function bo_alert_settings_form()
 			}
 			else
 			{
-				$sql = "SELECT name FROM ".BO_DB_PREF."conf WHERE name LIKE 'alert_".$user_id."_%' ORDER BY name DESC LIMIT 1";
+				$sql = "SELECT name FROM ".BO_DB_PREF."conf WHERE name LIKE 'alert\_".$user_id."\_%' ORDER BY name DESC LIMIT 1";
 				$res = bo_db($sql);
 				$row = $res->fetch_assoc();
 
@@ -484,7 +483,7 @@ function bo_alert_send()
 		//Warning! May cause very high Database load!
 		$sql = "SELECT name, data, changed
 				FROM ".BO_DB_PREF."conf
-				WHERE name LIKE 'alert_%'";
+				WHERE name LIKE 'alert\_%'";
 		$res = bo_db($sql);
 		while ($row = $res->fetch_assoc())
 		{

@@ -855,7 +855,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
 
 	$time_end  = strtotime($row['time'].' UTC');
-	$date_end  = gmdate('Y-m-d H:i:s', $time_end);
+	$date_end  = gmdate('Y-m-d H:i:s', $time_end - 180);
 	$date_start    = gmdate('Y-m-d H:i:s', time() - 3600 * $hours_back);
 	$c = 299792458;
 
@@ -872,8 +872,6 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	}
 	else
 	{
-		$date_end   = gmdate('Y-m-d H:i:s', $time_end - 180); // strike data may be older
-		
 		$sql_join = BO_DB_PREF."raw r LEFT OUTER JOIN ".BO_DB_PREF."strikes s ON s.raw_id=r.id ";
 		$table = 'r';
 	}

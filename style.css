@@ -128,7 +128,7 @@ color: blue;
 
 #myblitzortung legend {
 border: 1px solid #e4e4e4;
-padding: 3px 5px;
+padding: 1px 5px;
 background: #ffffff;
 font-weight: bold;
 font-size: 12px;
@@ -141,6 +141,7 @@ max-width: 660px;
 background: #f9f9f9;
 border: 1px solid #e4e4e4;
 font-size: 12px;
+padding: 3px 5px;
 }
 
 #myblitzortung label {
@@ -156,6 +157,9 @@ list-style-image: none;
 font-size: 12px;
 }
 
+#myblitzortung  h4 {
+margin-bottom: 5px;
+}
 
 #myblitzortung #bo_copyright, 
 #myblitzortung #bo_copyright_extra, 
@@ -540,6 +544,14 @@ margin: 1px 0px 5px 5px;
 
 /*** Statistics ***/
 
+#myblitzortung #bo_statistics fieldset {
+width: 540px;
+}
+
+#myblitzortung #bo_statistics fieldset legend {
+
+}
+
 #myblitzortung div#bo_network_stations_container {
 height: 400px; 
 width: 620px;
@@ -590,6 +602,7 @@ padding-left: 26px;
 margin:0;
 padding: 0;
 border-bottom: 1px dotted #e7e7e7;
+width: 540px;
 }
 
 #myblitzortung ul.bo_stat_overview .bo_descr {
@@ -605,8 +618,9 @@ color: #666;
 
 #myblitzortung p.bo_graph_description,
 #myblitzortung p.bo_stat_description  {
-width: 500px;
+width: 550px;
 font-size: 11px;
+color: #444;
 }
 
 #myblitzortung .bo_map_gps {
@@ -624,6 +638,7 @@ border: 1px solid #f0f0f0;
 display: inline-block;
 margin: 2px 5px 5px 0px;
 }
+
 #myblitzortung .bo_admin_user_fieldset .bo_form_submit {
 display: block;
 }
@@ -642,4 +657,17 @@ margin-right: 10px;
 
 #myblitzortung #bo_login_submit {
 display: block;
+}
+
+#myblitzortung #bo_stat_other_station_info {
+font-size: 11px;
+border: 1px solid #f88;
+background: #fff;
+color: #100;
+padding: 5px;
+width: 500px;
+}
+
+#myblitzortung #bo_infos p {
+width: 550px;
 }

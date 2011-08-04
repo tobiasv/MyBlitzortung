@@ -38,10 +38,17 @@ function bo_show_statistics()
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'network').$add_stid.'" class="bo_navi'.($show == 'network' ? '_active' : '').'">'._BL('stat_navi_network').'</a></li>';
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'longtime').$add_stid.'" class="bo_navi'.($show == 'longtime' ? '_active' : '').'">'._BL('stat_navi_longtime').'</a></li>';
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'other').$add_stid.'" class="bo_navi'.($show == 'other' ? '_active' : '').'">'._BL('stat_navi_other').'</a></li>';
-	//echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'advanced').$add_stid.'" class="bo_navi'.($show == 'advanced' ? '_active' : '').'">'._BL('stat_navi_advanced').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'advanced').$add_stid.'" class="bo_navi'.($show == 'advanced' ? '_active' : '').'">'._BL('stat_navi_advanced').'</a></li>';
 
 	echo '</ul>';
 
+	if ($add_stid)
+	{
+		echo '<div id="bo_stat_other_station_info">';
+		echo strtr(_BL('bo_stat_other_station_info'), array('{STATION_CITY}' => bo_station_city($station_id)));
+		echo ' <a href="'.bo_insert_url('bo_station_id').'">'._BL('bo_stat_other_station_info_back').'</a>';
+		echo '</div>';
+	}
 
 	switch($show)
 	{
@@ -191,18 +198,21 @@ function bo_show_statistics_strikes()
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
 	echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
 	
-	echo '<li><span class="bo_descr">'._BL('Last detected strike').': </span>';
-	echo '<span class="bo_value">'.date(_BL('_datetime'), $last_strike).'</span></li>';
-
-	echo '<li><span class="bo_descr">'._BL('Current strike rate').': </span>';
-	echo '<span class="bo_value">';
-	echo number_format($strike_rate, 1, _BL('.'), _BL(',')).' '.(0 && $strike_rate === 1.0 ? _BL('unit_strikesperminute_one') : _BL('unit_strikesperminute'));
-	echo '</span></li>';
-
-	if (intval(BO_TRACKS_SCANTIME) && $num_cells >= 0)
+	if ($own_station)
 	{
-		echo '<li><span class="bo_descr">'._BL('Thunder cells').': </span>';
-		echo '<span class="bo_value">'.number_format($num_cells, 0, _BL('.'), _BL(',')).' ('._BL('experimental').')</span></li>';
+		echo '<li><span class="bo_descr">'._BL('Last detected strike').': </span>';
+		echo '<span class="bo_value">'.date(_BL('_datetime'), $last_strike).'</span></li>';
+
+		echo '<li><span class="bo_descr">'._BL('Current strike rate').': </span>';
+		echo '<span class="bo_value">';
+		echo number_format($strike_rate, 1, _BL('.'), _BL(',')).' '.(0 && $strike_rate === 1.0 ? _BL('unit_strikesperminute_one') : _BL('unit_strikesperminute'));
+		echo '</span></li>';
+
+		if (intval(BO_TRACKS_SCANTIME) && $num_cells >= 0)
+		{
+			echo '<li><span class="bo_descr">'._BL('Thunder cells').': </span>';
+			echo '<span class="bo_value">'.number_format($num_cells, 0, _BL('.'), _BL(',')).' ('._BL('experimental').')</span></li>';
+		}
 	}
 	
 	echo '</ul>';
@@ -211,6 +221,7 @@ function bo_show_statistics_strikes()
 	echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_region'));
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_stat_strikes_now').'</legend>';
+	echo '<span class="bo_form_descr">'._BL('Region').': </span>';
 	bo_show_select_region($region);
 	echo '</fieldset>';
 	echo '</form>';
@@ -225,6 +236,8 @@ function bo_show_statistics_strikes()
 
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_stat_strikes').'</legend>';
+	
+	echo '<span class="bo_form_descr">'._BL('time_year_month').': </span>';
 	
 	echo '<select name="bo_year" onchange="submit();" id="bo_stat_strikes_select_year">';
 	foreach($years as $i => $y)
@@ -1020,7 +1033,11 @@ function bo_show_statistics_advanced()
 {
 	global $_BO;
 	
+	$show_options = array('strikes', 'strike_ratios', 'signals');
+	
+	$show = $_GET['bo_show2'];
 	$region = $_GET['bo_region'];
+	$channel = intval($_GET['bo_channel']);
 
 	$add_graph = '';
 	
@@ -1033,10 +1050,14 @@ function bo_show_statistics_advanced()
 	if (intval($_GET['bo_station_id']))
 	{
 		$station_id = intval($_GET['bo_station_id']);
-		$add_graph = '&id='.$station_id;
+		$add_graph .= '&id='.$station_id;
+		$show = '';
 	}
 	else
 	{
+		if ($channel)
+			$add_graph .= '&channel='.$channel;
+
 		$station_id = bo_station_id();
 		$own_station = true;
 	}
@@ -1055,123 +1076,252 @@ function bo_show_statistics_advanced()
 	echo _BL('bo_stat_advanced_info');
 	echo '</p>';
 	
-	if ($own_station)
-	{
-		echo '<ul class="bo_stat_overview">';
-		
-		echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
-		echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
-		
-		echo '<li><span class="bo_descr">'._BL('Channels').': </span>';
-		echo '<span class="bo_value">'.$channels.'</span></li>';
-
-		echo '<li><span class="bo_descr">'._BL('Samples per Channel').': </span>';
-		echo '<span class="bo_value">'.$values.'</span></li>';
-
-		echo '<li><span class="bo_descr">'._BL('Recording time').': </span>';
-		echo '<span class="bo_value">'.number_format($utime * $values, 0, _BL('.'), _BL(',')).'µs</span></li>';
-
-		echo '<li><span class="bo_descr">'._BL('Bits per Sample').': </span>';
-		echo '<span class="bo_value">'.$bpv.'</span></li>';
-
-		echo '<li><span class="bo_descr">'._BL('Sample rate').': </span>';
-		echo '<span class="bo_value">'.number_format(1 / $utime * 1000, 0, _BL('.'), _BL(','))._BL('unit_ksps').'</span></li>';
-		
-		
-		echo '</ul>';
-		
-
-		echo '<form action="?" method="GET" class="bo_stat_advanced_form">';
-		echo bo_insert_html_hidden(array('bo_region'));
-		echo '<fieldset>';
-		echo '<legend>'._BL('legend_stat_advanced_now').'</legend>';
-		bo_show_select_region($region);
-		echo 'Auswahlfeld Kanal';
-		echo '</fieldset>';
-		echo '</form>';
-
-	}
+	echo '<form action="?" method="GET" class="bo_stat_advanced_form">';
 	
-	echo '<ul>
-			<li>Kanal -> Spektrum letzte 24h (+Langzeit)
-			<li>Verhältnis Kanal max. Signal <-> Entfernung
-			<li>Quote nach Entfernung (wie ber. vorhanden) für einen Kanal
-			</ul>
-			';
-	
-	echo '<a name="graph_participants"></a>';
-	echo '<h4>'._BL('h4_graph_participants').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_participants">';
-	echo strtr(_BL('bo_graph_participants'), array('{MIN_PARTICIPANTS}' => BO_MIN_PARTICIPANTS));
-	echo '</p>';
-	if (BO_GRAPH_STAT_PARTICIPANTS_LOG === true)
-		echo '<p class="bo_graph_description bo_graph_log_warn" ><strong>'._BL('bo_graph_participants_log_warn').'</strong></p>';
-
-	bo_show_graph('participants', $add_graph);
-
-	echo '<h4>'._BL('h4_graph_participants_time').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_participants_time">';
-	echo _BL('bo_graph_participants_time');
-	echo '</p>';
-
-	echo '<a name="graph_deviations"></a>';
-
+	echo bo_insert_html_hidden(array('bo_show2', 'bo_region', 'bo_channel'));
 	echo '<fieldset>';
-	echo '<legend>'._BL('legend_stat_participants_time').'</legend>';
+	echo '<legend>'._BL('legend_stat_advanced_options').'</legend>';
 	
-	echo _BL('Min').': ';
-	echo '<select name="bo_region" onchange="bo_change_participants(this.value);" id="bo_stat_participants_time_select">';
-	//echo '<option value="0">'._BL('Average').'</option>';
-	for($i=BO_MIN_PARTICIPANTS;$i<150;$i+=$i<20?1:10)
-		echo '<option value="'.$i.'">'.$i.'</option>';
-	echo '</select> ';
-
-	echo _BL('Max').': ';
-	echo '<select name="bo_region" onchange="bo_change_participants_max(this.value);" id="bo_stat_participants_time_select_max">';
-	//echo '<option value="0">'._BL('Average').'</option>';
-	for($i=BO_MIN_PARTICIPANTS;$i<150;$i+=$i<20?1:10)
-		echo '<option value="'.$i.'">'.$i.'</option>';
-	echo '</select> ';
-
+	echo '<span class="bo_form_descr">'._BL('Show').': </span>';
+	echo '<select name="bo_show2" onchange="submit();" id="bo_stat_advanced_select_show" '.($own_station ? '' : 'disabled').'>';
+	foreach($show_options as $opt_name)
+	{
+		echo '<option value="'.$opt_name.'" '.($show == $opt_name ? 'selected' : '').'>'._BL('stat_advanced_show_'.$opt_name).'</option>';
+	}
+	echo '</select>';
+	
+	echo '<br>';
+	
+	echo '<span class="bo_form_descr">'._BL('Region').': </span>';
+	bo_show_select_region($region);
+	
+	if ($own_station && $channels > 1)
+	{
+		echo ' <span class="bo_form_descr">'._BL('Channel').': </span>';
+		echo '<select name="bo_channel" onchange="submit();" id="bo_stat_advanced_select_channel">';
+		echo '<option value="0" '.($channel == 0 ? 'selected' : '').'>'._BL('All').$y.'</option>';
+		for($i=1;$i<=$channels;$i++)
+			echo '<option value="'.$i.'" '.($i == $channel ? 'selected' : '').'>'._BL('Channel').' '.$i.'</option>';
+		echo '</select>';
+	}
 	
 	echo '</fieldset>';
+	echo '</form>';
 
 	echo '<script type="text/javascript">
-	function bo_change_participants (val) {
-		var img = document.getElementById("graph_participants_time");
-		img.src = img.src.replace(/&participants=[0-9]+/g, "") + "&participants=" + val;
+	function bo_change_value (val,tid,name) {
+		if (!name) name = "value";
+		var regex = new RegExp("/&"+name+"=[^&]*&?/g");
+		var img = document.getElementById("bo_graph_" + tid + "_img");
+		img.src = img.src.replace(regex, "") + "&"+name+"=" + val;
 	}
-	function bo_change_participants_max (val) {
-		var img = document.getElementById("graph_participants_time");
-		img.src = img.src.replace(/&participants_max=[0-9]+/g, "") + "&participants_max=" + val;
+	function bo_change_radio (val, type) {
+		var dis = val == 1;
+		document.getElementById("bo_stat_"+type+"_time_min").disabled=dis;
+		document.getElementById("bo_stat_"+type+"_time_max").disabled=dis;
+
+		var img = document.getElementById("bo_graph_"+type+"_time_img");
+		img.src = img.src.replace(/&average/g, "");
+		img.src += val == 1 ? "&average" : "";
 	}
 	</script>
 	';
+	
+	switch($show)
+	{
+		default: //Strikes
+	
+	
+			/*** PARTICIPANTS ***/
+			
+			echo '<a name="graph_participants"></a>';
+			echo '<h4>'._BL('h4_graph_participants').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_participants">';
+			echo strtr(_BL('bo_graph_participants'), array('{MIN_PARTICIPANTS}' => BO_MIN_PARTICIPANTS));
+			echo '</p>';
+			if (BO_GRAPH_STAT_PARTICIPANTS_LOG === true)
+				echo '<p class="bo_graph_description bo_graph_log_warn" ><strong>'._BL('bo_graph_log_warn').'</strong></p>';
 
-	bo_show_graph('participants_time', $add_graph);
-	
-	
-	echo '<a name="graph_deviations"></a>';
-	echo '<h4>'._BL('h4_graph_deviations').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_deviations">';
-	echo _BL('bo_graph_deviations');
-	echo '</p>';
-	bo_show_graph('deviations', $add_graph);
-	
+			bo_show_graph('participants', $add_graph);
 
-	echo '<a name="graph_deviations"></a>';
-	echo '<h4>'._BL('h4_graph_deviations').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_deviations">';
-	echo _BL('bo_graph_deviations');
-	echo '</p>';
-	bo_show_graph('deviations_dist', $add_graph);
+			echo '<h4>'._BL('h4_graph_participants_time').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_participants_time">';
+			echo _BL('bo_graph_participants_time');
+			echo '</p>';
+
+			echo '<a name="graph_participants_time"></a>';
+
+			echo '<fieldset>';
+			echo '<legend>'._BL('legend_stat_participants_time').'</legend>';
+			echo '<input type="radio" name="bo_participants_type" id="bo_participants_radio_avg" value="1" checked onclick="bo_change_radio(this.value, \'participants\');">';
+			echo '<label for="bo_participants_radio_avg">'._BL('Average').'</label>';
+			echo ' <input type="radio" name="bo_participants_type" id="bo_participants_radio_val" value="2" onclick="bo_change_radio(this.value, \'participants\');">';
+			echo '<label for="bo_participants_radio_val">'._BL('Values').'</label> &nbsp; &bull; &nbsp; ';
+			
+			echo _BL('Min').': ';
+			echo '<select name="bo_participants_min" onchange="bo_change_value(this.value, \'participants_time\');" id="bo_stat_participants_time_min" disabled>';
+			//echo '<option value="0">'._BL('Average').'</option>';
+			for($i=BO_MIN_PARTICIPANTS;$i<150;$i+=$i<20?1:10)
+				echo '<option value="'.$i.'">'.$i.'</option>';
+			echo '</select> ';
+			echo _BL('Max').': ';
+			echo '<select name="bo_participants_max" onchange="bo_change_value(this.value, \'participants_time\', \'value_max\');" id="bo_stat_participants_time_max" disabled>';
+			for($i=BO_MIN_PARTICIPANTS;$i<150;$i+=$i<20?1:10)
+				echo '<option value="'.$i.'">'.$i.'</option>';
+			echo '</select> ';
+			echo '</fieldset>';
+
+			bo_show_graph('participants_time', $add_graph.'&average');
+			
+			/*** DEVIATIONS ***/
+			
+			echo '<a name="graph_deviations"></a>';
+			echo '<h4>'._BL('h4_graph_deviations').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_deviations">';
+			echo _BL('bo_graph_deviations');
+			echo '</p>';
+			if (BO_GRAPH_STAT_DEVIATIONS_LOG === true)
+				echo '<p class="bo_graph_description bo_graph_log_warn" ><strong>'._BL('bo_graph_log_warn').'</strong></p>';
+
+			bo_show_graph('deviations', $add_graph);
+			
+
+			echo '<a name="graph_deviations_time"></a>';
+			echo '<h4>'._BL('h4_graph_deviations_time').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_deviations_time">';
+			echo _BL('bo_graph_deviations_time');
+			echo '</p>';
+
+			echo '<fieldset>';
+			echo '<legend>'._BL('legend_stat_deviations_time').'</legend>';
+
+			echo '<input type="radio" name="bo_deviations_type" id="bo_deviations_radio_avg" value="1" checked onclick="bo_change_radio(this.value, \'deviations\');">';
+			echo '<label for="bo_deviations_radio_avg">'._BL('Average').'</label>';
+			echo ' <input type="radio" name="bo_deviations_type" id="bo_deviations_radio_val" value="2" onclick="bo_change_radio(this.value, \'deviations\');">';
+			echo '<label for="bo_deviations_radio_val">'._BL('Values').'</label> &nbsp; &bull; &nbsp; ';
+
+			echo _BL('Min').': ';
+			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'deviations_time\');" id="bo_stat_deviations_time_min" disabled>';
+			//echo '<option value="0">'._BL('Average').'</option>';
+			for($i=0;$i<6000;$i+=100)
+				echo '<option value="'.$i.'">'.number_format($i / 1000, 1, _BL('.'), _BL(',')).'</option>';
+			echo '</select> ';
+			echo _BL('Max').': ';
+			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'deviations_time\', \'value_max\');" id="bo_stat_deviations_time_max" disabled>';
+			for($i=0;$i<6000;$i+=100)
+				echo '<option value="'.$i.'" '.($i == 1000 ? 'selected' : '').'>'.number_format($i / 1000, 1, _BL('.'), _BL(',')).'</option>';
+			echo '</select> ';
+			echo '</fieldset>';
+			
+			bo_show_graph('deviations_time', $add_graph.'&average');
+			
+			
+			/*** DISTANCE ***/
+			if ($own_station)
+			{
+				echo '<a name="graph_distance"></a>';
+				echo '<h4>'._BL('h4_graph_distance').'</h4>';
+				echo '<p class="bo_graph_description" id="bo_graph_distance">';
+				echo _BL('bo_graph_distance');
+				echo '</p>';
+				bo_show_graph('distance', $add_graph);
+			}
+			
+			break;
+	
 		
-	echo '<a name="graph_distance"></a>';
-	echo '<h4>'._BL('h4_graph_distance').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_distance">';
-	echo _BL('bo_graph_distance');
-	echo '</p>';
-	bo_show_graph('distance', $add_graph);
+		case 'strike_ratios':
+			
+			/*** EVALUATED RATIO ***/
+			echo '<a name="graph_evaluated_signals"></a>';
+			echo '<h4>'._BL('h4_graph_evaluated_signals').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_evaluated_signals">';
+			echo _BL('bo_graph_evaluated_signals');
+			echo '</p>';
+			bo_show_graph('evaluated_signals', $add_graph);
+
+			/*** RATIO DISTANCE ***/
+			echo '<a name="graph_ratio_distance"></a>';
+			echo '<h4>'._BL('h4_graph_ratio_distance').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_descr_radi">';
+			echo _BL('bo_graph_descr_radi_adv');
+			echo '</p>';
+			bo_show_graph('ratio_distance', $add_graph);
+
+			/*** RATIO BEARING ***/
+			echo '<a name="graph_ratio_bearing"></a>';
+			echo '<h4>'._BL('h4_graph_ratio_bearing').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_descr_bear">';
+			echo _BL('bo_graph_descr_bear_adv');
+			echo '</p>';
+			bo_show_graph('ratio_bearing', $add_graph);			
+	
+			break;
+			
+		case 'signals':
+			
+			echo '<h4>'._BL('h4_stat_signals').'</h4>';
+			echo '<ul class="bo_stat_overview">';
+			echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
+			echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
+			echo '<li><span class="bo_descr">'._BL('Channels').': </span>';
+			echo '<span class="bo_value">'.$channels.'</span></li>';
+			echo '<li><span class="bo_descr">'._BL('Samples per Channel').': </span>';
+			echo '<span class="bo_value">'.$values.'</span></li>';
+			echo '<li><span class="bo_descr">'._BL('Recording time').': </span>';
+			echo '<span class="bo_value">'.number_format($utime * $values, 0, _BL('.'), _BL(',')).'µs</span></li>';
+			echo '<li><span class="bo_descr">'._BL('Bits per Sample').': </span>';
+			echo '<span class="bo_value">'.$bpv.'</span></li>';
+			echo '<li><span class="bo_descr">'._BL('Sample rate').': </span>';
+			echo '<span class="bo_value">'.number_format(1 / $utime * 1000, 0, _BL('.'), _BL(',')).' '._BL('unit_ksps').'</span></li>';
+			echo '</ul>';
+
+			/*** SPECTRUM ***/
+			echo '<a name="graph_spectrum"></a>';
+			echo '<h4>'._BL('h4_graph_spectrum').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_spectrum">';
+			echo _BL('bo_graph_spectrum');
+			echo '</p>';
+			echo '<fieldset>';
+			echo '<legend>'._BL('legend_stat_spectrum').'</legend>';
+			echo _BL('With strikes connected').': ';
+			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'spectrum\');" id="bo_stat_spectrum_value">';
+			echo '<option value="0">'._BL('dontcare').'</option>';
+			echo '<option value="1">'._BL('participated_assigned').'</option>';
+			echo '<option value="2">'._BL('_participated').'</option>';
+			echo '<option value="-1">'._BL('not_participated').'</option>';
+			echo '</select> ';
+			echo '</fieldset>';
+			bo_show_graph('spectrum', $add_graph);
+
+			/*** AMPLITUDES ***/
+			echo '<a name="graph_spectrum"></a>';
+			echo '<h4>'._BL('h4_graph_amplitudes').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_amplitudes">';
+			echo _BL('bo_graph_amplitudes');
+			echo '</p>';
+			echo '<fieldset>';
+			echo '<legend>'._BL('legend_stat_amplitudes').'</legend>';
+			echo _BL('With strikes connected').': ';
+			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'amplitudes\');" id="bo_stat_amplitudes_strikes">';
+			echo '<option value="0">'._BL('dontcare').'</option>';
+			echo '<option value="1">'._BL('participated_assigned').'</option>';
+			echo '<option value="2">'._BL('_participated').'</option>';
+			echo '<option value="-1">'._BL('not_participated').'</option>';
+			echo '</select> &nbsp; ';
+			echo _BL('Amplitude').': ';
+			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'amplitudes\', \'graph_statistics\');" id="bo_stat_amplitudes_max">';
+			echo '<option value="amplitudes">'._BL('amp_first').'</option>';
+			echo '<option value="amplitudes_max">'._BL('Max').'</option>';
+			echo '</select> ';
+			echo '</fieldset>';
+			bo_show_graph('amplitudes', $add_graph);
+			
+			break;
+	
+		break;
+	
+	}
 	
 	echo '</div>';
 
@@ -1182,13 +1332,14 @@ function bo_show_graph($type, $add_graph='')
 	echo '<img src="'.BO_FILE.'?graph_statistics='.$type.'&bo_lang='._BL().$add_graph.'" 
 			class="bo_graph_img" 
 			style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;background-image:url(\''.BO_FILE.'?image=wait\');"
-			id="graph_'.$type.'"
+			id="bo_graph_'.$type.'_img"
 			>';
 }
 
 function bo_show_select_region($region)
 {
 	global $_BO;
+	
 	$regions = array();
 	if (isset($_BO['region']) && is_array($_BO['region']))
 	{

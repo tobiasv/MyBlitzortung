@@ -484,14 +484,14 @@ $_BL['de']['info_participate_text'] = '
 $_BL['de']['info_usage_text'] = '
 		Die hier und auf Blitzortung.org angebotenen Daten sind ausschließlich für den privaten 
 		Gebrauch der teilnehmenden Benutzer bestimmt.
-		Blitzortung.org ist kein offizieller Informationsdienst für Blitzdaten
+		Blitzortung.org ist kein offizieller Informationsdienst für Blitzdaten.
 		Eine gewerbliche Nutzung der hier angebotenen Informationen ist strengstens verboten!
 		Beachten Sie auch die Nutzungsbedingungen auf 
 		<a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=5" target="_blank">Blitzortung.org</a>
 		';
 $_BL['de']['info_myblitzortung_text'] = '
 		Die Aufbereitung und Visualisierung der Daten auf dieser Internetseite
-		erfolgt durch das Programm <em><span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span></em>. Die Verwendung von <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> erfolgt auf eigene
+		erfolgt durch das Programm <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>. Die Verwendung von <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> erfolgt auf eigene
 		Verantwortung! Weder der Betreiber der Internetseite noch der/die Ersteller des Programms 
 		können für fehlerfreihe Funktion Garantieren. <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> ist freie Software. Mehr
 		Informationen dazu unter 
@@ -539,7 +539,7 @@ $_BL['de']['bo_graph_descr_strikes_time_radius'] = 'Hier werden nur die Blitze g
 $_BL['de']['bo_graph_stations'] = 'Aktive Stationen senden Signale und nehmen somit an Blitzortungen teil. Verfügbare Stationen sind dagegen offline, z. B. wegen Wartungsarbeiten, Defekten.';
 $_BL['de']['bo_graph_participants'] = 'Je mehr Stationen einen Blitz empfangen, desto sicherer ist dessen Existent bzw. desto genauer ist dessen Position. 
 										Für eine Ortung müssen mindestens {MIN_PARTICIPANTS} Stationen ein entsprechendes Signal empfangen haben.';
-$_BL['de']['bo_graph_participants_log_warn'] = 'Achtung: Die Anzahl der Blitze ist logarithmisch aufgetragen!';
+$_BL['de']['bo_graph_log_warn'] = 'Achtung: Die Anzahl der Blitze ist logarithmisch aufgetragen!';
 
 
 /*************************************************************/
@@ -691,11 +691,10 @@ $_BL['de']['NRW'] = 'NRW';
 
 $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
 
+
+// Not sorted
+
 $_BL['de']['Score'] = 'Wertung';
-
-
-$_BL['de']['bo_graph_descr_strikes_now'] = '';
-
 $_BL['de']['Strike count per minute'] = 'Blitze pro Minute';
 $_BL['de']['graph_legend_strikes_now_all'] = 'Alle Blitze';
 $_BL['de']['graph_legend_strikes_now_own'] = 'Blitze Station {STATION}';
@@ -723,28 +722,79 @@ $_BL['de']['h3_stat_advanced'] = 'Erweiterte Statistiken';
 $_BL['de']['Thunder cells'] = 'Gewitterzellen';
 $_BL['de']['graph_stat_title_strikes_participants'] = 'Blitze mit {PARTICIPANTS} Teilnehmern';
 $_BL['de']['Evaluated'] = 'Ausgewertet';
-$_BL['de']['bo_stat_advanced_info'] = '';
+$_BL['de']['bo_stat_advanced_info'] = 'Erweiterte Statistiken, welche für den Stationsbetreiber hilfreich sein könnten um die Auswertungen zu optimieren. Im Gegensatz zur den Statistiken unter "Station" werden genauere Daten zur Berechnung verwendet.';
 $_BL['de']['Channels'] = 'Kanäle';
 $_BL['de']['Samples per Channel'] = 'Samples pro Kanal';
 $_BL['de']['Recording time'] = 'Aufnahmedauer';
 $_BL['de']['Bits per Sample'] = 'Bits pro Sample';
 $_BL['de']['Sample rate'] = 'Samplerate';
 $_BL['de']['unit_ksps'] = 'Kilosamples pro Sekunde';
-$_BL['de']['h4_graph_participants_time'] = '';
-$_BL['de']['bo_graph_participants_time'] = '';
-$_BL['de']['legend_stat_participants_time'] = '';
+$_BL['de']['h4_graph_participants_time'] = 'Verlauf der Teilnehmeranzahl';
+$_BL['de']['bo_graph_participants_time'] = 'Es kann der Verlauf des Mittelwerts oder der Verlauf des prozentualen Anteil einzelner Teilnehmerzahlen angezeigt werden.';
 $_BL['de']['Average'] = 'Mittel';
-$_BL['de']['h4_graph_deviations'] = '';
-$_BL['de']['bo_graph_deviations'] = '';
-$_BL['de']['h4_graph_distance'] = '';
-$_BL['de']['bo_graph_distance'] = '';
-$_BL['de']['graph_legend_participants_time_all'] = '';
-$_BL['de']['graph_legend_participants_time_own'] = '';
-$_BL['de']['Min'] = '';
-$_BL['de']['Max'] = '';
-$_BL['de']['legend_stat_advanced_now'] = '';
+$_BL['de']['h4_graph_deviations'] = 'Ortungen pro Positionsabweichung';
+$_BL['de']['bo_graph_deviations'] = 'Für jeden Blitz wird die Abweichung der Position berechnet, also die Unsicherheit der Einschlagsstelle. ';
+$_BL['de']['h4_graph_distance'] = 'Entfernung';
+$_BL['de']['bo_graph_distance'] = 'Zeitlicher Verlauf der durschnittlichen Entfernung zur Station {STATION}. Durch Vergleich der beiden Kurven kann die Empfindlichkeit der Station im Verhältnis zur Entfernung abgeschätzt werden.';
+$_BL['de']['graph_legend_participants_time_all'] = 'Prozentualer Anteil';
+$_BL['de']['graph_legend_participants_time_own'] = 'Prozentualer Anteil Station {STATION}';
+$_BL['de']['Min'] = 'Min';
+$_BL['de']['Max'] = 'Max';
 $_BL['de']['Update failed!'] = 'Update fehlgeschlagen!';
 $_BL['de']['Retry'] = 'Wiederholen';
 $_BL['de']['Continue'] = 'Weiter';
 $_BL['de']['total strikes station2'] = 'Blitze Station {STATION_CITY}';
-$_BL['de']['Test'] = '';
+$_BL['de']['graph_legend_deviatinons_time_all'] = 'Relative Anzahl';
+$_BL['de']['graph_legend_deviations_time_own'] = 'Relative Anzahl Station {STATION}';
+$_BL['de']['graph_stat_title_strikes_deviations'] = 'Blitze mit Abweichungen {DEVIATIONS}';
+$_BL['de']['h4_graph_evaluated_signals'] = 'Blitzquoten / Ausgewertete Signale';
+$_BL['de']['bo_graph_evaluated_signals'] = 'Signale der Station {STATION}, welche durch die TOA-Methode auf Blitzortung.org nicht einem Blitz zugeordnet werden konnten, werden durch MyBlitzortung noch einmal mit den vorhandenen Blitzdaten abgeglichen. In manchen Fällen kann damit ein Signal einem Blitz nachträglich zugeordnet werden. Je häufiger dieser Fall eintritt, desto eher liegt ein Fehler bei der Einstellung im Vorverstärker vor. Im Idealfall sollten die beiden Kurven also deckungsgleich sein.';
+$_BL['de']['h4_graph_deviations_time'] = 'Verlauf der Positionsabweichungen';
+$_BL['de']['bo_graph_deviations_time'] = 'Zeitlicher Verlauf der mittleren Abweichungen der Blitzpositionen bzw. Verlauf von bestimmten Abweichungen.';
+$_BL['de']['graph_legend_evaluated_signals_part_ratio'] = 'Blitzquote';
+$_BL['de']['graph_legend_evaluated_signals_part_all_ratio'] = 'Blitzquote mit nachträglicher Zuordnung';
+$_BL['de']['graph_stat_title_evaluated_signals'] = 'Blitzquoten';
+$_BL['de']['graph_legend_deviations_own'] = 'Abweichung Station {STATION}';
+$_BL['de']['graph_legend_deviations_all'] = 'Positionsabweichung';
+$_BL['de']['graph_legend_deviations_ratio'] = 'Anteil Station {STATION}';
+$_BL['de']['Deviations'] = 'Abweichungen';
+$_BL['de']['graph_stat_title_deviations'] = 'Ortungen pro Positionsabweichung';
+$_BL['de']['graph_legend_participants_time_avg_all'] = 'Durchschnittliche Teilnehmerzahl';
+$_BL['de']['graph_legend_participants_time_avg_own'] = 'Durchschnittliche Teilnehmerzahl Station {STATION}';
+$_BL['de']['graph_stat_title_strikes_participants_avg'] = 'Durchschnittliche Teilnehmerzahlen';
+$_BL['de']['graph_legend_deviatinons_time_avg_all'] = 'Durchschnittliche Abweichungen';
+$_BL['de']['graph_legend_deviations_time_avg_own'] = 'Durchschnittliche Abweichungen Station {STATION}';
+$_BL['de']['graph_stat_title_strikes_deviations_avg'] = 'Durchschnittliche Positionsabweichungen';
+$_BL['de']['bo_stat_other_station_info'] = 'Hinweis: Es werden Statistiken der <strong>Station {STATION_CITY}</strong> angezeigt. Aus technischen Gründen kann nur eine Auswahl der sonst vorhandenen Informationen angezeigt werden. Einzelne Informationen können sich auch weiterhin noch auf die Station {STATION} beziehen!';
+$_BL['de']['legend_stat_advanced_options'] = 'Optionen';
+$_BL['de']['legend_stat_participants_time'] = 'Optionen';
+$_BL['de']['legend_stat_deviations_time'] = 'Optionen';
+$_BL['de']['bo_stat_other_station_info_back'] = 'Zurück zur Station {STATION}';
+$_BL['de']['Values'] = 'Werte';
+$_BL['de']['time_year_month'] = 'Jahr und Monat';
+$_BL['de']['Channel'] = 'Kanal';
+$_BL['de']['Show'] = 'Zeige';
+$_BL['de']['stat_advanced_show_strikes'] = 'Blitzstatistiken';
+$_BL['de']['stat_advanced_show_signals'] = 'Signalstatistiken';
+$_BL['de']['h4_stat_signals'] = 'Signale';
+$_BL['de']['bo_graph_descr_radi_adv'] = 'Wie Blitzquote unter unter der Stations-Statistik, hier kann jedoch der entsprechende Kanal mit berücksichtigt werden.';
+$_BL['de']['bo_graph_descr_bear_adv'] = 'Wie Blitzquote unter unter der Stations-Statistik, hier kann jedoch der entsprechende Kanal mit berücksichtigt werden.';
+$_BL['de']['stat_advanced_show_strike_ratios'] = 'Quoten';
+$_BL['de']['Frequency'] = 'Frequenz';
+$_BL['de']['graph_stat_title_spectrum'] = 'Spektrum';
+$_BL['de']['graph_stat_yaxis_title'] = 'Amplitude';
+$_BL['de']['h4_graph_spectrum'] = 'Frequenzspektrum der Frequenzpeaks';
+$_BL['de']['bo_graph_spectrum'] = 'Bei den Spektren der einzelnen Signale gibt es jeweil eine Frequenz mit dem höchsten Peak. Die Amplituden dieser Peaks werden hier für die jeweiligen Frequenzen aufsummiert dargestellt.';
+$_BL['de']['Amplitude'] = 'Amplitude';
+$_BL['de']['graph_stat_title_amplitude'] = 'Amplituden';
+$_BL['de']['h4_graph_amplitudes'] = 'Amplituden';
+$_BL['de']['bo_graph_amplitudes'] = 'Die Amplituden der Signale. Es kann die Startamplitude bzw. die maximal gemessene gewählt werden.';
+$_BL['de']['graph_stat_spectrum_yaxis_title'] = 'Summierte Amplituden';
+$_BL['de']['With strikes connected'] = 'Mit verknüpften Blitzen';
+$_BL['de']['dontcare'] = 'Egal';
+$_BL['de']['participated_assigned'] = 'Zugewiesen';
+$_BL['de']['_participated'] = 'Teilgenommen';
+$_BL['de']['not_participated'] = 'Nicht teilgenommen';
+$_BL['de']['legend_stat_spectrum'] = 'Optionen';
+$_BL['de']['legend_stat_amplitudes'] = 'Optionen';
+$_BL['de']['amp_first'] = 'Erstes Sample';
