@@ -259,9 +259,12 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	
 	$hours_back = intval($hours_back) ? intval($hours_back) : 24;
 	$hours_back = !bo_user_get_level() && $hours_back > 96 ? 96 : $hours_back;
-
 	$stId = bo_station_id();
 
+	$group_minutes = intval($_GET['group_minutes']);
+	if ($group_minutes < BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES)
+		$group_minutes = BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES;
+	
 	$date_end = gmdate('Y-m-d H:i:s', bo_get_conf('uptime_stations'));
 	$time_end = strtotime($date_end." UTC");
 	$date_start = gmdate('Y-m-d H:i:s', time() - 3600 * $hours_back);
@@ -302,7 +305,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	if ($type == 'strikes_now')
 	{
 		$last_uptime = bo_get_conf('uptime_strikes') - 60;
-		$group_minutes = BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES;
 
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
@@ -756,7 +758,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					break;
 
 				case 'deviations':
-					$tickLabels[$i] = number_format($i/10, 1, _BL('.'), _BL(','));
+					$tickLabels[$i] = number_format($i/10, 1, _BL('.'), _BL(',')).'km';
 					$X[$i] = $i/10;
 					break;
 			}
@@ -817,10 +819,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				break;
 				
 		}
-		
 			
 		$last_uptime = bo_get_conf('uptime_strikes') - 60;
-		$group_minutes = BO_GRAPH_STAT_STRIKES_PARTICIPANTS_GROUP_MINUTES;
 
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
@@ -951,7 +951,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$station_id = 0;
 		
 		$last_uptime = bo_get_conf('uptime_raw') - 60; //RAW-update time!!!!
-		$group_minutes = BO_GRAPH_STAT_STRIKES_PARTICIPANTS_GROUP_MINUTES;
 
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
@@ -996,14 +995,14 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		
 		$channels = bo_get_conf('raw_channels');
 		$last_uptime = bo_get_conf('uptime_raw') - 60; //RAW-update time!!!!
-		$group_minutes = BO_GRAPH_STAT_STRIKES_PARTICIPANTS_GROUP_MINUTES;
-
+		$participated = intval($_GET['participated']);
+		
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
 		
 		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
 		
-		if ($value > 0)
+		if ($participated > 0)
 		{
 			$sql_join = "
 					JOIN ".BO_DB_PREF."strikes s
@@ -1011,7 +1010,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 			$add_title .= ' '._BL('with_strikes');
 			
-			if ($value == 2)
+			if ($participated == 2)
 			{
 				$sql_join .= " AND $sql_part ";
 				$add_title .= '+'._BL('with_participation');
@@ -1019,7 +1018,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 			$sql_join .= strtr(bo_region2sql($region), array('lat' => 's.lat', 'lon' => 's.lon'));
 		}
-		else if ($value < 0)
+		else if ($participated < 0)
 		{
 			$sql_join = "
 					LEFT JOIN ".BO_DB_PREF."strikes s
@@ -1076,7 +1075,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$ampmax = '_max';
 				$type = 'amplitudes';
 			}
-	
+			
+			$caption = '';
+			
 			for ($channel=1;$channel<=$channels;$channel++)
 			{
 				for ($i=0;$i<pow(2,8)/$amp_divisor;$i++)
@@ -1084,6 +1085,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					$Y[$channel][$i] = 0;
 				}
 				
+				$amp_sum = 0;
 				$sql = "SELECT ROUND(amp".$channel."$ampmax / $amp_divisor) amp, COUNT(r.id) cnt
 						FROM ".BO_DB_PREF."raw r
 						$sql_join
@@ -1094,8 +1096,18 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				while ($row = $res->fetch_assoc())
 				{
 					$Y[$channel][$row['amp']] = $row['cnt'];
-					$row['amp'].' ';
+					$amp_sum += $row['amp'] * $row['cnt'];
 				}
+				
+				$count = @array_sum($Y[$channel]);
+				
+				$caption .= _BL('Mean value channel').' '.$channel.': ';
+				if (intval($count))
+					$caption .= number_format(($amp_sum / $count * $amp_divisor) / 255 * BO_MAX_VOLTAGE, 3, _BL('.'), _BL(',')).'V';
+				else
+					$caption .= '?';
+				
+				$caption .= "\n";
 			}
 			
 			foreach($Y[1] as $amp_id => $dummy)
@@ -1110,6 +1122,162 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 		$graph_type = 'linlin';
 		$tickLabels[] = '';
+	}
+	else if ($type == 'frequencies_time' || $type == 'amplitudes_time' || $type == 'amplitudes_max_time')
+	{
+		$value_max = isset($_GET['value_max']) ? intval($_GET['value_max']) : 0;
+		$average = isset($_GET['average']);
+		$participated = intval($_GET['participated']);
+				
+		$channels = bo_get_conf('raw_channels');
+		$last_uptime = bo_get_conf('uptime_raw') - 60;
+
+		if ($hours_back > 24)
+			$group_minutes *= ceil($hours_back / 24);
+		
+		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+		
+		if ($participated > 0)
+		{
+			$sql_join = "
+					JOIN ".BO_DB_PREF."strikes s
+					ON s.raw_id=r.id ";
+			
+			$add_title .= ' '._BL('with_strikes');
+			
+			if ($participated == 2)
+			{
+				$sql_join .= " AND $sql_part ";
+				$add_title .= '+'._BL('with_participation');
+			}
+			
+			$sql_join .= strtr(bo_region2sql($region), array('lat' => 's.lat', 'lon' => 's.lon'));
+		}
+		else if ($participated < 0)
+		{
+			$sql_join = "
+					LEFT JOIN ".BO_DB_PREF."strikes s
+					ON s.raw_id=r.id ";
+			$sql_where = " AND s.id IS NULL ";
+			
+			$add_title .= ' '._BL('without_strikes');
+		}
+		
+		switch($type)
+		{
+			case 'frequencies_time':
+
+				if ($average)
+				{
+					$values_text = '';
+					$sql_select .= ", 0 extra, SUM(r.freq{CHANNEL}) extra_sum ";
+				}
+				else
+				{
+					if ($value < 0)
+						$value = 0;
+
+					if (!$value_max || $value_max < $value)
+						$value_max = $value + BO_GRAPH_RAW_SPEC_MAX_X / 10;
+
+					$values_text = $value.'-'.$value_max.'kHz';
+					$sql_select .= ", r.freq{CHANNEL} BETWEEN '$value' AND '$value_max' extra ";
+				}
+				
+					
+				break;
+
+			case 'amplitudes_max_time':
+				$ampmax = '_max';
+				$type = 'amplitudes_time';		
+				
+			case 'amplitudes_time':
+			
+			
+				if ($average)
+				{
+					$values_text = '';
+					$sql_select .= ", 0 extra, SUM(r.amp{CHANNEL}$ampmax)/255*".BO_MAX_VOLTAGE." extra_sum ";
+				}
+				else
+				{
+					if ($value < 0)
+						$value = 10;
+				
+					if (!$value_max || $value_max < $value)
+						$value_max = $value + 10;
+
+					$amp_min = $value / 10 / BO_MAX_VOLTAGE * 255;
+					$amp_max = $value_max / 10 / BO_MAX_VOLTAGE * 255;
+						
+					$values_text = number_format($value/10, 1, _BL('.'), _BL(',')).'-'.number_format($value_max/10, 1, _BL('.'), _BL(',')).'V';
+					$sql_select .= ", r.amp{CHANNEL}$ampmax BETWEEN '$amp_min' AND '$amp_max' extra ";
+				}
+					
+				break;
+				
+		}
+		
+		$count = array();
+		
+		for ($channel=1;$channel<=$channels;$channel++)
+		{
+			$tmp = array();
+			$sql = "SELECT r.time time, COUNT(r.id) cnt $sql_select
+					FROM ".BO_DB_PREF."raw r
+					$sql_join
+					WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+					$sql_where
+					GROUP BY FLOOR(UNIX_TIMESTAMP(r.time) / 60 / $group_minutes), extra";
+			
+			$sql = strtr($sql, array('{CHANNEL}' => $channel));
+			
+			$res = bo_db($sql);
+			while ($row = $res->fetch_assoc())
+			{
+				$time = strtotime($row['time'].' UTC');
+				$index = floor( ($time - $last_uptime + $hours_back * 3600) / 60 / $group_minutes);
+				$tmp[$index][$row['extra']] = $row['cnt'];
+				
+				if ($average)
+					$extra_sum[$index] = $row['extra_sum'];
+			}
+				
+			$count[$channel] = 0;
+			
+			for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)
+			{
+				$X[$i] = $last_uptime + ($i * $group_minutes - $hours_back * 60) * 60;
+				
+				$cnt_all      = (double)@array_sum($tmp[$i]);
+				$cnt_selected = (double)$tmp[$i][1];
+				
+				$count[$channel] += $cnt_all;
+				
+				if ($average)
+				{
+					$Y[$channel][$i]  = $cnt_all ? (double)$extra_sum[$i] / $cnt_all : 0;
+					$Y2[$channel][$i]  = $cnt_all;
+				}
+				else
+				{
+					$Y[$channel][$i] = $cnt_all ? $cnt_selected / $cnt_all * 100 : 0;
+					$Y2[$channel][$i]  = $cnt_selected;
+				}
+				
+			}
+		}
+
+		$graph_type = 'datlin';
+		
+		if (!$average)
+		{
+			$ymin = 0;
+			$ymax = 105;
+		}
+		else
+			$type .= '_average';
+		
 	}
 	else
 	{
@@ -1800,6 +1968,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->AddY(0,$plot);
 			
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
+			$graph->ynaxis[0]->title->Set(_BL('Count'));
 			$graph->title->Set(_BL('graph_stat_title_evaluated_signals').$add_title);
 				
 		
@@ -1920,6 +2089,99 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->xaxis->SetTextTickInterval(1);
 			
 			break;
+			
+			
+		case 'amplitudes_time':
+		case 'frequencies_time':
+		
+			$plot=new LinePlot($Y[1], $X);
+			$plot->SetColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_L1A);
+			if (BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F1A)
+				$plot->SetFillColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F1A);
+			$plot->SetWeight(BO_GRAPH_STAT_SIGNALS_TIME_WIDTH_1A);
+			$plot->SetLegend(_BL('graph_legend_signals_time_percent').' '._BL('Channel').' 1 ');
+			$graph->Add($plot);
+
+			if ($channels == 2)
+			{
+				$plot=new LinePlot($Y[2], $X);
+				$plot->SetColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_L2A);
+				if (BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F2A)
+					$plot->SetFillColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F2A);
+				$plot->SetWeight(BO_GRAPH_STAT_SIGNALS_TIME_WIDTH_2A);
+				$plot->SetLegend(_BL('graph_legend_signals_time_percent').' '._BL('Channel').' 2 ');
+				$graph->Add($plot);
+			}
+			
+			$plot=new LinePlot($Y2[1], $X);
+			$plot->SetColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_L1B);
+			if (BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F1B)
+				$plot->SetFillColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F1B);
+			$plot->SetWeight(BO_GRAPH_STAT_SIGNALS_TIME_WIDTH_1B);
+			$plot->SetLegend(_BL('Count').' '._BL('Channel').' 1 ');
+			$graph->AddY(0,$plot);
+			
+			if ($channels == 2)
+			{
+				$plot=new LinePlot($Y2[2], $X);
+				$plot->SetColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_L2B);
+				if (BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F2B)
+					$plot->SetFillColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F2B);
+				$plot->SetWeight(BO_GRAPH_STAT_SIGNALS_TIME_WIDTH_2B);
+				$plot->SetLegend(_BL('Count').' '._BL('Channel').' 2 ');
+				
+				$graph->AddY(0,$plot);
+			}
+			
+			$graph->SetYScale(0,'lin');
+			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
+			$graph->ynaxis[0]->title->Set(_BL('Count'));
+			$graph->title->Set(strtr(_BL('graph_stat_title_'.$type), array('{VALUES}' => $values_text)).$add_title);
+			
+			break;
+
+		case 'amplitudes_time_average':
+		case 'frequencies_time_average':
+			
+			$plot=new LinePlot($Y[1], $X);
+			$plot->SetColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_L1A);
+			if (BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F1A)
+				$plot->SetFillColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F1A);
+			$plot->SetWeight(BO_GRAPH_STAT_SIGNALS_TIME_WIDTH_1A);
+			$plot->SetLegend(_BL('graph_legend_'.$type).' '._BL('Channel').' 1 ');
+			$graph->Add($plot);
+
+			if ($channels == 2)
+			{
+				$plot=new LinePlot($Y[2], $X);
+				$plot->SetColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_L2A);
+				if (BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F2A)
+					$plot->SetFillColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F2A);
+				$plot->SetWeight(BO_GRAPH_STAT_SIGNALS_TIME_WIDTH_2A);
+				$plot->SetLegend(_BL('graph_legend_'.$type).' '._BL('Channel').' 2 ');
+				$graph->Add($plot);
+			}
+			
+			$plot=new LinePlot($Y2[1], $X);
+			$plot->SetColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_L3);
+			if (BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F3)
+				$plot->SetFillColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F3);
+			$plot->SetWeight(BO_GRAPH_STAT_SIGNALS_TIME_WIDTH_3);
+			$plot->SetLegend(_BL('Count'));
+			$graph->AddY(0,$plot);
+
+		
+			if ($type == 'frequencies_time_average')
+				$graph->yaxis->title->Set(_BL('Frequency').'  [kHz]');
+			else
+				$graph->yaxis->title->Set(_BL('Amplitude').'  [V]');
+
+			$graph->SetYScale(0,'lin');
+			$graph->ynaxis[0]->title->Set(_BL('Count'));
+			$graph->title->Set(_BL('graph_stat_title_'.$type).$add_title);
+			
+			break;
+
 	}
 
 	

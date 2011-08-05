@@ -5,6 +5,7 @@
 
 Version 0.6 (2011-08-05)
 ------------------------
+- new: regions (use i.e. &mark=germany on map image to see the area)
 - new: spectrum of raw signals
 - new: a lot of advanced statistics
 - avoid url retrieving with 'file_get_contents' (thx to a2700franz) 

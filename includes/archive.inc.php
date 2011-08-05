@@ -1037,7 +1037,7 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			echo '</span>';
 			echo '</li>';
 
-			if ($row['raw_id'] && !$only_strikes)
+			if ($row['raw_id'])
 			{
 				echo '<li>';
 				echo '<span class="bo_descr">';

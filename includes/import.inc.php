@@ -94,8 +94,6 @@ function bo_update_raw_signals($force = false)
 
 	if (time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force)
 	{
-		bo_set_conf('uptime_raw', time());
-
 		$file = bo_get_archive('lang=de&page=3&subpage_3=1&mode=4');
 
 		if ($file === false)
@@ -201,9 +199,9 @@ function bo_update_raw_signals($force = false)
 		//Longtime
 		$count = bo_get_conf('count_raw_signals');
 		bo_set_conf('count_raw_signals', $count + $i);
-
-		bo_match_strike2raw();
 		
+		bo_set_conf('uptime_raw', time());
+		bo_match_strike2raw();
 		$updated = true;
 	}
 	else
@@ -224,8 +222,6 @@ function bo_update_strikes($force = false)
 
 	if (time() - $last > BO_UP_INTVL_STRIKES * 60 - 30 || $force)
 	{
-		bo_set_conf('uptime_strikes', time());
-
 		$stations = bo_stations('user');
 
 		$u = 0;
@@ -472,7 +468,7 @@ function bo_update_strikes($force = false)
 			bo_set_conf('longtime_min_dist_own', $min_dist_own);
 
 		$updated = true;
-		
+		bo_set_conf('uptime_strikes', time());		
 	}
 	else
 	{
@@ -486,8 +482,11 @@ function bo_update_strikes($force = false)
 // Update strike_id <-> raw_id
 function bo_match_strike2raw()
 {
+	//not really physical values but determined empirical
 	$c = 299792458;
-	$fuzz = 0.0008;
+	$fuzz = 0.0001;
+	$dist_fuzz = -5.4; //power of 10
+	
 	$amp_trigger = (BO_TRIGGER_VOLTAGE / BO_MAX_VOLTAGE) * 256;
 
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
@@ -507,6 +506,8 @@ function bo_match_strike2raw()
 			FROM ".BO_DB_PREF."strikes
 			WHERE raw_id IS NULL
 					AND time BETWEEN '$mintime' AND '$maxtime'
+			ORDER BY part DESC
+			LIMIT 10000
 			";
 	$res = bo_db($sql);
 	while($row = $res->fetch_assoc())
@@ -529,8 +530,8 @@ function bo_match_strike2raw()
 		//fuzzy search
 		$search_from  = $time_raw;
 		$search_to    = $time_raw;
-		$nsearch_from = $ntime_raw - $fuzz;
-		$nsearch_to   = $ntime_raw + $fuzz;
+		$nsearch_from = $ntime_raw - $fuzz * (1 + $row['distance'] * pow(10, $dist_fuzz));
+		$nsearch_to   = $ntime_raw + $fuzz * (1 + $row['distance'] * pow(10, $dist_fuzz));
 
 		if ($nsearch_from < 0) { $nsearch_from++; $search_from--; }
 		else if ($nsearch_from > 1) { $nsearch_from--; $search_from++; }
@@ -552,6 +553,7 @@ function bo_match_strike2raw()
 		$sql = "SELECT id, time, time_ns, data, amp1, amp2, amp1_max, amp2_max
 				FROM ".BO_DB_PREF."raw
 				WHERE 	time BETWEEN '$search_date_from' AND '$search_date_to'
+						AND strike_id=0
 						AND $nsql
 				LIMIT 2";
 		$res2 = bo_db($sql);
@@ -560,7 +562,7 @@ function bo_match_strike2raw()
 
 		switch($num)
 		{
-			case 0:  $n[] = $row['id']; break; //no raw data found
+			case 0:  $n[] = $row['id'];	break; //no raw data found
 			default: $m[] = $row['id']; break; //too much lines matched
 
 			case 1:  //exact match
@@ -581,7 +583,7 @@ function bo_match_strike2raw()
 				$part[$row['id']] += $trigger2_later ? pow(2, 4) : 0;
 				
 				if (!($part[$row['id']] & 1)) //mark negative --> got strike but not tracked by blitzortung
-					$part[$row['id']] = $part[$row['id']] * -1;
+					$part[$row['id']] = abs($part[$row['id']]) * -1;
 				else
 					$own_found++;
 					
@@ -647,8 +649,6 @@ function bo_update_stations($force = false)
 
 	if (time() - $last > BO_UP_INTVL_STATIONS * 60 - 30 || $force)
 	{
-		bo_set_conf('uptime_stations', time());
-
 		$u = 0;
 		$i = 0;
 		$Count = array();
@@ -820,7 +820,8 @@ function bo_update_stations($force = false)
 			$time_interval += bo_get_conf('longtime_station_inactive_time');
 			bo_set_conf('longtime_station_inactive_time', $time_interval);
 		}
-
+		
+		bo_set_conf('uptime_stations', time());
 		$updated = true;
 	}
 	else
@@ -1074,21 +1075,7 @@ function bo_update_all($force)
 	echo "<h2>Getting lightning data from blitzortung.org</h2>\n";
 
 	$start_time = time();
-	
-	$max_time = intval(ini_get('max_execution_time')) - 10;
 	$debug = defined('BO_DEBUG') && BO_DEBUG;
-
-	if ($max_time < 20 || $debug) //allow infinite exec time in debug mode
-	{
-		$max_time = 50;
-	}
-	
-	@set_time_limit($max_time+10);
-	
-	if (!$force)
-		sleep(rand(0,30)); // to avoid to much connections from different stations to blitzortung.org at the same time
-
-	ini_set('default_socket_timeout', 10);
 	$is_updating = bo_get_conf('is_updating');
 
 	//Check if sth. went wrong on the last update (if older than 120sec continue)
@@ -1099,12 +1086,47 @@ function bo_update_all($force)
 	}
 
 	bo_set_conf('is_updating', time());
+	
+	//timeouts
+	$max_time = intval(ini_get('max_execution_time')) - 10;
+	if ($max_time < 20 || $debug) //allow infinite exec time in debug mode
+	{
+		$max_time = 50;
+	}
+	
+	
+	@set_time_limit($max_time+10);
+	
+	//recheck the new timeout
+	$exec_timeout = intval(ini_get('max_execution_time'));
+	
+	$max_time = $exec_timeout - 2;
+	if ($max_time < 5)
+		$max_time = 30;
+	
+	if (!$force)
+	{
+		echo '<div style="display:none">'.str_repeat('&nbsp;', 500).'</div>';
+		echo '<p>PHP Execution timeout: '.$exec_timeout.'s  - Set MyBlitzortung timeout to: '.$max_time.'s</p>';
+		flush();
+	}
+	
+	ini_set('default_socket_timeout', 10);
+
+	if (!$force && $max_time > 50)
+	{
+		$sleep = rand(0,30);
+		echo '<p>Waiting '.$sleep.' seconds...</p>';
+		flush();
+		sleep($sleep); // to avoid to much connections from different stations to blitzortung.org at the same time
+	}
+	
 
 	if (!bo_get_conf('first_update_time'))
 		bo_set_conf('first_update_time', time());
 
 		
-	//check if we should do a async update
+	//check if we should do an async update
 	if ( !(BO_UP_INTVL_STRIKES <= BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS <= BO_UP_INTVL_RAW) )
 	{
 		if (!$force)
@@ -1116,13 +1138,12 @@ function bo_update_all($force)
 		$async = false;
 	
 	/*** Get the data! ***/
-	//Update signals/stations only after strikes where imported
-	
 	flush();
 	$t = time();
 
 	$strikes_imported = bo_update_strikes($force);
 	
+	//Update signals/stations only after strikes where imported
 	if ($strikes_imported !== false || $async || $force)
 	{	
 		flush();
@@ -1144,6 +1165,7 @@ function bo_update_all($force)
 	
 	if (time() - $start_time > $max_time)
 	{
+		bo_set_conf('is_updating', 0);
 		echo '<p>TIMEOUT!</p>';
 		return;
 	}
@@ -1163,6 +1185,7 @@ function bo_update_all($force)
 
 	if (time() - $start_time > $max_time)
 	{
+		bo_set_conf('is_updating', 0);
 		echo '<p>TIMEOUT!</p>';
 		return;
 	}
@@ -1293,6 +1316,7 @@ function bo_update_all($force)
 	if (time() - $start_time > $max_time)
 	{
 		echo '<p>TIMEOUT!</p>';
+		bo_set_conf('is_updating', 0);
 		return;
 	}
 

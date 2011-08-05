@@ -778,3 +778,4 @@ $_BL['en']['amp_first'] = 'First sample';
 $_BL['en']['with_strikes'] = 'with strikes';
 $_BL['en']['with_participation'] = 'with participation';
 $_BL['en']['without_strikes'] = 'without strikes';
+$_BL['en']['Mean value channel'] = 'Mean value channel';
