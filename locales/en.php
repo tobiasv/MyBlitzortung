@@ -779,3 +779,17 @@ $_BL['en']['with_strikes'] = 'with strikes';
 $_BL['en']['with_participation'] = 'with participation';
 $_BL['en']['without_strikes'] = 'without strikes';
 $_BL['en']['Mean value channel'] = 'Mean value channel';
+$_BL['en']['graph_legend_signals_time_percent'] = 'Percentage of signals';
+$_BL['en']['graph_stat_title_amplitudes_time'] = 'Development of signal amplitudes';
+$_BL['en']['graph_stat_title_frequencies_time'] = 'Development of peak frequencies';
+$_BL['en']['graph_legend_frequencies_time_average'] = 'Mean of peak frequencies';
+$_BL['en']['graph_stat_title_frequencies_time_average'] = 'Mean of peak frequencies';
+$_BL['en']['graph_legend_amplitudes_time_average'] = 'Mean of amplitudes';
+$_BL['en']['graph_stat_title_amplitudes_time_average'] = 'Mean of amplitudes';
+$_BL['en']['h4_graph_amplitudes_time'] = 'Development of amplitudes';
+$_BL['en']['bo_graph_amplitudes_time'] = 'The development of the amplitudes of the signals. You can choose between the maximum amplitude of the signal or the amplitude of the first sample.';
+$_BL['en']['legend_stat_amplitudes_time'] = 'Options';
+$_BL['en']['h4_graph_frequencies_time'] = 'Options';
+$_BL['en']['bo_graph_frequencies_time'] = 'The development of the frequency peaks by time.';
+$_BL['en']['legend_stat_frequencies_time'] = 'Options';
+

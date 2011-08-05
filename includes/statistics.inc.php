@@ -1217,7 +1217,7 @@ function bo_show_statistics_advanced()
 			echo '</span>';
 			echo '<span class="bo_form_group">';
 			echo '<span class="bo_form_descr">'._BL('Max').':</span>';
-			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'deviations_time\', \'value_max\');" id="bo_stat_deviations_time_max" disabled>';
+			echo '<select onchange="bo_change_value(this.value, \'deviations_time\', \'value_max\');" id="bo_stat_deviations_time_max" disabled>';
 			for($i=0;$i<6000;$i+=100)
 				echo '<option value="'.$i.'" '.($i == 1000 ? 'selected' : '').'>'.number_format($i / 1000, 1, _BL('.'), _BL(',')).'</option>';
 			echo '</select> ';
@@ -1343,7 +1343,7 @@ function bo_show_statistics_advanced()
 			bo_show_select_strike_connected('amplitudes');
 			echo '<span class="bo_form_group">';
 			echo '<span class="bo_form_descr">'._BL('Amplitude').':</span> ';
-			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'amplitudes\', \'graph_statistics\');" id="bo_stat_amplitudes_max">';
+			echo '<select onchange="bo_change_value(this.value, \'amplitudes\', \'graph_statistics\');" id="bo_stat_amplitudes_max">';
 			echo '<option value="amplitudes">'._BL('amp_first').'</option>';
 			echo '<option value="amplitudes_max">'._BL('Max').'</option>';
 			echo '</select> ';
@@ -1361,10 +1361,11 @@ function bo_show_statistics_advanced()
 			bo_show_select_strike_connected('amplitudes_time');
 			echo '<span class="bo_form_group">';
 			echo '<span class="bo_form_descr">'._BL('Amplitude').':</span> ';
-			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'amplitudes_time\', \'graph_statistics\');" id="bo_stat_amplitudes_max">';
+			echo '<select onchange="bo_change_value(this.value, \'amplitudes_time\', \'graph_statistics\');" id="bo_stat_amplitudes_max">';
 			echo '<option value="amplitudes_time">'._BL('amp_first').'</option>';
 			echo '<option value="amplitudes_max_time">'._BL('Max').'</option>';
 			echo '</select> ';
+			echo '</span>';
 			echo '<div id="bo_amplitudes_time_value_div" class="bo_stat_minmax_values_div">';
 			echo '<input type="radio" name="bo_amplitudes_type" id="bo_amplitudes_radio_avg" value="1" checked onclick="bo_change_radio(this.value, \'amplitudes\');">';
 			echo '<label for="bo_amplitudes_radio_avg">'._BL('Average').'</label>';
@@ -1373,15 +1374,15 @@ function bo_show_statistics_advanced()
 			echo '<span class="bo_form_group">';
 			echo '<span class="bo_form_descr">'._BL('Min').':</span> ';
 			echo '<select name="bo_participants_min" onchange="bo_change_value(this.value, \'amplitudes_time\');" id="bo_stat_amplitudes_time_min" disabled>';
-			for($i=0;$i<25;$i++)
-				echo '<option value="'.round(($i/25)*BO_MAX_VOLTAGE*10).'">'.number_format(($i/25)*BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V</option>';
+			for($i=0;$i<=26;$i++)
+				echo '<option value="'.round(($i/26)*BO_MAX_VOLTAGE*10).'">'.number_format(($i/26)*BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V</option>';
 			echo '</select> ';
 			echo '</span>';
 			echo '<span class="bo_form_group">';
 			echo '<span class="bo_form_descr">'._BL('Max').':</span>';
 			echo '<select name="bo_participants_max" onchange="bo_change_value(this.value, \'amplitudes_time\', \'value_max\');" id="bo_stat_amplitudes_time_max" disabled>';
-			for($i=0;$i<25;$i++)
-				echo '<option value="'.round(($i/25)*BO_MAX_VOLTAGE*10).'">'.number_format(($i/25)*BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V</option>';
+			for($i=0;$i<=26;$i++)
+				echo '<option value="'.round(($i/26)*BO_MAX_VOLTAGE*10).'">'.number_format(($i/26)*BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V</option>';
 			echo '</select> ';
 			echo '</span>';
 			echo '</div>';

@@ -953,7 +953,13 @@ function bo_examine_signal($data, &$amp = array(), &$amp_max = array(), &$freq =
 		$max = 0;
 		foreach($sig_data['signal_raw'][$channel] as $signal)
 		{
-			$amp_max[$channel] = max($amp_max[$channel], abs($signal));
+			$sig = abs($signal - 128);
+			
+			if ($sig > $max)
+			{
+				$max = $sig;
+				$amp_max[$channel] = $signal;
+			}
 		}
 		
 		//main frequency

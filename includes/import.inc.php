@@ -484,10 +484,10 @@ function bo_match_strike2raw()
 {
 	//not really physical values but determined empirical
 	$c = 299792458;
-	$fuzz = 0.0001;
+	$fuzz = 0.0003;
 	$dist_fuzz = -5.4; //power of 10
 	
-	$amp_trigger = (BO_TRIGGER_VOLTAGE / BO_MAX_VOLTAGE) * 256;
+	$amp_trigger = (BO_TRIGGER_VOLTAGE / BO_MAX_VOLTAGE) * 256 / 2;
 
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 	$row = bo_db($sql)->fetch_assoc();
@@ -572,10 +572,10 @@ function bo_match_strike2raw()
 				$part[$row['id']] = abs($row['part']);
 				
 				//channel examination
-				$trigger1_first = $row2['amp1']     >= $amp_trigger;
-				$trigger2_first = $row2['amp2']     >= $amp_trigger;
-				$trigger1_later = $row2['amp1_max'] >= $amp_trigger;
-				$trigger2_later = $row2['amp2_max'] >= $amp_trigger;
+				$trigger1_first = abs($row2['amp1']     - 128) >= $amp_trigger;
+				$trigger2_first = abs($row2['amp2']     - 128) >= $amp_trigger;
+				$trigger1_later = abs($row2['amp1_max'] - 128) >= $amp_trigger;
+				$trigger2_later = abs($row2['amp2_max'] - 128) >= $amp_trigger;
 				
 				$part[$row['id']] += $trigger1_first ? pow(2, 1) : 0;
 				$part[$row['id']] += $trigger2_first ? pow(2, 2) : 0;

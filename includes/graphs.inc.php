@@ -1080,13 +1080,13 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 			for ($channel=1;$channel<=$channels;$channel++)
 			{
-				for ($i=0;$i<pow(2,8)/$amp_divisor;$i++)
+				for ($i=0;$i<256/$amp_divisor;$i++)
 				{
 					$Y[$channel][$i] = 0;
 				}
 				
 				$amp_sum = 0;
-				$sql = "SELECT ROUND(amp".$channel."$ampmax / $amp_divisor) amp, COUNT(r.id) cnt
+				$sql = "SELECT ROUND(ABS(CONVERT(amp".$channel."$ampmax, SIGNED) - 128)*2 / $amp_divisor) amp, COUNT(r.id) cnt
 						FROM ".BO_DB_PREF."raw r
 						$sql_join
 						WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
@@ -1103,7 +1103,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				
 				$caption .= _BL('Mean value channel').' '.$channel.': ';
 				if (intval($count))
-					$caption .= number_format(($amp_sum / $count * $amp_divisor) / 255 * BO_MAX_VOLTAGE, 3, _BL('.'), _BL(',')).'V';
+					$caption .= number_format(($amp_sum / $count * $amp_divisor) / 256 * BO_MAX_VOLTAGE, 3, _BL('.'), _BL(',')).'V';
 				else
 					$caption .= '?';
 				
@@ -1112,7 +1112,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 			foreach($Y[1] as $amp_id => $dummy)
 			{
-				$tickLabels[$amp_id] = number_format(($amp_id * $amp_divisor) / 255 * BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V';
+				$tickLabels[$amp_id] = number_format(($amp_id * $amp_divisor) / 256 * BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V';
 				$X[$amp_id] = $amp_id;
 			}
 		}
@@ -1197,7 +1197,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				if ($average)
 				{
 					$values_text = '';
-					$sql_select .= ", 0 extra, SUM(r.amp{CHANNEL}$ampmax)/255*".BO_MAX_VOLTAGE." extra_sum ";
+					$sql_select .= ", 0 extra, SUM(ABS(CONVERT(r.amp{CHANNEL}$ampmax, SIGNED) - 128)*2)/256*".BO_MAX_VOLTAGE." extra_sum ";
 				}
 				else
 				{
@@ -1211,7 +1211,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					$amp_max = $value_max / 10 / BO_MAX_VOLTAGE * 255;
 						
 					$values_text = number_format($value/10, 1, _BL('.'), _BL(',')).'-'.number_format($value_max/10, 1, _BL('.'), _BL(',')).'V';
-					$sql_select .= ", r.amp{CHANNEL}$ampmax BETWEEN '$amp_min' AND '$amp_max' extra ";
+					$sql_select .= ", ABS(CONVERT(r.amp{CHANNEL}$ampmax, SIGNED) - 128)*2 BETWEEN '$amp_min' AND '$amp_max' extra ";
 				}
 					
 				break;

@@ -1050,7 +1050,6 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			}
 			
 			echo '</ul>';
-
 		}
 		else
 		{
