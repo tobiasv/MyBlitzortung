@@ -1009,12 +1009,12 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					JOIN ".BO_DB_PREF."strikes s
 					ON s.raw_id=r.id ";
 			
-			$add_title .= ' '._BL('with strikes');
+			$add_title .= ' '._BL('with_strikes');
 			
 			if ($value == 2)
 			{
 				$sql_join .= " AND $sql_part ";
-				$add_title .= '+'._BL('participation');
+				$add_title .= '+'._BL('with_participation');
 			}
 			
 			$sql_join .= strtr(bo_region2sql($region), array('lat' => 's.lat', 'lon' => 's.lon'));
@@ -1026,7 +1026,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					ON s.raw_id=r.id ";
 			$sql_where = " AND s.id IS NULL ";
 			
-			$add_title .= ' '._BL('without strikes');
+			$add_title .= ' '._BL('without_strikes');
 		}
 		
 		if ($type == 'spectrum')
@@ -1066,9 +1066,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$X[$freq_id] = $freq;
 				$tickLabels[$freq_id] = $freq.'kHz';
 			}
-			
-			$xmin = 0;
-			$xmax = count($X);
 		}
 		else
 		{
@@ -1107,6 +1104,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$X[$amp_id] = $amp_id;
 			}
 		}
+
+		$xmin = 0;
+		$xmax = count($X);
 
 		$graph_type = 'linlin';
 		$tickLabels[] = '';

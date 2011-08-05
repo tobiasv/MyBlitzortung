@@ -1749,7 +1749,7 @@ function bo_my_station_update($url)
 	
 	if (!$login_id)
 	{
-		echo '<p>'._BL('Couldn\'t get login id').'.</p>';
+		echo '<p>'._BL('Couldnt get login id').'.</p>';
 	}
 	else
 	{

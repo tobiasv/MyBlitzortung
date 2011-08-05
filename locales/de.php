@@ -6,9 +6,13 @@
 
 $_BL['locale'] = 'de';
 
+
 /*************************************************************/
 /* General                                                   */
 /*************************************************************/
+
+$_BL['de']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
+$_BL['de']['MyBlitzortung_notags'] = 'MyBlitzortung';
 
 $_BL['de']['.'] = ',';
 $_BL['de'][','] = '.';
@@ -22,6 +26,7 @@ $_BL['de']['_minute_ago'] = 'Minute';
 $_BL['de']['unit_meters'] = 'm';
 $_BL['de']['unit_minutes'] = 'Minuten';
 $_BL['de']['unit_hours'] = 'Stunden';
+$_BL['de']['unit_us_short'] = 'µs';
 
 $_BL['de']['Jan'] = 'Jan';
 $_BL['de']['Feb'] = 'Feb';
@@ -110,7 +115,6 @@ $_BL['de']['Station'] = 'Station';
 $_BL['de']['Year'] = 'Jahr';
 $_BL['de']['Month'] = 'Monat';
 $_BL['de']['more'] = 'Mehr';
-$_BL['de']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
 $_BL['de']['stations'] = 'Stationen';
 $_BL['de']['Blitzortung.org'] = 'Blitzortung.org';
 $_BL['de']['Result'] = 'Ergebnis';
@@ -285,7 +289,6 @@ $_BL['de']['h3_stat_last_signals'] = 'Die letzten empfangenen Signale ';
 $_BL['de']['h3_stat_station'] = 'Statistiken der Station {STATION_CITY}';
 $_BL['de']['h3_stat_graphs'] = 'Statistiken: Diagramme';
 $_BL['de']['h3_stat_other'] = 'Weitere Statistiken';
-$_BL['de']['h4_stat_longtime_myblitzortung'] = 'MyBlitzortung';
 $_BL['de']['h4_stat_longtime_network'] = 'Ortungsnetzwerk';
 $_BL['de']['h4_stat_other_database'] = 'Datenbankstatistik';
 $_BL['de']['h4_stat_other_gps'] = 'GPS';
@@ -625,7 +628,7 @@ $_BL['de']['Connecting to '] = 'Verbinden mit';
 $_BL['de']['Received urls'] = 'Links empfangen';
 $_BL['de']['DONE'] = 'FERTIG';
 $_BL['de']['Really continue?'] = 'Wirklich fortfahren?';
-$_BL['de']['Couldn\'t get login id'] = 'Konnte Login Kennung nicht holen';
+$_BL['de']['Couldnt get login id'] = 'Konnte Login Kennung nicht holen';
 
 $_BL['de']['mybo_station_update_info'] = '
 		<p>
@@ -702,7 +705,6 @@ $_BL['de']['graph_stat_title_strikes_now'] = 'Blitzraten';
 $_BL['de']['No limit'] = 'Ohne Einschränkung';
 $_BL['de']['Region'] = 'Region';
 $_BL['de']['legend_stat_strikes_now'] = 'Auswahl der Region';
-$_BL['de']['h4_graph_strikes_time_now'] = 'Aktuelle Blitzstatistik';
 $_BL['de']['h3_stat_strikes_now'] = 'Aktuelle Blitzstatistik';
 $_BL['de']['h3_stat_strikes_time'] = 'Blitzzahlen pro Monat und Jahr';
 $_BL['de']['bo_descr_strikes_now'] = 'Die Blitzdaten werden alle {UPDATE_INTERVAL} Minute von Blitzortung.org übernommen, 
@@ -784,7 +786,7 @@ $_BL['de']['Frequency'] = 'Frequenz';
 $_BL['de']['graph_stat_title_spectrum'] = 'Spektrum';
 $_BL['de']['graph_stat_yaxis_title'] = 'Amplitude';
 $_BL['de']['h4_graph_spectrum'] = 'Frequenzspektrum der Frequenzpeaks';
-$_BL['de']['bo_graph_spectrum'] = 'Bei den Spektren der einzelnen Signale gibt es jeweil eine Frequenz mit dem höchsten Peak. Die Amplituden dieser Peaks werden hier für die jeweiligen Frequenzen aufsummiert dargestellt.';
+$_BL['de']['bo_graph_spectrum'] = 'Bei den Spektren der einzelnen Signale gibt es jeweils eine Frequenz mit dem höchsten Peak. Die Amplituden dieser Peaks werden hier für die jeweiligen Frequenzen aufsummiert dargestellt.';
 $_BL['de']['Amplitude'] = 'Amplitude';
 $_BL['de']['graph_stat_title_amplitude'] = 'Amplituden';
 $_BL['de']['h4_graph_amplitudes'] = 'Amplituden';
@@ -798,3 +800,6 @@ $_BL['de']['not_participated'] = 'Nicht teilgenommen';
 $_BL['de']['legend_stat_spectrum'] = 'Optionen';
 $_BL['de']['legend_stat_amplitudes'] = 'Optionen';
 $_BL['de']['amp_first'] = 'Erstes Sample';
+$_BL['de']['with_strikes'] = 'mit Blitzen';
+$_BL['de']['with_participation'] = 'mit Teilnahme';
+$_BL['de']['without_strikes'] = 'ohne Blitze';

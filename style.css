@@ -671,3 +671,8 @@ width: 500px;
 #myblitzortung #bo_infos p {
 width: 550px;
 }
+
+#myblitzortung .bo_form_group {
+white-space: nowrap;
+padding-right: 10px;
+}

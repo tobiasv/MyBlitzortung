@@ -192,6 +192,8 @@ function bo_check_for_update()
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 				
+				echo '<li><strong>You can update some signals by clicking <a href="'.bo_insert_url('bo_action', 'do_update').'&bo_update_signals">here</a>';
+				
 				break;
 			
 			default:
@@ -238,11 +240,12 @@ function bo_check_for_update()
 	
 	if (isset($_GET['bo_update_signals']))
 	{
+		session_write_close();
 		$limit = intval($_GET['bo_update_signals']);
 		if (!$limit)
-			$limit = 1000;
+			$limit = 5000;
 		
-		echo '<p>Updating!</p>';
+		echo '<p>Updating '.$limit.' signals!</p>';
 		flush();
 		
 		$res = bo_db("SELECT id, data FROM ".BO_DB_PREF."raw WHERE amp1=0 AND freq1=0 ORDER BY id DESC LIMIT $limit");
@@ -255,7 +258,7 @@ function bo_check_for_update()
 			$last_id = $row['id'];
 		}
 		
-		echo '<p>Examined '.$i.' signals. Last ID was '.$last_id.'. <a href="'.bo_insert_url('bo_action', 'do_update').'&bo_update_signals='.$limit.'">'._BL('Update more...').'</a></p>';
+		echo '<p>Examined '.$i.' signals. Last ID was '.$last_id.'. <a href="'.bo_insert_url(array('bo_action','bo_update_from','bo_update_signals'), 'do_update').'&bo_update_signals='.$limit.'">'._BL('Update more...').'</a></p>';
 	}
 	
 	echo '</div>';

@@ -45,7 +45,7 @@ function bo_show_statistics()
 	if ($add_stid)
 	{
 		echo '<div id="bo_stat_other_station_info">';
-		echo strtr(_BL('bo_stat_other_station_info'), array('{STATION_CITY}' => bo_station_city($station_id)));
+		echo strtr(_BL('bo_stat_other_station_info'), array('{STATION_CITY}' => _BC(bo_station_city($station_id))));
 		echo ' <a href="'.bo_insert_url('bo_station_id').'">'._BL('bo_stat_other_station_info_back').'</a>';
 		echo '</div>';
 	}
@@ -763,7 +763,7 @@ function bo_show_statistics_longtime()
 	echo '</ul>';
 
 	echo '<a name="longtime_network"></a>';
-	echo '<h4>'._BL('h4_stat_longtime_myblitzortung').'</h4>';
+	echo '<h4>'._BL('MyBlitzortung_notags').'</h4>';
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('First data').': </span><span class="bo_value">'.date(_BL('_datetime'), $first_update).'</span>';
@@ -1082,18 +1082,20 @@ function bo_show_statistics_advanced()
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_stat_advanced_options').'</legend>';
 	
+	echo '<span class="bo_form_group">';
 	echo '<span class="bo_form_descr">'._BL('Show').': </span>';
 	echo '<select name="bo_show2" onchange="submit();" id="bo_stat_advanced_select_show" '.($own_station ? '' : 'disabled').'>';
 	foreach($show_options as $opt_name)
 	{
 		echo '<option value="'.$opt_name.'" '.($show == $opt_name ? 'selected' : '').'>'._BL('stat_advanced_show_'.$opt_name).'</option>';
 	}
-	echo '</select>';
+	echo '</select> ';
+	echo '</span>&nbsp;';
 	
-	echo '<br>';
-	
+	echo '<span class="bo_form_group">';
 	echo '<span class="bo_form_descr">'._BL('Region').': </span>';
 	bo_show_select_region($region);
+	echo '</span>&nbsp;';
 	
 	if ($own_station && $channels > 1)
 	{
@@ -1103,7 +1105,9 @@ function bo_show_statistics_advanced()
 		for($i=1;$i<=$channels;$i++)
 			echo '<option value="'.$i.'" '.($i == $channel ? 'selected' : '').'>'._BL('Channel').' '.$i.'</option>';
 		echo '</select>';
+		echo '</span>&nbsp;';
 	}
+	
 	
 	echo '</fieldset>';
 	echo '</form>';
@@ -1269,7 +1273,7 @@ function bo_show_statistics_advanced()
 			echo '<li><span class="bo_descr">'._BL('Samples per Channel').': </span>';
 			echo '<span class="bo_value">'.$values.'</span></li>';
 			echo '<li><span class="bo_descr">'._BL('Recording time').': </span>';
-			echo '<span class="bo_value">'.number_format($utime * $values, 0, _BL('.'), _BL(',')).'µs</span></li>';
+			echo '<span class="bo_value">'.number_format($utime * $values, 0, _BL('.'), _BL(','))._BL('unit_us_short').'</span></li>';
 			echo '<li><span class="bo_descr">'._BL('Bits per Sample').': </span>';
 			echo '<span class="bo_value">'.$bpv.'</span></li>';
 			echo '<li><span class="bo_descr">'._BL('Sample rate').': </span>';
