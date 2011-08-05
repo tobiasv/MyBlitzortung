@@ -5,6 +5,8 @@ $out = 'en';
 
 include($in.'.php');
 include($out.'.php');
+if (file_exists('own.php'))
+	include('own.php');
 
 $O = ''; $U = '';
 $I = file_get_contents($in.'.php');

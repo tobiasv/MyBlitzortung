@@ -88,6 +88,7 @@
 @define("BO_UP_INTVL_STRIKES", 5);
 @define("BO_UP_INTVL_STATIONS", 15);
 @define("BO_UP_INTVL_RAW", 60);
+@define("BO_UP_MAX_SLEEP", 30);
 
 //set to true, if you want to use "file_get_contents"
 @define("BO_USE_PHPURLWRAPPER", false);
