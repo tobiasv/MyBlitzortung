@@ -175,12 +175,12 @@ function bo_update_raw_signals($force = false)
 				
 				if ($id)
 				{
-					bo_db("UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'");
+					bo_db("UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'", false);
 					$u++;
 				}
 				else
 				{
-					bo_db("INSERT INTO ".BO_DB_PREF."raw SET $sql");
+					bo_db("INSERT INTO ".BO_DB_PREF."raw SET $sql", false);
 					$i++;
 				}
 			}
@@ -1071,7 +1071,8 @@ function bo_update_daily_stat()
 function bo_update_all($force)
 {
 	session_write_close();
-
+	ignore_user_abort(true);
+	
 	echo "<h2>Getting lightning data from blitzortung.org</h2>\n";
 
 	$start_time = time();
@@ -1112,13 +1113,15 @@ function bo_update_all($force)
 	}
 	
 	ini_set('default_socket_timeout', 10);
-
-	if (!$force && $max_time > 50)
+	
+	// to avoid to much connections from different stations to blitzortung.org at the same time
+	if (!$force && $max_time > 20)
 	{
-		$sleep = rand(0,30);
+		$max_sleep = BO_UP_MAX_SLEEP;
+		$sleep = rand(0,$max_sleep);
 		echo '<p>Waiting '.$sleep.' seconds...</p>';
 		flush();
-		sleep($sleep); // to avoid to much connections from different stations to blitzortung.org at the same time
+		sleep($sleep); 
 	}
 	
 

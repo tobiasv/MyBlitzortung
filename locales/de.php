@@ -707,7 +707,7 @@ $_BL['de']['Region'] = 'Region';
 $_BL['de']['legend_stat_strikes_now'] = 'Auswahl der Region';
 $_BL['de']['h3_stat_strikes_now'] = 'Aktuelle Blitzstatistik';
 $_BL['de']['h3_stat_strikes_time'] = 'Blitzzahlen pro Monat und Jahr';
-$_BL['de']['bo_descr_strikes_now'] = 'Die Blitzdaten werden alle {UPDATE_INTERVAL} Minute von Blitzortung.org übernommen, 
+$_BL['de']['bo_descr_strikes_now'] = 'Die Blitzdaten werden alle {UPDATE_INTERVAL} Minuten von Blitzortung.org übernommen, 
 	die hier gezeigten Informationen sind also ggf. etwas zeitversetzt.
 	Das Intervall in welchem die Blitzrate bestimmt wird, beträgt {RATE_INTERVAL} Minuten. 
 	';

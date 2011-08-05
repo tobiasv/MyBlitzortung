@@ -890,6 +890,9 @@ function raw2array($raw = false, $calc_spec = false)
 		$utime    = bo_get_conf('raw_ntime') / 1000;
 		$values   = bo_get_conf('raw_values');
 	}
+
+	if (!$channels || !$bpv || !$utime || !$values)
+		return false;
 	
 	//dummy signal
 	if ($raw === false)
@@ -938,6 +941,9 @@ function raw2array($raw = false, $calc_spec = false)
 function bo_examine_signal($data, &$amp = array(), &$amp_max = array(), &$freq = array(), &$freq_amp = array())
 {
 	$sig_data = raw2array($data, true);
+	
+	if (!$sig_data)
+		return false;
 	
 	$amp = array();
 	$amp_max = array();
