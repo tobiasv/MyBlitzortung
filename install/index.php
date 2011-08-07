@@ -117,10 +117,10 @@ else
 	}
 	elseif (!strpos(BO_LAT, '.') || !strpos(BO_LON, '.'))
 	{
-			$step = 0;
-			$msg = 4;
+		$step = 0;
+		$msg = 4;
 	}
-	else
+	elseif ($step != 1)
 	{
 		$connid = BoDb::connect(false);
 
@@ -162,7 +162,9 @@ else
 				}
 			}
 
-			if (!count($tables) && $step == 2) //already installed --> no reinstall
+			if (count($tables)) // one or more tables missing
+				$step = 2;
+			else if (!count($tables) && $step == 2) //already installed --> no reinstall
 				$step = 3;
 			else if ($rows) // there's already sth in the database --> last step
 				$step = 4;
@@ -176,8 +178,9 @@ echo '
 <title>MyBlitzortung installation</title>
 <link rel="stylesheet" href="../style.css" type="text/css">
 <style>
-	body { font-size: 100.01%; font-family: Arial,Helvetica,sans-serif; margin: 0;  padding: 0 0 10px 0; background: #f6f6f9; }
+	body { font-size: 100.01%; font-family: Arial,Helvetica,sans-serif; margin: 0;  padding: 0 0 10px 0; background: #f6f6f9; font-size: 12px; width: 800px;}
 	#mybo_head h2 { display: block; margin-left:0 }
+	h3 { margin-top: 40px; text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -308,8 +311,10 @@ switch($step)
 		else
 		{
 			echo '<p>Database installation done!</p>';
-
-			echo '<p><a href="?step=3">Test data collection</a> (This may take a while!)</p>';
+			if (!$rows)
+				echo '<p><a href="?step=3">Test data collection</a> (This may take a while!)</p>';
+			else
+				echo '<p><a href="?step=4">Finish</a></p>';
 		}
 
 		break;
@@ -394,11 +399,11 @@ switch($step)
 			';
 		echo '<h3>Change your individual configuration</h3>
 				<p>Perhaps you want to add some settings to config.php. See README or <em>includes/default_settings.inc.php</em> for details.
-				German users should try those links:</p>
+				German users should try these links:</p>
 				<ul>
-				<li><a target="_blank" href="http://www.wetter-ybbs.at/blitzortung-faq/index.php?action=artikel&cat=20&id=143&artlang=de">Konfiguration (Allgemein)</a></li>
-				<li><a target="_blank" href="http://www.wetter-ybbs.at/blitzortung-faq/index.php?action=artikel&cat=20&id=156&artlang=de">Konfiguration (Karten)</a></li>
-				<li><a target="_blank" href="http://www.wetter-ybbs.at/blitzortung-faq/index.php?action=artikel&cat=20&id=157&artlang=de">Konfiguration (Beispiel)</a></li>
+				<li><a target="_blank" href="http://www.myblitzortung.de/myblitzortung_config">Konfiguration (Allgemein)</a></li>
+				<li><a target="_blank" href="http://www.myblitzortung.de/myblitzortung_config_maps">Konfiguration (Karten)</a></li>
+				<li><a target="_blank" href="http://www.myblitzortung.de/myblitzortung_config_example">Konfiguration (Beispiel)</a></li>
 				</ul>
 				';
 				

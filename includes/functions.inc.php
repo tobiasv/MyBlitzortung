@@ -942,47 +942,47 @@ function bo_examine_signal($data, &$amp = array(), &$amp_max = array(), &$freq =
 {
 	$sig_data = raw2array($data, true);
 	
-	if (!$sig_data)
-		return false;
+	$amp = array(0,0);
+	$amp_max = array(0,0);
+	$freq = array(0,0);
+	$freq_amp = array(0,0);
 	
-	$amp = array();
-	$amp_max = array();
-	$freq = array();
-	$freq_amp = array();
-	
-	foreach($sig_data['signal_raw'] as $channel => $dummy)
+	if ($sig_data)
 	{
-		//amplitude of first value
-		$amp[$channel] = $sig_data['signal_raw'][$channel][0];
-		
-		//max. amplitude
-		$max = 0;
-		foreach($sig_data['signal_raw'][$channel] as $signal)
+		foreach($sig_data['signal_raw'] as $channel => $dummy)
 		{
-			$sig = abs($signal - 128);
+			//amplitude of first value
+			$amp[$channel] = $sig_data['signal_raw'][$channel][0];
 			
-			if ($sig > $max)
+			//max. amplitude
+			$max = 0;
+			foreach($sig_data['signal_raw'][$channel] as $signal)
 			{
-				$max = $sig;
-				$amp_max[$channel] = $signal;
+				$sig = abs($signal - 128);
+				
+				if ($sig > $max)
+				{
+					$max = $sig;
+					$amp_max[$channel] = $signal;
+				}
 			}
-		}
-		
-		//main frequency
-		$max = 0;
-		$freq_id_max = 0;
-		foreach($sig_data['spec'][$channel] as $freq_id => $famp)
-		{
-			if ($freq_id > 0 && $max < $famp)
+			
+			//main frequency
+			$max = 0;
+			$freq_id_max = 0;
+			foreach($sig_data['spec'][$channel] as $freq_id => $famp)
 			{
-				$max = $famp;
-				$freq[$channel] = $sig_data['spec_freq'][$freq_id];
+				if ($freq_id > 0 && $max < $famp)
+				{
+					$max = $famp;
+					$freq[$channel] = $sig_data['spec_freq'][$freq_id];
+				}
 			}
+			
+			$freq_amp[$channel] = $max * 100;
 		}
-		
-		$freq_amp[$channel] = $max * 100;
 	}
-
+	
 	$sql = "amp1='$amp[0]', amp2='$amp[1]', 
 			amp1_max='$amp_max[0]', amp2_max='$amp_max[1]', 
 			freq1='$freq[0]', freq2='$freq[1]', 

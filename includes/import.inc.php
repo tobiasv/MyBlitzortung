@@ -116,7 +116,7 @@ function bo_update_raw_signals($force = false)
 				$utime = strtotime("$date $time UTC");
 
 				// update strike-data only some seconds *before* the *last download*
-				if ($utime < $last - 20)
+				if ($utime < $last - 120)
 				{
 					$a++;
 					continue;
@@ -175,12 +175,14 @@ function bo_update_raw_signals($force = false)
 				
 				if ($id)
 				{
-					bo_db("UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'", false);
+					$sql = "UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'";
+					bo_db($sql, false);
 					$u++;
 				}
 				else
 				{
-					bo_db("INSERT INTO ".BO_DB_PREF."raw SET $sql", false);
+					$sql = "INSERT INTO ".BO_DB_PREF."raw SET $sql";
+					bo_db($sql, false);
 					$i++;
 				}
 			}
