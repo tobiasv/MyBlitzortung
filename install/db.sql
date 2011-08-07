@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}raw` (
   `freq1` SMALLINT UNSIGNED NOT NULL,
   `freq1_amp` TINYINT UNSIGNED NOT NULL,
   `freq2` SMALLINT UNSIGNED NOT NULL,
-  `freq2_amp` TINYINT UNSIGNED NOT NULL`,
+  `freq2_amp` TINYINT UNSIGNED NOT NULL,
   `data` blob NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `strike_id` (`strike_id`),

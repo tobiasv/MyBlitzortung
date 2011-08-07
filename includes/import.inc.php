@@ -1068,6 +1068,11 @@ function bo_update_daily_stat()
 	return $ret;
 }
 
+function bo_update_shutdown()
+{
+	bo_set_conf('is_updating', 0);
+}
+
 function bo_update_all($force)
 {
 	session_write_close();
@@ -1087,6 +1092,7 @@ function bo_update_all($force)
 	}
 
 	bo_set_conf('is_updating', time());
+	register_shutdown_function('bo_update_shutdown');
 	
 	//timeouts
 	$max_time = intval(ini_get('max_execution_time')) - 10;
@@ -1324,7 +1330,6 @@ function bo_update_all($force)
 	}
 
 	bo_update_densities($max_time + $start_time - time());
-
 	
 	bo_set_conf('is_updating', 0);
 

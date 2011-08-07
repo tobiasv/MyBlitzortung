@@ -287,7 +287,7 @@ switch($step)
 		$contents = strtr($contents, array('{BO_DB_PREF}' => BO_DB_PREF));
 		$queries = explode(';', $contents);
 
-		$queries[] = "INSERT INTO ".BO_DB_PREF."user SET id=1, login='', password='', level=1, mail=''";
+		$queries[] = "INSERT IGNORE INTO ".BO_DB_PREF."user SET id=1, login='', password='', level=1, mail=''";
 
 		foreach($queries as $query)
 		{
