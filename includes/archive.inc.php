@@ -559,7 +559,10 @@ function bo_show_archive_search()
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Polarity').':</span><span class=\'bo_value\'> '.($row['polarity'] === null ? '?' : ($row['polarity'] < 0 ? _BL('negative') : _BL('positive'))).' ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participated').':</span><span class=\'bo_value\'> '.($row['part'] > 0 ? _BL('yes') : _BL('no')).'</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participants').':</span><span class=\'bo_value\'> '.intval($row['users']).'</span></li>';
-			$description .= '<li><span class=\'bo_value\'><a href=\''.bo_insert_url(array('bo_show', 'bo_*'), 'signals').'&bo_strike_id='.$row['id'].'\' target=\'_blank\'>'._BL('more').'<a></span></li>';
+
+			if ($perm)
+				$description .= '<li><span class=\'bo_value\'><a href=\''.bo_insert_url(array('bo_show', 'bo_*'), 'signals').'&bo_strike_id='.$row['id'].'\' target=\'_blank\'>'._BL('more').'<a></span></li>';
+
 			$description .= '</ul>';
 
 			if ($row['raw_id'])
