@@ -280,6 +280,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$ymax = null;
 	$add_title = '';
 
+	//2nd type
+	$type2 = $_GET['type2'];
+	
 	//Value
 	$value = isset($_GET['value']) ? intval($_GET['value']) : 0;
 	
@@ -1002,6 +1005,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		
 		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
 		
+		$amp_divisor = 10;
+		
 		if ($participated > 0)
 		{
 			$sql_join = "
@@ -1044,8 +1049,20 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					$Y[$channel][$freq_id] = 0;
 					$Y2[$channel][$freq_id] = 0;
 				}
+
+				if (substr($type2,0,3) == 'amp')
+				{
+					if ($type2 == 'amp_max')
+						$sname = "r.amp".$channel."_max";
+					else if ($type2 == 'amp')
+						$sname = "r.amp".$channel;
+						
+					$sname = "ABS(CONVERT($sname, SIGNED) - 128)*2/256*".BO_MAX_VOLTAGE;
+				}
+				else
+					$sname = "r.freq".$channel."_amp";
 				
-				$sql = "SELECT r.freq".$channel." freq, SUM(r.freq".$channel."_amp) amp_sum, COUNT(r.id) cnt
+				$sql = "SELECT r.freq".$channel." freq, SUM($sname) amp_sum, COUNT(r.id) cnt
 						FROM ".BO_DB_PREF."raw r
 						$sql_join
 						WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
@@ -1059,16 +1076,18 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					$Y2[$channel][$freq_id] = $row['cnt'];
 				}
 			}
-			
+
+			$tickLabels[0] = '0kHz';
 			foreach($freqs as $freq_id => $freq)
 			{
 				$X[$freq_id] = $freq;
 				$tickLabels[$freq_id] = $freq.'kHz';
 			}
+			
 		}
 		else
 		{
-			$amp_divisor = 10;
+			
 			
 			if ($type == 'amplitudes_max')
 			{
@@ -2027,10 +2046,19 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			}
 			
 			$graph->SetYScale(0,'lin');
-			$graph->yaxis->HideLabels();
-			$graph->yaxis->title->Set(_BL('graph_stat_spectrum_yaxis_title'));
+			
+			if (substr($type2,0,3) == 'amp')
+			{
+				$graph->yaxis->title->Set(_BL('Mean amplitude').'  [V]');
+			}
+			else
+			{
+				$graph->yaxis->HideLabels();
+				$graph->yaxis->title->Set(_BL('graph_stat_spectrum_yaxis_title'));
+			}
+			
 			$graph->xaxis->title->Set(_BL('Frequency').'  [kHz]');
-			$graph->ynaxis[0]->title->Set(_BL('Count'));
+			$graph->ynaxis[0]->title->Set(_BL('Signal count'));
 			$graph->title->Set(_BL('graph_stat_title_spectrum').$add_title);
 
 			$graph->xaxis->SetTickLabels($tickLabels);
@@ -2080,7 +2108,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 			}
 			
-			$graph->yaxis->title->Set(_BL('Count'));
+			$graph->yaxis->title->Set(_BL('Signal count'));
 			$graph->xaxis->title->Set(_BL('Amplitude').'  [V]');
 			$graph->title->Set(_BL('graph_stat_title_amplitude').$add_title);
 
@@ -2135,7 +2163,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 			$graph->SetYScale(0,'lin');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
-			$graph->ynaxis[0]->title->Set(_BL('Count'));
+			$graph->ynaxis[0]->title->Set(_BL('Signal count'));
 			$graph->title->Set(strtr(_BL('graph_stat_title_'.$type), array('{VALUES}' => $values_text)).$add_title);
 			
 			break;
@@ -2167,7 +2195,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			if (BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F3)
 				$plot->SetFillColor(BO_GRAPH_STAT_SIGNALS_TIME_COLOR_F3);
 			$plot->SetWeight(BO_GRAPH_STAT_SIGNALS_TIME_WIDTH_3);
-			$plot->SetLegend(_BL('Count'));
+			$plot->SetLegend(_BL('Signal count'));
 			$graph->AddY(0,$plot);
 
 		
@@ -2177,7 +2205,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$graph->yaxis->title->Set(_BL('Amplitude').'  [V]');
 
 			$graph->SetYScale(0,'lin');
-			$graph->ynaxis[0]->title->Set(_BL('Count'));
+			$graph->ynaxis[0]->title->Set(_BL('Signal count'));
 			$graph->title->Set(_BL('graph_stat_title_'.$type).$add_title);
 			
 			break;

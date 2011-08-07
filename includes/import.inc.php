@@ -486,7 +486,7 @@ function bo_match_strike2raw()
 {
 	//not really physical values but determined empirical
 	$c = 299792458;
-	$fuzz = 0.0003;
+	$fuzz = 0.00001;
 	$dist_fuzz = -5.4; //power of 10
 	
 	$amp_trigger = (BO_TRIGGER_VOLTAGE / BO_MAX_VOLTAGE) * 256 / 2;
@@ -506,7 +506,8 @@ function bo_match_strike2raw()
 
 	$sql = "SELECT id, time, time_ns, distance, bearing, polarity, part
 			FROM ".BO_DB_PREF."strikes
-			WHERE raw_id IS NULL
+			WHERE 1
+					AND raw_id IS NULL
 					AND time BETWEEN '$mintime' AND '$maxtime'
 			ORDER BY part DESC
 			LIMIT 10000
@@ -569,6 +570,8 @@ function bo_match_strike2raw()
 
 			case 1:  //exact match
 
+				//echo round($row2['time_ns'] - $nsearch_from).' '.abs(round($row2['time_ns'] - $nsearch_to)).' '.$row2['time_ns'].'<br>';
+			
 				$u[$row2['id']] = $row['id'];
 				$polarity[$row['id']] = $row['polarity'];
 				$part[$row['id']] = abs($row['part']);
