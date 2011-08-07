@@ -822,3 +822,5 @@ $_BL['de']['amp_first_signal'] = 'Signal: Erstes Sample';
 $_BL['de']['amp_max_signal'] = 'Signal: Max. Amplitude';
 $_BL['de']['amp_spec'] = 'Aus Frequenzspektrum';
 $_BL['de']['Signal count'] = 'Anzahl Signale';
+$_BL['de']['signal not found'] = 'Signal nicht gefunden';
+$_BL['de']['Test'] = '';

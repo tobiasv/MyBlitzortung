@@ -486,19 +486,21 @@ function bo_match_strike2raw()
 {
 	//not really physical values but determined empirical
 	$c = 299792458;
-	$fuzz = 0.00001;
-	$dist_fuzz = -5.4; //power of 10
+	$fuzz = 0.00001; //minimum fuzzy-seconds
+	$dist_fuzz = 0.0001; //fuzzy-seconds per meter (seconds)
+	$offset_fuzz = 0;
 	
 	$amp_trigger = (BO_TRIGGER_VOLTAGE / BO_MAX_VOLTAGE) * 256 / 2;
 
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 	$row = bo_db($sql)->fetch_assoc();
 	$maxtime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC'));
-	$mintime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC') - 3600 * 24);
+	$mintime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC') - 3600 * 74);
 	
 	$u = array();
 	$n = array();
 	$m = array();
+	$d = $d2 = array();
 	$polarity = array();
 	$part = array();
 	$own_found = 0;
@@ -533,8 +535,8 @@ function bo_match_strike2raw()
 		//fuzzy search
 		$search_from  = $time_raw;
 		$search_to    = $time_raw;
-		$nsearch_from = $ntime_raw - $fuzz * (1 + $row['distance'] * pow(10, $dist_fuzz));
-		$nsearch_to   = $ntime_raw + $fuzz * (1 + $row['distance'] * pow(10, $dist_fuzz));
+		$nsearch_from = $ntime_raw - $fuzz * (1 + $row['distance'] * $dist_fuzz) + $offset_fuzz;
+		$nsearch_to   = $ntime_raw + $fuzz * (1 + $row['distance'] * $dist_fuzz) + $offset_fuzz;
 
 		if ($nsearch_from < 0) { $nsearch_from++; $search_from--; }
 		else if ($nsearch_from > 1) { $nsearch_from--; $search_from++; }
@@ -572,9 +574,17 @@ function bo_match_strike2raw()
 
 				//echo round($row2['time_ns'] - $nsearch_from).' '.abs(round($row2['time_ns'] - $nsearch_to)).' '.$row2['time_ns'].'<br>';
 			
-				$u[$row2['id']] = $row['id'];
+				if ($raw2assigned[$row2['id']] && $row['part'] <= 0) // if signal already assigned and not participated
+				{
+					$d2[] = $row['id'];
+					continue;
+				}
+				else
+					$raw2assigned[$row2['id']] = true;
+				
+				$u[] = array($row2['id'], $row['id']);
 				$polarity[$row['id']] = $row['polarity'];
-				$part[$row['id']] = abs($row['part']);
+				$part[$row['id']] = $row['part'] > 0 ? 1 : 0;
 				
 				//channel examination
 				$trigger1_first = abs($row2['amp1']     - 128) >= $amp_trigger;
@@ -610,11 +620,13 @@ function bo_match_strike2raw()
 
 	echo "\n<p>Assign raw data to strikes: ".
 			(count($u) + count($n) + count($m))." strikes analyzed".
-			" *** Own strikes: ".$own_strikes." *** Unique found: ".count($u)." *** Own found: ".$own_found." *** Not found: ".count($n)." *** Multiple: ".count($m)."</p>";
-
+			" *** Own strikes: ".$own_strikes." *** Own unique found: ".$own_found." (Rate ".round($own_strikes ? $own_found / $own_strikes * 100 : 0,1)."%) *** Unique found: ".count($u)." *** Not found: ".count($n)." *** Multiple Signals to Strike: ".count($m)." *** Multiple Strikes to Signal: ".count($d2)."</p>";
+			
 	//Update matched
-	foreach($u as $raw_id => $strike_id)
+	foreach($u as $data)
 	{
+		$strike_id = $data[1];
+		$raw_id = $data[0];
 		$sql = "UPDATE ".BO_DB_PREF."strikes 
 				SET 
 					raw_id='$raw_id', 

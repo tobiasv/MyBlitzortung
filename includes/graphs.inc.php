@@ -654,7 +654,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		
 		$station_id = 0;
 		
-		$interval = $hours_back / 24 * 15;
+		$interval = $hours_back / 24 * $group_minutes;
 		$ticks = ($time_end - $time_start) / 60 / $interval;
 
 		$tmp = array();
@@ -686,8 +686,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		for($i=0;$i<$ticks;$i++)
 		{
 			$X[$i] = $time_start + $i * $interval * 60;
-			$Y[$i] = null;
-			$Y2[$i] = null;
+			$Y[$i] = 0;
+			$Y2[$i] = 0;
 			
 			if (intval($tmp['all_cnt'][$i]) != 0)
 				$Y[$i] = $tmp['all_sum'][$i] / $tmp['all_cnt'][$i] / 1000;

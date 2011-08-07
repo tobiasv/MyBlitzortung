@@ -242,7 +242,7 @@ color: #666;
 /*** Raw-Signals ***/
 
 #myblitzortung .bo_sig_navi {
-width: 560px;
+width: 795px;
 text-align: center;
 margin: 20px 0 5px 10px;
 font-size: 11px;
@@ -287,6 +287,11 @@ font-size: 12px;
 border-bottom: 1px dotted #eee;
 }
 
+#myblitzortung .bo_sig_table td.bo_sig_table_time a{
+color: #666;
+font-weight: bold;
+}
+
 #myblitzortung .bo_sig_table td.bo_sig_table_strikeinfo, 
 #myblitzortung .bo_sig_table td.bo_sig_table_graph {
 border-bottom: 1px solid #eee;
@@ -302,9 +307,10 @@ font-size:11px;
 padding-left: 10px;
 }
 
+
 #myblitzortung .bo_sig_table_strikeinfo, 
 #myblitzortung .bo_sig_table_strikeinfo li {
-font-size: 10px;
+font-size: 12px;
 color: #666;
 }
 
@@ -328,8 +334,9 @@ float: left;
 width: 160px;
 margin: 2px 0px;
 padding: 0;
-line-height: 15px;
+line-height: 13px;
 white-space: nowrap;
+text-align:left;
 }
 
 #myblitzortung #bo_arch_map_img {
@@ -400,11 +407,8 @@ margin: 0 0 10px 0;
 padding: 0;
 }
 
-#myblitzortung .bo_archiv_map_infowindow ul li .bo_value {
-line-height: 10px;
-}
-
-#myblitzortung .bo_archiv_map_infowindow ul li .bo_value {
+#myblitzortung .bo_archiv_map_infowindow ul li .bo_value, #myblitzortung .bo_archiv_map_infowindow ul li .bo_descr {
+line-height: 9px;
 font-size: 10px;
 }
 

@@ -1242,14 +1242,6 @@ function bo_show_statistics_advanced()
 	
 		
 		case 'strike_ratios':
-			
-			/*** EVALUATED RATIO ***/
-			echo '<a name="graph_evaluated_signals"></a>';
-			echo '<h4>'._BL('h4_graph_evaluated_signals').'</h4>';
-			echo '<p class="bo_graph_description" id="bo_graph_evaluated_signals">';
-			echo _BL('bo_graph_evaluated_signals');
-			echo '</p>';
-			bo_show_graph('evaluated_signals', $add_graph);
 
 			/*** RATIO DISTANCE ***/
 			echo '<a name="graph_ratio_distance"></a>';
@@ -1266,7 +1258,15 @@ function bo_show_statistics_advanced()
 			echo _BL('bo_graph_descr_bear_adv');
 			echo '</p>';
 			bo_show_graph('ratio_bearing', $add_graph);			
-	
+			
+			/*** EVALUATED RATIO ***/
+			echo '<a name="graph_evaluated_signals"></a>';
+			echo '<h4>'._BL('h4_graph_evaluated_signals').' ('._BL('experimental').')</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_evaluated_signals">';
+			echo _BL('bo_graph_evaluated_signals');
+			echo '</p>';
+			bo_show_graph('evaluated_signals', $add_graph);
+			
 			break;
 			
 		case 'signals':

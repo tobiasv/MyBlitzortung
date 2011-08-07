@@ -430,6 +430,15 @@ function bo_show_archive_search()
 	$radius = $_BO['radius'] * 1000;
 	$max_count = intval(BO_ARCHIVE_SEARCH_STRIKECOUNT);
 	$select_count = $max_count;
+	$perm = (bo_user_get_level() & BO_PERM_NOLIMIT);
+	
+	echo '<div id="bo_archive">';
+	echo '<p class="bo_stat_description" id="bo_archive_search_info">';
+	echo strtr(_BL('archive_search_info'), array('{COUNT}' => $perm ? '' : $max_count));
+	echo '</p>';
+	echo '<h4>'._BL('Map').'</h4>';
+	echo '<div id="bo_gmap" class="bo_map_archive"></div>';
+
 	
 	if ($_GET['bo_lat'])
 	{
@@ -439,8 +448,9 @@ function bo_show_archive_search()
 		$map_lon = (double)$_GET['bo_map_lon'];
 		$zoom = (int)$_GET['bo_map_zoom'];
 		$delta_dist = (int)$_GET['bo_dist'];
+		$getit = isset($_GET['bo_ok']);
 		
-		if ( (bo_user_get_level() & BO_PERM_NOLIMIT) && (int)$_GET['bo_count'])
+		if ( $perm && (int)$_GET['bo_count'])
 		{
 			$select_count = (int)$_GET['bo_count'];
 			$time_from = trim($_GET['bo_time_from']);
@@ -457,7 +467,6 @@ function bo_show_archive_search()
 				$time_to = '';
 				
 		}
-		
 	}
 	else
 	{
@@ -467,57 +476,63 @@ function bo_show_archive_search()
 		$delta_dist = 10000;
 	}
 
-	$getit = isset($_GET['bo_ok']);
+	if ($perm && $_GET['bo_strike_id'])
+	{
+		$getit = true;
+		$get_by_id = intval($_GET['bo_strike_id']);
+		$zoom = 4;
+	}
 
+	
 	if ($radius && $delta_dist > $radius)
 		$delta_dist = $radius;
-
-	echo '<div id="bo_archive">';
-
-	echo '<p class="bo_stat_description" id="bo_archive_search_info">';
-	echo strtr(_BL('archive_search_info'), array('{COUNT}' => (bo_user_get_level() & BO_PERM_NOLIMIT) ? '' : $max_count));
-	echo '</p>';
-	
-	echo '<h4>'._BL('Map').'</h4>';
-
-	echo '<div id="bo_gmap" class="bo_map_archive"></div>';
 	
 	/*** Get data from Database ***/
 
 	if ($getit)
 	{
-		//max and min latitude for strikes
-		list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($delta_dist * sqrt(2), 225, $lat, $lon);
-		list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($delta_dist * sqrt(2), 45, $lat, $lon);
-
-		//for database index
-		$lat2min = floor($str_lat_min);
-		$lon2min = floor($str_lon_min/180 * 128);
-		$lat2max = ceil($str_lat_max);
-		$lon2max = ceil($str_lon_max/180 * 128);
-		
 		$time_min = 0;
 		$time_max = 0;
 		$count = 0;
 		$text = '';
 		$more_found = false;
 		
-		$sql_time = '';
-		
-		if ($utime_from)
-			$sql_time .= " AND s.time >= '".gmdate('Y-m-d H:i:s', $utime_from)."' ";
+		$sql_where = '';
+		if ($get_by_id)
+		{
+			$sql_where .= " AND s.id='$get_by_id' ";
+		}
+		else
+		{
+			//max and min latitude for strikes
+			list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($delta_dist * sqrt(2), 225, $lat, $lon);
+			list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($delta_dist * sqrt(2), 45, $lat, $lon);
 
-		if ($utime_to)
-			$sql_time .= " AND s.time <= '".gmdate('Y-m-d H:i:s', $utime_to)."' ";
+			//for database index
+			$lat2min = floor($str_lat_min);
+			$lon2min = floor($str_lon_min/180 * 128);
+			$lat2max = ceil($str_lat_max);
+			$lon2max = ceil($str_lon_max/180 * 128);
+
+			if ($utime_from)
+				$sql_where .= " AND s.time >= '".gmdate('Y-m-d H:i:s', $utime_from)."' ";
+
+			if ($utime_to)
+				$sql_where .= " AND s.time <= '".gmdate('Y-m-d H:i:s', $utime_to)."' ";
+
+			$sql_where .= ($radius ? "AND distance < $radius" : "");
 			
+			$sql_where .= "
+					AND NOT (lat < $str_lat_min OR lat > $str_lat_max OR lon < $str_lon_min OR lon > $str_lon_max)
+					AND NOT (lat2 < $lat2min OR lat2 > $lat2max OR lon2 < $lon2min OR lon2 > $lon2max)";
+
+		}
+		
 		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
 						s.current current, s.deviation deviation, s.current current, s.polarity polarity, s.part part, s.raw_id raw_id
 				FROM ".BO_DB_PREF."strikes s
 				WHERE 1
-					".($radius ? "AND distance < $radius" : "")."
-					AND NOT (lat < $str_lat_min OR lat > $str_lat_max OR lon < $str_lon_min OR lon > $str_lon_max)
-					AND NOT (lat2 < $lat2min OR lat2 > $lat2max OR lon2 < $lon2min OR lon2 > $lon2max)
-					$sql_time
+					$sql_where
 				ORDER BY s.time DESC
 				LIMIT ".intval($select_count * 5);
 
@@ -525,7 +540,7 @@ function bo_show_archive_search()
 		while($row = $res->fetch_assoc())
 		{
 			//ToDo: We search by lat/lon (square) but we need circle
-			if (bo_latlon2dist($lat, $lon, $row['lat'], $row['lon']) > $delta_dist)
+			if (!$get_by_id && bo_latlon2dist($lat, $lon, $row['lat'], $row['lon']) > $delta_dist)
 				continue;
 
 			if ($count >= $select_count)
@@ -538,12 +553,13 @@ function bo_show_archive_search()
 
 			$description  = '<div class=\'bo_archiv_map_infowindow\'>';
 			$description .= '<ul class=\'bo_archiv_map_infowindow_list\'>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Time').':</span><span class=\'bo_value\'> '.date(_BL('_datetime'), $time).'</span></li>';
+			$description .= '<li><span class=\'bo_descr\'>'._BL('Time').':</span><span class=\'bo_value\'> '.date(_BL('_datetime'), $time).'.'.$row['time_ns'].'</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Deviation').':</span><span class=\'bo_value\'> '.number_format($row['deviation'] / 1000, 1, _BL('.'), _BL(',')).'km</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Current').':</span><span class=\'bo_value\'> '.number_format($row['current'], 1, _BL('.'), _BL(',')).'kA ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Polarity').':</span><span class=\'bo_value\'> '.($row['polarity'] === null ? '?' : ($row['polarity'] < 0 ? _BL('negative') : _BL('positive'))).' ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participated').':</span><span class=\'bo_value\'> '.($row['part'] > 0 ? _BL('yes') : _BL('no')).'</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participants').':</span><span class=\'bo_value\'> '.intval($row['users']).'</span></li>';
+			$description .= '<li><span class=\'bo_value\'><a href=\''.bo_insert_url(array('bo_show', 'bo_*'), 'signals').'&bo_strike_id='.$row['id'].'\' target=\'_blank\'>'._BL('more').'<a></span></li>';
 			$description .= '</ul>';
 
 			if ($row['raw_id'])
@@ -800,12 +816,17 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	$only_strikes = isset($_GET['bo_only_strikes']);
 	$page = intval($_GET['bo_action']);
 	
+	
 	if ($page < 0)
 		$page = 0;
 	else if ($page > $max_pages)
 		$page = $max_pages;
 	
-	$show_empty_sig = $perm && isset($_GET['bo_all_strikes']);
+	if ($perm)
+	{
+		$show_empty_sig = isset($_GET['bo_all_strikes']);
+		$strike_id = intval($_GET['bo_strike_id']);	
+	}
 	
 	$sql_where = '';
 	
@@ -824,6 +845,12 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 		$show_empty_sig = true;
 
 		$hours_back = 24 * 50;
+	}
+	else if ($strike_id)
+	{
+		$sql_where .= " AND s.id='$strike_id' ";
+		$show_empty_sig = true;
+		$hours_back = time() / 3600;
 	}
 	else
 	{
@@ -868,14 +895,14 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 	{
 		$sql_join = BO_DB_PREF."raw r JOIN ".BO_DB_PREF."strikes s ON s.raw_id=r.id ";
 		$table = 'r';
-		$sql_where = " AND s.part > 0 ";
+		$sql_where = " AND s.part != 0 ";
 	}
 	else
 	{
 		$sql_join = BO_DB_PREF."raw r LEFT OUTER JOIN ".BO_DB_PREF."strikes s ON s.raw_id=r.id ";
 		$table = 'r';
 	}
-
+	
 	$count = 0;
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
 					s.deviation deviation, s.current current,
@@ -924,11 +951,15 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 		echo '<span class="bo_value">';
 
 		if ($show_empty_sig)
-			echo date(_BL('_datetime'), $stime).'.'.sprintf('%09d', $row['stimens']);
+			$ttime = date(_BL('_datetime'), $stime).'.'.sprintf('%09d', $row['stimens']);
 		else
-			echo date(_BL('_datetime'), $rtime).'.'.sprintf('%09d', $row['rtimens']);
+			$ttime = date(_BL('_datetime'), $rtime).'.'.sprintf('%09d', $row['rtimens']);
 
-
+		if ($perm)
+			echo '<a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'search').'&bo_strike_id='.$row['strike_id'].'" target="_blank">'.$ttime.'</a>';
+		else
+			echo $ttime;
+			
 		echo '</span>';
 		echo '</td>';
 
@@ -1041,15 +1072,31 @@ function bo_show_archive_table($lat = null, $lon = null, $fuzzy = null)
 			{
 				echo '<li>';
 				echo '<span class="bo_descr">';
-				echo _BL('Evaluated').': ';
+				echo _BL('Participated').': ';
 				echo '</span>';
 				echo '<span class="bo_value">';
 				echo $row['part'] > 0 ? _BL('yes') : '<span class="bo_archive_not_evaluated">'._BL('no').'</span>';
 				echo '</span>';
 				echo '</li>';
 			}
-			
+			else if ($row['part'] > 0 && !$row['raw_id'])
+			{
+				echo '<li>';
+				echo '<span class="bo_descr">';
+				echo _BL('Participated').': ';
+				echo '</span>';
+				echo '<span class="bo_value">';
+				echo _BL('yes').' ('._BL('signal not found').')';
+				echo '</span>';
+				echo '</li>';
+			}
+
 			echo '</ul>';
+			
+		}
+		elseif ($row['part'] > 0)
+		{
+			echo _BL('participated but signal not found');
 		}
 		else
 		{

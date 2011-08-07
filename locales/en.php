@@ -797,3 +797,4 @@ $_BL['en']['amp_first_signal'] = 'Signal: First sample';
 $_BL['en']['amp_max_signal'] = 'Signal: Max. apmlitude';
 $_BL['en']['amp_spec'] = 'From spectrum';
 $_BL['en']['Signal count'] = 'Signal count';
+$_BL['en']['signal not found'] = 'signal not found';

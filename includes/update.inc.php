@@ -191,6 +191,11 @@ function bo_check_for_update()
 				$ok = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
+
+				// to assign new signals
+				bo_db('UPDATE `'.BO_DB_PREF.'raw` SET strike_id=0 WHERE time > NOW() - INTERVAL 72 HOUR', false);
+				bo_db('UPDATE `'.BO_DB_PREF.'strikes` SET raw_id=NULL WHERE time > NOW() - INTERVAL 72 HOUR', false);
+
 				
 				echo '<li><strong>You can update some signals by clicking <a href="'.bo_insert_url('bo_action', 'do_update').'&bo_update_signals">here</a>';
 				
