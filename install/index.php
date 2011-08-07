@@ -164,7 +164,7 @@ else
 
 			if (count($tables)) // one or more tables missing
 				$step = 2;
-			else if (!count($tables) && $step == 2) //already installed --> no reinstall
+			else if (!count($tables) && $step == 2 && $rows < 10) //already installed --> no reinstall
 				$step = 3;
 			else if ($rows) // there's already sth in the database --> last step
 				$step = 4;
