@@ -582,7 +582,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					FROM ".BO_DB_PREF."strikes s
 					LEFT JOIN ".BO_DB_PREF."stations_strikes ss
 						ON s.id=ss.strike_id AND ss.station_id='$station_id'
-					WHERE s.time BETWEEN '$date_start' AND '$date_end'";
+					WHERE s.time BETWEEN '$date_start' AND '$date_end'
+					".bo_region2sql($region)."
+					";
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())
 			{
@@ -608,6 +610,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$sql = "SELECT COUNT(id) cnt, $sql_part participated, $sql
 					FROM ".BO_DB_PREF."strikes s
 					WHERE time BETWEEN '$date_start' AND '$date_end'
+					".bo_region2sql($region)."
 					GROUP BY participated, val";
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())
@@ -636,7 +639,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					$tickMajPositions[] = $i;
 				}
 			}
-
+			
 			if ($tmp[0][$i])
 				$Y[$i] = $tmp[1][$i] / ($tmp[0][$i]+$tmp[1][$i]) * 100;
 			else
@@ -646,7 +649,12 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		}
 
 		$graph_type = 'textlin';
-
+		
+		if (count($tickMajPositions) < 2)
+		{
+			$tickLabels[] = $i*$dist_div;
+			$tickMajPositions[] = $i;
+		}
 	}
 	else if ($type == 'distance')
 	{

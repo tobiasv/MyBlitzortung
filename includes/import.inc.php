@@ -208,7 +208,7 @@ function bo_update_raw_signals($force = false)
 	}
 	else
 	{
-		echo "\n<p>NO UPDATE! Last update ".(time() - $last)." seconds ago.</p>\n";
+		echo "\n<p>Internal timer says: No update, because the last update was ".(time() - $last)." seconds ago. This is normal and no error message!</p>\n";
 		$updated = false;
 	}
 
@@ -474,7 +474,7 @@ function bo_update_strikes($force = false)
 	}
 	else
 	{
-		echo "\n<p>NO UPDATE! Last update ".(time() - $last)." seconds ago.</p>\n";
+		echo "\n<p>Internal timer says: No update, because the last update was ".(time() - $last)." seconds ago. This is normal and no error message!</p>\n";
 		$updated = false;
 	}
 
@@ -843,7 +843,7 @@ function bo_update_stations($force = false)
 	}
 	else
 	{
-		echo "\n<p>NO UPDATE! Last update ".(time() - $last)." seconds ago.</p>\n";
+		echo "\n<p>Internal timer says: No update, because the last update was ".(time() - $last)." seconds ago. This is normal and no error message!</p>\n";		
 		$updated = false;
 	}
 
@@ -889,7 +889,6 @@ function bo_update_daily_stat()
 			$row_own_rad = bo_db(strtr($sql,array('{where}' => 'part > 0 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
 
 			/*** Signals ***/
-			
 			//own exact value
 			$signals_exact = bo_db("SELECT COUNT(id) cnt FROM ".BO_DB_PREF."raw WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end'")->fetch_assoc();
 			
@@ -905,17 +904,30 @@ function bo_update_daily_stat()
 					$signals[(int)$row['own']] += $row['cnt'] / $row['entries'];
 			}
 			
+			/*** Stations ***/
+			$stations = array();
+			// available stations
+			$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status != '-'")->fetch_assoc();
+			$stations['available'] = $row->cnt;
+			
+			// active stations
+			$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status = 'A'")->fetch_assoc();
+			$stations['active'] = $row->cnt;
+			
+			
+			/*** Save the data ***/
 			$data = array(	0 => $row_all['cnt'], 
 							1 => $row_own['cnt'], 
 							2 => $row_all_rad['cnt'], 
 							3 => $row_own_rad['cnt'],
 							4 => $signals_exact['cnt'],
 							5 => round($signals[0]),
-							6 => round($signals[1]));
+							6 => round($signals[1]),
+							10 => $stations);
 			
 			bo_set_conf('strikes_temp_'.$day_id, serialize($data));
 		}
-		else if (count($data) == 7)
+		else if (count($data) == 8)
 		{
 			//strike count per region
 			if (isset($_BO['region']) && is_array($_BO['region']))
@@ -935,7 +947,7 @@ function bo_update_daily_stat()
 			$data[7] = $strikes_region;
 			bo_set_conf('strikes_temp_'.$day_id, serialize($data));
 		}
-		else if (count($data) >= 8)
+		else if (count($data) >= 9)
 		{
 			$channels = bo_get_conf('raw_channels');
 			$max_lines = 500;
@@ -1104,7 +1116,7 @@ function bo_update_all($force)
 	//Check if sth. went wrong on the last update (if older than 120sec continue)
 	if ($is_updating && time() - $is_updating < 120 && !($force && $debug))
 	{
-		echo "\n<p>Error: Another update is running</p>\n";
+		echo "\n<p>ERROR: Another update is running</p>\n";
 		return;
 	}
 
@@ -1124,14 +1136,16 @@ function bo_update_all($force)
 	//recheck the new timeout
 	$exec_timeout = intval(ini_get('max_execution_time'));
 	
-	$max_time = $exec_timeout - 2;
+	$max_time = $exec_timeout - 10;
 	if ($max_time < 5)
-		$max_time = 30;
+		$max_time = 20;
 	
 	if (!$force)
 	{
 		echo '<div style="display:none">'.str_repeat('&nbsp;', 500).'</div>';
-		echo '<p>PHP Execution timeout: '.$exec_timeout.'s  - Set MyBlitzortung timeout to: '.$max_time.'s</p>';
+		echo '<p>Information: PHP Execution timeout is '.$exec_timeout.'s ';
+		echo $exec_timeout < 15 ? ' - Not good :( ' : ' --> Fine :)  ';
+		echo '- Setting MyBlitzortung timeout to: '.$max_time.'s</p>';
 		flush();
 	}
 	
@@ -1142,7 +1156,7 @@ function bo_update_all($force)
 	{
 		$max_sleep = BO_UP_MAX_SLEEP;
 		$sleep = rand(0,$max_sleep);
-		echo '<p>Waiting '.$sleep.' seconds...</p>';
+		echo '<p>Waiting '.$sleep.' seconds, to avoid too hight load on Blitzortung servers ...</p>';
 		flush();
 		sleep($sleep); 
 	}
@@ -1156,7 +1170,7 @@ function bo_update_all($force)
 	if ( !(BO_UP_INTVL_STRIKES <= BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS <= BO_UP_INTVL_RAW) )
 	{
 		if (!$force)
-			echo '<p>Asynchronous update!</p>';
+			echo '<p>Info: Asynchronous update. No problem, but untestet. To avoid set strike timer < station timer < signal timer (or equal).</p>';
 		
 		$async = true;
 	}
@@ -1192,7 +1206,7 @@ function bo_update_all($force)
 	if (time() - $start_time > $max_time)
 	{
 		bo_set_conf('is_updating', 0);
-		echo '<p>TIMEOUT!</p>';
+		echo '<p>TIMEOUT! We will continue the next time.</p>';
 		return;
 	}
 
@@ -1212,7 +1226,7 @@ function bo_update_all($force)
 	if (time() - $start_time > $max_time)
 	{
 		bo_set_conf('is_updating', 0);
-		echo '<p>TIMEOUT!</p>';
+		echo '<p>TIMEOUT! We will continue the next time.</p>';
 		return;
 	}
 
@@ -1341,7 +1355,7 @@ function bo_update_all($force)
 	
 	if (time() - $start_time > $max_time)
 	{
-		echo '<p>TIMEOUT!</p>';
+		echo '<p>TIMEOUT! We will continue the next time.</p>';
 		bo_set_conf('is_updating', 0);
 		return;
 	}
