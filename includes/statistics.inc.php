@@ -195,7 +195,7 @@ function bo_show_statistics_strikes()
 	echo '<h3>'._BL('h3_stat_strikes_now').'</h3>';
 
 	echo '<p class="bo_stat_description" id="bo_stat_strikes_now_descr">';
-	echo strtr(_BL('bo_descr_strikes_now'), array('{UPDATE_INTERVAL}' => _BLN(BO_UP_INTVL_STRIKES), '{RATE_INTERVAL}' => _BLN($group_minutes)));
+	echo strtr(_BL('bo_descr_strikes_now'), array('{UPDATE_INTERVAL}' => _BLN(BO_UP_INTVL_STRIKES, 'every_minute'), '{RATE_INTERVAL}' => _BLN($group_minutes)));
 	echo '</p>';
 
 
