@@ -684,8 +684,8 @@ $_BL['en']['Region'] = 'Region';
 $_BL['en']['legend_stat_strikes_now'] = 'Region';
 $_BL['en']['h3_stat_strikes_now'] = 'Current lightning';
 $_BL['en']['h3_stat_strikes_time'] = 'Monthly and yearly strike count';
-$_BL['en']['bo_descr_strikes_now'] = 'The informations displayed here are not live, because lightning data is downloaded every {UPDATE_INTERVAL} minutes from
-Blitzortung.org. The interval for the calculation of the strike rate is {RATE_INTERVAL} minutes. ';
+$_BL['en']['bo_descr_strikes_now'] = 'The informations displayed here are not live, because lightning data is downloaded {UPDATE_INTERVAL} from
+Blitzortung.org. The interval for the calculation of the strike rate is {RATE_INTERVAL}. ';
 
 $_BL['en']['CEST'] = 'CEST';
 $_BL['en']['CET'] = 'CET';
@@ -798,3 +798,7 @@ $_BL['en']['amp_max_signal'] = 'Signal: Max. apmlitude';
 $_BL['en']['amp_spec'] = 'From spectrum';
 $_BL['en']['Signal count'] = 'Signal count';
 $_BL['en']['signal not found'] = 'signal not found';
+$_BL['en']['number_every_minutes'] = 'every {NUMBER} minutes';
+$_BL['en']['number_every_1minute'] = 'every minute';
+$_BL['en']['number_minutes'] = '{NUMBER} minutes';
+$_BL['en']['number_1minute'] = 'one minute';

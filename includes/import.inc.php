@@ -218,6 +218,8 @@ function bo_update_raw_signals($force = false)
 // Get new strikes from blitzortung.org
 function bo_update_strikes($force = false)
 {
+	global $_BO;
+	
 	$last = bo_get_conf('uptime_strikes');
 
 	echo "<h3>Strikes</h3>\n";
@@ -225,6 +227,7 @@ function bo_update_strikes($force = false)
 	if (time() - $last > BO_UP_INTVL_STRIKES * 60 - 30 || $force)
 	{
 		$stations = bo_stations('user');
+		$own_id = bo_station_id();
 
 		$u = 0;
 		$i = 0;
@@ -260,6 +263,8 @@ function bo_update_strikes($force = false)
 		$loadcount = bo_get_conf('upcount_strikes');
 		bo_set_conf('upcount_strikes', $loadcount+1);
 
+		$last_strikes = unserialize(bo_get_conf('last_strikes_stations'));
+		
 		echo "\n".'<p>Last strike: '.date('Y-m-d H:i:s', $last_strike). 
 				' *** Importing only strikes newer than: '.date('Y-m-d H:i:s', $time_update).
 				' *** This is update #'.$loadcount.'</p>'."\n";
@@ -364,6 +369,8 @@ function bo_update_strikes($force = false)
 					$id = bo_db("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
 					$i++;
 
+					$new_strike = true;
+					
 					//Long-Time Statistics
 					$bear_data[$bear_id]++;
 					$dist_data[$dist_id]++;
@@ -372,10 +379,11 @@ function bo_update_strikes($force = false)
 				{
 					bo_db("UPDATE ".BO_DB_PREF."strikes SET $sql WHERE id='$id'");
 					$u++;
+					$new_strike = false;
 				}
 
 				//Own Long-Time Statistics
-				if ( (!$id || !$old_part) && $part)
+				if ($new_strike && $part)
 				{
 					$bear_data_own[$bear_id]++;
 					$dist_data_own[$dist_id]++;
@@ -383,6 +391,8 @@ function bo_update_strikes($force = false)
 					$max_dist_own = max($dist, $max_dist_own);
 					$min_dist_own = min($dist, $min_dist_own);
 
+					$last_strikes[$own_id] = array($utime, $time_ns, $id);
+					
 					$own++;
 				}
 
@@ -395,6 +405,8 @@ function bo_update_strikes($force = false)
 						$stId = $stations[$user]['id'];
 						$stLat = $stations[$user]['lat'];
 						$stLon = $stations[$user]['lon'];
+						
+						$last_strikes[$stId] = array($utime, $time_ns, $id);
 
 						$sql .= ($sql ? ',' : '')." ('$id', '$stId') ";
 					}
@@ -421,6 +433,35 @@ function bo_update_strikes($force = false)
 		$count = bo_get_conf('count_strikes_own');
 		bo_set_conf('count_strikes_own', $count + $own);
 
+		bo_set_conf('last_strikes_stations', serialize($last_strikes));
+		
+		
+		//strike count per region
+		$_BO['region'][] = array(); //dummy for "all"
+
+		$time_start = gmdate('Y-m-d H:i:s', time() - 120 - BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES*60);
+		$time_end = gmdate('Y-m-d H:i:s', time() - 120);
+		$sql_template = "SELECT MAX(time) mtime, COUNT(id) cnt 
+			FROM ".BO_DB_PREF."strikes 
+			WHERE time BETWEEN '$time_start' AND '$time_end' {where} ";
+
+		$last_strikes_region = unserialize(bo_get_conf('last_strikes_region'));
+		$rate_strikes_region = unserialize(bo_get_conf('rate_strikes_region'));
+			
+		foreach ($_BO['region'] as $reg_id => $d)
+		{
+			$sql = strtr($sql_template,array('{where}' => bo_region2sql($reg_id)));
+			$row = bo_db($sql)->fetch_assoc();
+			$rate_strikes_region[$reg_id] = $row['cnt'] / BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES;
+			
+			if ($row['mtime'])
+				$last_strikes_region[$reg_id] = strtotime($row['mtime'].' UTC');
+		}
+	
+		bo_set_conf('last_strikes_region', serialize($last_strikes_region));
+		bo_set_conf('rate_strikes_region', serialize($rate_strikes_region));
+
+		
 		//Update Longtime stat
 		if ($own)
 		{
@@ -874,19 +915,19 @@ function bo_update_daily_stat()
 		$data = unserialize(bo_get_conf('strikes_temp_'.$day_id));
 
 		// Strikes SQL template
-		$sql = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes WHERE {where} time BETWEEN '$yesterday_start' AND '$yesterday_end'";
+		$sql_template = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes WHERE {where} time BETWEEN '$yesterday_start' AND '$yesterday_end'";
 		
 		if (!is_array($data) || count($data) < 7)
 		{
 			/*** Strikes ***/
 			//whole strike count
-			$row_all = bo_db(strtr($sql,array('{where}' => '')))->fetch_assoc();
+			$row_all = bo_db(strtr($sql_template,array('{where}' => '')))->fetch_assoc();
 			//own strike count
-			$row_own = bo_db(strtr($sql,array('{where}' => 'part > 0 AND ')))->fetch_assoc();
+			$row_own = bo_db(strtr($sql_template,array('{where}' => 'part > 0 AND ')))->fetch_assoc();
 			//whole strike count (in radius)
-			$row_all_rad = bo_db(strtr($sql,array('{where}' => 'distance < "'.$radius.'" AND ')))->fetch_assoc();
+			$row_all_rad = bo_db(strtr($sql_template,array('{where}' => 'distance < "'.$radius.'" AND ')))->fetch_assoc();
 			//own strike count (in radius)
-			$row_own_rad = bo_db(strtr($sql,array('{where}' => 'part > 0 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
+			$row_own_rad = bo_db(strtr($sql_template,array('{where}' => 'part > 0 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
 
 			/*** Signals ***/
 			//own exact value
@@ -935,11 +976,11 @@ function bo_update_daily_stat()
 				foreach ($_BO['region'] as $reg_id => $d)
 				{
 					//all strikes in a region
-					$row = bo_db(strtr($sql,array('{where}' => '1 '.bo_region2sql($reg_id).' AND ')))->fetch_assoc();
+					$row = bo_db(strtr($sql_template,array('{where}' => '1 '.bo_region2sql($reg_id).' AND ')))->fetch_assoc();
 					$strikes_region[$reg_id]['all'] = $row['cnt'];
 					
 					//own strikes in a region
-					$row = bo_db(strtr($sql,array('{where}' => 'part>0 '.bo_region2sql($reg_id).' AND ')))->fetch_assoc();
+					$row = bo_db(strtr($sql_template,array('{where}' => 'part>0 '.bo_region2sql($reg_id).' AND ')))->fetch_assoc();
 					$strikes_region[$reg_id]['own'] = $row['cnt'];
 				}
 			}

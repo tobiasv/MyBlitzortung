@@ -403,6 +403,16 @@ function _BL($msgid='', $noutf = false)
 	return $msg;
 }
 
+function _BLN($number, $unit = 'minute')
+{
+
+	if ($number == 1)
+		return _BL('number_1'.$unit.'');
+	else
+		return strtr(_BL('number_'.$unit.'s'), array('{NUMBER}' => $number));
+
+}
+
 //charset
 function _BC($text, $nospecialchars=false)
 {

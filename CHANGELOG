@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.6a (2011-08-10)
+------------------------
+- new: strike rates for region
+- fix: performance issue in statistics
+
 Version 0.6 (2011-08-05)
 ------------------------
 - new: regions (use i.e. &mark=germany on map image to see the area)

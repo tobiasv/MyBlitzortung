@@ -308,6 +308,10 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	if ($type == 'strikes_now')
 	{
 		$last_uptime = bo_get_conf('uptime_strikes') - 60;
+		
+		$group_minutes = intval($_GET['group_minutes']);
+		if ($group_minutes < BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES)
+			$group_minutes = BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES;
 
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);

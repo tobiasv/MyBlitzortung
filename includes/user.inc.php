@@ -209,13 +209,18 @@ function bo_show_login_form($fail = false)
 
 function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 {
+	$pass = trim($pass);
+	
 	if (!$user || !$pass)
 		return false;
 		
 	if (BO_LOGIN_ALLOW > 0 && $user == BO_USER && defined('BO_USER') && strlen(BO_USER))
 	{
-		if ($pass == BO_PASS && defined('BO_PASS') && strlen(BO_PASS))
+		if ( ($pass == BO_PASS || ($md5pass && $pass == md5(BO_PASS))) && defined('BO_PASS') && strlen(BO_PASS))
 		{
+			if (!$md5pass)
+				$pass = md5($pass);
+			
 			bo_user_set_session(1, pow(2, BO_PERM_COUNT) - 1, $cookie, $pass);
 			return true;
 		}

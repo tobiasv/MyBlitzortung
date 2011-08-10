@@ -707,9 +707,9 @@ $_BL['de']['Region'] = 'Region';
 $_BL['de']['legend_stat_strikes_now'] = 'Auswahl der Region';
 $_BL['de']['h3_stat_strikes_now'] = 'Aktuelle Blitzstatistik';
 $_BL['de']['h3_stat_strikes_time'] = 'Blitzzahlen pro Monat und Jahr';
-$_BL['de']['bo_descr_strikes_now'] = 'Die Blitzdaten werden alle {UPDATE_INTERVAL} Minuten von Blitzortung.org übernommen, 
+$_BL['de']['bo_descr_strikes_now'] = 'Die Blitzdaten werden {UPDATE_INTERVAL} von Blitzortung.org übernommen, 
 	die hier gezeigten Informationen sind also ggf. etwas zeitversetzt.
-	Das Intervall in welchem die Blitzrate bestimmt wird, beträgt {RATE_INTERVAL} Minuten. 
+	Das Intervall in welchem die Blitzrate bestimmt wird, beträgt {RATE_INTERVAL}. 
 	';
 
 $_BL['de']['CEST'] = 'MESZ';
@@ -823,12 +823,7 @@ $_BL['de']['amp_max_signal'] = 'Signal: Max. Amplitude';
 $_BL['de']['amp_spec'] = 'Aus Frequenzspektrum';
 $_BL['de']['Signal count'] = 'Anzahl Signale';
 $_BL['de']['signal not found'] = 'Signal nicht gefunden';
-$_BL['de']['Test'] = '';
-$_BL['de']['Webcam Sicht'] = '';
-$_BL['de']['Wetter.info Radar (10:45)'] = '';
-$_BL['de']['Wetter.info Radar (animiert)'] = '';
-$_BL['de']['EUCLID'] = '';
-$_BL['de']['BLIDS Germany'] = '';
-$_BL['de']['Meteox rain radar (Scandinavia)'] = '';
-$_BL['de']['Germany (mini)'] = '';
-$_BL['de']['Europe (mini)'] = '';
+$_BL['de']['number_every_minutes'] = 'alle {NUMBER} Minuten';
+$_BL['de']['number_every_1minute'] = 'jede Minute';
+$_BL['de']['number_minutes'] = '{NUMBER} Minuten';
+$_BL['de']['number_1minute'] = 'eine Minute';

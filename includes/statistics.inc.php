@@ -109,7 +109,7 @@ function bo_show_statistics_strikes()
 
 	//Regions
 	if (!preg_match('/[0-9a-z]+/i', $region) || !isset($_BO['region'][$region]['rect_add']))
-		$region = '';
+		$region = 0;
 	
 	/*** Strikes NOW ***/
 	$last_update = bo_get_conf('uptime_strikes');
@@ -117,28 +117,34 @@ function bo_show_statistics_strikes()
 	$group_minutes = BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES;
 	
 	
-	
-	$sql = "SELECT COUNT(*) cnt
-			FROM ".BO_DB_PREF."strikes 
-			WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', ($last_update) - 60*$group_minutes*2 )."' AND '".gmdate('Y-m-d H:i:s', $last_update-60*$group_minutes*1)."'
-			"; //	".bo_region2sql($region)."
-
-	$row = bo_db($sql)->fetch_assoc();
-	$strike_rate = $row['cnt'] / $group_minutes;
-	
-	$sql = "SELECT MAX(time) mtime
-			FROM ".BO_DB_PREF."strikes 
-			WHERE 1	"; //.bo_region2sql($region)."	";
-	$row = bo_db($sql)->fetch_assoc();
-	$last_strike = strtotime($row['mtime'].' UTC');
-	
-	if (intval(BO_TRACKS_SCANTIME))
+	if (1 || $region)
 	{
-		$num_cells = -1;
-		$cells_data = unserialize(gzinflate(bo_get_conf('strike_cells')));
-		if (is_array($cells_data['cells']))
+		$last_strikes_region = unserialize(bo_get_conf('last_strikes_region'));
+		$rate_strikes_region = unserialize(bo_get_conf('rate_strikes_region'));
+		$strike_rate = $rate_strikes_region[$region];
+		$last_strike = $last_strikes_region[$region];
+	}
+	else
+	{
+		$sql = "SELECT COUNT(*) cnt
+				FROM ".BO_DB_PREF."strikes 
+				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $last_update - 60*$group_minutes*2 )."' AND '".gmdate('Y-m-d H:i:s', $last_update-60*$group_minutes*1)."'"; 
+		$row = bo_db($sql)->fetch_assoc();
+		$strike_rate = $row['cnt'] / $group_minutes;
+		
+		$sql = "SELECT MAX(time) mtime
+				FROM ".BO_DB_PREF."strikes ";
+		$row = bo_db($sql)->fetch_assoc();
+		$last_strike = strtotime($row['mtime'].' UTC');
+	
+		if (intval(BO_TRACKS_SCANTIME))
 		{
-			$num_cells = count($cells_data['cells'][BO_TRACKS_DIVISOR-1]);
+			$num_cells = -1;
+			$cells_data = unserialize(gzinflate(bo_get_conf('strike_cells')));
+			if (is_array($cells_data['cells']))
+			{
+				$num_cells = count($cells_data['cells'][BO_TRACKS_DIVISOR-1]);
+			}
 		}
 	}
 	
@@ -181,7 +187,7 @@ function bo_show_statistics_strikes()
 		$year = $y;
 		$month = $m;
 	}
-	
+
 	
 	echo '<div id="bo_stat_strikes">';
 
@@ -189,33 +195,9 @@ function bo_show_statistics_strikes()
 	echo '<h3>'._BL('h3_stat_strikes_now').'</h3>';
 
 	echo '<p class="bo_stat_description" id="bo_stat_strikes_now_descr">';
-	echo strtr(_BL('bo_descr_strikes_now'), array('{UPDATE_INTERVAL}' => BO_UP_INTVL_STRIKES, '{RATE_INTERVAL}' => $group_minutes));
+	echo strtr(_BL('bo_descr_strikes_now'), array('{UPDATE_INTERVAL}' => _BLN(BO_UP_INTVL_STRIKES), '{RATE_INTERVAL}' => _BLN($group_minutes)));
 	echo '</p>';
 
-	
-	echo '<ul class="bo_stat_overview">';
-	
-	echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
-	echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
-	
-	if ($own_station)
-	{
-		echo '<li><span class="bo_descr">'._BL('Last detected strike').': </span>';
-		echo '<span class="bo_value">'.date(_BL('_datetime'), $last_strike).'</span></li>';
-
-		echo '<li><span class="bo_descr">'._BL('Current strike rate').': </span>';
-		echo '<span class="bo_value">';
-		echo number_format($strike_rate, 1, _BL('.'), _BL(',')).' '.(0 && $strike_rate === 1.0 ? _BL('unit_strikesperminute_one') : _BL('unit_strikesperminute'));
-		echo '</span></li>';
-
-		if (intval(BO_TRACKS_SCANTIME) && $num_cells >= 0)
-		{
-			echo '<li><span class="bo_descr">'._BL('Thunder cells').': </span>';
-			echo '<span class="bo_value">'.number_format($num_cells, 0, _BL('.'), _BL(',')).' ('._BL('experimental').')</span></li>';
-		}
-	}
-	
-	echo '</ul>';
 
 	echo '<form action="?" method="GET" class="bo_stat_strikes_form">';
 	echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_region'));
@@ -225,6 +207,28 @@ function bo_show_statistics_strikes()
 	bo_show_select_region($region);
 	echo '</fieldset>';
 	echo '</form>';
+
+	
+	echo '<ul class="bo_stat_overview">';
+	
+	echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
+	echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
+
+	echo '<li><span class="bo_descr">'._BL('Last detected strike').': </span>';
+	echo '<span class="bo_value">'.($last_strike ? date(_BL('_datetime'), $last_strike) : '?').'</span></li>';
+	
+	echo '<li><span class="bo_descr">'._BL('Current strike rate').': </span>';
+	echo '<span class="bo_value">';
+	echo number_format($strike_rate, 1, _BL('.'), _BL(',')).' '.(0 && $strike_rate === 1.0 ? _BL('unit_strikesperminute_one') : _BL('unit_strikesperminute'));
+	echo '</span></li>';
+
+	if (!$region && intval(BO_TRACKS_SCANTIME) && $num_cells >= 0)
+	{
+		echo '<li><span class="bo_descr">'._BL('Thunder cells').': </span>';
+		echo '<span class="bo_value">'.number_format($num_cells, 0, _BL('.'), _BL(',')).' ('._BL('experimental').')</span></li>';
+	}
+	
+	echo '</ul>';
 
 	bo_show_graph('strikes_now', $add_graph.'&region='.$region);
 	
@@ -306,10 +310,6 @@ function bo_show_statistics_station()
 						AND part>0 AND users='".BO_MIN_PARTICIPANTS."'";
 		$row = bo_db($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
-
-		$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes WHERE part>0";
-		$row = bo_db($sql)->fetch_assoc();
-		$last_strike = strtotime($row['mtime'].' UTC');
 	}
 	else
 	{
@@ -320,15 +320,10 @@ function bo_show_statistics_station()
 						AND users='".BO_MIN_PARTICIPANTS."'";
 		$row = bo_db($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
-		
-		//may be slow!
-		$sql = "SELECT s.time mtime FROM ".BO_DB_PREF."strikes s WHERE s.id=(SELECT ss.strike_id FROM ".BO_DB_PREF."stations_strikes ss WHERE ss.station_id='$station_id' ORDER BY ss.strike_id DESC LIMIT 1)";
-		$row = bo_db($sql)->fetch_assoc();
-		$last_strike = strtotime($row['mtime'].' UTC');
-
 	}
 	
-	
+	$tmp = @unserialize(bo_get_conf('last_strikes_stations'));
+	$last_strike = $tmp[$station_id][0];
 	$act_time = bo_get_conf('station_last_active');
 	$inact_time = bo_get_conf('station_last_inactive');
 	$active = $act_time > $inact_time;
@@ -351,13 +346,11 @@ function bo_show_statistics_station()
 		echo '<li><span class="bo_descr">'._BL('Last active').': </span><span class="bo_value">'._BL('_before').number_format($last_active, 1, _BL('.'), _BL(','))." ".(0 && $last_active == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
 
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(','))." ".(0 && $last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
-	
 	echo '<li><span class="bo_descr">'._BL('Last detected strike').': </span>';
 	echo '<span class="bo_value">';
 	echo $last_strike ? date(_BL('_datetime'), $last_strike) : _BL('Not yet');
 	echo '</span>';
 	echo '</li>';
-	
 	echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.number_format($strikesh_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.number_format($signalsh_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Locating ratio').': </span><span class="bo_value">';
@@ -1436,7 +1429,7 @@ function bo_show_select_region($region)
 	{
 		echo '<select name="bo_region" onchange="submit();" id="bo_stat_strikes_select_now">';
 		foreach($regions as $i => $y)
-			echo '<option value="'.$i.'" '.($i == $region ? 'selected' : '').'>'.$y.'</option>';
+			echo '<option value="'.$i.'" '.($i === $region ? 'selected' : '').'>'.$y.'</option>';
 		echo '</select>';
 	}
 	
