@@ -1842,26 +1842,41 @@ function bo_my_station_autoupdate($force)
 
 }
 
-function bo_my_station_update($url)
+function bo_my_station_update($url, $force_bo_login = false)
 {
 	echo '<h2>'._BL('Linking with other MyBlitzortung stations').'</h2>';
-	echo '<h3>'._BL('Getting Login string').'</h3>';
 	
-	$login_id = bo_get_login_str();
+	
+	if (!$force_bo_login)
+	{
+		$authid = bo_get_conf('mybo_authid');
+		
+		if ($authid)
+		{
+			echo '<h3>'._BL('Using auth ID').'</h3>';
+			echo '<p>'.$authid.'</p>';
+		}
+	}
+	
+	if (!$authid)
+	{
+		echo '<h3>'._BL('Getting Login string').'</h3>';
+		$login_id = bo_get_login_str();
+		echo '<p>'._BL('Login string is').': <em>'.$login_id.'</em></p>';
+	}
 	
 	$ret = false;
 	
-	if (!$login_id)
+	if (!$authid && !$login_id)
 	{
 		echo '<p>'._BL('Couldnt get login id').'.</p>';
 	}
 	else
 	{
-		echo '<p>'._BL('String is').': <em>'.$login_id.'</em></p>';
 		echo '<h3>'._BL('Requesting data').'</h3>';
 		echo '<p>'._BL('Connecting to ').' <em>'.BO_LINK_HOST.'</em></p>';
 		
-		$request = 'id='.bo_station_id().'&login='.$login_id.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
+		$request = 'id='.bo_station_id().'&login='.$login_id.'&authid='.$authid.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
 		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
 		
 		$content = bo_get_file($data_url);
@@ -1877,11 +1892,23 @@ function bo_my_station_update($url)
 			switch($R['status'])
 			{
 				case 'auth_fail':
+				
 					echo '<p>'._BL('Authentication failure').'.</p>';
+					
+					if ($authid && $force_bo_login === false)
+					{
+						echo '<p>Fallback to Blitzortung login!</p>';
+						return bo_my_station_update($url,true);
+					}
+					
 					break;
 
 				case 'request_fail':
 					echo '<p>'._BL('Failure in Request URL: ').'<em>'._BC($data_url).'</em></p>';
+					break;
+
+				case 'rad_limit': case 'zoom_limit':
+					echo '<p>'._BL('You exceeded max. radius or zoom limit. Please change your settings in config.php!').'</p>';
 					break;
 				
 				case 'ok':
@@ -1891,13 +1918,17 @@ function bo_my_station_update($url)
 					$info['lons'] = $R['lons'];
 					$info['rads'] = $R['rads'];
 
+					bo_set_conf('mybo_authid', $R['authid']);
+					
 					if (is_array($urls))
 					{
 						bo_set_conf('mybo_stations', serialize($urls));
 						bo_set_conf('mybo_stations_info', serialize($info));
 						
+						if (!$authid)
+							echo '<p>'._BL('Auth ID is').': '.$R['authid'].'</p>';
+						
 						echo '<p>'._BL('Received urls').': '.count($urls).'</p>';
-						echo '<p>'._BL('DONE').'!</p>';
 						echo '<ul>';
 						ksort($urls);
 						foreach($urls as $id => $st_url)
@@ -1905,6 +1936,8 @@ function bo_my_station_update($url)
 							echo '<li>'.$id.': '._BC($st_url).'</url>';
 						}
 						echo '</ul>';
+						echo '<p>'._BL('DONE').'!</p>';
+						
 						
 						$ret = true;
 					

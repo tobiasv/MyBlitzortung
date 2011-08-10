@@ -6,6 +6,7 @@
 Version 0.6a (2011-08-10)
 ------------------------
 - new: strike rates for region
+- new: station linking with auth id
 - fix: performance issue in statistics
 
 Version 0.6 (2011-08-05)
