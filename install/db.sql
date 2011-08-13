@@ -116,5 +116,14 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}densities` (
   KEY `date_start` (`date_start`,`date_end`),
   KEY `status` (`status`),
   KEY `type` (`type`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}cities` (
+  `id` int(11) unsigned NOT NULL auto_increment,
+  `name` varchar(50) NOT NULL,
+  `lat` decimal(9,6) NOT NULL,
+  `lon` decimal(9,6) NOT NULL,
+  `type` tinyint(4) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `latlon` (`lat`,`lon`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;

@@ -21,6 +21,10 @@
 */
 
 
+if (!defined('BO_VER'))
+	exit('No BO_VER');
+
+
 function bo_check_for_update()
 {
 	$updated = false;
@@ -200,6 +204,22 @@ function bo_check_for_update()
 				echo '<li><strong>You can update some signals by clicking <a href="'.bo_insert_url('bo_action', 'do_update').'&bo_update_signals">here</a>';
 				
 				break;
+			
+			case '0.6.1':
+			
+				$sql = 'CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}cities` (
+						  `id` int(11) unsigned NOT NULL auto_increment,
+						  `name` varchar(50) NOT NULL,
+						  `lat` decimal(9,6) NOT NULL,
+						  `lon` decimal(9,6) NOT NULL,
+						  `type` tinyint(4) NOT NULL,
+						  PRIMARY KEY  (`id`),
+						  KEY `latlon` (`lat`,`lon`)
+						) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+						';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();			
 			
 			default:
 				$ok = true;

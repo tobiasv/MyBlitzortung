@@ -20,6 +20,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+if (!defined('BO_VER'))
+	exit('No BO_VER');
+
 function bo_alert_settings()
 {
 	$level = bo_user_get_level();

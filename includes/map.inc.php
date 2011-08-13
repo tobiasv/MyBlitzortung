@@ -20,6 +20,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+if (!defined('BO_VER'))
+	exit('No BO_VER');
 
 function bo_show_map()
 {

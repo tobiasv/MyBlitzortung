@@ -21,6 +21,9 @@
 */
 
 
+if (!defined('BO_VER'))
+	exit('No BO_VER');
+
 
 // returns png-image for map-marker
 function bo_icon($icon)
@@ -953,6 +956,7 @@ function bo_get_map_image()
 		}
 	}
 
+
 	list($x1, $y1) = bo_latlon2mercator($latS, $lonW);
 	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
 	$w_x = $w / ($x2 - $x1);
@@ -1016,6 +1020,9 @@ function bo_get_map_image()
 		if ($tmpImage)
 			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
 	}
+	
+	//add cities
+	bo_add_cities2image($I, $cfg);
 	
 	//Show station pos
 	if ($cfg['show_station'][0])
@@ -1506,6 +1513,9 @@ function bo_get_density_image()
 		if ($tmpImage)
 			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
 	}
+	
+	//add cities
+	bo_add_cities2image($I, $cfg);
 
 	//Antennas
 	if ($ratio && $station_id == bo_station_id() && isset($info['antennas']) && is_array($info['antennas']['bearing']))
@@ -1841,4 +1851,100 @@ function bo_image_reduce_colors(&$I)
 		}
 	}
 }
+
+
+function bo_add_cities2image($I, $cfg, $before = true)
+{
+	
+	if (!isset($cfg['cities']) || !is_array($cfg['cities']))
+		return;
+	
+	$sql_types = '';
+	foreach($cfg['cities'] as $type => $data)
+	{
+		if (!$data['point_type'][0])
+			continue;
+		
+		$sql_types .= " OR type='$type' ";
+		
+		$color_font[$type]   = imagecolorallocatealpha($I, $data['font_color'][0], $data['font_color'][1], $data['font_color'][2], $data['font_color'][3]);
+		$color_point1[$type] = imagecolorallocatealpha($I, $data['point_fill'][0], $data['point_fill'][1], $data['point_fill'][2], $data['point_fill'][3]);
+		$color_point2[$type] = imagecolorallocatealpha($I, $data['point_border'][0], $data['point_border'][1], $data['point_border'][2], $data['point_border'][3]);
+	}
+	
+	$latN = $cfg['coord'][0];
+	$lonE = $cfg['coord'][1];
+	$latS = $cfg['coord'][2];
+	$lonW = $cfg['coord'][3];
+	
+	$w = imagesx($I);
+	$h = imagesy($I);
+
+	list($x1, $y1) = bo_latlon2mercator($latS, $lonW);
+	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
+	$w_x = $w / ($x2 - $x1);
+	$h_y = $h / ($y2 - $y1);
+
+	$sql = "SELECT id, name, lat, lon, type
+			FROM ".BO_DB_PREF."cities
+			WHERE 1
+				AND NOT (lat < '$latS' OR lat > '$latN' OR lon < '$lonW' OR lon > '$lonE')
+				AND (0 $sql_types)
+			ORDER BY type ASC";
+	$erg = bo_db($sql);
+	while ($row = $erg->fetch_assoc())
+	{
+		list($px, $py) = bo_latlon2mercator($row['lat'], $row['lon']);
+		$x =      ($px - $x1) * $w_x;
+		$y = $h - ($py - $y1) * $h_y;
+
+		$c = $cfg['cities'][$row['type']];
+	
+		if ($c['font'][1] < 0)
+			$font_x = $x - imagefontwidth($c['font'][0]) * strlen($row['name']) + $c['font'][1];
+		else
+			$font_x = $x + $c['font'][1];
+
+		$font_y = $y + $c['font'][2];
+	
+		imagestring($I, $c['font'][0], $font_x, $font_y, $row['name'], $color_font[$row['type']]);
+		
+		$s = $c['point_type'][1];
+		
+		switch($c['point_type'][0])
+		{
+			default: 
+			case 1: //circle
+				
+				if ($c['point_type'][3])
+					imagefilledellipse($I, $x, $y, $s, $s, $color_point1[$row['type']]);
+				
+				if ($c['point_type'][2])
+				{
+					imagesetthickness($I, $c['point_type'][2]);
+					imageellipse($I, $x, $y, $s+1, $s+1, $color_point2[$row['type']]);
+				}
+				
+				break;
+
+			case 2: //square
+				
+				if ($c['point_type'][3])
+					imagefilledrectangle($I, $x-$s/2, $y-$s/2, $x+$s/2, $y+$s/2, $color_point1[$row['type']]);
+				
+				if ($c['point_type'][2])
+				{
+					imagesetthickness($I, $c['point_type'][2]);
+					imagerectangle($I, $x-$s/2, $y-$s/2, $x+$s/2, $y+$s/2, $color_point2[$row['type']]);
+				}
+				
+				break;
+
+		}
+	
+	
+	}
+	
+}
+
 ?>

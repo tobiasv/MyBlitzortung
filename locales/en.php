@@ -684,7 +684,7 @@ $_BL['en']['Region'] = 'Region';
 $_BL['en']['legend_stat_strikes_now'] = 'Region';
 $_BL['en']['h3_stat_strikes_now'] = 'Current lightning';
 $_BL['en']['h3_stat_strikes_time'] = 'Monthly and yearly strike count';
-$_BL['en']['bo_descr_strikes_now'] = 'The informations displayed here are not live, because lightning data is downloaded {UPDATE_INTERVAL} from
+$_BL['en']['bo_descr_strikes_now'] = 'The information displayed here are not live, because lightning data is downloaded {UPDATE_INTERVAL} from
 Blitzortung.org. The interval for the calculation of the strike rate is {RATE_INTERVAL}. ';
 
 $_BL['en']['CEST'] = 'CEST';
@@ -742,7 +742,7 @@ $_BL['en']['graph_stat_title_strikes_participants_avg'] = 'Average number of par
 $_BL['en']['graph_legend_deviatinons_time_avg_all'] = 'Average deviations';
 $_BL['en']['graph_legend_deviations_time_avg_own'] = 'Average deviations station {STATION}';
 $_BL['en']['graph_stat_title_strikes_deviations_avg'] = 'Average deviations';
-$_BL['en']['bo_stat_other_station_info'] = 'Hint: Statistics of station {STATION_CITY} are displayed. Due to technical reasons only parts of the informations can be displayed. Some informations could still refer to the station {STATION}! ';
+$_BL['en']['bo_stat_other_station_info'] = 'Hint: Statistics of station {STATION_CITY} are displayed. Due to technical reasons only parts of the information can be displayed. Some information could still refer to the station {STATION}! ';
 $_BL['en']['legend_stat_advanced_options'] = 'Options';
 $_BL['en']['legend_stat_participants_time'] = 'Options';
 $_BL['en']['legend_stat_deviations_time'] = 'Options';

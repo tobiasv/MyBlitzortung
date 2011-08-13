@@ -25,7 +25,7 @@ if (!defined("BO_VER"))
 	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.6a');
+	define("BO_VER", '0.6.1-dev');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -84,6 +84,10 @@ if (!defined("BO_VER"))
 	else
 		require_once 'includes/db_mysqli.inc.php';
 
+	//Set user_id
+	if (!isset($_SESSION['bo_user']))
+		$_SESSION['bo_user'] = 0;
+		
 	//Check for stored login in cookie
 	if (!bo_user_get_id() && intval(BO_LOGIN_COOKIE_TIME) && isset($_COOKIE['bo_login']) && preg_match('/^([0-9]+)_([0-9a-z]+)$/i', trim($_COOKIE['bo_login']), $r) )
 	{

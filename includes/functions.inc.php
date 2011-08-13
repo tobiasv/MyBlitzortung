@@ -20,7 +20,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+if (!defined('BO_VER'))
+	exit('No BO_VER');
+	
+	
 // Database helper
 function bo_db($query = '', $die_on_errors = true)
 {

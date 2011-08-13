@@ -20,9 +20,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-if (!isset($_SESSION['bo_user']))
-	$_SESSION['bo_user'] = 0;
+if (!defined('BO_VER'))
+	exit('No BO_VER');
 
 
 function bo_show_login()
@@ -113,9 +112,14 @@ function bo_show_login()
 			case 'cache_info':
 				if ( (BO_PERM_ADMIN & $level) )
 					bo_cache_info();
-			
-			
 				break;
+
+			case 'cities':
+				if ( (BO_PERM_ADMIN & $level) )
+					bo_import_cities();
+				break;
+				
+
 			
 			default:
 				echo '<h3>'._BL('Welcome to MyBlitzortung user area').'!</h3>';
@@ -130,6 +134,7 @@ function bo_show_login()
 					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=update">'._BL('Do manual update').'</a></li>';
 					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=mybo_station_update">'._BL('Update MyBlitzortung Stations').'</a></li>';
 					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=cache_info">'._BL('File cache info').'</a></li>';
+					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=cities">'._BL('Read cities.txt').'</a></li>';
 					echo '<li><a href="'.dirname(BO_FILE).'/README" target="_blank">README</a></li>';
 					echo '</ul>';
 					
@@ -945,6 +950,59 @@ function bo_my_station_update_form()
 		echo '</fieldset>';
 		echo '</form>';
 	
+	}
+
+}
+
+function bo_import_cities()
+{
+	$fp = @fopen(BO_DIR."cities.txt", "r");
+	
+	echo '<h3>'._BL('Importing cities').'</h3>';
+	
+	if ($fp) 
+	{
+		$cities = array();
+		while (($line = fgets($fp, 4096)) !== false) 
+		{
+			$p = explode(',', $line);
+			$cities[] = $p;
+		}
+	
+		fclose($fp);
+	
+		echo '<p>'._BL('Cities read').': '.count($cities).'</p>';
+		flush();
+		
+		if (count($cities))
+		{
+			echo '<p>'._BL('Deleting existing cities from DB').'</p>';
+			flush();
+			bo_db("DELETE FROM ".BO_DB_PREF."cities");
+			
+			echo '<p>'._BL('Cities imported').': ';
+			flush();
+			
+			$i = 0;
+			foreach($cities as $city)
+			{
+				if (count($city) > 4) //cities with borders --> big cities
+					$city[3] += 4;
+					
+				$ok = bo_db("INSERT INTO ".BO_DB_PREF."cities 
+						SET name='".BoDb::esc($city[0])."',
+							lat ='".BoDb::esc($city[1])."',
+							lon ='".BoDb::esc($city[2])."',
+							type='".BoDb::esc($city[3])."'");
+				if ($ok) $i++;
+			}
+			
+			echo $i.'</p>';
+		}
+	}
+	else
+	{
+		echo _BL('Error');
 	}
 
 }

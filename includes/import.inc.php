@@ -20,6 +20,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+if (!defined('BO_VER'))
+	exit('No BO_VER');
+
 // Login to blitzortung.org an return login-string
 function bo_get_login_str()
 {
@@ -1903,6 +1906,10 @@ function bo_my_station_update($url, $force_bo_login = false)
 					
 					break;
 
+				case 'content_error':
+					echo '<p>'._BL('Cannot access your website').'!</p>';
+					break;
+					
 				case 'request_fail':
 					echo '<p>'._BL('Failure in Request URL: ').'<em>'._BC($data_url).'</em></p>';
 					break;
@@ -1950,6 +1957,13 @@ function bo_my_station_update($url, $force_bo_login = false)
 					break;
 			}
 		}
+	}
+	
+	//logout
+	if ($login_id)
+	{
+		echo '<h3>'._BL('Logging out from Blitzortung.org').'</h3>';
+		bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$login.'&logout=1');
 	}
 
 	return $ret;

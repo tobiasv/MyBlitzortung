@@ -20,6 +20,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+if (!defined('BO_VER'))
+	exit('No BO_VER');
 
 // Graph from raw dataset
 function bo_graph_raw($id, $spec = false)
