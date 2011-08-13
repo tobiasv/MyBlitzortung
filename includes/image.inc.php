@@ -1022,7 +1022,7 @@ function bo_get_map_image()
 	}
 	
 	//add cities
-	bo_add_cities2image($I, $cfg);
+	bo_add_cities2image($I, $cfg, $w, $h);
 	
 	//Show station pos
 	if ($cfg['show_station'][0])
@@ -1515,7 +1515,7 @@ function bo_get_density_image()
 	}
 	
 	//add cities
-	bo_add_cities2image($I, $cfg);
+	bo_add_cities2image($I, $cfg, $w, $h);
 
 	//Antennas
 	if ($ratio && $station_id == bo_station_id() && isset($info['antennas']) && is_array($info['antennas']['bearing']))
@@ -1853,7 +1853,7 @@ function bo_image_reduce_colors(&$I)
 }
 
 
-function bo_add_cities2image($I, $cfg, $before = true)
+function bo_add_cities2image($I, $cfg, $w, $h)
 {
 	
 	if (!isset($cfg['cities']) || !is_array($cfg['cities']))
@@ -1877,9 +1877,6 @@ function bo_add_cities2image($I, $cfg, $before = true)
 	$latS = $cfg['coord'][2];
 	$lonW = $cfg['coord'][3];
 	
-	$w = imagesx($I);
-	$h = imagesy($I);
-
 	list($x1, $y1) = bo_latlon2mercator($latS, $lonW);
 	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
 	$w_x = $w / ($x2 - $x1);
