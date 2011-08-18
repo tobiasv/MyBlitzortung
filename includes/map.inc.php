@@ -941,7 +941,8 @@ function bo_show_lightning_map()
 	}
 	
 	function bo_map_toggle_count(value, type)
-	{
+	{ 
+		value = value == '0' ? false : value;
 		bo_setcookie('bo_show_count', value ? 1 : -1);
 		bo_show_count = value;
 		bo_map_reload_overlays();
@@ -1001,11 +1002,9 @@ function bo_show_lightning_map()
 		if (bo_show_tracks)
 			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayTracks));
 		
-		if (overlay_count)
-		{
+		if (bo_show_count && overlay_count)
 			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayCount));
-		}
-
+			
 		bo_reload_mapinfo();
 	}
 	
