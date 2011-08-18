@@ -1,7 +1,7 @@
 <?php 
 
 /*
-* German translation for MyBlitzortung
+* French translation for MyBlitzortung
 */
 
 $_BL['locale'] = 'fr';
@@ -15,7 +15,7 @@ $_BL['locale'] = 'fr';
 $_BL['fr']['MyBlitzortung'] = '<span class="bo_my">Ma</span><span class="bo_mybo">Détection de foudre</span>';
 
 //Translated name of MyBlitzortung without html tags
-$_BL['fr']['MyBlitzortung_notags'] = 'MyBlitzortung';
+$_BL['fr']['MyBlitzortung_notags'] = 'MaDétection de foudre';
 
 //Should stay original name (MyBlitzortung)
 $_BL['fr']['MyBlitzortung_original'] = 'MyBlitzortung';
@@ -79,7 +79,7 @@ $_BL['fr']['distance'] = 'Distance';
 $_BL['fr']['unit_kilometers'] = 'km';
 $_BL['fr']['Bearing'] = 'Direction';
 $_BL['fr']['Deviation'] = 'Déviation';
-$_BL['fr']['copyright_footer'] = 'Généré par<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
+$_BL['fr']['copyright_footer'] = 'Généré par {MYBO_ORIG}';
 $_BL['fr']['for_station'] = 'pour la station';
 $_BL['fr']['Entries'] = 'Entrées';
 $_BL['fr']['days'] = 'jours';
@@ -392,7 +392,7 @@ $_BL['fr']['Not definite'] = 'Non définie';
 $_BL['fr']['No signal recieved.'] = 'Pas de signal reçu';
 $_BL['fr']['stat_navi_alarm'] = 'Alertes foudre';
 $_BL['fr']['user_welcome_text'] = 'Vous êtes connecté sous ';
-$_BL['fr']['MyBlitzortung version'] = 'Version de MyBlitzortung';
+$_BL['fr']['MyBlitzortung version'] = 'Version de {MYBO_NOTAGS}';
 $_BL['fr']['No permisson for saving to DB!'] = 'Pas d autorisation pour sauvegarder la DB!';
 $_BL['fr']['User list'] = 'Liste des utilisateurs';
 $_BL['fr']['Alert'] = 'Alerte';
@@ -415,7 +415,7 @@ $_BL['fr']['Change'] = 'Changé';
 $_BL['fr']['Password changed!'] = 'Password changé!';
 $_BL['fr']['No permission!'] = 'Pas d\'autorisation!';
 $_BL['fr']['Password was not changed!'] = 'Le password n a pas été changé!';
-$_BL['fr']['Welcome to MyBlitzortung user area'] = 'Bienvenu à <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> espace utilisateur';
+$_BL['fr']['Welcome to MyBlitzortung user area'] = 'Bienvenu à {MYBO} espace utilisateur';
 $_BL['fr']['Admin tools'] = 'Outils admin';
 $_BL['fr']['File cache info'] = 'Info sur le fichier cache';
 $_BL['fr']['Version information'] = 'Version information';
@@ -489,10 +489,10 @@ Nous ne sommes pas un service d information commerciale pour les données de foud
 ';
 $_BL['fr']['info_myblitzortung_text'] = '
 La visualisation de ces pages est faite par un logiciel appelé 
-<em><span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span></em>. 
+{MYBO} ({MYBO_ORIG}). 
 Personne ne peut garantir que ce logiciel affiche toujours des informations correctes!
 Vous êtes responsable de vous même!!!
-<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> est un logiciel libre. Vous pouvez trouver
+{MYBO} ({MYBO_ORIG}) est un logiciel libre. Vous pouvez trouver
 plus d\'informations ici: 
 <a href="http://www.myblitzortung.de" target="_blank">www.myblitzortung.de</a>.
 ';
@@ -511,7 +511,7 @@ de la station. Calcul:
 $_BL['fr']['bo_stat_network_descr_lasth'] = 'Toutes les informations sont fournies pour une période de 60 mn avant la dernière mise à jour';
 $_BL['fr']['bo_stat_network_descr_table'] = 'Ici vous pouvez voir toutes les stations actives du réseau de détection de foudre. Vous pouvez modifier le tableau en cliquant sur les liens dans les titres.';
 $_BL['fr']['bo_graph_descr_bear'] = 'Ratio de localisation géographique. Pour une meilleure comparaison, il y a aussi le nombre d\'éclaires détecté.';
-$_BL['fr']['bo_stat_longtime_descr'] = 'Toutes les informations disponobles ici datent depuis la mise en service de<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>. Les distances sont données par rapport à la station de {STATION}.';
+$_BL['fr']['bo_stat_longtime_descr'] = 'Toutes les informations disponobles ici datent depuis la mise en service de {MYBO}. Les distances sont données par rapport à la station de {STATION}.';
 $_BL['fr']['bo_stat_other_database_descr'] = 'Tous les impacts, signaux et données de la station sont sauvegardés dans une base de données locales à cette page:';
 $_BL['fr']['bo_stat_other_updates_descr'] = 'Les nouvelles données sont collectées depuis blitzortung.org à interval régulier:';
 $_BL['fr']['bo_stat_other_gps_descr'] = 'Quelques informations du récepteur GPS , qui est utilisé pour connaitre le temps exact et la position. Si elles sont connues, les orientations des antennes sont aussi affichées (rouge, vert).';
@@ -519,7 +519,7 @@ $_BL['fr']['bo_stat_station_descr_lasth'] = 'Toutes les informations sont fourni
 $_BL['fr']['bo_graph_descr_radi'] = 'Aperçu des éclaires en fonction de la direction. A titre de comparaison, le nombre total d\'éclaire détectée.';
 $_BL['fr']['bo_graph_descr_strikes'] = 'Ici vous pouvez voir la totalité des éclaires comptabilisée par le réseau Blitzortung, le nombre d\'éclaires par heure de la station {STATION_CITY} ainsi que le nombre moyen d\'éclaires de toutes les autres stations';
 $_BL['fr']['bo_graph_descr_signals'] = 'Le nombre de signaux reçu par heure par la station de {STATION_CITY} ainsi que la moyenne des autres stations.';
-$_BL['fr']['bo_stat_other_antennas_descr'] = 'L\'orientation des antennes peut être automatiquement détectée par <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>. C\'est utile pour determiner la polarité de la foudre(en expérimentation!).';
+$_BL['fr']['bo_stat_other_antennas_descr'] = 'L\'orientation des antennes peut être automatiquement détectée par {MYBO}. C\'est utile pour determiner la polarité de la foudre(en expérimentation!).';
 $_BL['fr']['bo_graph_descr_radi_longtime'] = 'Ce graphique représente le ration des impacts en fonction de la distance depuis la mise en service de la station';
 $_BL['fr']['bo_graph_descr_bear_longtime'] = 'Ce graphique représente le ration des impacts en fonction de l\'orientation géographique depuis la mise en service de la station';
 $_BL['fr']['bo_graph_descr_strikes_time'] = 'Graphique des impacts détectés par le réseau et la station {STATION}';
@@ -564,7 +564,7 @@ $_BL['fr']['Alert count'] = 'Compteur d\'alerte';
 $_BL['fr']['Create new alert'] = 'Créer une nouvelle alerte';
 $_BL['fr']['Change settings'] = 'Changer les réglages';
 $_BL['fr']['SMS'] = 'SMS';
-$_BL['fr']['alert_mail_description'] = 'Les informations suivantes sont automatiquement créées et vous sont envoyées par MyBlitzortung station de{STATION}. Aucune garantie!';
+$_BL['fr']['alert_mail_description'] = 'Les informations suivantes sont automatiquement créées et vous sont envoyées par {MYBO_NOTAGS} station de{STATION}. Aucune garantie!';
 $_BL['fr']['alert_mail_time range'] = 'Période examinée ';
 $_BL['fr']['alert_mail_strikes'] = 'Nombre d impacts ';
 $_BL['fr']['alert_mail_distance'] = 'Distance ';
@@ -572,7 +572,7 @@ $_BL['fr']['alert_mail_last_strike'] = 'Dernier impact ';
 $_BL['fr']['alert_mail_first_strike'] = 'Premier impact ';
 $_BL['fr']['alert_sms_last_strike'] = 'Dernier impact';
 $_BL['fr']['alert_sms_distance'] = 'Distance';
-$_BL['fr']['alert_sms_description'] = 'MyBlitzortung station de{STATION}';
+$_BL['fr']['alert_sms_description'] = '{MYBO_NOTAGS} station de {STATION}';
 $_BL['fr']['No alerts available. Create one yourself!'] = 'Pas d\'alerte disponible. Créez en une!!';
 $_BL['fr']['You must fill all fields!'] = 'Vous devez remplir tous les champs!';
 $_BL['fr']['Wrong format of E-Mail address'] = 'Mauvais format d\'adresse mail';
@@ -596,13 +596,13 @@ $_BL['fr']['No log entries'] = 'Pas de log';
 /*************************************************************/
 /* MyBo station linking                                      */
 /*************************************************************/
-$_BL['fr']['Link with the MyBlitzortung network'] = 'Lien avec le réseau MyBlitzortung';
+$_BL['fr']['Link with the MyBlitzortung network'] = 'Lien avec le réseau {MYBO_ORIG}';
 $_BL['fr']['URL of your website'] = 'URL de votre site';
 $_BL['fr']['Leave blank to remove your station from the list'] = 'Laissez vide pour retirer votre station de la liste';
 $_BL['fr']['Do an auto update every 24h to retrieve new stations'] = 'Faire une mise à jour toutes les 24h pour obtenir les nouvelles stations';
 $_BL['fr']['Agree and Send'] = 'Autorisation et envoi';
-$_BL['fr']['Update MyBlitzortung Stations'] = 'Mise à jour des stations MyBlitzortung';
-$_BL['fr']['Linking with other MyBlitzortung stations'] = 'Liens vers les autres stations MyBlitzortung';
+$_BL['fr']['Update MyBlitzortung Stations'] = 'Mise à jour des stations {MYBO_ORIG}';
+$_BL['fr']['Linking with other MyBlitzortung stations'] = 'Liens vers les autres stations {MYBO_ORIG}';
 $_BL['fr']['Getting Login string'] = 'Demande de chaîne de Login';
 $_BL['fr']['String is'] = 'La chaîne du login est:';
 $_BL['fr']['Requesting data'] = 'Demande de données';
@@ -614,8 +614,8 @@ $_BL['fr']['Couldnt get login id'] = 'Impossible d\'obtenir l\'ID du login';
 
 $_BL['fr']['mybo_station_update_info'] = '
 <p>
-Avec cette fonctionnalité, vous pouvez lier votre installation MyBlitzortung
-avec d autres stations qui ont MyBlitzortung en cours d exécution.
+Avec cette fonctionnalité, vous pouvez lier votre installation {MYBO_ORIG}
+avec d autres stations qui ont {MYBO_ORIG} en cours d exécution.
 Les choses suivantes se produiront, quand vous cliquez sur le lien ci-dessous:
 </p>
 
