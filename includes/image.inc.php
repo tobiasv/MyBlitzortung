@@ -1156,11 +1156,6 @@ function bo_get_map_image()
 	
 	if (!$blank)
 	{
-		$extra = _BL('Strikes', true).': '.array_sum($count);
-		
-		bo_image_banner_top($I, $w, $h, $cfg, $time_string, $extra);
-		bo_image_banner_bottom($I, $w, $h, $cfg);
-
 		/* LEGEND */
 		//lightning legend
 		if (isset($cfg['legend']) && is_array($cfg['legend']) && count($cfg['legend']))
@@ -1174,7 +1169,17 @@ function bo_get_map_image()
 			$coLegendWidth = $cw / count($color);
 			$cx = $w - $cw - $cx;
 			$cy = $h - $ch - $cy;
+			$legend = true;
+		}
+		
+		//banners
+		$extra = _BL('Strikes', true).': '.array_sum($count);
+		bo_image_banner_top($I, $w, $h, $cfg, $time_string, $extra);
+		bo_image_banner_bottom($I, $w, $h, $cfg, $cw);
 
+
+		if ($legend)
+		{
 			$legend_text_drawn = false;
 
 			ksort($count);
@@ -1834,8 +1839,11 @@ function bo_image_banner_top($I, $w, $h, $cfg, $time_string = null, $extra = nul
 }
 
 
-function bo_image_banner_bottom($I, $w, $h, $cfg)
+function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0)
 {
+	//default color
+	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
+
 	$tdy = 0;
 	
 	if (isset($cfg['top_font']))
@@ -1858,8 +1866,6 @@ function bo_image_banner_bottom($I, $w, $h, $cfg)
 		$tcol = $cfg['bottom_font'][2];
 	}
 	
-	//default color
-	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
 
 	/* BOTTOM LINE */
 	if (isset($cfg['bottom_style']))
@@ -1880,7 +1886,7 @@ function bo_image_banner_bottom($I, $w, $h, $cfg)
 	//Copyright
 	$text = _BL('Lightning data from Blitzortung.org', true);
 	$bo_width = bo_imagetextwidth($fontsize, $tbold, $text);
-	if ($bo_width > $w - $cw - 5)
+	if ($bo_width > $w - $legend_width - 5)
 		$text = _BL('Blitzortung.org', true);
 	bo_imagestring($I, $fontsize, 4, $h - $tdy, $text, $tcol, $tbold);
 
@@ -1891,7 +1897,7 @@ function bo_image_banner_bottom($I, $w, $h, $cfg)
 		$bo_width2 = bo_imagetextwidth($fontsize, $tbold, BO_OWN_COPYRIGHT);
 		$bo_pos2 = $bo_width + $fontsize * 5;
 		
-		if ($bo_width2+$bo_pos2 < $w - $cw - 5)
+		if ($bo_width2+$bo_pos2 < $w - $legend_width - 5)
 			bo_imagestring($I, $fontsize, $bo_pos2, $h - $tdy, BO_OWN_COPYRIGHT, $tcol, $tbold);
 	}
 	*/
