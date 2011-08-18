@@ -217,6 +217,17 @@ top: -20px;
 clear: left;
 }
 
+#myblitzortung #bo_lang_links .bo_flag {
+border:1px solid white;
+padding: 1px;
+position:relative;
+top: 4px;
+}
+
+#myblitzortung #bo_lang_links strong .bo_flag {
+border:1px solid #88f;
+background: #ccf;
+}
 
 #myblitzortung .bo_form_text {
 display: block;

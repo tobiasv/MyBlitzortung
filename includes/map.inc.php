@@ -173,19 +173,6 @@ function bo_show_lightning_map()
 {
 	global $_BO;
 	
-	//show strike archive for lat/lon instead of map (for known users only!)
-	$lat = $_GET['lat'];
-	$lon = $_GET['lon'];
-	$zoom = intval($_GET['zoom']);
-	if (bo_user_get_level() && $lat && $lon)
-	{
-		if ($zoom)
-			$fuzzy = 1/$zoom/7;
-			
-		bo_show_archive_table($lat, $lon, $fuzzy);
-		return;
-	}
-	
 	$disabled = (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !bo_user_get_level());
 	$no_google = isset($_GET['bo_showmap']) || $disabled;
 	
@@ -240,8 +227,8 @@ function bo_show_lightning_map()
 		echo '</div>';
 		
 		return;
-	} 
-
+	}
+	
 	//Get Stations
 	$sid = bo_station_id();
 	$js_stations = '';
@@ -320,7 +307,20 @@ function bo_show_lightning_map()
 	ksort($Overlays);
 	
 	$radius = $_BO['radius'] * 1000;
-	$zoom = BO_DEFAULT_ZOOM;
+
+	$lat = (double)$_GET['lat'];
+	$lon = (double)$_GET['lon'];
+	$zoom = intval($_GET['zoom']);
+
+	if ($lat || $lon || $zoom)
+		$cookie_load_defaults = false;
+	else
+		$cookie_load_defaults = true;
+	
+	$zoom = $zoom ? $zoom : BO_DEFAULT_ZOOM;
+	$lat = $lat ? $lat : BO_LAT;
+	$lon = $lon ? $lon : BO_LON;
+
 	
 	if ((bo_user_get_level() & BO_PERM_NOLIMIT)) //allow all zoom levels on logged in users with access rights
 	{
@@ -332,10 +332,6 @@ function bo_show_lightning_map()
 		$max_zoom = defined('BO_MAX_ZOOM_IN') ? intval(BO_MAX_ZOOM_IN) : 999;
 		$min_zoom = defined('BO_MIN_ZOOM_OUT') ? intval(BO_MIN_ZOOM_OUT) : 0;
 	}
-
-	$lat = BO_LAT;
-	$lon = BO_LON;
-
 
 	echo '<fieldset class="bo_map_options">';
 	echo '<legend>'._BL("map_options").'</legend>';
@@ -376,11 +372,37 @@ function bo_show_lightning_map()
 	echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label> &nbsp; ';
 	echo '</span>';
 
-	echo '<span class="bo_form_checkbox_text">';
-	echo '<input type="checkbox" onclick="bo_map_toggle_count(this.checked);" id="bo_map_opt_count"> ';
-	echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
-	echo '</span>';
+	if ((bo_user_get_level() & BO_PERM_NOLIMIT))
+	{
+		echo '</div>';
+		
+		echo '<span class="bo_form_descr">'._BL('Statistics').':</span> ';
+		
+		echo '<div class="bo_input_container">';
 
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="radio" name="bo_map_counter" value="0" onclick="bo_map_toggle_count(this.value);" id="bo_map_opt_count0"> ';
+		echo '<label for="bo_map_opt_count0">'._BL("Off").'</label> &nbsp; ';
+		echo '</span>';
+		
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="radio" name="bo_map_counter" value="1" onclick="bo_map_toggle_count(this.value);" id="bo_map_opt_count"> ';
+		echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
+		echo '</span>';
+		
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="radio" name="bo_map_counter" value="2" onclick="bo_map_toggle_count(this.value);" id="bo_map_opt_count2"> ';
+		echo '<label for="bo_map_opt_count2">'._BL("show strike counter").' ('._BL('stations').')</label> &nbsp; ';
+		echo '</span>';
+	}
+	else
+	{
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="checkbox" onclick="bo_map_toggle_count(this.checked);" id="bo_map_opt_count"> ';
+		echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
+		echo '</span>';
+	}
+	
 	if (intval(BO_TRACKS_SCANTIME))
 	{
 		echo '<span class="bo_form_checkbox_text">';
@@ -720,10 +742,10 @@ function bo_show_lightning_map()
 		var map_zoom = bo_getcookie('bo_map_zoom');
 		var map_type = bo_getcookie('bo_map_type');
 		
-		if (map_lat > 0 && map_lon > 0)
+		if (map_lat > 0 && map_lon > 0 && <?php echo $cookie_load_defaults ? 'true' : 'false' ?>)
 			bo_map.setOptions({ center: new google.maps.LatLng(map_lat,map_lon) });
 		
-		if (map_zoom > 0)
+		if (map_zoom > 0 && <?php echo $cookie_load_defaults ? 'true' : 'false' ?>)
 			bo_map.setOptions({ zoom: parseInt(map_zoom) });
 
 		if (map_type.match(/[a-z]+/i))
@@ -733,8 +755,7 @@ function bo_show_lightning_map()
 		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
 		if (bo_map.getZoom() > 7)
 		{
-			var newWindow = window.open("<?php echo bo_insert_url() ?>&lat="+event.latLng.lat()+"&lon="+event.latLng.lng()+"&zoom="+bo_map.getZoom(), '_blank');
-			newWindow.focus();
+			window.open("<?php echo BO_ARCHIVE_URL ?>&bo_show=strikes&bo_lat="+event.latLng.lat()+"&bo_lon="+event.latLng.lng()+"&bo_zoom="+bo_map.getZoom(), '_blank');
 		}
 		});
 <?php  } ?>
@@ -919,10 +940,10 @@ function bo_show_lightning_map()
 		bo_map_reload_overlays();
 	}
 	
-	function bo_map_toggle_count(checked)
+	function bo_map_toggle_count(value, type)
 	{
-		bo_setcookie('bo_show_count', checked ? 1 : -1);
-		bo_show_count = checked ? 1 : 0;
+		bo_setcookie('bo_show_count', value ? 1 : -1);
+		bo_show_count = value;
 		bo_map_reload_overlays();
 	}
 
@@ -980,8 +1001,10 @@ function bo_show_lightning_map()
 		if (bo_show_tracks)
 			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayTracks));
 		
-		if (bo_show_count && overlay_count)
+		if (overlay_count)
+		{
 			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayCount));
+		}
 
 		bo_reload_mapinfo();
 	}
@@ -1013,7 +1036,7 @@ function bo_show_lightning_map()
 		var now = new Date();
 		var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
 		
-		return "<?php echo BO_FILE ?>?tile&count="+types+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
+		return "<?php echo BO_FILE ?>?tile&count="+types+"&stat="+bo_show_count+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
 	}
 	
 	function bo_get_tile_tracks(zoom, coord)

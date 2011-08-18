@@ -26,10 +26,14 @@ if (!defined('BO_VER'))
 // Login to blitzortung.org an return login-string
 function bo_get_login_str()
 {
-	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&username='.BO_USER.'&password='.BO_PASS);
+	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&username='.BO_USER.'&password='.BO_PASS, $code);
 
 	if ($file === false)
+	{
+		echo "<p>ERROR: Couldn't get file to login! Code: $code</p>\n";
+		bo_update_error('archivelogin', 'Login to archive failed. '.$code);
 		return false;
+	}
 
 	if (preg_match('/login_string=([A-Z0-9]+)/', $file, $r))
 	{
@@ -50,10 +54,14 @@ function bo_get_archive($args='', $bo_login_id=false)
 		$auto_id = true;
 	}
 
-	$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&'.$args);
+	$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&'.$args, $code);
 
 	if ($file === false)
+	{
+		echo "<p>ERROR: Couldn't get file from archive! Code: $code</p>\n";
+		bo_update_error('archivedata', 'Download of archive data failed. '.$code);
 		return false;
+	}
 
 	if (strlen($file) < 100) //Login not successful --> new login ID
 	{
@@ -247,10 +255,14 @@ function bo_update_strikes($force = false)
 		$max_dist_own = 0;
 		$min_dist_own = 9E12;
 		
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt');
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code);
 
 		if ($file === false)
+		{
+			bo_update_error('strikedata', 'Download of strike data failed. '.$code);
+			echo "<p>ERROR: Couldn't get file for strikes! Code: $code</p>\n";
 			return false;
+		}
 
 		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
 		$row = $res->fetch_assoc();
@@ -715,15 +727,36 @@ function bo_update_stations($force = false)
 		$Count = array();
 		$signal_count = 0;
 
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt');
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt', $code);
 
 		if ($file === false)
+		{
+			bo_update_error('stationdata', 'Download of station data failed. '.$code);
+			echo "<p>ERROR: Couldn't get file for stations! Code: $code</p>\n";
 			return false;
+		}
+
+
+		$lines = explode("\n", $file);
+		
+				
+		//check if sth went wrong
+		$all_stations = bo_stations('user');
+		if ($lines < count($all_stations) * 0.5)
+		{
+			bo_update_error('stationcount', 'Station count differs too much: '.count($all_stations).'Database / '.$lines.' stations.txt');
+			bo_set_conf('uptime_stations', time());
+			
+			return;
+		}
 
 		$loadcount = bo_get_conf('upcount_stations');
 		bo_set_conf('upcount_stations', $loadcount+1);
-
-		$lines = explode("\n", $file);
+		
+		//reset error counter
+		bo_update_error('stationdata', true); 
+		bo_update_error('stationcount', true); 
+		
 		foreach($lines as $l)
 		{
 			$cols = explode(" ", $l);
@@ -744,12 +777,17 @@ function bo_update_stations($force = false)
 			$stDist 	= bo_latlon2dist($stLat, $stLon);
 			$stSignals	= (int)$cols[10];
 			
+			$stTimeU = strtotime($stTime);
+			
 			$Count[$stId]['sig'] = $stSignals;
 			$Count[$stId]['active'] = $stStatus == 'A'; //GPS is (or was) active
 			$Count[$stId]['available'] = $stStatus != '-'; //has sent some data some time ago
 			
+			//station has been active by user (~ a year ago)
+			if (time() - $stTimeU < 3600 * 24 * 366)
+				$activebyuser[$stUser] = array('id' => $stId, 'sig' => $stSignals);
+			
 			//mark Offline?
-			$stTimeU = strtotime($stTime);
 			if ($stStatus != '-' && $stSignals == 0 && time() - $stTime > intval(BO_STATION_OFFLINE_HOURS) * 3600)
 				$stStatus = 'O';  //Special offline status
 			
@@ -782,6 +820,34 @@ function bo_update_stations($force = false)
 
 		echo "\n<p>Stations: ".(count($lines)-2)." *** New Stations: $i *** Updated: $u</p>\n";
 
+		//New stations (by user name)
+		$data = unserialize(bo_get_conf('stations_new_date'));
+		if (!$data) //first call!
+		{
+			foreach($activebyuser as $user => $d)
+				$data[$user] = false; // mark as not new
+
+			bo_set_conf('stations_new_date', serialize($data));
+		}
+		else
+		{
+			$new = false;
+			foreach($activebyuser as $user => $d)
+			{
+				if (!$data[$user] && $d['sig']) //no old entry but new signals
+				{
+					$data[$user] = time(); // mark as NEW STATION
+					$new = true;
+				}
+			}
+		
+			if ($new)
+			{
+				bo_set_conf('stations_new_date', serialize($data));
+			}
+		}
+		
+		
 		//Update Statistics
 		$datetime      = gmdate('Y-m-d H:i:s', time());
 		$datetime_back = gmdate('Y-m-d H:i:s', time() - 3600);
@@ -1146,7 +1212,7 @@ function bo_update_shutdown()
 	bo_set_conf('is_updating', 0);
 }
 
-function bo_update_all($force)
+function bo_update_all($force = false)
 {
 	session_write_close();
 	ignore_user_abort(true);
@@ -1186,7 +1252,6 @@ function bo_update_all($force)
 	
 	if (!$force)
 	{
-		echo '<div style="display:none">'.str_repeat('&nbsp;', 500).'</div>';
 		echo '<p>Information: PHP Execution timeout is '.$exec_timeout.'s ';
 		echo $exec_timeout < 15 ? ' - Not good :( ' : ' --> Fine :)  ';
 		echo '- Setting MyBlitzortung timeout to: '.$max_time.'s</p>';
@@ -1882,13 +1947,13 @@ function bo_my_station_update($url, $force_bo_login = false)
 		$request = 'id='.bo_station_id().'&login='.$login_id.'&authid='.$authid.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
 		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
 		
-		$content = bo_get_file($data_url);
+		$content = bo_get_file($data_url, $error);
 		
 		$R = unserialize($content);
 		
 		if (!$R || !is_array($R))
 		{
-			echo '<p>'._BL('Error talking to the server. Please try again later.').'</p>';
+			echo '<p>'._BL('Error talking to the server. Please try again later.').($error ? ' Code: '.$error : '').'</p>';
 		}
 		else
 		{
@@ -1963,7 +2028,10 @@ function bo_my_station_update($url, $force_bo_login = false)
 	if ($login_id)
 	{
 		echo '<h3>'._BL('Logging out from Blitzortung.org').'</h3>';
-		bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$login.'&logout=1');
+		$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$login.'&logout=1', $code);
+		
+		if (!$file)
+			echo "<p>ERROR: Couldn't get file! Code: $code</p>\n";
 	}
 
 	return $ret;
@@ -2202,5 +2270,56 @@ function bo_update_tracks($force = false, $max_time = 0)
 	}
 }
 
+
+	
+function bo_update_error($type, $extra = null)
+{
+	// reset
+	if ($extra === true) 
+	{
+		bo_set_conf('uperror_'.$type, serialize(array()));
+		return;
+	}
+	
+	//Read
+	$data = unserialize(bo_get_conf('uperror_'.$type));
+
+	//Update
+	if (!$data['first'])
+		$data['first'] = time();
+		
+	$data['last'] = time();
+	$data['count']++;
+	
+	//Send?
+	if ($data['count'] > BO_UP_ERR_MIN_COUNT
+		&& time() - $data['first']     > BO_UP_ERR_MIN_MINUTES * 60
+		&& time() - $data['last_send'] > BO_UP_ERR_SEND_INTERVAL * 60)
+	{
+		$data['last_send'] = time();
+		
+		$mail = bo_user_get_mail(1);
+		
+		if ($mail)
+		{
+			$text = $extra;
+			$text .= "\n\nLast error: ".date('Y-m-d H:i:s', $data['last']);
+			$text .= "\nFirst error: ".date('Y-m-d H:i:s', $data['first']);
+			$text .= "\nError count: ".$data['count'];
+			
+			mail($mail, 
+		     _BL('MyBlitzortung_notags').' - '._BL('Error').': '.$type, 
+			 $text, 
+			 defined('BO_EMAIL_HEADERS') ? BO_EMAIL_HEADERS : '');
+			
+			echo '<p>Sent E-Mail to '.$mail.'</p>';
+		}
+	}
+	
+	print_r($data);
+	
+	//Write
+	bo_set_conf('uperror_'.$type, serialize($data));
+}	
 
 ?>

@@ -291,8 +291,8 @@ function bo_show_statistics_station()
 		$own_station = true;
 	}
 
-	$tmp = bo_station_info($station_id);
-	$city = _BC($tmp['city']);
+	$stInfo = bo_station_info($station_id);
+	$city = _BC($stInfo['city']);
 	
 	$row = bo_db("SELECT signalsh, strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id')")->fetch_assoc();
 	$strikesh_own = $row['strikesh'];
@@ -381,6 +381,22 @@ function bo_show_statistics_station()
 	
 	echo '</ul>';
 
+	if (!$own_station)
+	{
+		echo '<div id="bo_gmap" class="bo_map_station" style="width:560px;height:200px"></div>';
+		
+		?>
+		<script type="text/javascript">
+		function bo_gmap_init2()
+		{
+			//noting to do ;-)
+		}
+		</script>
+		<?php
+
+		bo_insert_map(0, round($stInfo['lat'],2), round($stInfo['lon'],2), 10, 'HYBRID');
+	}
+	
 	echo '<a name="graph_strikes"></a>';
 	echo '<h4>'._BL('h4_graph_strikes').'</h4>';
 	echo '<p class="bo_graph_description" id="bo_graph_descr_strikes">';
@@ -454,7 +470,7 @@ function bo_show_statistics_network()
 	$row = $res->fetch_assoc();
 	$available = $row['cnt'];
 	
-	$last_update = round((time()-$time)/60);
+	$last_update = (time()-$time)/60;
 
 	$whole_sig_count = 0;
 	$whole_sig_ratio = 0;
@@ -552,7 +568,7 @@ function bo_show_statistics_network()
 	echo '</p>';
 
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before')."$last_update ".($last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(',')).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).(' ('._BL('available_of').' '.number_format($available, 0, _BL('.'), _BL(',')).' '._BL('available_stations').')').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikesh, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
@@ -618,7 +634,12 @@ function bo_show_statistics_network()
 			echo '<tr>';
 
 		echo '<td class="bo_text">';
-		echo $pos++;
+		
+		if (bo_user_get_level()) 
+			echo '<a href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$id.'">'.$pos.'</a>';
+		else
+			echo $pos;
+			
 		echo '</td>';
 
 		echo '<td class="bo_text '.($sort == 'country' ? 'bo_marked' : '').'">';
@@ -656,8 +677,9 @@ function bo_show_statistics_network()
 		echo number_format($d['efficiency'] * 100, 1, _BL('.'), _BL(',')).'%';
 		echo '</td>';
 
-
 		echo '</tr>';
+		
+		$pos++;
 	}
 
 	echo '</table>';
@@ -671,7 +693,52 @@ function bo_show_statistics_network()
 	echo '</p>';
 	bo_show_graph('stations', $add_graph);
 
+	if (1 || intval(BO_STATISTICS_SHOW_NEW_STATIONS))
+	{
+		$user_stations = bo_stations('user');
 
+		$data = unserialize(bo_get_conf('stations_new_date'));
+		
+		$new_stations = array();
+		foreach($data as $user => $time)
+		{
+			if ($time)
+			{
+				$id = $user_stations[$user]['id'];
+				$new_stations[$id] = array($time, $user_stations[$user]['city']);
+			}
+		}
+		
+		arsort($new_stations);
+		
+		if (1 || count($new_stations))
+		{
+			echo '<a name="new_stations"></a>';
+			echo '<h4>'._BL('h4_new_stations').'</h4>';
+
+			echo '<ul class="bo_stat_overview">';
+			
+			$i = 0;
+			foreach($new_stations as $id => $d)
+			{
+				echo '<li><span class="bo_descr">';
+				echo _BC($d[0]);
+				echo '</span>';
+				echo '<span class="bo_value">';
+				echo date(_BL('_datetime'), $d[1]);
+				echo '</span>';
+				$i++;
+				
+				if ($i >= BO_STATISTICS_SHOW_NEW_STATIONS)
+					break;
+			}
+			
+			echo '</ul>';
+
+		}
+		
+	}
+	
 	echo '</div>';
 
 }

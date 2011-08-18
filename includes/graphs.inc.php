@@ -515,6 +515,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$graph_type = 'textlin';
 		$title_no_hours = true;
 		$add_title = ' '._BL('since begin of data logging');
+		
+		$ymin = 0;
+		$ymax = 100;
 	}
 	else if($type == 'ratio_bearing_longtime')
 	{
@@ -566,6 +569,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$title_no_hours = true;
 		$xmin = 0;
 		$xmax = 360;
+		$ymin = 0;
+		$ymax = 100;
 	}
 	else if ($type == 'ratio_distance' || $type == 'ratio_bearing')
 	{
@@ -661,6 +666,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$tickLabels[] = $i*$dist_div;
 			$tickMajPositions[] = $i;
 		}
+		$ymin = 0;
+		$ymax = 100;
 	}
 	else if ($type == 'distance')
 	{
@@ -1406,6 +1413,12 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			}
 		}
 
+		if ($type == 'ratio')
+		{
+			$ymin = 0;
+			$ymax = 100;
+		}
+		
 		$graph_type = 'datlin';
 	}
 
@@ -2246,16 +2259,29 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	else
 		$graph->SetBox(false);
 
-	$graph->SetMargin(50,50,20,70);
+	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
+	{
+		$graph->footer->left->Set(BO_OWN_COPYRIGHT);
+		$graph->footer->left->SetColor('#999999');
+		$graph->footer->left->SetFont(FF_DV_SANSSERIF,FS_NORMAL,BO_OWN_COPYRIGHT_SIZE);
+
+		$graph->SetMargin(50,50,20,75);
+		$graph->legend->SetPos(0.5,0.95,"center","bottom");
+
+	}
+	else
+	{
+		$graph->SetMargin(50,50,20,70);
+		$graph->legend->SetPos(0.5,0.99,"center","bottom");
+	}
 	
-	$graph->title->SetFont(FF_DV_SANSSERIF, FS_BOLD, BO_GRAPH_STAT_FONTSIZE_TITLE);
-	$graph->title->SetColor(BO_GRAPH_STAT_COLOR_TITLE);
-	
-	$graph->legend->SetPos(0.5,0.99,"center","bottom");
 	$graph->legend->SetColumns(2);
 	$graph->legend->SetFillColor(BO_GRAPH_STAT_COLOR_LEGEND_FILL);
 	$graph->legend->SetColor(BO_GRAPH_STAT_COLOR_LEGEND_TEXT, BO_GRAPH_STAT_COLOR_LEGEND_FRAME);
 	$graph->legend->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
+
+	$graph->title->SetFont(FF_DV_SANSSERIF, FS_BOLD, BO_GRAPH_STAT_FONTSIZE_TITLE);
+	$graph->title->SetColor(BO_GRAPH_STAT_COLOR_TITLE);
 	
 	if ($caption)
 	{
@@ -2306,8 +2332,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->xaxis->scale->SetTimeAlign(MINADJ_15);
 		}
 	}
-
-
+	
 	header("Content-Type: image/png");
 	header("Pragma: ");
 	header("Cache-Control: public, max-age=".($time_end + BO_UP_INTVL_STATIONS * 60 - time()));

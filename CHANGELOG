@@ -5,7 +5,18 @@
 
 Version 0.6.1 (2011-08-xx)
 --------------------------
-- new: display cities from cities.txt
+- new: complete FRENCH translation (by flc85)
+- new: own copyright info (footer, maps, graphs)
+- new: flags for language change
+- new: display cities from cities.txt in maps
+- new: display stations in maps
+- new: TTF fonts in maps, also with borders
+- new: more marker styles for station, strikes, cities in maps
+- new: show participated stations for a specific strike in map
+- new: show top stations per tile in dynamic map
+- new: email and more text output on errors during import
+- new: show new stations in network statistics
+- other visual improvements for maps
 - cleanup in default_settings.inc.php and templates.inc.php
 
 Version 0.6a (2011-08-10)

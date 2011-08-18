@@ -207,7 +207,7 @@ function bo_check_for_update()
 			
 			case '0.6.1':
 			
-				$sql = 'CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}cities` (
+				$sql = 'CREATE TABLE IF NOT EXISTS `'.BO_DB_PREF.'cities` (
 						  `id` int(11) unsigned NOT NULL auto_increment,
 						  `name` varchar(50) NOT NULL,
 						  `lat` decimal(9,6) NOT NULL,
@@ -215,7 +215,7 @@ function bo_check_for_update()
 						  `type` tinyint(4) NOT NULL,
 						  PRIMARY KEY  (`id`),
 						  KEY `latlon` (`lat`,`lon`)
-						) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+						) ENGINE=MyISAM  DEFAULT CHARSET=utf8
 						';
 				$ok = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';

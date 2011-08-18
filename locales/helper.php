@@ -50,13 +50,17 @@ foreach($lines as $line)
 		$T .= '</span>';
 		
 		if ($translated)
+		{
 			$O .= $T;
+		}
 		else
 		{
 			$U .= '<br>//'.$in.': '.htmlentities($_BL[$in][$r[1]]).'<br>';
 			$U .= $T;
 		}
 		
+		if (isset($_BL[$out][$r[1]]))
+			unset($_BL[$out][$r[1]]);
 	}
 	elseif (preg_match('/\$_BL\[\'locale\'\]/', $line))
 	{
@@ -68,6 +72,36 @@ foreach($lines as $line)
 	}
 }
 
+$X = '';
+if (!empty($_BL[$out]))
+{
+	foreach($_BL[$out] as $id => $text)
+	{
+		$X .= '$_BL[\''.$out.'\'][\''.$id.'\'] = ';
+		
+		if ($text === false)
+			$X .= 'false';
+		else
+			$X .= '\''.strtr(htmlentities($text), array("'" => "\\'")).'\'';
+		
+		$X .= ';<br>';
+	}
+}
+
+?>
+
+<html>
+<head>
+<style>
+body {
+font-family: courier;
+font-size: 11px;
+}
+</style>
+</head>
+
+<body>
+<?php
 echo htmlentities("<?php\n").'<br>';
 echo $O;
 
@@ -77,6 +111,14 @@ if ($U)
 	echo $U;
 }
 
+if ($X)
+{
+	echo "<br><br>/*******************************/<br>/*&nbsp;&nbsp;NOT AVAILABLE IN ORIGINAL&nbsp;&nbsp;*/<br>/*******************************/<br><br>";
+	echo $X;
+}
+
 echo '<br><br>';
 
 ?>
+</body>
+</html>

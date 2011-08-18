@@ -314,6 +314,14 @@ function bo_copyright_footer()
 	echo '<a href="http://'.BO_LINK_HOST.'/" target="_blank" id="mybo_copyright">';
 	echo _BL('copyright_footer');
 	echo '</a>';
+	
+	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
+	{
+		echo ' &bull; ';
+		echo BO_OWN_COPYRIGHT;
+	}
+
+	
 	echo '</div>';
 
 	echo '<div id="bo_copyright_extra">';
@@ -349,10 +357,16 @@ function bo_copyright_footer()
 		echo _BL('Languages').': ';
 		foreach($languages as $lang)
 		{
-			if (trim($lang) == _BL())
-				echo ' <strong>'.trim($lang).'</strong> ';
+			if (BO_SHOW_LANG_FLAGS == true)
+				$a_lang = '<img src="'.BO_FILE.'?image=flag_'.$lang.'" class="bo_flag">';
 			else
-				echo ' <a href="'.bo_insert_url('bo_lang', trim($lang)).'">'.trim($lang).'</a> ';
+				$a_lang = $lang;
+				
+			if (trim($lang) == _BL())
+				echo ' <strong>'.trim($a_lang).'</strong> ';
+			else
+				echo ' <a href="'.bo_insert_url('bo_lang', trim($lang)).'">'.trim($a_lang).'</a> ';
+				
 		}
 		
 		echo '</div>';
@@ -391,13 +405,22 @@ function _BL($msgid='', $noutf = false)
 	}
 
 	if (!$msg)
+	{
 		$msg = $msgid;
+	}
 	else
 	{
 		if (strpos($msg, "{STATION}") !== false)
-			$msg = strtr($msg, array('{STATION}' => bo_station_city()));
+			$msg = strtr($msg, array('{STATION}' => bo_station_city())); //needs a database lookup
 
-		$msg = strtr($msg, array('{USER}' => bo_user_get_name()));
+		$replace = array(
+					'{USER}' => bo_user_get_name(),
+					'{MYBO}' => $_BL[$locale]['MyBlitzortung'],
+					'{MYBO_NOTAGS}' => $_BL[$locale]['MyBlitzortung_notags'],
+					'{MYBO_ORIG}' => $_BL[$locale]['MyBlitzortung_original']
+				);
+			
+		$msg = strtr($msg, $replace);
 	}
 
 	if ($utf)
@@ -561,7 +584,10 @@ function bo_show_menu()
 
 	echo '<ul id="bo_mainmenu">';
 	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'map').'"        id="bo_mainmenu_map"  class="bo_mainmenu'.($page == 'map' ? '_active' : '').'">'._BL('main_menu_map').'</a></li>';
-	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'archive').'"    id="bo_mainmenu_arch" class="bo_mainmenu'.($page == 'archive' ? '_active' : '').'">'._BL('main_menu_archive').'</a></li>';
+	
+	if (BO_DISABLE_ARCHIVE !== true)
+		echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'archive').'"    id="bo_mainmenu_arch" class="bo_mainmenu'.($page == 'archive' ? '_active' : '').'">'._BL('main_menu_archive').'</a></li>';
+	
 	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'statistics').'" id="bo_mainmenu_stat" class="bo_mainmenu'.($page == 'statistics' ? '_active' : '').'">'._BL('main_menu_statistics').'</a></li>';
 	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'info').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'info' ? '_active' : '').'">'._BL('main_menu_info').'</a></li>';
 
@@ -680,7 +706,7 @@ function bo_load_locale()
 
 }
 
-function bo_get_file($url)
+function bo_get_file($url, &$error = '')
 {
 	if (BO_USE_PHPURLWRAPPER === true)
 	{
@@ -714,10 +740,26 @@ function bo_get_file($url)
 		
 		fwrite($fp, $out);		 
 		$content = ''; 
+		$first = true;
+		$response = array();
 		
 		//Header überlesen 
-		do { 
+		do 
+		{ 
 			$header = chop(fgets($fp)); 
+			
+			if ($first)
+			{
+				preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
+				
+				if ($response[1] != '200')
+				{
+					$err = true;
+					break;
+				}
+			}
+			
+			$first = false;
 		} while (!empty($header) and !feof($fp)); 
 			
 		//Daten übernehmen
@@ -728,6 +770,12 @@ function bo_get_file($url)
 		fclose($fp);
 	}
 
+	if ($err)
+	{
+		$error = $response[1].' '.$response[2];
+		$content = false;
+	}
+	
 	return $content; 	 
 }
 
@@ -855,7 +903,6 @@ function bo_fft($sign, &$ar, &$ai)
 	return true;
 }
 
-// transform from time domine to frequency domine using FFT
 if (!function_exists('hypot')) 
 {
 	function hypot($x, $y) 

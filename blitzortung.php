@@ -46,6 +46,7 @@ if (!defined("BO_VER"))
 	define('BO_LINK_HOST', 'www.myblitzortung.de');
 	define('BO_LINK_URL',  '/blitzortung/bo.php');
 
+	
 	//Some default PHP-Options
 	ini_set('magic_quotes_runtime', 0);
 
@@ -58,6 +59,7 @@ if (!defined("BO_VER"))
 		die('Missing config.php! Please run installation first!');
 
 	//Load Config
+	require_once 'includes/templates_gmap.inc.php';
 	require_once 'includes/templates.inc.php';
 	require_once 'config.php';
 	require_once 'includes/default_settings.inc.php';

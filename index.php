@@ -4,7 +4,7 @@ include_once 'blitzortung.php';
 
 $title = bo_get_title();
 
-if (defined('BO_UTF8') && BO_UTF8)
+if (defined('BO_UTF8') && BO_UTF8 && !headers_sent())
 	header("Content-Type: text/html; charset=UTF-8");
 
 ?><!DOCTYPE html>

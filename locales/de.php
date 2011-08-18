@@ -11,8 +11,15 @@ $_BL['locale'] = 'de';
 /* General                                                   */
 /*************************************************************/
 
+//Translated name of MyBlitzortung with html tags
 $_BL['de']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
+
+//Translated name of MyBlitzortung without html tags
 $_BL['de']['MyBlitzortung_notags'] = 'MyBlitzortung';
+
+//Should stay original name (MyBlitzortung)
+$_BL['de']['MyBlitzortung_original'] = 'MyBlitzortung';
+
 
 $_BL['de']['.'] = ',';
 $_BL['de'][','] = '.';
@@ -72,7 +79,7 @@ $_BL['de']['distance'] = 'Entfernung';
 $_BL['de']['unit_kilometers'] = 'km';
 $_BL['de']['Bearing'] = 'Richtung';
 $_BL['de']['Deviation'] = 'Abweichung';
-$_BL['de']['copyright_footer'] = 'Powered by <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
+$_BL['de']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['de']['for_station'] = 'für die Station';
 $_BL['de']['Entries'] = 'Einträge';
 $_BL['de']['days'] = 'Tage';
@@ -123,7 +130,6 @@ $_BL['de']['Current'] = 'Blitzstrom';
 $_BL['de']['Polarity'] = 'Polarität';
 $_BL['de']['Strike'] = 'Blitz';
 $_BL['de']['experimental'] = 'experimentell';
-$_BL['de']['Deviation'] = 'Genauigkeit';
 $_BL['de']['Participated'] = 'Teilgenommen';
 $_BL['de']['Recieved'] = 'Empfangen';
 $_BL['de']['positive'] = 'positiv';
@@ -145,7 +151,6 @@ $_BL['de']['Runtime'] = 'Laufzeit';
 $_BL['de']['unit_millisec'] = 'ms';
 $_BL['de']['Older'] = 'Älter';
 $_BL['de']['Newer'] = 'Neuer';
-$_BL['de']['Strikes'] = 'Blitze';
 $_BL['de']['Count'] = 'Anzahl';
 $_BL['de']['More than'] = 'Mehr als';
 $_BL['de']['Percent'] = 'Prozent';
@@ -387,7 +392,7 @@ $_BL['de']['Not definite'] = 'Nicht eindeutig';
 $_BL['de']['No signal recieved.'] = 'Kein Signal empfangen';
 $_BL['de']['stat_navi_alarm'] = 'Blitz-Alarm';
 $_BL['de']['user_welcome_text'] = 'Du bist angemeldet als';
-$_BL['de']['MyBlitzortung version'] = 'MyBlitzortung Version';
+$_BL['de']['MyBlitzortung version'] = '{MYBO_NOTAGS} Version';
 $_BL['de']['No permisson for saving to DB!'] = 'Keine Berechtigung zum Abspeichern in der Datenbank!';
 $_BL['de']['User list'] = 'Benutzerliste';
 $_BL['de']['Alert'] = 'Alarm';
@@ -410,7 +415,7 @@ $_BL['de']['Change'] = 'Ändern';
 $_BL['de']['Password changed!'] = 'Passwort wurde geändert';
 $_BL['de']['No permission!'] = 'Keine Berechtigung!';
 $_BL['de']['Password was not changed!'] = 'Passwort wurde NICHT geändert!';
-$_BL['de']['Welcome to MyBlitzortung user area'] = 'Willkommen im <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> Nutzerbereich';
+$_BL['de']['Welcome to MyBlitzortung user area'] = 'Willkommen im {MYBO} Nutzerbereich';
 $_BL['de']['Admin tools'] = 'Administrationstools';
 $_BL['de']['File cache info'] = 'Dateicache';
 $_BL['de']['Version information'] = 'Versionsinformation';
@@ -494,9 +499,9 @@ $_BL['de']['info_usage_text'] = '
 		';
 $_BL['de']['info_myblitzortung_text'] = '
 		Die Aufbereitung und Visualisierung der Daten auf dieser Internetseite
-		erfolgt durch das Programm <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>. Die Verwendung von <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> erfolgt auf eigene
+		erfolgt durch das Programm {MYBO}. Die Verwendung von {MYBO} erfolgt auf eigene
 		Verantwortung! Weder der Betreiber der Internetseite noch der/die Ersteller des Programms 
-		können für fehlerfreihe Funktion Garantieren. <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> ist freie Software. Mehr
+		können für fehlerfreihe Funktion Garantieren. {MYBO} ist freie Software. Mehr
 		Informationen dazu unter 
 		<a href="http://www.myblitzortung.de" target="_blank">myblitzortung.de</a>.
 		';
@@ -517,7 +522,7 @@ $_BL['de']['bo_graph_descr_ratio'] = '
 $_BL['de']['bo_stat_network_descr_lasth'] = 'Alle Angaben beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung. ';
 $_BL['de']['bo_stat_network_descr_table'] = 'Hier sind alle aktiven Stationen des Ortungsnetzwerks aufgelistet. Durch Anklicken der Spaltenüberschriften kann die Tabelle entsprechend sortiert werden.';
 $_BL['de']['bo_graph_descr_bear'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Himmelsrichtung. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
-$_BL['de']['bo_stat_longtime_descr'] = 'Die hier dargestellten Angaben werden seit Beginn der Aufzeichnung von <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> auf dieser Seite fortgeführt. Die Distanzen beziehen sich immer auf den Standort der Station {STATION}.';
+$_BL['de']['bo_stat_longtime_descr'] = 'Die hier dargestellten Angaben werden seit Beginn der Aufzeichnung von {MYBO} auf dieser Seite fortgeführt. Die Distanzen beziehen sich immer auf den Standort der Station {STATION}.';
 $_BL['de']['bo_stat_other_database_descr'] = 'Alle Blitze, Signal- und Stationsdaten uvm. auf dieser Internetseite werden in einer Datenbank gespeichert. Hier sind einige Angaben dazu:';
 $_BL['de']['bo_stat_other_updates_descr'] = 'In bestimmten Zeitintervallen werden alle notwendigen Daten von blitzortung.org geholt und auf dieser Seite gespeichert. Hier sind die Zeitpunkte der letzten Aktualisierung zu sehen:';
 $_BL['de']['bo_stat_other_gps_descr'] = 'Informationen zum GPS-Empfänger, welcher zur exakten Ermittlung der aktuellen Uhrzeit benötigt wird. Die Positionsdaten der letzten 24 Stunden sind in der Karte eingezeichnet. Falls die Antennenausrichtungen bekannt sind, so sind diese ebenfalls sichtbar.';
@@ -534,7 +539,7 @@ $_BL['de']['bo_stat_station_descr_lasth'] = '
 $_BL['de']['bo_graph_descr_radi'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Entfernung zur Station {STATION_CITY}. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
 $_BL['de']['bo_graph_descr_strikes'] = 'Zu sehen ist die Gesamtanzahl an Blitzen pro Stunde aus dem Ortungsnetzwerk, die Anzahl der detektierten Blitze der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
 $_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der empfangenen Signale pro Stunde der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
-$_BL['de']['bo_stat_other_antennas_descr'] = 'Die Ausrichtung der Antennen kann durch <span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span> automatisch bestimmt werden. Sie kann u.a. zur Bestimmung der Polarität eines Blitzes herangezogen werden.';
+$_BL['de']['bo_stat_other_antennas_descr'] = 'Die Ausrichtung der Antennen kann durch {MYBO} automatisch bestimmt werden. Sie kann u.a. zur Bestimmung der Polarität eines Blitzes herangezogen werden.';
 $_BL['de']['bo_graph_descr_radi_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt und gibt evtl. wertvolle Hinweise auf die Empfindlichkeit der Station. ';
 $_BL['de']['bo_graph_descr_bear_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt.';
 $_BL['de']['bo_graph_descr_strikes_time'] = 'Verlauf der Anzahl aller Blitze des Ortungsnetzwerkes bzw. der Station {STATION}';
@@ -570,7 +575,6 @@ $_BL['de']['Cancel'] = 'Abbrechen';
 $_BL['de']['alert_settings_legend_table'] = 'Optionen';
 $_BL['de']['show other users'] = 'Einstellungen anderer Benutzer zeigen';
 $_BL['de']['User'] = 'Benutzer';
-$_BL['de']['Alert name'] = 'Name';
 $_BL['de']['Send to'] = 'Senden an';
 $_BL['de']['Lat/Lon'] = 'Koordinaten';
 $_BL['de']['Max. Distance'] = 'Max. Entfernung';
@@ -580,8 +584,7 @@ $_BL['de']['Alert count'] = 'Alarmierungen';
 $_BL['de']['Create new alert'] = 'Neuen Alarm erstellen';
 $_BL['de']['Change settings'] = 'Einstellungen ändern';
 $_BL['de']['SMS'] = 'SMS';
-$_BL['de']['URL'] = 'URL';
-$_BL['de']['alert_mail_description'] = 'Die folgenden Angaben wurden von MyBlitzortung der Station {STATION} automatisch ermittelt und versendet. Ohne Gewähr!';
+$_BL['de']['alert_mail_description'] = 'Die folgenden Angaben wurden von {MYBO_NOTAGS} der Station {STATION} automatisch ermittelt und versendet. Ohne Gewähr!';
 $_BL['de']['alert_mail_time range']   = 'Untersuchter Zeitraum ';
 $_BL['de']['alert_mail_strikes']      = 'Anzahl an Blitzen     ';
 $_BL['de']['alert_mail_distance']     = 'Entfernung            ';
@@ -589,7 +592,7 @@ $_BL['de']['alert_mail_last_strike']  = 'Letzter Blitz         ';
 $_BL['de']['alert_mail_first_strike'] = 'Erster Blitz          ';
 $_BL['de']['alert_sms_last_strike']   = 'Letzter Blitz';
 $_BL['de']['alert_sms_distance']      = 'Entfernung';
-$_BL['de']['alert_sms_description']   = 'MyBlitzortung Station {STATION}';
+$_BL['de']['alert_sms_description']   = '{MYBO_NOTAGS} Station {STATION}';
 $_BL['de']['No alerts available. Create one yourself!'] = 'Noch keine Alarme vorhanden.';
 $_BL['de']['You must fill all fields!'] = 'Es müssen alle Felder ausgefüllt werden!';
 $_BL['de']['Wrong format of E-Mail address'] = 'Falsches Format der E-Mail-Adresse';
@@ -614,13 +617,13 @@ $_BL['de']['No log entries'] = 'Keine Einträge im Verlauf';
 /*************************************************************/
 /* MyBo station linking                                      */
 /*************************************************************/
-$_BL['de']['Link with the MyBlitzortung network'] = 'Mit Stationen verlinken, die MyBlitzortung einsetzen';
+$_BL['de']['Link with the MyBlitzortung network'] = 'Mit Stationen verlinken, die {MYBO_NOTAGS} einsetzen';
 $_BL['de']['URL of your website'] = 'Adresse Deiner Webseite';
 $_BL['de']['Leave blank to remove your station from the list'] = 'Leer lassen, um Deine Station von der Liste zu entfernen';
 $_BL['de']['Do an auto update every 24h to retrieve new stations'] = 'Automatisch alle 24h aktualisieren, um die neuesten Links zu bekommen';
 $_BL['de']['Agree and Send'] = 'Einverstanden und Los gehts';
-$_BL['de']['Update MyBlitzortung Stations'] = 'MyBlitzortung Stationen aktualisieren';
-$_BL['de']['Linking with other MyBlitzortung stations'] = 'Mit dem MyBlitzortung Stationsnetzwerk verlinken';
+$_BL['de']['Update MyBlitzortung Stations'] = '{MYBO_NOTAGS} Stationen aktualisieren';
+$_BL['de']['Linking with other MyBlitzortung stations'] = 'Mit dem {MYBO_NOTAGS} Stationsnetzwerk verlinken';
 $_BL['de']['Getting Login string'] = 'Hole eindeutigen Login Kennung';
 $_BL['de']['String is'] = 'Login Kennung ist';
 $_BL['de']['Requesting data'] = 'Daten abfragen';
@@ -632,8 +635,8 @@ $_BL['de']['Couldnt get login id'] = 'Konnte Login Kennung nicht holen';
 
 $_BL['de']['mybo_station_update_info'] = '
 		<p>
-		Hier hast Du die Möglichkeit Deine MyBlitzortung-Webseite mit anderen Stationen 
-		zu verknüpfen, die ebenfalls MyBlitzortung einsetzen.
+		Hier hast Du die Möglichkeit Deine {MYBO_NOTAGS}-Webseite mit anderen Stationen 
+		zu verknüpfen, die ebenfalls {MYBO_NOTAGS} einsetzen.
 		</p>
 		
 		<p>
@@ -686,6 +689,8 @@ $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 /*************************************************************/
 $_BL['de']['Europe'] = 'Europa';
 $_BL['de']['Germany'] = 'Deutschland';
+$_BL['de']['France'] = 'Frankreich';
+$_BL['de']['Austria'] = 'Österreich';
 $_BL['de']['Switzerland'] = 'Schweiz';
 $_BL['de']['Hungary'] = 'Ungarn';
 
@@ -750,7 +755,7 @@ $_BL['de']['graph_legend_deviatinons_time_all'] = 'Relative Anzahl';
 $_BL['de']['graph_legend_deviations_time_own'] = 'Relative Anzahl Station {STATION}';
 $_BL['de']['graph_stat_title_strikes_deviations'] = 'Blitze mit Abweichungen {DEVIATIONS}';
 $_BL['de']['h4_graph_evaluated_signals'] = 'Blitzquoten / Ausgewertete Signale';
-$_BL['de']['bo_graph_evaluated_signals'] = 'Signale der Station {STATION}, welche durch die TOA-Methode auf Blitzortung.org nicht einem Blitz zugeordnet werden konnten, werden durch MyBlitzortung noch einmal mit den vorhandenen Blitzdaten abgeglichen. In manchen Fällen kann damit ein Signal einem Blitz nachträglich zugeordnet werden. Je häufiger dieser Fall eintritt, desto eher liegt ein Fehler bei der Einstellung im Vorverstärker vor. Im Idealfall sollten die beiden Kurven also deckungsgleich sein.';
+$_BL['de']['bo_graph_evaluated_signals'] = 'Signale der Station {STATION}, welche durch die TOA-Methode auf Blitzortung.org nicht einem Blitz zugeordnet werden konnten, werden durch {MYBO_NOTAGS} noch einmal mit den vorhandenen Blitzdaten abgeglichen. In manchen Fällen kann damit ein Signal einem Blitz nachträglich zugeordnet werden. Je häufiger dieser Fall eintritt, desto eher liegt ein Fehler bei der Einstellung im Vorverstärker vor. Im Idealfall sollten die beiden Kurven also deckungsgleich sein.';
 $_BL['de']['h4_graph_deviations_time'] = 'Verlauf der Positionsabweichungen';
 $_BL['de']['bo_graph_deviations_time'] = 'Zeitlicher Verlauf der mittleren Abweichungen der Blitzpositionen bzw. Verlauf von bestimmten Abweichungen.';
 $_BL['de']['graph_legend_evaluated_signals_part_ratio'] = 'Blitzquote';
@@ -827,3 +832,7 @@ $_BL['de']['number_every_minutes'] = 'alle {NUMBER} Minuten';
 $_BL['de']['number_every_1minute'] = 'jede Minute';
 $_BL['de']['number_minutes'] = '{NUMBER} Minuten';
 $_BL['de']['number_1minute'] = 'eine Minute';
+$_BL['de']['h4_new_stations'] = 'Die letzten Neuzugänge';
+$_BL['de']['arch_navi_strikes'] = 'Blitze';
+$_BL['de']['h3_arch_last_strikes'] = 'Die letzten Blitze';
+$_BL['de']['Participated stations'] = 'Teilgenommene Stationen';

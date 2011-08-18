@@ -61,6 +61,7 @@ if (!defined('BO_VER'))
 @define("BO_LOCALE2", '');          //shows translation in this language, if main language doesn't exist
 @define("BO_LANGUAGES", 'de,en,fr');   //available locales
 @define("BO_SHOW_LANGUAGES", true); //show links in the footer
+@define("BO_SHOW_LANG_FLAGS", true); //show flags
 
 /*** User / Login                                                ***/
 @define("BO_LOGIN_SHOW", true);
@@ -72,6 +73,15 @@ if (!defined('BO_VER'))
 @define("BO_UP_INTVL_STATIONS", 15);
 @define("BO_UP_INTVL_RAW", 60);
 @define("BO_UP_MAX_SLEEP", 30);
+
+/*** Import error handling                                       ***/
+@define("BO_UP_ERR_MIN_MINUTES", 30);
+@define("BO_UP_ERR_MIN_COUNT",   1);
+@define("BO_UP_ERR_SEND_INTERVAL",   60);
+
+/*** Copyright footer/graphs/images                              ***/
+@define('BO_OWN_COPYRIGHT', '');
+@define('BO_OWN_COPYRIGHT_SIZE', 7);
 
 /*** URLs                                                        ***/
 /*   These have only to be changed if you use the PHP include      */
@@ -90,24 +100,44 @@ if (!defined('BO_VER'))
 /*** set to true, if you want to use "file_get_contents"         ***/
 @define("BO_USE_PHPURLWRAPPER", false);
 
-/*** Disable station statistics (for slow servers)               ***/
-@define("BO_STATION_STAT_DISABLE", false);
+
+
+/*******************************************************************/
+/*** Statistics                                                  ***/
 
 /*** Show GPS Info                                               ***/
 /*   You can set your BO_LAT, BO_LON to rough coordinates and      */
 /*   disable this option. So nobody can see your exact position.   */
 @define("BO_SHOW_GPS_INFO", true);
 
+/*** Disable station statistics (for slow servers)               ***/
+@define("BO_STATION_STAT_DISABLE", false);
+
 /*** Mark stations offline after specified time with no signals    */
 @define("BO_STATION_OFFLINE_HOURS", 24);
 
-/*** Images                                                        */
-@define("BO_IMAGE_PALETTE_COLORS", 0); // use palette images with defined colors (0 disables)
+/*** Show new stations                                           ***/
+@define("BO_STATISTICS_SHOW_NEW_STATIONS", 0);
 
 
 
 /*******************************************************************/
-/*** Map: General settings                                       ***/
+/*** Image Maps: General settings                                ***/
+
+@define("BO_IMAGE_USE_TRUECOLOR", true); // use true color images
+@define("BO_IMAGE_PALETTE_COLORS_MAPS", 256); // use palette images for MAPS with defined colors for output (0 disables)
+@define("BO_IMAGE_PALETTE_COLORS_DENSITIES", 0); // use palette images for DENSITY MAPS with defined colors for output (0 disables)
+
+
+/*******************************************************************/
+/*** Fonts: General settings                                     ***/
+@define("BO_FONT_TTF_NORMAL", 'fonts/DejaVuSans.ttf'); // normal truetype font file
+@define("BO_FONT_TTF_BOLD", 'fonts/DejaVuSans-Bold.ttf'); // normal bold font file
+@define("BO_FONT_TTF_MONO", 'fonts/DejaVuSansMono.ttf'); // mono truetype font file
+
+
+/*******************************************************************/
+/*** Dynamic Map: General settings                               ***/
 /*   Appearance of the dynamic map, colors, icons etc.             */
 
 //Map display
@@ -134,6 +164,13 @@ if (!defined('BO_VER'))
 @define('BO_MAP_STATION_ICON', 'http://labs.google.com/ridefinder/images/mm_20_red.png');
 @define('BO_MAP_MAX_STRIKES_PER_TILE', 20000);
 @define('BO_MAP_STATIONS_ICON', 'http://maps.google.com/mapfiles/kml/pal4/icon24.png'); //Stations icon
+
+@define('BO_MAP_LEGEND_WIDTH', 80);
+@define('BO_MAP_LEGEND_HEIGHT', 10); //only colorbar
+@define('BO_MAP_LEGEND_FONTSIZE', 2); //no TTF!
+@define('BO_MAP_NA_FONTSIZE', 3); //no TTF!
+@define('BO_MAP_COUNT_FONTSIZE', 8); 
+@define('BO_MAP_COUNT_FONTBOLD', true); 
 
 //MyBo Stations
 @define('BO_MAP_MYBO_CIRCLE_COLOR_LINE', '#0000FF');
@@ -169,6 +206,7 @@ if (!defined('BO_VER'))
 /*******************************************************************/
 /*** Archive                                                     ***/
 
+@define("BO_DISABLE_ARCHIVE", false); //Completely disables archive
 @define("BO_ENABLE_ARCHIVE_MAPS", false); //Enables archive (maps by date and animations) for guests
 @define("BO_ENABLE_DENSITIES", false); //Enables densities for guests (set the also next option to true)
 @define("BO_CALC_DENSITIES", false); //Calculates Densities 
@@ -176,6 +214,9 @@ if (!defined('BO_VER'))
 @define("BO_ARCHIVE_SEARCH_STRIKECOUNT", 10); //maximum no. of strikes displayed when searching for them
 @define("BO_ARCHIVE_SHOW_SPECTRUM", true);
 
+//Strike details
+@define("BO_ARCHIVE_STR_DETAILS_LINECOLOR", 'fff2');
+@define("BO_ARCHIVE_STR_DETAILS_DEFAULT_POINT", 'stations_strikedetails');
 
 
 /*******************************************************************/
@@ -232,9 +273,9 @@ if (!defined('BO_VER'))
 @define("BO_GRAPH_STAT_COLOR_YAXIS", '#666');
 @define("BO_GRAPH_STAT_COLOR_XAXIS_TITLE", '#666');
 @define("BO_GRAPH_STAT_COLOR_YAXIS_TITLE", '#666');
-@define("BO_GRAPH_STAT_COLOR_LEGEND_FILL", '#fff');
+@define("BO_GRAPH_STAT_COLOR_LEGEND_FILL", '#fff@1');
 @define("BO_GRAPH_STAT_COLOR_LEGEND_TEXT", '#666');
-@define("BO_GRAPH_STAT_COLOR_LEGEND_FRAME", '#fff');
+@define("BO_GRAPH_STAT_COLOR_LEGEND_FRAME", '#fff@1');
 @define("BO_GRAPH_STAT_COLOR_TITLE", '#666');
 @define("BO_GRAPH_STAT_FONTSIZE_TITLE", 8);
 @define("BO_GRAPH_STAT_FONTSIZE_XAXIS", 7);
