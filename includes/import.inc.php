@@ -1214,6 +1214,11 @@ function bo_update_shutdown()
 
 function bo_update_all($force = false)
 {
+	$overall_timeout = intval(BO_UP_MAX_TIME);
+	if (!$overall_timeout)
+		$overall_timeout = 55;
+		
+	
 	session_write_close();
 	ignore_user_abort(true);
 	
@@ -1221,12 +1226,12 @@ function bo_update_all($force = false)
 
 	$start_time = time();
 	$debug = defined('BO_DEBUG') && BO_DEBUG;
-	$is_updating = bo_get_conf('is_updating');
+	$is_updating = (int)bo_get_conf('is_updating');
 
-	//Check if sth. went wrong on the last update (if older than 120sec continue)
-	if ($is_updating && time() - $is_updating < 120 && !($force && $debug))
+	//Check if sth. went wrong on the last update (if older continue)
+	if ($is_updating && time() - $is_updating < $overall_timeout + 120 && !($force && $debug))
 	{
-		echo "\n<p>ERROR: Another update is running</p>\n";
+		echo "\n<p>ERROR: Another update is running *** Begin: ".date('Y-m-d H:i:s', $is_updating)." *** Now: ".date('Y-m-d H:i:s')."</p>\n";
 		return;
 	}
 
@@ -1249,6 +1254,8 @@ function bo_update_all($force = false)
 	$max_time = $exec_timeout - 10;
 	if ($max_time < 5)
 		$max_time = 20;
+	else if ($max_time > $overall_timeout)
+		$max_time = $overall_timeout;
 	
 	if (!$force)
 	{
@@ -1771,7 +1778,7 @@ function bo_update_densities($max_time)
 					
 					// line by line
 					$sql = "SELECT COUNT(*) cnt, FLOOR((s.lon+".(-$lon).")/(".$dlon.")) lon_id
-							FROM ".BO_DB_PREF."strikes s
+							FROM ".BO_DB_PREF."strikes s FORCE INDEX (time)
 								$sql_join
 							WHERE 1
 								AND NOT (s.lat < ".($lat)." OR s.lat > ".($lat+$dlat)." OR s.lon < ".$lon." OR s.lon > ".$lon_end.") 
@@ -2315,8 +2322,6 @@ function bo_update_error($type, $extra = null)
 			echo '<p>Sent E-Mail to '.$mail.'</p>';
 		}
 	}
-	
-	print_r($data);
 	
 	//Write
 	bo_set_conf('uperror_'.$type, serialize($data));
