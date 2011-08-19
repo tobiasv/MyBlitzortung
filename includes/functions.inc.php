@@ -704,6 +704,10 @@ function bo_load_locale()
 			include $locdir.'own.php';
 	}
 
+	//Send the language
+	if (!headers_sent())
+		header("Content-Language: $locale");
+
 }
 
 function bo_get_file($url, &$error = '')

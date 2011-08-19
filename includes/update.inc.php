@@ -35,7 +35,8 @@ function bo_check_for_update()
 						'0.3.1' => 301, 
 						'0.4.8' => 408, 
 						'0.5.2' => 502,
-						'0.5.5' => 505);
+						'0.5.5' => 505,
+						'0.6.1' => 601);
 
 	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
 	{
