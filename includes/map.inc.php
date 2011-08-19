@@ -222,7 +222,7 @@ function bo_show_lightning_map()
 
 		$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name']).' '.date(_BL('_datetime'), $last_update);
 		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
-		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.BO_FILE.'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
+		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'&bo_lang='._BL().'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.BO_FILE.'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
 		echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 		echo '</div>';
 
