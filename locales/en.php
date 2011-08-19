@@ -270,6 +270,7 @@ $_BL['en']['No strikes found!'] = 'No strikes found!';
 $_BL['en']['arch_navi_maps'] = 'Maps';
 $_BL['en']['h3_arch_maps'] = 'Strike archive: Maps and animations';
 $_BL['en']['legend_arch_strikes'] = 'Options';
+$_BL['en']['Strike density'] = 'Strike density';
 $_BL['en']['arch_navi_density'] = 'Strike densities';
 $_BL['en']['h3_arch_density'] = 'Strike densities';
 $_BL['en']['legend_arch_densities'] = 'Options';

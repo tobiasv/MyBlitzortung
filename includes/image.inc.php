@@ -322,7 +322,6 @@ function bo_tile()
 		if ($_GET['stat'] == 2)
 		{
 			$stations = bo_stations();
-			$only_own = false;
 			$stations_count = array();
 			
 			$sql = "SELECT ss.station_id sid, COUNT(s.time) cnt 
@@ -333,6 +332,7 @@ function bo_tile()
 					".($radius ? "AND s.distance < $radius" : "")."
 					AND NOT (s.lat < $lat1 OR s.lat > $lat2 OR s.lon < $lon1 OR s.lon > $lon2)
 					AND (0 $sql_where)
+					".($only_own ? " AND part>0 " : "")."
 				GROUP BY sid
 				";
 			$erg = bo_db($sql);
@@ -364,17 +364,18 @@ function bo_tile()
 			else
 				$strike_count += $row['cnt'];
 		}
-	
-		//create Image
-		$I = imagecreatetruecolor(BO_TILE_SIZE, BO_TILE_SIZE);
-		imagesavealpha($I, true);
-		imagealphablending($I, false);
-
-		$blank = imagecolorallocatealpha($I, 0, 0, 0, 127);
-		imagefilledrectangle( $I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
 		
+		//create tile image
+		$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
+		imagealphablending($I, true); 
+		imagesavealpha($I, true);
+
+		$blank = imagecolorallocatealpha($I, 255, 255, 255, 127);
+		imagefilledrectangle($I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
+	
+	
 		//border
-		$col = imagecolorallocatealpha($I, 100,100,100,80);
+		$col = imagecolorallocatealpha($I, 100,100,100,50);
 		imagerectangle( $I, 0, 0, BO_TILE_SIZE-1, BO_TILE_SIZE-1, $col);
 		
 		//number
@@ -1643,6 +1644,14 @@ function bo_get_density_image()
 	$PosY = 10;
 	$MarginX = 8;
 
+	//Station name
+	if ($station_id)
+	{
+		$PosY = bo_imagestring_max($I, 2, $PosX, $PosY, _BL('Station', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, 3, $PosX+$MarginX, $PosY, $stinfo['city'], $text_col, $LegendWidth);
+		$PosY += 10;
+	}
+	
 	//Strike count
 	$PosY = bo_imagestring_max($I, 2, $PosX, $PosY, _BL('Strikes', true).':', $text_col, $LegendWidth);
 	$PosY = bo_imagestring_max($I, 3, $PosX+$MarginX, $PosY, $strike_count, $text_col, $LegendWidth);
@@ -1739,8 +1748,6 @@ function bo_get_density_image()
 	$extra_text = '';
 	if ($station_id)
 	{
-		$extra_text = _BL('Station', true).': '.$stinfo['city'].($ratio ? ' ('._BL('Strike ratio').')' : '');
-		
 		imagestring($I, $fontsize, 1, 1 + $fontsize * 3, $text, $text_col);
 		
 		$size = 6;
@@ -1750,10 +1757,11 @@ function bo_get_density_image()
 		
 	}
 
-
 	//Banner
+	$extra_text = _BL($ratio ? 'Strike ratio' : 'Strike density', true);
+
 	bo_image_banner_top($I, $w, $h, $cfg, $time_string, $extra_text);
-	bo_image_banner_bottom($I, $w, $h, $cfg);
+	bo_image_banner_bottom($I, $w, $h, $cfg, 0);
 	
 	
 
@@ -1785,7 +1793,7 @@ function bo_get_density_image()
 }
 
 
-function bo_image_banner_top($I, $w, $h, $cfg, $time_string = null, $extra = null)
+function bo_image_banner_top($I, $w, $h, $cfg, $time_string = null, $extra = null, $copy = true)
 {
 	//default color
 	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
@@ -1825,7 +1833,7 @@ function bo_image_banner_top($I, $w, $h, $cfg, $time_string = null, $extra = nul
 		bo_imagestringright($I, $fontsize, $w - 2, 2+$tdy, $extra, $tcol, $tbold);
 	
 	//Own Copyright
-	if (defined('BO_OWN_COPYRIGHT'))
+	if (defined('BO_OWN_COPYRIGHT') && $copy)
 	{
 		$copy_width = bo_imagetextwidth($fontsize, $tbold, BO_OWN_COPYRIGHT);
 		$info_text_width = bo_imagetextwidth($fontsize, $tbold, $time_string.'         '.$strike_text);
@@ -1839,7 +1847,7 @@ function bo_image_banner_top($I, $w, $h, $cfg, $time_string = null, $extra = nul
 }
 
 
-function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0)
+function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = false)
 {
 	//default color
 	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
@@ -1891,8 +1899,7 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0)
 	bo_imagestring($I, $fontsize, 4, $h - $tdy, $text, $tcol, $tbold);
 
 	//Own copyright
-	/*
-	if (defined('BO_OWN_COPYRIGHT'))
+	if (defined('BO_OWN_COPYRIGHT') && $copy)
 	{
 		$bo_width2 = bo_imagetextwidth($fontsize, $tbold, BO_OWN_COPYRIGHT);
 		$bo_pos2 = $bo_width + $fontsize * 5;
@@ -1900,7 +1907,6 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0)
 		if ($bo_width2+$bo_pos2 < $w - $legend_width - 5)
 			bo_imagestring($I, $fontsize, $bo_pos2, $h - $tdy, BO_OWN_COPYRIGHT, $tcol, $tbold);
 	}
-	*/
 }
 
 //writes text with automatic line brakes into an image

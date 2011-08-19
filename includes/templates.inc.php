@@ -107,7 +107,10 @@ $_BO['tpl_density_colors'][] = array(255, 190, 255, 15);
 //point-Array: type,size,fillcolor,borderwidth,bordercolor
 
 $_BO['points']['whitered1']['font']          = array(7, 1, array('fff8',1,'000c'), 6, -11); 
-$_BO['points']['whitered1']['point']         = array(3, 3, 'f008', 1, 'fff8'); 
+$_BO['points']['whitered1']['point']         = array(3, 2, 'f008', 1, 'fff8'); 
+
+$_BO['points']['whitered2']['font']          = array(7, 1, array('fff8',0,'000c'), 5, -9); 
+$_BO['points']['whitered2']['point']         = array(3, 2, 'f008', 1, 'fff8'); 
 
 $_BO['points']['stations_active']['point']   = array(10, 5, '0f4', 1, '0f4e'); 
 $_BO['points']['stations_inactive']['point'] = array(10, 5, 'c64', 1, 'c64e'); 
@@ -162,7 +165,7 @@ $_BO['tpl_imgmap_default']['col'] = $_BO['tpl_color']['standard'];
 /**************************************/
 
 //Europe
-//MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=71.3&map_generator_west=-22&map_generator_east=52&map_generator_south=24.3&map_generator_min_area=50&map_generator_shorelines=0.1p%2F30%2F30%2F30&map_generator_boundaries=a%2F0.1p%2F30%2F30%2F30&map_generator_rivers=-&map_generator_lakes=31%2F31%2F160&map_generator_dry_area=-&map_generator_wet_area=31%2F31%2F160&map_generator_color_map=-200+100+195+100+0+100+195+100+%0D%0A0+100+188+100+100+100+188+100+%0D%0A100+100+177+100+200+100+177+100+%0D%0A200+100+166+100+500+100+166+100+%0D%0A500+100+155+100+1000+100+155+100+%0D%0A1000+90+144+90+1500+90+144+90%0D%0A1500+80+140+80+2000+80+140+80%0D%0A2000+75+135+75+2500+75+135+75%0D%0A2500+70+130+70+3000+70+130+70%0D%0A3000+65+120+65+5000+65+120+65%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.01
+//MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=71.3&map_generator_west=-22&map_generator_east=52&map_generator_south=24.3&map_generator_min_area=50&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.01p%2F80%2F80%2F80+3%2F0.01p%2F80%2F80%2F80+4%2F0.01p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500+++90+150++80+1000++90+150++80%0D%0A1000+100+150++80+1500+100+150++80%0D%0A1500+105+140++60+2000+105+140++60%0D%0A2000+110+135++40+2500+110+135++40%0D%0A2500+110+130++30+3000+110+130++30%0D%0A3000+115+125++20+6000+115+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.01
 $_BO['tpl_imgmap']['europe'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['europe']['name'] = 'Europe';
 $_BO['tpl_imgmap']['europe']['file'] = 'map_europe.png';
@@ -174,6 +177,23 @@ $_BO['tpl_imgmap']['europe']['density'] = true;
 $_BO['tpl_imgmap']['europe']['density_blocksize'] = 5;
 $_BO['tpl_imgmap']['europe']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['europe']['density_darken'] = 40;
+
+//Europe: Western / Central
+//MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=57&map_generator_west=-5&map_generator_east=18&map_generator_south=42.2&map_generator_min_area=20&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.1p%2F80%2F80%2F80+3%2F0.1p%2F80%2F80%2F80+4%2F0.1p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500++110+155++80+1000+110+155++80%0D%0A1000+150+150++80+1500+150+150++80%0D%0A1500+160+140++60+2000+160+140++60%0D%0A2000+170+135++40+2500+170+135++40%0D%0A2500+180+130++30+3000+180+130++30%0D%0A3000+185+125++20+6000+185+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.1
+$_BO['tpl_imgmap']['europe_west_central'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['europe_west_central']['name'] = 'Europe (West/Central)';
+$_BO['tpl_imgmap']['europe_west_central']['file'] = 'map_europe_west_central.png';
+$_BO['tpl_imgmap']['europe_west_central']['borders'] = array('map_europe_west_central_borders.png', 60);
+$_BO['tpl_imgmap']['europe_west_central']['coord'] = array(57, 18, 42.2, -5); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['europe_west_central']['point_type'] = 2;
+$_BO['tpl_imgmap']['europe_west_central']['point_size'] = 3;
+$_BO['tpl_imgmap']['europe_west_central']['density'] = true;
+$_BO['tpl_imgmap']['europe_west_central']['density_blocksize'] = 5;
+$_BO['tpl_imgmap']['europe_west_central']['density_colors'] = $_BO['tpl_density_colors'];
+$_BO['tpl_imgmap']['europe_west_central']['density_darken'] = 40;
+$_BO['tpl_imgmap']['europe_west_central']['cities'][1] = $_BO['points']['whitered2'];
+$_BO['tpl_imgmap']['europe_west_central']['cities'][5] = $_BO['points']['whitered2'];
+$_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitered2'];
 
 
 //Germany (Landkreise) no exact merator prjection!
@@ -317,7 +337,7 @@ $_BO['tpl_imgmap']['germany_mini']['upd_intv'] = 5; //minutes
 $_BO['tpl_imgmap']['germany_mini']['textcolor'] = array(255,255,255);
 $_BO['tpl_imgmap']['germany_mini']['textsize'] = 1;
 $_BO['tpl_imgmap']['germany_mini']['point_type'] = 2;
-$_BO['tpl_imgmap']['germany_mini']['point_size'] = 1;
+$_BO['tpl_imgmap']['germany_mini']['point_size'] = 2;
 $_BO['tpl_imgmap']['germany_mini']['legend'] = array(0, 42, 26, 0, 0, 0);
 $_BO['tpl_imgmap']['germany_mini']['col'] = $_BO['tpl_color']['standard'];
 

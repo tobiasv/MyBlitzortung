@@ -144,6 +144,7 @@ function bo_show_archive_map()
 	echo '<legend>'._BL('legend_arch_strikes').'</legend>';
 
 	$map = bo_archive_select_map($map);
+	$mapname = _BL($_BO['mapimg'][$map]['name']);
 	
 	//image dimensions
 	$file = BO_DIR.'images/'.$_BO['mapimg'][$map]['file'];
@@ -218,14 +219,17 @@ function bo_show_archive_map()
 				
 				$images .= ($images ? ',' : '').'"'.date('YmdHi', $time).'-'.$ani_pic_interval.'"';
 			}
+
+			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time).' ('._BL('Animation').')';
 			
-			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
-			echo '<img style="position:absolute;top:0;left:0;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.BO_FILE.'?map='.$map.'&transparent&date='.sprintf('%04d%02d%02d0000-%d', $year, $month, $day, $ani_pic_interval).'&bo_lang='._BL().'">';
+			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
+			echo '<img style="position:absolute;top:0;left:0;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.BO_FILE.'?map='.$map.'&transparent&date='.sprintf('%04d%02d%02d0000-%d', $year, $month, $day, $ani_pic_interval).'&bo_lang='._BL().'" alt="'.htmlspecialchars($alt).'">';
 		}
 		else
 		{
+			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time);
 			$img_file = BO_FILE.'?map='.$map.'&date='.sprintf('%04d%02d%02d', $year, $month, $day).'&bo_lang='._BL();
-			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
+			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
 		}
 		
 		$footer = $_BO['mapimg'][$map]['footer'];
@@ -306,7 +310,10 @@ function bo_show_archive_density()
 	$lonW = $cfg['coord'][3];
 
 	
-	$sql = "SELECT MIN(date_start) mindate, MAX(date_start) maxdate, MAX(date_end) maxdate_end FROM ".BO_DB_PREF."densities ";
+	$sql = "SELECT MIN(date_start) mindate, MAX(date_start) maxdate, MAX(date_end) maxdate_end 
+			FROM ".BO_DB_PREF."densities 
+			WHERE (status=1 OR status=3)
+			";
 	$res = bo_db($sql);
 	$row = $res->fetch_assoc();
 	$start_time = strtotime($row['mindate']);
@@ -336,8 +343,6 @@ function bo_show_archive_density()
 
 	
 	echo '<span class="bo_form_descr">'._BL('Map').':</span> ';
-	
-	ksort($_BO['mapimg']);
 	echo '<select name="bo_map" id="bo_arch_dens_select_map" onchange="submit();">';
 	foreach($_BO['mapimg'] as $id => $d)
 	{
@@ -387,7 +392,9 @@ function bo_show_archive_density()
 
 	for($i=1;$i<=12;$i++)
 	{
-		if ($year == date('Y', $end_time) && $i > date('m', $end_time))
+		if ( ($year == date('Y', $end_time) && $i > date('m', $end_time))
+		     || strtotime("$year-$i-01") < $start_time
+		   )
 		{
 			echo '<span class="bo_archive_density_monthurl">';
 			echo _BL(date('M', strtotime("2000-$i-01")));
@@ -409,15 +416,19 @@ function bo_show_archive_density()
 
 	echo '</form>';
 
+	$mapname = _BL($_BO['mapimg'][$map]['name']);
 	
-	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 	
+	$alt = $ratio ? _BL('Strike ratio') : _BL('arch_navi_density');
+	$alt .= $station_id ? ' ('._BL('Station').' '._BC($station_infos[$station_id]['city']).')' : '';
+	$alt .= ' '.$mapname.' '.$year.' '.($month ? _BL(date('F', strtotime("2000-$month-01"))) : '');
 	$img_file = BO_FILE.'?density&map='.$map.'&bo_year='.$year.'&bo_month='.$month.'&id='.$station_id.($ratio ? '&ratio' : '').'&bo_lang='._BL();
-	echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
-
 	$footer = $_BO['mapimg'][$map]['footer'];
-	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 
+	// The map
+	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
+	echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
+	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 	echo '</div>';
 	
 	echo '</div>';
@@ -565,7 +576,10 @@ function bo_show_archive_search()
 			$description .= '</ul>';
 
 			if ($row['raw_id'])
-				$description .= '<img src=\''.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\'>';
+			{
+				$alt = _BL('Signals');
+				$description .= '<img src=\''.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\' alt="'.htmlspecialchars($alt).'">';
+			}
 
 			$description .= '</div>';
 
@@ -964,10 +978,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '</span>';
 		echo '</td>';
 
-
+		$alt = _BL('Signals');
 		echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 		if ($row['raw_id'])
-			echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px">';
+			echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'">';
 		else
 			echo _BL('No signal recieved.');
 		echo '</td>';
@@ -976,7 +990,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		{
 			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 			if ($row['raw_id'])
-				echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px">';
+				echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'">';
 			else
 				echo _BL('No signal recieved.');
 			echo '</td>';
@@ -1167,7 +1181,6 @@ function bo_archive_select_map($map)
 	global $_BO;
 	echo '<span class="bo_form_descr">'._BL('Map').':</span> ';
 	
-	ksort($_BO['mapimg']);
 	echo '<select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
 	foreach($_BO['mapimg'] as $id => $d)
 	{

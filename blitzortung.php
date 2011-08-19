@@ -223,6 +223,30 @@ if (!defined("BO_VER"))
 		bo_get_map_image();
 		exit;
 	}
+	
+	
+	//Order maps
+	if (defined('BO_IMAGE_PALETTE_COLORS_DENSITIES') && strlen(BO_IMAGE_PALETTE_COLORS_DENSITIES))
+	{
+		$order = explode(',',BO_IMAGE_PALETTE_COLORS_DENSITIES);
+		$tmp = array();
+		ksort($_BO['mapimg']);
+		
+		foreach($order as $id)
+		{
+			$tmp[$id] = $_BO['mapimg'][$id];
+		}
+		
+		foreach($_BO['mapimg'] as $id => $data)
+		{
+			if (!isset($tmp[$id]))
+				$tmp[$id] = $_BO['mapimg'][$id];
+		}
+		
+		$_BO['mapimg'] = $tmp;
+	}
+	
+	
 }
 
 ?>

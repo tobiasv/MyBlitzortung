@@ -268,6 +268,7 @@ $_BL['fr']['No strikes found!'] = 'Pas d\'impacts de foudre trouvés!';
 $_BL['fr']['arch_navi_maps'] = 'Cartes';
 $_BL['fr']['h3_arch_maps'] = 'Archive: Cartes et Animations';
 $_BL['fr']['legend_arch_strikes'] = 'Options';
+$_BL['fr']['Strike density'] = 'Densité de la foudre';
 $_BL['fr']['arch_navi_density'] = 'Densité des impacts';
 $_BL['fr']['h3_arch_density'] = 'Densité de la foudre';
 $_BL['fr']['legend_arch_densities'] = 'Options';

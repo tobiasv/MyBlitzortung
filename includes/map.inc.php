@@ -175,10 +175,11 @@ function bo_show_lightning_map()
 	
 	$disabled = (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !bo_user_get_level());
 	$no_google = isset($_GET['bo_showmap']) || $disabled;
+	$last_update = bo_get_conf('uptime_strikes');
 	
 	$static_map_id = intval($_GET['bo_showmap']);
 	$menu_text = '';
-	ksort($_BO['mapimg']);
+
 	foreach($_BO['mapimg'] as $id => $d)
 	{
 		if (!$d['name'] || !$d['menu'])
@@ -218,9 +219,10 @@ function bo_show_lightning_map()
 			echo '<a href="'.BO_ARCHIVE_URL.'&bo_map='.$static_map_id.'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
 			echo '</div>';
 		}
-		
+
+		$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name']).' '.date(_BL('_datetime'), $last_update);
 		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
-		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.BO_FILE.'?image=wait\');">';
+		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.BO_FILE.'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
 		echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 		echo '</div>';
 

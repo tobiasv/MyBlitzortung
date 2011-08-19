@@ -268,6 +268,7 @@ $_BL['de']['No strikes found!'] = 'Keine Blitze gefunden!';
 $_BL['de']['arch_navi_maps'] = 'Karten';
 $_BL['de']['h3_arch_maps'] = 'Blitzarchiv: Karten und Animationen';
 $_BL['de']['legend_arch_strikes'] = 'Optionen';
+$_BL['de']['Strike density'] = 'Blitzdichte';
 $_BL['de']['arch_navi_density'] = 'Blitzdichte';
 $_BL['de']['h3_arch_density'] = 'Blitzdichten';
 $_BL['de']['legend_arch_densities'] = 'Optionen';

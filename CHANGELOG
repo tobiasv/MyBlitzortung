@@ -16,6 +16,8 @@ Version 0.6.1 (2011-08-xx)
 - new: show top stations per tile in dynamic map
 - new: email and more text output on errors during import
 - new: show new stations in network statistics
+- new: alt-tag in "img"
+- new: map for western/central europe (germany+france) and new europe map with nicer colors
 - other visual improvements for maps
 - cleanup in default_settings.inc.php and templates.inc.php
 
