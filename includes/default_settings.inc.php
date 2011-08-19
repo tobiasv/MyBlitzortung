@@ -120,6 +120,8 @@ if (!defined('BO_VER'))
 /*** Show new stations                                           ***/
 @define("BO_STATISTICS_SHOW_NEW_STATIONS", 0);
 
+/*** Statistics for all station                                  ***/
+@define("BO_STATISTICS_ALL_STATIONS", 0); // 0 = disable, 1 = with specific link, 2 = links from table for everyone
 
 
 /*******************************************************************/

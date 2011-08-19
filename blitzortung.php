@@ -226,9 +226,9 @@ if (!defined("BO_VER"))
 	
 	
 	//Order maps
-	if (defined('BO_IMAGE_PALETTE_COLORS_DENSITIES') && strlen(BO_IMAGE_PALETTE_COLORS_DENSITIES))
+	if (defined('BO_MAPS_ORDER') && strlen(BO_MAPS_ORDER))
 	{
-		$order = explode(',',BO_IMAGE_PALETTE_COLORS_DENSITIES);
+		$order = explode(',',BO_MAPS_ORDER);
 		$tmp = array();
 		ksort($_BO['mapimg']);
 		

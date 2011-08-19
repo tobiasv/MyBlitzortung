@@ -861,11 +861,18 @@ function bo_show_lightning_map()
 					  title:bo_stations[i].city,
 					  icon: '<?php echo  BO_MAP_STATIONS_ICON ?>',
 					  stid: bo_stations[i].stid
-					});
+					});  
+
+					
+<?php if (BO_STATISTICS_ALL_STATIONS == 2 || ((bo_user_get_level() & BO_PERM_NOLIMIT))) { ?>
 					
 					google.maps.event.addListener(bo_station_markers[i], 'click', function() {
 						window.open('<?php echo BO_STATISTICS_URL ?>&bo_show=station&bo_station_id=' + this.stid, '_blank');
-					});
+					}); 
+
+<?php } ?>
+
+					
 				}
 			}
 			else

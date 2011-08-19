@@ -978,7 +978,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '</span>';
 		echo '</td>';
 
-		$alt = _BL('Signals');
+		$alt = _BL('rawgraph');
 		echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 		if ($row['raw_id'])
 			echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'">';

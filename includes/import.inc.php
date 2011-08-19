@@ -820,6 +820,7 @@ function bo_update_stations($force = false)
 
 		echo "\n<p>Stations: ".(count($lines)-2)." *** New Stations: $i *** Updated: $u</p>\n";
 
+		
 		//New stations (by user name)
 		$data = unserialize(bo_get_conf('stations_new_date'));
 		if (!$data) //first call!
@@ -834,10 +835,12 @@ function bo_update_stations($force = false)
 			$new = false;
 			foreach($activebyuser as $user => $d)
 			{
-				if (!$data[$user] && $d['sig']) //no old entry but new signals
+				if (!isset($data[$user]) && $d['sig']) //no old entry but new signals
 				{
 					$data[$user] = time(); // mark as NEW STATION
 					$new = true;
+					
+					echo "<p>Found NEW station: '.$user.'</p>\n";
 				}
 			}
 		

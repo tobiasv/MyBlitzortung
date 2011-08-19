@@ -27,10 +27,24 @@ if (!defined('BO_VER'))
 function bo_show_statistics()
 {
 	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'strikes';
-	$station_id = intval($_GET['bo_station_id']);
+	
+	if (defined('BO_STATISTICS_ALL_STATIONS') && BO_STATISTICS_ALL_STATIONS || ((bo_user_get_level() & BO_PERM_NOLIMIT)))
+	{
+		$station_id = intval($_GET['bo_station_id']);
 
-	if ($station_id && $station_id != bo_station_id())
-		$add_stid = '&bo_station_id='.$station_id;
+		if ($station_id && $station_id != bo_station_id())
+		{
+			$add_stid = '&bo_station_id='.$station_id;
+			$add_graph = '&id='.$station_id;
+			$own_station = false;
+		}
+	}
+	
+	if (!$station_id)
+	{
+		$station_id = bo_station_id();
+		$own_station = true;
+	}
 	
 	echo '<div id="bo_statistics">';
 
@@ -57,31 +71,31 @@ function bo_show_statistics()
 	{
 		default:
 		case 'strikes':
-			bo_show_statistics_strikes();
+			bo_show_statistics_strikes($station_id, $own_station, $add_graph);
 			break;
 
 		case 'station':
-			bo_show_statistics_station();
+			bo_show_statistics_station($station_id, $own_station, $add_graph);
 			break;
 
 		case 'longtime':
 			echo '<h3>'._BL('h3_stat_longtime').'</h3>';
-			bo_show_statistics_longtime();
+			bo_show_statistics_longtime($station_id, $own_station, $add_graph);
 			break;
 
 		case 'network':
 			echo '<h3>'._BL('h3_stat_network').'</h3>';
-			bo_show_statistics_network();
+			bo_show_statistics_network($station_id, $own_station, $add_graph);
 			break;
 
 		case 'other':
 			echo '<h3>'._BL('h3_stat_other').'</h3>';
-			bo_show_statistics_other();
+			bo_show_statistics_other($station_id, $own_station, $add_graph);
 			break;
 		
 		case 'advanced':
 			echo '<h3>'._BL('h3_stat_advanced').'</h3>';
-			bo_show_statistics_advanced();
+			bo_show_statistics_advanced($station_id, $own_station, $add_graph);
 			break;
 	}
 
@@ -91,20 +105,9 @@ function bo_show_statistics()
 }
 
 //strike statistics 
-function bo_show_statistics_strikes()
+function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_graph = '')
 {
 	global $_BO;
-	
-	if (intval($_GET['bo_station_id']))
-	{
-		$station_id = intval($_GET['bo_station_id']);
-		$add_graph = '&id='.$station_id;
-	}
-	else
-	{
-		$station_id = bo_station_id();
-		$own_station = true;
-	}
 	
 	$year = intval($_GET['bo_year']);
 	$month = intval($_GET['bo_month']);
@@ -278,19 +281,8 @@ function bo_show_statistics_strikes()
 }
 
 //show station-statistics
-function bo_show_statistics_station()
+function bo_show_statistics_station($station_id = 0, $own_station = true, $add_graph = '')
 {
-	if (intval($_GET['bo_station_id']))
-	{
-		$station_id = intval($_GET['bo_station_id']);
-		$add_graph = '&id='.$station_id;
-	}
-	else
-	{
-		$station_id = bo_station_id();
-		$own_station = true;
-	}
-
 	$stInfo = bo_station_info($station_id);
 	$city = _BC($stInfo['city']);
 	
@@ -437,20 +429,10 @@ function bo_show_statistics_station()
 }
 
 //show network-statistics
-function bo_show_statistics_network()
+function bo_show_statistics_network($station_id = 0, $own_station = true, $add_graph = '')
 {
 	$sort = $_GET['bo_sort'];
-	
-	if (intval($_GET['bo_station_id']))
-	{
-		$station_id = intval($_GET['bo_station_id']);
-		$add_graph = '&id='.$station_id;
-	}
-	else
-	{
-		$station_id = bo_station_id();
-		$own_station = true;
-	}
+
 
 	$date_1h = gmdate('Y-m-d H:i:s', time() - 3600);
 
@@ -635,8 +617,8 @@ function bo_show_statistics_network()
 
 		echo '<td class="bo_text">';
 		
-		if (bo_user_get_level()) 
-			echo '<a href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$id.'">'.$pos.'</a>';
+		if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
+			echo '<a href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">'.$pos.'</a>';
 		else
 			echo $pos;
 			
@@ -693,7 +675,7 @@ function bo_show_statistics_network()
 	echo '</p>';
 	bo_show_graph('stations', $add_graph);
 
-	if (1 || intval(BO_STATISTICS_SHOW_NEW_STATIONS))
+	if (intval(BO_STATISTICS_SHOW_NEW_STATIONS))
 	{
 		$user_stations = bo_stations('user');
 
@@ -705,13 +687,13 @@ function bo_show_statistics_network()
 			if ($time)
 			{
 				$id = $user_stations[$user]['id'];
-				$new_stations[$id] = array($time, $user_stations[$user]['city']);
+				$new_stations[$id] = array($time, $user_stations[$user]['city'].' ('.$user_stations[$user]['country'].')');
 			}
 		}
 		
 		arsort($new_stations);
 		
-		if (1 || count($new_stations))
+		if (count($new_stations))
 		{
 			echo '<a name="new_stations"></a>';
 			echo '<h4>'._BL('h4_new_stations').'</h4>';
@@ -722,10 +704,12 @@ function bo_show_statistics_network()
 			foreach($new_stations as $id => $d)
 			{
 				echo '<li><span class="bo_descr">';
-				echo _BC($d[0]);
+				
+				echo _BC($d[1]);
+				echo '</a>';
 				echo '</span>';
 				echo '<span class="bo_value">';
-				echo date(_BL('_datetime'), $d[1]);
+				echo date(_BL('_datetime'), $d[0]);
 				echo '</span>';
 				$i++;
 				
@@ -744,7 +728,7 @@ function bo_show_statistics_network()
 }
 
 //show longtime statistics
-function bo_show_statistics_longtime()
+function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_graph = '')
 {
 	//Own
 	$str_own	 		= bo_get_conf('count_strikes_own');
@@ -853,7 +837,7 @@ function bo_show_statistics_longtime()
 
 
 //show own other statistics
-function bo_show_statistics_other()
+function bo_show_statistics_other($station_id = 0, $own_station = true, $add_graph = '')
 {
 	$D = array();
 	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'user', 'densities');
@@ -1092,7 +1076,7 @@ function bo_show_statistics_other()
 }
 
 //show own other statistics
-function bo_show_statistics_advanced()
+function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_graph = '')
 {
 	global $_BO;
 	
@@ -1102,27 +1086,20 @@ function bo_show_statistics_advanced()
 	$region = $_GET['bo_region'];
 	$channel = intval($_GET['bo_channel']);
 
-	$add_graph = '';
-	
 	//Regions
 	if (!preg_match('/[0-9a-z]+/i', $region) || !isset($_BO['region'][$region]['rect_add']))
 		$region = '';
 	else
 		$add_graph .= '&region='.$region;
 		
-	if (intval($_GET['bo_station_id']))
+	if (!$own_station)
 	{
-		$station_id = intval($_GET['bo_station_id']);
-		$add_graph .= '&id='.$station_id;
 		$show = '';
 	}
 	else
 	{
 		if ($channel)
 			$add_graph .= '&channel='.$channel;
-
-		$station_id = bo_station_id();
-		$own_station = true;
 	}
 	
 	$channels = bo_get_conf('raw_channels');
@@ -1470,10 +1447,20 @@ function bo_show_statistics_advanced()
 
 function bo_show_graph($type, $add_graph='')
 {
+	$alt = _BL('graph_stat_title_'.$type);
+	
+	if ($alt == 'graph_stat_title_'.$type)
+		$alt = '';
+	else
+		$alt = ': '.$alt;
+	
+	$alt = _BL('h3_graphs').$alt;
+	
 	echo '<img src="'.BO_FILE.'?graph_statistics='.$type.'&bo_lang='._BL().$add_graph.'" 
 			class="bo_graph_img" 
 			style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;background-image:url(\''.BO_FILE.'?image=wait\');"
 			id="bo_graph_'.$type.'_img"
+			alt="'.htmlspecialchars($alt).'"
 			>';
 }
 
