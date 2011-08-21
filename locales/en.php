@@ -812,4 +812,5 @@ $_BL['en']['h4_new_stations'] = 'New stations';
 $_BL['en']['arch_navi_strikes'] = 'Strikes';
 $_BL['en']['h3_arch_last_strikes'] = 'Last strikes';
 $_BL['en']['Participated stations'] = 'Participated stations';
-
+$_BL['en']['Statistics'] = 'Statistics';
+$_BL['en']['Off'] = 'Off';

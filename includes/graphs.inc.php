@@ -1387,10 +1387,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			{
 				$X[$i] = $time_start + $i * $interval * 60;
 
-				//JpGraph wants equal number of x and y data points
-				if (!isset($Y[$data_id]['sig'][$i])) $Y[$data_id]['sig'][$i] = $Y[$data_id]['sig'][$i-1];
-				if (!isset($Y[$data_id]['astr'][$i])) $Y[$data_id]['astr'][$i] = $Y[$data_id]['astr'][$i-1];
-				if (!isset($Y[$data_id]['mstr'][$i])) $Y[$data_id]['mstr'][$i] = $Y[$data_id]['mstr'][$i-1];
 				
 				//special treatment for the following vars
 				if (!isset($Y[$data_id]['sig_ratio'][$i]) && !isset($Y[$data_id]['str_ratio'][$i]) && $data_id > 0)
@@ -1398,17 +1394,25 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				else
 					$no_data_count = 0;
 				
-				if ($no_data_count > 3)
+				if ($no_data_count > 1)
 				{
-					$Y[$data_id]['cnt'][$i] = null;
+					$Y[$data_id]['sig'][$i] = 0;
+					$Y[$data_id]['astr'][$i] = 0;
+					$Y[$data_id]['mstr'][$i] = 0;
+					$Y[$data_id]['cnt'][$i] = 0;
 					$Y[$data_id]['sig_ratio'][$i] = null;
 					$Y[$data_id]['str_ratio'][$i] = null;
 				}
 				else
 				{
+					//JpGraph wants equal number of x and y data points
+					if (!isset($Y[$data_id]['sig'][$i])) $Y[$data_id]['sig'][$i] = $Y[$data_id]['sig'][$i-1];
+					if (!isset($Y[$data_id]['astr'][$i])) $Y[$data_id]['astr'][$i] = $Y[$data_id]['astr'][$i-1];
+					if (!isset($Y[$data_id]['mstr'][$i])) $Y[$data_id]['mstr'][$i] = $Y[$data_id]['mstr'][$i-1];
 					if (!isset($Y[$data_id]['cnt'][$i])) $Y[$data_id]['cnt'][$i] = $Y[$data_id]['cnt'][$i-1];
 					if (!isset($Y[$data_id]['sig_ratio'][$i])) $Y[$data_id]['sig_ratio'][$i] = $Y[$data_id]['sig_ratio'][$i-1];
 					if (!isset($Y[$data_id]['str_ratio'][$i])) $Y[$data_id]['str_ratio'][$i] = $Y[$data_id]['str_ratio'][$i-1];
+
 				}
 			}
 		}

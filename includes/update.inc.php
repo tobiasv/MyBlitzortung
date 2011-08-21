@@ -36,7 +36,8 @@ function bo_check_for_update()
 						'0.4.8' => 408, 
 						'0.5.2' => 502,
 						'0.5.5' => 505,
-						'0.6.1' => 601);
+						'0.6.1' => 601,
+						'0.6.2' => 602);
 
 	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
 	{
@@ -225,6 +226,50 @@ function bo_check_for_update()
 				$ok = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();			
+				
+				break;
+			
+			
+			case '0.6.2':
+			
+				$res = bo_db("SHOW COLUMNS FROM `".BO_DB_PREF."strikes` WHERE Field='time_key'");
+				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD `time_key` MEDIUMINT UNSIGNED NOT NULL AFTER `time_ns`";
+				echo '<li><em>'.$sql.'</em>: <b>';
+				if (!$res->num_rows)
+				{
+					$ok = bo_db($sql);
+					echo _BL($ok ? 'OK' : 'FAIL');
+				}
+				else
+				{
+					echo _BL('Already DONE BEFORE');
+				}
+				echo '</b></li>';
+				flush();
+
+				
+				$sql = "UPDATE `".BO_DB_PREF."strikes` SET time_key=FLOOR(UNIX_TIMESTAMP(time) / (60*5) ) WHERE time_key=0";
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'.$ok.' rows affected</b></li>';
+				flush();
+
+				
+				$res = bo_db("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='time_latlon'");
+				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD INDEX `time_latlon` (`time_key`,`lat2`,`lon2`)";
+				echo '<li><em>'.$sql.'</em>: <b>';
+				if (!$res->num_rows)
+				{
+					$ok = bo_db($sql);
+					echo _BL($ok ? 'OK' : 'FAIL');
+				}
+				else
+				{
+					echo _BL('Already DONE BEFORE');
+				}
+				echo '</b></li>';
+				flush();
+			
+				break;
 			
 			default:
 				$ok = true;

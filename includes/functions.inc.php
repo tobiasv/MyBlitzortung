@@ -800,7 +800,7 @@ function bo_get_file($url, &$error = '', $type = '')
 
 function bo_latlon2sql($lat1, $lat2, $lon1, $lon2, $with_indexed_values = false)
 {
-	$sql = " (lat BETWEEN  '$lat2'     AND '$lat1'     AND lon  BETWEEN '$lon2'     AND '$lon1' ";
+	$sql = " (lat BETWEEN '$lat2' AND '$lat1' AND lon BETWEEN '$lon2' AND '$lon1' ";
 	
 	if ($with_indexed_values)
 	{
@@ -813,6 +813,41 @@ function bo_latlon2sql($lat1, $lat2, $lon1, $lon2, $with_indexed_values = false)
 	}
 
 	$sql .= ") ";
+	
+	return $sql;
+}
+
+function bo_times2sql($time_min, $time_max, $with_indexed_values = false)
+{
+	$time_min = intval($time_min);
+	$time_max = intval($time_max);
+
+	//date range
+	$date_min = gmdate('Y-m-d H:i:s', $time_min);
+	$date_max = gmdate('Y-m-d H:i:s', $time_max);
+
+	$sql .= " ( time BETWEEN '$date_min' AND '$date_max' ";
+	
+	if ($with_indexed_values)
+	{
+		$sql .= " AND time_key BETWEEN $time_min/(60*5) AND $time_max/(60*5) ";
+	}
+
+	$sql .= ") ";
+	
+	return $sql;
+}
+
+function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1, $lat2, $lon1, $lon2)
+{
+	
+	$sql  = " (";
+	$sql .= bo_latlon2sql($lat1, $lat2, $lon1, $lon2, true);
+	$sql .= " AND ";
+	$sql .= bo_times2sql($time_min, $time_max, true);
+	$sql .= ") ";
+	
+	$index_sql = " FORCE INDEX (time_latlon) ";
 	
 	return $sql;
 }
@@ -1069,5 +1104,147 @@ function bo_examine_signal($data, &$amp = array(), &$amp_max = array(), &$freq =
 
 	return $sql;
 }	
+
+
+
+function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = false, $angle = 0, $bordercolor = false, $px = 0)
+{
+	$font = bo_imagestring_font($size, $bold);
+	
+	if (is_string($tcolor))
+	{
+		$color = bo_hex2color($I, $tcolor);
+	}
+	elseif (is_array($tcolor))
+	{
+		$color = bo_hex2color($I, $tcolor[0]);
+		$bordercolor = bo_hex2color($I, $tcolor[2]);
+		$px = $tcolor[1];
+	}
+	else
+		$color = $tcolor;
+
+	if ($size <= 5)
+	{
+		if ($angle == 90)
+			imagestringup($I, $size, $x, $y, $text, $color);
+		else
+			imagestring($I, $size, $x, $y, $text, $color);
+	}
+	else
+	{
+		$h = $angle ? 0 : $size;
+		$w = $angle ? $size : 0;
+		
+		$text = utf8_encode($text);
+		
+		bo_imagettftextborder($I, $size, $angle, $x+$w, $y+$h, $color, $font, $text, $bordercolor, $px);
+	}
+}
+
+function bo_imagestringright($I, $size, $x, $y, $text, $color = false, $bold = false, $angle = 0)
+{
+	$x -= bo_imagetextwidth($size, $bold, $text);
+	return bo_imagestring($I, $size, $x, $y, $text, $color, $bold);
+}
+
+
+function bo_imagetextheight($size, $bold = false, $string = false)
+{
+	if ($size <= 5)
+	{
+		return imagefontheight($size);
+	}
+	
+	$font = bo_imagestring_font($size, $bold);
+
+	$string = $string === false ? 'Ag' : $string;
+	$tmp = imagettfbbox($size, 0, $font, $string);
+	$height = $tmp[1] - $tmp[5];
+	
+	return $height;
+}
+
+function bo_imagetextwidth($size, $bold = false, $string = false)
+{
+	if ($size <= 5)
+	{
+		return imagefontwidth($size) * strlen($string);
+	}
+	
+	$font = bo_imagestring_font($size, $bold);
+	
+	$string = $string === false ? 'A' : $string;
+	$tmp = imagettfbbox($size, 0, $font, $string);
+	$width = $tmp[2] - $tmp[0];
+	
+	return $width;
+}
+
+
+function bo_imagestring_font(&$size, &$type)
+{
+	if ($type === true) // bold
+		$font = BO_DIR.BO_FONT_TTF_BOLD;
+	else if ((int)$type && $type == 1)
+		$font = BO_DIR.BO_FONT_TTF_MONO;
+	else
+		$font = BO_DIR.BO_FONT_TTF_NORMAL;
+
+	
+	return $font;
+
+}
+
+
+function bo_imagettftextborder(&$I, $size, $angle, $x, $y, &$textcolor, $font, $text, $bordercolor = false, $px = 0)
+{
+	if ($px)
+	{
+		for($c1 = ($x-abs($px)); $c1 <= ($x+abs($px)); $c1++)
+			for($c2 = ($y-abs($px)); $c2 <= ($y+abs($px)); $c2++)
+				$bg = imagettftext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
+	}
+ 
+   return imagettftext($I, $size, $angle, $x, $y, $textcolor, $font, $text);
+}
+
+function bo_hex2color(&$I, $str)
+{
+	$rgb = bo_hex2rgb($str);
+
+	if (count($rgb) == 4 && imageistruecolor($I))
+		return imagecolorallocatealpha($I, $rgb[0], $rgb[1], $rgb[2], $rgb[3]);
+	else
+		return imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
+}
+
+function bo_hex2rgb($str) 
+{
+    $hexStr = preg_replace("/[^0-9A-Fa-f]/", '', $str);
+    $rgb = array();
+	
+	if (strlen($hexStr) == 3 || strlen($hexStr) == 4) 
+	{
+        $rgb[0] = hexdec(str_repeat(substr($hexStr, 0, 1), 2));
+        $rgb[1] = hexdec(str_repeat(substr($hexStr, 1, 1), 2));
+        $rgb[2] = hexdec(str_repeat(substr($hexStr, 2, 1), 2));
+		
+		if (strlen($hexStr) == 4)
+			$rgb[3] = hexdec(str_repeat(substr($hexStr, 3, 1), 2)) / 2;
+    } 
+	elseif (strlen($hexStr) == 6 || strlen($hexStr) == 8) 
+	{
+        $rgb[0] = hexdec(substr($hexStr, 0, 2));
+        $rgb[1] = hexdec(substr($hexStr, 2, 2));
+        $rgb[2] = hexdec(substr($hexStr, 4, 2));
+		
+		if (strlen($hexStr) == 8)
+			$rgb[3] = hexdec(substr($hexStr, 6, 2)) / 2;
+    }
+	
+    return $rgb;
+}
+
 
 ?>

@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}strikes` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `time` datetime NOT NULL,
   `time_ns` int(11) NOT NULL,
+  `time_key` mediumint(9) unsigned NOT NULL,
   `lat` decimal(9,6) NOT NULL,
   `lon` decimal(9,6) NOT NULL,
   `lat2` tinyint(4) NOT NULL,
@@ -81,7 +82,8 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}strikes` (
   KEY `part` (`part`),
   KEY `raw_id` (`raw_id`),
   KEY `time` (`time`),
-  KEY `latlon2` (`lat2`,`lon2`)
+  KEY `latlon2` (`lat2`,`lon2`),
+  KEY `time_latlon` (`time_key`,`lat2`,`lon2`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 

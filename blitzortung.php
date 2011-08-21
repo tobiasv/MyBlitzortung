@@ -25,7 +25,7 @@ if (!defined("BO_VER"))
 	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.6.1-dev');
+	define("BO_VER", '0.6.2-dev');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -78,8 +78,8 @@ if (!defined("BO_VER"))
 	
 	//includes #1
 	require_once 'includes/functions.inc.php';
-	require_once 'includes/image.inc.php';
 	require_once 'includes/user.inc.php';
+	require_once 'includes/tiles.inc.php';
 
 	if (!class_exists('mysqli'))
 		require_once 'includes/db_mysql.inc.php';
@@ -136,6 +136,7 @@ if (!defined("BO_VER"))
 	require_once 'includes/archive.inc.php';
 	require_once 'includes/info.inc.php';
 	require_once 'includes/alert.inc.php';
+	require_once 'includes/image.inc.php';
 
 	//Save info wether headers where sent
 	$_BO['headers_sent'] = headers_sent();

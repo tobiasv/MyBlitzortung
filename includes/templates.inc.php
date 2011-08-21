@@ -306,6 +306,7 @@ $_BO['tpl_imgmap']['germany_nrw_dark']['file'] = 'map_germany_nrw_dark.png';
 $_BO['tpl_imgmap']['france'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['france']['name'] = 'France';
 $_BO['tpl_imgmap']['france']['file'] = 'map_france.png';
+$_BO['tpl_imgmap']['france']['borders'] = array('map_france_borders.png', 70);
 $_BO['tpl_imgmap']['france']['coord'] = array(51.8,9,41.51,-6); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['france']['trange'] = 2; //hours!
 $_BO['tpl_imgmap']['france']['upd_intv'] = 5; //minutes

@@ -333,6 +333,8 @@ function bo_update_strikes($force = false)
 				}
 				
 				$time_ns = intval($r[3]);
+				$time_key = floor($utime / (60*5));
+				
 				$lat = $r[4];
 				$lon = $r[5];
 				$cur = $r[6];
@@ -349,6 +351,7 @@ function bo_update_strikes($force = false)
 				$sql = "
 							time='$date $time',
 							time_ns='$time_ns',
+							time_key='$time_key',
 							lat='$lat',lon='$lon',
 							lat2='$lat2',lon2='$lon2',
 							distance='$dist',

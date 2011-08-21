@@ -1,7 +1,7 @@
 <?php 
 
 /*
-* French translation for MyBlitzortung
+* German translation for MyBlitzortung
 */
 
 $_BL['locale'] = 'fr';
@@ -815,4 +815,14 @@ $_BL['fr']['Participated stations'] = 'Stations ayant participés';
 
 
 
+/********************/
+/*  NOT TRANSLATED  */
+/********************/
+
+
+//en: Statistics
+$_BL['fr']['Statistics'] = '';
+
+//en: Off
+$_BL['fr']['Off'] = '';
 

@@ -66,7 +66,10 @@ function bo_show_login()
 			include 'update.inc.php';
 			
 			if (bo_check_for_update() == true)
+			{
+				bo_copyright_footer();
 				return;
+			}
 		}
 		
 		switch($show)

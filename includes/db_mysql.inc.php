@@ -79,6 +79,9 @@ class BoDb
 		{
 			self::select_db();
 			self::set_charset();
+			
+			//hope this works for everyone :-/
+			self::query("SET time_zone = '+00:00'");
 		}
 		
 		return self::$dbh;
