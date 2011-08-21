@@ -1,7 +1,7 @@
 <?php 
 
 /*
-* German translation for MyBlitzortung
+* French translation for MyBlitzortung
 */
 
 $_BL['locale'] = 'fr';
