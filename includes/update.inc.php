@@ -243,14 +243,15 @@ function bo_check_for_update()
 				else
 				{
 					echo _BL('Already DONE BEFORE');
+					$ok = true;
 				}
 				echo '</b></li>';
 				flush();
 
 				
 				$sql = "UPDATE `".BO_DB_PREF."strikes` SET time_key=FLOOR(UNIX_TIMESTAMP(time) / (60*5) ) WHERE time_key=0";
-				$ok = bo_db($sql, false);
-				echo '<li><em>'.$sql.'</em>: <b>'.$ok.' rows affected</b></li>';
+				$no = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'.$no.' rows affected</b></li>';
 				flush();
 
 				
