@@ -710,7 +710,7 @@ function bo_load_locale()
 
 }
 
-function bo_get_file($url, &$error = '')
+function bo_get_file($url, &$error = '', $type = '')
 {
 	if (BO_USE_PHPURLWRAPPER === true)
 	{
@@ -724,12 +724,15 @@ function bo_get_file($url, &$error = '')
 	$path = $parsedurl['path'];
 	$query = $parsedurl['query'];
 	
-	$fp = fsockopen($host, 80, $errno, $errstr, 60);
+	$fp = fsockopen($host, 80, $errno, $errstr);
+	
+	$err = 0;
 	
 	if (!$fp)
 	{
-		//echo "$errstr ($errno)<br />\n";
-		return false;
+		$error = "Connect ERROR: $errstr ($errno)<br />\n";
+		echo $error;
+		$err = 1;
 	}
 	else
 	{
@@ -747,7 +750,7 @@ function bo_get_file($url, &$error = '')
 		$first = true;
 		$response = array();
 		
-		//Header überlesen 
+		//Header
 		do 
 		{ 
 			$header = chop(fgets($fp)); 
@@ -758,15 +761,16 @@ function bo_get_file($url, &$error = '')
 				
 				if ($response[1] != '200')
 				{
-					$err = true;
+					$err = 2;
 					break;
 				}
 			}
 			
 			$first = false;
-		} while (!empty($header) and !feof($fp)); 
+		} 
+		while (!empty($header) and !feof($fp)); 
 			
-		//Daten übernehmen
+		//Get the Content
 		while (!feof($fp)) { 
 			$content .= fgets($fp); 
 		} 
@@ -774,10 +778,21 @@ function bo_get_file($url, &$error = '')
 		fclose($fp);
 	}
 
-	if ($err)
+	if ($err == 2)
 	{
 		$error = $response[1].' '.$response[2];
 		$content = false;
+	}
+	
+	if ($type)
+	{
+		$data = unserialize(bo_get_conf('download_'.$type));
+		$data['count'][$err]++;
+		
+		if ($content)
+			$data['traffic'] += strlen($content);
+		
+		bo_set_conf('download_'.$type, serialize($data));
 	}
 	
 	return $content; 	 

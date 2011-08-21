@@ -127,9 +127,10 @@ if (!defined('BO_VER'))
 /*******************************************************************/
 /*** Image Maps: General settings                                ***/
 
-@define("BO_IMAGE_USE_TRUECOLOR", true); // use true color images
+@define("BO_IMAGE_USE_TRUECOLOR", true); // use true color images for internal drawing
 @define("BO_IMAGE_PALETTE_COLORS_MAPS", 256); // use palette images for MAPS with defined colors for output (0 disables)
 @define("BO_IMAGE_PALETTE_COLORS_DENSITIES", 0); // use palette images for DENSITY MAPS with defined colors for output (0 disables)
+@define("BO_IMAGE_PALETTE_AUTO", true); // automatically use true color if colorcount in palette image is 256 (set to 256 above!)
 @define("BO_MAPS_ORDER", ''); // order your maps, comma separated ids
 
 /*******************************************************************/

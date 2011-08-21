@@ -26,7 +26,7 @@ if (!defined('BO_VER'))
 // Login to blitzortung.org an return login-string
 function bo_get_login_str()
 {
-	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&username='.BO_USER.'&password='.BO_PASS, $code);
+	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&username='.BO_USER.'&password='.BO_PASS, $code, 'login');
 
 	if ($file === false)
 	{
@@ -34,6 +34,8 @@ function bo_get_login_str()
 		bo_update_error('archivelogin', 'Login to archive failed. '.$code);
 		return false;
 	}
+	
+	bo_update_error('archivelogin', false);
 
 	if (preg_match('/login_string=([A-Z0-9]+)/', $file, $r))
 	{
@@ -54,7 +56,7 @@ function bo_get_archive($args='', $bo_login_id=false)
 		$auto_id = true;
 	}
 
-	$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&'.$args, $code);
+	$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&'.$args, $code, 'archive');
 
 	if ($file === false)
 	{
@@ -62,6 +64,8 @@ function bo_get_archive($args='', $bo_login_id=false)
 		bo_update_error('archivedata', 'Download of archive data failed. '.$code);
 		return false;
 	}
+	
+	bo_update_error('archivedata', false);
 
 	if (strlen($file) < 100) //Login not successful --> new login ID
 	{
@@ -255,7 +259,7 @@ function bo_update_strikes($force = false)
 		$max_dist_own = 0;
 		$min_dist_own = 9E12;
 		
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code);
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes');
 
 		if ($file === false)
 		{
@@ -263,6 +267,8 @@ function bo_update_strikes($force = false)
 			echo "<p>ERROR: Couldn't get file for strikes! Code: $code</p>\n";
 			return false;
 		}
+		
+		bo_update_error('strikedata', false);
 
 		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
 		$row = $res->fetch_assoc();
@@ -727,7 +733,7 @@ function bo_update_stations($force = false)
 		$Count = array();
 		$signal_count = 0;
 
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt', $code);
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt', $code, 'stations');
 
 		if ($file === false)
 		{
@@ -1957,7 +1963,7 @@ function bo_my_station_update($url, $force_bo_login = false)
 		$request = 'id='.bo_station_id().'&login='.$login_id.'&authid='.$authid.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
 		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
 		
-		$content = bo_get_file($data_url, $error);
+		$content = bo_get_file($data_url, $error, 'mybo_stations');
 		
 		$R = unserialize($content);
 		
@@ -2038,7 +2044,7 @@ function bo_my_station_update($url, $force_bo_login = false)
 	if ($login_id)
 	{
 		echo '<h3>'._BL('Logging out from Blitzortung.org').'</h3>';
-		$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$login.'&logout=1', $code);
+		$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$login.'&logout=1', $code, 'logout');
 		
 		if (!$file)
 			echo "<p>ERROR: Couldn't get file! Code: $code</p>\n";
@@ -2319,8 +2325,7 @@ function bo_update_error($type, $extra = null)
 			
 			mail($mail, 
 		     _BL('MyBlitzortung_notags').' - '._BL('Error').': '.$type, 
-			 $text, 
-			 defined('BO_EMAIL_HEADERS') ? BO_EMAIL_HEADERS : '');
+			 $text);
 			
 			echo '<p>Sent E-Mail to '.$mail.'</p>';
 		}

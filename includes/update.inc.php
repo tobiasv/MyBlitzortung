@@ -54,6 +54,10 @@ function bo_check_for_update()
 			
 		$cur_version_num = bo_version2number($cur_version);
 		$bo_version = BO_VER;
+
+		//Workaround for developer Versions
+		if (BO_VER != $cur_version && (strpos($cur_version, 'dev') || strpos($cur_version, '-')))
+			$cur_version_num--;
 		
 		if ($cur_version_num < max($updates) && $_GET['bo_action'] != 'do_update')
 		{

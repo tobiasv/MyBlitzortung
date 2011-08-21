@@ -923,18 +923,20 @@ function bo_get_map_image()
 			$time_max = strtotime("$year-$month-$day 23:59:59");
 		}
 		
-		$time_string = date(_BL('_date').' ', $time_min);
+		
 		
 		if ($time_max > $last_update)
 		{
 			$time_max = $last_update;
-			$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
 		}
 		else
 		{
 			$last_update = $time_max + 3600;
 		}
-			
+
+		$time_string = date(_BL('_date').' ', $time_min);
+		$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
+		
 		$expire = time() + 3600;
 		
 		if (BO_CACHE_SUBDIRS === true)
@@ -1034,12 +1036,23 @@ function bo_get_map_image()
 		$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
 		$count[$i] = 0;
 	}
-
+	
+	if ($cfg['col_smooth'])
+	{
+		for ($i=0;$i<=$cfg['col_smooth'];$i++)
+		{
+			list($red, $green, $blue, $alpha) = bo_value2color($i/$cfg['col_smooth'], $c);
+			$color_smooth[$i] = imagecolorallocatealpha($I, $red, $green, $blue, $alpha);
+		}
+	
+	}
+	
 	//for backward compat.
 	if (!isset($cfg['point_style']) && $cfg['point_type'])
 		$cfg['point_style'] = array(0 => $cfg['point_type'], 1 => $cfg['point_size']);
 
-	$color_intvl = ($time_max - $time_min) / count($c);
+	$time_range  = $time_max - $time_min;
+	$color_intvl = $time_range / count($c);
 	
 	if (!$blank)
 	{
@@ -1057,8 +1070,9 @@ function bo_get_map_image()
 		while ($row = $erg->fetch_assoc())
 		{
 			$strike_time = strtotime($row['time'].' UTC');
-			$col = floor(($time_max-1 - $strike_time) / $color_intvl);
-			$count[$col]++;
+			$age = $time_max-1 - $strike_time;
+			$color_index = floor($age / $color_intvl);
+			$count[$color_index]++;
 
 			if (isset($cfg['point_style']))
 			{
@@ -1066,7 +1080,13 @@ function bo_get_map_image()
 				$x =      ($px - $x1) * $w_x;
 				$y = $h - ($py - $y1) * $h_y;
 
-				bo_drawpoint($I, $x, $y, $cfg['point_style'], $color[$col]);
+
+				if ($cfg['col_smooth'])
+					$pcolor = $color_smooth[floor($age / $time_range * $cfg['col_smooth'])];
+				else
+					$pcolor = $color[$color_index];
+				
+				bo_drawpoint($I, $x, $y, $cfg['point_style'], $pcolor);
 			}
 		}
 	}
@@ -1167,7 +1187,7 @@ function bo_get_map_image()
 			$cx = $cfg['legend'][3];
 			$cy = $cfg['legend'][4];
 
-			$coLegendWidth = $cw / count($color);
+			$coLegendWidth = floor($cw / count($color));
 			$cx = $w - $cw - $cx;
 			$cy = $h - $ch - $cy;
 			$legend = true;
@@ -1226,8 +1246,8 @@ function bo_get_map_image()
 			if ($cfg['legend'][5])
 			{
 				imagesetthickness($I, 1);
-				imageline($I, $cx, $cy-1, $cx, $cy+$ch, $text_col);
-				imageline($I, $cx, $cy+$ch, $cx+$cw+2, $cy+$ch, $text_col);
+				imageline($I, $cx-1, $cy-1, $cx-1, $cy+$ch, $text_col);
+				imageline($I, $cx-1, $cy+$ch, $cx+$cw+2, $cy+$ch, $text_col);
 			}
 		}
 
@@ -2059,17 +2079,27 @@ function bo_image_reduce_colors(&$I, $density_map=false)
 	
 	if ($colors)
 	{
+		//works only for palette images
 		$total = imagecolorstotal($I);
-		
 		if ($total && $total <= 256)
 			return;
 
+		
 		if ($colors)
 		{
+			$auto = true;
+			$width = imagesx($I);
+			$height = imagesy($I);
+			
+			if (BO_IMAGE_PALETTE_AUTO)
+			{
+				$Itmp = ImageCreateTrueColor($width, $height);
+				ImageCopy($Itmp, $I, 0, 0, 0, 0, $width, $height);
+			}
+			
+			//reduce colors: imagecolormatch doesn't exist in some PHP-GD modules (i.e. Ubuntu)
 			if (function_exists('imagecolormatch'))
 			{
-				$width = imagesx($I);
-				$height = imagesy($I);
 				$colors_handle = ImageCreateTrueColor($width, $height);
 				ImageCopyMerge($colors_handle, $I, 0, 0, 0, 0, $width, $height, 100 );
 				ImageTrueColorToPalette($I, false, $colors);
@@ -2077,7 +2107,23 @@ function bo_image_reduce_colors(&$I, $density_map=false)
 				ImageDestroy($colors_handle);
 			}
 			else
+			{
 				imagetruecolortopalette($I, false, $colors);
+			}
+			
+			if (BO_IMAGE_PALETTE_AUTO)
+			{
+				if (imagecolorstotal($I) == 256) //too much colors ==> back to truecolor
+				{
+					imagedestroy($I);
+					$I = $Itmp;
+				}
+				else
+				{
+					imagedestroy($Itmp);
+				}
+			}
+			
 		}
 	}
 }

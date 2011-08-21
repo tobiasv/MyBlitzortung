@@ -89,7 +89,8 @@ $_BO['tpl_color']['standard'][] = array(255, 200, 0);
 $_BO['tpl_color']['standard'][] = array(255, 150, 0);
 $_BO['tpl_color']['standard'][] = array(255, 100, 0);
 $_BO['tpl_color']['standard'][] = array(255,   0, 0);
-$_BO['tpl_color']['standard'][] = array(225,   0, 0);
+$_BO['tpl_color']['standard'][] = array(205,   0, 0);
+$_BO['tpl_color']['standard'][] = array(150,   0, 120);
 
 $_BO['tpl_density_colors'][] = array(150, 150, 250, 105);
 $_BO['tpl_density_colors'][] = array(50, 150, 155, 15);
@@ -158,13 +159,18 @@ $_BO['tpl_imgmap_default']['trange'] = 2; //hours!
 $_BO['tpl_imgmap_default']['upd_intv'] = 15; //minutes
 $_BO['tpl_imgmap_default']['textcolor'] = array(255,255,255);
 $_BO['tpl_imgmap_default']['col'] = $_BO['tpl_color']['standard'];
+$_BO['tpl_imgmap_default']['col_smooth'] = 24;
 
 
 /**************************************/
 /* Image Maps (PNG)                   */
 /**************************************/
 
-//Europe
+
+
+/* ============================= EUROPE ============================= */
+
+
 //MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=71.3&map_generator_west=-22&map_generator_east=52&map_generator_south=24.3&map_generator_min_area=50&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.01p%2F80%2F80%2F80+3%2F0.01p%2F80%2F80%2F80+4%2F0.01p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500+++90+150++80+1000++90+150++80%0D%0A1000+100+150++80+1500+100+150++80%0D%0A1500+105+140++60+2000+105+140++60%0D%0A2000+110+135++40+2500+110+135++40%0D%0A2500+110+130++30+3000+110+130++30%0D%0A3000+115+125++20+6000+115+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.01
 $_BO['tpl_imgmap']['europe'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['europe']['name'] = 'Europe';
@@ -196,6 +202,9 @@ $_BO['tpl_imgmap']['europe_west_central']['cities'][5] = $_BO['points']['whitere
 $_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitered2'];
 
 
+
+/* ============================= Germany ============================= */
+
 //Germany (Landkreise) no exact merator prjection!
 $_BO['tpl_imgmap']['germany_lkr'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['germany_lkr']['name'] = 'Germany';
@@ -214,6 +223,7 @@ $_BO['tpl_imgmap']['germany_lkr']['density_darken'] = 10;
 //$_BO['tpl_imgmap']['germany_lkr']['stations']['O'] = $_BO['points']['stations_offline'];
 //$_BO['tpl_imgmap']['germany_lkr']['stations']['V'] = $_BO['points']['stations_nogps'];
 
+
 //Germany (Landkreise) Geodatenzentrum
 //see http://www.geodatenzentrum.de/geodaten/gdz_rahmen.gdz_div?gdz_spr=deu&gdz_akt_zeile=5&gdz_anz_zeile=4&gdz_user_id=0
 $_BO['tpl_imgmap']['germany_lkr_gdz'] = $_BO['tpl_imgmap']['germany_lkr'];
@@ -223,12 +233,11 @@ $_BO['tpl_imgmap']['germany_lkr_gdz']['coord'] = array(55.22, 15.64, 47.05, 5.21
 $_BO['tpl_imgmap']['germany_lkr_gdz']['footer'] = '© Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, 2011<br>
 	Vervielfältigung, Verbreitung und öffentliche Zugänglichmachung, auch auszugsweise, mit Quellenangabe gestattet.';
 
+	
 //Germany (Bavaria) * don't know wether mercator, but border overlap really good in google earth
 $_BO['tpl_imgmap']['germany_bavaria'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['germany_bavaria']['name'] = 'Bavaria';
 $_BO['tpl_imgmap']['germany_bavaria']['footer'] = 'Kartenmaterial: <a href="http://commons.wikimedia.org/wiki/File:Bavaria_relief_location_map.jpg?uselang=de">Wikimedia Commons</a> &bull; GNU-Lizenz für freie Dokumentation ';
-$_BO['tpl_imgmap']['germany_bavaria']['menu'] = true;
-$_BO['tpl_imgmap']['germany_bavaria']['archive'] = true;
 $_BO['tpl_imgmap']['germany_bavaria']['file'] = 'map_germany_bavaria.png';
 $_BO['tpl_imgmap']['germany_bavaria']['borders'] = array('map_germany_bavaria_borders.png', 50);
 $_BO['tpl_imgmap']['germany_bavaria']['coord'] = array(50.62, 14.059753, 47.25, 8.897552); //North, East, South, West (Degrees)
@@ -262,8 +271,6 @@ $_BO['tpl_imgmap']['germany_bavaria_dark']['show_station'] = array(5, 255,100,10
 $_BO['tpl_imgmap']['germany_nrw'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['germany_nrw']['name'] = 'NRW';
 $_BO['tpl_imgmap']['germany_nrw']['footer'] = 'Kartenmaterial: <a href="http://commons.wikimedia.org/wiki/File:North_Rhine-Westphalia_location_map_03.svg" target="_blank">Wikipedia</a>';
-$_BO['tpl_imgmap']['germany_nrw']['menu'] = true;
-$_BO['tpl_imgmap']['germany_nrw']['archive'] = true;
 $_BO['tpl_imgmap']['germany_nrw']['file'] = 'map_germany_nrw_color.png';
 $_BO['tpl_imgmap']['germany_nrw']['coord'] = array(52.552, 9.481 , 50.295 , 5.84); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['germany_nrw']['trange'] = 2; //hours!
@@ -291,11 +298,40 @@ $_BO['tpl_imgmap']['germany_nrw_dark']['file'] = 'map_germany_nrw_dark.png';
 
 
 
-//Switzerland
+
+
+/* ============================= FRANCE ============================= */
+
+//http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=51.8&map_generator_west=-6&map_generator_east=9&map_generator_south=41.51&map_generator_min_area=20&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.1p%2F80%2F80%2F80+3%2F0.1p%2F80%2F80%2F80+4%2F0.1p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500++110+155++80+1000+110+155++80%0D%0A1000+150+150++80+1500+150+150++80%0D%0A1500+160+140++60+2000+160+140++60%0D%0A2000+170+135++40+2500+170+135++40%0D%0A2500+180+130++30+3000+180+130++30%0D%0A3000+185+125++20+6000+185+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.1
+$_BO['tpl_imgmap']['france'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['france']['name'] = 'France';
+$_BO['tpl_imgmap']['france']['file'] = 'map_france.png';
+$_BO['tpl_imgmap']['france']['coord'] = array(51.8,9,41.51,-6); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['france']['trange'] = 2; //hours!
+$_BO['tpl_imgmap']['france']['upd_intv'] = 5; //minutes
+$_BO['tpl_imgmap']['france']['textcolor'] = array(0,0,60);
+$_BO['tpl_imgmap']['france']['textsize'] = 5;
+$_BO['tpl_imgmap']['france']['density'] = true;
+$_BO['tpl_imgmap']['france']['density_blocksize'] = 40;
+$_BO['tpl_imgmap']['france']['density_darken'] = 70;
+$_BO['tpl_imgmap']['france']['density_colors'][] = array(150, 150, 250, 95);
+$_BO['tpl_imgmap']['france']['density_colors'][] = array(50, 150, 155, 90);
+$_BO['tpl_imgmap']['france']['density_colors'][] = array(205, 205, 50, 85);
+$_BO['tpl_imgmap']['france']['density_colors'][] = array(230, 0, 0, 80);
+$_BO['tpl_imgmap']['france']['density_colors'][] = array(255, 0, 255, 75);
+$_BO['tpl_imgmap']['france']['density_colors'][] = array(255, 190, 255, 70);
+$_BO['tpl_imgmap']['france']['cities'][1] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['france']['cities'][2] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['france']['cities'][5] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['france']['cities'][6] = $_BO['points']['whitered1'];
+
+
+
+
+/* ============================= SWITZERLAND ============================= */
+
 $_BO['tpl_imgmap']['switzerland'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['switzerland']['name'] = 'Switzerland';
-$_BO['tpl_imgmap']['switzerland']['menu'] = true;
-$_BO['tpl_imgmap']['switzerland']['archive'] = true;
 $_BO['tpl_imgmap']['switzerland']['file'] = 'map_switzerland.png';
 $_BO['tpl_imgmap']['switzerland']['borders'] = array('map_switzerland_borders.png', 70);
 $_BO['tpl_imgmap']['switzerland']['coord'] = array(48.7, 11, 44.85, 5.4); //North, East, South, West (Degrees)
@@ -309,9 +345,15 @@ $_BO['tpl_imgmap']['switzerland']['density_darken'] = 0;
 $_BO['tpl_imgmap']['switzerland']['cities'][2] = $_BO['points']['whitered1'];
 
 
+
+
 /**************************************/
 /* Image Maps (PNG)  Mini             */
 /**************************************/
+
+
+
+/* ============================= EUROPE ============================= */
 
 //Europe (mini)
 $_BO['tpl_imgmap']['europe_mini']['name'] = 'Europe (mini)';
@@ -326,6 +368,9 @@ $_BO['tpl_imgmap']['europe_mini']['point_type'] = 1;
 $_BO['tpl_imgmap']['europe_mini']['point_size'] = 2;
 $_BO['tpl_imgmap']['europe_mini']['legend'] = array(0, 54, 26, 0, 0, 0);
 $_BO['tpl_imgmap']['europe_mini']['col'] = $_BO['tpl_color']['standard'];
+
+
+/* ============================= GERMANY ============================= */
 
 //Germany (mini)
 $_BO['tpl_imgmap']['germany_mini']['name'] = 'Germany (mini)';
@@ -343,71 +388,6 @@ $_BO['tpl_imgmap']['germany_mini']['col'] = $_BO['tpl_color']['standard'];
 
 
 
-/**************************************/
-/* Extra Overlays for dynamic Map     */
-/**************************************/
-
-//Meteox Radar Overlay
-//WARNING: Copyright! Only internal private usage!
-$_BO['tpl_overlay']['meteox_radar']['img'] = 'http://www2.meteox.com/radareu.php';
-$_BO['tpl_overlay']['meteox_radar']['coord'] = array(59.9934, 20.4106, 41.4389, -14.9515); //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['meteox_radar']['default_show'] = false;
-$_BO['tpl_overlay']['meteox_radar']['sel_name'] = 'Meteox rain radar';
-$_BO['tpl_overlay']['meteox_radar']['only_loggedin'] = true;
-$_BO['tpl_overlay']['meteox_radar']['to_mercator'] = true;
-
-//Meteox Radar Overlay (Scandinavia)
-//WARNING: Copyright! Only internal private usage!
-$_BO['tpl_overlay']['meteox_radar_scandinavia']['img'] = 'http://www.vaderradar.se/image.ashx';
-$_BO['tpl_overlay']['meteox_radar_scandinavia']['coord'] = array(71.546744,35.110422,53.879462,2.865478); //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['meteox_radar_scandinavia']['default_show'] = false;
-$_BO['tpl_overlay']['meteox_radar_scandinavia']['sel_name'] = 'Meteox rain radar (Scandinavia)';
-$_BO['tpl_overlay']['meteox_radar_scandinavia']['only_loggedin'] = true;
-$_BO['tpl_overlay']['meteox_radar_scandinavia']['to_mercator'] = true;
-
-//EUCLID (you can check strike polarity with this map)
-//WARNING: Copyright! Only internal private usage!
-//It's calibrated only for germany!
-$_BO['tpl_overlay']['euclid']['img'] = 'http://www.meteorage.fr/euclid/euclid_last_lightnings.gif';
-$_BO['tpl_overlay']['euclid']['coord'] = array(68, 43, 33.7, -22); //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['euclid']['default_show'] = false;
-$_BO['tpl_overlay']['euclid']['sel_name'] = 'EUCLID';
-$_BO['tpl_overlay']['euclid']['only_loggedin'] = true;
-$_BO['tpl_overlay']['euclid']['to_mercator'] = false;
-$_BO['tpl_overlay']['euclid']['opacity'] = 50;
-
-//BLIDS Lightning Overlay
-//WARNING: Copyright! Only internal private usage!
-$_BO['tpl_overlay']['blids_de']['img'] = 'http://www.blids.de/spion/bilder/aktkartegergrau.jpg';
-$_BO['tpl_overlay']['blids_de']['coord'] = array(55.11, 15.53, 47.13, 4.97);  //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['blids_de']['default_show'] = false;
-$_BO['tpl_overlay']['blids_de']['sel_name'] = 'BLIDS Germany';
-$_BO['tpl_overlay']['blids_de']['only_loggedin'] = true;
-$_BO['tpl_overlay']['blids_de']['to_mercator'] = false;
-$_BO['tpl_overlay']['blids_de']['opacity'] = 50;
-
-//T-Online/wetter.info Radar
-//WARNING: Copyright! Only internal private usage!
-$time = time() - 300;
-$i = sprintf('%02d', (string)intval(date('i', $time) / 15) * 15);
-$time = strtotime(gmdate('Y-m-d H:'.$i.':00', $time).' UTC');
-$date = gmdate('YmdHi', $time);
-
-$_BO['tpl_overlay']['wetterinfo_radar']['img'] = "http://data.wetter.info//data/layers/xxlradar-de/xxlradar-de_radar_$date.gif"; //'http://data.wetter.info//data/maps/basemaps/xxlradar-de.jpg';
-$_BO['tpl_overlay']['wetterinfo_radar']['coord'] = array(55.5, 16.6, 46.2, 4.5);  //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['wetterinfo_radar']['default_show'] = false;
-$_BO['tpl_overlay']['wetterinfo_radar']['sel_name'] = 'Wetter.info Radar ('.date('H:i', $time).')';
-$_BO['tpl_overlay']['wetterinfo_radar']['only_loggedin'] = true;
-$_BO['tpl_overlay']['wetterinfo_radar']['to_mercator'] = true;
-$_BO['tpl_overlay']['wetterinfo_radar']['opacity'] = 40;
-
-$_BO['tpl_overlay']['wetterinfo_radar_small']['img'] = 'http://data.wetter.info/data/teaser/radar_de.gif';
-$_BO['tpl_overlay']['wetterinfo_radar_small']['coord'] = array(55.4, 16.25, 46.55, 4.64);  //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['wetterinfo_radar_small']['default_show'] = false;
-$_BO['tpl_overlay']['wetterinfo_radar_small']['sel_name'] = 'Wetter.info Radar (animiert)';
-$_BO['tpl_overlay']['wetterinfo_radar_small']['only_loggedin'] = true;
-$_BO['tpl_overlay']['wetterinfo_radar_small']['to_mercator'] = false;
-$_BO['tpl_overlay']['wetterinfo_radar_small']['opacity'] = 60;
 
 
 /**************************************/

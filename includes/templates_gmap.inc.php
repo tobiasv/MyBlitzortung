@@ -84,4 +84,73 @@ $_BO['tpl_gmap']['1-10d']['only_loggedin'] = true;
 
 
 
+/**************************************/
+/* Extra Overlays for dynamic Map     */
+/**************************************/
+
+//Meteox Radar Overlay
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['meteox_radar']['img'] = 'http://www2.meteox.com/radareu.php';
+$_BO['tpl_overlay']['meteox_radar']['coord'] = array(59.9934, 20.4106, 41.4389, -14.9515); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['meteox_radar']['default_show'] = false;
+$_BO['tpl_overlay']['meteox_radar']['sel_name'] = 'Meteox rain radar';
+$_BO['tpl_overlay']['meteox_radar']['only_loggedin'] = true;
+$_BO['tpl_overlay']['meteox_radar']['to_mercator'] = true;
+
+//Meteox Radar Overlay (Scandinavia)
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['img'] = 'http://www.vaderradar.se/image.ashx';
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['coord'] = array(71.546744,35.110422,53.879462,2.865478); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['default_show'] = false;
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['sel_name'] = 'Meteox rain radar (Scandinavia)';
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['only_loggedin'] = true;
+$_BO['tpl_overlay']['meteox_radar_scandinavia']['to_mercator'] = true;
+
+//EUCLID (you can check strike polarity with this map)
+//WARNING: Copyright! Only internal private usage!
+//It's calibrated only for germany!
+$_BO['tpl_overlay']['euclid']['img'] = 'http://www.meteorage.fr/euclid/euclid_last_lightnings.gif';
+$_BO['tpl_overlay']['euclid']['coord'] = array(68, 43, 33.7, -22); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['euclid']['default_show'] = false;
+$_BO['tpl_overlay']['euclid']['sel_name'] = 'EUCLID';
+$_BO['tpl_overlay']['euclid']['only_loggedin'] = true;
+$_BO['tpl_overlay']['euclid']['to_mercator'] = false;
+$_BO['tpl_overlay']['euclid']['opacity'] = 50;
+
+//BLIDS Lightning Overlay
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['blids_de']['img'] = 'http://www.blids.de/spion/bilder/aktkartegergrau.jpg';
+$_BO['tpl_overlay']['blids_de']['coord'] = array(55.11, 15.53, 47.13, 4.97);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['blids_de']['default_show'] = false;
+$_BO['tpl_overlay']['blids_de']['sel_name'] = 'BLIDS Germany';
+$_BO['tpl_overlay']['blids_de']['only_loggedin'] = true;
+$_BO['tpl_overlay']['blids_de']['to_mercator'] = false;
+$_BO['tpl_overlay']['blids_de']['opacity'] = 50;
+
+//T-Online/wetter.info Radar
+//WARNING: Copyright! Only internal private usage!
+$time = time() - 300;
+$i = sprintf('%02d', (string)intval(date('i', $time) / 15) * 15);
+$time = strtotime(gmdate('Y-m-d H:'.$i.':00', $time).' UTC');
+$date = gmdate('YmdHi', $time);
+
+$_BO['tpl_overlay']['wetterinfo_radar']['img'] = "http://data.wetter.info//data/layers/xxlradar-de/xxlradar-de_radar_$date.gif"; //'http://data.wetter.info//data/maps/basemaps/xxlradar-de.jpg';
+$_BO['tpl_overlay']['wetterinfo_radar']['coord'] = array(55.5, 16.6, 46.2, 4.5);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['wetterinfo_radar']['default_show'] = false;
+$_BO['tpl_overlay']['wetterinfo_radar']['sel_name'] = 'Wetter.info Radar ('.date('H:i', $time).')';
+$_BO['tpl_overlay']['wetterinfo_radar']['only_loggedin'] = true;
+$_BO['tpl_overlay']['wetterinfo_radar']['to_mercator'] = true;
+$_BO['tpl_overlay']['wetterinfo_radar']['opacity'] = 40;
+
+$_BO['tpl_overlay']['wetterinfo_radar_small']['img'] = 'http://data.wetter.info/data/teaser/radar_de.gif';
+$_BO['tpl_overlay']['wetterinfo_radar_small']['coord'] = array(55.4, 16.25, 46.55, 4.64);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['wetterinfo_radar_small']['default_show'] = false;
+$_BO['tpl_overlay']['wetterinfo_radar_small']['sel_name'] = 'Wetter.info Radar (animiert)';
+$_BO['tpl_overlay']['wetterinfo_radar_small']['only_loggedin'] = true;
+$_BO['tpl_overlay']['wetterinfo_radar_small']['to_mercator'] = false;
+$_BO['tpl_overlay']['wetterinfo_radar_small']['opacity'] = 60;
+
+
+
+
 ?>

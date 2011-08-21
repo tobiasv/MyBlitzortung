@@ -86,9 +86,9 @@ $_BL['fr']['days'] = 'jours';
 $_BL['fr']['unit_days'] = 'jours';
 
 $_BL['fr']['Advanced'] = 'Avancé';
-$_BL['fr']['Lightning data'] = 'Source';
+$_BL['fr']['Lightning data'] = 'Source des données';
 $_BL['fr']['Home'] = 'Fontenay le comte';
-$_BL['fr']['lightning data'] = 'source';
+$_BL['fr']['lightning data'] = 'source des données';
 $_BL['fr']['Latitude'] = 'Latitude';
 $_BL['fr']['Longitude'] = 'Longitude';
 $_BL['fr']['Distance'] = 'Distance';
@@ -393,7 +393,7 @@ $_BL['fr']['Not definite'] = 'Non définie';
 $_BL['fr']['No signal recieved.'] = 'Pas de signal reçu';
 $_BL['fr']['stat_navi_alarm'] = 'Alertes foudre';
 $_BL['fr']['user_welcome_text'] = 'Vous êtes connecté sous ';
-$_BL['fr']['MyBlitzortung version'] = 'Version de {MYBO_NOTAGS}';
+$_BL['fr']['MyBlitzortung version'] = 'Version de {MYBO_ORIG}';
 $_BL['fr']['No permisson for saving to DB!'] = 'Pas d autorisation pour sauvegarder la DB!';
 $_BL['fr']['User list'] = 'Liste des utilisateurs';
 $_BL['fr']['Alert'] = 'Alerte';
@@ -464,8 +464,8 @@ $_BL['fr']['info_general_warning'] = '
 Nous ne sommes pas responsables de l\'exactitude du contenu, de la mise à jour et de la qualité des informations sur notre site.
 Nous ne sommes pas responsable des dommages en résultant de la confiance du contenu de notre site Web ou de son utilisation.';
 $_BL['fr']['info_general_text'] = '
-Blitzortung.org est un réseau privé de stations de détection de la foudre. Ils captent les signaux électromagnétiques des orages,et les
-les données de temps ainsi la position de la foudre peut être calculée (TOA - time of arrival).
+Blitzortung.org est un réseau privé de stations de détection de la foudre. Elles captent les signaux électromagnétiques des orages,et les
+les données de temps ainsi, la position de la foudre peut être calculée (TOA - time of arrival).
 Vous pouvez trouver plus d\'informations sur le site du projet: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
 
 ';
@@ -485,7 +485,7 @@ et ici:
 
 $_BL['fr']['info_usage_text'] = '
 Les données fournies sur cette page et par Blitzortung.org sont uniquement utilisable à des fins privées et de divertissement.
-Nous ne sommes pas un service d information commerciale pour les données de foudre! Voir plus d\'informations sur
+Nous ne sommes pas un service d\'information commerciale pour les données de foudre! Voir plus d\'informations sur
 <a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=5" target="_blank">Blitzortung.org</a>
 ';
 $_BL['fr']['info_myblitzortung_text'] = '
@@ -565,7 +565,7 @@ $_BL['fr']['Alert count'] = 'Compteur d\'alerte';
 $_BL['fr']['Create new alert'] = 'Créer une nouvelle alerte';
 $_BL['fr']['Change settings'] = 'Changer les réglages';
 $_BL['fr']['SMS'] = 'SMS';
-$_BL['fr']['alert_mail_description'] = 'Les informations suivantes sont automatiquement créées et vous sont envoyées par {MYBO_NOTAGS} station de{STATION}. Aucune garantie!';
+$_BL['fr']['alert_mail_description'] = 'Les informations suivantes sont automatiquement créées et vous sont envoyées par MyBlitzortung station de{STATION}. Aucune garantie!';
 $_BL['fr']['alert_mail_time range'] = 'Période examinée ';
 $_BL['fr']['alert_mail_strikes'] = 'Nombre d impacts ';
 $_BL['fr']['alert_mail_distance'] = 'Distance ';
@@ -632,7 +632,7 @@ Vous devez mettre à jour les données de temps en temps, afin que de nouvelles st
 </p>
 
 <p>
-Pour vous authentifier en tant que membre blitzortung.org, un login et id doit être demandé à blitzortung.org.
+Pour vous authentifiez en tant que membre blitzortung.org, un login et id doit être demandé à blitzortung.org.
 Cet id sera envoyé à <em>{LINK_HOST}</em> et il sera revérifié par blitzortung.org.
 L id n est pas enregistré! Votre mot de passe ne sera jamais envoyé à d autres sites que blitzortung.org!
 Votre station doit avoir envoyée au moins un signal depuis les 2 dernières heures, sinon l\'authentification ne fonctionne pas.
@@ -691,8 +691,7 @@ $_BL['fr']['Region'] = 'Région';
 $_BL['fr']['legend_stat_strikes_now'] = 'Région';
 $_BL['fr']['h3_stat_strikes_now'] = 'Foudre actuelle';
 $_BL['fr']['h3_stat_strikes_time'] = 'Compteur mensuel et annuel';
-$_BL['fr']['bo_descr_strikes_now'] = 'Les informations affichées ne sont pas en direct, car les données sont mise à jour tous les {UPDATE_INTERVAL} minutes depuis
-Blitzortung.org. L\'interval de calcul est de {RATE_INTERVAL} minutes. ';
+$_BL['fr']['bo_descr_strikes_now'] = 'Les informations affichées ne sont pas en direct, car les données sont mises à jour tous les {UPDATE_INTERVAL} minutes depuis Blitzortung.org. L\'interval de calcul est de {RATE_INTERVAL} minutes. ';
 
 $_BL['fr']['CEST'] = 'CEST';
 $_BL['fr']['CET'] = 'CET';
@@ -761,27 +760,27 @@ $_BL['fr']['Show'] = 'Montrer';
 $_BL['fr']['stat_advanced_show_strikes'] = 'Stat.impact';
 $_BL['fr']['stat_advanced_show_signals'] = 'Stat.signal';
 $_BL['fr']['h4_stat_signals'] = 'Signaux';
-$_BL['fr']['bo_graph_descr_radi_adv'] = 'The same as strike ratios in the station statistics, but here you can select the channel.';
-$_BL['fr']['bo_graph_descr_bear_adv'] = 'The same as strike ratios in the station statistics, but here you can select the channel.';
+$_BL['fr']['bo_graph_descr_radi_adv'] = 'La même chose que les ratios des impacts dans les statistiques , mais ici, vous pouvez sélectionner le canal.';
+$_BL['fr']['bo_graph_descr_bear_adv'] = 'La même chose que les ratios des impacts dans les statistiques , mais ici, vous pouvez sélectionner le canal.';
 $_BL['fr']['stat_advanced_show_strike_ratios'] = 'Ratios';
 $_BL['fr']['Frequency'] = 'Fréquence';
 $_BL['fr']['graph_stat_title_spectrum'] = 'Spectre';
 $_BL['fr']['graph_stat_yaxis_title'] = 'Amplitude';
 $_BL['fr']['h4_graph_spectrum'] = 'Spectre des fréquences';
-$_BL['fr']['bo_graph_spectrum'] = 'In each single spectrum of a singnal is a frequency with a maximum peak. The sum of the amplitudes of these peaks for each frequency are displayed here.';
+$_BL['fr']['bo_graph_spectrum'] = 'Dans chaque spectre unique d\'un signal est une fréquence avec un pic maximal. La somme des amplitudes de ces pics pour chaque fréquence sont affichés ici.';
 $_BL['fr']['Amplitude'] = 'Amplitude';
 $_BL['fr']['graph_stat_title_amplitude'] = 'Amplitudes';
 $_BL['fr']['h4_graph_amplitudes'] = 'Amplitudes';
-$_BL['fr']['bo_graph_amplitudes'] = 'Amplitudes of Signals. You can change between the amplitude of the first sample or the maximum amplitude.';
+$_BL['fr']['bo_graph_amplitudes'] = 'Amplitudes des signaux. Vous pouvez changer entre l\'amplitude du premier échantillon ou de l\'amplitude maximale.';
 $_BL['fr']['graph_stat_spectrum_yaxis_title'] = 'Somme des amplitudes';
-$_BL['fr']['With strikes connected'] = 'With strikes connected';
-$_BL['fr']['dontcare'] = 'Don\'t care';
-$_BL['fr']['participated_assigned'] = 'Assigned';
+$_BL['fr']['With strikes connected'] = 'Avec les impacts liés';
+$_BL['fr']['dontcare'] = 'Ne pas tenir compte';
+$_BL['fr']['participated_assigned'] = 'Assigné';
 $_BL['fr']['_participated'] = 'a participé';
 $_BL['fr']['not_participated'] = 'n\'a pas participé';
 $_BL['fr']['legend_stat_spectrum'] = 'Options';
 $_BL['fr']['legend_stat_amplitudes'] = 'Options';
-$_BL['fr']['amp_first'] = 'First sample';
+$_BL['fr']['amp_first'] = 'Premier échantillon';
 $_BL['fr']['with_strikes'] = 'avec impact';
 $_BL['fr']['with_participation'] = 'avec participation';
 $_BL['fr']['without_strikes'] = 'sans impact';
@@ -809,25 +808,11 @@ $_BL['fr']['number_every_minutes'] = 'toute les {NUMBER} minutes';
 $_BL['fr']['number_every_1minute'] = 'toute les minutes';
 $_BL['fr']['number_minutes'] = 'minutes';
 $_BL['fr']['number_1minute'] = 'une minute';
+$_BL['fr']['h4_new_stations'] = 'Nouvelles stations';
+$_BL['fr']['arch_navi_strikes'] = 'Impacts';
+$_BL['fr']['h3_arch_last_strikes'] = 'Derniers impacts';
+$_BL['fr']['Participated stations'] = 'Stations ayant participés';
 
 
-
-
-/********************/
-/*  NOT TRANSLATED  */
-/********************/
-
-
-//en: New stations
-$_BL['fr']['h4_new_stations'] = '';
-
-//en: Strikes
-$_BL['fr']['arch_navi_strikes'] = '';
-
-//en: Last strikes
-$_BL['fr']['h3_arch_last_strikes'] = '';
-
-//en: Participated stations
-$_BL['fr']['Participated stations'] = '';
 
 
