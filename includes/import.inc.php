@@ -35,7 +35,7 @@ function bo_get_login_str()
 		return false;
 	}
 	
-	bo_update_error('archivelogin', false);
+	bo_update_error('archivelogin', true);
 
 	if (preg_match('/login_string=([A-Z0-9]+)/', $file, $r))
 	{
@@ -65,7 +65,7 @@ function bo_get_archive($args='', $bo_login_id=false)
 		return false;
 	}
 	
-	bo_update_error('archivedata', false);
+	bo_update_error('archivedata', true);
 
 	if (strlen($file) < 100) //Login not successful --> new login ID
 	{
@@ -268,7 +268,7 @@ function bo_update_strikes($force = false)
 			return false;
 		}
 		
-		bo_update_error('strikedata', false);
+		bo_update_error('strikedata', true);
 
 		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
 		$row = $res->fetch_assoc();
