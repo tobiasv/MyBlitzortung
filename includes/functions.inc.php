@@ -863,11 +863,16 @@ function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2
 	}
 	else
 	{
-		if ($time_max - $time_min > 3600 * 24 && BO_DB_USE_LATLON_TIME_INDEX === true)
+		if ($time_max - $time_min <= 3600 * 48)
+			$index_sql = " FORCE INDEX (time) ";
+		else if ($time_max - $time_min > 3600 * 24 && BO_DB_USE_LATLON_TIME_INDEX === true)
 			$index_sql = " FORCE INDEX (time_latlon) ";
 		else
 			$index_sql = " FORCE INDEX (latlon) ";
 	}
+	
+	
+	$index_sql = " FORCE INDEX (time) ";
 	
 	return $sql;
 }

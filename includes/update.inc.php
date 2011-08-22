@@ -249,7 +249,7 @@ function bo_check_for_update()
 				flush();
 
 				
-				$sql = "UPDATE `".BO_DB_PREF."strikes` SET time_key=FLOOR(UNIX_TIMESTAMP(time) / (3600*12) ) WHERE time_key=0";
+				$sql = "UPDATE `".BO_DB_PREF."strikes` SET time_key=FLOOR(UNIX_TIMESTAMP(time) / (3600*12) )";
 				$no = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'.$no.' rows affected</b></li>';
 				flush();
