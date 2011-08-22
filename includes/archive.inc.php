@@ -524,23 +524,17 @@ function bo_show_archive_search()
 			$lat2max = ceil($str_lat_max);
 			$lon2max = ceil($str_lon_max/180 * 128);
 
-			if ($utime_from)
-				$sql_where .= " AND s.time >= '".gmdate('Y-m-d H:i:s', $utime_from)."' ";
-
-			if ($utime_to)
-				$sql_where .= " AND s.time <= '".gmdate('Y-m-d H:i:s', $utime_to)."' ";
+			
+			$sql_where .= " AND ".bo_strikes_sqlkey($index_sql, $utime_from, $utime_to, $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
 
 			$sql_where .= ($radius ? "AND distance < $radius" : "");
 			
-			$sql_where .= "
-					AND NOT (lat < $str_lat_min OR lat > $str_lat_max OR lon < $str_lon_min OR lon > $str_lon_max)
-					AND NOT (lat2 < $lat2min OR lat2 > $lat2max OR lon2 < $lon2min OR lon2 > $lon2max)";
 
 		}
 		
 		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
 						s.current current, s.deviation deviation, s.current current, s.polarity polarity, s.part part, s.raw_id raw_id
-				FROM ".BO_DB_PREF."strikes s
+				FROM ".BO_DB_PREF."strikes s $index_sql
 				WHERE 1
 					$sql_where
 				ORDER BY s.time DESC

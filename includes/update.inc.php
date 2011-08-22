@@ -233,7 +233,7 @@ function bo_check_for_update()
 			case '0.6.2':
 			
 				$res = bo_db("SHOW COLUMNS FROM `".BO_DB_PREF."strikes` WHERE Field='time_key'");
-				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD `time_key` MEDIUMINT UNSIGNED NOT NULL AFTER `time_ns`";
+				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD `time_key` SMALLINT UNSIGNED NOT NULL AFTER `time_ns`";
 				echo '<li><em>'.$sql.'</em>: <b>';
 				if (!$res->num_rows)
 				{
@@ -249,7 +249,7 @@ function bo_check_for_update()
 				flush();
 
 				
-				$sql = "UPDATE `".BO_DB_PREF."strikes` SET time_key=FLOOR(UNIX_TIMESTAMP(time) / (60*5) ) WHERE time_key=0";
+				$sql = "UPDATE `".BO_DB_PREF."strikes` SET time_key=FLOOR(UNIX_TIMESTAMP(time) / (3600*12) ) WHERE time_key=0";
 				$no = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'.$no.' rows affected</b></li>';
 				flush();

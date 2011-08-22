@@ -271,11 +271,15 @@ function bo_tile()
 			$date_min = gmdate('Y-m-d H:i:s', $times_min[$i]);
 			$date_max = gmdate('Y-m-d H:i:s', $times_max[$i]);
 			
-			$sql_where .= " OR s.time BETWEEN '$date_min' AND '$date_max' ";
+			$sql_where_time .= " OR s.time BETWEEN '$date_min' AND '$date_max' ";
 		}
 		
 		$strike_count = 0;
 		$whole_strike_count = 0;
+		
+		//the where clause
+		$sql_where = bo_strikes_sqlkey($index_sql, min($times_min), max($times_max), $lat1, $lat2, $lon1, $lon2);
+
 		
 		if ($_GET['stat'] == 2)
 		{
@@ -284,12 +288,12 @@ function bo_tile()
 			
 			$sql = "SELECT ss.station_id sid, COUNT(s.time) cnt 
 				FROM ".BO_DB_PREF."stations_strikes ss
-				JOIN ".BO_DB_PREF."strikes s USE INDEX (time)
+				JOIN ".BO_DB_PREF."strikes s $index_sql
 					ON s.id=ss.strike_id
 				WHERE 1
 					".($radius ? "AND s.distance < $radius" : "")."
-					AND NOT (s.lat < $lat1 OR s.lat > $lat2 OR s.lon < $lon1 OR s.lon > $lon2)
-					AND (0 $sql_where)
+					AND (0 $sql_where_time)
+					AND $sql_where
 					".($only_own ? " AND part>0 " : "")."
 				GROUP BY sid
 				";
@@ -301,12 +305,11 @@ function bo_tile()
 		}
 		
 		$sql = "SELECT COUNT(time) cnt ".($only_own ? ", part>0 participated " : "")."
-			FROM ".BO_DB_PREF."strikes s
-			USE INDEX (time)
+			FROM ".BO_DB_PREF."strikes s $index_sql
 			WHERE 1
 				".($radius ? "AND distance < $radius" : "")."
-				AND NOT (lat < $lat1 OR lat > $lat2 OR lon < $lon1 OR lon > $lon2)
-				AND (0 $sql_where)
+				AND (0 $sql_where_time)
+				AND $sql_where
 				".($only_own ? " GROUP BY participated " : "")."
 			";
 		$erg = bo_db($sql);
@@ -400,7 +403,7 @@ function bo_tile()
 	$color_intvl = ($time_max - $time_min) / count($c);
 
 	//the where clause
-	$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat2, $lat1, $lon2, $lon1);
+	$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat1, $lat2, $lon1, $lon2);
 	
 	//get the data!
 	$points = array();

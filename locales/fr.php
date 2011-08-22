@@ -812,17 +812,6 @@ $_BL['fr']['h4_new_stations'] = 'Nouvelles stations';
 $_BL['fr']['arch_navi_strikes'] = 'Impacts';
 $_BL['fr']['h3_arch_last_strikes'] = 'Derniers impacts';
 $_BL['fr']['Participated stations'] = 'Stations ayant participés';
-
-
-
-/********************/
-/*  NOT TRANSLATED  */
-/********************/
-
-
-//en: Statistics
-$_BL['fr']['Statistics'] = '';
-
-//en: Off
-$_BL['fr']['Off'] = '';
+$_BL['fr']['Statistics'] = 'Statistiques';
+$_BL['fr']['Off'] = 'Off';
 

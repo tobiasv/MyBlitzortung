@@ -189,7 +189,7 @@ function bo_get_map_image()
 	else
 	{
 		$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
-		$time = time();
+		$time = $last_update;
 		$time_min = $time - 3600 * $cfg['trange'];
 		$time_max = $time;
 		

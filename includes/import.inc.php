@@ -333,7 +333,7 @@ function bo_update_strikes($force = false)
 				}
 				
 				$time_ns = intval($r[3]);
-				$time_key = floor($utime / (60*5));
+				$time_key = floor($utime / (3600*12));
 				
 				$lat = $r[4];
 				$lon = $r[5];

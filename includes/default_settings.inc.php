@@ -101,6 +101,9 @@ if (!defined('BO_VER'))
 /*** set to true, if you want to use "file_get_contents"         ***/
 @define("BO_USE_PHPURLWRAPPER", false);
 
+/*** use experimental mysql kex for faster strike search         ***/
+/*   by time *and* latlon                                          */
+@define("BO_DB_USE_LATLON_TIME_INDEX", false);
 
 
 /*******************************************************************/

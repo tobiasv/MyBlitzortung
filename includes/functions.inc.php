@@ -798,18 +798,21 @@ function bo_get_file($url, &$error = '', $type = '')
 	return $content; 	 
 }
 
-function bo_latlon2sql($lat1, $lat2, $lon1, $lon2, $with_indexed_values = false)
+function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false, $with_indexed_values = false)
 {
-	$sql = " (lat BETWEEN '$lat2' AND '$lat1' AND lon BETWEEN '$lon2' AND '$lon1' ";
+	if ($lat === false)
+		return " 1 ";
+	
+	$sql = " (lat BETWEEN '$lat1' AND '$lat2' AND lon BETWEEN '$lon1' AND '$lon2' ";
 	
 	if ($with_indexed_values)
 	{
-		$lat2min = floor($lat2);
-		$lat1max = ceil($lat1);
-		$lon2min = floor($lon2/180 * 128);
-		$lon1max = ceil($lon1/180 * 128);
+		$lat1min = floor($lat1);
+		$lat2max = ceil($lat2);
+		$lon1min = floor($lon1/180 * 128);
+		$lon2max = ceil($lon2/180 * 128);
 
-		$sql .= " AND lat2 BETWEEN '$lat2min' AND '$lat1max' AND lon2 BETWEEN '$lon2min' AND '$lon1max' ";
+		$sql .= " AND lat2 BETWEEN '$lat1min' AND '$lat2max' AND lon2 BETWEEN '$lon1min' AND '$lon2max' ";
 	}
 
 	$sql .= ") ";
@@ -817,20 +820,23 @@ function bo_latlon2sql($lat1, $lat2, $lon1, $lon2, $with_indexed_values = false)
 	return $sql;
 }
 
-function bo_times2sql($time_min, $time_max, $with_indexed_values = false)
+function bo_times2sql($time_min = 0, $time_max = 0, $with_indexed_values = false)
 {
 	$time_min = intval($time_min);
 	$time_max = intval($time_max);
 
+	if (!$time_max)
+		$time_max = pow(2, 31) - 1;
+	
 	//date range
 	$date_min = gmdate('Y-m-d H:i:s', $time_min);
 	$date_max = gmdate('Y-m-d H:i:s', $time_max);
 
 	$sql .= " ( time BETWEEN '$date_min' AND '$date_max' ";
 	
-	if ($with_indexed_values)
+	if ($with_indexed_values && BO_DB_USE_LATLON_TIME_INDEX === true)
 	{
-		$sql .= " AND time_key BETWEEN $time_min/(60*5) AND $time_max/(60*5) ";
+		$sql .= " AND time_key BETWEEN FLOOR($time_min/(3600*12)) AND CEIL($time_max/(3600*12)) ";
 	}
 
 	$sql .= ") ";
@@ -838,7 +844,7 @@ function bo_times2sql($time_min, $time_max, $with_indexed_values = false)
 	return $sql;
 }
 
-function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1, $lat2, $lon1, $lon2)
+function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2=false, $lon1=false, $lon2=false)
 {
 	
 	$sql  = " (";
@@ -847,7 +853,21 @@ function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1, $lat2, $lon
 	$sql .= bo_times2sql($time_min, $time_max, true);
 	$sql .= ") ";
 	
-	$index_sql = " FORCE INDEX (time_latlon) ";
+	if ($lat1===false) //only time
+	{
+		$index_sql = " FORCE INDEX (time) ";
+	}
+	else if (!$time_min && !$time_max) // only latlon
+	{
+		$index_sql = " FORCE INDEX (latlon) ";
+	}
+	else
+	{
+		if ($time_max - $time_min > 3600 * 24 && BO_DB_USE_LATLON_TIME_INDEX === true)
+			$index_sql = " FORCE INDEX (time_latlon) ";
+		else
+			$index_sql = " FORCE INDEX (latlon) ";
+	}
 	
 	return $sql;
 }
