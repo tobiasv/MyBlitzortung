@@ -3,10 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.6.1 (2011-08-xx)
---------------------------
+Version 0.7 (2011-08-xx)
+------------------------
 - new: complete FRENCH translation (by flc85)
 - new: own copyright info (footer, maps, graphs)
+- new: individual time range in dyn map
 - new: flags for language change
 - new: display cities from cities.txt in maps
 - new: display stations in maps

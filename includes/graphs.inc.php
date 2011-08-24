@@ -1042,7 +1042,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$add_title .= '+'._BL('with_participation');
 			}
 			
-			$sql_join .= strtr(bo_region2sql($region), array('lat' => 's.lat', 'lon' => 's.lon'));
+			$sql_join .= bo_region2sql($region);
 		}
 		else if ($participated < 0)
 		{
@@ -1191,7 +1191,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$add_title .= '+'._BL('with_participation');
 			}
 			
-			$sql_join .= strtr(bo_region2sql($region), array('lat' => 's.lat', 'lon' => 's.lon'));
+			$sql_join .= bo_region2sql($region);
 		}
 		else if ($participated < 0)
 		{

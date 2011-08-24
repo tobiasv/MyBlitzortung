@@ -814,3 +814,8 @@ $_BL['en']['h3_arch_last_strikes'] = 'Last strikes';
 $_BL['en']['Participated stations'] = 'Participated stations';
 $_BL['en']['Statistics'] = 'Statistics';
 $_BL['en']['Off'] = 'Off';
+$_BL['en']['tile_time_range_na_err'] = 'Selecting time ranges\nis not allowed for you!';
+$_BL['en']['tile_wrong_time_range_err'] = 'Second date/time\nhas to be greater\nthan the first one!';
+$_BL['en']['tile_maximum_time_range_err'] = 'Time range too big!\nMaximum is {HOURS} hours.';
+
+

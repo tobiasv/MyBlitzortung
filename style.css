@@ -399,6 +399,10 @@ border-top: 1px dotted #e4e4e4;
 padding-top:8px;
 }
 
+#myblitzortung #bo_map_timerange select{
+font-size: 10px;
+}
+
 /*** Archive ***/
 
 #myblitzortung .bo_map_archive {

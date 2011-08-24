@@ -36,6 +36,7 @@ if (!defined('BO_VER'))
 /* Dynamic map tiles                  */
 /**************************************/
 
+
 // 0 to 15 minutes
 $_BO['tpl_gmap']['0-15']['tstart'] = 15;
 $_BO['tpl_gmap']['0-15']['trange'] = 15;
@@ -81,6 +82,22 @@ $_BO['tpl_gmap']['1-10d']['sel_name'] = '1-10 days';
 $_BO['tpl_gmap']['1-10d']['only_loggedin'] = true;
 
 
+/**************************************/
+/* Manual time selection: colors      */
+/**************************************/
+
+$_BO['tpl_gmap']['manual']['col'][] = array(255, 255, 0);
+$_BO['tpl_gmap']['manual']['col'][] = array(255, 240, 0);
+$_BO['tpl_gmap']['manual']['col'][] = array(255, 225, 0);
+$_BO['tpl_gmap']['manual']['col'][] = array(250, 190, 0);
+$_BO['tpl_gmap']['manual']['col'][] = array(245, 170, 10);
+$_BO['tpl_gmap']['manual']['col'][] = array(240, 150, 10);
+$_BO['tpl_gmap']['manual']['col'][] = array(235, 130, 10);
+$_BO['tpl_gmap']['manual']['col'][] = array(230, 110, 10);
+$_BO['tpl_gmap']['manual']['col'][] = array(225,  90, 10);
+$_BO['tpl_gmap']['manual']['col'][] = array(220,  70, 10);
+for ($i=0;$i<20;$i++)
+	$_BO['tpl_gmap']['manual']['col'][] = array(200-150*$i/20, 10+40*$i/20, 50+200*$i/20);
 
 
 

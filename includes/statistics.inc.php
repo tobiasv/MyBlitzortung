@@ -142,17 +142,18 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 				FROM ".BO_DB_PREF."strikes ";
 		$row = bo_db($sql)->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
-	
-		if (intval(BO_TRACKS_SCANTIME))
+	}
+
+	if (!$region && intval(BO_TRACKS_SCANTIME))
+	{
+		$num_cells = -1;
+		$cells_data = unserialize(gzinflate(bo_get_conf('strike_cells')));
+		if (is_array($cells_data['cells']))
 		{
-			$num_cells = -1;
-			$cells_data = unserialize(gzinflate(bo_get_conf('strike_cells')));
-			if (is_array($cells_data['cells']))
-			{
-				$num_cells = count($cells_data['cells'][BO_TRACKS_DIVISOR-1]);
-			}
+			$num_cells = count($cells_data['cells'][BO_TRACKS_DIVISOR-1]);
 		}
 	}
+
 	
 	/*** Strikes by month/year ***/
 	$time = mktime(0,0,0,date('m'), date('d'), date('Y'));
@@ -705,8 +706,15 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			{
 				echo '<li><span class="bo_descr">';
 				
-				echo _BC($d[1]);
-				echo '</a>';
+				if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
+				{
+					echo '<a href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">';
+					echo _BC($d[1]);
+					echo '</a>';
+				}
+				else
+					echo _BC($d[1]);
+					
 				echo '</span>';
 				echo '<span class="bo_value">';
 				echo date(_BL('_datetime'), $d[0]);

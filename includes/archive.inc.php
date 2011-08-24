@@ -572,7 +572,7 @@ function bo_show_archive_search()
 			if ($row['raw_id'])
 			{
 				$alt = _BL('Signals');
-				$description .= '<img src=\''.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\' alt="'.htmlspecialchars($alt).'">';
+				$description .= '<img src=\''.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\' alt=\''.htmlspecialchars($alt).'\'>';
 			}
 
 			$description .= '</div>';

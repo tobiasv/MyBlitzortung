@@ -76,9 +76,9 @@ if (!defined('BO_VER'))
 @define("BO_UP_MAX_SLEEP", 30); // max. sleep time in seconds before importing
 
 /*** Import error handling                                       ***/
-@define("BO_UP_ERR_MIN_MINUTES", 30);
-@define("BO_UP_ERR_MIN_COUNT",   1);
-@define("BO_UP_ERR_SEND_INTERVAL",   60);
+@define("BO_UP_ERR_MIN_COUNT",   1);     // min count, error occured (0 disables reporting)
+@define("BO_UP_ERR_MIN_MINUTES", 30);    // time in minutes in which the error occurs
+@define("BO_UP_ERR_SEND_INTERVAL", 60);  // if error persits, send mail max. every defined minutes
 
 /*** Copyright footer/graphs/images                              ***/
 @define('BO_OWN_COPYRIGHT', '');
@@ -178,6 +178,10 @@ if (!defined('BO_VER'))
 @define('BO_MAP_NA_FONTSIZE', 3); //no TTF!
 @define('BO_MAP_COUNT_FONTSIZE', 8); 
 @define('BO_MAP_COUNT_FONTBOLD', true); 
+
+//Manual time ranges
+@define('BO_MAP_MANUAL_TIME_ENABLE', false); //enables for guests
+@define('BO_MAP_MANUAL_TIME_MAX_HOURS', 6); //max. hours between start and end (YOU can always access as much as you want - be careful!)
 
 //MyBo Stations
 @define('BO_MAP_MYBO_CIRCLE_COLOR_LINE', '#0000FF');
@@ -553,6 +557,9 @@ if (!isset($_BO['mapcfg'][1]))
 	
 if (!isset($_BO['mapcfg'][2]))
 	$_BO['mapcfg'][2] = $_BO['tpl_gmap']['2-24h'];
+
+if (!isset($_BO['mapcfg'][-1]))
+	$_BO['mapcfg'][-1] = $_BO['tpl_gmap']['manual'];
 
 	
 /*** Image Maps ***/

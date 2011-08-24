@@ -636,7 +636,7 @@ function bo_show_calibrate_antennas()
 	echo '<input type="text" name="bo_limit" value="'.$limit.'" id="bo_calibrate_limit" class="bo_form_text bo_form_input">';
 
 	echo '<span class="bo_form_descr">'._BL('Max Distance (Kilometers)').':</span>';
-	echo '<input type="text" name="bo_max_dist" value="'.($dist ? $dist : '').'" id="bo_calibrate_dist" class="bo_form_text bo_form_input">';
+	echo '<input type="text" name="bo_max_dist" value="'.($dist ? $dist/1000 : '').'" id="bo_calibrate_dist" class="bo_form_text bo_form_input">';
 
 	echo '<span class="bo_form_descr">'._BL('Max Age (Days)').':</span>';
 	echo '<input type="text" name="bo_max_age" value="'.($age ? $age : '').'" id="bo_calibrate_age" class="bo_form_text bo_form_input">';

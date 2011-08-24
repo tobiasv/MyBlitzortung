@@ -716,7 +716,7 @@ function bo_get_file($url, &$error = '', $type = '')
 	{
 		return file_get_contents($url);
 	}
-	
+
 	$parsedurl = @parse_url($url); 
 	$host = $parsedurl['host'];
 	$user = $parsedurl['user'];
@@ -745,35 +745,42 @@ function bo_get_file($url, &$error = '', $type = '')
 		
 		$out .= "Connection: Close\r\n\r\n";
 		
-		fwrite($fp, $out);		 
-		$content = ''; 
-		$first = true;
-		$response = array();
-		
-		//Header
-		do 
-		{ 
-			$header = chop(fgets($fp)); 
+		if (fwrite($fp, $out) !== false)
+		{
+			$content = ''; 
+			$first = true;
+			$response = array();
 			
-			if ($first)
-			{
-				preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
+			//Header
+			do 
+			{ 
+				$header = chop(fgets($fp)); 
 				
-				if ($response[1] != '200')
+				if ($first)
 				{
-					$err = 2;
-					break;
+					preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
+					
+					if ($response[1] != '200')
+					{
+						$err = 2;
+						break;
+					}
 				}
-			}
-			
-			$first = false;
-		} 
-		while (!empty($header) and !feof($fp)); 
-			
-		//Get the Content
-		while (!feof($fp)) { 
-			$content .= fgets($fp); 
-		} 
+				
+				$first = false;
+			} 
+			while (!empty($header) and !feof($fp)); 
+				
+			//Get the Content
+			while (!feof($fp)) { 
+				$content .= fgets($fp); 
+			} 
+		}
+		else
+		{
+			$error = "Send ERROR: $errstr ($errno)<br />\n";
+			echo $error;
+		}
 		
 		fclose($fp);
 	}
@@ -803,7 +810,7 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false, $with
 	if ($lat === false)
 		return " 1 ";
 	
-	$sql = " (lat BETWEEN '$lat1' AND '$lat2' AND lon BETWEEN '$lon1' AND '$lon2' ";
+	$sql = " (s.lat BETWEEN '$lat1' AND '$lat2' AND s.lon BETWEEN '$lon1' AND '$lon2' ";
 	
 	if ($with_indexed_values)
 	{
@@ -812,7 +819,7 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false, $with
 		$lon1min = floor($lon1/180 * 128);
 		$lon2max = ceil($lon2/180 * 128);
 
-		$sql .= " AND lat2 BETWEEN '$lat1min' AND '$lat2max' AND lon2 BETWEEN '$lon1min' AND '$lon2max' ";
+		$sql .= " AND s.lat2 BETWEEN '$lat1min' AND '$lat2max' AND s.lon2 BETWEEN '$lon1min' AND '$lon2max' ";
 	}
 
 	$sql .= ") ";
@@ -832,11 +839,13 @@ function bo_times2sql($time_min = 0, $time_max = 0, $with_indexed_values = false
 	$date_min = gmdate('Y-m-d H:i:s', $time_min);
 	$date_max = gmdate('Y-m-d H:i:s', $time_max);
 
-	$sql .= " ( time BETWEEN '$date_min' AND '$date_max' ";
+	$sql .= " ( s.time BETWEEN '$date_min' AND '$date_max' ";
 	
 	if ($with_indexed_values && BO_DB_USE_LATLON_TIME_INDEX === true)
 	{
-		$sql .= " AND time_key BETWEEN FLOOR($time_min/(3600*12)) AND CEIL($time_max/(3600*12)) ";
+		$a = floor($time_min/(3600*12));
+		$b = ceil($time_max/(3600*12));
+		$sql .= " AND s.time_key BETWEEN $a AND $b ";
 	}
 
 	$sql .= ") ";
@@ -846,7 +855,6 @@ function bo_times2sql($time_min = 0, $time_max = 0, $with_indexed_values = false
 
 function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2=false, $lon1=false, $lon2=false)
 {
-	
 	$sql  = " (";
 	$sql .= bo_latlon2sql($lat1, $lat2, $lon1, $lon2, true);
 	$sql .= " AND ";
@@ -855,25 +863,28 @@ function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2
 	
 	if ($lat1===false) //only time
 	{
-		$index_sql = " FORCE INDEX (time) ";
+		$index_sql = " USE INDEX (time) ";
 	}
 	else if (!$time_min && !$time_max) // only latlon
 	{
-		$index_sql = " FORCE INDEX (latlon) ";
+		$index_sql = " USE INDEX (latlon) ";
 	}
 	else
 	{
+		if (!$time_max)
+			$time_max = pow(2, 31) - 1;
+
 		if ($time_max - $time_min <= 3600 * 48)
-			$index_sql = " FORCE INDEX (time) ";
+			$index_sql = " USE INDEX (time) ";
 		else if ($time_max - $time_min > 3600 * 24 && BO_DB_USE_LATLON_TIME_INDEX === true)
-			$index_sql = " FORCE INDEX (time_latlon) ";
+			$index_sql = " USE INDEX (time_latlon) ";
 		else
-			$index_sql = " FORCE INDEX (latlon) ";
+			$index_sql = " USE INDEX (latlon) ";
 	}
 	
-	
-	$index_sql = " FORCE INDEX (time) ";
-	
+	//no hints at all
+	$index_sql = '';
+
 	return $sql;
 }
 
@@ -894,7 +905,7 @@ function bo_region2sql($region)
 		list(,$lat2) = @each($reg);
 		list(,$lon2) = @each($reg);
 		
-		$sql .= " OR ".bo_latlon2sql($lat1, $lat2, $lon1, $lon2, true);
+		$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1, true);
 	}
 	
 	$sql .= ' ) ';
@@ -911,7 +922,7 @@ function bo_region2sql($region)
 			list(,$lat2) = @each($reg);
 			list(,$lon2) = @each($reg);
 			
-			$sql .= " OR ".bo_latlon2sql($lat1, $lat2, $lon1, $lon2, true);
+			$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1, true);
 
 		}
 		

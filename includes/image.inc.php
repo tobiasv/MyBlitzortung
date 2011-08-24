@@ -298,7 +298,7 @@ function bo_get_map_image()
 	if (!$blank)
 	{
 		$sql = "SELECT time, lat, lon
-				FROM ".BO_DB_PREF."strikes
+				FROM ".BO_DB_PREF."strikes s
 				USE INDEX ($sql_index)
 				WHERE 1
 					".($only_own ? " AND part>0 " : "")."
@@ -1483,8 +1483,10 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 		$lon = $d['lon'];
 		$lat = $d['lat'];
 		
-		if ( (!isset($cfg['stations'][$type]) && !isset($cfg['stations'][0]) )
-				|| $lat > $latN || $lat < $latS || $lon > $lonE || $lon < $lonW)
+		if ( !isset($cfg['stations'][$type]) && !isset($cfg['stations'][0]) )
+			continue;
+		
+		if (!$strike_id && ($lat > $latN || $lat < $latS || $lon > $lonE || $lon < $lonW))
 			continue;
 		
 		if (isset($cfg['stations'][$type]))

@@ -38,9 +38,53 @@ function bo_tile()
 	$zoom = intval($_GET['zoom']);
 	$only_own = intval($_GET['own']);
 	$only_info = isset($_GET['info']);
-
+	$type = intval($_GET['type']);
+	
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$time = time();
+
+	$cfg = $_BO['mapcfg'][$type];
+	
+	//manual time select
+	if (isset($_GET['from']) && isset($_GET['to']))
+	{
+		if (!$only_info && BO_MAP_MANUAL_TIME_ENABLE !== true && !(bo_user_get_level() & BO_PERM_NOLIMIT))
+		{
+			bo_tile_message('tile_time_range_na_err', 'range_na', $caching);
+			exit;
+		}
+		
+		$time_manual_from = strtotime($_GET['from']);
+		$time_manual_to = strtotime($_GET['to']);
+		
+		// set "current" time
+		$time = $time_manual_to;
+		
+		// add config
+		$cfg['trange'] = ($time_manual_to - $time_manual_from - 59) / 60; 
+		$cfg['upd_intv'] = 1;
+		$cfg['tstart'] = ($time_manual_to - $time_manual_from) / 60;
+
+		if (!$only_info && $time_manual_to < $time_manual_from)
+		{
+			bo_tile_message('tile_wrong_time_range_err', 'range_wrong', $caching);
+			exit;
+		}
+		else if (!$only_info && intval(BO_MAP_MANUAL_TIME_MAX_HOURS) < $cfg['trange']/60 && bo_user_get_id() != 1)
+		{
+			bo_tile_message('tile_maximum_time_range_err', 'range_max', $caching, array('{HOURS}' => intval(BO_MAP_MANUAL_TIME_MAX_HOURS)));
+			exit;
+		}
+		
+		
+		//disable caching
+		$caching = false;
+	}
+	else
+	{
+		$time_manual_from = false;
+	}
+
 	
 	//Debug
 	//$time = strtotime('2011-06-16 17:00:00 UTC');
@@ -48,8 +92,6 @@ function bo_tile()
 	//get config
 	if (isset($_GET['count'])) // display strike count
 	{
-		$count_types = explode(',',$_GET['count']);
-
 		$type = 0;
 		$time_range = 0;
 		$time_start = 0;
@@ -59,11 +101,17 @@ function bo_tile()
 		$time_max = array();
 		$update_interval = array();
 		
+		if ($time_manual_from)
+			$count_types[0] = -1;
+		else
+			$count_types = explode(',',$_GET['count']);
+			
 		foreach($count_types as $i)
 		{
 			$type += pow(2, $i);
 			
-			$cfg = $_BO['mapcfg'][$i];
+			if (!$time_manual_from)
+				$cfg = $_BO['mapcfg'][$i];
 			
 			if (!is_array($cfg) || !$cfg['upd_intv'])
 				continue;
@@ -80,13 +128,9 @@ function bo_tile()
 		$time_max        = count($times_max) ? max($times_max) : 0;
 		
 		$type = 'count_'.$type;
-		
 	}
 	else //normal strike display
 	{
-		$type = intval($_GET['type']);
-		
-		$cfg = $_BO['mapcfg'][$type];
 		$time_start = $time - 60 * $cfg['tstart'];
 		$time_range = $cfg['trange'];
 		$update_interval = $cfg['upd_intv'];
@@ -127,7 +171,7 @@ function bo_tile()
 		bo_load_locale();
 		
 		$time_max = min(bo_get_conf('uptime_strikes'), $time_max);
-		$show_date = $time_max - $time_min > 3600 * 12 ? true : false;
+		$show_date = $time_manual_from || ($time_max-$time_min) > 3600 * 12 ? true : false;
 		
 		$fh = imagefontheight(BO_MAP_LEGEND_FONTSIZE);
 		$w = BO_MAP_LEGEND_WIDTH;
@@ -208,54 +252,8 @@ function bo_tile()
 				)
 			{
 
-				if (!file_exists($dir.'na.png') || !$caching)
-				{
-					bo_load_locale();
-					
-					$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
-
-					$blank = imagecolorallocate($I, 255, 255, 255);
-					$textcol = imagecolorallocate($I, 70, 70, 70);
-					$box_bg  = imagecolorallocate($I, 210, 210, 255);
-					$box_line  = imagecolorallocate($I, 255, 255, 255);
-
-					imagefilledrectangle( $I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
-
-					$text = _BL('tile not available', true);
-					$lines = explode("\n", $text);
-					$height = (count($lines));
-					$width = 0;
-					foreach($lines as $line)
-						$width = max(strlen($line), $width);
-					
-					$fwidth  = imagefontwidth(BO_MAP_NA_FONTSIZE);
-					$fheight = imagefontheight(BO_MAP_NA_FONTSIZE);
-
-					imagefilledrectangle( $I, 25, 115, 35+$width*$fwidth, 127+$height*$fheight, $box_bg);
-					imagerectangle( $I, 25, 115, 35+$width*$fwidth, 127+$height*$fheight, $box_line);
-
-					foreach($lines as $i=>$line)
-						imagestring($I, BO_MAP_NA_FONTSIZE, 30, 120+$i*$fheight, $line, $textcol);
-
-					imagecolortransparent($I, $blank);
-					
-					if (!$caching)
-					{
-						header("Content-Type: image/png");
-						imagepng($I);
-						exit;
-					}
-					
-					$ok = @imagepng($I, $dir.'na.png');
-					
-					if (!$ok)
-						bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
-
-				}
-
-				header("Content-Type: image/png");
-				readfile($dir.'na.png');
-
+				$text = _BL('tile not available', true);
+				bo_tile_message($text, 'na', $caching);
 				exit;
 			}
 
@@ -408,7 +406,7 @@ function bo_tile()
 	//get the data!
 	$points = array();
 	$deviation = array();
-	 $sql = "SELECT id, time, lat, lon, deviation, polarity
+	$sql = "SELECT id, time, lat, lon, deviation, polarity
 			FROM ".BO_DB_PREF."strikes s
 			$index_sql
 			WHERE 1
@@ -781,5 +779,64 @@ function bo_tile_output($file='', $caching=false, &$I=null)
 	exit;
 }
 
+
+function bo_tile_message($text, $type, $caching=false, $replace = array())
+{
+	$dir = BO_DIR.'cache/tiles/';
+	
+	$file = $dir.$type.'_'._BL().'.png';
+	
+	if (!file_exists($file) || !$caching)
+	{
+		bo_load_locale();
+		$text = strtr(_BL($text, true), $replace);
+		
+		$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
+
+		$blank = imagecolorallocate($I, 255, 255, 255);
+		$textcol = imagecolorallocate($I, 70, 70, 70);
+		$box_bg  = imagecolorallocate($I, 210, 210, 255);
+		$box_line  = imagecolorallocate($I, 255, 255, 255);
+
+		imagefilledrectangle( $I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
+		
+		$text = strtr($text, array('\n' => "\n"));
+		
+		$lines = explode("\n", $text);
+		$height = (count($lines));
+		$width = 0;
+		foreach($lines as $line)
+			$width = max(strlen($line), $width);
+		
+		$fwidth  = imagefontwidth(BO_MAP_NA_FONTSIZE);
+		$fheight = imagefontheight(BO_MAP_NA_FONTSIZE);
+
+		imagefilledrectangle( $I, 25, 115, 35+$width*$fwidth, 127+$height*$fheight, $box_bg);
+		imagerectangle( $I, 25, 115, 35+$width*$fwidth, 127+$height*$fheight, $box_line);
+
+		foreach($lines as $i=>$line)
+			imagestring($I, BO_MAP_NA_FONTSIZE, 30, 120+$i*$fheight, $line, $textcol);
+
+		imagecolortransparent($I, $blank);
+		
+		if (!$caching)
+		{
+			header("Content-Type: image/png");
+			imagepng($I);
+			exit;
+		}
+		
+		$ok = @imagepng($I, $file);
+		
+		if (!$ok)
+			bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
+
+	}
+
+	header("Content-Type: image/png");
+	readfile($file);
+
+
+}
 
 ?>

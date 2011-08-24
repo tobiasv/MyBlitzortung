@@ -231,6 +231,11 @@ function bo_show_lightning_map()
 		return;
 	}
 	
+	//Max,min striketime
+	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+	$start_time = strtotime($row['mintime'].' UTC');
+	$end_time = strtotime($row['maxtime'].' UTC');
+	
 	//Get Stations
 	$sid = bo_station_id();
 	$js_stations = '';
@@ -341,8 +346,10 @@ function bo_show_lightning_map()
 	$min_upd_interval = null;
 	foreach ($_BO['mapcfg'] as $mapid => $cfg)
 	{
-		if (!is_array($cfg) || empty($cfg) || ($cfg['only_loggedin'] && !bo_user_get_level()) )
+		if (!is_array($cfg) || empty($cfg) || ($cfg['only_loggedin'] && !bo_user_get_level()) || !$cfg['sel_name'] || !$cfg['upd_intv'])
 			continue;
+		
+		$mapcfg[$mapid] = $cfg;
 		
 		if ($min_upd_interval == null || $min_upd_interval > $cfg['upd_intv'])
 			$min_upd_interval = $cfg['upd_intv'];
@@ -356,16 +363,100 @@ function bo_show_lightning_map()
 		echo '</span>';
 	}
 
+	$mapcfg[-1] = $_BO['mapcfg'][-1];
+	
 	echo ' <input type="submit" value="'._BL('more').' &dArr;" onclick="return bo_show_more();" id="bo_map_more">';
 	echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_overlays(); return false;" id="bo_map_reload">';
 
 	echo '<span class="bo_form_checkbox_text">';
-	echo '<input type="checkbox" onclick="bo_toggle_autoupdate(this.checked)" id="bo_autoupdate"> ';
-	echo '<label for="bo_autoupdate">'._BL('auto update').'</label> ';
+	echo '<input type="checkbox" onclick="bo_toggle_autoupdate(this.checked);" id="bo_check_autoupdate"> ';
+	echo '<label for="bo_check_autoupdate">'._BL('auto update').'</label> ';
 	echo '</span>';
 	
 	echo '<div id="bo_map_more_container" style="display: none">';
 
+	
+	/*** Manual time range ***/
+	
+	if (BO_MAP_MANUAL_TIME_ENABLE === true || (bo_user_get_level() & BO_PERM_NOLIMIT))
+	{
+		$max_range = intval(BO_MAP_MANUAL_TIME_MAX_HOURS);
+	
+		$yesterday = strtotime('now -1 day');
+		$year1 = (int)date('Y', $yesterday);
+		$month1 = (int)date('m', $yesterday);
+		$day1 = (int)date('d', $yesterday);
+		$hour1 = $minute1 = 0;
+		
+		$today = strtotime("$year1-$month1-$day1 00:00:00");
+		if ($max_range < 24)
+			$today += $max_range * 3600;
+		else
+			$today += $max_range * 3600 * 24;
+		
+		$year2 = (int)date('Y', $today);
+		$month2 = (int)date('m', $today);
+		$day2 = (int)date('d', $today);
+		$hour2 = (int)date('H', $today);
+		$minute2 = (int)date('i', $today);
+		
+		
+		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
+		
+		echo '<div class="bo_input_container" id="bo_map_timerange">';
+
+		echo '<select id="bo_map_select_year1" disabled>';
+		for($i=date('Y', $start_time); $i<=date('Y');$i++)
+			echo '<option value="'.$i.'" '.($i == $year1 ? 'selected' : '').'>'.$i.'</option>';
+		echo '</select> ';
+		echo '<select id="bo_map_select_month1" disabled>';
+		for($i=1;$i<=12;$i++)
+			echo '<option value="'.$i.'" '.($i == $month1 ? 'selected' : '').'>'._BL(date('M', strtotime("2000-$i-01"))).'</option>';
+		echo '</select> ';
+		echo '<select id="bo_map_select_day1" disabled>';
+		for($i=1;$i<=31;$i++)
+			echo '<option value="'.$i.'" '.($i == $day1 ? 'selected' : '').'>'.$i.'</option>';
+		echo '</select> &nbsp; ';
+		echo '<select id="bo_map_select_hour1" disabled>';
+		for($i=0;$i<=23;$i++)
+			echo '<option value="'.$i.'" '.($i == $hour1 ? 'selected' : '').'>'.sprintf('%02d', $i).'</option>';
+		echo '</select> : ';
+		echo '<select id="bo_map_select_minute1" disabled>';
+		for($i=0;$i<=59;$i++)
+			echo '<option value="'.$i.'" '.($i == $minute1 ? 'selected' : '').'>'.sprintf('%02d', $i).'</option>';
+		echo '</select>';
+		echo ' - ';
+		echo '<select id="bo_map_select_year2" disabled>';
+		for($i=date('Y', $start_time); $i<=date('Y');$i++)
+			echo '<option value="'.$i.'" '.($i == $year2 ? 'selected' : '').'>'.$i.'</option>';
+		echo '</select> ';
+		echo '<select id="bo_map_select_month2" disabled>';
+		for($i=1;$i<=12;$i++)
+			echo '<option value="'.$i.'" '.($i == $month2 ? 'selected' : '').'>'._BL(date('M', strtotime("2000-$i-01"))).'</option>';
+		echo '</select> ';
+		echo '<select id="bo_map_select_day2" disabled>';
+		for($i=1;$i<=31;$i++)
+			echo '<option value="'.$i.'" '.($i == $day2 ? 'selected' : '').'>'.$i.'</option>';
+		echo '</select> &nbsp; ';
+		echo '<select id="bo_map_select_hour2" disabled>';
+		for($i=0;$i<=23;$i++)
+			echo '<option value="'.$i.'" '.($i == $hour2 ? 'selected' : '').'>'.sprintf('%02d', $i).'</option>';
+		echo '</select> : ';
+		echo '<select id="bo_map_select_minute2" disabled>';
+		for($i=0;$i<=59;$i++)
+			echo '<option value="'.$i.'" '.($i == $minute2 ? 'selected' : '').'>'.sprintf('%02d', $i).'</option>';
+		echo '</select>';
+		
+		echo ' &nbsp; ';
+		
+		echo ' <span class="bo_form_checkbox_text">';
+		echo '<input type="checkbox" onclick="bo_toggle_timerange(this.checked);" id="bo_map_timerange"> ';
+		echo '<label for="bo_map_timerange">'._BL('Activated').'</label>';
+		echo '</span>';
+		
+		echo '</div>';
+	}
+	
 	echo '<span class="bo_form_descr">'._BL('Advanced').':</span> ';
 
 	echo '<div class="bo_input_container">';
@@ -491,7 +582,8 @@ function bo_show_lightning_map()
 	var bo_stations      = [ <?php echo $js_stations ?> ];
 	var bo_infowindow;
 	var bo_autoupdate = false;
-	var bo_autoupdate_running = false; 
+	var bo_autoupdate_running = false;
+	var bo_manual_timerange = false;
 
 	//ProjectedOverlay
 	//Source: http://www.usnaviguide.com/v3maps/js/ProjectedOverlay.js
@@ -628,18 +720,15 @@ function bo_show_lightning_map()
 		bo_infowindow = new google.maps.InfoWindow({content: ''});
 <?php
 		
-		foreach($_BO['mapcfg'] as $mapid => $cfg)
+		foreach($mapcfg as $mapid => $cfg)
 		{
-			if (!is_array($cfg) || empty($cfg) || ($cfg['only_loggedin'] && !bo_user_get_level()) )
-				continue;
-				
 			echo '
 			bo_OverlayMaps['.$mapid.'] = {
-				getTileUrl: function (coord, zoom) { return bo_get_tile(zoom, coord, '.$mapid.', '.$cfg['upd_intv'].'); },
+				getTileUrl: function (coord, zoom) { return bo_get_tile(zoom, coord, '.$mapid.', '.intval($cfg['upd_intv']).'); },
 				tileSize: new google.maps.Size(256,256), 
 				isPng:true, 
 				bo_show:'.($cfg['default_show'] ? 'true' : 'false').',
-				bo_interval:'.$cfg['upd_intv'].'
+				bo_interval:'.intval($cfg['upd_intv']).'
 			};
 			';
 		}
@@ -999,12 +1088,20 @@ function bo_show_lightning_map()
 			bo_map.overlayMapTypes.pop();
 		
 		var overlay_count=0;
-		for (i=bo_OverlayMaps.length-1; i>=0;i--)
+		if (bo_manual_timerange == true)
 		{
-			if (bo_OverlayMaps[i].bo_show)
+			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayMaps[-1]));
+			overlay_count=1;
+		}
+		else
+		{
+			for (i=bo_OverlayMaps.length-1; i>=0;i--)
 			{
-				bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayMaps[i]));
-				overlay_count++;
+				if (bo_OverlayMaps[i].bo_show)
+				{
+					bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayMaps[i]));
+					overlay_count++;
+				}
 			}
 		}
 
@@ -1017,32 +1114,54 @@ function bo_show_lightning_map()
 		bo_reload_mapinfo();
 	}
 	
+	
 	function bo_get_tile(zoom, coord, type, interval)
 	{
+		var url = "<?php echo BO_FILE ?>?tile&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y;
 		var now = new Date();
-		var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
+		var add = "";
 		
-		return "<?php echo BO_FILE ?>?tile&type="+type+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
+		//manual time range
+		if (type == -1)
+		{
+			return url+"&type="+type+"&from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2)+"&"+add;
+		}
+		else
+		{
+			//defined time range
+			add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
+			return url+"&type="+type+"&"+add;
+		}
+		
 	}
 
 	function bo_get_tile_counts(zoom, coord)
 	{
 		var types='';
 		var interval=0;
+		var now = new Date();
+		var add = "";
 		
-		for (i in bo_OverlayMaps)
+		if (bo_manual_timerange)
 		{
-			if (bo_OverlayMaps[i].bo_show)
+			types = '-1';
+			add = "&from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2)+"&";
+		}
+		else
+		{
+			add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
+			for (i in bo_OverlayMaps)
 			{
-				types = types + (types ? ',' : '') + i;
-				
-				if (!interval || interval > bo_OverlayMaps[i].bo_interval)
-					interval = bo_OverlayMaps[i].bo_interval;
+				if (bo_OverlayMaps[i].bo_show)
+				{
+					types = types + (types ? ',' : '') + i;
+					
+					if (!interval || interval > bo_OverlayMaps[i].bo_interval)
+						interval = bo_OverlayMaps[i].bo_interval;
+				}
 			}
 		}
 		
-		var now = new Date();
-		var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
 		
 		return "<?php echo BO_FILE ?>?tile&count="+types+"&stat="+bo_show_count+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
 	}
@@ -1090,13 +1209,17 @@ function bo_show_lightning_map()
 		bo_infobox.style.textAlign = 'right';
 		bo_infobox.appendChild(infoUI);
 		
-		for (i=bo_OverlayMaps.length-1; i>=0;i--)
+		for (i in bo_OverlayMaps)
 		{
-			if (bo_OverlayMaps[i].bo_show)
+			if ( ((i >= 0 && !bo_manual_timerange) || (bo_manual_timerange && i == -1)) && bo_OverlayMaps[i].bo_show)
 			{
 				var now = new Date();
 				var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / bo_OverlayMaps[i].bo_interval);
 				var infoImg = document.createElement('IMG');
+				
+				if (bo_manual_timerange)
+					add = "from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2)+"&" + add;
+				
 				infoImg.src = "<?php echo BO_FILE ?>?tile&info&type="+i+"&"+add+now.getTime();
 				infoImg.style.paddingTop = '5px';
 				infoImg.style.display = 'block';
@@ -1127,7 +1250,54 @@ function bo_show_lightning_map()
 		});
 
 	}
+	
+	function bo_get_time_man(i)
+	{
+		return  document.getElementById('bo_map_select_year'+i).value + '-'
+			+ document.getElementById('bo_map_select_month'+i).value + '-'
+			+ document.getElementById('bo_map_select_day'+i).value + escape(' ')
+			+ document.getElementById('bo_map_select_hour'+i).value + escape(':')
+			+ document.getElementById('bo_map_select_minute'+i).value;
+	}
 
+
+	function bo_toggle_timerange(enable)
+	{
+		bo_OverlayMaps[-1].bo_show = enable;
+		
+		bo_manual_timerange=enable;
+		
+		document.getElementById('bo_map_select_year1').disabled = !enable;
+		document.getElementById('bo_map_select_month1').disabled = !enable;
+		document.getElementById('bo_map_select_day1').disabled = !enable;
+		document.getElementById('bo_map_select_hour1').disabled = !enable;
+		document.getElementById('bo_map_select_minute1').disabled = !enable;
+
+		document.getElementById('bo_map_select_year2').disabled = !enable;
+		document.getElementById('bo_map_select_month2').disabled = !enable;
+		document.getElementById('bo_map_select_day2').disabled = !enable;
+		document.getElementById('bo_map_select_hour2').disabled = !enable;
+		document.getElementById('bo_map_select_minute2').disabled = !enable;
+		
+		for (i in bo_OverlayMaps)
+		{
+			if (i >= 0)
+				document.getElementById('bo_map_opt' + i).disabled = enable;
+		}
+
+<?php	
+	if (intval(BO_TRACKS_SCANTIME)) 
+	{
+?>
+		document.getElementById('bo_map_opt_tracks').disabled = enable;
+<?php	
+	}
+?>
+		
+		document.getElementById('bo_check_autoupdate').disabled = enable;
+			
+		bo_map_reload_overlays();
+	}
 	
 		
 	</script>

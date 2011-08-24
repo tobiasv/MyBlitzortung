@@ -839,3 +839,7 @@ $_BL['de']['h3_arch_last_strikes'] = 'Die letzten Blitze';
 $_BL['de']['Participated stations'] = 'Teilgenommene Stationen';
 $_BL['de']['Statistics'] = 'Statistiken';
 $_BL['de']['Off'] = 'Aus';
+$_BL['de']['tile_time_range_na_err'] = 'Sie haben nicht die\nBerechtigung beliebige\nZeitbereiche auszuw‰hlen!';
+$_BL['de']['tile_wrong_time_range_err'] = 'Der erste Zeitpunkt\nmuss kleiner als\nder zweite sein.';
+$_BL['de']['tile_maximum_time_range_err'] = 'Zeitraum zu groﬂ!\nDas Maximum ist {HOURS} Stunden.';
+$_BL['de']['Activated'] = 'Aktiv';

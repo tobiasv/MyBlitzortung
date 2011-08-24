@@ -466,7 +466,7 @@ function bo_update_strikes($force = false)
 		$time_start = gmdate('Y-m-d H:i:s', time() - 120 - BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES*60);
 		$time_end = gmdate('Y-m-d H:i:s', time() - 120);
 		$sql_template = "SELECT MAX(time) mtime, COUNT(id) cnt 
-			FROM ".BO_DB_PREF."strikes 
+			FROM ".BO_DB_PREF."strikes s
 			WHERE time BETWEEN '$time_start' AND '$time_end' {where} ";
 
 		$last_strikes_region = unserialize(bo_get_conf('last_strikes_region'));
@@ -794,7 +794,7 @@ function bo_update_stations($force = false)
 			
 			//station has been active by user (~ a year ago)
 			if (time() - $stTimeU < 3600 * 24 * 366)
-				$activebyuser[$stUser] = array('id' => $stId, 'sig' => $stSignals);
+				$activebyuser[$stUser] = array('id' => $stId, 'sig' => $stSignals, 'lat' => $stLat, 'lon' => $stLon);
 			
 			//mark Offline?
 			if ($stStatus != '-' && $stSignals == 0 && time() - $stTime > intval(BO_STATION_OFFLINE_HOURS) * 3600)
@@ -844,12 +844,12 @@ function bo_update_stations($force = false)
 			$new = false;
 			foreach($activebyuser as $user => $d)
 			{
-				if (!isset($data[$user]) && $d['sig']) //no old entry but new signals
+				if (!isset($data[$user]) && $d['sig'] && $d['lat'] && $d['lon']) //no old entry but new signals and a fixed
 				{
 					$data[$user] = time(); // mark as NEW STATION
 					$new = true;
 					
-					echo "<p>Found NEW station: '.$user.'</p>\n";
+					echo "<p>Found NEW station: <b>$user</b></p>\n";
 				}
 			}
 		
@@ -1757,6 +1757,8 @@ function bo_update_densities($max_time)
 				$lat_end = $a['coord'][0];
 				$lon_end = $a['coord'][1];
 
+				$time_min = strtotime($b['date_start'].' 00:00:00 UTC');
+				$time_max = strtotime($b['date_end'].' 23:59:59 UTC');
 		
 				echo " *** Start: $lat&deg; / $lon&deg; *** End: $lat_end&deg; / $lon_end&deg; *** <em>... Calculating ...</em>";
 				flush();
@@ -1766,12 +1768,12 @@ function bo_update_densities($max_time)
 				
 				if (intval($b['station_id']) && $b['station_id'] == bo_station_id())
 				{
-					$sql_where = " AND s.part > 0 ";
+					$sql_where_station = " AND s.part > 0 ";
 				}
 				elseif ($b['station_id'])
 				{
 					$sql_join  = ",".BO_DB_PREF."stations_strikes ss ";
-					$sql_where = " AND ss.strike_id=s.id AND ss.station_id='".intval($b['station_id'])."'";
+					$sql_where_station = " AND ss.strike_id=s.id AND ss.station_id='".intval($b['station_id'])."'";
 				}
 
 				$max_count = 0;
@@ -1788,14 +1790,17 @@ function bo_update_densities($max_time)
 
 					$last_lon_id = 0;
 					
+					//the where clause
+					$sql_where = bo_strikes_sqlkey($index_sql, min($times_min), max($times_max), $lat, $lat+$dlat, $lon, $lon_end);
+
+					
 					// line by line
 					$sql = "SELECT COUNT(*) cnt, FLOOR((s.lon+".(-$lon).")/(".$dlon.")) lon_id
-							FROM ".BO_DB_PREF."strikes s FORCE INDEX (time)
+							FROM ".BO_DB_PREF."strikes s $index_sql
 								$sql_join
 							WHERE 1
-								AND NOT (s.lat < ".($lat)." OR s.lat > ".($lat+$dlat)." OR s.lon < ".$lon." OR s.lon > ".$lon_end.") 
 								AND s.time BETWEEN '".$b['date_start']." 00:00:00' AND '".$b['date_end']." 23:59:59'
-								$sql_where
+								$sql_where_station
 							GROUP BY lon_id
 							";
 					$res = bo_db($sql);
@@ -2311,7 +2316,7 @@ function bo_update_error($type, $extra = null)
 	$data['count']++;
 	
 	//Send?
-	if ($data['count'] > BO_UP_ERR_MIN_COUNT
+	if ($data['count'] > BO_UP_ERR_MIN_COUNT && intval(BO_UP_ERR_MIN_MINUTES)
 		&& time() - $data['first']     > BO_UP_ERR_MIN_MINUTES * 60
 		&& time() - $data['last_send'] > BO_UP_ERR_SEND_INTERVAL * 60)
 	{
