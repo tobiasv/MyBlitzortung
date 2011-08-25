@@ -701,8 +701,8 @@ function bo_match_strike2raw()
 		$sql = "UPDATE ".BO_DB_PREF."strikes 
 				SET 
 					raw_id='$raw_id', 
-					polarity=".$polarity[$strike_id].",
-					part=".$part[$strike_id]."
+					polarity='".$polarity[$strike_id]."',
+					part='".$part[$strike_id]."'
 				WHERE id='$strike_id'";
 		bo_db($sql);
 

@@ -644,7 +644,7 @@ function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 		{
 			@unlink($dir.$file);
 		}
-		else if (is_dir($dir.$file) && $file != '.' && $file != '..' && $depth > 0)
+		else if (is_dir($dir.$file) && substr($file,0,1) != '.' && $depth > 0)
 		{
 			bo_delete_files($dir.$file.'/', $min_age, $depth-1,$delete_dir_depth-1);
 
