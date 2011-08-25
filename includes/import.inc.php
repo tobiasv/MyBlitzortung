@@ -979,7 +979,7 @@ function bo_update_stations($force = false)
 }
 
 // Daily and longtime strike counts
-function bo_update_daily_stat()
+function bo_update_daily_stat($max_time)
 {
 	global $_BO;
 	
@@ -988,10 +988,10 @@ function bo_update_daily_stat()
 	//Update strike-count per day
 	$ytime = mktime(date('H')-3,0,0,date("n"),date('j')-1);
 	$day_id = gmdate('Ymd', $ytime);
-	$yesterday_count = bo_get_conf('strikes_'.$day_id);
+	$data = unserialize(bo_get_conf('strikes_'.$day_id));
 	
 	// Daily Statistics and longtime strike-count
-	if (!$yesterday_count)
+	if (!$data || !is_array($data) || !$data['done'])
 	{
 		echo "\n<h2>Updating daily statistics</h2>\n";
 		
@@ -999,12 +999,13 @@ function bo_update_daily_stat()
 		$yesterday_start = gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 00:00:00', $ytime)));
 		$yesterday_end =   gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 23:59:59', $ytime)));
 		
-		$data = unserialize(bo_get_conf('strikes_temp_'.$day_id));
-
+		$stat_ok = bo_get_conf('uptime_stations') > $yesterday_end + 60;
+		$raw_ok  = bo_get_conf('uptime_raw') > $yesterday_end + 60;
+		
 		// Strikes SQL template
 		$sql_template = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes s WHERE {where} time BETWEEN '$yesterday_start' AND '$yesterday_end'";
 		
-		if (!is_array($data) || count($data) < 7)
+		if (!is_array($data) || $data['status'] < 1)
 		{
 			/*** Strikes ***/
 			//whole strike count
@@ -1016,46 +1017,17 @@ function bo_update_daily_stat()
 			//own strike count (in radius)
 			$row_own_rad = bo_db(strtr($sql_template,array('{where}' => 'part > 0 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
 
-			/*** Signals ***/
-			//own exact value
-			$signals_exact = bo_db("SELECT COUNT(id) cnt FROM ".BO_DB_PREF."raw WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end'")->fetch_assoc();
-			
-			//all from station statistics
-			$sql = "SELECT SUM(signalsh) cnt, COUNT(DISTINCT time) entries, station_id=".bo_station_id()." own
-							FROM ".BO_DB_PREF."stations_stat 
-							WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end' AND station_id != 0
-							GROUP BY own, HOUR(time)";
-			$res = bo_db($sql);
-			while ($row = $res->fetch_assoc())
-			{
-				if (intval($row['entries']))
-					$signals[(int)$row['own']] += $row['cnt'] / $row['entries'];
-			}
-			
-			/*** Stations ***/
-			$stations = array();
-			// available stations
-			$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status != '-'")->fetch_assoc();
-			$stations['available'] = $row->cnt;
-			
-			// active stations
-			$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status = 'A'")->fetch_assoc();
-			$stations['active'] = $row->cnt;
-			
-			
 			/*** Save the data ***/
 			$data = array(	0 => $row_all['cnt'], 
 							1 => $row_own['cnt'], 
 							2 => $row_all_rad['cnt'], 
-							3 => $row_own_rad['cnt'],
-							4 => $signals_exact['cnt'],
-							5 => round($signals[0]),
-							6 => round($signals[1]),
-							10 => $stations);
+							3 => $row_own_rad['cnt']
+						);
 			
-			bo_set_conf('strikes_temp_'.$day_id, serialize($data));
+			$data['status'] = 1;
+			bo_set_conf('strikes_'.$day_id, serialize($data));
 		}
-		else if (count($data) == 8)
+		else if ($data['status'] == 1 )
 		{
 			//strike count per region
 			if (isset($_BO['region']) && is_array($_BO['region']))
@@ -1073,13 +1045,61 @@ function bo_update_daily_stat()
 			}
 			
 			$data[7] = $strikes_region;
-			bo_set_conf('strikes_temp_'.$day_id, serialize($data));
+			$data['status'] = 2;
+			bo_set_conf('strikes_'.$day_id, serialize($data));
 		}
-		else if (count($data) >= 9)
+		else if ($data['status'] == 2 && $stat_ok)
 		{
+			/*** Stations ***/
+			$stations = array();
+			// available stations
+			$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status != '-'")->fetch_assoc();
+			$stations['available'] = $row->cnt;
+			
+			// active stations
+			$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status = 'A'")->fetch_assoc();
+			$stations['active'] = $row->cnt;
+
+			$data[10] = $stations;
+			$data['status'] = 3;
+			bo_set_conf('strikes_'.$day_id, serialize($data));
+
+		}
+		else if ($data['status'] == 3 && $raw_ok)
+		{
+
+			/*** Signals ***/
+			//own exact value
+			$signals_exact = bo_db("SELECT COUNT(id) cnt FROM ".BO_DB_PREF."raw WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end'")->fetch_assoc();
+			
+			//all from station statistics
+			$sql = "SELECT SUM(signalsh) cnt, COUNT(DISTINCT time) entries, station_id=".bo_station_id()." own
+							FROM ".BO_DB_PREF."stations_stat 
+							WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end' AND station_id != 0
+							GROUP BY own, HOUR(time)";
+			$res = bo_db($sql);
+			while ($row = $res->fetch_assoc())
+			{
+				if (intval($row['entries']))
+					$signals[(int)$row['own']] += $row['cnt'] / $row['entries'];
+			}
+			
+			$data[4] = $signals_exact['cnt'];
+			$data[5] = round($signals[0]);
+			$data[6] = round($signals[1]);
+	
+			$data['status'] = 4;
+			bo_set_conf('strikes_'.$day_id, serialize($data));
+		}
+		else if ($data['status'] == 4 && $raw_ok)
+		{
+			$start_time = time();
 			$channels = bo_get_conf('raw_channels');
-			$max_lines = 500;
+			$max_lines = 10000;
 			$limit = intval($data['raw_limit']);
+			
+			echo "\n<p>Analyzing signals: Start at $limit</p>\n";
+			flush();
 			
 			if (!$limit) //first call
 			{
@@ -1100,6 +1120,9 @@ function bo_update_daily_stat()
 			$res = bo_db($sql);
 			while ($row = $res->fetch_assoc())
 			{
+				if (time() - $start_time > $max_time - 3)
+					break;
+
 				$d = raw2array($row['data'], true);
 
 				if ($row['amp1_max'] || $row['amp2_max'])
@@ -1148,21 +1171,14 @@ function bo_update_daily_stat()
 			if ($rows < $max_lines) //Done!
 			{
 				unset($data['raw_limit']);
-				
-				//delete old temp var
-				bo_set_conf('strikes_temp_'.$day_id, serialize(array()));
-				
-				//finally, save it
-				bo_set_conf('strikes_'.$day_id, serialize($data));
+				$data['done'] = true;
 			}
 			else
 			{
-				$data['raw_limit'] = $limit + $max_lines;
-				
-				//delete old temp var
-				bo_set_conf('strikes_temp_'.$day_id, serialize($data));
+				$data['raw_limit'] = $limit + $rows;
 			}
 			
+			bo_set_conf('strikes_'.$day_id, serialize($data));			
 		}
 
 		echo "\n<p>Datasets: ".count($data)."</p>\n";
@@ -1328,7 +1344,7 @@ function bo_update_all($force = false)
 		flush();
 		$signals_imported = bo_update_raw_signals($force);
 		
-		bo_update_daily_stat();
+		bo_update_daily_stat($max_time + $start_time - time());
 		
 		/*** Check and send strike alerts ***/
 		if (defined('BO_ALERTS') && BO_ALERTS)
