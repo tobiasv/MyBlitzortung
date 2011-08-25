@@ -224,7 +224,11 @@ if (!defined("BO_VER"))
 		bo_get_map_image();
 		exit;
 	}
-	
+	elseif (isset($_GET['animation']))
+	{
+		bo_get_map_image_ani();
+		exit;
+	}
 	
 	//Order maps
 	if (defined('BO_MAPS_ORDER') && strlen(BO_MAPS_ORDER))

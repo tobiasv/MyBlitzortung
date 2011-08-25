@@ -996,7 +996,7 @@ function bo_update_daily_stat()
 		$data = unserialize(bo_get_conf('strikes_temp_'.$day_id));
 
 		// Strikes SQL template
-		$sql_template = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes WHERE {where} time BETWEEN '$yesterday_start' AND '$yesterday_end'";
+		$sql_template = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes s WHERE {where} time BETWEEN '$yesterday_start' AND '$yesterday_end'";
 		
 		if (!is_array($data) || count($data) < 7)
 		{
@@ -1252,11 +1252,13 @@ function bo_update_all($force = false)
 	
 	//timeouts
 	$max_time = intval(ini_get('max_execution_time')) - 10;
-	if ($max_time < 20 || $debug) //allow infinite exec time in debug mode
-	{
-		$max_time = 50;
-	}
 	
+	if ($debug)
+		$max_time = 300;
+	else if ($max_time < 20)  //give it a try
+		$max_time = 50;
+	else
+		$max_time = $overall_timeout;
 	
 	@set_time_limit($max_time+10);
 	
@@ -1765,6 +1767,7 @@ function bo_update_densities($max_time)
 				
 				$sql_where = '';
 				$sql_join  = '';
+				$sql_where_station = '';
 				
 				if (intval($b['station_id']) && $b['station_id'] == bo_station_id())
 				{
@@ -1791,15 +1794,15 @@ function bo_update_densities($max_time)
 					$last_lon_id = 0;
 					
 					//the where clause
-					$sql_where = bo_strikes_sqlkey($index_sql, min($times_min), max($times_max), $lat, $lat+$dlat, $lon, $lon_end);
+					$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat, $lat+$dlat, $lon, $lon_end);
 
 					
 					// line by line
 					$sql = "SELECT COUNT(*) cnt, FLOOR((s.lon+".(-$lon).")/(".$dlon.")) lon_id
 							FROM ".BO_DB_PREF."strikes s $index_sql
 								$sql_join
-							WHERE 1
-								AND s.time BETWEEN '".$b['date_start']." 00:00:00' AND '".$b['date_end']." 23:59:59'
+							WHERE 
+								$sql_where
 								$sql_where_station
 							GROUP BY lon_id
 							";

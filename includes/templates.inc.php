@@ -146,6 +146,7 @@ $_BO['tpl_density']['germany']['bps'] 		= 2; // bytes per area
 /* Some default settings              */
 /**************************************/
 
+//defaults
 $_BO['tpl_imgmap_default']['point_style'] = array(2, 4, 'f008', 0); //type,size,fillcolor,borderwidth,bordercolor
 $_BO['tpl_imgmap_default']['top_font'] = array(9, true, array('fff1', 1, '000a'));
 $_BO['tpl_imgmap_default']['top_style'] = array(16, 2, '9999ff66', 1, 'ccf8');
@@ -160,6 +161,15 @@ $_BO['tpl_imgmap_default']['upd_intv'] = 15; //minutes
 $_BO['tpl_imgmap_default']['textcolor'] = array(255,255,255);
 $_BO['tpl_imgmap_default']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap_default']['col_smooth'] = 24;
+
+
+//an animation template
+$_BO['tpl_animation_mini']['minutes'] = 60 * 3;
+$_BO['tpl_animation_mini']['count'] = 12;
+$_BO['tpl_animation_mini']['interval'] = 120;
+$_BO['tpl_animation_mini']['delay'] = 40;
+$_BO['tpl_animation_mini']['delay_end'] = 120;
+$_BO['tpl_animation_mini']['legend'] = false;
 
 
 /**************************************/
@@ -200,6 +210,8 @@ $_BO['tpl_imgmap']['europe_west_central']['density_darken'] = 40;
 $_BO['tpl_imgmap']['europe_west_central']['cities'][1] = $_BO['points']['whitered2'];
 $_BO['tpl_imgmap']['europe_west_central']['cities'][5] = $_BO['points']['whitered2'];
 $_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitered2'];
+$_BO['tpl_imgmap']['europe_west_central']['animation_enable'] = true;
+$_BO['tpl_imgmap']['europe_west_central']['animation'] = $_BO['tpl_animation_mini'];
 
 
 
@@ -354,6 +366,7 @@ $_BO['tpl_imgmap']['switzerland']['cities'][2] = $_BO['points']['whitered1'];
 
 
 
+
 /* ============================= EUROPE ============================= */
 
 //Europe (mini)
@@ -369,6 +382,8 @@ $_BO['tpl_imgmap']['europe_mini']['point_type'] = 1;
 $_BO['tpl_imgmap']['europe_mini']['point_size'] = 2;
 $_BO['tpl_imgmap']['europe_mini']['legend'] = array(0, 54, 26, 0, 0, 0);
 $_BO['tpl_imgmap']['europe_mini']['col'] = $_BO['tpl_color']['standard'];
+$_BO['tpl_imgmap']['europe_mini']['animation_enable'] = true;
+$_BO['tpl_imgmap']['europe_mini']['animation'] = $_BO['tpl_animation_mini'];
 
 
 /* ============================= GERMANY ============================= */
@@ -386,7 +401,8 @@ $_BO['tpl_imgmap']['germany_mini']['point_type'] = 2;
 $_BO['tpl_imgmap']['germany_mini']['point_size'] = 2;
 $_BO['tpl_imgmap']['germany_mini']['legend'] = array(0, 42, 26, 0, 0, 0);
 $_BO['tpl_imgmap']['germany_mini']['col'] = $_BO['tpl_color']['standard'];
-
+$_BO['tpl_imgmap']['germany_mini']['animation_enable'] = true;
+$_BO['tpl_imgmap']['germany_mini']['animation'] = $_BO['tpl_animation_mini'];
 
 
 

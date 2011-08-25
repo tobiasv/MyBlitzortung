@@ -62,32 +62,47 @@ function bo_icon($icon)
 	exit;
 }
 
-
 //render a map with strike positions and strike-bar-plot
-function bo_get_map_image()
+function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 {
 	session_write_close();
 	@set_time_limit(10);
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	
-	if (rand(0, 500) == 1)
+	if (rand(0, 500) == 1 && $id !== false)
 	{	
 		register_shutdown_function('bo_delete_files', BO_DIR.'cache/maps/', 96, 3);
 	}
 	
 	global $_BO;
 
-	$id 			= intval($_GET['map']);
-	$date 			= $_GET['date'];
-	$transparent 	= isset($_GET['transparent']);
-	$blank 			= isset($_GET['blank']);
-	$region			= $_GET['mark'];
-	$strike_id		= intval($_GET['strike_id']);
+	if ($id === false)
+	{
+		$id 			= intval($_GET['map']);
+		$date 			= $_GET['date'];
+		$transparent 	= isset($_GET['transparent']);
+		$blank 			= isset($_GET['blank']);
+		$region			= $_GET['mark'];
+		$strike_id		= intval($_GET['strike_id']);
+		
+		$cfg = $_BO['mapimg'][$id];
+	}
+	else
+	{
+		$date 			= $cfg['date'];
+		$transparent 	= $cfg['transparent'];
+		$blank 			= $cfg['blank'];
+		$region			= $cfg['mark'];
+		$strike_id		= $cfg['strike_id'];
+		$caching		= $caching && $cfg['caching'];
+	}
 	
-	$cfg = $_BO['mapimg'][$id];
-	if (!is_array($cfg))
-		exit;
+	if (!is_array($cfg) || empty($cfg))
+		return;
 
+	if ($return_img)
+		$caching = false;
+	
 	$last_update = bo_get_conf('uptime_strikes');
 	
 	//Cache file naming
@@ -189,7 +204,12 @@ function bo_get_map_image()
 	else
 	{
 		$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
-		$time = $last_update;
+		
+		if (isset($cfg['tstart']))
+			$time = $cfg['tstart'];
+		else
+			$time = $last_update;
+			
 		$time_min = $time - 3600 * $cfg['trange'];
 		$time_max = $time;
 		
@@ -292,7 +312,7 @@ function bo_get_map_image()
 	if (!isset($cfg['point_style']) && $cfg['point_type'])
 		$cfg['point_style'] = array(0 => $cfg['point_type'], 1 => $cfg['point_size']);
 
-	$time_range  = $time_max - $time_min;
+	$time_range  = $time_max - $time_min + 59;
 	$color_intvl = $time_range / count($c);
 	
 	if (!$blank)
@@ -495,6 +515,11 @@ function bo_get_map_image()
 	}
 	
 
+	if ($return_img)
+	{
+		return $I;
+	}
+	
 	BoDb::close();
 	
 	bo_image_reduce_colors($I);
@@ -521,6 +546,88 @@ function bo_get_map_image()
 
 	exit;
 }
+
+
+
+//get gif animation
+function bo_get_map_image_ani()
+{	
+	global $_BO;
+	include 'gifencoder/GIFEncoder.class.php';
+
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);	
+	$dir = BO_DIR.'cache/maps/';
+	$id = intval($_GET['animation']);
+	$cfg = $_BO['mapimg'][$id];
+	
+	if (!is_array($cfg) || empty($cfg))
+		return;
+
+	if (!$cfg['animation_enable'])
+		exit('Animation disabled!');
+	
+	$cfg_ani = $cfg['animation'];
+	$cache_file = $dir._BL().'_ani_'.$id.'.gif';	
+	$last_update = bo_get_conf('uptime_strikes');
+
+	//Caching
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
+	{
+		header("Content-Type: image/gif");
+		readfile($cache_file);
+		exit;
+	}
+
+	$time_start = $last_update - $cfg_ani['minutes'] * 60;
+	$cfg_single = $cfg;
+	
+	if (!$cfg_ani['interval'])
+		$cfg_ani['interval'] = $cfg_ani['minutes'] / $cfg_ani['count'];
+	
+	$cfg_single['trange'] = $cfg_ani['interval'] / 60;
+	
+	if (isset($cfg_ani['colors']))
+		$cfg_single['col'] = $cfg_ani['colors'];
+
+	if (isset($cfg_ani['legend']))
+		$cfg_single['legend'] = $cfg_ani['legend'];
+		
+	$frames = array();
+	$framed = array();
+	
+	for ($i=1;$i<=$cfg_ani['count'];$i++)
+	{
+		$cfg_single['tstart'] = $time_start + $cfg_ani['minutes'] * 60 * $i / $cfg_ani['count'];
+		$file = $dir._BL().'_gifani_'.$id.'_'.$i.'.gif';
+		
+		$I = bo_get_map_image($id, $cfg_single, true);
+		imagegif($I, $file);
+		
+		$framed[] = $i == $cfg_ani['count'] ? $cfg_ani['delay_end'] : $cfg_ani['delay'];
+		$frames[] = $file;
+	}
+	
+	$loops = 0;
+	$disposal = 2;
+
+	
+	$gif = new GIFEncoder($frames, $framed, $loops, $disposal, 0, 0, 0, "url"); 
+	
+
+	header('Content-type: image/gif'); 
+	if ($caching)
+	{
+		file_put_contents($cache_file, $gif->GetAnimation());
+		readfile($cache_file);
+	}
+	else
+	{
+		echo $gif->GetAnimation(); 
+	}
+	
+	return;
+}
+
 
 
 //render a map with strike positions and strike-bar-plot

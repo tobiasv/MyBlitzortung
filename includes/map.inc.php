@@ -1103,10 +1103,12 @@ function bo_show_lightning_map()
 					overlay_count++;
 				}
 			}
+
+			if (bo_show_tracks)
+				bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayTracks));
+
 		}
 
-		if (bo_show_tracks)
-			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayTracks));
 		
 		if (bo_show_count && overlay_count)
 			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayCount));

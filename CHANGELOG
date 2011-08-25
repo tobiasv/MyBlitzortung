@@ -20,6 +20,7 @@ Version 0.7 (2011-08-xx)
 - new: alt-tag in "img"
 - new: maps for western/central europe (germany+france), france and new europe map with nicer colors
 - new: smooth colors for maps
+- new: gif animations for maps
 - other visual improvements for maps
 - cleanup in default_settings.inc.php and templates.inc.php
 
