@@ -127,8 +127,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	$archive_maps_enabled = (BO_DISABLE_ARCHIVE !== true && defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS)
 								|| (bo_user_get_level() & BO_PERM_ARCHIVE);
 
-	$sql_where = '';
-	$sql_index = 'time';
+	$sql_where_id = '';
 	
 	if ($strike_id)
 	{
@@ -138,11 +137,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$time_min = 0;
 		$time_max = time();
 		
-		$sql_where .= " AND id='$strike_id' ";
+		$sql_where_id .= " AND id='$strike_id' ";
 		
 		$cfg['legend'] = array();
-		
-		$sql_index = 'PRIMARY';
 	}
 	else if (preg_match('/^[0-9\-]+$/', $date))
 	{
@@ -219,9 +216,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$cache_file .= $id.'.png';
 	}
 
-	$date_min = gmdate('Y-m-d H:i:s', $time_min);
-	$date_max = gmdate('Y-m-d H:i:s', $time_max);
-	
 	
 	header("Pragma: ");
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
@@ -317,14 +311,17 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	if (!$blank)
 	{
+	
+		//the where clause
+		$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $latS, $latN, $lonW, $lonE);
+	
 		$sql = "SELECT time, lat, lon
 				FROM ".BO_DB_PREF."strikes s
-				USE INDEX ($sql_index)
-				WHERE 1
+				$index_sql
+				WHERE 1 AND
 					".($only_own ? " AND part>0 " : "")."
-					AND NOT (lat < '$latS' OR lat > '$latN' OR lon < '$lonW' OR lon > '$lonE')
-					AND time BETWEEN '$date_min' AND '$date_max'
 					$sql_where
+					$sql_where_id
 					".bo_region2sql($region)."
 				-- ORDER BY time ASC";
 		$erg = bo_db($sql);

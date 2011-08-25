@@ -141,9 +141,6 @@ if (!defined("BO_VER"))
 	//Save info wether headers where sent
 	$_BO['headers_sent'] = headers_sent();
 
-	//load locale after tiles
-	bo_load_locale();
-	
 	//Update with new data from blitzortung.org
 	$do_update = false;
 	$force_update = false;
@@ -166,6 +163,8 @@ if (!defined("BO_VER"))
 		}
 	}
 
+	//load locale after tiles
+	bo_load_locale();
 	
 	//decisions what to do begins...
 	if ($do_update)

@@ -95,6 +95,7 @@ if (!defined('BO_VER'))
 
 /*** Experimental Polarity                                       ***/
 @define("BO_EXPERIMENTAL_POLARITY_CHECK", true);
+@define("BO_EXPERIMENTAL_POLARITY_MAX_DIST", 300);
 @define("BO_EXPERIMENTAL_POLARITY_ZOOM", 8);
 @define("BO_MAP_STRIKE_POLARITY_SIZE", 5);
 

@@ -172,6 +172,8 @@ $_BO['tpl_animation_mini']['delay_end'] = 120;
 $_BO['tpl_animation_mini']['legend'] = false;
 
 
+
+
 /**************************************/
 /* Image Maps (PNG)                   */
 /**************************************/

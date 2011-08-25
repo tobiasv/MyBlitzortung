@@ -828,6 +828,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$lon = $_GET['bo_lon'];
 	$zoom = intval($_GET['bo_zoom']);
 	$only_strikes = $_GET['bo_only_strikes'] == 1;
+	$only_participated = $_GET['bo_only_participated'] == 1;
 	
 	if ($page < 0)
 		$page = 0;
@@ -872,19 +873,23 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	}
 	else
 	{
+
+		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes'));
+		echo '<fieldset>';
+		echo '<legend>'._BL('settings').'</legend>';
+
 		if (!$show_empty_sig)
 		{
-			echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes'));
-
-			echo '<fieldset>';
-			echo '<legend>'._BL('settings').'</legend>';
-
 			echo '<input type="checkbox" name="bo_only_strikes" value="1" '.($only_strikes ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_strikes">';
 			echo '<label for="check_only_strikes"> '._BL('check_only_strikes').'</label> &nbsp; ';
-			
-			echo '</fieldset>';
+		}
+		else
+		{
+			echo '<input type="checkbox" name="bo_only_participated" value="1" '.($only_participated ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_participated">';
+			echo '<label for="check_only_participated"> '._BL('check_only_participated').'</label> &nbsp; ';
 		}
 		
+		echo '</fieldset>';
 		$hours_back = 24;
 	}
 
@@ -899,6 +904,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	{
 		$sql_join = BO_DB_PREF."strikes s LEFT OUTER JOIN ".BO_DB_PREF."raw r ON s.raw_id=r.id ";
 		$table = 's';
+		
+		if ($only_participated)
+			$sql_where = " AND s.part>0 ";
 	}
 	elseif ($only_strikes)
 	{

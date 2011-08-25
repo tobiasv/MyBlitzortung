@@ -843,3 +843,4 @@ $_BL['de']['tile_time_range_na_err'] = 'Sie haben nicht die\nBerechtigung belieb
 $_BL['de']['tile_wrong_time_range_err'] = 'Der erste Zeitpunkt\nmuss kleiner als\nder zweite sein.';
 $_BL['de']['tile_maximum_time_range_err'] = 'Zeitraum zu groﬂ!\nDas Maximum ist {HOURS} Stunden.';
 $_BL['de']['Activated'] = 'Aktiv';
+$_BL['de']['check_only_participated'] = 'Nur teilgenommene';

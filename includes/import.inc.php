@@ -555,7 +555,7 @@ function bo_match_strike2raw()
 	$dist_fuzz = 0.0001; //fuzzy-seconds per meter (seconds)
 	$offset_fuzz = 0;
 	
-	$amp_trigger = (BO_TRIGGER_VOLTAGE / BO_MAX_VOLTAGE) * 256 / 2;
+	$amp_trigger = (BO_TRIGGER_VOLTAGE * 0.95 / BO_MAX_VOLTAGE) * 256 / 2;
 
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 	$row = bo_db($sql)->fetch_assoc();
@@ -667,8 +667,14 @@ function bo_match_strike2raw()
 				else
 					$own_found++;
 					
+					
+					
 				//experimental polarity checking
-				if (BO_EXPERIMENTAL_POLARITY_CHECK === true) 
+				if (BO_EXPERIMENTAL_POLARITY_CHECK === true
+					&& ( !intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST)
+                          || intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST) * 1000 > $row['distance'] 
+					   )
+					) 
 				{
 					$polarity[$row['id']] = bo_strike2polarity($row2['data'], $row['bearing']);
 

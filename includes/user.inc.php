@@ -625,6 +625,9 @@ function bo_show_calibrate_antennas()
 	$limit = intval($_POST['bo_limit']);
 	$limit = $limit ? $limit : 5000;
 
+	if (!$dist && intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST))
+		$dist = intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST) * 1000;
+	
 	echo '<h3>'._BL('Automatic antenna calibration').'</h3>';
 	
 	echo '<form action="'.bo_insert_url(array()).'" method="POST" class="bo_admin_user_form">';

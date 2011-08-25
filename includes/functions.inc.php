@@ -655,7 +655,7 @@ function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 }
 
 //loads the needed locales
-function bo_load_locale()
+function bo_load_locale($locale = '')
 {
 	global $_BL;
 	$locdir = BO_DIR.'locales/';
@@ -679,31 +679,37 @@ function bo_load_locale()
 	
 	
 	//individual locale for user (link, session, cookie)
+	if ($locale == '')
+	{
+		if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
+		{
+			$locale = strtolower($_GET['bo_lang']);
+			$_SESSION['bo_locale'] = $locale;
+			@setcookie("bo_locale", $locale, time()+3600*24*365*10,'/');
+		}
+		else if (isset($_SESSION['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_SESSION['bo_locale']))
+		{
+			$locale = $_SESSION['bo_locale'];
+		}
+		else if (isset($_COOKIE['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_COOKIE['bo_locale']))
+		{
+			$locale = $_COOKIE['bo_locale'];
+		}
+
+		if ($locale && file_exists($locdir.$locale.'.php') && $locale != BO_LOCALE)
+		{
+			include $locdir.$locale.'.php';
+
+			if (file_exists($locdir.'own.php')) //include this 2nd time (must overwrite the manual specified language!)
+				include $locdir.'own.php';
+		}
+	}
+	elseif ($locale !== false)
+	{
+		if (file_exists($locdir.$locale.'.php'))
+			include $locdir.$locale.'.php';
+	}
 	
-	$locale = '';
-	if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
-	{
-		$locale = strtolower($_GET['bo_lang']);
-		$_SESSION['bo_locale'] = $locale;
-		@setcookie("bo_locale", $locale, time()+3600*24*365*10,'/');
-	}
-	else if (isset($_SESSION['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_SESSION['bo_locale']))
-	{
-		$locale = $_SESSION['bo_locale'];
-	}
-	else if (isset($_COOKIE['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_COOKIE['bo_locale']))
-	{
-		$locale = $_COOKIE['bo_locale'];
-	}
-
-	if ($locale && file_exists($locdir.$locale.'.php') && $locale != BO_LOCALE)
-	{
-		include $locdir.$locale.'.php';
-
-		if (file_exists($locdir.'own.php')) //include this 2nd time (must overwrite the manual specified language!)
-			include $locdir.'own.php';
-	}
-
 	//Send the language
 	if (!headers_sent())
 		header("Content-Language: $locale");
