@@ -210,8 +210,6 @@ $_BO['tpl_imgmap']['europe_west_central']['density_darken'] = 40;
 $_BO['tpl_imgmap']['europe_west_central']['cities'][1] = $_BO['points']['whitered2'];
 $_BO['tpl_imgmap']['europe_west_central']['cities'][5] = $_BO['points']['whitered2'];
 $_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitered2'];
-$_BO['tpl_imgmap']['europe_west_central']['animation_enable'] = true;
-$_BO['tpl_imgmap']['europe_west_central']['animation'] = $_BO['tpl_animation_mini'];
 
 
 
