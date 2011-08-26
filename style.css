@@ -685,3 +685,12 @@ width: 550px;
 white-space: nowrap;
 padding-right: 10px;
 }
+
+#myblitzortung #bo_stat_network {
+width: 620px;
+}
+
+#myblitzortung #bo_stat_network_stations_map {
+float: right;
+margin: 0px 0px 5px 5px;
+}

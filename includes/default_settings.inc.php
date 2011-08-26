@@ -584,6 +584,9 @@ if (!isset($_BO['mapimg'][2]))
 if (!isset($_BO['mapimg'][3]))
 	$_BO['mapimg'][3] = $_BO['tpl_imgmap']['europe_mini'];
 
+if (!isset($_BO['mapimg']['stations_mini']))
+	$_BO['mapimg']['stations_mini'] = $_BO['tpl_imgmap']['europe_mini_stations'];
+
 	
 /*** Densities ***/
 if (!isset($_BO['density'][0]))

@@ -20,9 +20,10 @@ Version 0.7 (2011-08-xx)
 - new: alt-tag in "img"
 - new: maps for western/central europe (germany+france), france and new europe map with nicer colors
 - new: smooth colors for maps
-- new: gif animations for maps
+- new: gif animations for maps (currently only visible when using blitzortung.php?animation=0 ) - not useful for bigger maps (high load)!
 - new: extended traffic and database statistics (when logged-in)
 - new: status files - insert some information (strike count etc...) in your HTML files
+- new: mini station map
 - other visual improvements for maps
 - cleanup in default_settings.inc.php and templates.inc.php
 

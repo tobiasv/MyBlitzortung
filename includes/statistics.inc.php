@@ -546,13 +546,16 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	echo '<div id="bo_stat_network">';
 
+	echo '<img src="'.BO_FILE.'?map=stations_mini&blank" id="bo_stat_network_stations_map">';
+	
 	echo '<p class="bo_stat_description" id="bo_stat_network_descr_lasth">';
 	echo _BL('bo_stat_network_descr_lasth');
 	echo '</p>';
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(',')).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).(' ('._BL('available_of').' '.number_format($available, 0, _BL('.'), _BL(',')).' '._BL('available_stations').')').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Available Stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikesh, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.number_format($avg_part, 1, _BL('.'), _BL(',')).'</span>';

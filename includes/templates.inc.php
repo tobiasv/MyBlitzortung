@@ -116,7 +116,13 @@ $_BO['points']['whitered2']['point']         = array(3, 2, 'f008', 1, 'fff8');
 $_BO['points']['stations_active']['point']   = array(10, 5, '0f4', 1, '0f4e'); 
 $_BO['points']['stations_inactive']['point'] = array(10, 5, 'c64', 1, 'c64e'); 
 $_BO['points']['stations_offline']['point']  = array(10, 5, 'c04', 1, 'c04e'); 
-$_BO['points']['stations_nogps']['point']  = array(10, 5, '04f', 1, '04fe'); 
+$_BO['points']['stations_nogps']['point']    = array(10, 5, '04f', 1, '04fe'); 
+
+$_BO['points']['stations_dots_active']['point']   = array(1, 1, '0f4', 0, '0f4e'); 
+$_BO['points']['stations_dots_inactive']['point'] = array(1, 1, 'f94', 0, 'c64e'); 
+$_BO['points']['stations_dots_offline']['point']  = array(1, 1, 'f00', 0, 'c04e'); 
+$_BO['points']['stations_dots_nogps']['point']    = array(1, 1, '77f', 0, '04fe'); 
+
 
 $_BO['points']['stations_strikedetails']['point']  = array(2, 2, 'c04', 0, 'c04e'); 
 
@@ -384,6 +390,27 @@ $_BO['tpl_imgmap']['europe_mini']['legend'] = array(0, 54, 26, 0, 0, 0);
 $_BO['tpl_imgmap']['europe_mini']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap']['europe_mini']['animation_enable'] = true;
 $_BO['tpl_imgmap']['europe_mini']['animation'] = $_BO['tpl_animation_mini'];
+
+
+//Europe (mini) - with stations
+$_BO['tpl_imgmap']['europe_mini_stations']['name'] = 'Europe (mini)';
+$_BO['tpl_imgmap']['europe_mini_stations']['menu'] = false;
+$_BO['tpl_imgmap']['europe_mini_stations']['file'] = 'map_europe_mini_dark.png';
+$_BO['tpl_imgmap']['europe_mini_stations']['coord'] = array(71.1, 44.5, 31.8, -14.0); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['europe_mini_stations']['trange'] = 2; //hours!
+$_BO['tpl_imgmap']['europe_mini_stations']['upd_intv'] = 15; //minutes
+$_BO['tpl_imgmap']['europe_mini_stations']['textcolor'] = array(255,255,255);
+$_BO['tpl_imgmap']['europe_mini_stations']['textsize'] = 1;
+$_BO['tpl_imgmap']['europe_mini_stations']['point_type'] = 1;
+$_BO['tpl_imgmap']['europe_mini_stations']['point_size'] = 2;
+$_BO['tpl_imgmap']['europe_mini_stations']['legend'] = array(0, 54, 26, 0, 0, 0);
+$_BO['tpl_imgmap']['europe_mini_stations']['col'] = $_BO['tpl_color']['standard'];
+$_BO['tpl_imgmap']['europe_mini_stations']['animation_enable'] = true;
+$_BO['tpl_imgmap']['europe_mini_stations']['animation'] = $_BO['tpl_animation_mini'];
+$_BO['tpl_imgmap']['europe_mini_stations']['stations']['A'] = $_BO['points']['stations_dots_active'];
+$_BO['tpl_imgmap']['europe_mini_stations']['stations']['-'] = $_BO['points']['stations_dots_inactive'];
+$_BO['tpl_imgmap']['europe_mini_stations']['stations']['O'] = $_BO['points']['stations_dots_offline'];
+$_BO['tpl_imgmap']['europe_mini_stations']['stations']['V'] = $_BO['points']['stations_dots_nogps'];
 
 
 /* ============================= GERMANY ============================= */

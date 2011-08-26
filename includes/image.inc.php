@@ -78,7 +78,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 	if ($id === false)
 	{
-		$id 			= intval($_GET['map']);
+		$id 			= $_GET['map'];
+		
+		if (preg_match('/[^0-9a-z_]/i', $id))
+			exit('Hacking disabled ;-)');
+		
 		$date 			= $_GET['date'];
 		$transparent 	= isset($_GET['transparent']);
 		$blank 			= isset($_GET['blank']);
