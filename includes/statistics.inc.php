@@ -881,7 +881,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 function bo_show_statistics_other($station_id = 0, $own_station = true, $add_graph = '')
 {
 	$D = array();
-	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'user', 'densities');
+	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'user', 'densities', 'cities');
 
 	$res = bo_db("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
 	while($row = $res->fetch_assoc())
@@ -942,6 +942,21 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 			</span><span class="bo_value">'.number_format($mem_all, 1, _BL('.'), _BL(',')).'MB
 					('.number_format($mem_keys, 1, _BL('.'), _BL(',')).'% '._BL('for keys').')
 			</span>';
+	
+	
+	if (bo_user_get_level() & BO_PERM_NOLIMIT)
+	{
+		foreach($D['rows'] as $type => $rows)
+		{
+			echo '<li><span class="bo_descr">'._BL('Usage').' "'.$type.'": </span><span class="bo_value">';
+			echo number_format($D['rows'][$type], 0, _BL('.'), _BL(',')).' rows / ';
+			echo number_format( ($D['data'][$type]+$D['keys'][$type])  / 1024 / 1024, 1, _BL('.'), _BL(',')).' MB / ';
+			echo number_format( $D['keys'][$type]/($D['data'][$type]+$D['keys'][$type])*100, 1, _BL('.'), _BL(',')).'% '._BL('for keys');
+			echo '</span>';		
+		
+		}
+	}
+	
 	echo '</ul>';
 	
 	

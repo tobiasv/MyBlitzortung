@@ -301,32 +301,11 @@ function bo_insert_url($exclude = array(), $add = null)
 function bo_copyright_footer()
 {
 
-	echo '<div id="bo_copyright">';
+	echo '<div id="bo_footer">';
+	
 	echo '<a href="http://www.blitzortung.org/" target="_blank">';
 	echo '<img src="'.BO_FILE.'?image=logo" id="bo_copyright_logo">';
 	echo '</a>';
-	echo _BL('Lightning data');
-	echo ' &copy; 2003-'.date('Y ');
-	echo '<a href="http://www.blitzortung.org/" target="_blank">';
-	echo 'www.Blitzortung.org';
-	echo '</a>';
-	echo ' &bull; ';
-	echo '<a href="http://'.BO_LINK_HOST.'/" target="_blank" id="mybo_copyright">';
-	echo _BL('copyright_footer');
-	echo '</a>';
-	
-	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
-	{
-		echo ' &bull; ';
-		echo BO_OWN_COPYRIGHT;
-	}
-
-	
-	echo '</div>';
-
-	echo '<div id="bo_copyright_extra">';
-	echo _BL('timezone_is').' <strong>'.date('H:i:s').' '._BL(date('T')).'</strong>';
-	echo '</div>';
 
 	if (BO_LOGIN_SHOW === true)
 	{
@@ -370,8 +349,35 @@ function bo_copyright_footer()
 		}
 		
 		echo '</div>';
-	
 	}
+	
+	
+	echo '<div id="bo_copyright">';
+	echo _BL('Lightning data');
+	echo ' &copy; 2003-'.date('Y ');
+	echo '<a href="http://www.blitzortung.org/" target="_blank">';
+	echo 'www.Blitzortung.org';
+	echo '</a>';
+	echo ' &bull; ';
+	echo '<a href="http://'.BO_LINK_HOST.'/" target="_blank" id="mybo_copyright">';
+	echo _BL('copyright_footer');
+	echo '</a>';
+	echo '</div>';
+
+	echo '<div id="bo_copyright_extra">';
+	echo _BL('timezone_is').' <strong>'.date('H:i:s').' '._BL(date('T')).'</strong>';
+	echo '</div>';
+
+	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
+	{
+		echo '<div id="bo_copyright_own">';
+		echo BO_OWN_COPYRIGHT;
+		echo '</div>';
+	}
+
+	
+
+	echo '</div>';
 
 }
 
