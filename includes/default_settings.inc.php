@@ -239,7 +239,7 @@ if (!defined('BO_VER'))
 @define("BO_ARCHIVE_STR_DETAILS_DEFAULT_POINT", 'stations_strikedetails');
 
 //Animations
-@define("BO_ANIMATIONS_INTERVAL", 0); //Time in minutes between two frames - 0 disables animations
+@define("BO_ANIMATIONS_INTERVAL", 15); //Time in minutes between two frames - 0 disables animations
 @define("BO_ANIMATIONS_STRIKE_TIME", 120); //Time range of displayed strikes per frame
 @define("BO_ANIMATIONS_DEFAULT_RANGE", 2);  //Default time range bewteen start and end time
 @define("BO_ANIMATIONS_WAITTIME", 100); //Wait time between frames during animation (milliseconds)
