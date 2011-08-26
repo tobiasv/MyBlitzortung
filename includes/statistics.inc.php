@@ -764,7 +764,20 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 
 	//MyBO
 	$first_update		= bo_get_conf('first_update_time');
+	$download_count     = bo_get_conf('upcount_strikes');
+	$download_stat      = unserialize(bo_get_conf('download_statistics'));
 
+	$kb_per_day = array();
+	$kb_traffic = 0;
+	foreach($download_stat as $type => $d)
+	{
+		$kb_traffic += $d['traffic']  / 1024;
+		if ($d['time_first'])
+		{
+			$kb_per_day[$type] = $d['traffic']  / 1024 / (time() - $d['time_first']) * 3600 * 24;
+		}
+	}
+	
 	if (!$max_str_day_all[0])
 		$max_str_day_all[1] = 0;
 	if (!$max_str_dayrad_all[0])
@@ -822,7 +835,27 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('First data').': </span><span class="bo_value">'.date(_BL('_datetime'), $first_update).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Lightning data downloads').': </span><span class="bo_value">'.number_format($download_count, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Traffic per day').': </span><span class="bo_value">'.number_format(array_sum($kb_per_day), 0, _BL('.'), _BL(',')).' kB</span>';
+	
+	//print detailed stat
+	if (bo_user_get_level() & BO_PERM_NOLIMIT)
+	{
+		$traffic_show = array('strikes' => 'Strikes', 'stations' => 'Stations', 'archive' => 'Signals');
 
+		foreach($traffic_show as $type => $name)
+		{
+			$kb_per_day_single = $kb_per_day[$type];
+			unset($kb_per_day[$type]);
+
+			echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL($name).': </span><span class="bo_value">'.number_format($kb_per_day_single, 0, _BL('.'), _BL(',')).' kB/'._BL('day').'</span>';
+		}
+		
+		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Other').': </span><span class="bo_value">'.number_format(array_sum($kb_per_day), 0, _BL('.'), _BL(',')).' kB/'._BL('day').'</span>';
+		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Total').': </span><span class="bo_value">'.number_format($kb_traffic, 0, _BL('.'), _BL(',')).' kB</span>';		
+		
+	}
+	
 	echo '</ul>';
 
 	echo '<a name="graph_ratio_distance"></a>';

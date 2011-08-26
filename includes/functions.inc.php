@@ -718,94 +718,99 @@ function bo_load_locale($locale = '')
 
 function bo_get_file($url, &$error = '', $type = '')
 {
+	$content = ''; 
+	$err = 0;
+		
 	if (BO_USE_PHPURLWRAPPER === true)
 	{
-		return file_get_contents($url);
-	}
-
-	$parsedurl = @parse_url($url); 
-	$host = $parsedurl['host'];
-	$user = $parsedurl['user'];
-	$pass = $parsedurl['pass'];
-	$path = $parsedurl['path'];
-	$query = $parsedurl['query'];
-	
-	$fp = fsockopen($host, 80, $errno, $errstr);
-	
-	$err = 0;
-	
-	if (!$fp)
-	{
-		$error = "Connect ERROR: $errstr ($errno)<br />\n";
-		echo $error;
-		$err = 1;
+		$content = file_get_contents($url);
 	}
 	else
 	{
-		$out =  "GET ".$path."?".$query." HTTP/1.1\r\n";
-		$out .= "Host: ".$host."\r\n";
-		$out .= "User-Agent: MyBlitzortung ".BO_VER."\r\n";
+		$parsedurl = @parse_url($url); 
+		$host = $parsedurl['host'];
+		$user = $parsedurl['user'];
+		$pass = $parsedurl['pass'];
+		$path = $parsedurl['path'];
+		$query = $parsedurl['query'];
 		
-		if ($user && $pass)
-			$out .= "Authorization: Basic ".base64_encode($user.':'.$pass)."\r\n";
+		$fp = fsockopen($host, 80, $errno, $errstr);
 		
-		$out .= "Connection: Close\r\n\r\n";
-		
-		if (fwrite($fp, $out) !== false)
+		if (!$fp)
 		{
-			$content = ''; 
-			$first = true;
-			$response = array();
-			
-			//Header
-			do 
-			{ 
-				$header = chop(fgets($fp)); 
-				
-				if ($first)
-				{
-					preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
-					
-					if ($response[1] != '200')
-					{
-						$err = 2;
-						break;
-					}
-				}
-				
-				$first = false;
-			} 
-			while (!empty($header) and !feof($fp)); 
-				
-			//Get the Content
-			while (!feof($fp)) { 
-				$content .= fgets($fp); 
-			} 
+			$error = "Connect ERROR: $errstr ($errno)<br />\n";
+			echo $error;
+			$err = 1;
 		}
 		else
 		{
-			$error = "Send ERROR: $errstr ($errno)<br />\n";
-			echo $error;
+			$out =  "GET ".$path."?".$query." HTTP/1.1\r\n";
+			$out .= "Host: ".$host."\r\n";
+			$out .= "User-Agent: MyBlitzortung ".BO_VER."\r\n";
+			
+			if ($user && $pass)
+				$out .= "Authorization: Basic ".base64_encode($user.':'.$pass)."\r\n";
+			
+			$out .= "Connection: Close\r\n\r\n";
+			
+			if (fwrite($fp, $out) !== false)
+			{
+				$first = true;
+				$response = array();
+				
+				//Header
+				do 
+				{ 
+					$header = chop(fgets($fp)); 
+					
+					if ($first)
+					{
+						preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
+						
+						if ($response[1] != '200')
+						{
+							$err = 2;
+							break;
+						}
+					}
+					
+					$first = false;
+				} 
+				while (!empty($header) and !feof($fp)); 
+					
+				//Get the Content
+				while (!feof($fp)) { 
+					$content .= fgets($fp); 
+				} 
+			}
+			else
+			{
+				$error = "Send ERROR: $errstr ($errno)<br />\n";
+				echo $error;
+			}
+			
+			fclose($fp);
 		}
-		
-		fclose($fp);
-	}
 
-	if ($err == 2)
-	{
-		$error = $response[1].' '.$response[2];
-		$content = false;
+		if ($err == 2)
+		{
+			$error = $response[1].' '.$response[2];
+			$content = false;
+		}
 	}
 	
 	if ($type)
 	{
-		$data = unserialize(bo_get_conf('download_'.$type));
-		$data['count'][$err]++;
+		$data = unserialize(bo_get_conf('download_statistics'));
+		$data[$type]['count'][$err]++;
 		
 		if ($content)
-			$data['traffic'] += strlen($content);
+			$data[$type]['traffic'] += strlen($content);
 		
-		bo_set_conf('download_'.$type, serialize($data));
+		if (!$data[$type]['time_first'])
+			$data[$type]['time_first'] = time();
+		
+		bo_set_conf('download_statistics', serialize($data));
 	}
 	
 	return $content; 	 

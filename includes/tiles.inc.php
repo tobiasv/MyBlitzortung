@@ -127,7 +127,10 @@ function bo_tile()
 		$time_min        = count($times_min) ? min($times_min) : 0;
 		$time_max        = count($times_max) ? max($times_max) : 0;
 		
-		$type = 'count_'.$type;
+		if ($_GET['stat'] == 2)
+			$type = 'count_stat_'.$type;
+		else
+			$type = 'count_'.$type;
 	}
 	else //normal strike display
 	{
