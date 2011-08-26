@@ -824,3 +824,5 @@ $_BL['en']['Traffic per day'] = 'Traffic per day';
 $_BL['en']['Traffic'] = 'Traffic';
 $_BL['en']['Other'] = 'Other';
 $_BL['en']['Total'] = 'Total';
+$_BL['en']['Lightning data imports'] = 'Lightning data imports';
+$_BL['en']['Traffic to Blitzortung.org'] = 'Traffic to Blitzortung.org';

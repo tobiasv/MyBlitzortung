@@ -830,15 +830,17 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$zoom = intval($_GET['bo_zoom']);
 	$only_strikes = $_GET['bo_only_strikes'] == 1;
 	$only_participated = $_GET['bo_only_participated'] == 1;
+	$strike_id = intval($_GET['bo_strike_id']);	
 	
 	if ($page < 0)
 		$page = 0;
 	else if ($page > $max_pages)
 		$page = $max_pages;
 	
-	if ($perm)
+	if (!$perm)
 	{
-		$strike_id = intval($_GET['bo_strike_id']);	
+		$show_empty_sig = false;
+		$strike_id = 0;
 	}
 	
 	echo '<form action="" method="GET">';	
@@ -923,7 +925,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	$count = 0;
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
-					s.deviation deviation, s.current current,
+					s.deviation deviation, s.current current, s.polarity polarity,
 					s.time stime, s.time_ns stimens, s.users users, s.part part,
 					r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data
 			FROM $sql_join
@@ -1006,8 +1008,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 		if ($row['strike_id'])
 		{
-			$pol = bo_strike2polarity($row['data'], $bearing);
-
 			echo '<ul>';
 
 			echo '<li>';
@@ -1066,12 +1066,12 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo _BL('Polarity').': ';
 				echo '</span>';
 				echo '<span class="bo_value">';
-			
-				if ($pol === null)
+
+				if (!$row['polarity'])
 					echo '?';
-				elseif ($pol > 0)
+				elseif ($row['polarity'] > 0)
 					echo _BL('positive');
-				elseif ($pol < 0)
+				elseif ($row['polarity'] < 0)
 					echo _BL('negative');
 				echo '</span>';
 				echo '</li>';

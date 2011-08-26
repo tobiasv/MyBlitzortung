@@ -219,6 +219,7 @@ function bo_update_raw_signals($force = false)
 		
 		bo_set_conf('uptime_raw', time());
 		bo_match_strike2raw();
+		bo_update_status_files('signals');
 		$updated = true;
 	}
 	else
@@ -535,7 +536,8 @@ function bo_update_strikes($force = false)
 			bo_set_conf('longtime_min_dist_own', $min_dist_own);
 
 		$updated = true;
-		bo_set_conf('uptime_strikes', time());		
+		bo_set_conf('uptime_strikes', time());
+		bo_update_status_files('strikes');
 	}
 	else
 	{
@@ -967,6 +969,39 @@ function bo_update_stations($force = false)
 		}
 		
 		bo_set_conf('uptime_stations', time());
+		
+		
+		//send mail to owner if no signals
+		if (BO_TRACKER_WARN_ENABLED === true)
+		{
+			$data = unserialize(bo_get_conf('warn_tracker_offline'));
+			
+			if ($Count[$own_id]['sig'] == 0)
+			{
+				if (!isset($data['offline_since']))
+					$data['offline_since'] = time();
+				
+				if (time() - $data['offline_since'] >= ((double)BO_TRACKER_WARN_AFTER_HOURS * 3600))
+				{
+					if (time() - $data['last_msg'] >= ((double)BO_TRACKER_WARN_RESEND_HOURS * 3600))
+					{
+						$data['last_msg'] = time();
+						bo_set_conf('warn_tracker_offline', serialize($data));
+						bo_owner_mail('Station OFFLINE', "Your station/tracker didn't send any signals since ".date(_BL('_datetime'),$data['offline_since'] - 3600)." ! If there is lightning near your station, your tracker might be in interference mode. In this case you can ignore this message.");
+					}
+				}
+			}
+			else if ($data['last_msg']) //reset
+			{
+				$data = array();
+				bo_owner_mail('Station ONLINE', "Your station/tracker is online again! ".$Count[$own_id]['sig']." signals in the last 60 minutes.");		
+			}
+			
+			bo_set_conf('warn_tracker_offline', serialize($data));
+		}
+		
+		bo_update_status_files('stations');
+		
 		$updated = true;
 	}
 	else
@@ -2346,26 +2381,106 @@ function bo_update_error($type, $extra = null)
 		&& time() - $data['last_send'] > BO_UP_ERR_SEND_INTERVAL * 60)
 	{
 		$data['last_send'] = time();
+
+		$text = $extra;
+		$text .= "\n\nLast error: ".date('Y-m-d H:i:s', $data['last']);
+		$text .= "\nFirst error: ".date('Y-m-d H:i:s', $data['first']);
+		$text .= "\nError count: ".$data['count'];
 		
-		$mail = bo_user_get_mail(1);
-		
-		if ($mail)
-		{
-			$text = $extra;
-			$text .= "\n\nLast error: ".date('Y-m-d H:i:s', $data['last']);
-			$text .= "\nFirst error: ".date('Y-m-d H:i:s', $data['first']);
-			$text .= "\nError count: ".$data['count'];
-			
-			mail($mail, 
-		     _BL('MyBlitzortung_notags').' - '._BL('Error').': '.$type, 
-			 $text);
-			
-			echo '<p>Sent E-Mail to '.$mail.'</p>';
-		}
+		bo_owner_mail(_BL('MyBlitzortung_notags').' - '._BL('Error').': '.$type, $text);
 	}
 	
 	//Write
 	bo_set_conf('uperror_'.$type, serialize($data));
 }	
+
+
+function bo_update_status_files($type)
+{
+	if (BO_ENABLE_STATUS_FILES !== true)
+		return true;
+
+	$cfile = BO_DIR.'status/status.cfg';
+	
+	if (!file_exists($cfile))
+		return false;
+		
+	
+	$row = bo_db("SELECT signalsh, strikesh FROM ".BO_DB_PREF."stations_stat WHERE station_id='".bo_station_id()."' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
+	$STATION_CURRENT_STRIKES = $row['strikesh'];
+	$STATION_CURRENT_SIGNALS = $row['signalsh'];
+
+	
+	$last_strikes_region = unserialize(bo_get_conf('last_strikes_region'));
+	$rate_strikes_region = unserialize(bo_get_conf('rate_strikes_region'));
+	$STRIKE_RATE = number_format($rate_strikes_region[0], 1, _BL('.'), _BL(','));
+	$LAST_STRIKE = date(_BL('_datetime'), $last_strikes_region[0]);
+	
+	$tmp = @unserialize(bo_get_conf('last_strikes_stations'));
+	$STATION_LAST_STRIKE   = date(_BL('_datetime'), $tmp[$station_id][0]);
+	
+	$act_time = bo_get_conf('station_last_active');
+	$inact_time = bo_get_conf('station_last_inactive');
+	$STATION_LAST_ACTIVE   = date(_BL('_datetime'), $act_time);
+	$STATION_LAST_INACTIVE = date(_BL('_datetime'), $inact_time);
+	$STATION_ACTIVE        = $act_time > $inact_time ? _BL('yes') : _BL('no');
+	
+	$IMPORT_LAST_STRIKES   = date(_BL('_datetime'), bo_get_conf('uptime_strikes'));
+	$IMPORT_LAST_STATIONS  = date(_BL('_datetime'), bo_get_conf('uptime_stations'));
+	$IMPORT_LAST_SIGNALS   = date(_BL('_datetime'), bo_get_conf('uptime_raw'));
+	
+	$replace = array(
+		'{STATION_CURRENT_STRIKES}'  => $STATION_CURRENT_STRIKES,
+		'{STATION_CURRENT_SIGNALS}'  => $STATION_CURRENT_SIGNALS,
+		'{STRIKE_RATE}'              => $STRIKE_RATE,
+        '{LAST_STRIKE}'              => $LAST_STRIKE,
+		'{STATION_ACTIVE}'           => $STATION_ACTIVE,
+        '{STATION_LAST_STRIKE}'      => $STATION_LAST_STRIKE,
+		'{STATION_LAST_ACTIVE}'      => $STATION_LAST_ACTIVE,
+		'{STATION_LAST_INACTIVE}'    => $STATION_LAST_INACTIVE,
+		'{IMPORT_LAST_STRIKES}'      => $IMPORT_LAST_STRIKES,
+		'{IMPORT_LAST_STATIONS}'     => $IMPORT_LAST_STRIKES,
+		'{IMPORT_LAST_SIGNALS}'      => $IMPORT_LAST_STRIKES,
+		
+	);
+
+	$config = file_get_contents($cfile);
+	$lines = explode("\n", $config);
+	chdir(BO_DIR);
+	$i = 0;
+	foreach($lines as $line)
+	{
+		$line = trim($line);
+		
+		if (substr($line,0,1) == '#')
+			continue;
+		
+		$d = explode(";", $line);
+		
+		if (count($d) != 3)
+			continue;
+		
+		$cfg_file = trim($d[0]);
+		$cfg_dir  = trim($d[1]);
+		$cfg_type = strtolower(trim($d[2]));
+		
+		if ($cfg_type == $type)
+		{
+			$content = file_get_contents(BO_DIR.'status/'.$cfg_file);
+			
+			if (!$content)
+				continue;
+			
+			
+			$content = strtr($content, $replace);
+			
+			file_put_contents($cfg_dir.'/'.$cfg_file, $content);
+			
+			$i++;
+		}
+	}
+	
+	return $i;	
+}
 
 ?>

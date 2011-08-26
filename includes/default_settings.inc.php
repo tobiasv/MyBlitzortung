@@ -75,10 +75,18 @@ if (!defined('BO_VER'))
 @define("BO_UP_MAX_TIME",  55); // max. exec time
 @define("BO_UP_MAX_SLEEP", 30); // max. sleep time in seconds before importing
 
+/*** Warn if station/tracker sends no signals                    ***/
+@define("BO_TRACKER_WARN_ENABLED", true);
+@define("BO_TRACKER_WARN_AFTER_HOURS", 0);
+@define("BO_TRACKER_WARN_RESEND_HOURS", 6);
+
 /*** Import error handling                                       ***/
 @define("BO_UP_ERR_MIN_COUNT",   1);     // min count, error occured (0 disables reporting)
 @define("BO_UP_ERR_MIN_MINUTES", 30);    // time in minutes in which the error occurs
 @define("BO_UP_ERR_SEND_INTERVAL", 60);  // if error persits, send mail max. every defined minutes
+
+/*** Enable automatic rewriting of status files                  ***/
+@define("BO_ENABLE_STATUS_FILES", false);
 
 /*** Copyright footer/graphs/images                              ***/
 @define('BO_OWN_COPYRIGHT', '');

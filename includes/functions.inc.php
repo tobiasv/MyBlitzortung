@@ -1300,4 +1300,18 @@ function bo_hex2rgb($str)
 }
 
 
+function bo_owner_mail($subject, $text)
+{
+	$mail = bo_user_get_mail(1);
+	$ret = false;
+	
+	if ($mail)
+	{
+		$ret = mail($mail, $subject, $text, "From: MyBlitzortung");
+		echo '<p>Sent E-Mail to '.$mail.':</p><p>'.$subject.'</p><pre>'.$text.'</pre>';
+	}
+	
+	return $ret;
+}
+
 ?>
