@@ -24,6 +24,7 @@ Version 0.7 (2011-08-xx)
 - new: extended traffic and database statistics (when logged-in)
 - new: status files - insert some information (strike count etc...) in your HTML files
 - new: mini station map
+- new: time range in animations
 - other visual improvements for maps
 - cleanup in default_settings.inc.php and templates.inc.php
 

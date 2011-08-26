@@ -1734,6 +1734,7 @@ function bo_update_densities($max_time)
 					$date_start_add = 0;
 					$DATA = '';
 				}
+				
 				flush();
 				$sql = "SELECT data, date_start, date_end
 						FROM ".BO_DB_PREF."densities 
@@ -1743,7 +1744,7 @@ function bo_update_densities($max_time)
 							AND date_start >= '".$b['date_start']."'
 							AND date_end   <= '".$b['date_end']."'
 							AND station_id = '".$b['station_id']."'
-						ORDER BY status, date_start";
+						ORDER BY status, date_start, date_end DESC";
 				$res = bo_db($sql);
 				while ($row = $res->fetch_assoc())
 				{

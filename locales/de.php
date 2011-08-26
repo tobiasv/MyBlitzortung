@@ -849,3 +849,5 @@ $_BL['de']['Other'] = 'Sonstige';
 $_BL['de']['Total'] = 'Gesamt';
 $_BL['de']['Lightning data imports'] = 'Anzahl Akualisierungen der Blitzdaten';
 $_BL['de']['Traffic to Blitzortung.org'] = 'Datenverkehr mit Blitzortung.org';
+$_BL['de']['oclock'] = 'Uhr';
+$_BL['de']['On'] = 'Ein';

@@ -103,15 +103,30 @@ function bo_show_archive_map()
 {
 	global $_BO;
 
-	$ani_div = 15;
-	$ani_pic_interval = 120;
+	$ani_div = intval(BO_ANIMATIONS_INTERVAL);
+	$ani_pic_interval = intval(BO_ANIMATIONS_STRIKE_TIME);
+	$ani_default_range = intval(BO_ANIMATIONS_DEFAULT_RANGE);
 	
 	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;
 	$year = intval($_GET['bo_year']);
 	$month = intval($_GET['bo_month']);
 	$day = intval($_GET['bo_day']);
 	$day_add = intval($_GET['bo_day_add']);
-	$ani = isset($_GET['bo_animation']);
+	$ani = isset($_GET['bo_animation']) && $_GET['bo_animation'] !== '0';
+	$hour_from = intval($_GET['bo_hour_from']);
+	$hour_to = intval($_GET['bo_hour_to']);
+	
+	if (!$hour_from && !$hour_to)
+	{
+		$hour_from = (int)date('H', time() - 3600 * $ani_default_range - $ani_pic_interval * 60);
+		$hour_to = (int)date('H', time());
+	}
+	
+	if (!$hour_to || !$hour_to < 0 || $hour_to > 24)
+		$hour_to = 24;
+
+	if (!$hour_from < 0 || $hour_from > 23)
+		$hour_from = 0;
 	
 	if (!$year || $year < 0)
 		$year = date('Y');
@@ -126,7 +141,7 @@ function bo_show_archive_map()
 		$day_add = -1;
 	else if ($_GET['bo_next'])
 		$day_add = +1;
-		
+	
 	$time  = mktime(0,0,0,$month,$day+$day_add,$year);
 	$year  = date('Y', $time);
 	$month = date('m', $time);
@@ -174,8 +189,34 @@ function bo_show_archive_map()
 	echo '&nbsp;<input type="submit" name="bo_next" value=" &gt; " id="bo_archive_maps_nextday" class="bo_form_submit">';
 	
 	
-	echo '<input type="submit" name="bo_ok" value="'._BL('Picture').'" id="bo_archive_maps_submit" class="bo_form_submit">';
-	echo '<input type="submit" name="bo_animation" value="'._BL('Animation').'" id="bo_archive_maps_animation" class="bo_form_submit">';
+	echo '<input type="submit" name="bo_ok" value="'._BL('update map').'" id="bo_archive_maps_submit" class="bo_form_submit">';
+	
+	if ($ani_div)
+	{
+		echo '<div class="bo_input_container">';
+		
+		echo '<span class="bo_form_descr">'._BL('Animation').':</span> ';
+		echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false);">';
+		echo '<label for="bo_archive_maps_animation_off">'._BL('Off').'</label>';
+		echo '<input type="radio" name="bo_animation" value="1" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true);">';
+		echo '<label for="bo_archive_maps_animation_on">'._BL('On').'</label>';
+		echo ' &nbsp; ';
+		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
+		
+		echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from" disabled>';
+		for($i=0;$i<=23;$i++)
+			echo '<option value="'.$i.'" '.($i == $hour_from ? 'selected' : '').'>'.$i.'</option>';
+		echo '</select>';
+		echo ' - ';
+		echo '<select name="bo_hour_to" id="bo_arch_strikes_select_hour_to" disabled>';
+		for($i=1;$i<=24;$i++)
+			echo '<option value="'.$i.'" '.($i == $hour_to ? 'selected' : '').'>'.$i.'</option>';
+		echo '</select> ';
+		
+		echo _BL('oclock');
+		
+		echo '</div>';
+	}
 	
 	echo '</fieldset>';
 	echo '</form>';
@@ -187,11 +228,17 @@ function bo_show_archive_map()
 		echo '<div class="bo_arch_map_links">';
 		echo _BL('Yesterday').': &nbsp; ';
 		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=0" >'._BL('Picture').'</a> ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=0&bo_animation" >'._BL('Animation').'</a> ';
+		
+		if ($ani_div)
+			echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_hour_from', 'bo_hour_to')).'&bo_day_add=0&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
+		
 		echo '  &nbsp;  &nbsp; &nbsp; ';
 		echo _BL('Today').': &nbsp; ';
 		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=1" >'._BL('Picture').'</a> ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
+		
+		if ($ani_div)
+			echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_hour_from', 'bo_hour_to')).'&bo_day_add=1&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
+			
 		echo '</div>';
 
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
@@ -211,7 +258,10 @@ function bo_show_archive_map()
 			
 			$images = '';
 			
-			for ($i=0; $i<= 24 * 60; $i+= $ani_div)
+			if ($hour_from >= $hour_to)
+				$hour_to += 24; //next day
+			
+			for ($i=$hour_from*60; $i<= $hour_to * 60; $i+= $ani_div)
 			{
 				$time = strtotime("$year-$month-$day 00:00:00 +$i minutes");
 				
@@ -251,9 +301,9 @@ var bo_maps_loaded = 0;
 
 function bo_maps_animation(nr)
 {
-	var timeout = 100;
+	var timeout = <?php echo intval(BO_ANIMATIONS_WAITTIME); ?>;
 	document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[nr].src;
-	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += 2000; }
+	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += <?php echo intval(BO_ANIMATIONS_WAITTIME_END); ?>; }
 	window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
 	
 }
@@ -283,7 +333,15 @@ function bo_maps_animation_start()
 		document.getElementById('bo_arch_map_img_ani').src = bo_maps_img[bo_maps_loaded-1].src;
 	}
 }
+
+function bo_enable_timerange(enable)
+{
+	document.getElementById('bo_arch_strikes_select_hour_from').disabled=!enable;
+	document.getElementById('bo_arch_strikes_select_hour_to').disabled=!enable;
+}
+
 window.setTimeout("bo_maps_load();", 500);
+bo_enable_timerange(<?php echo $ani ? 'true' : 'false'; ?>);
 </script>
 
 <?php

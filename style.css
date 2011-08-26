@@ -383,8 +383,13 @@ clear: left;
 margin: 8px 0px;
 padding-top:6px;
 }
+
 #myblitzortung #bo_map_more_container .bo_input_container {
 padding-left: 165px;
+}
+
+#myblitzortung #bo_map_more_container .bo_input_container,
+#myblitzortung .bo_arch_strikes_form .bo_input_container {
 border-top: 1px dotted #e4e4e4;
 padding-top:8px;
 }
