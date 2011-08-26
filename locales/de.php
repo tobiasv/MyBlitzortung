@@ -694,6 +694,21 @@ $_BL['de']['France'] = 'Frankreich';
 $_BL['de']['Austria'] = 'Österreich';
 $_BL['de']['Switzerland'] = 'Schweiz';
 $_BL['de']['Hungary'] = 'Ungarn';
+$_BL['de']['Belgium'] = 'Belgien';
+$_BL['de']['Czech Republic'] = 'Tschechien';
+$_BL['de']['Denmark'] = 'Dänemark';
+$_BL['de']['England'] = 'England';
+$_BL['de']['Estonia'] = 'Estland';
+$_BL['de']['Finland'] = 'Finnland';
+$_BL['de']['Greece'] = 'Griechenland';
+$_BL['de']['Italy'] = 'Italien';
+$_BL['de']['Luxemburg'] = 'Luxemburg';
+$_BL['de']['Norway'] = 'Norwegen';
+$_BL['de']['Poland'] = 'Polen';
+$_BL['de']['Spain'] = 'Spanien';
+$_BL['de']['Sweden'] = 'Schweden';
+$_BL['de']['The Netherlands'] = 'Niederlande';
+$_BL['de']['United Kingdom'] = 'Großbritannien';
 
 $_BL['de']['Bavaria'] = 'Bayern';
 $_BL['de']['NRW'] = 'NRW';
@@ -851,3 +866,5 @@ $_BL['de']['Lightning data imports'] = 'Anzahl Akualisierungen der Blitzdaten';
 $_BL['de']['Traffic to Blitzortung.org'] = 'Datenverkehr mit Blitzortung.org';
 $_BL['de']['oclock'] = 'Uhr';
 $_BL['de']['On'] = 'Ein';
+$_BL['de']['Available stations'] = 'Verfügbare Stationen';
+

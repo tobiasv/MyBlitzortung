@@ -1,0 +1,41 @@
+
+This is an example text file for MyBlitzortung "status".
+
+The following tags will be replaced and the new file will be saved
+at the place configured in status.cfg.
+
+--------------------------------
+
+Current strike rate:
+{STRIKE_RATE}              
+
+Last strike:
+{LAST_STRIKE}              
+
+Detected strikes by your station in the last 60min:
+{STATION_CURRENT_STRIKES}
+
+Signals by your station in the last 60min:
+{STATION_CURRENT_SIGNALS}
+
+Station active:
+{STATION_ACTIVE}           
+
+Last detected strike of your station:
+{STATION_LAST_STRIKE}      
+
+Station last activity:
+{STATION_LAST_ACTIVE} 
+
+Station last inactive:     
+{STATION_LAST_INACTIVE}    
+
+Last import of strikes:
+{IMPORT_LAST_STRIKES}  
+
+Last import of stations:    
+{IMPORT_LAST_STATIONS}  
+
+Last import of signals:   
+{IMPORT_LAST_SIGNALS}
+

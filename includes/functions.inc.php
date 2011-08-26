@@ -747,6 +747,7 @@ function bo_get_file($url, &$error = '', $type = '')
 			$error = "Connect ERROR: $errstr ($errno)<br />\n";
 			echo $error;
 			$err = 1;
+			$content = false;
 		}
 		else
 		{

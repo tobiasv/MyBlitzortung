@@ -472,6 +472,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	while($row = $res->fetch_assoc())
 	{
 		$D[$row['sid']] = $row;
+		$D[$row['sid']]['country'] = _BL(strtr($row['country'], array(chr(160) => ' ')));
 
 		if ($row['signalsh'])
 		{
@@ -555,7 +556,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(',')).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Available Stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikesh, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.number_format($avg_part, 1, _BL('.'), _BL(',')).'</span>';
@@ -629,7 +630,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		echo '</td>';
 
 		echo '<td class="bo_text '.($sort == 'country' ? 'bo_marked' : '').'">';
-		echo _BC($d['country']);
+		echo $d['country'];
 		echo '</td>';
 
 		echo '<td class="bo_text '.($sort == 'city' ? 'bo_marked' : '').'">';
@@ -690,8 +691,9 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		{
 			if ($time)
 			{
+				$country = _BL(strtr($user_stations[$user]['country'], array(chr(160) => ' ')));
 				$id = $user_stations[$user]['id'];
-				$new_stations[$id] = array($time, $user_stations[$user]['city'].' ('.$user_stations[$user]['country'].')');
+				$new_stations[$id] = array($time, $user_stations[$user]['city'].' ('.$country.')');
 			}
 		}
 		

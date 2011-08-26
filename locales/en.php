@@ -663,7 +663,7 @@ $_BL['en']['Lightning data from Blitzortung.org'] = 'Lightning data from Blitzor
 $_BL['en']['No data available!'] = 'No data available!';
 
 /*************************************************************/
-/* Translations for templates                                */
+/* Translations for templates/countries                      */
 /*************************************************************/
 $_BL['en']['Europe'] = 'Europe';
 $_BL['en']['Germany'] = 'Germany';
@@ -671,6 +671,22 @@ $_BL['en']['France'] = 'France';
 $_BL['en']['Austria'] = 'Austria';
 $_BL['en']['Switzerland'] = 'Switzerland';
 $_BL['en']['Hungary'] = 'Hungary';
+$_BL['en']['Belgium'] = 'Belgium';
+$_BL['en']['Czech Republic'] = 'Czech Republic';
+$_BL['en']['Denmark'] = 'Denmark';
+$_BL['en']['England'] = 'England';
+$_BL['en']['Estonia'] = 'Estonia';
+$_BL['en']['Finland'] = 'Finland';
+$_BL['en']['Greece'] = 'Greece';
+$_BL['en']['Italy'] = 'Italy';
+$_BL['en']['Luxemburg'] = 'Luxemburg';
+$_BL['en']['Norway'] = 'Norway';
+$_BL['en']['Poland'] = 'Poland';
+$_BL['en']['Spain'] = 'Spain';
+$_BL['en']['Sweden'] = 'Sweden';
+$_BL['en']['The Netherlands'] = 'The Netherlands';
+$_BL['en']['United Kingdom'] = 'United Kingdom	';
+
 
 $_BL['en']['Bavaria'] = 'Bavaria';
 $_BL['en']['NRW'] = 'NRW';
@@ -828,3 +844,6 @@ $_BL['en']['Lightning data imports'] = 'Lightning data imports';
 $_BL['en']['Traffic to Blitzortung.org'] = 'Traffic to Blitzortung.org';
 $_BL['en']['oclock'] = 'o\'clock';
 $_BL['en']['On'] = 'On';
+$_BL['en']['Available stations'] = 'Available stations';
+
+
