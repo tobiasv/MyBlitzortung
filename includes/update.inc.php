@@ -68,7 +68,6 @@ function bo_check_for_update()
 			echo ' <a href="'.bo_insert_url('bo_action', 'do_update').'">'._BL('Click to update').'</a>';
 			echo '</p>';
 			echo '</div>';
-			bo_copyright_footer();
 			return true;
 		}
 	}
