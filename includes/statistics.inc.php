@@ -1367,7 +1367,11 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 			echo '<p class="bo_graph_description" id="bo_graph_descr_bear">';
 			echo _BL('bo_graph_descr_bear_adv');
 			echo '</p>';
-			bo_show_graph('ratio_bearing', $add_graph);			
+			
+			if (BO_GRAPH_STAT_RATIO_BEAR_WINDROSE === true)
+				bo_show_graph('ratio_bearing', $add_graph, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE);
+			else
+				bo_show_graph('ratio_bearing', $add_graph);
 			
 			/*** EVALUATED RATIO ***/
 			echo '<a name="graph_evaluated_signals"></a>';

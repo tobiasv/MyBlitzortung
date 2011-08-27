@@ -292,7 +292,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$region = $_GET['region'];
 	
 	if ($_BO['region'][$region]['name'])
-		$add_title .= ' ('._BL($_BO['region'][$region]['name']).')';
+		$add_title .= ' ('._BL($_BO['region'][$region]['name'], true).')';
 
 	//Channel
 	$channel = intval($_GET['channel']);
@@ -300,7 +300,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	if ($channel)
 	{
 		$sql_part = ' ( (s.part&'.(1<<$channel).')>0 AND s.part>0  ) ';
-		$add_title .= ' ('._BL('Channel').' '.($channel).')';
+		$add_title .= ' ('._BL('Channel', true).' '.($channel).')';
 	}
 	else
 	{
@@ -707,7 +707,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			}
 		}
 
-		for($i=0;$i<$ticks;$i++)
+		for($i=0;$i<$ticks-1;$i++)
 		{
 			$X[$i] = $time_start + $i * $interval * 60;
 			$Y[$i] = 0;
@@ -1432,13 +1432,13 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$info_station_id = $station_id ? $station_id : $stId;
 
 	if (!$title_no_hours)
-		$add_title .= ' '._BL('of the last').' '.$hours_back.'h';
+		$add_title .= ' '._BL('of the last', true).' '.$hours_back.'h';
 
 	$stInfo = bo_station_info($station_id);
 	$city = $stInfo['city'];
 	if ($station_id)
 	{
-		$add_title .= ' '._BL('for_station').': '.$city;
+		$add_title .= ' '._BL('for_station', true).': '.$city;
 		bo_station_city(0, $stInfo['city']);
 	}
 	
@@ -1450,7 +1450,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			($type == 'ratio_bearing'  || $type == 'ratio_bearing_longtime')
 		)
 	{
-		$title = _BL('graph_stat_title_ratio_bearing').$add_title;
+		$title = _BL('graph_stat_title_ratio_bearing', true).$add_title;
 		$size = BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE;
 		
 		$D = array();
@@ -1461,7 +1461,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$D2[$i] = $Y2[$i];
 		}
 
-		$I = bo_windrose($D, $D2, $size, null, array(), '', $bear_div, $title);
+		$I = bo_windrose($D, $D2, $size, null, array(), '', $bear_div, $title, !$station_id);
 		
 		header("Content-type: image/png");
 		imagepng($I);
@@ -2386,7 +2386,7 @@ function bo_graph_error($w, $h)
 
 
 
-function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend = array(), $sub = '', $dseg = 22.5, $title = '')
+function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend = array(), $sub = '', $dseg = 22.5, $title = '', $antennas = false)
 {
 
 	$pcircle = 0.85; // Anteil, welcher der Kreis im Bild einnimmt
@@ -2523,7 +2523,7 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 	$ant1 = bo_get_conf('antenna1_bearing');
 	$ant2 = bo_get_conf('antenna2_bearing');
 	
-	if ($ant1 !== '' && $ant1 !== null && $ant2 !== '' && $ant2 !== null)
+	if ($antennas && $ant1 !== '' && $ant1 !== null && $ant2 !== '' && $ant2 !== null)
 	{
 		imagesetthickness($I,BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_ANTENNA_WIDTH);
 		
@@ -2581,7 +2581,7 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 	
 	
 
-	//Legend
+	//Legend (currently not used)
 	if (!empty($legend) && $alegend)
 	{
 		$lxpos = $size * 1.04;

@@ -3,7 +3,7 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7 (2011-08-xx)
+Version 0.7 (2011-08-27)
 ------------------------
 - new: complete FRENCH translation (by flc85)
 - new: own copyright info (footer, maps, graphs)
@@ -29,6 +29,7 @@ Version 0.7 (2011-08-xx)
 - new: added windrose for bearing ratios - thanks to Guido for the idea
 - other visual improvements for maps
 - cleanup in default_settings.inc.php and templates.inc.php
+- a lot of bugfixes
 
 Version 0.6a (2011-08-10)
 ------------------------

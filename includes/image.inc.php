@@ -1013,28 +1013,32 @@ function bo_get_density_image()
 	$PosY = 10;
 	$MarginX = 8;
 
+	$size_title = 8;
+	$size_text = 9;
+	$size_title_legend = 12;
+	
 	//Station name
 	if ($station_id)
 	{
-		$PosY = bo_imagestring_max($I, 2, $PosX, $PosY, _BL('Station', true).':', $text_col, $LegendWidth);
-		$PosY = bo_imagestring_max($I, 3, $PosX+$MarginX, $PosY, $stinfo['city'], $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Station', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, $stinfo['city'], $text_col, $LegendWidth, true);
 		$PosY += 10;
 	}
 	
 	//Strike count
-	$PosY = bo_imagestring_max($I, 2, $PosX, $PosY, _BL('Strikes', true).':', $text_col, $LegendWidth);
-	$PosY = bo_imagestring_max($I, 3, $PosX+$MarginX, $PosY, $strike_count, $text_col, $LegendWidth);
+	$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Strikes', true).':', $text_col, $LegendWidth);
+	$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, $strike_count, $text_col, $LegendWidth, true);
 	$PosY += 10;
 	
 	
 	if ($ratio && intval($strike_count))
 	{
-		$PosY = bo_imagestring_max($I, 2, $PosX, $PosY, strtr(_BL('densities_strikes_station', true), array('{STATION_CITY}' => $stinfo['city'])).':', $text_col, $LegendWidth);
-		$PosY = bo_imagestring_max($I, 3, $PosX+$MarginX, $PosY, $strike_count_own, $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, strtr(_BL('densities_strikes_station', true), array('{STATION_CITY}' => $stinfo['city'])).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, $strike_count_own, $text_col, $LegendWidth, true);
 		$PosY += 10;
 	
-		$PosY = bo_imagestring_max($I, 2, $PosX, $PosY, _BL('Mean strike ratio', true).':', $text_col, $LegendWidth);
-		$PosY = bo_imagestring_max($I, 3, $PosX+$MarginX, $PosY, number_format($strike_count_own / $strike_count * 100, 1, _BL('.'), _BL(',')).'%', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Mean strike ratio', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, number_format($strike_count_own / $strike_count * 100, 1, _BL('.'), _BL(',')).'%', $text_col, $LegendWidth, true);
 		$PosY += 25;
 	}
 	else
@@ -1043,8 +1047,8 @@ function bo_get_density_image()
 	/*
 	//Area elements (calculation)
 	$length_text = number_format($length, 1, _BL('.'), _BL(','));
-	$PosY = bo_imagestring_max($I, 2, $PosX, $PosY, _BL("Calculation basis are elements with area", true).':', $text_col, $LegendWidth);
-	$PosY = bo_imagestring_max($I, 3, $PosX+$MarginX, $PosY, " ".$length_text.'km x '.$length_text.'km', $text_col, $LegendWidth);
+	$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL("Calculation basis are elements with area", true).':', $text_col, $LegendWidth);
+	$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, " ".$length_text.'km x '.$length_text.'km', $text_col, $LegendWidth);
 	$PosY += 10;
 
 	if (!$ratio && $area)
@@ -1052,8 +1056,8 @@ function bo_get_density_image()
 		$max_real_density = $max_real_count / $area;
 		
 		//Strike density
-		$PosY = bo_imagestring_max($I, 2, $PosX, $PosY, _BL('Maximum strike density calculated', true).':', $text_col, $LegendWidth);
-		$PosY = bo_imagestring_max($I, 3, $PosX+$MarginX, $PosY, " ".number_format($max_real_density, 1, _BL('.'), _BL(',')).'/km^2', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Maximum strike density calculated', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, " ".number_format($max_real_density, 1, _BL('.'), _BL(',')).'/km^2', $text_col, $LegendWidth);
 		$PosY += 10;
 	}
 	
@@ -1064,17 +1068,17 @@ function bo_get_density_image()
 	{
 		//Max. density per block
 		$max_density = $max_count_block / $area;
-		$PosY = bo_imagestring_max($I, 2, $PosX, $PosY, _BL('Maximum mean strike density displayed', true).':', $text_col, $LegendWidth);
-		$PosY = bo_imagestring_max($I, 3, $PosX+$MarginX, $PosY, number_format($max_density, 3, _BL('.'), _BL(',')).'/km^2', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Maximum mean strike density displayed', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, number_format($max_density, 3, _BL('.'), _BL(',')).'/km²', $text_col, $LegendWidth, true);
 		$PosY += 15;
 	}
 	
 	$PosY += 10;
-	$PosY = bo_imagestring_max($I, 5, $PosX, $PosY, _BL('Legend', true), $text_col, $LegendWidth);
+	$PosY = bo_imagestring_max($I, $size_title_legend, $PosX, $PosY, _BL('Legend', true), $text_col, $LegendWidth);
 	if ($ratio)
-		$PosY = bo_imagestring_max($I, 2, $PosX+$MarginX, $PosY, '('._BL('Strike ratio', true).')', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_title, $PosX+$MarginX, $PosY, '('._BL('Strike ratio', true).')', $text_col, $LegendWidth);
 	else
-		$PosY = bo_imagestring_max($I, 2, $PosX+$MarginX, $PosY, '('._BL('Strikes per square kilometer', true).')', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_title, $PosX+$MarginX, $PosY, '('._BL('Strikes per square kilometer', true).')', $text_col, $LegendWidth);
 	
 	if ($PosY + 15 > $ColorBarY)
 	{

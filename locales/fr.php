@@ -18,14 +18,14 @@ $_BL['fr']['MyBlitzortung'] = '<span class="bo_my">Mon</span><span class="bo_myb
 $_BL['fr']['MyBlitzortung_notags'] = 'Mon détecteur de foudre';
 
 //Should stay original name (MyBlitzortung)
-$_BL['fr']['MyBlitzortung_original'] = ' MyBlitzortung ';
+$_BL['fr']['MyBlitzortung_original'] = 'MyBlitzortung';
 
 
-$_BL['fr']['.'] = '.';
-$_BL['fr'][','] = ',';
-$_BL['fr']['_date'] = 'd-m-Y';
+$_BL['fr']['.'] = ',';
+$_BL['fr'][','] = '.';
+$_BL['fr']['_date'] = 'd/m/Y';
 $_BL['fr']['_dateshort'] = 'd/m';
-$_BL['fr']['_datetime'] = 'd-m-Y H:i:s';
+$_BL['fr']['_datetime'] = 'd/m/Y H:i:s';
 
 $_BL['fr']['_before'] = 'depuis ';
 $_BL['fr']['_minutes_ago'] = 'minutes';
@@ -94,7 +94,7 @@ $_BL['fr']['Longitude'] = 'Longitude';
 $_BL['fr']['Distance'] = 'Distance';
 $_BL['fr']['Height'] = 'Altitude';
 $_BL['fr']['Map'] = 'Carte';
-$_BL['fr']['Strikes'] = 'Coups de foudre';
+$_BL['fr']['Strikes'] = 'Foudres';
 $_BL['fr']['found'] = 'trouvé(s)';
 $_BL['fr']['Oldest'] = 'Plus vieux';
 $_BL['fr']['Newest'] = 'Plus récent';
@@ -335,7 +335,7 @@ $_BL['fr']['Last update stations'] = 'Dernière mise à jour des données de la sta
 $_BL['fr']['Last update signals'] = 'Dernière mise à jour des données de signal ';
 $_BL['fr']['Active Stations'] = 'Stations actives';
 $_BL['fr']['Sum of Signals'] = 'Nombre de signaux';
-$_BL['fr']['Sum of Strikes'] = 'Nombre de coups de foudre';
+$_BL['fr']['Sum of Strikes'] = 'Nombre de foudres';
 $_BL['fr']['Strikes detected'] = 'Coups de foudre détectés';
 $_BL['fr']['of the last'] = 'des dernières';
 $_BL['fr']['Currently no GPS coordinates available!'] = 'Coordonnées GPS non disponibles';
@@ -509,7 +509,7 @@ de la station. Calcul:
 ';
 
 $_BL['fr']['bo_stat_network_descr_lasth'] = 'Tous les chiffres se rapportent à une période de 60 minutes avant la dernière mise à jour.';
-$_BL['en']['bo_stat_network_descr_table'] = 'Ici vous pouvez voir toutes les stations actives du réseau de détection de la foudre. Vous pouvez faire des tris dans le tableau en cliquant sur les liens dans la première rangée.';
+$_BL['fr']['bo_stat_network_descr_table'] = 'Ici vous pouvez voir toutes les stations actives du réseau de détection de la foudre. Vous pouvez faire des tris dans le tableau en cliquant sur les liens dans la première rangée.';
 $_BL['fr']['bo_graph_descr_bear'] = 'Taux de localisation géographique. Pour une meilleure comparaison, il y a aussi le nombre de coups de foudre détecté.';
 $_BL['fr']['bo_stat_longtime_descr'] = 'Toutes les informations disponibles ici datent depuis la mise en service de {MYBO}. Les distances sont données par rapport à {STATION}.';
 $_BL['fr']['bo_stat_other_database_descr'] = 'Tous les coups de foudres, signaux et données de la station sont sauvegardés dans une base de données ';
@@ -554,7 +554,6 @@ $_BL['fr']['Cancel'] = 'Effacer';
 $_BL['fr']['alert_settings_legend_table'] = 'Options';
 $_BL['fr']['show other users'] = 'Voir le réglage des autres utilisateurs';
 $_BL['fr']['User'] = 'Utilisateur';
-$_BL['fr']['Alert name'] = 'Nom de l\'alerte';
 $_BL['fr']['Send to'] = 'Envoyer à';
 $_BL['fr']['Lat/Lon'] = 'Lat/Long';
 $_BL['fr']['Max. Distance'] = 'Max. distance';
@@ -581,6 +580,7 @@ $_BL['fr']['You have to stay in the area around the station!'] = 'Vous devez res
 $_BL['fr']['Enter URL like this'] = 'Entrez l\'URL comme cela';
 $_BL['fr']['Show log'] = 'Montrer le log';
 $_BL['fr']['Return value'] = 'Retourner la valeur';
+$_BL['fr']['Alert name'] = 'Nom de l\'alerte';
 $_BL['fr']['Name of your alert'] = 'Nom de votre alerte';
 $_BL['fr']['Strike count'] = 'Nombre de coups de foudre';
 $_BL['fr']['Time of last strike'] = 'Heure du dernier coup';
@@ -671,6 +671,21 @@ $_BL['fr']['France'] = 'France';
 $_BL['fr']['Austria'] = 'Autriche';
 $_BL['fr']['Switzerland'] = 'Suisse';
 $_BL['fr']['Hungary'] = 'Hongrie';
+$_BL['fr']['Belgium'] = 'Belgique';
+$_BL['fr']['Czech Republic'] = 'République Tchéque';
+$_BL['fr']['Denmark'] = 'Danemark';
+$_BL['fr']['England'] = 'Angleterre';
+$_BL['fr']['Estonia'] = 'EStonie';
+$_BL['fr']['Finland'] = 'Finland';
+$_BL['fr']['Greece'] = 'Grèce';
+$_BL['fr']['Italy'] = 'Italie';
+$_BL['fr']['Luxemburg'] = 'Luxembourg';
+$_BL['fr']['Norway'] = 'Norvége';
+$_BL['fr']['Poland'] = 'Pologne';
+$_BL['fr']['Spain'] = 'Espagne';
+$_BL['fr']['Sweden'] = 'Suéde';
+$_BL['fr']['The Netherlands'] = 'Pays bas';
+$_BL['fr']['United Kingdom'] = 'Royaume unis';
 
 $_BL['fr']['Bavaria'] = 'Bavière';
 $_BL['fr']['NRW'] = 'Rhénanie-du-Nord-Westphalie';
@@ -813,3 +828,24 @@ $_BL['fr']['h3_arch_last_strikes'] = 'Derniers coups';
 $_BL['fr']['Participated stations'] = 'Stations ayant participées';
 $_BL['fr']['Statistics'] = 'Statistiques';
 $_BL['fr']['Off'] = 'Off';
+$_BL['fr']['tile_time_range_na_err'] = 'La période de temps selectionnée \n ne vous est pas autorisé';
+$_BL['fr']['tile_wrong_time_range_err'] = 'La 2éme date \n doit être plus grande que la 1ère \n';
+$_BL['fr']['tile_maximum_time_range_err'] = 'Période trops grande! Le maximum est de {HOURS} heures ';
+$_BL['fr']['Activated'] = 'Activé';
+$_BL['fr']['check_only_participated'] = 'Seulement avec participation';
+$_BL['fr']['Traffic'] = 'Trafic';
+$_BL['fr']['Other'] = 'Autre';
+$_BL['fr']['Total'] = 'Total';
+$_BL['fr']['Lightning data imports'] = 'Importation des données de foudre';
+$_BL['fr']['Traffic to Blitzortung.org'] = 'Trafic vers Blitzortung.org';
+$_BL['fr']['oclock'] = 'heures';
+$_BL['fr']['On'] = 'Marche';
+$_BL['fr']['Available stations'] = 'Stations disponibles';
+$_BL['fr']['strikes'] = 'foudres';
+$_BL['fr']['Usage'] = 'Utilisation';
+
+
+
+
+
+

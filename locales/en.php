@@ -1,7 +1,7 @@
 <?php 
 
 /*
-* German translation for MyBlitzortung
+* English translation for MyBlitzortung
 */
 
 $_BL['locale'] = 'en';
@@ -556,7 +556,6 @@ $_BL['en']['Cancel'] = 'Cancel';
 $_BL['en']['alert_settings_legend_table'] = 'Options';
 $_BL['en']['show other users'] = 'Show settings of other users';
 $_BL['en']['User'] = 'User';
-$_BL['en']['Alert name'] = 'Alert name';
 $_BL['en']['Send to'] = 'Send to';
 $_BL['en']['Lat/Lon'] = 'Coordinates';
 $_BL['en']['Max. Distance'] = 'Max. distance';
@@ -583,6 +582,7 @@ $_BL['en']['You have to stay in the area around the station!'] = 'You have to st
 $_BL['en']['Enter URL like this'] = 'Enter URL like this';
 $_BL['en']['Show log'] = 'Show log';
 $_BL['en']['Return value'] = 'Return value';
+$_BL['en']['Alert name'] = 'Alert name';
 $_BL['en']['Name of your alert'] = 'Name of your alert';
 $_BL['en']['Strike count'] = 'Strike count';
 $_BL['en']['Time of last strike'] = 'Time of last strike';
@@ -663,7 +663,7 @@ $_BL['en']['Lightning data from Blitzortung.org'] = 'Lightning data from Blitzor
 $_BL['en']['No data available!'] = 'No data available!';
 
 /*************************************************************/
-/* Translations for templates/countries                      */
+/* Translations for templates                                */
 /*************************************************************/
 $_BL['en']['Europe'] = 'Europe';
 $_BL['en']['Germany'] = 'Germany';
@@ -686,7 +686,6 @@ $_BL['en']['Spain'] = 'Spain';
 $_BL['en']['Sweden'] = 'Sweden';
 $_BL['en']['The Netherlands'] = 'The Netherlands';
 $_BL['en']['United Kingdom'] = 'United Kingdom	';
-
 
 $_BL['en']['Bavaria'] = 'Bavaria';
 $_BL['en']['NRW'] = 'NRW';
@@ -835,8 +834,6 @@ $_BL['en']['tile_wrong_time_range_err'] = 'Second date/time\nhas to be greater\n
 $_BL['en']['tile_maximum_time_range_err'] = 'Time range too big!\nMaximum is {HOURS} hours.';
 $_BL['en']['Activated'] = 'Activated';
 $_BL['en']['check_only_participated'] = 'Only participated';
-$_BL['en']['Lightning data downloads'] = 'Lightning data downloads';
-$_BL['en']['Traffic per day'] = 'Traffic per day';
 $_BL['en']['Traffic'] = 'Traffic';
 $_BL['en']['Other'] = 'Other';
 $_BL['en']['Total'] = 'Total';
@@ -847,5 +844,7 @@ $_BL['en']['On'] = 'On';
 $_BL['en']['Available stations'] = 'Available stations';
 $_BL['en']['strikes'] = 'strikes';
 $_BL['en']['Usage'] = 'Usage';
+
+
 
 
