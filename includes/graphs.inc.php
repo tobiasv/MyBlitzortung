@@ -522,6 +522,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	else if($type == 'ratio_bearing_longtime')
 	{
 		$station_id = 0;
+		$bear_div = 1;
 		
 		$own = unserialize(bo_get_conf('longtime_bear_own'));
 		$all = unserialize(bo_get_conf('longtime_bear'));
@@ -577,9 +578,10 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$dist_div = BO_GRAPH_STAT_RATIO_DIST_DIV; //interval in km
 		$bear_div = BO_GRAPH_STAT_RATIO_BEAR_DIV;
 
+		
 		$xmin = 0;
 		if ($type == 'ratio_bearing')
-			$xmax = 360 / $bear_div;
+			$xmax = floor(360 / $bear_div) -1 ;
 		
 		$tmp = array();
 		$ticks = 0;
@@ -600,9 +602,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			while($row = $res->fetch_assoc())
 			{
 				if ($type == 'ratio_bearing')
-					$val = ceil(bo_latlon2bearing($row['lat'], $row['lon'], $stLat, $stLon) / $bear_div);
+					$val = floor((bo_latlon2bearing($row['lat'], $row['lon'], $stLat, $stLon)%360) / $bear_div);
 				else
-					$val = ceil(bo_latlon2dist($row['lat'], $row['lon'], $stLat, $stLon) / $dist_div / 1000);
+					$val = floor(bo_latlon2dist($row['lat'], $row['lon'], $stLat, $stLon) / $dist_div / 1000);
 
 				$part = $row['stid'] ? 1 : 0;
 				$tmp[$part][$val] += 1;
@@ -613,9 +615,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		else
 		{
 			if ($type == 'ratio_bearing')
-				$sql = " CEIL(bearing/$bear_div) val ";
+				$sql = " FLOOR((bearing%360)/$bear_div) val ";
 			else
-				$sql = " CEIL(distance/$dist_div/1000) val ";
+				$sql = " FLOOR(distance/$dist_div/1000) val ";
 
 			//strike ratio for own station
 			$sql = "SELECT COUNT(id) cnt, $sql_part participated, $sql
@@ -666,6 +668,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$tickLabels[] = $i*$dist_div;
 			$tickMajPositions[] = $i;
 		}
+		
 		$ymin = 0;
 		$ymax = 100;
 	}
@@ -1441,6 +1444,31 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	
 	$caption = strtr($caption, array('{STATION_CITY}' => $city));
 
+	
+	//Display Windrose
+	if (BO_GRAPH_STAT_RATIO_BEAR_WINDROSE === true 	&& 
+			($type == 'ratio_bearing'  || $type == 'ratio_bearing_longtime')
+		)
+	{
+		$title = _BL('graph_stat_title_ratio_bearing').$add_title;
+		$size = BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE;
+		
+		$D = array();
+		$D2 = array();
+		foreach($Y as $i => $d)
+		{
+			$D[$i][0] = $d;
+			$D2[$i] = $Y2[$i];
+		}
+
+		$I = bo_windrose($D, $D2, $size, null, array(), '', $bear_div, $title);
+		
+		header("Content-type: image/png");
+		imagepng($I);
+		exit;
+	}
+
+	
 	require_once 'jpgraph/jpgraph.php';
 	require_once 'jpgraph/jpgraph_line.php';
 	require_once 'jpgraph/jpgraph_bar.php';
@@ -2356,5 +2384,269 @@ function bo_graph_error($w, $h)
 	bo_image_error($w, $h, $text);
 }
 
+
+
+function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend = array(), $sub = '', $dseg = 22.5, $title = '')
+{
+
+	$pcircle = 0.85; // Anteil, welcher der Kreis im Bild einnimmt
+	$pcmax = 0.9; // wie weit reicht max. teil an $pcircle heran
+	$dtick = 45; //Bogenlänge eines Segments der Skala °
+	//$dseg = 22.5; //Bogenlänge eines Segments der Balken
+	$csize = 0.1; //Anteil, die Windstille haben soll
+
+	$aborder = $dseg >= 22.5 && $dseg < 360 && $size > 100;
+	$atext = $size > 100;
+	$alegend = $size > 100;
+	
+	//Standardwerte berechnen
+	$xm = $size;
+	$ym = $size;
+	$fontsize = $size / 200 * 14;
+	$div = count($D1);
+	$sum = 0;
+	$rsize = $size * $pcircle * 2;
+	$psize = $rsize * $pcmax;
+	$lsize = $size * 0.4 * 2; 
+	$size = $size * 2;
+
+	
+	//Calculations for the arcs
+	foreach($D1 as $d)
+	{
+		$max = max(array_sum($d), $max);
+		$sum += array_sum($d);
+	}
+	
+	//Create the pic
+	if (empty($legend))
+		$lsize = 0;
+
+	$I = imagecreatetruecolor($size + $lsize, $size);
+
+	
+	//Colors
+	$Cwhite = imagecolorallocate($I, 255,255,255);
+	$Cblack = imagecolorallocate($I, 0,0,0);
+	$Cgrey  = imagecolorallocate($I, 150,150,150);
+	$Ctrans = imagecolorallocatealpha($I, 0,0,0,127);
+
+	//Color for the arcs (only the first is used)
+	$C[0] = bo_hex2rgb(BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_COLOR1);
+
+	
+	//Styles
+	$Sdotted1 = array($Cgrey, $Ctrans);
+	$Sdotted2 = array($Cgrey,$Cgrey,$Cgrey, $Ctrans,$Ctrans,$Ctrans);
+
+	imagefill($I, 0, 0, bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_COLOR_BACKGROUND));
+
+	$color = imagecolorallocate($I, 150,150,150);
+	imagearc($I, $xm, $ym, $rsize, $rsize, 0, 360, $color);
+
+	//Himmelsrichtungen
+	if ($atext)
+	{
+		$bfsize = $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_FONTSIZE_BEAR;
+		$color = imagecolorallocate($I, 10,10,10);
+		
+		$dx = bo_imagetextwidth($bfsize, _BL('N')) / 2;
+		bo_imagestring($I, $bfsize, $rsize * 0.595 - $dx, $rsize * 0.030, _BL('N'), $color);
+		
+		$dx = bo_imagetextwidth($bfsize, _BL('S')) / 2;
+		bo_imagestring($I, $bfsize, $rsize * 0.595 - $dx, $rsize * 1.120, _BL('S'), $color);
+		
+		$dy = bo_imagetextheight($bfsize, _BL('W')) / 2;
+		bo_imagestringright($I, $bfsize, $rsize * 0.075, $rsize * 0.595 - $dy, _BL('W'), $color);
+		
+		$dy = bo_imagetextheight($bfsize, _BL('E')) / 2;
+		bo_imagestring($I, $bfsize, $rsize * 1.108, $rsize * 0.595 - $dy, _BL('E'), $color);
+	}
+
+	ksort($D1);
+	//The PLOT
+	$polyline = array();
+	foreach($D1 as $i => $d)
+	{
+		$alpha = 360 / $div * $i + 180;
+
+		krsort($d); //Rückwärts durchgehen!
+		$startval = array_sum($d);
+		$nr = count($d)-1;
+		
+		//the arcs
+		foreach($d as $val)
+		{
+			$y = $startval / $max * $psize + $csize * (1-$startval / $max) * $psize;
+			$beta = $dseg / 2;
+
+			$color = imagecolorallocate($I, $C[$nr][0],$C[$nr][1],$C[$nr][2]);
+			imagefilledarc($I, $xm, $ym, $y, $y, $alpha + 90 - $beta, $alpha + 90 + $beta, $color,  IMG_ARC_PIE);
+			
+			if ($aborder)
+				imagefilledarc($I, $xm, $ym, $y, $y, $alpha + 90 - $beta, $alpha + 90 + $beta, $Cblack, IMG_ARC_PIE | IMG_ARC_EDGED | IMG_ARC_NOFILL);
+			
+			$nr--;
+			$startval -= $val;
+		}
+		
+		//calculate the polyline
+		if (!empty($D2) && intval(max($D2)))
+		{
+			$y = ($D2[$i]/max($D2) + $csize) * ($psize+2) / 2;
+			list($px, $py) = bo_rotate(0, $y, $alpha, $xm, $ym);
+			$polyline[] = $px ;
+			$polyline[] = $py ;
+		}
+	}
+	
+	if (!empty($polyline))
+	{
+		imagesetthickness($I,BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_COUNT_WIDTH);
+		$color = bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_COLOR2);
+		imagepolygon($I, $polyline, count($polyline)/2, $color);
+		imagesetthickness($I,1);
+	}
+	
+	
+
+	//Lines
+	imagesetstyle($I, $Sdotted2);
+	for($i=0;$i<180;$i+=$dtick)
+	{
+		list($x1, $y1) = bo_rotate(0, -$rsize/2, $i, $xm, $ym);
+		list($x2, $y2) = bo_rotate(0, $rsize/2, $i, $xm, $ym);
+		imageline($I, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
+	}
+
+	//Antennas
+	$ant1 = bo_get_conf('antenna1_bearing');
+	$ant2 = bo_get_conf('antenna2_bearing');
+	
+	if ($ant1 !== '' && $ant1 !== null && $ant2 !== '' && $ant2 !== null)
+	{
+		imagesetthickness($I,BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_ANTENNA_WIDTH);
+		
+		$color = bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_ANTENNA1_COLOR);
+		list($x1, $y1) = bo_rotate(0, -$rsize/2*1.14, $ant1, $xm, $ym);
+		list($x2, $y2) = bo_rotate(0, $rsize/2*1.14, $ant1, $xm, $ym);
+		imageline($I, $x1, $y1, $x2, $y2, $color);
+		
+		$color = bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_ANTENNA2_COLOR);
+		list($x1, $y1) = bo_rotate(0, -$rsize/2*1.14, $ant2, $xm, $ym);
+		list($x2, $y2) = bo_rotate(0, $rsize/2*1.14, $ant2, $xm, $ym);
+		imageline($I, $x1, $y1, $x2, $y2, $color);
+		
+		imagesetthickness($I,1);
+
+	}
+
+
+	//Circle in the center
+	$y = $csize * $psize;
+	imagefilledarc($I, $xm, $ym, $y, $y, 0, 360, $Cwhite, IMG_ARC_PIE );
+	imagefilledarc($I, $xm, $ym, $y, $y, 0, 360, $Cblack, IMG_ARC_PIE | IMG_ARC_NOFILL);
+
+
+	
+	//Circles and Values
+	$color1 = bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_COLOR1);
+	$color2 = bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_COLOR2);
+	$pmax = round($max / $sum, 3); //höchste Prozentzahl, die eingezeichnet wird
+	imagesetstyle($I, $Sdotted1);
+	$circles = 4;
+	for($i=1; $i<=4;$i++)
+	{
+		$s = $i / $circles * $psize + ($csize * (1-$i/$circles)) * $psize;
+		imagefilledarc ($I, $xm, $ym, $s, $s, 0, 360, IMG_COLOR_STYLED, IMG_ARC_NOFILL);
+		
+		list($x, $y) = bo_rotate(0, $s/2, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_ANGLE1-180, $xm, $ym);
+		$e = ($max * $i / $circles);
+		$e = $e >= 10 ? round($e) : number_format($e,1,_BL('.'),_BL(','));
+		$e .= '%';
+		bo_imagestring($I, $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_SIZE, $x, $y, $e, $color1);
+		
+		
+		if (!empty($D2) && intval(max($D2)))
+		{
+			list($x, $y) = bo_rotate(0, $s/2, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_ANGLE2-180, $xm, $ym);
+			$e = (max($D2) * $i / $circles);
+			$e = $e >= 10 ? round($e) : number_format($e,1,_BL('.'),_BL(','));
+			$e .= ' '._BL('strikes');
+			bo_imagestring($I, $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_SIZE, $x, $y, $e, $color2);
+		}
+		
+		
+	}
+	
+	
+
+	//Legend
+	if (!empty($legend) && $alegend)
+	{
+		$lxpos = $size * 1.04;
+		$lypos = $size * 0.05;
+		$ksize = count($legend) > 14 ? 0.5 : 1;
+		
+		foreach($legend as $i => $l)
+		{
+			if ($i == 0)
+			{
+				if ($l != '')
+				{
+					$color = imagecolorallocate($I, 10,10,10);
+					bo_imagestring($I, $fontsize * 0.8, $lxpos, $lypos, "$l", $color);
+					$lypos += $size * 0.09 * $ksize;
+				}
+					
+				continue;
+			}
+			
+			$nr = $i - 1;
+			$color = imagecolorallocate($I, $C[$nr][0],$C[$nr][1],$C[$nr][2]);
+		
+			bo_imagestring($I, $fontsize * 0.6 * $ksize, $lxpos + $size * 0.09 * $ksize, $lypos - $size * 0.014 * $ksize, "$l", $Cblack);
+			imagefilledrectangle ($I, $lxpos + $size * 0.02 * $ksize, $lypos - $size * 0.05 * $ksize, $lxpos + $size * 0.07 * $ksize, $lypos, $color);
+			
+			$lypos += $size * 0.06 * $ksize;
+			
+			if ($lypos > $size * 0.99)
+				break;
+		}
+	
+	
+	}
+
+	if ($atext)
+	{
+		if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
+		{
+			//Copyright
+			$color = imagecolorallocate($I, 128,128,128);
+			bo_imagestring($I, $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_FONTSIZE_OTHER, $size * 0.75, $size * 0.94, BO_OWN_COPYRIGHT, $color);
+		}
+		
+		
+		//Titel
+		$color = imagecolorallocate($I, 20,20,20);
+		bo_imagestring_max($I, $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_TITLE_SIZE, $size * 0.03, $size * 0.03, $title, $color, $size * 0.2, true);
+	}
+
+	$T = imagecreatetruecolor(($size+$lsize)/2, $size/2);
+	imagecopyresampled($T, $I, 0,0, 0,0, ($size+$lsize)/2,$size/2, $size+$lsize,$size);
+
+	return $T;
+
+}
+
+function bo_rotate($x,$y,$alpha, $xm=0,$ym=0)
+{
+	$alpha = $alpha / 180 * M_PI;
+	
+	$x2 = cos($alpha) * $x - sin($alpha) * $y + $xm;
+	$y2 = sin($alpha) * $x + cos($alpha) * $y + $ym;
+	
+	return array($x2, $y2);
+}
 
 ?>

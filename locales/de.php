@@ -867,4 +867,7 @@ $_BL['de']['Traffic to Blitzortung.org'] = 'Datenverkehr mit Blitzortung.org';
 $_BL['de']['oclock'] = 'Uhr';
 $_BL['de']['On'] = 'Ein';
 $_BL['de']['Available stations'] = 'Verfügbare Stationen';
+$_BL['de']['strikes'] = 'Blitze';
+$_BL['de']['Usage'] = 'Verbrauch';
+
 

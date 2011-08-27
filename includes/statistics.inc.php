@@ -424,7 +424,11 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	echo '<p class="bo_graph_description" id="bo_graph_descr_bear">';
 	echo strtr(_BL('bo_graph_descr_bear'), array('{STATION_CITY}' => $city));
 	echo '</p>';
-	bo_show_graph('ratio_bearing', $add_graph);
+	
+	if (BO_GRAPH_STAT_RATIO_BEAR_WINDROSE === true)
+		bo_show_graph('ratio_bearing', $add_graph, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE);
+	else
+		bo_show_graph('ratio_bearing', $add_graph);
 
 	echo '</div>';
 }
@@ -875,8 +879,13 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	echo '<p class="bo_graph_description" id="bo_graph_descr_bear_longtime">';
 	echo _BL('bo_graph_descr_bear_longtime');
 	echo '</p>';
-	bo_show_graph('ratio_bearing_longtime', $add_graph);
 	
+	
+	if (BO_GRAPH_STAT_RATIO_BEAR_WINDROSE === true)
+		bo_show_graph('ratio_bearing_longtime', $add_graph, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE);
+	else
+		bo_show_graph('ratio_bearing_longtime', $add_graph);
+
 	echo '</div>';
 
 }
@@ -1506,7 +1515,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 
 }
 
-function bo_show_graph($type, $add_graph='')
+function bo_show_graph($type, $add_graph='', $width=BO_GRAPH_STAT_W, $height=BO_GRAPH_STAT_H)
 {
 	$alt = _BL('graph_stat_title_'.$type);
 	
@@ -1519,7 +1528,7 @@ function bo_show_graph($type, $add_graph='')
 	
 	echo '<img src="'.BO_FILE.'?graph_statistics='.$type.'&bo_lang='._BL().$add_graph.'" 
 			class="bo_graph_img" 
-			style="width:'.BO_GRAPH_STAT_W.'px;height:'.BO_GRAPH_STAT_H.'px;background-image:url(\''.BO_FILE.'?image=wait\');"
+			style="width:'.$width.'px;height:'.$height.'px;background-image:url(\''.BO_FILE.'?image=wait\');"
 			id="bo_graph_'.$type.'_img"
 			alt="'.htmlspecialchars($alt).'"
 			>';

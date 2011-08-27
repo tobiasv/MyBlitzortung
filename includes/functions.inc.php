@@ -1202,6 +1202,46 @@ function bo_imagestringright($I, $size, $x, $y, $text, $color = false, $bold = f
 	return bo_imagestring($I, $size, $x, $y, $text, $color, $bold);
 }
 
+function bo_imagestringcenter($I, $size, $x, $y, $text, $color = false, $bold = false, $angle = 0)
+{
+	$x -= bo_imagetextwidth($size, $bold, $text) / 2;
+	return bo_imagestring($I, $size, $x, $y, $text, $color, $bold);
+}
+
+
+//writes text with automatic line brakes into an image
+function bo_imagestring_max(&$I, $size, $x, $y, $text, $color, $maxwidth, $bold = false)
+{
+	$text = strtr($text, array(chr(160) => ' '));
+	$line_height = bo_imagetextheight($size, $bold) * 1.2;
+	$breaks = explode("\n", $text);
+	$blankwidth = bo_imagetextwidth($size, $bold, " ");
+	
+	foreach($breaks as $text2)
+	{
+		$width = 0;
+		$lines = explode(" ", $text2);
+		$x2 = $x;
+		
+		foreach($lines as $i=>$line)
+		{
+			$width = bo_imagetextwidth($size, $bold, $line) + $blankwidth;
+			
+			if ($x2+$width+3 > $x+$maxwidth)
+			{
+				$y += $line_height;
+				$x2 = $x;
+			}
+			
+			bo_imagestring($I, $size, $x2, $y, $line, $color, $bold);
+			
+			$x2 += $width;
+		}
+		
+		$y += $line_height;
+	}
+	return $y;
+}
 
 function bo_imagetextheight($size, $bold = false, $string = false)
 {

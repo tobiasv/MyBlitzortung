@@ -16,15 +16,17 @@ Version 0.7 (2011-08-xx)
 - new: show participated stations for a specific strike in map
 - new: show top stations per tile in dynamic map
 - new: email and more text output on errors during import
+- new: email when station sends no signals
 - new: show new stations in network statistics
 - new: alt-tag in "img"
 - new: maps for western/central europe (germany+france), france and new europe map with nicer colors
 - new: smooth colors for maps
-- new: gif animations for maps (currently only visible when using blitzortung.php?animation=0 ) - not useful for bigger maps (high load)!
+- new: gif animations for maps (currently only visible when using blitzortung.php?animation=0); not useful for bigger maps (high load)!
 - new: extended traffic and database statistics (when logged-in)
 - new: status files - insert some information (strike count etc...) in your HTML files
 - new: mini station map
 - new: time range in animations
+- new: added windrose for bearing ratios - thanks to Guido for the idea
 - other visual improvements for maps
 - cleanup in default_settings.inc.php and templates.inc.php
 

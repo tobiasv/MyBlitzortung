@@ -1278,40 +1278,6 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 	}
 }
 
-//writes text with automatic line brakes into an image
-function bo_imagestring_max(&$I, $size, $x, $y, $text, $textcol, $maxwidth)
-{
-	$text = strtr($text, array(chr(160) => ' '));
-	
-	$line_height = imagefontheight($size) * 1.2;
-	$breaks = explode("\n", $text);
-	
-	foreach($breaks as $text2)
-	{
-		$width = 0;
-		$lines = explode(" ", $text2);
-		$fw = imagefontwidth($size);
-		$x2 = $x;
-		
-		foreach($lines as $i=>$line)
-		{
-			$width = $fw*(strlen($line)+1);
-			
-			if ($x2+$width+3 > $x+$maxwidth)
-			{
-				$y += $line_height;
-				$x2 = $x;
-			}
-			
-			imagestring($I, $size, $x2, $y, $line, $textcol);
-			
-			$x2 += $width;
-		}
-		
-		$y += $line_height;
-	}
-	return $y;
-}
 
 //error output
 function bo_image_error($w, $h, $text, $size=2)

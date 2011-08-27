@@ -845,5 +845,7 @@ $_BL['en']['Traffic to Blitzortung.org'] = 'Traffic to Blitzortung.org';
 $_BL['en']['oclock'] = 'o\'clock';
 $_BL['en']['On'] = 'On';
 $_BL['en']['Available stations'] = 'Available stations';
+$_BL['en']['strikes'] = 'strikes';
+$_BL['en']['Usage'] = 'Usage';
 
 
