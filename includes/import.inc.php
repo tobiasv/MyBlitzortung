@@ -1428,27 +1428,29 @@ function bo_update_all($force = false)
 		if ( (defined('BO_PURGE_MAIN_INTVL') && BO_PURGE_MAIN_INTVL && time() - $last > 3600 * BO_PURGE_MAIN_INTVL) || $force)
 		{
 			bo_set_conf('purge_time', time());
+			
+			$num_strikes = 0;
+			$num_stations = 0;
+			$num_signals = 0;
+			$num_stastr = 0;
 
 			//Raw-Signals, where no strike assigned
 			if (defined('BO_PURGE_SIG_NS') && BO_PURGE_SIG_NS)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_SIG_NS * 3600);
 				$num = bo_db("DELETE FROM ".BO_DB_PREF."raw WHERE time < '$dtime' AND strike_id=0");
+				$num_signals += $num;
 				echo "<p>Raw signals (with no strikes assigned): $num</p>\n";
-
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."raw");
-
 				flush();
 			}
 
+			
 			//All Raw-Signals
 			if (defined('BO_PURGE_SIG_ALL') && BO_PURGE_SIG_ALL)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_SIG_ALL * 3600);
 				$num = bo_db("DELETE FROM ".BO_DB_PREF."raw WHERE time < '$dtime'");
-
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."raw");
-
+				$num_signals += $num;
 				echo "<p>Raw signals: $num</p>\n";
 				flush();
 			}
@@ -1457,13 +1459,14 @@ function bo_update_all($force = false)
 			if (defined('BO_PURGE_STR_NP') && BO_PURGE_STR_NP)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STR_NP * 3600);
-				$num  = bo_db("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
+				$num1  = bo_db("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
 						WHERE time < '$dtime' AND a.id=b.strike_id AND part=0");
-				$num += bo_db("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime' AND part=0"); //to be sure
+				$num2  = bo_db("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime' AND part=0"); //to be sure
 
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes, ".BO_DB_PREF."strikes");
+				$num_stastr += $num1;
+				$num_strikes += $num2;
 
-				echo "<p>Strikes (not participated): $num</p>\n";
+				echo "<p>Strikes (not participated): ".($num1+$num2)."</p>\n";
 				flush();
 			}
 
@@ -1471,13 +1474,14 @@ function bo_update_all($force = false)
 			if (defined('BO_PURGE_STR_DIST') && BO_PURGE_STR_DIST && defined('BO_PURGE_STR_DIST_KM') && BO_PURGE_STR_DIST_KM)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STR_DIST * 3600);
-				$num  = bo_db("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
+				$num1  = bo_db("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
 						WHERE time < '$dtime' AND a.id=b.strike_id AND distance > '".(BO_PURGE_STR_DIST_KM * 1000)."'");
-				$num += bo_db("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime' AND distance > '".(BO_PURGE_STR_DIST_KM * 1000)."'"); //to be sure
+				$num2  = bo_db("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime' AND distance > '".(BO_PURGE_STR_DIST_KM * 1000)."'"); //to be sure
 
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes, ".BO_DB_PREF."strikes");
+				$num_stastr += $num1;
+				$num_strikes += $num2;
 
-				echo "<p>Strikes (over ".BO_PURGE_STR_DIST_KM."km away): $num</p>\n";
+				echo "<p>Strikes (over ".BO_PURGE_STR_DIST_KM."km away): ".($num1+$num2)."</p>\n";
 				flush();
 			}
 
@@ -1485,13 +1489,14 @@ function bo_update_all($force = false)
 			if (defined('BO_PURGE_STR_ALL') && BO_PURGE_STR_ALL)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STR_ALL * 3600);
-				$num  = bo_db("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
+				$num1  = bo_db("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
 						WHERE time < '$dtime' AND a.id=b.strike_id");
-				$num += bo_db("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime'"); //to be sure
+				$num2 = bo_db("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime'"); //to be sure
+				
+				$num_stastr += $num1;
+				$num_strikes += $num2;
 
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes, ".BO_DB_PREF."strikes");
-
-				echo "<p>Strikes: $num</p>\n";
+				echo "<p>Strikes: ".($num1+$num2)."</p>\n";
 				flush();
 			}
 
@@ -1499,14 +1504,10 @@ function bo_update_all($force = false)
 			if (defined('BO_PURGE_STRSTA_ALL') && BO_PURGE_STRSTA_ALL)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STRSTA_ALL * 3600);
-
 				$row = bo_db("SELECT MAX(id) id FROM ".BO_DB_PREF."strikes WHERE time < '$dtime'")->fetch_assoc();
 				$strId = $row['id'];
-
 				$num = bo_db("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE strike_id < '$strId'");
-
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes");
-
+				$num_stastr += $num;
 				echo "<p>Strike <-> Station table: $num</p>\n";
 				flush();
 			}
@@ -1515,9 +1516,9 @@ function bo_update_all($force = false)
 			if (defined('BO_PURGE_STA_OTHER') && BO_PURGE_STA_OTHER)
 			{
 				$stId = bo_station_id();
-
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STA_OTHER * 3600);
 				$num = bo_db("DELETE FROM ".BO_DB_PREF."stations_stat WHERE time < '$dtime' AND station_id != '$stId' AND station_id != 0");
+				$num_stations += $num;
 				echo "<p>Station statistics (not yours): $num</p>\n";
 				flush();
 			}
@@ -1526,11 +1527,36 @@ function bo_update_all($force = false)
 			if (defined('BO_PURGE_STA_ALL') && BO_PURGE_STA_ALL)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STA_ALL * 3600);
-				bo_db("DELETE FROM ".BO_DB_PREF."stations_stat WHERE time < '$dtime'");
+				$num = bo_db("DELETE FROM ".BO_DB_PREF."stations_stat WHERE time < '$dtime'");
+				$num_stations += $num;
 				echo "<p>Station statistics: $num</p>\n";
 				flush();
 			}
 
+			if ($num_strikes > 1000)
+			{
+				echo "<p>Optimizing strikes table</p>\n";
+				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."strikes");
+			}
+
+			if ($num_stations > 1000)
+			{
+				echo "<p>Optimizing stations table</p>\n";
+				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_stat");
+			}
+			
+			if ($num_signals > 1000)
+			{
+				echo "<p>Optimizing signals table</p>\n";
+				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."raw");
+			}
+			
+			if ($num_stastr > 1000)
+			{
+				echo "<p>Optimizing strikes-stations table</p>\n";
+				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes");
+			}
+			
 		}
 
 
