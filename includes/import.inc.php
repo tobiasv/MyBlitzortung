@@ -1533,7 +1533,7 @@ function bo_update_all($force = false)
 				flush();
 			}
 
-			if ($num_strikes > 1000)
+			if ($num_strikes > 10000)
 			{
 				echo "<p>Optimizing strikes table</p>\n";
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."strikes");
@@ -1545,13 +1545,13 @@ function bo_update_all($force = false)
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_stat");
 			}
 			
-			if ($num_signals > 1000)
+			if ($num_signals > 5000)
 			{
 				echo "<p>Optimizing signals table</p>\n";
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."raw");
 			}
 			
-			if ($num_stastr > 1000)
+			if ($num_stastr > 50000)
 			{
 				echo "<p>Optimizing strikes-stations table</p>\n";
 				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes");
