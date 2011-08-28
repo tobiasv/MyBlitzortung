@@ -24,7 +24,6 @@ error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 1);
 ini_set('magic_quotes_runtime', 0); 
 
-
 $path = realpath(dirname(__FILE__).'/../').'/';
 
 if (file_exists($path.'config.php'))
@@ -411,7 +410,7 @@ switch($step)
 			<p>JpGraph is used for creating the graphs.
 			You can get it at <a href="http://jpgraph.net/download/">http://jpgraph.net/download/</a>. 
 			Copy the files from the JpGraph-<em>src</em> direcory to includes/jpgraph. 
-			You can omit the directories <em>src/barcode</em>, <em>src/Examples</em>, <em>src/themes</em> 
+			You can omit the directories <em>src/barcode</em>, <em>src/Examples</em>
 			and all files beginnig width <em>flag</em>.
 			No further installation needed!
 			</p>';

@@ -1,7 +1,7 @@
 <?php
 
-$in  = 'de';
-$out = 'en';
+$in  = 'en';
+$out = 'nl';
 
 include($in.'.php');
 include($out.'.php');
@@ -39,7 +39,7 @@ foreach($lines as $line)
 		}
 		
 		$T  = '<span style="'.($translated ? '' : 'color: red').'">';
-		$T .= '$_BL[\''.$out.'\'][\''.$r[1].'\'] = ';
+		$T .= '$_BL[\''.$out.'\'][\'<strong>'.$r[1].'</strong>\'] = ';
 		
 		if ($_BL[$out][$r[1]] === false)
 			$T .= 'false';
@@ -55,7 +55,12 @@ foreach($lines as $line)
 		}
 		else
 		{
-			$U .= '<br>//'.$in.': '.htmlentities($_BL[$in][$r[1]]).'<br>';
+			$comment = htmlentities(strtr($_BL[$in][$r[1]], array("'" => "\\'")));
+			$comment = strtr($comment, array("\n" => "<br>//      "));
+			
+			$U .= '<span style="color:#080">';
+			$U .= '<br>//'.$in.': \''.$comment.'\'<br>';
+			$U .= '</span>';
 			$U .= $T;
 		}
 		

@@ -243,11 +243,11 @@ function bo_show_archive_map()
 
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 		
-		if ($time < $start_time || $time > $end_time)
+		if ($time < $start_time - 3600 * 24 || $time > $end_time)
 		{
 			$text = _BL('arch_select_dates_beween');
 			echo '<p>';
-			echo strtr($text, array('{START}' => date(_BL('_date'), $start_time + 3600 * 26), '{END}' => date(_BL('_date'), $end_time) ));
+			echo strtr($text, array('{START}' => date(_BL('_date'), $start_time), '{END}' => date(_BL('_date'), $end_time) ));
 			echo '</p>';
 		}
 		else if ($ani)

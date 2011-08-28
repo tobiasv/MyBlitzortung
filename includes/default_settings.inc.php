@@ -28,9 +28,9 @@
 /* This file is included AFTER config.php                          */
 /*******************************************************************/
 
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
+//breaks install!!!
+//if (!defined('BO_VER'))
+//	exit('No BO_VER');
 	
 
 /*******************************************************************/

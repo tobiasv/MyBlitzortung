@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7a (2011-08-28)
+-------------------------
+- fixed installation
+- tuned data purging
+
 Version 0.7 (2011-08-27)
 ------------------------
 - new: complete FRENCH translation (by flc85)
