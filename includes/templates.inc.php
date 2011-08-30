@@ -205,7 +205,7 @@ $_BO['tpl_imgmap']['europe']['density_darken'] = 40;
 //Europe: Western / Central
 //MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=57&map_generator_west=-5&map_generator_east=18&map_generator_south=42.2&map_generator_min_area=20&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.1p%2F80%2F80%2F80+3%2F0.1p%2F80%2F80%2F80+4%2F0.1p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500++110+155++80+1000+110+155++80%0D%0A1000+150+150++80+1500+150+150++80%0D%0A1500+160+140++60+2000+160+140++60%0D%0A2000+170+135++40+2500+170+135++40%0D%0A2500+180+130++30+3000+180+130++30%0D%0A3000+185+125++20+6000+185+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.1
 $_BO['tpl_imgmap']['europe_west_central'] = $_BO['tpl_imgmap_default'];
-$_BO['tpl_imgmap']['europe_west_central']['name'] = 'Europe (West/Central)';
+$_BO['tpl_imgmap']['europe_west_central']['name'] = 'Western Europe';
 $_BO['tpl_imgmap']['europe_west_central']['file'] = 'map_europe_west_central.png';
 $_BO['tpl_imgmap']['europe_west_central']['borders'] = array('map_europe_west_central_borders.png', 60);
 $_BO['tpl_imgmap']['europe_west_central']['coord'] = array(57, 18, 42.2, -5); //North, East, South, West (Degrees)

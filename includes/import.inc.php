@@ -894,7 +894,7 @@ function bo_update_stations($force = false)
 			if ($only_own && $only_own != $id)
 				continue;
 			
-			if ($id && $data['sig'])
+			if ($id && ($data['sig'] || $data['strikes']))
 			{
 				bo_db("INSERT INTO ".BO_DB_PREF."stations_stat
 					SET station_id='$id', time='$datetime', signalsh='".intval($data['sig'])."', strikesh='".intval($data['strikes'])."'");
