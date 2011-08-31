@@ -263,6 +263,20 @@ function bo_tile()
 		}
 	}
 
+	if (1)
+	{
+		//to avoid too much parallel sql queries
+		usleep(rand(0,100) * 1000);
+		$maxwait = 5000000;
+		$wait_start = microtime(true);
+		while( (int)($is_creating = bo_get_conf('is_creating_tile')) && microtime(true) - $wait_start < $maxwait)
+		{
+			usleep(rand(200,500) * 1000);
+		}
+		
+		bo_set_conf('is_creating_tile', $is_creating+1);
+	}
+	
 	//Display only strike count
 	if (isset($_GET['count'])) 
 	{
@@ -327,6 +341,8 @@ function bo_tile()
 				$strike_count += $row['cnt'];
 		}
 		
+		BoDb::close();
+		
 		//create tile image
 		$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
 		imagealphablending($I, true); 
@@ -379,6 +395,9 @@ function bo_tile()
 			}
 		}
 		
+		if (1)
+			bo_set_conf('is_creating_tile', 0);
+			
 		bo_tile_output($file, $caching, $I);
 		
 		exit;
@@ -451,6 +470,9 @@ function bo_tile()
 		
 		$points[] = array($px, $py, $col, $row['polarity']);
 	}
+	
+	if (1)
+		bo_set_conf('is_creating_tile', 0);
 	
 	BoDb::close();
 
