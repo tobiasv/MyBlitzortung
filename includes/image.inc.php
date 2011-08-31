@@ -247,7 +247,14 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	{
 		$w = $cfg['dim'][0];
 		$h = $cfg['dim'][1];
-		$I = imagecreate($w, $h);
+		
+		if (!$transparent)
+		{
+			$I = imagecreate($w, $h);
+			$blank = imagecolorallocate($I, 1, 2, 3);
+			imagefilledrectangle( $I, 0, 0, $w, $h, $blank);
+			imagecolortransparent($I, $blank);
+		}
 	}
 
 	if ($file)
@@ -258,7 +265,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				list($w, $h) = getimagesize(BO_DIR.'images/'.$file);
 			
 			$I = imagecreate($w, $h);
-			$blank = imagecolorallocate($I, 0, 0, 0);
+			$blank = imagecolorallocate($I, 1, 2, 3);
 			imagefilledrectangle( $I, 0, 0, $w, $h, $blank);
 			imagecolortransparent($I, $blank);
 		}
@@ -267,6 +274,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$J = imagecreatefrompng(BO_DIR.'images/'.$file);
 			imagecopy($I, $J, 0, 0, 0, 0, imagesx($J), imagesy($J));
 			imagedestroy($J);
+			$transparent = true;
 		}
 		else
 		{

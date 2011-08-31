@@ -2473,21 +2473,24 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 		krsort($d); //Rückwärts durchgehen!
 		$startval = array_sum($d);
 		$nr = count($d)-1;
-		
-		//the arcs
-		foreach($d as $val)
-		{
-			$y = $startval / $max * $psize + $csize * (1-$startval / $max) * $psize;
-			$beta = $dseg / 2;
 
-			$color = imagecolorallocate($I, $C[$nr][0],$C[$nr][1],$C[$nr][2]);
-			imagefilledarc($I, $xm, $ym, $y, $y, $alpha + 90 - $beta, $alpha + 90 + $beta, $color,  IMG_ARC_PIE);
-			
-			if ($aborder)
-				imagefilledarc($I, $xm, $ym, $y, $y, $alpha + 90 - $beta, $alpha + 90 + $beta, $Cblack, IMG_ARC_PIE | IMG_ARC_EDGED | IMG_ARC_NOFILL);
-			
-			$nr--;
-			$startval -= $val;
+		if ((double)$max)
+		{		
+			//the arcs
+			foreach($d as $val)
+			{
+				$y = $startval / $max * $psize + $csize * (1-$startval / $max) * $psize;
+				$beta = $dseg / 2;
+
+				$color = imagecolorallocate($I, $C[$nr][0],$C[$nr][1],$C[$nr][2]);
+				imagefilledarc($I, $xm, $ym, $y, $y, $alpha + 90 - $beta, $alpha + 90 + $beta, $color,  IMG_ARC_PIE);
+				
+				if ($aborder)
+					imagefilledarc($I, $xm, $ym, $y, $y, $alpha + 90 - $beta, $alpha + 90 + $beta, $Cblack, IMG_ARC_PIE | IMG_ARC_EDGED | IMG_ARC_NOFILL);
+				
+				$nr--;
+				$startval -= $val;
+			}
 		}
 		
 		//calculate the polyline
@@ -2499,6 +2502,7 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 			$polyline[] = $py ;
 		}
 	}
+
 	
 	if (!empty($polyline))
 	{
@@ -2552,7 +2556,7 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 	//Circles and Values
 	$color1 = bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_COLOR1);
 	$color2 = bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_COLOR2);
-	$pmax = round($max / $sum, 3); //höchste Prozentzahl, die eingezeichnet wird
+	
 	imagesetstyle($I, $Sdotted1);
 	$circles = 4;
 	for($i=1; $i<=4;$i++)

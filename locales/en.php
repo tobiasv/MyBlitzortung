@@ -496,7 +496,7 @@ Nobody can guarantee, that this software shows always the correct information!
 The responsibility is on your side!
 {MYBO} ({MYBO_ORIG}) is free software. You can find
 more information here: 
-<a href="http://www.myblitzortung.de" target="_blank">www.myblitzortung.de</a>.
+<a href="http://www.myblitzortung.de?lang=en" target="_blank">www.myblitzortung.de</a>.
 ';
 
 
@@ -845,7 +845,9 @@ $_BL['en']['On'] = 'On';
 $_BL['en']['Available stations'] = 'Available stations';
 $_BL['en']['strikes'] = 'strikes';
 $_BL['en']['Usage'] = 'Usage';
-
+$_BL['en']['Last signal'] = 'Last signal';
+$_BL['en']['Never before'] = 'Never before';
+$_BL['en']['no_strike_yet'] = 'None';
 
 
 

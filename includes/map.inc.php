@@ -344,26 +344,31 @@ function bo_show_lightning_map()
 	echo '<legend>'._BL("map_options").'</legend>';
 	ksort($_BO['mapcfg']);
 	$min_upd_interval = null;
+	$i = 0;
 	foreach ($_BO['mapcfg'] as $mapid => $cfg)
 	{
 		if (!is_array($cfg) || empty($cfg) || ($cfg['only_loggedin'] && !bo_user_get_level()) || !$cfg['sel_name'] || !$cfg['upd_intv'])
 			continue;
 		
-		$mapcfg[$mapid] = $cfg;
+		$mapcfg[$i] = $cfg;
+		$mapcfg[$i]['id'] = $mapid;
 		
 		if ($min_upd_interval == null || $min_upd_interval > $cfg['upd_intv'])
 			$min_upd_interval = $cfg['upd_intv'];
 		
 		$name = strtr($cfg['sel_name'], array('min' => _BL('unit_minutes'), 'h' => _BL('unit_hours'), 'days' => _BL('unit_days')));
 		echo '<span class="bo_form_checkbox_text">';
-		echo '<input type="checkbox" onclick="bo_map_toggle_overlay(this.checked, '.$mapid.');" ';
+		echo '<input type="checkbox" onclick="bo_map_toggle_overlay(this.checked, '.$i.');" ';
 		echo $cfg['default_show'] ? ' checked="checked" ' : '';
-		echo ' id="bo_map_opt'.$mapid.'"> ';
-		echo '<label for="bo_map_opt'.$mapid.'">'.$name.'</label> &nbsp; ';
+		echo ' id="bo_map_opt'.$i.'"> ';
+		echo '<label for="bo_map_opt'.$i.'">'.$name.'</label> &nbsp; ';
 		echo '</span>';
+		
+		$i++;
 	}
 
 	$mapcfg[-1] = $_BO['mapcfg'][-1];
+	$mapcfg[-1]['id'] = -1;
 	
 	echo ' <input type="submit" value="'._BL('more').' &dArr;" onclick="return bo_show_more();" id="bo_map_more">';
 	echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_overlays(); return false;" id="bo_map_reload">';
@@ -724,11 +729,12 @@ function bo_show_lightning_map()
 		{
 			echo '
 			bo_OverlayMaps['.$mapid.'] = {
-				getTileUrl: function (coord, zoom) { return bo_get_tile(zoom, coord, '.$mapid.', '.intval($cfg['upd_intv']).'); },
+				getTileUrl: function (coord, zoom) { return bo_get_tile(zoom, coord, '.$cfg['id'].', '.intval($cfg['upd_intv']).'); },
 				tileSize: new google.maps.Size(256,256), 
 				isPng:true, 
 				bo_show:'.($cfg['default_show'] ? 'true' : 'false').',
-				bo_interval:'.intval($cfg['upd_intv']).'
+				bo_interval:'.intval($cfg['upd_intv']).',
+				bo_mapid:'.$cfg['id'].'
 			};
 			';
 		}
@@ -1222,7 +1228,7 @@ function bo_show_lightning_map()
 				if (bo_manual_timerange)
 					add = "from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2)+"&" + add;
 				
-				infoImg.src = "<?php echo BO_FILE ?>?tile&info&type="+i+"&"+add+now.getTime();
+				infoImg.src = "<?php echo BO_FILE ?>?tile&info&type="+bo_OverlayMaps[i].bo_mapid+"&"+add+now.getTime();
 				infoImg.style.paddingTop = '5px';
 				infoImg.style.display = 'block';
 				infoImg.style.opacity = 0.7;

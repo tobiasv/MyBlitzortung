@@ -876,5 +876,8 @@ $_BL['de']['On'] = 'Ein';
 $_BL['de']['Available stations'] = 'Verfügbare Stationen';
 $_BL['de']['strikes'] = 'Blitze';
 $_BL['de']['Usage'] = 'Verbrauch';
+$_BL['de']['Last signal'] = 'Letztes Signal';
+$_BL['de']['Never before'] = 'Noch nie';
+$_BL['de']['no_strike_yet'] = 'Noch keiner';
 
 
