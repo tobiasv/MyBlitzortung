@@ -686,6 +686,7 @@ $_BL['en']['Spain'] = 'Spain';
 $_BL['en']['Sweden'] = 'Sweden';
 $_BL['en']['The Netherlands'] = 'The Netherlands';
 $_BL['en']['United Kingdom'] = 'United Kingdom	';
+$_BL['en']['Western Europe'] = 'Western Europe';
 
 $_BL['en']['Bavaria'] = 'Bavaria';
 $_BL['en']['NRW'] = 'NRW';

@@ -722,7 +722,7 @@ function bo_load_locale($locale = '')
 
 }
 
-function bo_get_file($url, &$error = '', $type = '')
+function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 {
 	$content = ''; 
 	$err = 0;
@@ -758,28 +758,38 @@ function bo_get_file($url, &$error = '', $type = '')
 			if ($user && $pass)
 				$out .= "Authorization: Basic ".base64_encode($user.':'.$pass)."\r\n";
 			
+			if ($range > 0)
+				$out .= "Range: bytes=".intval($range)."-\r\n";
+				
 			$out .= "Connection: Close\r\n\r\n";
-			
+
 			if (fwrite($fp, $out) !== false)
 			{
 				$first = true;
 				$response = array();
+				$accepted_range = false;
 				
 				//Header
 				do 
 				{ 
 					$header = chop(fgets($fp)); 
 					
-					if ($first)
+					if ($first) //Check the first line (=Response)
 					{
 						preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
 						
-						if ($response[1] != '200')
+						if ($response[1] != '200' && $response[1] != '206')
 						{
 							$err = 2;
 							break;
 						}
 					}
+					
+					if (preg_match('/Accept\-Ranges: bytes/', $header))
+						$accepted_range = true;
+					
+					if (preg_match('/Content\-Range: bytes ([0-9]+)\-([0-9]+)\/([0-9]+)/', $header, $r))
+						$range = array($r[1], $r[2], $r[3]);
 					
 					$first = false;
 				} 
@@ -819,6 +829,9 @@ function bo_get_file($url, &$error = '', $type = '')
 		
 		bo_set_conf('download_statistics', serialize($data));
 	}
+	
+	if (!$accepted_range || !is_array($range))
+		$range = array();
 	
 	return $content; 	 
 }

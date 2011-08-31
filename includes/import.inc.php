@@ -260,38 +260,81 @@ function bo_update_strikes($force = false)
 		$max_dist_own = 0;
 		$min_dist_own = 9E12;
 		
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes');
-
-		if ($file === false)
-		{
-			bo_update_error('strikedata', 'Download of strike data failed. '.$code);
-			echo "<p>ERROR: Couldn't get file for strikes! Code: $code</p>\n";
-			return false;
-		}
 		
+		/***** PREPARATIONS BEFORE READING *****/
 		bo_update_error('strikedata', true);
 
 		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
 		$row = $res->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
-		
+
 		if ($last_strike > time())
 			$last_strike = time() - 3600 * 24;
 		else if ($last_strike <= 0 || !$last_strike)
 			$last_strike = strtotime('2000-01-01');
 		
 		$time_update = $last_strike - 10;
+
+		
+		
+		/***** PARTIAL DOWNLOAD OF STRIKEDATA *****/
+		
+		//estimate the size of the participants.txt before none-imported strikes
+		$date_file_begins = strtotime('now -2 hours');
+		$sql = "SELECT COUNT(*) cnt_lines, SUM(users) sum_users
+				FROM ".BO_DB_PREF."strikes
+				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $last - 60)."'";
+		$res = bo_db($sql);
+		$row = $res->fetch_assoc();
+		$range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
+		$range *= 0.9; //some margin to be sure
+		
+		//get the file
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
+		
+		//check the date of the 2nd line (1st may be truncated!)
+		$lines = explode("\n", $file);
+		$first_strike_file = strtotime(substr($lines[1],0,19).' UTC');
+		
+		/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
+		if ($file === false || $first_strike_file > $last_strike || empty($range))
+		{
+			print_r($range);
+			echo "<p>Using partial download FAILED! Fallback to normal download. ($code) ";
+			
+			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
+			
+			if ($file === false)
+			{
+				bo_update_error('strikedata', 'Download of strike data failed. '.$code);
+				echo "<p>ERROR: Couldn't get file for strikes! Code: $code</p>\n";
+				return false;
+			}
+			
+			$lines = explode("\n", $file);
+		}
+		else
+		{
+			echo "<p>Using partial download! Beginning with strike ".gmdate('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]).") from ".$range[2].". ";
+			
+			if (intval($range[2]))
+				echo "This saved ".round($range[0] / $range[2] * 100)."% traffic.";
+				
+			echo '</p>';
+		
+		}
+		
+		
+		
+		/***** SOME MORE PREPARATIONS BEFORE READING *****/
 		
 		$loadcount = bo_get_conf('upcount_strikes');
 		bo_set_conf('upcount_strikes', $loadcount+1);
-
 		$last_strikes = unserialize(bo_get_conf('last_strikes_stations'));
-		
 		echo "\n".'<p>Last strike: '.date('Y-m-d H:i:s', $last_strike). 
 				' *** Importing only strikes newer than: '.date('Y-m-d H:i:s', $time_update).
 				' *** This is update #'.$loadcount.'</p>'."\n";
 		
-		$lines = explode("\n", $file);
 		foreach($lines as $l)
 		{
 			if (preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9\.]+)kA.* ([0-9]+)m [0-9]+ (.*)/', $l, $r))

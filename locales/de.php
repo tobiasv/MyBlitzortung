@@ -688,6 +688,8 @@ $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 /*************************************************************/
 /* Translations for templates                                */
 /*************************************************************/
+
+//Countries
 $_BL['de']['Europe'] = 'Europa';
 $_BL['de']['Germany'] = 'Deutschland';
 $_BL['de']['France'] = 'Frankreich';
@@ -710,6 +712,11 @@ $_BL['de']['Sweden'] = 'Schweden';
 $_BL['de']['The Netherlands'] = 'Niederlande';
 $_BL['de']['United Kingdom'] = 'Groﬂbritannien';
 
+//Europe
+$_BL['de']['Europe'] = 'Europa';
+$_BL['de']['Western Europe'] = 'Westeuropa';
+
+//German states
 $_BL['de']['Bavaria'] = 'Bayern';
 $_BL['de']['NRW'] = 'NRW';
 
