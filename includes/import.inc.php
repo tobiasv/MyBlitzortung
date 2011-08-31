@@ -1386,7 +1386,7 @@ function bo_update_all($force = false)
 	{
 		$max_sleep = BO_UP_MAX_SLEEP;
 		$sleep = rand(0,$max_sleep);
-		echo '<p>Waiting '.$sleep.' seconds, to avoid too hight load on Blitzortung servers ...</p>';
+		echo '<p>Waiting '.$sleep.' seconds, to avoid too high load on Blitzortung servers ...</p>';
 		flush();
 		sleep($sleep); 
 	}
