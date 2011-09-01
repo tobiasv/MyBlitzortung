@@ -842,10 +842,14 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 			$today = date('Ymd');
 			
 			if ($today != $data[$type]['traffic_today_date'])
+			{
 				$data[$type]['traffic_today'] = 0;
+				$data[$type]['count_today'] = 0;
+			}
 			
 			$data[$type]['traffic_today_date'] = $today;
 			$data[$type]['traffic_today'] += strlen($content);
+			$data[$type]['count_today']++;
 		}
 		
 		if (!$data[$type]['time_first'])
