@@ -812,10 +812,12 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	$download_stat      = unserialize(bo_get_conf('download_statistics'));
 
 	$kb_per_day = array();
+	$kb_today = 0;
 	$kb_traffic = 0;
 	foreach($download_stat as $type => $d)
 	{
 		$kb_traffic += $d['traffic']  / 1024;
+		$kb_today += $d['traffic_today']  / 1024;
 		if ($d['time_first'])
 		{
 			$kb_per_day[$type] = $d['traffic']  / 1024 / (time() - $d['time_first']) * 3600 * 24;
@@ -953,6 +955,11 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	$mem_keys = array_sum($D['keys']) / (array_sum($D['data']) + array_sum($D['keys'])) * 100;
 	$entries_all = array_sum($D['rows']);
 
+	$download_stat      = unserialize(bo_get_conf('download_statistics'));
+	$kb_today = 0;
+	foreach($download_stat as $type => $d)
+		$kb_today += $d['traffic_today']  / 1024;
+	
 	echo '<h4>'._BL('h4_stat_other_updates').'</h4>';
 	echo '<p class="bo_stat_description" id="bo_stat_other_descr_updates">';
 	echo _BL('bo_stat_other_updates_descr');
@@ -974,6 +981,9 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 					.date(_BL('_datetime'), $last_sig)
 					.' ('._BL('update every').' '.intval(BO_UP_INTVL_RAW).' '._BL('unit_minutes').')'
 					.'</span>';
+
+	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'.number_format($kb_today, 0, _BL('.'), _BL(',')).' kB ('._BL('Today').')</span>';
+					
 	echo '</ul>';
 
 
