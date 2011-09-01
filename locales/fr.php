@@ -468,8 +468,6 @@ Blitzortung.org est un réseau privé de stations de détection de la foudre. Elles
 Vous pouvez trouver plus d\'informations sur le site du projet: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
 
 ';
-
-
 $_BL['fr']['info_accuracy_text'] = '
 La précision est très bonne,inférieur à 1km,équivalent aux sociétés professionelles de détection de la foudre.
 ';
@@ -641,9 +639,6 @@ Votre station doit avoir envoyée au moins un signal depuis les 2 dernières heure
 
 
 
-
-
-
 /*************************************************************/
 /* Update                                                    */
 /*************************************************************/
@@ -665,7 +660,8 @@ $_BL['fr']['No data available!'] = 'Pas de données!';
 /*************************************************************/
 /* Translations for templates                                */
 /*************************************************************/
-$_BL['fr']['Europe'] = 'Europe';
+
+//Countries
 $_BL['fr']['Germany'] = 'Allemagne';
 $_BL['fr']['France'] = 'France';
 $_BL['fr']['Austria'] = 'Autriche';
@@ -687,6 +683,11 @@ $_BL['fr']['Sweden'] = 'Suéde';
 $_BL['fr']['The Netherlands'] = 'Pays bas';
 $_BL['fr']['United Kingdom'] = 'Royaume unis';
 
+//Europe
+$_BL['fr']['Europe'] = 'Europe';
+$_BL['fr']['Western Europe'] = 'Europe de l\'Ouest';
+
+//German states
 $_BL['fr']['Bavaria'] = 'Bavière';
 $_BL['fr']['NRW'] = 'Rhénanie-du-Nord-Westphalie';
 
@@ -843,8 +844,9 @@ $_BL['fr']['On'] = 'Marche';
 $_BL['fr']['Available stations'] = 'Stations disponibles';
 $_BL['fr']['strikes'] = 'foudres';
 $_BL['fr']['Usage'] = 'Utilisation';
-
-
+$_BL['fr']['Last signal'] = 'Dernière signal';
+$_BL['fr']['Never before'] = 'Jamais depuis';
+$_BL['fr']['no_strike_yet'] = 'Pas encore';
 
 
 

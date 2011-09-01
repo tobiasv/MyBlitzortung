@@ -1,7 +1,7 @@
 <?php
 
-$in  = 'en';
-$out = 'nl';
+$in  = 'de';
+$out = 'fr';
 
 include($in.'.php');
 include($out.'.php');

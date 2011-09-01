@@ -20,6 +20,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+define("BO_WAIT_SIM_TILE_CREATION", true); //waits when another tile is created (for testing)
+
 function bo_tile()
 {
 	@set_time_limit(5);
@@ -263,7 +265,7 @@ function bo_tile()
 		}
 	}
 
-	if (1)
+	if (BO_WAIT_SIM_TILE_CREATION)
 	{
 		//to avoid too much parallel sql queries
 		usleep(rand(0,100) * 1000);
@@ -395,7 +397,7 @@ function bo_tile()
 			}
 		}
 		
-		if (1)
+		if (BO_WAIT_SIM_TILE_CREATION)
 			bo_set_conf('is_creating_tile', 0);
 			
 		bo_tile_output($file, $caching, $I);
@@ -471,7 +473,7 @@ function bo_tile()
 		$points[] = array($px, $py, $col, $row['polarity']);
 	}
 	
-	if (1)
+	if (BO_WAIT_SIM_TILE_CREATION)
 		bo_set_conf('is_creating_tile', 0);
 	
 	BoDb::close();

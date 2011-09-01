@@ -40,7 +40,7 @@ if (!defined('BO_VER'))
 // 0 to 15 minutes
 $_BO['tpl_gmap']['0-15']['tstart'] = 15;
 $_BO['tpl_gmap']['0-15']['trange'] = 15;
-$_BO['tpl_gmap']['0-15']['upd_intv'] = 5;
+$_BO['tpl_gmap']['0-15']['upd_intv'] = 1;
 $_BO['tpl_gmap']['0-15']['col'][] = array(255, 255, 0);
 $_BO['tpl_gmap']['0-15']['col'][] = array(255, 240, 0);
 $_BO['tpl_gmap']['0-15']['col'][] = array(255, 225, 0);

@@ -690,7 +690,6 @@ $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 /*************************************************************/
 
 //Countries
-$_BL['de']['Europe'] = 'Europa';
 $_BL['de']['Germany'] = 'Deutschland';
 $_BL['de']['France'] = 'Frankreich';
 $_BL['de']['Austria'] = 'Österreich';

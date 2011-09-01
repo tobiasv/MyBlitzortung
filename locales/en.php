@@ -665,7 +665,8 @@ $_BL['en']['No data available!'] = 'No data available!';
 /*************************************************************/
 /* Translations for templates                                */
 /*************************************************************/
-$_BL['en']['Europe'] = 'Europe';
+
+//Countries
 $_BL['en']['Germany'] = 'Germany';
 $_BL['en']['France'] = 'France';
 $_BL['en']['Austria'] = 'Austria';
@@ -686,8 +687,12 @@ $_BL['en']['Spain'] = 'Spain';
 $_BL['en']['Sweden'] = 'Sweden';
 $_BL['en']['The Netherlands'] = 'The Netherlands';
 $_BL['en']['United Kingdom'] = 'United Kingdom	';
+
+//Europe
+$_BL['en']['Europe'] = 'Europe';
 $_BL['en']['Western Europe'] = 'Western Europe';
 
+//German states
 $_BL['en']['Bavaria'] = 'Bavaria';
 $_BL['en']['NRW'] = 'NRW';
 
@@ -848,6 +853,7 @@ $_BL['en']['Usage'] = 'Usage';
 $_BL['en']['Last signal'] = 'Last signal';
 $_BL['en']['Never before'] = 'Never before';
 $_BL['en']['no_strike_yet'] = 'None';
+
 
 
 
