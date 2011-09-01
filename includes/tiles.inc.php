@@ -20,7 +20,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define("BO_WAIT_SIM_TILE_CREATION", true); //waits when another tile is created (for testing)
+define("BO_WAIT_SIM_TILE_CREATION", false); //waits when another tile is created (for testing)
 
 function bo_tile()
 {

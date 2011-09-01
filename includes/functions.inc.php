@@ -508,6 +508,20 @@ function bo_latlon2mercator($lat, $lon)
 	return array($lon, $lat);
 }
 
+function bo_latlon2projection($proj, $lat, $lon)
+{
+	switch ($proj)
+	{
+	
+		default:
+			return bo_latlon2mercator($lat, $lon);
+		
+		case 'plate':
+			return array($lon, $lat);
+	
+	}
+}
+
 function bo_strike2polarity($data, $bearing)
 {
 	static $cache=0, $antbear=array();

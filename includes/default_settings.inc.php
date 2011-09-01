@@ -69,7 +69,7 @@
 @define("BO_LOGIN_COOKIE_TIME", 60); // days where automatic login cookie is valid. set to false to disable auto login
 
 /*** Update intervals (Minutes!)                                 ***/
-@define("BO_UP_INTVL_STRIKES", 1);
+@define("BO_UP_INTVL_STRIKES", 5);
 @define("BO_UP_INTVL_STATIONS", 15);
 @define("BO_UP_INTVL_RAW", 60);
 @define("BO_UP_MAX_TIME",  55); // max. exec time

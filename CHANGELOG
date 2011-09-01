@@ -3,6 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.1 (2011-09-xx)
+--------------------------
+- new: partial downloads of strikedata (saves > 90% traffic)
+- new: plate carrée projection (use $_BO['mapimg'][xx]['proj'] = 'plate'; )
+- bugfixes
+
+
 Version 0.7a (2011-08-28)
 -------------------------
 - fixed installation

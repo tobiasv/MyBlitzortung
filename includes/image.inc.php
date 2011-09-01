@@ -293,8 +293,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		imagealphablending($I, true);
 	}
 
-	list($x1, $y1) = bo_latlon2mercator($latS, $lonW);
-	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
+	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $latS, $lonW);
+	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $latN, $lonE);
 	$w_x = $w / ($x2 - $x1);
 	$h_y = $h / ($y2 - $y1);
 
@@ -346,7 +346,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 			if (isset($cfg['point_style']))
 			{
-				list($px, $py) = bo_latlon2mercator($row['lat'], $row['lon']);
+				list($px, $py) = bo_latlon2projection($cfg['proj'], $row['lat'], $row['lon']);
 				$x =      ($px - $x1) * $w_x;
 				$y = $h - ($py - $y1) * $h_y;
 
@@ -386,7 +386,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		{
 			$stinfo = bo_station_info();
 			
-			list($px, $py) = bo_latlon2mercator($stinfo['lat'], $stinfo['lon']);
+			list($px, $py) = bo_latlon2projection($cfg['proj'], $stinfo['lat'], $stinfo['lon']);
 			$x =      ($px - $x1) * $w_x;
 			$y = $h - ($py - $y1) * $h_y;
 			
@@ -430,11 +430,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				list(,$lat2) = @each($reg);
 				list(,$lon2) = @each($reg);
 				
-				list($px, $py) = bo_latlon2mercator($lat1, $lon1);
+				list($px, $py) = bo_latlon2projection($cfg['proj'], $lat1, $lon1);
 				$rx1 =      ($px - $x1) * $w_x;
 				$ry1 = $h - ($py - $y1) * $h_y;
 
-				list($px, $py) = bo_latlon2mercator($lat2, $lon2);
+				list($px, $py) = bo_latlon2projection($cfg['proj'], $lat2, $lon2);
 				$rx2 =      ($px - $x1) * $w_x;
 				$ry2 = $h - ($py - $y1) * $h_y;
 				
@@ -532,7 +532,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	BoDb::close();
 	
 	bo_image_reduce_colors($I);
-	
+
 	header("Content-Type: image/png");
 	if ($caching)
 	{
@@ -742,8 +742,8 @@ function bo_get_density_image()
 	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
 	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
 	
-	list($x1, $y1) = bo_latlon2mercator($PicLatS, $PicLonW);
-	list($x2, $y2) = bo_latlon2mercator($PicLatN, $PicLonE);
+	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $PicLatS, $PicLonW);
+	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $PicLatN, $PicLonE);
 	$w_x = $w / ($x2 - $x1);
 	$h_y = $h / ($y2 - $y1);
 
@@ -828,7 +828,7 @@ function bo_get_density_image()
 	if ($station_id)
 	{
 		$stinfo = bo_station_info($station_id);
-		list($px, $py) = bo_latlon2mercator($stinfo['lat'], $stinfo['lon']);
+		list($px, $py) = bo_latlon2projection($cfg['proj'], $stinfo['lat'], $stinfo['lon']);
 		$StX =      ($px - $x1) * $w_x;
 		$StY = $h - ($py - $y1) * $h_y;
 	}
@@ -874,7 +874,7 @@ function bo_get_density_image()
 			$lon_data = substr($DATA, $string_pos + $lon_start_pos, $lon_string_len);
 			
 			//image coordinates (left side of image, height is current latitude)
-			list($px, $py) = bo_latlon2mercator($DensLat, $PicLonE);
+			list($px, $py) = bo_latlon2projection($cfg['proj'], $DensLat, $PicLonE);
 			$y  = $h - ($py - $y1) * $h_y; //image y
 			$ay = round(($y / $min_block_size)); //block number y
 			$dx = $dlon / ($PicLonE - $PicLonW) * $w; //delta x
@@ -999,7 +999,7 @@ function bo_get_density_image()
 		foreach($info['antennas']['bearing'] as $bear)
 		{
 			list($lat, $lon) = bo_distbearing2latlong(100000, $bear, $stinfo['lat'], $stinfo['lon']);
-			list($px, $py) = bo_latlon2mercator($lat, $lon);
+			list($px, $py) = bo_latlon2projection($cfg['proj'], $lat, $lon);
 			$ant_x =      ($px - $x1) * $w_x - $StX;
 			$ant_y = $h - ($py - $y1) * $h_y - $StY;
 			
@@ -1475,8 +1475,8 @@ function bo_add_cities2image($I, $cfg, $w, $h)
 	$latS = $cfg['coord'][2];
 	$lonW = $cfg['coord'][3];
 	
-	list($x1, $y1) = bo_latlon2mercator($latS, $lonW);
-	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
+	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $latS, $lonW);
+	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $latN, $lonE);
 	$w_x = $w / ($x2 - $x1);
 	$h_y = $h / ($y2 - $y1);
 
@@ -1489,7 +1489,7 @@ function bo_add_cities2image($I, $cfg, $w, $h)
 	$erg = bo_db($sql);
 	while ($row = $erg->fetch_assoc())
 	{
-		list($px, $py) = bo_latlon2mercator($row['lat'], $row['lon']);
+		list($px, $py) = bo_latlon2projection($cfg['proj'], $row['lat'], $row['lon']);
 		$x =      ($px - $x1) * $w_x;
 		$y = $h - ($py - $y1) * $h_y;
 
@@ -1526,8 +1526,8 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 	$latS = $cfg['coord'][2];
 	$lonW = $cfg['coord'][3];
 	
-	list($x1, $y1) = bo_latlon2mercator($latS, $lonW);
-	list($x2, $y2) = bo_latlon2mercator($latN, $lonE);
+	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $latS, $lonW);
+	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $latN, $lonE);
 	$w_x = $w / ($x2 - $x1);
 	$h_y = $h / ($y2 - $y1);
 
@@ -1541,7 +1541,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 				WHERE id='$strike_id'";
 		$erg = bo_db($sql);
 		$row = $erg->fetch_assoc();
-		list($px, $py) = bo_latlon2mercator($row['lat'], $row['lon']);
+		list($px, $py) = bo_latlon2projection($cfg['proj'], $row['lat'], $row['lon']);
 		$strike_x =      ($px - $x1) * $w_x;
 		$strike_y = $h - ($py - $y1) * $h_y;
 	
@@ -1580,7 +1580,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 		else
 			$c = $cfg['stations'][0];
 		
-		list($px, $py) = bo_latlon2mercator(round($d['lat'],2), round($d['lon'],2));
+		list($px, $py) = bo_latlon2projection($cfg['proj'], round($d['lat'],2), round($d['lon'],2));
 		$x =      ($px - $x1) * $w_x;
 		$y = $h - ($py - $y1) * $h_y;
 

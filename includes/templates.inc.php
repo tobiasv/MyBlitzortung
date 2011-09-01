@@ -223,7 +223,7 @@ $_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitere
 
 /* ============================= Germany ============================= */
 
-//Germany (Landkreise) no exact merator prjection!
+//Germany (Landkreise) no exact merator projection!
 $_BO['tpl_imgmap']['germany_lkr'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['germany_lkr']['name'] = 'Germany';
 $_BO['tpl_imgmap']['germany_lkr']['footer'] = 'Kartenmaterial: <a href="http://de.wikipedia.org/w/index.php?title=Datei:Landkreise,_Kreise_und_kreisfreie_St%C3%A4dte_in_Deutschland.svg" target="_blank">Wikipedia</a> &bull; Achtung: Positionen sind nicht exakt (nur bei dieser Karte!)';
