@@ -1325,6 +1325,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	else
 	{
 		$interval = BO_UP_INTVL_STATIONS;
+		if ($interval < 10)
+			$interval = 10;
+			
 		$ticks = ($time_end - $time_start) / 60 / $interval;
 
 		$stId = $station_id ? $station_id : $stId;

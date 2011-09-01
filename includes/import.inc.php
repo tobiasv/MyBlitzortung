@@ -1306,7 +1306,10 @@ function bo_update_daily_stat($max_time)
 			$d = unserialize($row['data']);
 			
 			foreach($d as $id => $cnt)
-				$data[$id] += $cnt;
+			{
+				if (!is_array($cnt))
+					$data[$id] += $cnt;
+			}
 			
 			$data['daycount']++;
 		}
