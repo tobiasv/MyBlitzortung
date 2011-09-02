@@ -287,8 +287,11 @@ function bo_update_strikes($force = false)
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
-		$range *= 0.95; //some margin to be sure
-		$range = $range - 1000;
+		$range = $range * 0.95 - 1000; //some margin to be sure
+		
+		if ($range < 1000)
+			$range = 0;
+		
 		
 		//get the file
 		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
@@ -312,7 +315,7 @@ function bo_update_strikes($force = false)
 			echo "\n<p>Using partial download FAILED! Fallback to normal download. ";
 
 			if ($first_strike_file > 0)
-				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database :(</p>\n";			
+				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database.</p>\n";			
 			elseif ($code)
 				echo " Errorcode: $code</p>\n";
 			
@@ -812,10 +815,11 @@ function bo_update_stations($force = false)
 
 		$lines = explode("\n", $file);
 		
-				
+		//we need the current station data for later usage
+		$all_stations = bo_stations();
+		
 		//check if sth went wrong
-		$all_stations = bo_stations('user');
-		if ($lines < count($all_stations) * 0.5)
+		if ($lines < count($all_stations) * 0.9)
 		{
 			bo_update_error('stationcount', 'Station count differs too much: '.count($all_stations).'Database / '.$lines.' stations.txt');
 			bo_set_conf('uptime_stations', time());
@@ -829,6 +833,8 @@ function bo_update_stations($force = false)
 		//reset error counter
 		bo_update_error('stationdata', true); 
 		bo_update_error('stationcount', true); 
+		
+		$activebyuser = array();
 		
 		foreach($lines as $l)
 		{
@@ -877,22 +883,44 @@ function bo_update_stations($force = false)
 
 			$sql = strtr($sql, array('\null' => ''));
 
-			if (bo_db("INSERT INTO ".BO_DB_PREF."stations SET $sql", false))
+
+			//user rename ==> station owner/city changed ==> new station ==> delete old data
+			if (isset($all_stations[$stId]) && $all_stations[$stId]['user'] != $stUser)
 			{
-				$i++;
+				bo_db("DELETE FROM ".BO_DB_PREF."stations WHERE id='$stId'", false);
+				echo "\n<p>Deleted old station $id (user change ".$all_stations[$stId]['user']." -> $stUser: Old Data ".serialize($all_stations[$stId])."</p>\n";
+				unset($all_stations[$stId]);
 			}
-			else
+
+			
+			if (isset($all_stations[$stId]))
 			{
 				bo_db("UPDATE ".BO_DB_PREF."stations SET $sql WHERE id='$stId'");
 				$u++;
 			}
-
+			else 
+			{
+				bo_db("INSERT INTO ".BO_DB_PREF."stations SET $sql", false);
+				$i++;
+			}
+			
 			$signal_count += $Count[$stId]['sig'];
 
 		}
 
 		echo "\n<p>Stations: ".(count($lines)-2)." *** New Stations: $i *** Updated: $u</p>\n";
 
+		
+		//Check wether stations still exists
+		foreach($all_stations as $id => $d)
+		{
+			//station was deleted in stations.txt :(
+			if (!isset($Count[$id]))
+			{
+				bo_db("DELETE FROM ".BO_DB_PREF."stations WHERE id='$id'", false);
+				echo "\n<p>Deleted station $id: Data ".serialize($all_stations[$id])."</p>\n";
+			}
+		}
 		
 		//New stations (by user name)
 		$data = unserialize(bo_get_conf('stations_new_date'));
@@ -1389,9 +1417,9 @@ function bo_update_all($force = false)
 	
 	if (!$force)
 	{
-		echo '<p>Information: PHP Execution timeout is '.$exec_timeout.'s ';
+		echo "\n<p>Information: PHP Execution timeout is ".$exec_timeout.'s ';
 		echo $exec_timeout < 15 ? ' - Not good :( ' : ' --> Fine :)  ';
-		echo '- Setting MyBlitzortung timeout to: '.$max_time.'s</p>';
+		echo '- Setting MyBlitzortung timeout to: '.$max_time."s</p>\n";
 		flush();
 	}
 	
@@ -1402,7 +1430,7 @@ function bo_update_all($force = false)
 	{
 		$max_sleep = BO_UP_MAX_SLEEP;
 		$sleep = rand(0,$max_sleep);
-		echo '<p>Waiting '.$sleep.' seconds, to avoid too high load on Blitzortung servers ...</p>';
+		echo "\n<p>Waiting $sleep seconds, to avoid too high load on Blitzortung servers ...</p>\n";
 		flush();
 		sleep($sleep); 
 	}
@@ -1416,7 +1444,7 @@ function bo_update_all($force = false)
 	if ( !(BO_UP_INTVL_STRIKES <= BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS <= BO_UP_INTVL_RAW) )
 	{
 		if (!$force)
-			echo '<p>Info: Asynchronous update. No problem, but untestet. To avoid set strike timer < station timer < signal timer (or equal).</p>';
+			echo "\n<p>Info: Asynchronous update. No problem, but untestet. To avoid set strike timer < station timer < signal timer (or equal).</p>\n";
 		
 		$async = true;
 	}
@@ -1452,7 +1480,7 @@ function bo_update_all($force = false)
 	if (time() - $start_time > $max_time)
 	{
 		bo_set_conf('is_updating', 0);
-		echo '<p>TIMEOUT! We will continue the next time.</p>';
+		echo "\n<p>TIMEOUT! We will continue the next time.</p>\n";
 		return;
 	}
 
@@ -1472,7 +1500,7 @@ function bo_update_all($force = false)
 	if (time() - $start_time > $max_time)
 	{
 		bo_set_conf('is_updating', 0);
-		echo '<p>TIMEOUT! We will continue the next time.</p>';
+		echo "\n<p>TIMEOUT! We will continue the next time.</p>\n";
 		return;
 	}
 
@@ -1627,7 +1655,7 @@ function bo_update_all($force = false)
 	
 	if (time() - $start_time > $max_time)
 	{
-		echo '<p>TIMEOUT! We will continue the next time.</p>';
+		echo "\n<p>TIMEOUT! We will continue the next time.</p>\n";
 		bo_set_conf('is_updating', 0);
 		return;
 	}

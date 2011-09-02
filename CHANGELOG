@@ -3,13 +3,17 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.2 (2011-09-xx)
+--------------------------
+- new: deletion of old stations from station database
+- tuned partial strike download
+
 Version 0.7.1 (2011-09-01)
 --------------------------
 - new: partial downloads of strikedata (saves > 90% traffic)
 - new: plate carrée projection (use $_BO['mapimg'][xx]['proj'] = 'plate'; )
 - fixed: major php-error when updating month statistics 
 - other bugfixes
-
 
 Version 0.7a (2011-08-28)
 -------------------------
