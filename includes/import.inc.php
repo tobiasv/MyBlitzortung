@@ -301,10 +301,11 @@ function bo_update_strikes($force = false)
 		{
 			echo "\n<p>Using partial download FAILED! Fallback to normal download. ";
 			
-			if ($first_strike_file > 0)
-				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database :(</p>\n";
-			else
+			if (empty($range) || $file === false)
 				echo " Errorcode: $code</p>\n";
+			else if ($first_strike_file > 0)
+				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database :(</p>\n";
+				
 			
 			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
 			
