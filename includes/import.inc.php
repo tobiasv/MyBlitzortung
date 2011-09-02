@@ -299,8 +299,12 @@ function bo_update_strikes($force = false)
 		/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
 		if ($file === false || $first_strike_file > $last_strike || empty($range))
 		{
-			print_r($range);
-			echo "<p>Using partial download FAILED! Fallback to normal download. ($code) ";
+			echo "\n<p>Using partial download FAILED! Fallback to normal download. ";
+			
+			if ($first_strike_file > 0)
+				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database :(</p>\n";
+			else
+				echo " Errorcode: $code</p>\n";
 			
 			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
 			
@@ -315,7 +319,7 @@ function bo_update_strikes($force = false)
 		}
 		else
 		{
-			echo "<p>Using partial download! Beginning with strike ".gmdate('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]).") from ".$range[2].". ";
+			echo "<p>Using partial download! Beginning with strike ".date('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]).") from ".$range[2].". ";
 			
 			if (intval($range[2]))
 				echo "This saved ".round($range[0] / $range[2] * 100)."% traffic.";
