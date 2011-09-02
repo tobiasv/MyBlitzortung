@@ -777,17 +777,18 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 				
 			$out .= "Connection: Close\r\n\r\n";
 
+			$first = true;
+			$response = array();
+			$accepted_range = false;
+			$content_length = 0;
+				
 			if (fwrite($fp, $out) !== false)
 			{
-				$first = true;
-				$response = array();
-				$accepted_range = false;
-				
 				//Header
 				do 
 				{ 
 					$header = chop(fgets($fp)); 
-					
+					echo $header.'<br>';
 					if ($first) //Check the first line (=Response)
 					{
 						preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
@@ -799,12 +800,13 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 						}
 					}
 					
-					if (preg_match('/Accept\-Ranges: bytes/', $header))
-						$accepted_range = true;
-					
-					if (preg_match('/Content\-Range: bytes ([0-9]+)\-([0-9]+)\/([0-9]+)/', $header, $r))
-						$range = array($r[1], $r[2], $r[3]);
-					
+					if (preg_match('/Content\-Range: ?bytes ([0-9]+)\-([0-9]+)\/([0-9]+)/', $header, $r))
+						$accepted_range = array($r[1], $r[2], $r[3]);
+
+					if (preg_match('/Content\-Length: ?([0-9]+)/', $header, $r))
+						$content_length = $r[1];
+						
+			
 					$first = false;
 				} 
 				while (!empty($header) and !feof($fp)); 
@@ -858,8 +860,26 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 		bo_set_conf('download_statistics', serialize($data));
 	}
 	
-	if (!$accepted_range || !is_array($range))
-		$range = array();
+	if ($range > 0)
+	{
+		if ($accepted_range === false)
+		{
+			$range = array();
+			if ($content_length > 0 && $content !== false) // didn't accept range, but sent whole file
+			{
+				//$range = array(1, $content_length, $content_length);
+			}
+			else
+			{
+				$range = array();
+				$content = false;
+			}
+		}
+		else
+		{
+			$range = $accepted_range;
+		}
+	}
 	
 	return $content; 	 
 }

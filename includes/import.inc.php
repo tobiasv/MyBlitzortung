@@ -280,32 +280,41 @@ function bo_update_strikes($force = false)
 		/***** PARTIAL DOWNLOAD OF STRIKEDATA *****/
 		
 		//estimate the size of the participants.txt before none-imported strikes
-		$date_file_begins = strtotime('now -2 hours');
+		$date_file_begins = strtotime('now -1 hours -58 minutes');
 		$sql = "SELECT COUNT(*) cnt_lines, SUM(users) sum_users
 				FROM ".BO_DB_PREF."strikes
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $last - 60)."'";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
-		$range *= 0.9; //some margin to be sure
+		$range *= 0.95; //some margin to be sure
+		$range = $range - 1000;
 		
 		//get the file
 		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
 		
 		//check the date of the 2nd line (1st may be truncated!)
-		$lines = explode("\n", $file);
-		$first_strike_file = strtotime(substr($lines[1],0,19).' UTC');
+		if ($file !== false)
+		{
+			$lines = explode("\n", $file);
+			$first_strike_file = strtotime(substr($lines[1],0,19).' UTC');
+		}
+		else
+			$first_strike_file = 0;
 		
+		if ($file !== false && empty($range))
+		{
+			echo "\nPartial download didn't work, got whole file instead (".strlen($file)." bytes)\n";
+		}
 		/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
-		if ($file === false || $first_strike_file > $last_strike || empty($range))
+		else if ($file === false || $first_strike_file > $last_strike)
 		{
 			echo "\n<p>Using partial download FAILED! Fallback to normal download. ";
-			
-			if (empty($range) || $file === false)
+
+			if ($first_strike_file > 0)
+				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database :(</p>\n";			
+			elseif ($code)
 				echo " Errorcode: $code</p>\n";
-			else if ($first_strike_file > 0)
-				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database :(</p>\n";
-				
 			
 			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
 			
@@ -320,13 +329,12 @@ function bo_update_strikes($force = false)
 		}
 		else
 		{
-			echo "<p>Using partial download! Beginning with strike ".date('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]).") from ".$range[2].". ";
+			echo "<p>Using partial download! Beginning with strike ".date('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]+1).") from ".$range[2].". ";
 			
 			if (intval($range[2]))
 				echo "This saved ".round($range[0] / $range[2] * 100)."% traffic.";
 				
 			echo '</p>';
-		
 		}
 		
 		
