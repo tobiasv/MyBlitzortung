@@ -788,7 +788,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 				do 
 				{ 
 					$header = chop(fgets($fp)); 
-					echo $header.'<br>';
+					//echo $header.'<br>';
 					if ($first) //Check the first line (=Response)
 					{
 						preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
