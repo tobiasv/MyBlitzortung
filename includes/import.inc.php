@@ -280,18 +280,33 @@ function bo_update_strikes($force = false)
 		/***** PARTIAL DOWNLOAD OF STRIKEDATA *****/
 		
 		//estimate the size of the participants.txt before none-imported strikes
-		$date_file_begins = strtotime('now -1 hours -58 minutes');
+		$date_file_begins = strtotime('now -2 hours');
 		$sql = "SELECT COUNT(*) cnt_lines, SUM(users) sum_users
 				FROM ".BO_DB_PREF."strikes
-				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $last - 60)."'";
+				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $last - 120)."'";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
-		$range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
+		$range = $row['cnt_lines'] * 64 + $row['sum_users'] * 9;
 		$range = $range * 0.90 - 2000; //some margin to be sure
+		
+		//adjust range
+		$tmp = unserialize(bo_get_conf('import_strike_filelength'));
+		
+		// use old file size if range got wrong the last time
+		if (!empty($tmp))
+		{
+			list($oldrange, $oldtime) = $tmp;
+			$time_diff = (time() - $oldtime) / 60;
+			
+			if ( $time_diff < 11 && $range > $oldrange ) 
+				$range = $oldrange * 0.9;
+		}
 		
 		if ($range < 1000)
 			$range = 0;
-		
+
+			
+		$sent_range = $range;
 		
 		//get the file
 		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
@@ -307,7 +322,8 @@ function bo_update_strikes($force = false)
 		
 		if ($file !== false && empty($range))
 		{
-			echo "\nPartial download didn't work, got whole file instead (".strlen($file)." bytes)\n";
+			echo "\n<p>Partial download didn't work, got whole file instead (sent range $sent_range got ".strlen($file)." bytes)</p>\n";
+			bo_set_conf('import_strike_filelength', serialize(array(strlen($file), time())));
 		}
 		else if ($file === false || $first_strike_file > $last_strike)
 		{
@@ -333,6 +349,7 @@ function bo_update_strikes($force = false)
 		else
 		{
 			echo "<p>Using partial download! Beginning with strike ".date('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]+1).") from ".$range[2].". ";
+			bo_set_conf('import_strike_filelength', serialize(array()));
 			
 			if (intval($range[2]))
 				echo "This saved ".round($range[0] / $range[2] * 100)."% traffic.";
