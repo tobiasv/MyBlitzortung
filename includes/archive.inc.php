@@ -981,6 +981,11 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$table = 'r';
 	}
 	
+	if (bo_user_get_id() == 1)
+	{
+		$stations = bo_stations();
+	}
+	
 	$count = 0;
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
 					s.deviation deviation, s.current current, s.polarity polarity,
@@ -1179,6 +1184,29 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo _BL('no strike detected');
 		}
 
+		
+		if (bo_user_get_id() == 1 && $row['strike_id'])
+		{
+			echo '<tr><td class="bo_sig_table_strikeinfo" colspan="3" style="font-size:60%">';
+			
+			$i = 0;
+			$sql2 = "SELECT ss.station_id id
+				FROM ".BO_DB_PREF."stations_strikes ss
+				WHERE ss.strike_id='".$row['strike_id']."'
+				";
+			$res2 = bo_db($sql2);
+
+			while ($row2 = $res2->fetch_assoc())
+			{
+				echo $i ? ', ' : '';
+				echo $stations[$row2['id']]['user'];
+				$i++;
+			}
+			
+			echo '</td></tr>';
+		}
+
+		
 		echo '</td>';
 		echo '</tr>';
 

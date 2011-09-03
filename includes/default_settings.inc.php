@@ -73,6 +73,10 @@
 @define("BO_UP_INTVL_STATIONS", 15);
 @define("BO_UP_INTVL_RAW", 60);
 
+/*** Fuzzy strike update                                         ***/
+@define("BO_UP_STRIKES_FUZZY_NSEC", 400000);
+@define("BO_UP_STRIKES_FUZZY_KM",   50);
+
 /*** Timeouts (Seconds)                                          ***/
 @define("BO_UP_MAX_TIME",  55); // max. exec time
 @define("BO_UP_MAX_SLEEP", 30); // max. sleep time in seconds before importing

@@ -287,7 +287,7 @@ function bo_update_strikes($force = false)
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$calc_range = $row['cnt_lines'] * 64 + $row['sum_users'] * 9;
-		$calc_range = $calc_range * 0.90 - 2000; //some margin to be sure
+		$calc_range = $calc_range * 0.98 - 2000; //some margin to be sure
 		
 		$range = $calc_range;
 		
@@ -307,8 +307,8 @@ function bo_update_strikes($force = false)
 			}
 		}
 		
-		if ($range < 1000)
-			$range = 0;
+		if ($range < 8000)
+			$range = 8000;
 
 			
 		$sent_range = $range;
@@ -459,8 +459,8 @@ function bo_update_strikes($force = false)
 					
 					$search_from  = $utime;
 					$search_to    = $utime;
-					$nsearch_from = ($time_ns - $delta_nsec) * 1E-9;
-					$nsearch_to   = ($time_ns + $delta_nsec) * 1E-9;
+					$nsearch_from = ($time_ns - 400000) * 1E-9;
+					$nsearch_to   = ($time_ns + 400000) * 1E-9;
 
 					if ($nsearch_from < 0) { $nsearch_from++; $search_from--; }
 					else if ($nsearch_from > 1) { $nsearch_from--; $search_from++; }
@@ -514,7 +514,7 @@ function bo_update_strikes($force = false)
 								$old_dist = bo_latlon2dist($lat, $lon, $d['loc'][0], $d['loc'][1]);
 
 								//could be a new one if participant count differs too much
-								if ($old_dist < 50000) // && $users * 0.9 <= $d['users'] && $d['users'] <= $users * 1.5)
+								if ($old_dist < BO_UP_STRIKES_FUZZY_KM * 1000) // && $users * 0.9 <= $d['users'] && $d['users'] <= $users * 1.5)
 									$ids_found[] = $oldid;
 								else
 									echo " Dist/Users didn't match ::: ";
