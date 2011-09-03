@@ -72,6 +72,8 @@
 @define("BO_UP_INTVL_STRIKES", 5);
 @define("BO_UP_INTVL_STATIONS", 15);
 @define("BO_UP_INTVL_RAW", 60);
+
+/*** Timeouts (Seconds)                                          ***/
 @define("BO_UP_MAX_TIME",  55); // max. exec time
 @define("BO_UP_MAX_SLEEP", 30); // max. sleep time in seconds before importing
 
@@ -108,11 +110,25 @@
 @define("BO_MAP_STRIKE_POLARITY_SIZE", 5);
 
 /*** set to true, if you want to use "file_get_contents"         ***/
-@define("BO_USE_PHPURLWRAPPER", false);
+@define("BO_USE_PHPURLWRAPPER", false); // you wouldn't be able to use partial downloads with setting "true"!
 
 /*** use experimental mysql kex for faster strike search         ***/
 /*   by time *and* latlon                                          */
 @define("BO_DB_USE_LATLON_TIME_INDEX", false);
+
+
+
+/*******************************************************************/
+/*** The file cache                                              ***/
+@define("BO_CACHE_DISABLE", false); //when true, disables caching of maps and map tiles (you should leave it on false!)
+@define("BO_CACHE_SUBDIRS", true);  //create subdirs for faster access (may not work with php safemode ON)
+@define("BO_CACHE_PURGE_TILES_HOURS", 24); //purges tiles when older that specified value (hours)
+@define("BO_CACHE_PURGE_TILES_RAND",  1000); //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
+@define("BO_CACHE_PURGE_MAPS_HOURS", 24 * 4); //purges maps when older that specified value (hours)
+@define("BO_CACHE_PURGE_MAPS_RAND",  500); //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
+@define("BO_CACHE_PURGE_DENS_HOURS", 24 * 10); //purges density maps when older that specified value (hours)
+@define("BO_CACHE_PURGE_DENS_RAND",  50); //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
+
 
 
 /*******************************************************************/
@@ -143,7 +159,9 @@
 @define("BO_IMAGE_PALETTE_COLORS_MAPS", 256); // use palette images for MAPS with defined colors for output (0 disables)
 @define("BO_IMAGE_PALETTE_COLORS_DENSITIES", 0); // use palette images for DENSITY MAPS with defined colors for output (0 disables)
 @define("BO_IMAGE_PALETTE_AUTO", true); // automatically use true color if colorcount in palette image is 256 (set to 256 above!)
+@define("BO_IMAGE_JPEG_QUALITY", 85);
 @define("BO_MAPS_ORDER", ''); // order your maps, comma separated ids
+
 
 /*******************************************************************/
 /*** Fonts: General settings                                     ***/
@@ -573,9 +591,6 @@
 @define("BO_DEBUG", false); //enables PHP error reporting
 @define("BO_LANG_AUTO_ADD", false); //automatically adds missing translations to the locale file if it is writeable
 
-//Cache
-@define("BO_CACHE_DISABLE", false); //disables caching of maps and map tiles
-@define("BO_CACHE_SUBDIRS", true);  //create subdirs for faster access (may not work with php safemode ON)
 
 
 /*******************************************************************/

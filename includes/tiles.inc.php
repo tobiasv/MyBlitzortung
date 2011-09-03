@@ -30,9 +30,9 @@ function bo_tile()
 
 	session_write_close();
 	
-	if (rand(0, 3000) == 1)
+	if (intval(BO_CACHE_PURGE_TILES_RAND) > 0 && rand(0, BO_CACHE_PURGE_TILES_RAND) == 1)
 	{
-		register_shutdown_function('bo_delete_files', BO_DIR.'cache/tiles/', 24, 3);
+		register_shutdown_function('bo_delete_files', BO_DIR.'cache/tiles/', BO_CACHE_PURGE_TILES_HOURS, 3);
 	}
 	
 	$x = intval($_GET['x']);
@@ -571,11 +571,6 @@ function bo_tile_tracks()
 
 	if (!intval(BO_TRACKS_SCANTIME)) //disabled
 		exit;
-	
-	if (rand(0, 3000) == 1)
-	{
-		register_shutdown_function('bo_delete_files', BO_DIR.'cache/tiles/', 24, 3);
-	}
 	
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$x = intval($_GET['x']);

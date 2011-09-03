@@ -660,7 +660,7 @@ function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 
 	foreach($files as $file)
 	{
-		if (!is_dir($dir.$file) && ($min_age == 0 || @fileatime($dir.$file) < time() - 3600 * $min_age) )
+		if (!is_dir($dir.$file) && substr($file,0,1) != '.' && ($min_age == 0 || @fileatime($dir.$file) < time() - 3600 * $min_age) )
 		{
 			@unlink($dir.$file);
 		}

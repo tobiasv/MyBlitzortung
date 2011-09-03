@@ -287,7 +287,7 @@ function bo_update_strikes($force = false)
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
-		$range = $range * 0.95 - 1000; //some margin to be sure
+		$range = $range * 0.90 - 2000; //some margin to be sure
 		
 		if ($range < 1000)
 			$range = 0;
@@ -309,17 +309,17 @@ function bo_update_strikes($force = false)
 		{
 			echo "\nPartial download didn't work, got whole file instead (".strlen($file)." bytes)\n";
 		}
-		/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
 		else if ($file === false || $first_strike_file > $last_strike)
 		{
-			echo "\n<p>Using partial download FAILED! Fallback to normal download. ";
+			/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
+			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
+
+			echo "\n<p>Using partial download FAILED! Fallback to normal download (".strlen($file)." bytes). ";
 
 			if ($first_strike_file > 0)
-				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database.</p>\n";			
+				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database (size: ".($range[1]-$range[0]+1).").</p>\n";			
 			elseif ($code)
 				echo " Errorcode: $code</p>\n";
-			
-			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
 			
 			if ($file === false)
 			{

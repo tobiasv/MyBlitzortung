@@ -67,11 +67,14 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 {
 	session_write_close();
 	@set_time_limit(10);
+
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
-	
-	if (rand(0, 500) == 1 && $id !== false)
+	$archive_maps_enabled = (BO_DISABLE_ARCHIVE !== true && defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS)
+								|| (bo_user_get_level() & BO_PERM_ARCHIVE);
+
+	if (intval(BO_CACHE_PURGE_DENS_RAND) > 0 && rand(0, BO_CACHE_PURGE_MAPS_RAND) == 1 && $id !== false)
 	{	
-		register_shutdown_function('bo_delete_files', BO_DIR.'cache/maps/', 96, 3);
+		register_shutdown_function('bo_delete_files', BO_DIR.'cache/maps/', intval(BO_CACHE_PURGE_MAPS), 3);
 	}
 	
 	global $_BO;
@@ -128,13 +131,13 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if (preg_match('/[0-9a-z]+/i', $region) && isset($_BO['region'][$region]['rect_add']))
 		$cache_file .= 'region'.$region.'_';
 
-	$archive_maps_enabled = (BO_DISABLE_ARCHIVE !== true && defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS)
-								|| (bo_user_get_level() & BO_PERM_ARCHIVE);
 
 	$sql_where_id = '';
 	
 	if ($strike_id)
 	{
+		//image with only one strike
+		
 		if (!$archive_maps_enabled)
 			exit('Forbidden!');
 		
@@ -147,6 +150,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	else if (preg_match('/^[0-9\-]+$/', $date))
 	{
+		//the archive images
 		
 		if (!$archive_maps_enabled)
 			exit('Forbidden!');
@@ -199,11 +203,13 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		if (BO_CACHE_SUBDIRS === true)
 			$cache_file .= date('dmY', $time_min).'/';
 		
-		$cache_file .= $id.'_'.$date.'.png';
+		$cache_file .= $id.'_'.$date;
 		
 	}
 	else
 	{
+		//the normal "live" image
+		
 		$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
 		
 		if (isset($cfg['tstart']))
@@ -217,25 +223,53 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		//$time_string  = date(_BL('_date').' ', $time_min);
 		$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
 		
-		$cache_file .= $id.'.png';
+		$cache_file .= $id;
 	}
 
+
+	//file type
+	$file = $cfg['file'];
+	$extension = strtolower(substr($file, strrpos($file, '.')+1));
+	 
+	if ($extension == 'jpg' || $extension == 'jpeg')
+	{
+		$cache_file .= '.jpg';
+		$mime = "image/jpeg";
+		$use_truecolor = true;
+	}
+	elseif ($extension == 'gif')
+	{
+		$cache_file .= '.gif';
+		$mime = "image/gif";
+		$use_truecolor = BO_IMAGE_USE_TRUECOLOR;
+	}
+	else // PNG is default
+	{
+		$cache_file .= '.png';
+		$mime = "image/png";
+		$use_truecolor = BO_IMAGE_USE_TRUECOLOR;
+		$extension = ".png";
+	}
 	
+	
+	
+	//Headers
 	header("Pragma: ");
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
 	header("Cache-Control: public, max-age=".($expire - time()));
-	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.png\"");
+	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap".$extension."\"");
 
 	//Caching
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
-		header("Content-Type: image/png");
+		header("Content-Type: $mime");
 		readfile($cache_file);
 		exit;
 	}
 
-	$file = $cfg['file'];
+	
+	//Preparations
 	$latN = $cfg['coord'][0];
 	$lonE = $cfg['coord'][1];
 	$latS = $cfg['coord'][2];
@@ -243,6 +277,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	$c = $cfg['col'];
 	$size = $cfg['point_size'];
 
+	
+	//Dimensions are given
 	if ($cfg['dim'][0] && $cfg['dim'][1])
 	{
 		$w = $cfg['dim'][0];
@@ -257,9 +293,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		}
 	}
 
+	//Filename is given
 	if ($file)
 	{
-		if ($transparent)
+		if ($transparent) //transpatent image
 		{
 			if (!$w || !$h)
 				list($w, $h) = getimagesize(BO_DIR.'images/'.$file);
@@ -269,22 +306,24 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			imagefilledrectangle( $I, 0, 0, $w, $h, $blank);
 			imagecolortransparent($I, $blank);
 		}
-		else if ($w && $h)
+		else if ($w && $h) //Dimensions where given => copy the image
 		{
-			$J = imagecreatefrompng(BO_DIR.'images/'.$file);
+			$J = bo_imagecreatefromfile(BO_DIR.'images/'.$file);
 			imagecopy($I, $J, 0, 0, 0, 0, imagesx($J), imagesy($J));
 			imagedestroy($J);
 			$transparent = true;
 		}
-		else
+		else //normal image
 		{
-			$I = imagecreatefrompng(BO_DIR.'images/'.$file);
+			$I = bo_imagecreatefromfile(BO_DIR.'images/'.$file);
 			$w = imagesx($I);
 			$h = imagesy($I);
 		}
 	}
 
-	if (!$transparent && BO_IMAGE_USE_TRUECOLOR === true) //to truecolor
+	
+	//to truecolor, if needed
+	if (!$transparent && $use_truecolor === true && imageistruecolor($I) === false) 
 	{
 		$tmpImage = imagecreatetruecolor($w, $h);
 		imagecopy($tmpImage,$I,0,0,0,0,$w,$h);
@@ -293,17 +332,23 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		imagealphablending($I, true);
 	}
 
+	
+	//image dimensions
 	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $latS, $lonW);
 	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $latN, $lonE);
 	$w_x = $w / ($x2 - $x1);
 	$h_y = $h / ($y2 - $y1);
 
+	
+	//main strike colors
 	foreach($c as $i => $rgb)
 	{
 		$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
 		$count[$i] = 0;
 	}
 	
+	
+	//smooth the colors
 	if ($cfg['col_smooth'])
 	{
 		for ($i=0;$i<=$cfg['col_smooth'];$i++)
@@ -314,13 +359,18 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	}
 	
-	//for backward compat.
+	
+	//for backward compat. read the old point settings (deprecated!)
 	if (!isset($cfg['point_style']) && $cfg['point_type'])
 		$cfg['point_style'] = array(0 => $cfg['point_type'], 1 => $cfg['point_size']);
 
+		
+	//time calculations
 	$time_range  = $time_max - $time_min + 59;
 	$color_intvl = $time_range / count($c);
 	
+	
+	//get the strikes
 	if (!$blank)
 	{
 	
@@ -369,7 +419,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		//Borders
 		if ($cfg['borders'][0] && file_exists(BO_DIR.'images/'.$cfg['borders'][0]))
 		{
-			$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$cfg['borders'][0]);
+			$tmpImage = bo_imagecreatefromfile(BO_DIR.'images/'.$cfg['borders'][0]);
 			if ($tmpImage)
 				imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
 		}
@@ -533,7 +583,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	bo_image_reduce_colors($I);
 
-	header("Content-Type: image/png");
+	header("Content-Type: $mime");
 	if ($caching)
 	{
 		if (BO_CACHE_SUBDIRS === true)
@@ -543,7 +593,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				mkdir($dir, 0777, true);
 		}
 		
-		$ok = @imagepng($I, $cache_file);
+		$ok = @bo_imageout($I, $extension, $cache_file);
 		
 		if (!$ok)
 			bo_image_cache_error($w, $h);
@@ -551,7 +601,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		readfile($cache_file);
 	}
 	else
-		imagepng($I);
+	{
+		bo_imageout($I, $extension);
+	}
 
 	exit;
 }
@@ -649,12 +701,12 @@ function bo_get_density_image()
 	if (!$densities_enabled)
 		exit('Forbidden');
 
-	if (rand(0, 50) == 1)
+	if (intval(BO_CACHE_PURGE_DENS_RAND) > 0 && rand(0, BO_CACHE_PURGE_DENS_RAND) == 1)
 	{
 		if (BO_CACHE_SUBDIRS === true)
-			register_shutdown_function('bo_delete_files', BO_DIR.'cache/densitymap', 0, 3);
+			register_shutdown_function('bo_delete_files', BO_DIR.'cache/densitymap', intval(BO_CACHE_PURGE_DENS_HOURS), 3);
 		else
-			register_shutdown_function('bo_delete_files', BO_DIR.'cache', 0, 0);
+			register_shutdown_function('bo_delete_files', BO_DIR.'cache', intval(BO_CACHE_PURGE_DENS_HOURS), 0);
 	}
 		
 	$year = intval($_GET['bo_year']);
@@ -674,17 +726,8 @@ function bo_get_density_image()
 		exit('Missing image data!');
 
 	$min_block_size = max($cfg['density_blocksize'], intval($_GET['bo_blocksize']), 1);	
-		
-	//todo: needs adjustments
-	$last_update = strtotime('today +  4 hours');
-	$expire      = strtotime('today + 28 hours');
 	
-	header("Pragma: ");
-	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
-	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
-	header("Cache-Control: public, max-age=".($expire - time()));
-	header("Content-Disposition: inline; filename=\"MyBlitzortungDensity.png\"");
-
+	
 	//Caching
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$cache_file = BO_DIR.'cache/';
@@ -694,28 +737,65 @@ function bo_get_density_image()
 	else
 		$cache_file .= 'densitymap_'.$map_id.'_';
 		
-	$cache_file .= _BL().'_'.sprintf('station%d_%d_b%d_%04d%02d.png', $station_id, $ratio ? 1 : 0, $min_block_size, $year, $month);
+	$cache_file .= _BL().'_'.sprintf('station%d_%d_b%d_%04d%02d', $station_id, $ratio ? 1 : 0, $min_block_size, $year, $month);
+
+	
+	//file format
+	$file = $cfg['file'];
+	$extension = strtolower(substr($file, strrpos($file, '.')+1));
+	 
+	if ($extension == 'jpg' || $extension == 'jpeg')
+	{
+		$cache_file .= '.jpg';
+		$mime = "image/jpeg";
+	}
+	elseif ($extension == 'gif')
+	{
+		$cache_file .= '.gif';
+		$mime = "image/gif";
+	}
+	else // PNG is default
+	{
+		$cache_file .= '.png';
+		$mime = "image/png";
+		$extension = ".png";
+	}
 	
 	
+	//todo: needs adjustments
+	$last_update = strtotime('today +  4 hours');
+	$expire      = strtotime('today + 28 hours');
 	
+	
+	//Headers
+	header("Pragma: ");
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
+	header("Cache-Control: public, max-age=".($expire - time()));
+	header("Content-Disposition: inline; filename=\"MyBlitzortungDensity".$extension."\"");
+
+	
+	//Cache
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
-		header("Content-Type: image/png");
+		header("Content-Type: $mime");
 		readfile($cache_file);
 		exit;
 	}
-		
-	$file = $cfg['file'];
+	
+	
+	//Image: Size, colors	
 	$PicLatN = $cfg['coord'][0];
 	$PicLonE = $cfg['coord'][1];
 	$PicLatS = $cfg['coord'][2];
 	$PicLonW = $cfg['coord'][3];
 	$colors = is_array($cfg['density_colors']) ? $cfg['density_colors'] : $_BO['tpl_density_colors'];
 
-	$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$file);
+	$tmpImage = bo_imagecreatefromfile(BO_DIR.'images/'.$file);
 	$w = imagesx($tmpImage);
 	$h = imagesy($tmpImage);
 
+	
 	//Legend
 	$LegendWidth = 150;
 	$ColorBarWidth  = 10;
@@ -724,7 +804,8 @@ function bo_get_density_image()
 	$ColorBarY = 50;
 	$ColorBarStep = 15;
 	
-	//create new image
+	
+	//create new trucolor image (always needed because of legend!)
 	$I = imagecreatetruecolor($w+$LegendWidth, $h);
 	imagecopy($I,$tmpImage,0,0,0,0,$w,$h);
 	imagedestroy($tmpImage);
@@ -738,6 +819,7 @@ function bo_get_density_image()
 		imagefilledrectangle($I, 0,0, $w, $h, $color);
 	}
 
+	
 	//Legend
 	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
 	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
@@ -757,6 +839,7 @@ function bo_get_density_image()
 		$date_start = "$year-01-01";
 		$date_end   = "$year-12-31";	
 	}
+	
 	
 	//find density to image
 	$sql = "SELECT 	id, station_id, type, info, data, 
@@ -978,7 +1061,7 @@ function bo_get_density_image()
 	//Borders
 	if ($cfg['borders'][0] && file_exists(BO_DIR.'images/'.$cfg['borders'][0]))
 	{
-		$tmpImage = imagecreatefrompng(BO_DIR.'images/'.$cfg['borders'][0]);
+		$tmpImage = bo_imagecreatefromfile(BO_DIR.'images/'.$cfg['borders'][0]);
 		if ($tmpImage)
 			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
 	}
@@ -1149,7 +1232,7 @@ function bo_get_density_image()
 
 	bo_image_reduce_colors($I, true);
 
-	header("Content-Type: image/png");
+	header("Content-Type: $mime");
 	if ($caching)
 	{
 		if (BO_CACHE_SUBDIRS === true)
@@ -1159,7 +1242,7 @@ function bo_get_density_image()
 				mkdir($dir, 0777, true);
 		}
 
-		$ok = @imagepng($I, $cache_file, 9, PNG_ALL_FILTERS);
+		$ok = @bo_imageout($I, $extension, $cache_file);
 		
 		if (!$ok)
 			bo_image_cache_error($w, $h);
@@ -1167,7 +1250,7 @@ function bo_get_density_image()
 		readfile($cache_file);
 	}
 	else
-		imagepng($I, null, 9, PNG_ALL_FILTERS);
+		bo_imageout($I, $extension);
 
 	exit;
 	
@@ -1608,7 +1691,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 }
 
 
-function bo_drawpoint($I, $x, $y, $style, $color = null, $strikedata = null)
+function bo_drawpoint($I, $x, $y, &$style, $color = null, $strikedata = null)
 {
 	if ($color == null && $style[2]) //fillcolor
 		$color = bo_hex2color($I, $style[2]);
@@ -1698,7 +1781,7 @@ function bo_drawpoint($I, $x, $y, $style, $color = null, $strikedata = null)
 			
 		case 20: // Strike sign
 		
-		$points = array(
+			$points = array(
 					$x-$s*0.3, $y+$s*0.1, 
 					$x-$s*0.1, $y+$s*0.1,
 					$x-$s*0.3, $y+$s,
@@ -1708,12 +1791,12 @@ function bo_drawpoint($I, $x, $y, $style, $color = null, $strikedata = null)
 					$x+$s*0.1, $y-$s,
 					$x-$s*0.3, $y+$s*0.1);
 
-		if ($style[2])					
-			imagefilledpolygon($I, $points, count($points)/2, $color);
-		
-		if ($bordercolor !== null)
-			imagepolygon($I, $points, count($points)/2, $bordercolor);
-		
+			if ($style[2])					
+				imagefilledpolygon($I, $points, count($points)/2, $color);
+			
+			if ($bordercolor !== null)
+				imagepolygon($I, $points, count($points)/2, $bordercolor);
+			
 			
 			break;
 			
@@ -1730,5 +1813,37 @@ function bo_drawpoint($I, $x, $y, $style, $color = null, $strikedata = null)
 }
 
 
+function bo_imagecreatefromfile($file)
+{
+	$extension = strtolower(substr($file, strrpos($file, '.')+1));
+	
+	if ($extension == 'jpg' || $extension == 'jpeg')
+		$I = imagecreatefromjpeg($file);
+	elseif ($extension == 'gif')
+		$I = imagecreatefromgif($file);
+	else // PNG is default
+		$I = imagecreatefrompng($file);
+	
+	if ($I === false)
+		exit("Couldn't open image file!");
+	
+	return $I;
+}
+
+function bo_imageout($I, $extension = 'png', $file = null, $quality = BO_IMAGE_JPEG_QUALITY)
+{
+	$extension = strtr($extension, array('.' => ''));
+	
+	if ($extension == 'png')
+		imagepng($I, $file, 9, PNG_ALL_FILTERS);
+	else if ($extension == 'gif')
+		imagegif($I, $file);
+	else if ($extension == 'jpeg')
+		imagejpeg($I, $file, $quality);
+	else if (imageistruecolor($I) === false)
+		imagepng($I, $file, 9, PNG_ALL_FILTERS);
+	else
+		imagejpeg($I, $file, $quality);
+}
 
 ?>
