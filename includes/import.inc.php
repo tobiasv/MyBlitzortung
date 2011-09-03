@@ -293,7 +293,7 @@ function bo_update_strikes($force = false)
 		$tmp = unserialize(bo_get_conf('import_strike_filelength'));
 		
 		// use old file size if range got wrong the last time
-		if (!empty($tmp))
+		if (is_array($tmp) && !empty($tmp))
 		{
 			list($oldrange, $oldtime) = $tmp;
 			$time_diff = (time() - $oldtime) / 60;
@@ -349,7 +349,6 @@ function bo_update_strikes($force = false)
 		else
 		{
 			echo "<p>Using partial download! Beginning with strike ".date('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]+1).") from ".$range[2].". ";
-			bo_set_conf('import_strike_filelength', serialize(array()));
 			
 			if (intval($range[2]))
 				echo "This saved ".round($range[0] / $range[2] * 100)."% traffic.";
