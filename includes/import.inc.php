@@ -273,7 +273,7 @@ function bo_update_strikes($force = false)
 		else if ($last_strike <= 0 || !$last_strike)
 			$last_strike = strtotime('2000-01-01');
 		
-		$time_update = $last_strike - 10;
+		$time_update = $last_strike - 300;
 
 		
 		
@@ -286,8 +286,10 @@ function bo_update_strikes($force = false)
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $last - 120)."'";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
-		$range = $row['cnt_lines'] * 64 + $row['sum_users'] * 9;
-		$range = $range * 0.90 - 2000; //some margin to be sure
+		$calc_range = $row['cnt_lines'] * 64 + $row['sum_users'] * 9;
+		$calc_range = $calc_range * 0.90 - 2000; //some margin to be sure
+		
+		$range = $calc_range;
 		
 		//adjust range
 		$tmp = unserialize(bo_get_conf('import_strike_filelength'));
@@ -295,11 +297,14 @@ function bo_update_strikes($force = false)
 		// use old file size if range got wrong the last time
 		if (is_array($tmp) && !empty($tmp))
 		{
-			list($oldrange, $oldtime) = $tmp;
+			list($oldsize, $oldtime, $oldrange) = $tmp;
 			$time_diff = (time() - $oldtime) / 60;
 			
-			if ( $time_diff < 11 && $range > $oldrange ) 
-				$range = $oldrange * 0.9;
+			if ( $time_diff < 11 && $range > $oldsize && ($oldrange > $oldsize * 0.98 || !$oldrange) ) 
+			{	
+				echo "<p>Calculated range was $calc_range</p>";
+				$range = $oldsize * 0.90;
+			}
 		}
 		
 		if ($range < 1000)
@@ -323,7 +328,7 @@ function bo_update_strikes($force = false)
 		if ($file !== false && empty($range))
 		{
 			echo "\n<p>Partial download didn't work, got whole file instead (sent range $sent_range got ".strlen($file)." bytes)</p>\n";
-			bo_set_conf('import_strike_filelength', serialize(array(strlen($file), time())));
+			bo_set_conf('import_strike_filelength', serialize(array(strlen($file), time(), 0)));
 		}
 		else if ($file === false || $first_strike_file > $last_strike)
 		{
@@ -349,6 +354,7 @@ function bo_update_strikes($force = false)
 		else
 		{
 			echo "<p>Using partial download! Beginning with strike ".date('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]+1).") from ".$range[2].". ";
+			bo_set_conf('import_strike_filelength', serialize(array($range[2], time(), $calc_range)));
 			
 			if (intval($range[2]))
 				echo "This saved ".round($range[0] / $range[2] * 100)."% traffic.";
@@ -356,8 +362,7 @@ function bo_update_strikes($force = false)
 			echo '</p>';
 		}
 		
-		
-		
+	
 		/***** SOME MORE PREPARATIONS BEFORE READING *****/
 		
 		$loadcount = bo_get_conf('upcount_strikes');
@@ -383,39 +388,39 @@ function bo_update_strikes($force = false)
 					continue;
 				}
 				
+				//get older strike data to avoid duplicates
 				if ($old_data === null)
 				{
-					$old_data['part'] = array();
-					$old_data['time'] = array();
-					$old_data['loc'] = array();
+					$old_data = array();
 					
-					$date_start = gmdate('Y-m-d H:i:s', $utime - 120); //120s back to be sure
-					$date_end = gmdate('Y-m-d H:i:s', $utime + 3600 * 6); //6h to the future to be sure
+					//get the range out of the time of the first line
+					$date_start = gmdate('Y-m-d H:i:s', $time_update - 10); //a small margin to be sure
+					$date_end = gmdate('Y-m-d H:i:s', $utime + 3600 * 3); //3h to the future to be sure
 					
 					//Searching for old Strikes (to avoid duplicates)
 					//ToDo: fuzzy search for lat/lon AND time
-					$sql = "SELECT id, part, time, time_ns, lat, lon
+					$sql = "SELECT id, part, time, time_ns, lat, lon, users
 							FROM ".BO_DB_PREF."strikes
 							WHERE time BETWEEN '$date_start' AND '$date_end'";
 					$res = bo_db($sql);
 					while ($row = $res->fetch_assoc())
 					{
 						$id = $row['id'];
-						
-						$old_data['part'][$id] = $row['part'];
-						$old_data['time'][$id] = $row['time'].'.'.$row['time_ns'];
-						$old_data['loc'][$id] = $row['lat'].'/'.$row['lon'];
+						$old_data[$id]['t'] = strtotime($row['time'].' UTC');
+						$old_data[$id]['n'] = $row['time_ns'];
+						$old_data[$id]['loc'] = array($row['lat'], $row['lon']);
+						$old_data[$id]['users'] = $row['users'];
 					}
 				}
 				
+				
+				//The data for the strike
 				$time_ns = intval($r[3]);
 				$time_key = floor($utime / (3600*12));
-				
 				$lat = $r[4];
 				$lon = $r[5];
 				$cur = $r[6];
 				$deviation = $r[7];
-
 				$participants = explode(' ', $r[8]);
 				$users = count($participants);
 				$part = strpos($r[8], BO_USER) !== false ? 1 : 0;
@@ -423,7 +428,7 @@ function bo_update_strikes($force = false)
 				$bear = bo_latlon2bearing($lat, $lon);
 				$lat2 = floor($lat);
 				$lon2 = floor($lon/180 * 128);
-
+				
 				$sql = "
 							time='$date $time',
 							time_ns='$time_ns',
@@ -438,32 +443,109 @@ function bo_update_strikes($force = false)
 							part='$part'
 							";
 
-				//Searching for old Strikes (to avoid duplicates)
-				//ToDo: fuzzy search for lat/lon AND time
-				/*
-				$sql2 = "SELECT id, part, time, time_ns, lat, lon
-						FROM ".BO_DB_PREF."strikes
-						WHERE (time='$date $time' AND time_ns='$time_ns')";
-				$row2 = bo_db($sql2)->fetch_assoc();
-				$id = $row2['id'];
-				$old_part = $row2['part'];
-				*/
-				
-				//search for older entries of the same strike
-				$id = array_search("$date $time.$time_ns", $old_data['time']);
-				
-				if ($id === false)
-					$id = array_search("$lat/$lon", $old_data['loc']);
-
-				if ($id)
-					$old_part = $old_data['part'][$id];
-				else
-					$old_part = 0;
-
 				//for statistics
 				$bear_id = intval($bear);
 				$dist_id = intval($dist / 10 / 1000);
 
+							
+				//search for older entries of the same strike
+				$id = false;
+				$ids_found = array();
+				$nreftime = 0;
+
+				if ($utime < $last_strike + 2)
+				{
+					$delta_nsec = 400000;
+					
+					$search_from  = $utime;
+					$search_to    = $utime;
+					$nsearch_from = ($time_ns - $delta_nsec) * 1E-9;
+					$nsearch_to   = ($time_ns + $delta_nsec) * 1E-9;
+
+					if ($nsearch_from < 0) { $nsearch_from++; $search_from--; }
+					else if ($nsearch_from > 1) { $nsearch_from--; $search_from++; }
+
+					if ($nsearch_to < 0) { $nsearch_to++; $search_to--; }
+					else if ($nsearch_to > 1) { $nsearch_to--; $search_to++; }
+
+					
+					foreach($old_data as $oldid => $d)
+					{
+						//remove entries, which are too old
+						if ($utime - $d['t'] >= 2)
+						{
+							unset($old_data[$i]);
+							continue;
+						}
+					
+						//couldn't find any previous strikes to update
+						if ($d['t'] - $utime >= 2)
+						{
+							break;
+						}
+						
+						
+						
+						$nreftime = $d['n'] * 1E-9;
+						
+						if ($search_from <= $d['t'] && $d['t'] <= $search_to) //found seconds match
+						{
+						
+							echo "<br>".gmdate("H:i:s", $search_from)."$nsearch_from <= ".gmdate("H:i:s", $d['t'])." <= ".gmdate("H:i:s", $search_to)."$nsearch_to ::: ";
+							echo " ".gmdate("H:i:s", $d['t']).".$d[n] ::: ";
+							
+							$is_old_strike = false;
+							
+							//search for nseconds match
+							if ($nsearch_from > $nsearch_to && ($search_from <= $nreftime || $nreftime <= $search_to) )
+							{
+								echo ' Found2! ';
+								$is_old_strike = true;
+							}
+							elseif ($nsearch_from <= $nsearch_to && $nsearch_from <= $nreftime && $nreftime <= $nsearch_to)
+							{
+								echo ' Found1! ';
+								$is_old_strike = true;
+							}
+							
+							if ($is_old_strike)
+							{
+								//was strike the same area?
+								$old_dist = bo_latlon2dist($lat, $lon, $d['loc'][0], $d['loc'][1]);
+
+								//could be a new one if participant count differs too much
+								if ($old_dist < 50000) // && $users * 0.9 <= $d['users'] && $d['users'] <= $users * 1.5)
+									$ids_found[] = $oldid;
+								else
+									echo " Dist/Users didn't match ::: ";
+							}
+							
+						}
+						
+					}
+					
+					
+					if (!empty($ids_found))
+					{
+						$id = $ids_found[0];
+						
+						if (count($ids_found) > 1)
+							echo "Found multiple old strikes!<br>";
+					}
+					else
+						echo " NEW STRIKE !!!";
+						
+					echo "<p>";
+				}
+		
+				
+				/*
+				if ($id === false)
+					$id = array_search("$lat/$lon", $old_data['loc']);
+				*/
+
+
+				// either an updated strike or a new one
 				if (!$id)
 				{
 					$id = bo_db("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
@@ -482,19 +564,7 @@ function bo_update_strikes($force = false)
 					$new_strike = false;
 				}
 
-				//Own Long-Time Statistics
-				if ($new_strike && $part)
-				{
-					$bear_data_own[$bear_id]++;
-					$dist_data_own[$dist_id]++;
-
-					$max_dist_own = max($dist, $max_dist_own);
-					$min_dist_own = min($dist, $min_dist_own);
-
-					$last_strikes[$own_id] = array($utime, $time_ns, $id);
-					
-					$own++;
-				}
+				
 
 				//Update Strike <-> All Participated Stations
 				if ($id && !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true) )
@@ -513,18 +583,35 @@ function bo_update_strikes($force = false)
 
 					if ($sql)
 					{
-						$sql = "INSERT IGNORE INTO ".BO_DB_PREF."stations_strikes (strike_id, station_id) VALUES $sql";
+						$sql = "REPLACE INTO ".BO_DB_PREF."stations_strikes (strike_id, station_id) VALUES $sql";
 						bo_db($sql);
 					}
 				}
 
+
+				//Own Long-Time Statistics
+				if ($new_strike && $part)
+				{
+					$bear_data_own[$bear_id]++;
+					$dist_data_own[$dist_id]++;
+
+					$max_dist_own = max($dist, $max_dist_own);
+					$min_dist_own = min($dist, $min_dist_own);
+
+					$last_strikes[$own_id] = array($utime, $time_ns, $id);
+					
+					$own++;
+				}
+
+				
+				//some more statistics
 				$max_users = max($max_users, $users);
 				$max_dist_all = max($dist, $max_dist_all);
 				$min_dist_all = min($dist, $min_dist_all);
 
 			}
 		}
-
+		
 		echo "\n<p>Lines: ".count($lines)." *** New Strikes: $i *** Updated: $u *** Already read: $a</p>\n";
 
 		$count = bo_get_conf('count_strikes');
@@ -613,6 +700,7 @@ function bo_update_strikes($force = false)
 		$updated = true;
 		bo_set_conf('uptime_strikes', time());
 		bo_update_status_files('strikes');
+		
 	}
 	else
 	{
