@@ -1835,15 +1835,17 @@ function bo_imageout($I, $extension = 'png', $file = null, $quality = BO_IMAGE_J
 	$extension = strtr($extension, array('.' => ''));
 	
 	if ($extension == 'png')
-		imagepng($I, $file, 9, PNG_ALL_FILTERS);
+		$ret = imagepng($I, $file, 9, PNG_ALL_FILTERS);
 	else if ($extension == 'gif')
-		imagegif($I, $file);
+		$ret = imagegif($I, $file);
 	else if ($extension == 'jpeg')
-		imagejpeg($I, $file, $quality);
+		$ret = imagejpeg($I, $file, $quality);
 	else if (imageistruecolor($I) === false)
-		imagepng($I, $file, 9, PNG_ALL_FILTERS);
+		$ret = imagepng($I, $file, 9, PNG_ALL_FILTERS);
 	else
-		imagejpeg($I, $file, $quality);
+		$ret = imagejpeg($I, $file, $quality);
+		
+	return $ret;
 }
 
 ?>
