@@ -385,7 +385,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 					$sql_where
 					$sql_where_id
 					".bo_region2sql($region)."
-				-- ORDER BY time ASC";
+				ORDER BY time ASC";
 		$erg = bo_db($sql);
 		while ($row = $erg->fetch_assoc())
 		{

@@ -278,12 +278,11 @@ function bo_update_strikes($force = false)
 		
 		
 		/***** PARTIAL DOWNLOAD OF STRIKEDATA *****/
-		
 		//estimate the size of the participants.txt before none-imported strikes
 		$date_file_begins = strtotime('now -2 hours');
 		$sql = "SELECT COUNT(*) cnt_lines, SUM(users) sum_users
 				FROM ".BO_DB_PREF."strikes
-				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $last - 120)."'";
+				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $time_update - 60)."'";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$calc_range = $row['cnt_lines'] * 64 + $row['sum_users'] * 9;
@@ -455,12 +454,10 @@ function bo_update_strikes($force = false)
 
 				if ($utime < $last_strike + 2)
 				{
-					$delta_nsec = 400000;
-					
 					$search_from  = $utime;
 					$search_to    = $utime;
-					$nsearch_from = ($time_ns - 400000) * 1E-9;
-					$nsearch_to   = ($time_ns + 400000) * 1E-9;
+					$nsearch_from = ($time_ns - BO_UP_STRIKES_FUZZY_NSEC) * 1E-9;
+					$nsearch_to   = ($time_ns + BO_UP_STRIKES_FUZZY_NSEC) * 1E-9;
 
 					if ($nsearch_from < 0) { $nsearch_from++; $search_from--; }
 					else if ($nsearch_from > 1) { $nsearch_from--; $search_from++; }
@@ -491,33 +488,33 @@ function bo_update_strikes($force = false)
 						if ($search_from <= $d['t'] && $d['t'] <= $search_to) //found seconds match
 						{
 						
-							echo "<br>".gmdate("H:i:s", $search_from)."$nsearch_from <= ".gmdate("H:i:s", $d['t'])." <= ".gmdate("H:i:s", $search_to)."$nsearch_to ::: ";
-							echo " ".gmdate("H:i:s", $d['t']).".$d[n] ::: ";
+							//echo "<br>".gmdate("H:i:s", $search_from)."$nsearch_from <= ".gmdate("H:i:s", $d['t'])." <= ".gmdate("H:i:s", $search_to)."$nsearch_to ::: ";
+							//echo " ".gmdate("H:i:s", $d['t']).".$d[n] ::: ";
 							
 							$is_old_strike = false;
 							
 							//search for nseconds match
 							if ($nsearch_from > $nsearch_to && ($search_from <= $nreftime || $nreftime <= $search_to) )
 							{
-								echo ' Found2! ';
+								//echo ' Found2! ';
 								$is_old_strike = true;
 							}
 							elseif ($nsearch_from <= $nsearch_to && $nsearch_from <= $nreftime && $nreftime <= $nsearch_to)
 							{
-								echo ' Found1! ';
+								//echo ' Found1! ';
 								$is_old_strike = true;
 							}
 							
 							if ($is_old_strike)
 							{
-								//was strike the same area?
+								//was strike in the same area?
 								$old_dist = bo_latlon2dist($lat, $lon, $d['loc'][0], $d['loc'][1]);
 
 								//could be a new one if participant count differs too much
 								if ($old_dist < BO_UP_STRIKES_FUZZY_KM * 1000) // && $users * 0.9 <= $d['users'] && $d['users'] <= $users * 1.5)
 									$ids_found[] = $oldid;
 								else
-									echo " Dist/Users didn't match ::: ";
+									echo " Distance didn't match ($oldid) ::: ";
 							}
 							
 						}
@@ -530,12 +527,12 @@ function bo_update_strikes($force = false)
 						$id = $ids_found[0];
 						
 						if (count($ids_found) > 1)
-							echo "Found multiple old strikes!<br>";
+							echo "$id: Found multiple old strikes!<br>";
 					}
-					else
-						echo " NEW STRIKE !!!";
+					//else
+					//	echo " NEW STRIKE !!!";
 						
-					echo "<p>";
+					//echo "<p>";
 				}
 		
 				

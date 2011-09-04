@@ -884,27 +884,32 @@ function bo_cache_info()
 		
 		$files = glob($dir.'*');
 		
-		if ($depth)
+		if ($depth && is_array($files))
 		{
 			for ($i = 0; $i < count($files); $i++) 
 			{
 				if (is_dir($files[$i])) 
 				{
 					$add = glob($files[$i].'/*');
-					$files = array_merge($files, $add);
+					
+					if ($add && is_array($add))
+						$files = array_merge($files, $add);
 				}
 			}
 		}
 		
-		$size = 0;
-		$count = 0;
-		foreach($files as $file)
+		if (is_array($files))
 		{
-			$file = $file;
-			if (!is_dir($file))
+			$size = 0;
+			$count = 0;
+			foreach($files as $file)
 			{
-				$size += filesize($file);
-				$count++;
+				$file = $file;
+				if (!is_dir($file))
+				{
+					$size += filesize($file);
+					$count++;
+				}
 			}
 		}
 		
