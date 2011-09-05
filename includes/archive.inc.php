@@ -269,12 +269,12 @@ function bo_show_archive_map()
 			if ($ani_cfg['transparent'] === false)
 			{
 				$img_file = BO_FILE.'?image=bt'; //blank "tile"
-				$bo_file_url = BO_FILE.'?map='.$map.'&date=';
+				$bo_file_url = BO_FILE.'?map='.$map.'&bo_lang='._BL().'&date=';
 			}
 			else
 			{
 				$img_file = BO_FILE.'?map='.$map.'&blank&bo_lang='._BL().'';
-				$bo_file_url = BO_FILE.'?map='.$map.'&transparent&date=';
+				$bo_file_url = BO_FILE.'?map='.$map.'&transparent&bo_lang='._BL().'&date=';
 			}
 
 			$first_image = $bo_file_url.sprintf('%04d%02d%02d%02d00-%d', $year, $month, $day, $hour_from, $ani_pic_range).'&bo_lang='._BL();

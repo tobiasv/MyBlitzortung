@@ -118,6 +118,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			@set_time_limit(5);
 		else
 			@set_time_limit(10);
+		
+		if (BO_FORCE_MAP_LANG === true)
+			bo_load_locale(BO_LOCALE);
 	}
 	
 	$last_update = bo_get_conf('uptime_strikes_modified');
@@ -744,6 +747,10 @@ function bo_get_map_image_ani()
 	if (!$cfg['gif_animation_enable'])
 		exit('Animation disabled!');
 	
+	if (BO_FORCE_MAP_LANG === true)
+		bo_load_locale(BO_LOCALE);
+
+	
 	$cfg_ani = $cfg['gif_animation'];
 	$cache_file = $dir._BL().'_ani_'.$id.'.gif';	
 	$last_update = bo_get_conf('uptime_strikes_modified');
@@ -825,7 +832,11 @@ function bo_get_density_image()
 		else
 			register_shutdown_function('bo_delete_files', BO_DIR.'cache', intval(BO_CACHE_PURGE_DENS_HOURS), 0);
 	}
-		
+	
+	if (BO_FORCE_MAP_LANG === true)
+		bo_load_locale(BO_LOCALE);
+
+	
 	$year = intval($_GET['bo_year']);
 	$month = intval($_GET['bo_month']);
 	$map_id = intval($_GET['map']);

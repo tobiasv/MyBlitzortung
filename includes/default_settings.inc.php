@@ -62,6 +62,7 @@
 @define("BO_LANGUAGES", 'de,en,fr');   //available locales
 @define("BO_SHOW_LANGUAGES", true); //show links in the footer
 @define("BO_SHOW_LANG_FLAGS", true); //show flags
+@define("BO_FORCE_MAP_LANG", true); //force default language in maps
 
 /*** User / Login                                                ***/
 @define("BO_LOGIN_SHOW", true);
