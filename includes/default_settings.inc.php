@@ -73,7 +73,7 @@
 @define("BO_UP_INTVL_STATIONS", 15);
 @define("BO_UP_INTVL_RAW", 60);
 
-/*** Fuzzy strike update                                         ***/
+/*** Fuzzy strike update to avoid duplicates                     ***/
 @define("BO_UP_STRIKES_FUZZY_NSEC", 400000);
 @define("BO_UP_STRIKES_FUZZY_KM",   50);
 

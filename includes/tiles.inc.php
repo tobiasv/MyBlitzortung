@@ -90,6 +90,7 @@ function bo_tile()
 	
 	//Debug
 	//$time = strtotime('2011-06-16 17:00:00 UTC');
+	$time = bo_get_conf('uptime_strikes_modified');
 	
 	//get config
 	if (isset($_GET['count'])) // display strike count
@@ -175,7 +176,7 @@ function bo_tile()
 	{
 		bo_load_locale();
 		
-		$time_max = min(bo_get_conf('uptime_strikes'), $time_max);
+		$time_max = min(bo_get_conf('uptime_strikes_modified'), $time_max);
 		$show_date = $time_manual_from || ($time_max-$time_min) > 3600 * 12 ? true : false;
 		
 		$fh = imagefontheight(BO_MAP_LEGEND_FONTSIZE);
@@ -437,7 +438,7 @@ function bo_tile()
 				".($radius ? "AND distance < $radius" : "")."
 				".($only_own ? " AND part>0 " : "")."
 				AND $sql_where
-			-- ORDER BY time ASC";
+			ORDER BY time ASC";
 	$erg = bo_db($sql);
 	
 	//Max. strikes per tile

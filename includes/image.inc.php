@@ -65,9 +65,6 @@ function bo_icon($icon)
 //render a map with strike positions and strike-bar-plot
 function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 {
-	session_write_close();
-	@set_time_limit(10);
-
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$archive_maps_enabled = (BO_DISABLE_ARCHIVE !== true && defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS)
 								|| (bo_user_get_level() & BO_PERM_ARCHIVE);
@@ -107,10 +104,23 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if (!is_array($cfg) || empty($cfg))
 		return;
 
-	if ($return_img)
-		$caching = false;
+		
 	
-	$last_update = bo_get_conf('uptime_strikes');
+	if ($return_img)
+	{
+		$caching = false;
+	}
+	else
+	{
+		session_write_close();
+		
+		if ($transparent)
+			@set_time_limit(5);
+		else
+			@set_time_limit(10);
+	}
+	
+	$last_update = bo_get_conf('uptime_strikes_modified');
 	
 	//Cache file naming
 	$cache_file = BO_DIR.'cache/maps/';
@@ -278,40 +288,60 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	$size = $cfg['point_size'];
 
 	
-	//Dimensions are given
-	if ($cfg['dim'][0] && $cfg['dim'][1])
+	//dimensions are set
+	if (isset($cfg['dim']))
 	{
 		$w = $cfg['dim'][0];
 		$h = $cfg['dim'][1];
+	}
+	
+	//move img
+	if (isset($cfg['dim'][3]) || isset($cfg['dim'][4]))
+	{
+		$move_x = intval($cfg['dim'][3]);
+		$move_y = intval($cfg['dim'][4]);
 		
-		if (!$transparent)
-		{
-			$I = imagecreate($w, $h);
-			$blank = imagecolorallocate($I, 1, 2, 3);
-			imagefilledrectangle( $I, 0, 0, $w, $h, $blank);
-			imagecolortransparent($I, $blank);
-		}
+		//reset dimensions (only important when no $file)
+		$w -= $move_x;
+		$h -= $move_y;
 	}
 
-	//Filename is given
-	if ($file)
+	//dimensions
+	if ($transparent && $file)
+	{
+		list($w, $h) = getimagesize(BO_DIR.'images/'.$file);
+		$file = '';
+	}
+	
+	$I = null;
+	
+	//Dimensions are given, but no file (or transparent)
+	if (!$file && $w && $h) 
+	{
+		if ($use_truecolor === true)
+			$I = imagecreatetruecolor($w, $h);
+		else
+			$I = imagecreate($w, $h);
+		
+		if ($cfg['dim'][2])
+			$back = bo_hex2color($I, $cfg['dim'][2]);
+		else
+			$back = imagecolorallocate($I, 1, 2, 3);
+		
+		imagefilledrectangle( $I, 0, 0, $w, $h, $back);
+		
+		if ($transparent)
+			imagecolortransparent($I, $back);
+	}
+	else if ($file) 	//Filename is given
 	{
 		if ($transparent) //transpatent image
 		{
-			if (!$w || !$h)
-				list($w, $h) = getimagesize(BO_DIR.'images/'.$file);
-			
+			list($w, $h) = getimagesize(BO_DIR.'images/'.$file);
 			$I = imagecreate($w, $h);
 			$blank = imagecolorallocate($I, 1, 2, 3);
 			imagefilledrectangle( $I, 0, 0, $w, $h, $blank);
 			imagecolortransparent($I, $blank);
-		}
-		else if ($w && $h) //Dimensions where given => copy the image
-		{
-			$J = bo_imagecreatefromfile(BO_DIR.'images/'.$file);
-			imagecopy($I, $J, 0, 0, 0, 0, imagesx($J), imagesy($J));
-			imagedestroy($J);
-			$transparent = true;
 		}
 		else //normal image
 		{
@@ -321,6 +351,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		}
 	}
 
+	if (!$I)
+		exit("Image error $w x $h");
 	
 	//to truecolor, if needed
 	if (!$transparent && $use_truecolor === true && imageistruecolor($I) === false) 
@@ -492,7 +524,38 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			}
 		}
 	}
+
 	
+	/*** no more calculations with coordinates from here, because image dimensions may change! ***/
+	
+	//Dimensions where given => copy the image 
+	//or image must be resized/moved
+	if ($file && $cfg['dim'][0] && $cfg['dim'][1] || ($move_x || $move_y)) 
+	{
+		$w = $cfg['dim'][0];
+		$h = $cfg['dim'][1];
+		
+		if ($use_truecolor === true)
+			$J = imagecreatetruecolor($cfg['dim'][0], $cfg['dim'][1]);
+		else
+			$J = imagecreate($cfg['dim'][0], $cfg['dim'][1]);
+
+		imagealphablending($J, true);
+		
+		if ($cfg['dim'][2])
+			$back = bo_hex2color($J, $cfg['dim'][2]);
+		else
+			$back = imagecolorallocate($J, 1, 2, 3);
+		imagefilledrectangle( $J, 0, 0, $w, $h, $back);
+		if ($transparent)
+			imagecolortransparent($J, $back);
+			
+		
+		imagecopy($J, $I, $move_x, $move_y, 0, 0, imagesx($J), imagesy($J));
+		imagedestroy($I);
+		$I = $J;
+	}
+
 	
 	
 	if (!$blank)
@@ -629,7 +692,7 @@ function bo_get_map_image_ani()
 	
 	$cfg_ani = $cfg['animation'];
 	$cache_file = $dir._BL().'_ani_'.$id.'.gif';	
-	$last_update = bo_get_conf('uptime_strikes');
+	$last_update = bo_get_conf('uptime_strikes_modified');
 
 	//Caching
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)

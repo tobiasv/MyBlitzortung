@@ -262,8 +262,6 @@ function bo_update_strikes($force = false)
 		
 		
 		/***** PREPARATIONS BEFORE READING *****/
-		bo_update_error('strikedata', true);
-
 		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
 		$row = $res->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
@@ -309,20 +307,35 @@ function bo_update_strikes($force = false)
 		if ($range < 8000)
 			$range = 8000;
 
-			
 		$sent_range = $range;
 		
+		//send a last modified header
+		$last_modified = bo_get_conf('uptime_strikes_modified');
+		$modified = $last_modified; //!!
+		
 		//get the file
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range, $modified);
+		
 		
 		//check the date of the 2nd line (1st may be truncated!)
-		if ($file !== false)
+		if ($file === false)
+		{
+			if ($code == 304) //wasn't modified
+			{
+				bo_set_conf('uptime_strikes', time());
+				echo "\n<p>File not changed since last download (".date('r', $modified).")</p>\n";
+				return;
+			}
+			
+			$first_strike_file = 0;
+		}
+		else
 		{
 			$lines = explode("\n", $file);
 			$first_strike_file = strtotime(substr($lines[1],0,19).' UTC');
 		}
-		else
-			$first_strike_file = 0;
+
+			
 		
 		if ($file !== false && empty($range))
 		{
@@ -332,10 +345,20 @@ function bo_update_strikes($force = false)
 		else if ($file === false || $first_strike_file > $last_strike)
 		{
 			/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
-			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range);
+			$modified = $last_modified; //!!
+			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range, $modified);
 
 			echo "\n<p>Using partial download FAILED! Fallback to normal download (".strlen($file)." bytes). ";
 
+			
+			if ($code == 304) //wasn't modified
+			{
+				bo_set_conf('uptime_strikes', time());
+				echo "\n<p>File not changed since last download (".date('r', $modified).")</p>\n";
+				return;
+			}
+
+			
 			if ($first_strike_file > 0)
 				echo " The problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database (size: ".($range[1]-$range[0]+1).").</p>\n";			
 			elseif ($code)
@@ -360,10 +383,14 @@ function bo_update_strikes($force = false)
 				
 			echo '</p>';
 		}
-		
-	
+
+		//set the modified header
+		if (intval($modified) <= 0)
+			$modified = time() - 180;
+		bo_set_conf('uptime_strikes_modified', $modified);
+
 		/***** SOME MORE PREPARATIONS BEFORE READING *****/
-		
+		bo_update_error('strikedata', true); //reset error reporting		
 		$loadcount = bo_get_conf('upcount_strikes');
 		bo_set_conf('upcount_strikes', $loadcount+1);
 		$last_strikes = unserialize(bo_get_conf('last_strikes_stations'));

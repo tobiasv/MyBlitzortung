@@ -736,7 +736,7 @@ function bo_load_locale($locale = '')
 
 }
 
-function bo_get_file($url, &$error = '', $type = '', &$range = 0)
+function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0)
 {
 	$content = ''; 
 	$err = 0;
@@ -774,6 +774,9 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 			
 			if ($range > 0)
 				$out .= "Range: bytes=".intval($range)."-\r\n";
+			
+			if ($modified)
+				$out .= "If-Modified-Since: ".gmdate("r", $modified)."\r\n";
 				
 			$out .= "Connection: Close\r\n\r\n";
 
@@ -781,7 +784,9 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 			$response = array();
 			$accepted_range = false;
 			$content_length = 0;
-				
+			
+			//echo nl2br($out);
+			
 			if (fwrite($fp, $out) !== false)
 			{
 				//Header
@@ -793,7 +798,12 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 					{
 						preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
 						
-						if ($response[1] != '200' && $response[1] != '206')
+						if ($response[1] == '304')
+						{
+							$err = 3;
+							break;
+						}
+						else if ($response[1] != '200' && $response[1] != '206')
 						{
 							$err = 2;
 							break;
@@ -805,7 +815,9 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 
 					if (preg_match('/Content\-Length: ?([0-9]+)/', $header, $r))
 						$content_length = $r[1];
-						
+
+					if (preg_match('/Last\-Modified:(.+)/', $header, $r))
+						$modified = strtotime($r[1]);
 			
 					$first = false;
 				} 
@@ -828,6 +840,11 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 		if ($err == 2)
 		{
 			$error = $response[1].' '.$response[2];
+			$content = false;
+		}
+		elseif ($err == 3) //Not Modified
+		{
+			$error = 304;
 			$content = false;
 		}
 	}
@@ -881,6 +898,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0)
 		}
 	}
 	
+
 	return $content; 	 
 }
 
