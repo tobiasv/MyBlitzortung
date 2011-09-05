@@ -266,7 +266,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$file = strtr($cfg['file_time'], $replace);
 		
 		if (!file_exists(BO_DIR.'images/'.$file))
+		{
+			$cache_file .= '_nobg';
 			$file = '';
+		}
 	}
 	
 	if (!$file && isset($cfg['file']))
