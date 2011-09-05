@@ -69,7 +69,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	$archive_maps_enabled = (BO_DISABLE_ARCHIVE !== true && defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS)
 								|| (bo_user_get_level() & BO_PERM_ARCHIVE);
 
-	if (intval(BO_CACHE_PURGE_DENS_RAND) > 0 && rand(0, BO_CACHE_PURGE_MAPS_RAND) == 1 && $id !== false)
+	if (intval(BO_CACHE_PURGE_MAPS_RAND) > 0 && rand(0, BO_CACHE_PURGE_MAPS_RAND) == 1 && $id !== false)
 	{	
 		register_shutdown_function('bo_delete_files', BO_DIR.'cache/maps/', intval(BO_CACHE_PURGE_MAPS), 3);
 	}
@@ -152,7 +152,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		//image with only one strike
 		
 		if (!$archive_maps_enabled)
-			exit('Forbidden!');
+			bo_image_error('Forbidden!');
 		
 		$sql_where_id .= " AND id='$strike_id' ";
 		
@@ -172,7 +172,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		//the archive images
 		
 		if (!$archive_maps_enabled)
-			exit('Forbidden!');
+			bo_image_error('Forbidden!');
 		
 		$year = substr($date, 0, 4);
 		$month = substr($date, 4, 2);
@@ -182,10 +182,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$minute = substr($date, 10, 2);
 		$duration = intval(substr($date, 13));
 
-		if (!bo_user_get_level())
+	
+		if (!bo_user_get_level() && $duration != $cfg['animation']['range'])
 		{
-			if ( ($duration > 60 * 24 || ($duration && $duration < 60)) )
-				exit;
+			if ( ($duration > 60 * 24 || ($duration && $duration < 15)) )
+				bo_image_error('Time range not allowed!');
 			
 			//allow only specific settings for guests
 			$minute   = floor($minute / 15) * 15;
@@ -393,7 +394,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 
 	if (!$I)
-		exit("Image error $w x $h");
+		bo_image_error("Image error $w x $h");
 	
 	//to truecolor, if needed
 	if (!$transparent && $use_truecolor === true && imageistruecolor($I) === false) 
@@ -748,7 +749,7 @@ function bo_get_map_image_ani()
 		return;
 
 	if (!$cfg['gif_animation_enable'])
-		exit('Animation disabled!');
+		bo_image_error('Animation disabled!');
 	
 	if (BO_FORCE_MAP_LANG === true)
 		bo_load_locale(BO_LOCALE);
@@ -826,7 +827,7 @@ function bo_get_density_image()
 							&& BO_DISABLE_ARCHIVE !== true;
 	
 	if (!$densities_enabled)
-		exit('Forbidden');
+		bo_image_error('Forbidden');
 
 	if (intval(BO_CACHE_PURGE_DENS_RAND) > 0 && rand(0, BO_CACHE_PURGE_DENS_RAND) == 1)
 	{
@@ -854,7 +855,7 @@ function bo_get_density_image()
 	//Image settings
 	$cfg = $_BO['mapimg'][$map_id];
 	if (!is_array($cfg) || !$cfg['density'])
-		exit('Missing image data!');
+		bo_image_error('Missing image data!');
 
 	$min_block_size = max($cfg['density_blocksize'], intval($_GET['bo_blocksize']), 1);	
 	
@@ -1506,7 +1507,7 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 
 
 //error output
-function bo_image_error($w, $h, $text, $size=2)
+function bo_image_error($text, $w=400, $h=300, $size=2)
 {
 	$I = imagecreate($w, $h);
 	imagefill($I, 0, 0, imagecolorallocate($I, 255, 150, 150));
@@ -1519,9 +1520,9 @@ function bo_image_error($w, $h, $text, $size=2)
 	exit;
 }
 
-function bo_image_cache_error($w, $h)
+function bo_image_cache_error($w=400, $h=300)
 {
-	bo_image_error($w, $h, 'Creating image failed! Please check if your cache-dirs are writeable!', 3);
+	bo_image_error('Creating image failed! Please check if your cache-dirs are writeable!', $w, $h, 3);
 }
 
 //get an image from /images directory
@@ -1956,7 +1957,7 @@ function bo_imagecreatefromfile($file)
 		$I = imagecreatefrompng($file);
 	
 	if ($I === false)
-		exit("Couldn't open image file!");
+		bo_image_error("Couldn't open image file!");
 	
 	return $I;
 }

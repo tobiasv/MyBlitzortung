@@ -2381,10 +2381,10 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 }
 
-function bo_graph_error($w, $h)
+function bo_graph_error($w=400, $h=300)
 {
 	$text = 'File "includes/jpgraph/jpgraph.php" not found!';
-	bo_image_error($w, $h, $text);
+	bo_image_error($text, $w, $h);
 }
 
 

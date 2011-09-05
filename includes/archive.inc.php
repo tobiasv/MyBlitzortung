@@ -156,7 +156,7 @@ function bo_show_archive_map()
 	echo '<div id="bo_arch_maps">';
 
 	echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
-	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev'));
+	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_ok'));
 
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_arch_strikes').'</legend>';
@@ -225,17 +225,17 @@ function bo_show_archive_map()
 
 		echo '<div class="bo_arch_map_links">';
 		echo _BL('Yesterday').': &nbsp; ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=0" >'._BL('Picture').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_ok')).'&bo_day_add=0" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_hour_from', 'bo_hour_to')).'&bo_day_add=0&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_hour_from', 'bo_hour_to', 'bo_ok')).'&bo_day_add=0&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
 		
 		echo '  &nbsp;  &nbsp; &nbsp; ';
 		echo _BL('Today').': &nbsp; ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add')).'&bo_day_add=1" >'._BL('Picture').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_ok')).'&bo_day_add=1" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_hour_from', 'bo_hour_to')).'&bo_day_add=1&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_hour_from', 'bo_hour_to', 'bo_ok')).'&bo_day_add=1&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
 			
 		echo '</div>';
 
