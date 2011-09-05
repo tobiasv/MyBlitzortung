@@ -104,8 +104,10 @@ function bo_show_archive_map()
 	global $_BO;
 
 	$ani_div = intval(BO_ANIMATIONS_INTERVAL);
-	$ani_pic_interval = intval(BO_ANIMATIONS_STRIKE_TIME);
+	$ani_pic_range = intval(BO_ANIMATIONS_STRIKE_TIME);
 	$ani_default_range = intval(BO_ANIMATIONS_DEFAULT_RANGE);
+	$ani_delay = BO_ANIMATIONS_WAITTIME;
+	$ani_delay_end = BO_ANIMATIONS_WAITTIME_END;
 	
 	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;
 	$year = intval($_GET['bo_year']);
@@ -118,7 +120,7 @@ function bo_show_archive_map()
 	
 	if (!$hour_from && !$hour_to)
 	{
-		$hour_from = (int)date('H', time() - 3600 * $ani_default_range - $ani_pic_interval * 60);
+		$hour_from = (int)date('H', time() - 3600 * $ani_default_range - $ani_pic_range * 60);
 		$hour_to = (int)date('H', time());
 	}
 	
@@ -163,11 +165,7 @@ function bo_show_archive_map()
 	$mapname = _BL($_BO['mapimg'][$map]['name']);
 	
 	//image dimensions
-	$file = BO_DIR.'images/'.$_BO['mapimg'][$map]['file'];
-	if (file_exists($file) && !is_dir($file))
-	{
-		list(,,,$img_dim) = getimagesize($file);
-	}
+	$img_dim = bo_archive_get_dim($map);
 	
 	echo '<span class="bo_form_descr">'._BL('Date').':</span> ';
 	echo '<select name="bo_year" id="bo_arch_strikes_select_year">';
@@ -252,29 +250,53 @@ function bo_show_archive_map()
 		}
 		else if ($ani)
 		{
-			$img_file = BO_FILE.'?map='.$map.'&blank&bo_lang='._BL().'';
-			$bo_file_url = BO_FILE.'?map='.$map.'&transparent&date=';
+			$ani_cfg = $_BO['mapimg'][$map]['animation'];
 			
+			//individual settings
+			if (isset($ani_cfg['delay']))
+				$ani_delay = $ani_cfg['delay'];
+				
+			if (isset($ani_cfg['delay_end']))
+				$ani_delay_end = $ani_cfg['delay_end'];
 			
-			$images = '';
+			if (isset($ani_cfg['interval']))
+				$ani_div = $ani_cfg['interval'];
+				
+			if (isset($ani_cfg['range']))
+				$ani_pic_range = $ani_cfg['range'];
+
+			//use transparency?
+			if ($ani_cfg['transparent'] === false)
+			{
+				$img_file = BO_FILE.'?image=bt'; //blank "tile"
+				$bo_file_url = BO_FILE.'?map='.$map.'&date=';
+			}
+			else
+			{
+				$img_file = BO_FILE.'?map='.$map.'&blank&bo_lang='._BL().'';
+				$bo_file_url = BO_FILE.'?map='.$map.'&transparent&date=';
+			}
+
+			$first_image = $bo_file_url.sprintf('%04d%02d%02d%02d00-%d', $year, $month, $day, $hour_from, $ani_pic_range).'&bo_lang='._BL();
 			
 			if ($hour_from >= $hour_to)
 				$hour_to += 24; //next day
 			
+			$images = '';
 			for ($i=$hour_from*60; $i<= $hour_to * 60; $i+= $ani_div)
 			{
 				$time = strtotime("$year-$month-$day 00:00:00 +$i minutes");
 				
-				if ($time + 60 * $ani_pic_interval > $end_time)
+				if ($time + 60 * $ani_pic_range > $end_time)
 					break;
 				
-				$images .= ($images ? ',' : '').'"'.date('YmdHi', $time).'-'.$ani_pic_interval.'"';
+				$images .= ($images ? ',' : '').'"'.date('YmdHi', $time).'-'.$ani_pic_range.'"';
 			}
 
 			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time).' ('._BL('Animation').')';
 			
 			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
-			echo '<img style="position:absolute;top:0;left:0;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.BO_FILE.'?map='.$map.'&transparent&date='.sprintf('%04d%02d%02d0000-%d', $year, $month, $day, $ani_pic_interval).'&bo_lang='._BL().'" alt="'.htmlspecialchars($alt).'">';
+			echo '<img style="position:absolute;top:0;left:0;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.$first_image.'" alt="'.htmlspecialchars($alt).'">';
 		}
 		else
 		{
@@ -301,9 +323,9 @@ var bo_maps_loaded = 0;
 
 function bo_maps_animation(nr)
 {
-	var timeout = <?php echo intval(BO_ANIMATIONS_WAITTIME); ?>;
+	var timeout = <?php echo intval($ani_delay); ?>;
 	document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[nr].src;
-	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += <?php echo intval(BO_ANIMATIONS_WAITTIME_END); ?>; }
+	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += <?php echo intval($ani_delay_end); ?>; }
 	window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
 	
 }
@@ -417,13 +439,7 @@ function bo_show_archive_density()
 	
 	
 	//image dimensions
-	$file = BO_DIR.'images/'.$_BO['mapimg'][$map]['file'];
-	if (file_exists($file) && !is_dir($file))
-	{
-		list($w,$h,,$img_dim) = getimagesize($file);
-		$img_dim = ' width="'.($w+150).'" height="'.$h.'" ';
-	}
-	
+	bo_archive_get_dim($map, 150);
 	
 	echo '<span class="bo_form_descr">'._BL('Year').':</span> ';
 	echo '<select name="bo_year" id="bo_arch_dens_select_year" onchange="submit();">';
@@ -1232,36 +1248,19 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	echo '</form>';
 	
-	
-	
 	if ($show_empty_sig && $count == 1 && $strike_id)
 	{
 		$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;
-
-		$file = BO_DIR.'images/'.$_BO['mapimg'][$map]['file'];
-		if (file_exists($file) && !is_dir($file))
-		{
-			list(,,,$img_dim) = getimagesize($file);
-		}
-		
-		
-		
-		
+		$img_dim = bo_archive_get_dim($map);
 		echo '<h4>'._BL('Participated stations').'</h4>';
 		echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
 		echo bo_insert_html_hidden(array('bo_map'));
 		echo '<fieldset>';
 		$map = bo_archive_select_map($map);
 		echo '</fieldset>';
-		
 		$img_file = BO_FILE.'?map='.$map.'&strike_id='.$strike_id.'&bo_lang='._BL();
 		echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
-		
 	}
-
-	
-	
-
 }
 
 
@@ -1285,5 +1284,29 @@ function bo_archive_select_map($map)
 	
 	return $map;
 }
+
+
+function bo_archive_get_dim($map, $addx=0)
+{
+	global $_BO;
+	
+	$cfg = $_BO['mapimg'][$map];
+	
+	if ($cfg['dim'][0] && $cfg['dim'][1])
+	{
+		$img_dim = ' width="'.($cfg['dim'][0]+$addx).'" height="'.$cfg['dim'][1].'" ';	
+	}
+	else
+	{
+		$file = BO_DIR.'images/'.$cfg['file'];
+		if (file_exists($file) && !is_dir($file))
+		{
+			list(,,,$img_dim) = getimagesize($file);
+		}
+	}
+	
+	return $img_dim;
+}
+
 
 ?>

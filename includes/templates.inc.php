@@ -169,13 +169,13 @@ $_BO['tpl_imgmap_default']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap_default']['col_smooth'] = 24;
 
 
-//an animation template
-$_BO['tpl_animation_mini']['minutes'] = 60 * 3;
-$_BO['tpl_animation_mini']['count'] = 12;
-$_BO['tpl_animation_mini']['interval'] = 120;
-$_BO['tpl_animation_mini']['delay'] = 40;
-$_BO['tpl_animation_mini']['delay_end'] = 120;
-$_BO['tpl_animation_mini']['legend'] = false;
+//an animation template4
+$_BO['tpl_gif_animation_mini']['minutes'] = 60 * 3;
+$_BO['tpl_gif_animation_mini']['count'] = 12;
+$_BO['tpl_gif_animation_mini']['range'] = 120;
+$_BO['tpl_gif_animation_mini']['delay'] = 40;
+$_BO['tpl_gif_animation_mini']['delay_end'] = 120;
+$_BO['tpl_gif_animation_mini']['legend'] = false;
 
 
 
@@ -378,8 +378,8 @@ $_BO['tpl_imgmap']['europe_mini']['textsize'] = 1;
 $_BO['tpl_imgmap']['europe_mini']['point_style'] = array(3, 1, 'f008', 0);
 $_BO['tpl_imgmap']['europe_mini']['legend'] = array(0, 54, 26, 0, 0, 0);
 $_BO['tpl_imgmap']['europe_mini']['col'] = $_BO['tpl_color']['standard'];
-$_BO['tpl_imgmap']['europe_mini']['animation_enable'] = true;
-$_BO['tpl_imgmap']['europe_mini']['animation'] = $_BO['tpl_animation_mini'];
+$_BO['tpl_imgmap']['europe_mini']['gif_animation_enable'] = true;
+$_BO['tpl_imgmap']['europe_mini']['gif_animation'] = $_BO['tpl_gif_animation_mini'];
 
 
 //Europe (mini) - with stations
@@ -394,8 +394,8 @@ $_BO['tpl_imgmap']['europe_mini_stations']['textsize'] = 1;
 $_BO['tpl_imgmap']['europe_mini_stations']['point_style'] = array(3, 1, 'f008', 0);
 $_BO['tpl_imgmap']['europe_mini_stations']['legend'] = array(0, 54, 26, 0, 0, 0);
 $_BO['tpl_imgmap']['europe_mini_stations']['col'] = $_BO['tpl_color']['standard'];
-$_BO['tpl_imgmap']['europe_mini_stations']['animation_enable'] = true;
-$_BO['tpl_imgmap']['europe_mini_stations']['animation'] = $_BO['tpl_animation_mini'];
+$_BO['tpl_imgmap']['europe_mini_stations']['gif_animation_enable'] = true;
+$_BO['tpl_imgmap']['europe_mini_stations']['gif_animation'] = $_BO['tpl_gif_animation_mini'];
 $_BO['tpl_imgmap']['europe_mini_stations']['stations']['A'] = $_BO['points']['stations_dots_active'];
 $_BO['tpl_imgmap']['europe_mini_stations']['stations']['-'] = $_BO['points']['stations_dots_inactive'];
 $_BO['tpl_imgmap']['europe_mini_stations']['stations']['O'] = $_BO['points']['stations_dots_offline'];
@@ -416,8 +416,8 @@ $_BO['tpl_imgmap']['germany_mini']['textsize'] = 1;
 $_BO['tpl_imgmap']['germany_mini']['point_style'] = array(2, 2, 'f008', 0);
 $_BO['tpl_imgmap']['germany_mini']['legend'] = array(0, 42, 26, 0, 0, 0);
 $_BO['tpl_imgmap']['germany_mini']['col'] = $_BO['tpl_color']['standard'];
-$_BO['tpl_imgmap']['germany_mini']['animation_enable'] = true;
-$_BO['tpl_imgmap']['germany_mini']['animation'] = $_BO['tpl_animation_mini'];
+$_BO['tpl_imgmap']['germany_mini']['gif_animation_enable'] = true;
+$_BO['tpl_imgmap']['germany_mini']['gif_animation'] = $_BO['tpl_gif_animation_mini'];
 
 
 

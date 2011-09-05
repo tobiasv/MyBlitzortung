@@ -205,11 +205,7 @@ function bo_show_lightning_map()
 		$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
 		
 		//image dimensions
-		$file = BO_DIR.'images/'.$_BO['mapimg'][$static_map_id]['file'];
-		if (file_exists($file) && !is_dir($file))
-		{
-			list(,,,$img_dim) = getimagesize($file);
-		}
+		$img_dim = bo_archive_get_dim($static_map_id);
 		
 		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 

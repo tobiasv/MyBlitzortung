@@ -931,8 +931,27 @@ function bo_update_stations($force = false)
 		$Count = array();
 		$signal_count = 0;
 
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt', $code, 'stations');
+		//send a last modified header
+		$modified = bo_get_conf('uptime_stations_modified');
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt', $code, 'stations', $range, $modified);
 
+		
+		//wasn't modified
+		if ($code == 304) 
+		{
+			bo_set_conf('uptime_stations', time());
+			echo "\n<p>File not changed since last download (".date('r', $modified).")</p>\n";
+			return;
+		}
+		
+		
+		//set the modified header
+		if (intval($modified) <= 0)
+			$modified = time() - 180;
+		bo_set_conf('uptime_stations_modified', $modified);
+
+		
+		//ERROR
 		if ($file === false)
 		{
 			bo_update_error('stationdata', 'Download of station data failed. '.$code);

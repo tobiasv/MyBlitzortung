@@ -163,7 +163,7 @@
 @define("BO_IMAGE_PALETTE_COLORS_MAPS", 256); // use palette images for MAPS with defined colors for output (0 disables)
 @define("BO_IMAGE_PALETTE_COLORS_DENSITIES", 0); // use palette images for DENSITY MAPS with defined colors for output (0 disables)
 @define("BO_IMAGE_PALETTE_AUTO", true); // automatically use true color if colorcount in palette image is 256 (set to 256 above!)
-@define("BO_IMAGE_JPEG_QUALITY", 85);
+@define("BO_IMAGE_JPEG_QUALITY", 90);
 @define("BO_MAPS_ORDER", ''); // order your maps, comma separated ids
 
 

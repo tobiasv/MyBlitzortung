@@ -8,6 +8,7 @@ Version 0.7.2 (2011-09-xx)
 - new: deletion of old stations from station database
 - new: added support of jpg and gif map files
 - new: using "If-Modified" header for strike download
+- new: use map image by time (i.e. for animations with satellite images)
 - fixed: better importing of strikes to avoid duplicates (needs still tuning)
 - tuned partial strike download
 

@@ -151,12 +151,18 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		if (!$archive_maps_enabled)
 			exit('Forbidden!');
 		
-		$time_min = 0;
-		$time_max = time();
-		
 		$sql_where_id .= " AND id='$strike_id' ";
 		
+		//no legend
 		$cfg['legend'] = array();
+		
+		$sql = "SELECT time, time_ns FROM ".BO_DB_PREF."strikes s WHERE id='$strike_id' ";
+		$res = bo_db($sql);
+		$row = $res->fetch_assoc();
+		$time_min = $time_max = strtotime($row['time'].' UTC');
+		$time_string = date('H:i:s', $time_min).'.'.substr($row['time_ns'], 0, 6);
+		
+		$file_by_time = true;
 	}
 	else if (preg_match('/^[0-9\-]+$/', $date))
 	{
@@ -215,6 +221,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 		$cache_file .= $id.'_'.$date;
 		
+		$file_by_time = true;
 	}
 	else
 	{
@@ -234,11 +241,35 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
 		
 		$cache_file .= $id;
+		
+		$file_by_time = false;
 	}
 
 
+	//find the correct file
+	$file = '';
+	
+	//filename by endtime
+	if ($file_by_time && isset($cfg['file_time']))
+	{
+		$replace = array(
+			'%Y' => gmdate('Y', $time_max),
+			'%M' => gmdate('m', $time_max),
+			'%D' => gmdate('d', $time_max),
+			'%h' => gmdate('H', $time_max),
+			'%m' => gmdate('i', $time_max)
+			);
+			
+		$file = strtr($cfg['file_time'], $replace);
+		
+		if (!file_exists(BO_DIR.'images/'.$file))
+			$file = '';
+	}
+	
+	if (!$file && isset($cfg['file']))
+		$file = $cfg['file'];
+	
 	//file type
-	$file = $cfg['file'];
 	$extension = strtolower(substr($file, strrpos($file, '.')+1));
 	 
 	if ($extension == 'jpg' || $extension == 'jpeg')
@@ -258,9 +289,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$cache_file .= '.png';
 		$mime = "image/png";
 		$use_truecolor = BO_IMAGE_USE_TRUECOLOR;
-		$extension = ".png";
+		$extension = "png";
 	}
 	
+	if ($transparent)
+		$extension = "png";
 	
 	
 	//Headers
@@ -268,7 +301,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
 	header("Cache-Control: public, max-age=".($expire - time()));
-	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap".$extension."\"");
+	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.".$extension."\"");
 
 	//Caching
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
@@ -284,9 +317,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	$lonE = $cfg['coord'][1];
 	$latS = $cfg['coord'][2];
 	$lonW = $cfg['coord'][3];
-	$c = $cfg['col'];
 	$size = $cfg['point_size'];
-
+	$c = $cfg['col'];
 	
 	//dimensions are set
 	if (isset($cfg['dim']))
@@ -323,15 +355,18 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		else
 			$I = imagecreate($w, $h);
 		
-		if ($cfg['dim'][2])
-			$back = bo_hex2color($I, $cfg['dim'][2]);
-		else
-			$back = imagecolorallocate($I, 1, 2, 3);
-		
-		imagefilledrectangle( $I, 0, 0, $w, $h, $back);
-		
 		if ($transparent)
+		{
+			$back = imagecolorallocate($I, 1, 2, 3);
+			imagefilledrectangle($I, 0, 0, $w, $h, $back);
 			imagecolortransparent($I, $back);
+		}
+		elseif ($cfg['dim'][2])
+		{
+			$back = bo_hex2color($I, $cfg['dim'][2]);
+			imagefilledrectangle($I, 0, 0, $w, $h, $back);
+		}			
+
 	}
 	else if ($file) 	//Filename is given
 	{
@@ -373,12 +408,26 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 	
 	//main strike colors
+	$color_tmp = array();
 	foreach($c as $i => $rgb)
 	{
-		$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
+		if (!is_array($rgb))
+		{
+			 $rgb = bo_hex2rgb($rgb);
+			 $color_tmp[$i] = $rgb;
+		}
+		
+		//alpha doens't work with alpha-channel and transparent background
+		if ($transparent)
+			$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
+		else
+			$color[$i] = imagecolorallocatealpha($I, $rgb[0], $rgb[1], $rgb[2], $rgb[3]);
+			
 		$count[$i] = 0;
 	}
 	
+	if (!empty($color_tmp))
+		$c = $color_tmp;
 	
 	//smooth the colors
 	if ($cfg['col_smooth'])
@@ -386,7 +435,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		for ($i=0;$i<=$cfg['col_smooth'];$i++)
 		{
 			list($red, $green, $blue, $alpha) = bo_value2color($i/$cfg['col_smooth'], $c);
-			$color_smooth[$i] = imagecolorallocatealpha($I, $red, $green, $blue, $alpha);
+			
+			if ($transparent)	
+				$color_smooth[$i] = imagecolorallocate($I, $red, $green, $blue);
+			else
+				$color_smooth[$i] = imagecolorallocatealpha($I, $red, $green, $blue, $alpha);
 		}
 	
 	}
@@ -418,8 +471,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 					$sql_where_id
 					".bo_region2sql($region)."
 				ORDER BY time ASC";
-		$erg = bo_db($sql);
-		while ($row = $erg->fetch_assoc())
+		$res = bo_db($sql);
+		while ($row = $res->fetch_assoc())
 		{
 			$strike_time = strtotime($row['time'].' UTC');
 			$age = $time_max-1 - $strike_time;
@@ -438,7 +491,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				else
 					$pcolor = $color[$color_index];
 				
-				bo_drawpoint($I, $x, $y, $cfg['point_style'], $pcolor);
+				bo_drawpoint($I, $x, $y, $cfg['point_style'], $pcolor, !$transparent);
 			}
 		}
 	}
@@ -542,21 +595,22 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 		imagealphablending($J, true);
 		
-		if ($cfg['dim'][2])
-			$back = bo_hex2color($J, $cfg['dim'][2]);
-		else
-			$back = imagecolorallocate($J, 1, 2, 3);
-		imagefilledrectangle( $J, 0, 0, $w, $h, $back);
 		if ($transparent)
+		{
+			$back = imagecolorallocate($J, 1, 2, 3);
+			imagefilledrectangle( $J, 0, 0, $w, $h, $back);
 			imagecolortransparent($J, $back);
-			
+		}
+		elseif ($cfg['dim'][2])
+		{
+			$back = bo_hex2color($J, $cfg['dim'][2]);
+			imagefilledrectangle( $J, 0, 0, $w, $h, $back);
+		}			
 		
 		imagecopy($J, $I, $move_x, $move_y, 0, 0, imagesx($J), imagesy($J));
 		imagedestroy($I);
 		$I = $J;
 	}
-
-	
 	
 	if (!$blank)
 	{
@@ -687,10 +741,10 @@ function bo_get_map_image_ani()
 	if (!is_array($cfg) || empty($cfg))
 		return;
 
-	if (!$cfg['animation_enable'])
+	if (!$cfg['gif_animation_enable'])
 		exit('Animation disabled!');
 	
-	$cfg_ani = $cfg['animation'];
+	$cfg_ani = $cfg['gif_animation'];
 	$cache_file = $dir._BL().'_ani_'.$id.'.gif';	
 	$last_update = bo_get_conf('uptime_strikes_modified');
 
@@ -705,10 +759,10 @@ function bo_get_map_image_ani()
 	$time_start = $last_update - $cfg_ani['minutes'] * 60;
 	$cfg_single = $cfg;
 	
-	if (!$cfg_ani['interval'])
-		$cfg_ani['interval'] = $cfg_ani['minutes'] / $cfg_ani['count'];
+	if (!$cfg_ani['range'])
+		$cfg_ani['range'] = $cfg_ani['minutes'] / $cfg_ani['count'];
 	
-	$cfg_single['trange'] = $cfg_ani['interval'] / 60;
+	$cfg_single['trange'] = $cfg_ani['range'] / 60;
 	
 	if (isset($cfg_ani['colors']))
 		$cfg_single['col'] = $cfg_ani['colors'];
@@ -821,7 +875,7 @@ function bo_get_density_image()
 	{
 		$cache_file .= '.png';
 		$mime = "image/png";
-		$extension = ".png";
+		$extension = "png";
 	}
 	
 	
@@ -835,7 +889,7 @@ function bo_get_density_image()
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
 	header("Cache-Control: public, max-age=".($expire - time()));
-	header("Content-Disposition: inline; filename=\"MyBlitzortungDensity".$extension."\"");
+	header("Content-Disposition: inline; filename=\"MyBlitzortungDensity.".$extension."\"");
 
 	
 	//Cache
@@ -1754,16 +1808,16 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 }
 
 
-function bo_drawpoint($I, $x, $y, &$style, $color = null, $strikedata = null)
+function bo_drawpoint($I, $x, $y, &$style, $color = null, $use_alpha = true, $strikedata = null)
 {
 	if ($color == null && $style[2]) //fillcolor
-		$color = bo_hex2color($I, $style[2]);
+		$color = bo_hex2color($I, $style[2], $use_alpha);
 
 	$bordercolor = null;
 		
 	if ($style[3]) 
 	{
-		$bordercolor = bo_hex2color($I, $style[4]);
+		$bordercolor = bo_hex2color($I, $style[4], $use_alpha);
 		imagesetthickness($I, $style[3]);
 	}
 

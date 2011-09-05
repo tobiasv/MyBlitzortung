@@ -1382,11 +1382,11 @@ function bo_imagettftextborder(&$I, $size, $angle, $x, $y, &$textcolor, $font, $
    return imagettftext($I, $size, $angle, $x, $y, $textcolor, $font, $text);
 }
 
-function bo_hex2color(&$I, $str)
+function bo_hex2color(&$I, $str, $use_alpha = true)
 {
 	$rgb = bo_hex2rgb($str);
 
-	if (count($rgb) == 4 && imageistruecolor($I))
+	if (count($rgb) == 4 && imageistruecolor($I) && $use_alpha)
 		return imagecolorallocatealpha($I, $rgb[0], $rgb[1], $rgb[2], $rgb[3]);
 	else
 		return imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
@@ -1405,6 +1405,8 @@ function bo_hex2rgb($str)
 		
 		if (strlen($hexStr) == 4)
 			$rgb[3] = hexdec(str_repeat(substr($hexStr, 3, 1), 2)) / 2;
+		else
+			$rgb[3] = 0;
     } 
 	elseif (strlen($hexStr) == 6 || strlen($hexStr) == 8) 
 	{
@@ -1414,6 +1416,8 @@ function bo_hex2rgb($str)
 		
 		if (strlen($hexStr) == 8)
 			$rgb[3] = hexdec(substr($hexStr, 6, 2)) / 2;
+		else
+			$rgb[3] = 0;
     }
 	
     return $rgb;
