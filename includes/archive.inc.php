@@ -439,7 +439,7 @@ function bo_show_archive_density()
 	
 	
 	//image dimensions
-	bo_archive_get_dim($map, 150);
+	$img_dim = bo_archive_get_dim($map, 150);
 	
 	echo '<span class="bo_form_descr">'._BL('Year').':</span> ';
 	echo '<select name="bo_year" id="bo_arch_dens_select_year" onchange="submit();">';
@@ -1201,7 +1201,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		}
 
 		
-		if (bo_user_get_id() == 1 && $row['strike_id'])
+		if (bo_user_get_id() == 1 && ($strike_id || ($row['strike_id'] && isset($_GET['bo_show_part']))) )
 		{
 			echo '<tr><td class="bo_sig_table_strikeinfo" colspan="3" style="font-size:60%">';
 			
@@ -1229,8 +1229,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		if ($count == $per_page)
 			break;
 
-		if ($show_empty_sig)
-			$strike_id = $row['strike_id'];
+		
+		$last_strike_id = $row['strike_id'];
 	}
 
 	echo '</table>';
@@ -1248,6 +1248,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	echo '</form>';
 	
+	if ($show_empty_sig && !$strike_id)
+		$strike_id = $last_strike_id;
+		
 	if ($show_empty_sig && $count == 1 && $strike_id)
 	{
 		$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;
@@ -1294,17 +1297,23 @@ function bo_archive_get_dim($map, $addx=0)
 	
 	if ($cfg['dim'][0] && $cfg['dim'][1])
 	{
-		$img_dim = ' width="'.($cfg['dim'][0]+$addx).'" height="'.$cfg['dim'][1].'" ';	
+		$x = $cfg['dim'][0];
+		$y = $cfg['dim'][1];
 	}
 	else
 	{
 		$file = BO_DIR.'images/'.$cfg['file'];
 		if (file_exists($file) && !is_dir($file))
 		{
-			list(,,,$img_dim) = getimagesize($file);
+			list($x,$y,,$img_dim) = getimagesize($file);
 		}
 	}
 	
+	if ($x && $y)
+		$img_dim = ' width="'.($x+$addx).'" height="'.$y.'" ';	
+	else
+		$img_dim = '';
+		
 	return $img_dim;
 }
 

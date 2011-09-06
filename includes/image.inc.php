@@ -273,8 +273,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		}
 	}
 	
-	if (!$file && isset($cfg['file']))
+	if (!$file && $cfg['file'])
 		$file = $cfg['file'];
+	
+	
 	
 	//file type
 	$extension = strtolower(substr($file, strrpos($file, '.')+1));
