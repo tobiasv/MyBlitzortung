@@ -501,7 +501,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$whole_strike_ratio_cnt = 0;
 
 	$D = array();
-	$res = bo_db("SELECT a.id sid, a.city city, a.country country, a.distance distance,
+	$res = bo_db("SELECT a.id sid, a.city city, a.country country, a.distance distance, a.user user,
 							b.signalsh signalsh, b.strikesh strikesh
 					FROM ".BO_DB_PREF."stations a, ".BO_DB_PREF."stations_stat b
 					WHERE 1
@@ -562,6 +562,14 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				$S[$row['sid']] = $row['distance'];
 				break;
 
+			case 'user':
+				$S[$row['sid']] = $row['user'];
+				break;
+
+			case 'id':
+				$S[$row['sid']] = $row['sid'];
+				break;
+
 			case 'signals':
 				$S[$row['sid']] = $row['signalsh'];
 				break;
@@ -618,7 +626,16 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo '<div id="bo_network_stations_container">';
 	echo '<table id="bo_network_stations">';
 	echo '<tr>
-			<th rowspan="2">'._BL('Pos.').'</th>
+			<th rowspan="2">'._BL('Pos.').'</th>';
+	
+	if (bo_user_get_id() == 1)
+	{
+		echo '
+			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'id').'#table_network" rel="nofollow">'._BL('Id').'</a></th>
+			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'user').'#table_network" rel="nofollow">'._BL('User').'</a></th>';
+	}
+	
+	echo '
 			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'country').'#table_network" rel="nofollow">'._BL('Country').'</a></th>
 			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'city').'#table_network" rel="nofollow">'._BL('City').'</a></th>
 			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'distance').'#table_network" rel="nofollow">'._BL('Distance').'</a></th>
@@ -639,7 +656,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	// Stations table
 	switch($sort)
 	{
-		case 'city': case 'country': case 'distance':
+		case 'city': case 'country': case 'distance': case 'user': case 'id':
 			asort($S);
 			break;
 		default:
@@ -668,6 +685,18 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			
 		echo '</td>';
 
+		if (bo_user_get_id() == 1)
+		{
+			echo '<td class="bo_text '.($sort == 'id' ? 'bo_marked' : '').'">';
+			echo $d['sid'];
+			echo '</td>';
+
+			echo '<td class="bo_text '.($sort == 'user' ? 'bo_marked' : '').'">';
+			echo $d['user'];
+			echo '</td>';
+		}
+		
+		
 		echo '<td class="bo_text '.($sort == 'country' ? 'bo_marked' : '').'">';
 		echo $d['country'];
 		echo '</td>';

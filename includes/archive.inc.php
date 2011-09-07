@@ -296,7 +296,7 @@ function bo_show_archive_map()
 			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time).' ('._BL('Animation').')';
 			
 			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
-			echo '<img style="position:absolute;top:0;left:0;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.$first_image.'" alt="'.htmlspecialchars($alt).'">';
+			echo '<img style="position:absolute;top:1px;left:1px;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.$first_image.'" alt="'.htmlspecialchars($alt).'">';
 		}
 		else
 		{

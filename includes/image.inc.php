@@ -909,7 +909,7 @@ function bo_get_density_image()
 	header("Content-Disposition: inline; filename=\"MyBlitzortungDensity.".$extension."\"");
 
 	
-	//Cache
+	//Cache - First cache try
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
 		header("Content-Type: $mime");
@@ -978,7 +978,8 @@ function bo_get_density_image()
 	//find density to image
 	$sql = "SELECT 	id, station_id, type, info, data, 
 					lat_max, lon_max, lat_min, lon_min, length,
-					date_start, date_end, status
+					date_start, date_end, status,
+					UNIX_TIMESTAMP(changed) changed
 					FROM ".BO_DB_PREF."densities 
 					WHERE 1 
 						AND status >= 1 
@@ -1014,6 +1015,7 @@ function bo_get_density_image()
 	$date_start = $row['date_start'];
 	$date_end = $row['date_end'];
 	$time_string = date(_BL('_date'), strtotime($row['date_start'])).' - '.date(_BL('_date'), strtotime($row['date_end']));
+	$last_changed = $row['changed'];
 	
 	//coordinates
 	$DensLat       = $row['lat_min'];
@@ -1024,6 +1026,7 @@ function bo_get_density_image()
 	$area      = pow($length, 2);
 	$distance = $length * sqrt(2) * 1000;
 	
+	//SECOND DATABASE CALL
 	if ($ratio)
 	{
 		$row_own = $res->fetch_assoc();
@@ -1036,6 +1039,7 @@ function bo_get_density_image()
 			$OWN_DATA = gzinflate($row_own['data']);
 			$info = unserialize($row_own['info']);
 			$max_real_own_count = $info['max']; //max strike count
+			$last_changed = max($row['changed'], $last_changed);
 		}
 	}
 	
@@ -1059,6 +1063,17 @@ function bo_get_density_image()
 		imagepng($I);
 		exit;
 	}
+	
+	
+	//Cache - Second cache try
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_changed)
+	{
+		header("Content-Type: $mime");
+		readfile($cache_file);
+		exit;
+	}
+
+	
 	
 	//pointer on current part of string
 	$string_pos = 0;
