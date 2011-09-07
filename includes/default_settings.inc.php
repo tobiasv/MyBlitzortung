@@ -130,7 +130,7 @@
 @define("BO_CACHE_PURGE_TILES_HOURS", 24); //purges tiles when older that specified value (hours)
 @define("BO_CACHE_PURGE_TILES_RAND",  1000); //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
 @define("BO_CACHE_PURGE_MAPS_HOURS", 24 * 4); //purges maps when older that specified value (hours)
-@define("BO_CACHE_PURGE_MAPS_RAND",  500); //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
+@define("BO_CACHE_PURGE_MAPS_RAND",  1); //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
 @define("BO_CACHE_PURGE_DENS_HOURS", 24 * 10); //purges density maps when older that specified value (hours)
 @define("BO_CACHE_PURGE_DENS_RAND",  50); //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
 

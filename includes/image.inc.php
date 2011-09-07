@@ -71,7 +71,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 	if (intval(BO_CACHE_PURGE_MAPS_RAND) > 0 && rand(0, BO_CACHE_PURGE_MAPS_RAND) == 1 && $id !== false)
 	{	
-		register_shutdown_function('bo_delete_files', BO_DIR.'cache/maps/', intval(BO_CACHE_PURGE_MAPS), 3);
+		register_shutdown_function('bo_delete_files', BO_DIR.'cache/maps/', intval(BO_CACHE_PURGE_MAPS_HOURS), 3);
 	}
 	
 	global $_BO;
@@ -166,6 +166,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$time_string = date('H:i:s', $time_min).'.'.substr($row['time_ns'], 0, 6);
 		
 		$file_by_time = true;
+		$caching = false;
 	}
 	else if (preg_match('/^[0-9\-]+$/', $date))
 	{
@@ -174,12 +175,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		if (!$archive_maps_enabled)
 			bo_image_error('Forbidden!');
 		
-		$year = substr($date, 0, 4);
-		$month = substr($date, 4, 2);
-		$day = substr($date, 6, 2);
-
-		$hour = substr($date, 8, 2);
-		$minute = substr($date, 10, 2);
+		$year     = sprintf('%04d', substr($date, 0, 4));
+		$month    = sprintf('%02d', substr($date, 4, 2));
+		$day      = sprintf('%02d', substr($date, 6, 2));
+		$hour     = sprintf('%02d', substr($date, 8, 2));
+		$minute   = sprintf('%02d', substr($date, 10, 2));
 		$duration = intval(substr($date, 13));
 
 	
@@ -203,8 +203,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$time_min = strtotime("$year-$month-$day 00:00:00");
 			$time_max = strtotime("$year-$month-$day 23:59:59");
 		}
+
+		if (BO_CACHE_SUBDIRS === true)
+			$cache_file .= gmdate('YmdHi', $time_min).'/';
 		
-		
+		$cache_file .= $id.'_'.gmdate('YmdHi', $time_min).'_'.$duration;
 		
 		if ($time_max > $last_update)
 		{
@@ -220,10 +223,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 		$expire = time() + 3600;
 		
-		if (BO_CACHE_SUBDIRS === true)
-			$cache_file .= date('dmY', $time_min).'/';
 		
-		$cache_file .= $id.'_'.$date;
 		
 		$file_by_time = true;
 	}

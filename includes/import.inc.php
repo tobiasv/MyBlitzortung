@@ -324,7 +324,7 @@ function bo_update_strikes($force = false)
 			{
 				bo_set_conf('uptime_strikes', time());
 				echo "\n<p>File not changed since last download (".date('r', $modified).")</p>\n";
-				return;
+				return false;
 			}
 			
 			$first_strike_file = 0;
@@ -355,7 +355,7 @@ function bo_update_strikes($force = false)
 			{
 				bo_set_conf('uptime_strikes', time());
 				echo "\n<p>File not changed since last download (".date('r', $modified).")</p>\n";
-				return;
+				return false;
 			}
 
 			
@@ -941,7 +941,7 @@ function bo_update_stations($force = false)
 		{
 			bo_set_conf('uptime_stations', time());
 			echo "\n<p>File not changed since last download (".date('r', $modified).")</p>\n";
-			return;
+			return false;
 		}
 		
 		

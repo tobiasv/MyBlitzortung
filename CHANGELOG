@@ -8,10 +8,12 @@ Version 0.7.2 (2011-09-xx)
 - new: deletion of old stations from station database
 - new: added support of jpg and gif map files
 - new: using "If-Modified" header for strike download
-- new: use map image by time (i.e. for animations with satellite images)
+- new: use map image by time (i.e. for animations with satellite images) - thx to oh6mqm
 - new: force default language in maps (not so much load with cache)
+- new: show participated users in strike info (when logged-in)
+- new: show user and station-id in list (when logged-in)
 - fixed: better importing of strikes to avoid duplicates (needs still tuning)
-- tuned partial strike download
+- fixed: tuned partial strike download
 
 Version 0.7.1 (2011-09-01)
 --------------------------
