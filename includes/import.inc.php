@@ -575,7 +575,7 @@ function bo_update_strikes($force = false)
 				}
 				else
 				{
-					if (time() - $utime > 5 * 60)
+					if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
 						$sql .= " , status=2 ";
 					else
 						$sql .= " , status=1 ";
@@ -1529,7 +1529,7 @@ function bo_update_all($force = false)
 	$is_updating = (int)bo_get_conf('is_updating');
 
 	//Check if sth. went wrong on the last update (if older continue)
-	if ($is_updating && time() - $is_updating < $overall_timeout + 120 && !($force && $debug))
+	if ($is_updating && time() - $is_updating < $overall_timeout + 300 && !($force && $debug))
 	{
 		echo "\n<p>ERROR: Another update is running *** Begin: ".date('Y-m-d H:i:s', $is_updating)." *** Now: ".date('Y-m-d H:i:s')."</p>\n";
 		return;
@@ -1764,28 +1764,31 @@ function bo_update_all($force = false)
 				flush();
 			}
 
-			if ($num_strikes > 10000)
+			if (intval(BO_PURGE_OPTIMIZE_TABLES))
 			{
-				echo "<p>Optimizing strikes table</p>\n";
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."strikes");
-			}
+				if ($num_strikes > BO_PURGE_OPTIMIZE_TABLES)
+				{
+					echo "<p>Optimizing strikes table</p>\n";
+					bo_db("OPTIMIZE TABLE ".BO_DB_PREF."strikes");
+				}
 
-			if ($num_stations > 1000)
-			{
-				echo "<p>Optimizing stations table</p>\n";
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_stat");
-			}
-			
-			if ($num_signals > 5000)
-			{
-				echo "<p>Optimizing signals table</p>\n";
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."raw");
-			}
-			
-			if ($num_stastr > 50000)
-			{
-				echo "<p>Optimizing strikes-stations table</p>\n";
-				bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes");
+				if ($num_stations > BO_PURGE_OPTIMIZE_TABLES)
+				{
+					echo "<p>Optimizing stations table</p>\n";
+					bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_stat");
+				}
+				
+				if ($num_signals > BO_PURGE_OPTIMIZE_TABLES)
+				{
+					echo "<p>Optimizing signals table</p>\n";
+					bo_db("OPTIMIZE TABLE ".BO_DB_PREF."raw");
+				}
+				
+				if ($num_stastr > BO_PURGE_OPTIMIZE_TABLES)
+				{
+					echo "<p>Optimizing strikes-stations table</p>\n";
+					bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes");
+				}
 			}
 			
 		}

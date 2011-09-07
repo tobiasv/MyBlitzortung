@@ -41,6 +41,7 @@ if (!defined("BO_VER"))
 	define("BO_MIN_PARTICIPANTS", 7);
 	define("BO_MAX_VOLTAGE", 2.5);
 	define("BO_TRIGGER_VOLTAGE", 0.45);
+	define("BO_MIN_MINUTES_STRIKE_CONFIRMED", 5);
 	
 	//Do not change these values (needed for auto linking stations)
 	define('BO_LINK_HOST', 'www.myblitzortung.de');

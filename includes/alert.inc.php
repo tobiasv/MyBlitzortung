@@ -475,10 +475,7 @@ function bo_alert_send()
 	else
 		$min_send_interval = 45; 
 	
-	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes";
-	$res = bo_db($sql);
-	$row = $res->fetch_assoc();
-	$max_time = strtotime($row['mtime'].' UTC');
+	$max_time = bo_get_conf('uptime_strikes_modified');
 	
 	//strike data is to old --> do nothing
 	if (time() - $max_time < 30 * 60)
@@ -525,9 +522,13 @@ function bo_alert_send()
 									";
 				}
 				
+				if ($d['count'] <= 2) // only confirmed strikes should count when min strike count is very low
+					$sql_where .= " AND status > 0 ";
+				
 				$sql = "SELECT COUNT(id) cnt, MAX(time) maxtime, MIN(time) mintime
 						FROM ".BO_DB_PREF."strikes
-						WHERE 1	$sql_where";
+						WHERE 1	
+							$sql_where";
 				$res2 = bo_db($sql);
 				$row2 = $res2->fetch_assoc();
 				
@@ -538,7 +539,8 @@ function bo_alert_send()
 						//only use the poition of the last strike in the interval to avoid to much calculating
 						$sql = "SELECT lat, lon
 								FROM ".BO_DB_PREF."strikes
-								WHERE 1	$sql_where 
+								WHERE 1	
+									$sql_where 
 								ORDER BY time DESC
 								LIMIT 1";
 						$res3 = bo_db($sql);

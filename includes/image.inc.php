@@ -230,6 +230,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	else
 	{
 		//the normal "live" image
+		$sql_where_id .= " AND (status>0 OR time > '".gmdate('Y-m-d H:i:s', $last_update - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)."') ";
 		
 		$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
 		
@@ -471,7 +472,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		//the where clause
 		$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $latS, $latN, $lonW, $lonE);
 	
-		$sql = "SELECT time, lat, lon
+		$sql = "SELECT time, lat, lon, status
 				FROM ".BO_DB_PREF."strikes s
 				$index_sql
 				WHERE 1 AND
@@ -827,7 +828,7 @@ function bo_get_density_image()
 	$densities_enabled = defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES
 							&& ((defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES) || (bo_user_get_level() & BO_PERM_ARCHIVE))
 							&& BO_DISABLE_ARCHIVE !== true;
-	
+
 	if (!$densities_enabled)
 		bo_image_error('Forbidden');
 

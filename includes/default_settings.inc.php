@@ -556,6 +556,7 @@
 //global purge settings
 @define("BO_PURGE_ENABLE", true);
 @define("BO_PURGE_MAIN_INTVL", 6);
+@define("BO_PURGE_OPTIMIZE_TABLES", 0); //optimizes table if deleted rows are bigger than value (0 disables)
 
 // min-age in hours, 0 disables
 @define("BO_PURGE_SIG_NS", 24);     //signals with no strike assigned        
