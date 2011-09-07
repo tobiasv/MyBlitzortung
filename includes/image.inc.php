@@ -482,6 +482,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 					".bo_region2sql($region)."
 				ORDER BY time ASC";
 		$res = bo_db($sql);
+		
+		
 		while ($row = $res->fetch_assoc())
 		{
 			$strike_time = strtotime($row['time'].' UTC');
@@ -711,7 +713,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	bo_image_reduce_colors($I);
 
 	header("Content-Type: $mime");
-	if ($caching)
+	if (1 ||$caching)
 	{
 		if (BO_CACHE_SUBDIRS === true)
 		{
@@ -719,9 +721,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			if (!file_exists($dir))
 				mkdir($dir, 0777, true);
 		}
-		
+
 		$ok = @bo_imageout($I, $extension, $cache_file);
-		
+
 		if (!$ok)
 			bo_image_cache_error($w, $h);
 		
@@ -1985,13 +1987,13 @@ function bo_imageout($I, $extension = 'png', $file = null, $quality = BO_IMAGE_J
 	$extension = strtr($extension, array('.' => ''));
 	
 	if ($extension == 'png')
-		$ret = imagepng($I, $file, 9, PNG_ALL_FILTERS);
+		$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
 	else if ($extension == 'gif')
 		$ret = imagegif($I, $file);
 	else if ($extension == 'jpeg')
 		$ret = imagejpeg($I, $file, $quality);
 	else if (imageistruecolor($I) === false)
-		$ret = imagepng($I, $file, 9, PNG_ALL_FILTERS);
+		$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
 	else
 		$ret = imagejpeg($I, $file, $quality);
 		

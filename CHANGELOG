@@ -14,6 +14,7 @@ Version 0.7.2 (2011-09-xx)
 - new: show user and station-id in list (when logged-in)
 - fixed: better importing of strikes to avoid duplicates (needs still tuning)
 - fixed: tuned partial strike download
+- strike count in maps now closer of those on blitzortung.org-maps
 
 Version 0.7.1 (2011-09-01)
 --------------------------
