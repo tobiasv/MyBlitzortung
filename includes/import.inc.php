@@ -508,8 +508,6 @@ function bo_update_strikes($force = false)
 							break;
 						}
 						
-						
-						
 						$nreftime = $d['n'] * 1E-9;
 						
 						if ($search_from <= $d['t'] && $d['t'] <= $search_to) //found seconds match
@@ -540,8 +538,8 @@ function bo_update_strikes($force = false)
 								//could be a new one if participant count differs too much
 								if ($old_dist < BO_UP_STRIKES_FUZZY_KM * 1000) // && $users * 0.9 <= $d['users'] && $d['users'] <= $users * 1.5)
 									$ids_found[] = $oldid;
-								else
-									echo " Distance didn't match ($oldid) ::: ";
+								//else
+								//	echo " Distance didn't match ($oldid) ::: ";
 							}
 							
 						}
@@ -553,8 +551,8 @@ function bo_update_strikes($force = false)
 					{
 						$id = $ids_found[0];
 						
-						if (count($ids_found) > 1)
-							echo "$id: Found multiple old strikes!<br>";
+						//if (count($ids_found) > 1)
+						//	echo "$id: Found multiple old strikes!<br>";
 					}
 					//else
 					//	echo " NEW STRIKE !!!";
@@ -562,16 +560,10 @@ function bo_update_strikes($force = false)
 					//echo "<p>";
 				}
 		
-				
-				/*
-				if ($id === false)
-					$id = array_search("$lat/$lon", $old_data['loc']);
-				*/
-
-
 				// either an updated strike or a new one
 				if (!$id)
 				{
+					$sql .= " , status=0 ";
 					$id = bo_db("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
 					$i++;
 
@@ -583,6 +575,11 @@ function bo_update_strikes($force = false)
 				}
 				else
 				{
+					if (time() - $utime > 5 * 60)
+						$sql .= " , status=2 ";
+					else
+						$sql .= " , status=1 ";
+					
 					bo_db("UPDATE ".BO_DB_PREF."strikes SET $sql WHERE id='$id'");
 					$u++;
 					$new_strike = false;

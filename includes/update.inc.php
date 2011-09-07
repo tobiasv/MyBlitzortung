@@ -37,7 +37,8 @@ function bo_check_for_update()
 						'0.5.2' => 502,
 						'0.5.5' => 505,
 						'0.6.1' => 601,
-						'0.6.2' => 602);
+						'0.6.2' => 602,
+						'0.7.2' => 702,);
 
 	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
 	{
@@ -270,6 +271,25 @@ function bo_check_for_update()
 				flush();
 			
 				break;
+			
+			case '0.7.2':
+			
+			
+				$res = bo_db("SHOW COLUMNS FROM `".BO_DB_PREF."strikes` WHERE Field='status'");
+				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD `status` tinyint(4) NOT NULL";
+				echo '<li><em>'.$sql.'</em>: <b>';
+				if (!$res->num_rows)
+				{
+					$ok = bo_db($sql);
+					echo _BL($ok ? 'OK' : 'FAIL');
+				}
+				else
+				{
+					echo _BL('Already DONE BEFORE');
+					$ok = true;
+				}
+				echo '</b></li>';
+				flush();	
 			
 			default:
 				$ok = true;
