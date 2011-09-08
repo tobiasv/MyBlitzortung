@@ -502,7 +502,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 					$pcolor = $color_smooth[floor($age / $time_range * $cfg['col_smooth'])];
 				else
 					$pcolor = $color[$color_index];
-				
+
 				bo_drawpoint($I, $x, $y, $cfg['point_style'], $pcolor, !$transparent);
 			}
 		}

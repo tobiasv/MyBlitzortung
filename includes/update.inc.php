@@ -278,18 +278,35 @@ function bo_check_for_update()
 				$res = bo_db("SHOW COLUMNS FROM `".BO_DB_PREF."strikes` WHERE Field='status'");
 				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD `status` tinyint(4) NOT NULL";
 				echo '<li><em>'.$sql.'</em>: <b>';
+				flush();
 				if (!$res->num_rows)
 				{
 					$ok = bo_db($sql);
 					echo _BL($ok ? 'OK' : 'FAIL');
+					echo '</b></li>';
+					flush();
+					
+					if ($ok)
+					{
+						$sql = "UPDATE `".BO_DB_PREF."strikes` SET status=3 WHERE status=0";
+						echo '<li><em>'.$sql.'</em>: <b>';
+						flush();
+						$ok = bo_db($sql, false);
+						echo _BL($ok ? 'OK' : 'FAIL');
+						echo '</b></li>';
+					}
 				}
 				else
 				{
 					echo _BL('Already DONE BEFORE');
+					echo '</b></li>';
 					$ok = true;
 				}
-				echo '</b></li>';
+				
 				flush();	
+			
+			
+				
 			
 			default:
 				$ok = true;

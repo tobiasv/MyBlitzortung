@@ -563,7 +563,11 @@ function bo_update_strikes($force = false)
 				// either an updated strike or a new one
 				if (!$id)
 				{
-					$sql .= " , status=0 ";
+					if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
+						$sql .= " , status=2 ";
+					else
+						$sql .= " , status=0 ";
+					
 					$id = bo_db("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
 					$i++;
 
