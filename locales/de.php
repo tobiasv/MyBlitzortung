@@ -880,3 +880,20 @@ $_BL['de']['Never before'] = 'Noch nie';
 $_BL['de']['no_strike_yet'] = 'Noch keiner';
 
 
+$_BL['de']['Roﬂtal'] = '';
+$_BL['de']['Germany 2'] = '';
+$_BL['de']['Sat (HRV)'] = '';
+$_BL['de']['Sat (IR)'] = '';
+$_BL['de']['Scandi'] = '';
+$_BL['de']['Sat (MPE)'] = '';
+$_BL['de']['Sat TEST'] = '';
+$_BL['de']['Webcam Sicht'] = '';
+$_BL['de']['Wetter.info Radar (21:30)'] = '';
+$_BL['de']['Wetter.info Radar (animiert)'] = '';
+$_BL['de']['EUCLID'] = '';
+$_BL['de']['BLIDS Germany'] = '';
+$_BL['de']['Meteox rain radar (Scandinavia)'] = '';
+$_BL['de'][''] = '';
+$_BL['de']['Europe (mini)'] = '';
+$_BL['de']['Germany (mini)'] = '';
+$_BL['de']['Wetter.info Radar (21:45)'] = '';

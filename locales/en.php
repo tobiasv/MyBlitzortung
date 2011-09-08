@@ -857,3 +857,20 @@ $_BL['en']['no_strike_yet'] = 'None';
 
 
 
+$_BL['en']['Roﬂtal'] = '';
+$_BL['en']['Germany 2'] = '';
+$_BL['en']['Sat (HRV)'] = '';
+$_BL['en']['Sat (IR)'] = '';
+$_BL['en']['Scandi'] = '';
+$_BL['en']['Sat (MPE)'] = '';
+$_BL['en']['Sat TEST'] = '';
+$_BL['en']['Webcam Sicht'] = '';
+$_BL['en']['Wetter.info Radar (21:30)'] = '';
+$_BL['en']['Wetter.info Radar (animiert)'] = '';
+$_BL['en']['EUCLID'] = '';
+$_BL['en']['BLIDS Germany'] = '';
+$_BL['en']['Meteox rain radar (Scandinavia)'] = '';
+$_BL['en'][''] = '';
+$_BL['en']['Europe (mini)'] = '';
+$_BL['en']['Germany (mini)'] = '';
+$_BL['en']['Wetter.info Radar (21:45)'] = '';

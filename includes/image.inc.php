@@ -195,8 +195,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 		if ($duration)
 		{
-			$time_min = strtotime("$year-$month-$day $hour:$minute:00");
-			$time_max = strtotime("$year-$month-$day $hour:$minute:00 +$duration minutes");
+			//When duration/time then use UTC!
+			$time_min = strtotime("$year-$month-$day $hour:$minute:00 UTC");
+			$time_max = strtotime("$year-$month-$day $hour:$minute:00 +$duration minutes UTC");
 		}
 		else
 		{
@@ -205,7 +206,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		}
 
 		if (BO_CACHE_SUBDIRS === true)
-			$cache_file .= gmdate('YmdHi', $time_min).'/';
+			$cache_file .= gmdate('Ymd', $time_min).'/';
 		
 		$cache_file .= $id.'_'.gmdate('YmdHi', $time_min).'_'.$duration;
 		
@@ -222,8 +223,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
 		
 		$expire = time() + 3600;
-		
-		
 		
 		$file_by_time = true;
 	}
@@ -257,29 +256,63 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	$file = '';
 	
 	//filename by endtime
-	if ($file_by_time && isset($cfg['file_time']))
+	if (($file_by_time || isset($cfg['file_time_search'])) && isset($cfg['file_time']))
 	{
-		$replace = array(
-			'%Y' => gmdate('Y', $time_max),
-			'%y' => gmdate('y', $time_max),
-			'%M' => gmdate('m', $time_max),
-			'%D' => gmdate('d', $time_max),
-			'%h' => gmdate('H', $time_max),
-			'%m' => gmdate('i', $time_max)
-			);
-			
-		$file = strtr($cfg['file_time'], $replace);
+		$search_times[] = $time_max;
 		
-		if (!file_exists(BO_DIR.'images/'.$file))
+		if (isset($cfg['file_time_search']) && is_array($cfg['file_time_search']))
+		{
+			$sstep = $cfg['file_time_search'][0];
+			$sback = $cfg['file_time_search'][1]; 
+			$sforw = $cfg['file_time_search'][2];
+
+			$time_search = floor($time_max / 60 / $sstep) * 60 * $sstep;
+			
+			$j=0;
+			for ($i=$time_search-60*$sback;$i<=$time_search+60*$sforw;$i+=60*$sstep)
+			{
+				if ($i != $time_search)
+					$search_times[(abs($time_search-$i)/60).'.'.$j] = $i;
+				$j++;
+			}
+			
+			ksort($search_times);
+		}
+		
+		$found = false;
+		foreach($search_times as $stime)
+		{
+			$replace = array(
+				'%Y' => gmdate('Y', $stime),
+				'%y' => gmdate('y', $stime),
+				'%M' => gmdate('m', $stime),
+				'%D' => gmdate('d', $stime),
+				'%h' => gmdate('H', $stime),
+				'%m' => gmdate('i', $stime)
+				);
+
+			$file = strtr($cfg['file_time'], $replace);
+
+			if (file_exists(BO_DIR.'images/'.$file))
+			{
+				$found = true;
+				break;
+			}
+		}
+		
+		if (!$found)
 		{
 			$cache_file .= '_nobg';
 			$file = '';
+		}
+		else
+		{
+			$cache_file .= '_'.strtr(basename($file), array('.' => '_')).'_'.filemtime(BO_DIR.'images/'.$file);
 		}
 	}
 	
 	if (!$file && $cfg['file'])
 		$file = $cfg['file'];
-	
 	
 	
 	//file type
@@ -308,7 +341,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if ($transparent)
 		$extension = "png";
 	
-	
 	//Headers
 	header("Pragma: ");
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
@@ -317,7 +349,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.".$extension."\"");
 
 	//Caching
-	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update - intval($cfg['upd_intv'])*60 )
 	{
 		header("Content-Type: $mime");
 		readfile($cache_file);
@@ -716,7 +748,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	bo_image_reduce_colors($I);
 
 	header("Content-Type: $mime");
-	if (1 ||$caching)
+	if ($caching)
 	{
 		if (BO_CACHE_SUBDIRS === true)
 		{
@@ -725,7 +757,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				mkdir($dir, 0777, true);
 		}
 
-		$ok = @bo_imageout($I, $extension, $cache_file);
+		$ok = bo_imageout($I, $extension, $cache_file);
 
 		if (!$ok)
 			bo_image_cache_error($w, $h);
@@ -1515,6 +1547,10 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 	$bo_width = bo_imagetextwidth($fontsize, $tbold, $text);
 	if ($bo_width > $w - $legend_width - 5)
 		$text = _BL('Blitzortung.org', true);
+	
+	if ($cfg['image_footer'])
+		$text .= ' '.$cfg['image_footer'];
+	
 	bo_imagestring($I, $fontsize, 4, $h - $tdy, $text, $tcol, $tbold);
 
 	//Own copyright

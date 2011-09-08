@@ -228,7 +228,7 @@ function bo_show_archive_map()
 
 	
 	if ($cfg['date_min'] && ($min = strtotime($cfg['date_min'])))
-		$start_time = $min;
+		$start_time = $min + 3600*24;
 	
 	if ($cfg['archive'])
 	{
@@ -262,7 +262,6 @@ function bo_show_archive_map()
 		else if ($ani)
 		{
 			$ani_cfg = $_BO['mapimg'][$map]['animation'];
-			$ani_add = 0;
 			
 			//individual settings
 			if (isset($ani_cfg['delay']))
@@ -274,9 +273,6 @@ function bo_show_archive_map()
 			if (isset($ani_cfg['interval']))
 				$ani_div = $ani_cfg['interval'];
 
-			if (isset($ani_cfg['time_add']))
-				$ani_add = $ani_cfg['time_add'];
-				
 			if (isset($ani_cfg['range']))
 				$ani_pic_range = $ani_cfg['range'];
 
@@ -292,7 +288,7 @@ function bo_show_archive_map()
 				$bo_file_url = BO_FILE.'?map='.$map.'&transparent&bo_lang='._BL().'&date=';
 			}
 
-			$first_image = $bo_file_url.sprintf('%04d%02d%02d%02d00-%d', $year, $month, $day, $hour_from, $ani_pic_range).'&bo_lang='._BL();
+			$first_image = ""; //$bo_file_url.sprintf('%04d%02d%02d%02d00-%d', $year, $month, $day, $hour_from, $ani_pic_range).'&bo_lang='._BL();
 			
 			if ($hour_from >= $hour_to)
 				$hour_to += 24; //next day
@@ -300,14 +296,16 @@ function bo_show_archive_map()
 			$images = '';
 			for ($i=$hour_from*60; $i<= $hour_to * 60; $i+= $ani_div)
 			{
-				$minutes = $i + $ani_add;
-				
+				$minutes = $i;
 				$time = strtotime("$year-$month-$day 00:00:00 +$minutes minutes");
+
+				if (!$first_image)
+					$first_image = $bo_file_url.gmdate('YmdHi', $time).'-'.$ani_pic_range;
 				
 				if ($time + 60 * $ani_pic_range > $end_time)
 					break;
 				
-				$images .= ($images ? ',' : '').'"'.date('YmdHi', $time).'-'.$ani_pic_range.'"';
+				$images .= ($images ? ',' : '').'"'.gmdate('YmdHi', $time).'-'.$ani_pic_range.'"';
 			}
 
 			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time).' ('._BL('Animation').')';
