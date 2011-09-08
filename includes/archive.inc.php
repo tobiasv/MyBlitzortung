@@ -167,6 +167,15 @@ function bo_show_archive_map()
 	//image dimensions
 	$img_dim = bo_archive_get_dim($map);
 	
+	//Config
+	$cfg = $_BO['mapimg'][$map];
+	
+	if ($cfg['animation']['force'])
+	{
+		$ani_forced = true;
+		$ani = true;
+	}
+	
 	echo '<span class="bo_form_descr">'._BL('Date').':</span> ';
 	echo '<select name="bo_year" id="bo_arch_strikes_select_year">';
 	for($i=date('Y', $start_time); $i<=date('Y');$i++)
@@ -185,16 +194,14 @@ function bo_show_archive_map()
 
 	echo '&nbsp;<input type="submit" name="bo_prev" value=" &lt; " id="bo_archive_maps_prevday" class="bo_form_submit">';
 	echo '&nbsp;<input type="submit" name="bo_next" value=" &gt; " id="bo_archive_maps_nextday" class="bo_form_submit">';
-	
-	
 	echo '<input type="submit" name="bo_ok" value="'._BL('update map').'" id="bo_archive_maps_submit" class="bo_form_submit">';
-	
+
 	if ($ani_div)
 	{
 		echo '<div class="bo_input_container">';
 		
 		echo '<span class="bo_form_descr">'._BL('Animation').':</span> ';
-		echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false);">';
+		echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false);" '.($ani_forced ? ' disabled' : '').'>';
 		echo '<label for="bo_archive_maps_animation_off">'._BL('Off').'</label>';
 		echo '<input type="radio" name="bo_animation" value="1" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true);">';
 		echo '<label for="bo_archive_maps_animation_on">'._BL('On').'</label>';
@@ -218,8 +225,12 @@ function bo_show_archive_map()
 	
 	echo '</fieldset>';
 	echo '</form>';
+
 	
-	if ($_BO['mapimg'][$map]['archive'])
+	if ($cfg['date_min'] && ($min = strtotime($cfg['date_min'])))
+		$start_time = $min;
+	
+	if ($cfg['archive'])
 	{
 		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 
@@ -251,6 +262,7 @@ function bo_show_archive_map()
 		else if ($ani)
 		{
 			$ani_cfg = $_BO['mapimg'][$map]['animation'];
+			$ani_add = 0;
 			
 			//individual settings
 			if (isset($ani_cfg['delay']))
@@ -261,6 +273,9 @@ function bo_show_archive_map()
 			
 			if (isset($ani_cfg['interval']))
 				$ani_div = $ani_cfg['interval'];
+
+			if (isset($ani_cfg['time_add']))
+				$ani_add = $ani_cfg['time_add'];
 				
 			if (isset($ani_cfg['range']))
 				$ani_pic_range = $ani_cfg['range'];
@@ -285,7 +300,9 @@ function bo_show_archive_map()
 			$images = '';
 			for ($i=$hour_from*60; $i<= $hour_to * 60; $i+= $ani_div)
 			{
-				$time = strtotime("$year-$month-$day 00:00:00 +$i minutes");
+				$minutes = $i + $ani_add;
+				
+				$time = strtotime("$year-$month-$day 00:00:00 +$minutes minutes");
 				
 				if ($time + 60 * $ani_pic_range > $end_time)
 					break;

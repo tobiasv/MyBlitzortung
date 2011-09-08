@@ -250,7 +250,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$file_by_time = false;
 	}
 
-
+	if ($cfg['date_min'] && strtotime($cfg['date_min']) && $time_min < strtotime($cfg['date_min']))
+		bo_image_error('Minimum date is '.$cfg['date_min']);
+	
 	//find the correct file
 	$file = '';
 	
@@ -259,6 +261,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	{
 		$replace = array(
 			'%Y' => gmdate('Y', $time_max),
+			'%y' => gmdate('y', $time_max),
 			'%M' => gmdate('m', $time_max),
 			'%D' => gmdate('d', $time_max),
 			'%h' => gmdate('H', $time_max),
