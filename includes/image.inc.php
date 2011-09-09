@@ -304,6 +304,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		{
 			$cache_file .= '_nobg';
 			$file = '';
+			$expire = time() + 15 * 60;
 		}
 		else
 		{

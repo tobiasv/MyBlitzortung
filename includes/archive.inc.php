@@ -118,18 +118,33 @@ function bo_show_archive_map()
 	$hour_from = intval($_GET['bo_hour_from']);
 	$hour_to = intval($_GET['bo_hour_to']);
 	
-	if (!$hour_from && !$hour_to)
+	//Map
+	$select_map = bo_archive_select_map($map);
+	
+	if (!isset($_GET['bo_oldmap']) || $map != $_GET['bo_oldmap'])
+		$map_changed = true;
+	
+	//image dimensions
+	$img_dim = bo_archive_get_dim($map);
+	
+	//Config
+	$cfg = $_BO['mapimg'][$map];
+	$ani_cfg = $_BO['mapimg'][$map]['animation'];
+	
+	$mapname = _BL($cfg['name']);
+	
+	if ($ani_cfg['force'])
 	{
-		$hour_from = (int)date('H', time() - 3600 * $ani_default_range - $ani_pic_range * 60);
-		$hour_to = (int)date('H', time());
+		$ani_forced = true;
+		$ani = true;
 	}
 	
-	if (!$hour_to || !$hour_to < 0 || $hour_to > 24)
-		$hour_to = 24;
+	if (isset($ani_cfg['range']))
+		$ani_pic_range = $ani_cfg['range'];
 
-	if (!$hour_from < 0 || $hour_from > 23)
-		$hour_from = 0;
-	
+	if (isset($ani_cfg['default_range']))
+		$ani_default_range = $ani_cfg['default_range'];
+
 	if (!$year || $year < 0)
 		$year = date('Y');
 
@@ -145,9 +160,30 @@ function bo_show_archive_map()
 		$day_add = +1;
 	
 	$time  = mktime(0,0,0,$month,$day+$day_add,$year);
-	$year  = date('Y', $time);
-	$month = date('m', $time);
-	$day   = date('d', $time);
+		
+	if (!$hour_from && !$hour_to)
+	{
+		$hour_time_from = time() - 3600 * $ani_default_range - $ani_pic_range * 60;
+		$hour_time_to   = $hour_time_from + 3600 * $ani_default_range;
+		$hour_from = (int)date('H', $hour_time_from);
+		$hour_to = (int)date('H', $hour_time_to);
+		$hours_not_set = true;
+	}
+	else if ($map_changed && $hour_from < $hour_to && $hour_from-$hour_to < $ani_default_range)
+		$hour_from = floor($hour_to - $ani_default_range);
+
+		
+	//Today and start time lies on yesterday
+	if (date('Ymd', $time) == date('Ymd') && date('Ymd', $hour_time_from) != date('Ymd'))
+		$time -= 3600 * 24;
+
+		
+	$hour_from = abs(($hour_from+24)%24);
+	$hour_to   = abs(($hour_to+24)%24);
+	$year      = date('Y', $time);
+	$month     = date('m', $time);
+	$day       = date('d', $time);
+
 	
 	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$start_time = strtotime($row['mintime'].' UTC');
@@ -156,26 +192,13 @@ function bo_show_archive_map()
 	echo '<div id="bo_arch_maps">';
 
 	echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
-	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_ok'));
-
+	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_ok', 'bo_oldmap'));
+	echo '<input type="hidden" name="bo_oldmap" value="'.$map.'">';
+	
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_arch_strikes').'</legend>';
+	echo $select_map;
 
-	$map = bo_archive_select_map($map);
-	$mapname = _BL($_BO['mapimg'][$map]['name']);
-	
-	//image dimensions
-	$img_dim = bo_archive_get_dim($map);
-	
-	//Config
-	$cfg = $_BO['mapimg'][$map];
-	
-	if ($cfg['animation']['force'])
-	{
-		$ani_forced = true;
-		$ani = true;
-	}
-	
 	echo '<span class="bo_form_descr">'._BL('Date').':</span> ';
 	echo '<select name="bo_year" id="bo_arch_strikes_select_year">';
 	for($i=date('Y', $start_time); $i<=date('Y');$i++)
@@ -261,8 +284,6 @@ function bo_show_archive_map()
 		}
 		else if ($ani)
 		{
-			$ani_cfg = $_BO['mapimg'][$map]['animation'];
-			
 			//individual settings
 			if (isset($ani_cfg['delay']))
 				$ani_delay = $ani_cfg['delay'];
@@ -272,9 +293,6 @@ function bo_show_archive_map()
 			
 			if (isset($ani_cfg['interval']))
 				$ani_div = $ani_cfg['interval'];
-
-			if (isset($ani_cfg['range']))
-				$ani_pic_range = $ani_cfg['range'];
 
 			//use transparency?
 			if ($ani_cfg['transparent'] === false)
@@ -1274,7 +1292,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
 		echo bo_insert_html_hidden(array('bo_map'));
 		echo '<fieldset>';
-		$map = bo_archive_select_map($map);
+		echo bo_archive_select_map($map);
 		echo '</fieldset>';
 		$img_file = BO_FILE.'?map='.$map.'&strike_id='.$strike_id.'&bo_lang='._BL();
 		echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
@@ -1282,25 +1300,32 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 }
 
 
-function bo_archive_select_map($map)
+function bo_archive_select_map(&$map)
 {
 	global $_BO;
-	echo '<span class="bo_form_descr">'._BL('Map').':</span> ';
 	
-	echo '<select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
+	$map_ok = false;
+	
+	$ret = '<span class="bo_form_descr">'._BL('Map').':</span> ';
+	$ret .= '<select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
 	foreach($_BO['mapimg'] as $id => $d)
 	{
 		if (!$d['name'] || !$d['archive'])
 			continue;
 			
-		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
+		$ret .= '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
 		
 		if ($map < 0)
 			$map = $id;
+		
+		if ($map == $id)
+			$map_ok = true;
 	}
-	echo '</select>';
+	$ret .= '</select>';
 	
-	return $map;
+	$map = $map_ok ? $map : 0;
+	
+	return $ret;
 }
 
 
