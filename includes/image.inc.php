@@ -795,6 +795,10 @@ function bo_get_map_image_ani()
 	if (BO_FORCE_MAP_LANG === true)
 		bo_load_locale(BO_LOCALE);
 
+
+	session_write_close();
+	@set_time_limit(20);
+		
 	
 	$cfg_ani = $cfg['gif_animation'];
 	$cache_file = $dir._BL().'_ani_'.$id.'.gif';	
