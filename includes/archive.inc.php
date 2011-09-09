@@ -191,7 +191,7 @@ function bo_show_archive_map()
 	
 	echo '<div id="bo_arch_maps">';
 
-	echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
+	echo '<form action="?" method="GET" class="bo_arch_strikes_form" id="bo_arch_strikes_maps_form">';
 	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_ok', 'bo_oldmap'));
 	echo '<input type="hidden" name="bo_oldmap" value="'.$map.'">';
 	
@@ -224,9 +224,9 @@ function bo_show_archive_map()
 		echo '<div class="bo_input_container">';
 		
 		echo '<span class="bo_form_descr">'._BL('Animation').':</span> ';
-		echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false);" '.($ani_forced ? ' disabled' : '').'>';
+		echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false, true);" '.($ani_forced ? ' disabled' : '').'>';
 		echo '<label for="bo_archive_maps_animation_off">'._BL('Off').'</label>';
-		echo '<input type="radio" name="bo_animation" value="1" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true);">';
+		echo '<input type="radio" name="bo_animation" value="1" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true, true);">';
 		echo '<label for="bo_archive_maps_animation_on">'._BL('On').'</label>';
 		echo ' &nbsp; ';
 		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
@@ -389,10 +389,11 @@ function bo_maps_animation_start()
 	}
 }
 
-function bo_enable_timerange(enable)
+function bo_enable_timerange(enable, s)
 {
 	document.getElementById('bo_arch_strikes_select_hour_from').disabled=!enable;
 	document.getElementById('bo_arch_strikes_select_hour_to').disabled=!enable;
+	if (s) document.getElementById('bo_arch_strikes_maps_form').submit();
 }
 
 window.setTimeout("bo_maps_load();", 500);
