@@ -121,7 +121,7 @@ function bo_show_archive_map()
 	//Map
 	$select_map = bo_archive_select_map($map);
 	
-	if (!isset($_GET['bo_oldmap']) || $map != $_GET['bo_oldmap'])
+	if (isset($_GET['bo_oldmap']) && $map != $_GET['bo_oldmap'])
 		$map_changed = true;
 	
 	//image dimensions
