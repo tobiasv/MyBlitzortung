@@ -168,18 +168,23 @@ function bo_show_archive_map()
 		$hour_from = (int)date('H', $hour_time_from);
 		$hour_to = (int)date('H', $hour_time_to);
 		$hours_not_set = true;
+
+		//Today and start time lies on yesterday
+		if ($hour_time_from && date('Ymd', $time) == date('Ymd') && date('Ymd', $hour_time_from) != date('Ymd'))
+			$time -= 3600 * 24;
+
 	}
 	else if ($map_changed && $hour_from < $hour_to && $hour_from-$hour_to < $ani_default_range)
 		$hour_from = floor($hour_to - $ani_default_range);
 
-		
-	//Today and start time lies on yesterday
-	if (date('Ymd', $time) == date('Ymd') && date('Ymd', $hour_time_from) != date('Ymd'))
-		$time -= 3600 * 24;
 
 		
 	$hour_from = abs(($hour_from+24)%24);
 	$hour_to   = abs(($hour_to+24)%24);
+	if ($hour_to == 0)
+		$hour_to = 24;
+	
+	
 	$year      = date('Y', $time);
 	$month     = date('m', $time);
 	$day       = date('d', $time);

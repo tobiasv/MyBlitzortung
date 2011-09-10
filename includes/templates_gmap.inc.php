@@ -134,7 +134,7 @@ $_BO['tpl_overlay']['euclid']['only_loggedin'] = true;
 $_BO['tpl_overlay']['euclid']['to_mercator'] = false;
 $_BO['tpl_overlay']['euclid']['opacity'] = 50;
 
-//BLIDS Lightning Overlay
+//BLIDS GERMANY Lightning Overlay
 //WARNING: Copyright! Only internal private usage!
 $_BO['tpl_overlay']['blids_de']['img'] = 'http://www.blids.de/spion/bilder/aktkartegergrau.jpg';
 $_BO['tpl_overlay']['blids_de']['coord'] = array(55.11, 15.53, 47.13, 4.97);  //North, East, South, West (Degrees)
@@ -143,6 +143,47 @@ $_BO['tpl_overlay']['blids_de']['sel_name'] = 'BLIDS Germany';
 $_BO['tpl_overlay']['blids_de']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_de']['to_mercator'] = false;
 $_BO['tpl_overlay']['blids_de']['opacity'] = 50;
+
+//BLIDS BENELUX Lightning Overlay
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['blids_benelux']['img'] = 'http://www.blids.de/spion/bilder/aktkartebeneluxgrau.jpg';
+$_BO['tpl_overlay']['blids_benelux']['coord'] = array(53.665, 7.775, 49.22, 2.25);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['blids_benelux']['default_show'] = false;
+$_BO['tpl_overlay']['blids_benelux']['sel_name'] = 'BLIDS BeNeLux';
+$_BO['tpl_overlay']['blids_benelux']['only_loggedin'] = true;
+$_BO['tpl_overlay']['blids_benelux']['to_mercator'] = false;
+$_BO['tpl_overlay']['blids_benelux']['opacity'] = 50;
+
+//BLIDS UK Lightning Overlay
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['blids_uk']['img'] = 'http://www.blids.de/spion/bilder/aktkartegbgrau.jpg';
+$_BO['tpl_overlay']['blids_uk']['coord'] = array(59.73, 1.88, 49.63, -10.89);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['blids_uk']['default_show'] = false;
+$_BO['tpl_overlay']['blids_uk']['sel_name'] = 'BLIDS UK';
+$_BO['tpl_overlay']['blids_uk']['only_loggedin'] = true;
+$_BO['tpl_overlay']['blids_uk']['to_mercator'] = false;
+$_BO['tpl_overlay']['blids_uk']['opacity'] = 50;
+
+//BLIDS POLAND Lightning Overlay
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['blids_pl']['img'] = 'http://www.blids.de/spion/bilder/aktkartepolengrau.jpg';
+$_BO['tpl_overlay']['blids_pl']['coord'] = array(54.99, 24.32, 48.77, 13.33);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['blids_pl']['default_show'] = false;
+$_BO['tpl_overlay']['blids_pl']['sel_name'] = 'BLIDS Poland';
+$_BO['tpl_overlay']['blids_pl']['only_loggedin'] = true;
+$_BO['tpl_overlay']['blids_pl']['to_mercator'] = false;
+$_BO['tpl_overlay']['blids_pl']['opacity'] = 50;
+
+//BLIDS SWITZERLAND Lightning Overlay
+//WARNING: Copyright! Only internal private usage!
+$_BO['tpl_overlay']['blids_ch']['img'] = 'http://www.blids.de/spion/bilder/aktkarteschweizgrau.jpg';
+$_BO['tpl_overlay']['blids_ch']['coord'] = array(47.91, 10.75, 45.66, 5.26);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['blids_ch']['default_show'] = false;
+$_BO['tpl_overlay']['blids_ch']['sel_name'] = 'BLIDS Switzerland';
+$_BO['tpl_overlay']['blids_ch']['only_loggedin'] = true;
+$_BO['tpl_overlay']['blids_ch']['to_mercator'] = false;
+$_BO['tpl_overlay']['blids_ch']['opacity'] = 50;
+
 
 //T-Online/wetter.info Radar
 //WARNING: Copyright! Only internal private usage!

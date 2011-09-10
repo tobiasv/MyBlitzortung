@@ -431,7 +431,7 @@ function bo_tile()
 	//get the data!
 	$points = array();
 	$deviation = array();
-	$sql = "SELECT id, time, lat, lon, deviation, polarity
+	$sql = "SELECT s.id id, s.time time, s.lat lat, s.lon lon, s.deviation deviation, s.polarity polarity
 			FROM ".BO_DB_PREF."strikes s
 			$index_sql
 			WHERE 1
