@@ -523,8 +523,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		while ($row = $res->fetch_assoc())
 		{
 			$strike_time = strtotime($row['time'].' UTC');
-			$age = $time_max-1 - $strike_time;
+			$age = $time_max - $strike_time;
 			$color_index = floor($age / $color_intvl);
+			
+
 			$count[$color_index]++;
 
 			if (isset($cfg['point_style']))
@@ -746,7 +748,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	BoDb::close();
 	
-	bo_image_reduce_colors($I);
+	bo_image_reduce_colors($I, false, $transparent);
 
 	header("Content-Type: $mime");
 	if ($caching)
@@ -795,11 +797,9 @@ function bo_get_map_image_ani()
 	if (BO_FORCE_MAP_LANG === true)
 		bo_load_locale(BO_LOCALE);
 
-
 	session_write_close();
 	@set_time_limit(20);
 		
-	
 	$cfg_ani = $cfg['gif_animation'];
 	$cache_file = $dir._BL().'_ani_'.$id.'.gif';	
 	$last_update = bo_get_conf('uptime_strikes_modified');
@@ -894,6 +894,8 @@ function bo_get_density_image()
 	
 	
 	@set_time_limit(30);
+	session_write_close();
+	
 	
 	global $_BO;
 
@@ -1675,7 +1677,7 @@ function bo_value2color($value, &$colors)
 }
 
 
-function bo_image_reduce_colors(&$I, $density_map=false)
+function bo_image_reduce_colors(&$I, $density_map=false, $transparent=false)
 {
 	if ($density_map)
 		$colors = intval(BO_IMAGE_PALETTE_COLORS_DENSITIES);
@@ -1685,7 +1687,7 @@ function bo_image_reduce_colors(&$I, $density_map=false)
 	
 	if ($colors)
 	{
-		//works only for palette images
+		//colorstotal works only for palette images
 		$total = imagecolorstotal($I);
 		if ($total && $total <= 256)
 			return;
@@ -1696,10 +1698,18 @@ function bo_image_reduce_colors(&$I, $density_map=false)
 			$auto = true;
 			$width = imagesx($I);
 			$height = imagesy($I);
-			
+
 			if (BO_IMAGE_PALETTE_AUTO)
 			{
 				$Itmp = ImageCreateTrueColor($width, $height);
+				
+				if ($transparent)
+				{
+					$back = imagecolorallocate($Itmp, 1, 2, 3);
+					imagefilledrectangle($Itmp, 0, 0, $width, $height, $back);
+					imagecolortransparent($Itmp, $back);
+				}
+
 				ImageCopy($Itmp, $I, 0, 0, 0, 0, $width, $height);
 			}
 			
@@ -1716,7 +1726,7 @@ function bo_image_reduce_colors(&$I, $density_map=false)
 			{
 				imagetruecolortopalette($I, false, $colors);
 			}
-			
+
 			if (BO_IMAGE_PALETTE_AUTO)
 			{
 				if (imagecolorstotal($I) == 256) //too much colors ==> back to truecolor
@@ -1729,7 +1739,7 @@ function bo_image_reduce_colors(&$I, $density_map=false)
 					imagedestroy($Itmp);
 				}
 			}
-			
+
 		}
 	}
 }
