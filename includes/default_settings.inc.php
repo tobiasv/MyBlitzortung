@@ -38,26 +38,35 @@
 /*   Only "blitzortung.php" should be ok in most cases             */
 /*   Example: http://myhomepage.com/strikes/blitzortung.php        */
 /*             ==> BO_FILE = "/strikes/blitzortung.php"            */
+
 @define("BO_FILE", 'blitzortung.php');
 
 
-
+/*******************************************************************/
 /*** UTF8-Encoding                                               ***/
 /*   Most Content-Management-Systems use UTF8-encoding.            */
 /*   Set it to false, when including with php into your            */
 /*   own page and wrong characters appear                          */
+
 @define("BO_UTF8", true);
 
 
+/*******************************************************************/
 /*** Update secret                                               ***/
+
 @define("BO_UPDATE_SECRET", '');
 
 
+/*******************************************************************/
 /*** Default timezone                                            ***/
+
 @define("BO_TIMEZONE", "Europe/Berlin");
 
 
+
+/*******************************************************************/
 /*** Default Port for MySQL                                      ***/
+
 @define("BO_DB_PORT", null);
 
 
