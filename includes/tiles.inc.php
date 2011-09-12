@@ -58,7 +58,7 @@ function bo_tile()
 		
 		$time_manual_from = strtotime($_GET['from']);
 		$time_manual_to = strtotime($_GET['to']);
-		
+
 		// set "current" time
 		$time = $time_manual_to;
 		
@@ -84,13 +84,10 @@ function bo_tile()
 	}
 	else
 	{
+		$time = bo_get_conf('uptime_strikes_modified');
 		$time_manual_from = false;
 	}
 
-	
-	//Debug
-	//$time = strtotime('2011-06-16 17:00:00 UTC');
-	$time = bo_get_conf('uptime_strikes_modified');
 	
 	//get config
 	if (isset($_GET['count'])) // display strike count

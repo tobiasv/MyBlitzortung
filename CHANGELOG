@@ -3,9 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.?? (2011-??)
-------------------------
+Version 0.7.2a (2011-09-12)
+---------------------------
 - added some more overlay templates for dynamic map
+- fix: sometimes transparency not working
+- fix: manual time range in dynamic map broken
 
 Version 0.7.2 (2011-09-09)
 --------------------------
