@@ -175,7 +175,7 @@
 @define("BO_FONT_TTF_NORMAL", 'fonts/DejaVuSans.ttf'); // normal truetype font file
 @define("BO_FONT_TTF_BOLD", 'fonts/DejaVuSans-Bold.ttf'); // normal bold font file
 @define("BO_FONT_TTF_MONO", 'fonts/DejaVuSansMono.ttf'); // mono truetype font file
-
+@define("BO_FONT_USE_FREETYPE2", true);
 
 /*******************************************************************/
 /*** Dynamic Map: General settings                               ***/
@@ -212,6 +212,7 @@
 @define('BO_MAP_NA_FONTSIZE', 3); //no TTF!
 @define('BO_MAP_COUNT_FONTSIZE', 8); 
 @define('BO_MAP_COUNT_FONTBOLD', true); 
+@define('BO_MAP_COUNT_STATIONS', 15);
 
 //Manual time ranges
 @define('BO_MAP_MANUAL_TIME_ENABLE', false); //enables for guests

@@ -8,6 +8,8 @@ Version 0.7.2a (2011-09-12)
 - added some more overlay templates for dynamic map
 - fix: sometimes transparency not working
 - fix: manual time range in dynamic map broken
+- fix: font problems with strike counter in dynamic map (untested!)
+- using freetype2 by default (change with BO_FONT_USE_FREETYPE2 -> false)
 
 Version 0.7.2 (2011-09-09)
 --------------------------

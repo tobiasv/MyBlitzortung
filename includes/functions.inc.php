@@ -1260,9 +1260,9 @@ function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = fals
 	if ($size <= 5)
 	{
 		if ($angle == 90)
-			imagestringup($I, $size, $x, $y, $text, $color);
+			return imagestringup($I, $size, $x, $y, $text, $color);
 		else
-			imagestring($I, $size, $x, $y, $text, $color);
+			return imagestring($I, $size, $x, $y, $text, $color);
 	}
 	else
 	{
@@ -1271,7 +1271,7 @@ function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = fals
 		
 		$text = utf8_encode($text);
 		
-		bo_imagettftextborder($I, $size, $angle, $x+$w, $y+$h, $color, $font, $text, $bordercolor, $px);
+		return bo_imagettftextborder($I, $size, $angle, $x+$w, $y+$h, $color, $font, $text, $bordercolor, $px);
 	}
 }
 
@@ -1332,7 +1332,12 @@ function bo_imagetextheight($size, $bold = false, $string = false)
 	$font = bo_imagestring_font($size, $bold);
 
 	$string = $string === false ? 'Ag' : $string;
-	$tmp = imagettfbbox($size, 0, $font, $string);
+	
+	if (BO_FONT_USE_FREETYPE2)
+		$tmp = imageftbbox($size, 0, $font, $string);
+	else
+		$tmp = imagettfbbox($size, 0, $font, $string);
+		
 	$height = $tmp[1] - $tmp[5];
 	
 	return $height;
@@ -1348,7 +1353,12 @@ function bo_imagetextwidth($size, $bold = false, $string = false)
 	$font = bo_imagestring_font($size, $bold);
 	
 	$string = $string === false ? 'A' : $string;
-	$tmp = imagettfbbox($size, 0, $font, $string);
+
+	if (BO_FONT_USE_FREETYPE2)
+		$tmp = imageftbbox($size, 0, $font, $string);
+	else
+		$tmp = imagettfbbox($size, 0, $font, $string);
+
 	$width = $tmp[2] - $tmp[0];
 	
 	return $width;
@@ -1376,10 +1386,18 @@ function bo_imagettftextborder(&$I, $size, $angle, $x, $y, &$textcolor, $font, $
 	{
 		for($c1 = ($x-abs($px)); $c1 <= ($x+abs($px)); $c1++)
 			for($c2 = ($y-abs($px)); $c2 <= ($y+abs($px)); $c2++)
-				$bg = imagettftext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
+				$bg = bo_imagefttext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
 	}
  
-   return imagettftext($I, $size, $angle, $x, $y, $textcolor, $font, $text);
+   return bo_imagefttext($I, $size, $angle, $x, $y, $textcolor, $font, $text);
+}
+
+function bo_imagefttext(&$I, $size, $angle, $c1, $c2, $bordercolor, $font, $text)
+{
+	if (BO_FONT_USE_FREETYPE2)
+		return imagefttext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
+	else
+		return imagettftext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
 }
 
 function bo_hex2color(&$I, $str, $use_alpha = true)

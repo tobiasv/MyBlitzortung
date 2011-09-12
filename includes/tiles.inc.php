@@ -362,21 +362,22 @@ function bo_tile()
 		$twidth = bo_imagetextwidth($textsize, $bold, $strike_count);
 		$theight = bo_imagetextheight($textsize, $bold, $strike_count);
 		$white = imagecolorallocatealpha($I, 255,255,255,0);
-		imagefilledrectangle( $I, 0, 0, $twidth+2, $theight, $col);
+		imagefilledrectangle( $I, 0, 0, $twidth+2, $theight+2, $col);
 		bo_imagestring($I, $textsize, 2, 2, $strike_count, $white, $bold);
 		
 		if ($only_own && intval($whole_strike_count))
 		{
 			$ratio = round($strike_count / $whole_strike_count * 100).'%';
 			$twidth = bo_imagetextwidth($textsize, false, $ratio);
-			imagefilledrectangle( $I, 0, $theight+1, $twidth+2, 2*$theight, $col);
-			bo_imagestring($I, $textsize, 2, $theight+2, $ratio, $white, $bold);
+			imagefilledrectangle( $I, 0, $theight+3, $twidth+4, 2*$theight+4, $col);
+			bo_imagestring($I, $textsize, 2, $theight+4, $ratio, $white, $bold);
 		}
 		
 		//Stations
 		if ($_GET['stat'] == 2)
 		{
 			arsort($stations_count);
+			$theight = bo_imagetextheight($textsize-1, $bold, $strike_count);
 			$i = 0;
 			foreach($stations_count as $sid => $cnt)
 			{
@@ -387,10 +388,10 @@ function bo_tile()
 
 				$twidth = bo_imagetextwidth($textsize-1, $bold, $text);
 				
-				imagefilledrectangle($I, 0, ($theight*1.1)*$i, $twidth, ($theight*1.1)*($i+1)-1, $col);
-				bo_imagestring($I, $textsize-1, 2, ($theight*1.1)*$i+3, $text, $white, false);
+				imagefilledrectangle($I, 0, ($theight+3)*$i, $twidth, ($theight+3)*($i+1)-1, $col);
+				bo_imagestring($I, $textsize-1, 2, ($theight+3)*$i+3, $text, $white, false);
 				
-				if ($i >= 10)
+				if ($i >= BO_MAP_COUNT_STATIONS)
 					break;
 			}
 		}
