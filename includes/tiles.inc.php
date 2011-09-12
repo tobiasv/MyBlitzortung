@@ -78,7 +78,6 @@ function bo_tile()
 			exit;
 		}
 		
-		
 		//disable caching
 		$caching = false;
 	}
