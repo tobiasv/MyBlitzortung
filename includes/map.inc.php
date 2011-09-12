@@ -451,8 +451,8 @@ function bo_show_lightning_map()
 		echo ' &nbsp; ';
 		
 		echo ' <span class="bo_form_checkbox_text">';
-		echo '<input type="checkbox" onclick="bo_toggle_timerange(this.checked);" id="bo_map_timerange"> ';
-		echo '<label for="bo_map_timerange">'._BL('Activated').'</label>';
+		echo '<input type="checkbox" id="bo_map_timerange_check" onclick="bo_toggle_timerange(this.checked);"> ';
+		echo '<label for="bo_map_timerange_check">'._BL('Activated').'</label>';
 		echo '</span>';
 		
 		echo '</div>';
