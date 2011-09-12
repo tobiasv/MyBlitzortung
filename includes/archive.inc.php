@@ -1311,6 +1311,7 @@ function bo_archive_select_map(&$map)
 	global $_BO;
 	
 	$map_ok = false;
+	$map_default = false;
 	
 	$ret = '<span class="bo_form_descr">'._BL('Map').':</span> ';
 	$ret .= '<select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
@@ -1318,6 +1319,9 @@ function bo_archive_select_map(&$map)
 	{
 		if (!$d['name'] || !$d['archive'])
 			continue;
+		
+		if ($map_default === false)
+			$map_default = $id;
 			
 		$ret .= '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
 		
@@ -1329,7 +1333,7 @@ function bo_archive_select_map(&$map)
 	}
 	$ret .= '</select>';
 	
-	$map = $map_ok ? $map : 0;
+	$map = $map_ok ? $map : $map_default;
 	
 	return $ret;
 }

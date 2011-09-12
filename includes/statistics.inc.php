@@ -1246,7 +1246,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 			$add_graph .= '&channel='.$channel;
 	}
 	
-	$channels = bo_get_conf('raw_channels');
+	$channels = 2; //always TWO!   // bo_get_conf('raw_channels');
 	$bpv      = bo_get_conf('raw_bitspervalue');
 	$values   = bo_get_conf('raw_values');
 	$utime    = bo_get_conf('raw_ntime') / 1000;
@@ -1287,7 +1287,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 		echo ' <span class="bo_form_descr">'._BL('Channel').': </span>';
 		echo '<select name="bo_channel" onchange="submit();" id="bo_stat_advanced_select_channel">';
 		echo '<option value="0" '.($channel == 0 ? 'selected' : '').'>'._BL('All').$y.'</option>';
-		for($i=1;$i<=$channels;$i++)
+		for($i=1;$i<=2;$i++)
 			echo '<option value="'.$i.'" '.($i == $channel ? 'selected' : '').'>'._BL('Channel').' '.$i.'</option>';
 		echo '</select>';
 		echo '</span>&nbsp;';

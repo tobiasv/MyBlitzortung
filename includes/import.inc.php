@@ -1361,7 +1361,7 @@ function bo_update_daily_stat($max_time)
 		else if ($data['status'] == 4 && $raw_ok)
 		{
 			$start_time = time();
-			$channels = bo_get_conf('raw_channels');
+			//$channels = bo_get_conf('raw_channels');
 			$max_lines = 10000;
 			$limit = intval($data['raw_limit']);
 			
@@ -1392,30 +1392,42 @@ function bo_update_daily_stat($max_time)
 
 				$d = raw2array($row['data'], true);
 
-				if ($row['amp1_max'] || $row['amp2_max'])
+				if ($row['amp1_max'])
 				{
-					$freq1_index = round($row['freq1'] / 10);
-					$freq2_index = round($row['freq2'] / 10);
-
 					//count of first amplitudes
 					$amps['count'][round($row['amp1'] / 10)][0]++;
-					$amps['count'][round($row['amp2'] / 10)][1]++;
-					
+				
 					//count of max amplitudes
 					$amps['count_max'][round($row['amp1_max'] / 10)][0]++;
-					$amps['count_max'][round($row['amp2_max'] / 10)][1]++;
+
+					$freq1_index = round($row['freq1'] / 10);
 					
 					//count of main frequency
 					$freqs['count'][$freq1_index][0]++;
-					$freqs['count'][$freq2_index][1]++;
 
 					//amp sum of main frequency
 					$freqs['sum_main'][$freq1_index][0] += $row['freq1_amp'];
+				}
+
+				if ($row['amp2_max'])
+				{
+					//count of first amplitudes
+					$amps['count'][round($row['amp2'] / 10)][1]++;
+					
+					//count of max amplitudes
+					$amps['count_max'][round($row['amp2_max'] / 10)][1]++;
+
+					$freq2_index = round($row['freq2'] / 10);
+					
+					//count of main frequency
+					$freqs['count'][$freq2_index][1]++;
+
+					//amp sum of main frequency
 					$freqs['sum_main'][$freq2_index][1] += $row['freq2_amp'];
 				}
 				
 				//spectrum analyzation
-				for ($i=0;$i<$channels;$i++)
+				for ($i=0;$i<2;$i++)
 				{
 					foreach($d['spec_freq'] as $freq_id => $freq)
 					{

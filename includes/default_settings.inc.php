@@ -281,7 +281,8 @@
 //use palette images for DENSITY MAPS with defined colors for output (0 disables)
 @define('BO_IMAGE_PALETTE_COLORS_DENSITIES', 0); 
 
-//automatically use true color if colorcount in palette image is 256 (set to 256 above!)
+//automatically use true color if colorcount in palette image is above 256
+//set BO_IMAGE_PALETTE_COLORS_MAPS to 256
 @define('BO_IMAGE_PALETTE_AUTO', true); 
 
 //PNG compression: the highter the slower!!!

@@ -58,7 +58,7 @@ function bo_graph_raw($id, $spec = false)
 	$tickMajPositions = array();
 	$tickPositions = array();
 
-	$channels = bo_get_conf('raw_channels');
+	$channels = 2; //bo_get_conf('raw_channels');
 	
 	$graph = new Graph(BO_GRAPH_RAW_W,BO_GRAPH_RAW_H,"auto");
 	$graph->ClearTheme();
@@ -99,31 +99,21 @@ function bo_graph_raw($id, $spec = false)
 		$values   = bo_get_conf('raw_values');
 		
 		$graph->SetScale("textlin", 0, BO_GRAPH_RAW_SPEC_MAX_Y, 0, BO_GRAPH_RAW_SPEC_MAX_X * $values * $utime / 1000);
+
 		
-		if ($channels == 1)
-		{
-			$plot=new BarPlot($data['spec'][0]);
-			$plot->SetColor('#fff@1');
-			$plot->SetFillColor(BO_GRAPH_RAW_COLOR1);
-			$plot->SetWidth(BO_GRAPH_RAW_SPEC_WIDTH);
-			$graph->Add($plot);
-		}
-		else if ($channels == 2)
-		{
-			$plot1=new BarPlot($data['spec'][0]);
-			$plot1->SetFillColor(BO_GRAPH_RAW_COLOR1);
-			$plot1->SetColor('#fff@1');
-			$plot1->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
+		$plot1=new BarPlot($data['spec'][0]);
+		$plot1->SetFillColor(BO_GRAPH_RAW_COLOR1);
+		$plot1->SetColor('#fff@1');
+		$plot1->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
 
-			$plot2=new BarPlot($data['spec'][1]);
-			$plot2->SetFillColor(BO_GRAPH_RAW_COLOR2);
-			$plot2->SetColor('#fff@1');
-			$plot2->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
+		$plot2=new BarPlot($data['spec'][1]);
+		$plot2->SetFillColor(BO_GRAPH_RAW_COLOR2);
+		$plot2->SetColor('#fff@1');
+		$plot2->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
 
-			$plot = new GroupBarPlot(array($plot1, $plot2));
-			$graph->Add($plot);
-			$plot2->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH);
-		}
+		$plot = new GroupBarPlot(array($plot1, $plot2));
+		$graph->Add($plot);
+
 		
 		if (BO_GRAPH_RAW_COLOR_XGRID)
 		{
@@ -183,12 +173,15 @@ function bo_graph_raw($id, $spec = false)
 		$xmax = $datax[$n-1];
 
 		$graph->SetScale("linlin",-BO_MAX_VOLTAGE,BO_MAX_VOLTAGE,$xmin,$xmax);
-			
-		$plot=new LinePlot($data['signal'][0], $datax);
-		$plot->SetColor(BO_GRAPH_RAW_COLOR1);
-		$graph->Add($plot);
+		
+		if (max($data['signal'][0]) || min($data['signal'][0]))
+		{
+			$plot=new LinePlot($data['signal'][0], $datax);
+			$plot->SetColor(BO_GRAPH_RAW_COLOR1);
+			$graph->Add($plot);
+		}
 
-		if ($channels == 2)
+		if (max($data['signal'][1]) || min($data['signal'][1]))
 		{
 			$plot=new LinePlot($data['signal'][1], $datax);
 			$plot->SetColor(BO_GRAPH_RAW_COLOR2);
@@ -1020,7 +1013,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	{
 		$station_id = 0;
 		
-		$channels = bo_get_conf('raw_channels');
+		$channels = 2; //bo_get_conf('raw_channels');
 		$last_uptime = bo_get_conf('uptime_raw') - 60; //RAW-update time!!!!
 		$participated = intval($_GET['participated']);
 		
@@ -1172,7 +1165,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$average = isset($_GET['average']);
 		$participated = intval($_GET['participated']);
 				
-		$channels = bo_get_conf('raw_channels');
+		$channels = 2; //bo_get_conf('raw_channels');
 		$last_uptime = bo_get_conf('uptime_raw') - 60;
 
 		if ($hours_back > 24)

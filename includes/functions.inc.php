@@ -540,10 +540,18 @@ function bo_strike2polarity($data, $bearing)
 	
 	$ant_arc = 80;
 
-	for ($i=0;$i<$channels;$i++)
+	for ($i=0;$i<2;$i++)
 	{
 		$signal[$i] = (ord(substr($data,$i,1)) - 128) / 128;
+		
+		//workaround for "best channel setting"
+		if ($signal[$i] == 0)
+		{
+			$channels = 1;
+			continue;
+		}
 
+		
 		if (abs($signal[$i]) > 0.03)
 			$sig_pol[$i] = $signal[$i] > 0 ? 1 : -1;
 		else
@@ -1141,7 +1149,7 @@ function raw2array($raw = false, $calc_spec = false)
 	if (!$channels || !$bpv || !$utime || !$values)
 		return false;
 	
-	//dummy signal
+	//dummy signal when returning an empty array
 	if ($raw === false)
 	{
 		$calc_spec = true;
@@ -1154,20 +1162,45 @@ function raw2array($raw = false, $calc_spec = false)
 	$data['spec'] = array();
 	$data['spec_freq'] = array();
 	
-	$ymax = pow(2,$bpv-1);
 	
+	//fill array with zeros
+	for ($i=0;$i<$values;$i++)
+	{
+		$data['signal_time'][$i] = $i * $utime;
+		
+		$data['signal'][0][$i] = 0;
+		$data['signal'][1][$i] = 0;
+		
+		$data['signal_raw'][0][$i] = 0;
+		$data['signal_raw'][1][$i] = 0;
+	}
+
+	
+	//channel select
+	if ($channels == 1)
+	{
+		//last byte even ==> channel 1 (A)
+		//last byte odd  ==> channel 2 (B)
+		$ch = ord(substr($raw,-1)) % 2;
+	}
+	
+	
+	//signal string to array
+	$ymax = pow(2,$bpv-1);
 	for ($i=0;$i<strlen($raw);$i++)
 	{
 		$byte = ord(substr($raw,$i,1));
-		$data['signal_raw'][$i%$channels][] = $byte;
-		$data['signal'][$i%$channels][] = ($byte - $ymax) / $ymax * BO_MAX_VOLTAGE;	
+		$pos  = floor($i / $channels);
+		
+		if ($channels == 2)
+			$ch = $i%$channels;
+		
+		$data['signal_raw'][$ch][$pos] = $byte;
+		$data['signal'][$ch][$pos] = ($byte - $ymax) / $ymax * BO_MAX_VOLTAGE;	
 	}
 
-	foreach($data['signal'][0] as $i => $dummy)
-	{
-		$data['signal_time'][$i] = $i * $utime;
-	}
 
+	//spectrum for each channel
 	if ($calc_spec)
 	{
 		foreach($data['signal'] as $channel => $d)
