@@ -408,6 +408,7 @@ function bo_user_show_passw_change()
 function bo_user_show_admin()
 {
 	$user_id = intval($_GET['id']);
+	$failure = false;
 
 	if (isset($_POST['bo_admin_user']) && (bo_user_get_level() & BO_PERM_ADMIN) )
 	{
@@ -446,10 +447,13 @@ function bo_user_show_admin()
 			bo_db("INSERT IGNORE INTO ".BO_DB_PREF."user SET id=1", false);
 			
 			if ($user_id)
-				$ok = bo_db("UPDATE $sql WHERE id='$user_id'");
+				$ok = bo_db("UPDATE $sql WHERE id='$user_id'", false);
 			else
-				bo_db("INSERT IGNORE INTO $sql");
+				$ok = bo_db("INSERT INTO $sql", false);
 
+			if (!$ok)
+				$failure = true;
+				
 			$user_id = 0;
 		}
 		else
@@ -514,7 +518,7 @@ function bo_user_show_admin()
 		echo '<td>';
 			
 		if ($row['id'] > 1)
-			echo '<a href="'.bo_insert_url(array('bo_action2')).'&bo_action2=delete&id='.$row['id'].'" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
+			echo '<a href="'.bo_insert_url(array('bo_action2')).'&bo_action2=delete&id='.$row['id'].'" style="color:red" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
 
 		echo '</td>';
 		
@@ -538,6 +542,10 @@ function bo_user_show_admin()
 		$disabled = ' disabled="disabled"';
 	}
 
+	if ($failure)
+		echo '<div class="bo_info_fail">'._BL('Failure!').'</div>';
+
+	
 	echo '<form action="'.bo_insert_url(array('bo_logout', 'id', 'bo_action2')).'" method="POST" class="bo_admin_user_form">';
 
 	echo '<fieldset class="bo_admin_user_fieldset">';
