@@ -945,6 +945,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$only_participated = $_GET['bo_only_participated'] == 1;
 	$strike_id = intval($_GET['bo_strike_id']);	
 	
+	$channels = bo_get_conf('raw_channels');
+	
 	if ($page < 0)
 		$page = 0;
 	else if ($page > $max_pages)
@@ -959,13 +961,14 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	echo '<form action="" method="GET">';	
 	
 	$sql_where = '';
+	$date_end_max_sec = 0;
 	
 	if ($lat !== null && $lon !== null)
 	{
 		if (!$fuzzy)
 		{
 			if ($zoom)
-				$fuzzy = 1/$zoom/7;
+				$fuzzy = 1/pow(2,$zoom)*5;
 			else
 				$fuzzy = 0.005;
 		}
@@ -976,7 +979,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$lonE = $lon + $fuzzy;
 
 		$sql_where = " AND NOT (s.lat < '$latS' OR s.lat > '$latN' OR s.lon < '$lonW' OR s.lon > '$lonE') ";
-		$only_strikes = true;
 		$show_empty_sig = true;
 
 		$hours_back = 24 * 50;
@@ -1007,18 +1009,22 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		echo '</fieldset>';
 		$hours_back = 24;
+		
+		$date_end_max_sec = 180;
 	}
 
 	$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
 
 	$time_end  = strtotime($row['time'].' UTC');
-	$date_end  = gmdate('Y-m-d H:i:s', $time_end - 180);
+	$date_end  = gmdate('Y-m-d H:i:s', $time_end - $date_end_max_sec);
 	$date_start    = gmdate('Y-m-d H:i:s', time() - 3600 * $hours_back);
 	$c = 299792458;
 
 	if ($show_empty_sig)
 	{
-		$sql_join = BO_DB_PREF."strikes s LEFT OUTER JOIN ".BO_DB_PREF."raw r ON s.raw_id=r.id ";
+		$sql_join = BO_DB_PREF."strikes s 
+					LEFT OUTER JOIN ".BO_DB_PREF."raw r 
+					ON s.raw_id=r.id ";
 		$table = 's';
 		
 		if ($only_participated)
@@ -1045,7 +1051,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
 					s.deviation deviation, s.current current, s.polarity polarity,
 					s.time stime, s.time_ns stimens, s.users users, s.part part,
-					r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data
+					r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data,
+					r.amp1 amp1, r.amp2 amp2, r.amp1_max amp1_max, r.amp2_max amp2_max
 			FROM $sql_join
 			WHERE 1
 					AND $table.time BETWEEN '$date_start' AND '$date_end'
@@ -1064,9 +1071,13 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 	echo '<table class="bo_sig_table'.(BO_ARCHIVE_SHOW_SPECTRUM ? ' bo_sig_table_spectrum' : '').'">';
 
+	
 
 	while($row = $res->fetch_assoc())
 	{
+
+		if ($show_empty_sig && $res->num_rows == 1)
+			$strike_id = $row['strike_id'];
 
 		$count++;
 		$stime = strtotime($row['stime'].' UTC');
@@ -1093,7 +1104,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		else
 			$ttime = date(_BL('_datetime'), $rtime).'.'.sprintf('%09d', $row['rtimens']);
 
-		if ($perm && $row['strike_id'])
+		if (!$strike_id && $perm && $row['strike_id'])
 			echo '<a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'&bo_strike_id='.$row['strike_id'].'" target="_blank">'.$ttime.'</a>';
 		else
 			echo $ttime;
@@ -1124,10 +1135,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '<td class="bo_sig_table_strikeinfo">';
 
 
+		echo '<ul>';
+		
 		if ($row['strike_id'])
 		{
-			echo '<ul>';
-
 			echo '<li>';
 			echo '<span class="bo_descr">';
 			echo _BL('Runtime').': ';
@@ -1149,16 +1160,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
 			echo '</span>';
 			echo '</li>';
-/*
-			echo '<li>';
-			echo '<span class="bo_descr">';
-			echo _BL('Bearing').': ';
-			echo '</span>';
-			echo '<span class="bo_value">';
-			echo _BL(bo_bearing2direction($bearing));
-			echo '</span>';
-			echo '</li>';
-*/
+
 			echo '<li>';
 			echo '<span class="bo_descr">';
 			echo _BL('Deviation').': ';
@@ -1227,14 +1229,43 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '</li>';
 			}
 
-			echo '</ul>';
+		
+			
 			
 		}
-		elseif ($row['part'] > 0)
+		
+		if ($row['raw_id'] && $channels == 1)
+		{
+			echo '<li>';
+			echo '<span class="bo_descr">';
+			echo _BL('Channel').': ';
+			echo '</span>';
+			echo '<span class="bo_value">';
+
+			if (abs($row['amp1_max']-128))
+				echo 'A';
+			elseif (abs($row['amp2_max']-128))
+				echo 'B';
+			else
+				echo '?';
+			
+			echo '</span>';
+			echo '</li>';				
+					
+			echo '</span>';
+			echo '</li>';
+
+		}
+		
+		echo '</ul>';
+		
+		echo '<div style="clear:both"></div>';
+		
+		if (!$row['strike_id'] && $row['part'] > 0)
 		{
 			echo _BL('participated but signal not found');
 		}
-		else
+		elseif (!$row['strike_id'])
 		{
 			echo _BL('no strike detected');
 		}
@@ -1267,9 +1298,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 		if ($count == $per_page)
 			break;
-
-		
-		$last_strike_id = $row['strike_id'];
 	}
 
 	echo '</table>';
@@ -1287,9 +1315,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	echo '</form>';
 	
-	if ($show_empty_sig && !$strike_id)
-		$strike_id = $last_strike_id;
-		
+	
 	if ($show_empty_sig && $count == 1 && $strike_id)
 	{
 		$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;

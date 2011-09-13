@@ -1171,8 +1171,8 @@ function raw2array($raw = false, $calc_spec = false)
 		$data['signal'][0][$i] = 0;
 		$data['signal'][1][$i] = 0;
 		
-		$data['signal_raw'][0][$i] = 0;
-		$data['signal_raw'][1][$i] = 0;
+		$data['signal_raw'][0][$i] = 128;
+		$data['signal_raw'][1][$i] = 128;
 	}
 
 	
@@ -1240,7 +1240,7 @@ function bo_examine_signal($data, &$amp = array(), &$amp_max = array(), &$freq =
 			{
 				$sig = abs($signal - 128);
 				
-				if ($sig > $max)
+				if ($sig >= $max)
 				{
 					$max = $sig;
 					$amp_max[$channel] = $signal;

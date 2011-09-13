@@ -745,7 +745,7 @@ function bo_match_strike2raw()
 	$dist_fuzz = 0.0001; //fuzzy-seconds per meter (seconds)
 	$offset_fuzz = 0;
 	
-	$amp_trigger = (BO_TRIGGER_VOLTAGE * 0.95 / BO_MAX_VOLTAGE) * 256 / 2;
+	$amp_trigger = (BO_TRIGGER_VOLTAGE * 0.90 / BO_MAX_VOLTAGE) * 256 / 2;
 
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 	$row = bo_db($sql)->fetch_assoc();
@@ -852,7 +852,8 @@ function bo_match_strike2raw()
 				$part[$row['id']] += $trigger1_later ? pow(2, 3) : 0;
 				$part[$row['id']] += $trigger2_later ? pow(2, 4) : 0;
 				
-				if (!($part[$row['id']] & 1)) //mark negative --> got strike but not tracked by blitzortung
+				//mark negative --> got strike but not tracked by blitzortung
+				if (!($part[$row['id']] & 1)) 
 					$part[$row['id']] = abs($part[$row['id']]) * -1;
 				else
 					$own_found++;
