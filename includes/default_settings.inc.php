@@ -72,6 +72,14 @@
 
 
 /*******************************************************************/
+/*** Number of Antennas of your Station                          ***/
+/*** only "1" or "2" is possible !                               ***/
+
+@define('BO_ANTENNAS', 2);
+
+
+
+/*******************************************************************/
 /*** Copyright footer                                            ***/
 /*** your own copyright/web-address in images/graphs/footer      ***/
 
@@ -80,6 +88,7 @@
 
 //Textsize for graphs
 @define('BO_OWN_COPYRIGHT_SIZE', 7);
+
 
 
 /*******************************************************************/

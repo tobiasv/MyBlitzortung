@@ -2200,15 +2200,25 @@ function bo_update_densities($max_time)
 			//for displaying antenna direction in ratio map
 			if ($b['station_id'] == bo_station_id())
 			{
+				$ant = array();
+				
 				$ant[0] = bo_get_conf('antenna1_bearing');
-				$ant[1] = bo_get_conf('antenna2_bearing');
-	
-				if ($ant[0] !== '' && $ant[0] !== null && $ant[1] !== '' && $ant[1] !== null)
+				if ($ant[0] !== '' && $ant[0] !== null)
 				{
-					$info['antennas']['bearing'] = $ant;
+					$info['antennas']['bearing'][0] = $ant[0];
 					$info['antennas']['bearing_elec'][0] = bo_get_conf('antenna1_bearing_elec');
-					$info['antennas']['bearing_elec'][1] = bo_get_conf('antenna2_bearing_elec');
 				}
+
+				if (BO_ANTENNAS == 2)
+				{
+					$ant[1] = bo_get_conf('antenna2_bearing');
+					if ($ant[1] !== '' && $ant[1] !== null)
+					{
+						$info['antennas']['bearing'][1] = $ant[1];
+						$info['antennas']['bearing_elec'][1] = bo_get_conf('antenna2_bearing_elec');
+					}
+				}
+				
 			}
 
 			$sql = "UPDATE ".BO_DB_PREF."densities 

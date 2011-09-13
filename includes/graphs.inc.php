@@ -58,7 +58,7 @@ function bo_graph_raw($id, $spec = false)
 	$tickMajPositions = array();
 	$tickPositions = array();
 
-	$channels = 2; //bo_get_conf('raw_channels');
+	$channels = BO_ANTENNAS;
 	
 	$graph = new Graph(BO_GRAPH_RAW_W,BO_GRAPH_RAW_H,"auto");
 	$graph->ClearTheme();
@@ -1013,7 +1013,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	{
 		$station_id = 0;
 		
-		$channels = 2; //bo_get_conf('raw_channels');
+		$channels = BO_ANTENNAS;
 		$last_uptime = bo_get_conf('uptime_raw') - 60; //RAW-update time!!!!
 		$participated = intval($_GET['participated']);
 		
@@ -1082,7 +1082,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$sql = "SELECT r.freq".$channel." freq, SUM($sname) amp_sum, COUNT(r.id) cnt
 						FROM ".BO_DB_PREF."raw r
 						$sql_join
-						WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+						WHERE 
+							r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+							AND (r.amp".$channel."_max != 128)
 						$sql_where
 						GROUP BY freq";
 				$res = bo_db($sql);
@@ -1127,6 +1129,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 						$sql_join
 						WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
 						$sql_where
+						AND (r.amp".$channel."_max != 128)
 						GROUP BY amp";
 				$res = bo_db($sql);
 				while ($row = $res->fetch_assoc())
@@ -1165,7 +1168,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$average = isset($_GET['average']);
 		$participated = intval($_GET['participated']);
 				
-		$channels = 2; //bo_get_conf('raw_channels');
+		$channels = BO_ANTENNAS;
 		$last_uptime = bo_get_conf('uptime_raw') - 60;
 
 		if ($hours_back > 24)
@@ -1264,6 +1267,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					$sql_join
 					WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
 					$sql_where
+					AND (r.amp".$channel."_max != 128)
 					GROUP BY FLOOR(UNIX_TIMESTAMP(r.time) / 60 / $group_minutes), extra";
 			
 			$sql = strtr($sql, array('{CHANNEL}' => $channel));
@@ -2522,26 +2526,26 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 	//Antennas
 	$ant1 = bo_get_conf('antenna1_bearing');
 	$ant2 = bo_get_conf('antenna2_bearing');
+	imagesetthickness($I,BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_ANTENNA_WIDTH);
 	
-	if ($antennas && $ant1 !== '' && $ant1 !== null && $ant2 !== '' && $ant2 !== null)
+	if ($antennas && $ant1 !== '' && $ant1 !== null)
 	{
-		imagesetthickness($I,BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_ANTENNA_WIDTH);
-		
 		$color = bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_ANTENNA1_COLOR);
 		list($x1, $y1) = bo_rotate(0, -$rsize/2*1.14, $ant1, $xm, $ym);
 		list($x2, $y2) = bo_rotate(0, $rsize/2*1.14, $ant1, $xm, $ym);
 		imageline($I, $x1, $y1, $x2, $y2, $color);
-		
+	}
+	
+	if ($antennas && $ant2 !== '' && $ant2 !== null && BO_ANTENNAS == 2)
+	{
 		$color = bo_hex2color($I, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_ANTENNA2_COLOR);
 		list($x1, $y1) = bo_rotate(0, -$rsize/2*1.14, $ant2, $xm, $ym);
 		list($x2, $y2) = bo_rotate(0, $rsize/2*1.14, $ant2, $xm, $ym);
 		imageline($I, $x1, $y1, $x2, $y2, $color);
-		
-		imagesetthickness($I,1);
-
 	}
 
-
+	imagesetthickness($I,1);
+	
 	//Circle in the center
 	$y = $csize * $psize;
 	imagefilledarc($I, $xm, $ym, $y, $y, 0, 360, $Cwhite, IMG_ARC_PIE );

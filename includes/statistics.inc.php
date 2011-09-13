@@ -1047,27 +1047,29 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	
 	echo '</ul>';
 	
-	
-	$ant1 = bo_get_conf('antenna1_bearing');
-	$ant2 = bo_get_conf('antenna2_bearing');
-	$show_ant = false;
-	
-	if ($ant1 !== '' && $ant1 !== null && $ant2 !== '' && $ant2 !== null)
+	if (BO_ANTENNAS == 2)
 	{
-		$show_ant = true;
-		$ant1 = round($ant1);
-		$ant2 = round($ant2);
+		$ant1 = bo_get_conf('antenna1_bearing');
+		$ant2 = bo_get_conf('antenna2_bearing');
+		$show_ant = false;
 		
-		echo '<h4>'._BL('h4_stat_other_antennas').'</h4>';
-		echo '<p class="bo_stat_description" id="bo_stat_other_descr_antennas">';
-		echo _BL('bo_stat_other_antennas_descr');
-		echo '</p>';
+		if ($ant1 !== '' && $ant1 !== null && $ant2 !== '' && $ant2 !== null)
+		{
+			$show_ant = true;
+			$ant1 = round($ant1);
+			$ant2 = round($ant2);
+			
+			echo '<h4>'._BL('h4_stat_other_antennas').'</h4>';
+			echo '<p class="bo_stat_description" id="bo_stat_other_descr_antennas">';
+			echo _BL('bo_stat_other_antennas_descr');
+			echo '</p>';
 
-		echo '<ul class="bo_stat_overview">';
-		echo '<li><span class="bo_descr">'._BL('Direction antenna 1').': </span><span class="bo_value">'.$ant1.'&deg; - '.($ant1+180).'&deg ('.(_BL(bo_bearing2direction($ant1)).'-'._BL(bo_bearing2direction($ant1+180))).')</span>';
-		echo '<li><span class="bo_descr">'._BL('Direction antenna 2').': </span><span class="bo_value">'.$ant2.'&deg; - '.($ant2+180).'&deg ('.(_BL(bo_bearing2direction($ant2)).'-'._BL(bo_bearing2direction($ant2+180))).')</span>';
-		echo '</ul>';
-		
+			echo '<ul class="bo_stat_overview">';
+			echo '<li><span class="bo_descr">'._BL('Direction antenna 1').': </span><span class="bo_value">'.$ant1.'&deg; - '.($ant1+180).'&deg ('.(_BL(bo_bearing2direction($ant1)).'-'._BL(bo_bearing2direction($ant1+180))).')</span>';
+			echo '<li><span class="bo_descr">'._BL('Direction antenna 2').': </span><span class="bo_value">'.$ant2.'&deg; - '.($ant2+180).'&deg ('.(_BL(bo_bearing2direction($ant2)).'-'._BL(bo_bearing2direction($ant2+180))).')</span>';
+			echo '</ul>';
+			
+		}
 	}
 	
 	//Show GPS Info
@@ -1246,7 +1248,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 			$add_graph .= '&channel='.$channel;
 	}
 	
-	$channels = 2; //always TWO!   // bo_get_conf('raw_channels');
+	$channels = BO_ANTENNAS;
 	$bpv      = bo_get_conf('raw_bitspervalue');
 	$values   = bo_get_conf('raw_values');
 	$utime    = bo_get_conf('raw_ntime') / 1000;

@@ -388,7 +388,7 @@ function bo_user_show_passw_change()
 	
 	echo '<h3>'._BL('Change password').'</h3>';
 	
-	echo '<form action="'.bo_insert_url(array()).'" method="POST" class="bo_admin_user_form">';
+	echo '<form action="'.bo_insert_url().'" method="POST" class="bo_admin_user_form">';
 
 	echo '<fieldset class="bo_admin_user_fieldset">';
 	echo '<legend>'._BL('user_change_passw_legend').'</legend>';
@@ -592,19 +592,28 @@ function bo_user_show_admin()
 
 function bo_show_calibrate_antennas()
 {
+	$channels = bo_get_conf('raw_channels');
+	
 	if (!$_POST['bo_calibrate'])
 	{
-		if ($_POST['bo_calibrate_manual'])
+		if ($_POST['bo_calibrate_manual'] && (bo_user_get_level() & BO_PERM_ADMIN))
 		{
-			bo_set_conf('antenna1_bearing', (double)$_POST['bo_antenna1_bearing']);	
-			bo_set_conf('antenna2_bearing', (double)$_POST['bo_antenna2_bearing']);	
-			bo_set_conf('antenna1_bearing_elec', (double)$_POST['bo_antenna1_bearing_elec']);
-			bo_set_conf('antenna2_bearing_elec', (double)$_POST['bo_antenna2_bearing_elec']);
+			if (strlen(trim($_POST['bo_antenna1_bearing'])))
+				bo_set_conf('antenna1_bearing', (double)$_POST['bo_antenna1_bearing']);	
+			
+			if (strlen(trim($_POST['bo_antenna2_bearing'])))
+				bo_set_conf('antenna2_bearing', (double)$_POST['bo_antenna2_bearing']);	
+			
+			if (strlen(trim($_POST['bo_antenna1_bearing_elec'])))
+				bo_set_conf('antenna1_bearing_elec', (double)$_POST['bo_antenna1_bearing_elec']);
+				
+			if (strlen(trim($_POST['bo_antenna2_bearing_elec'])))
+				bo_set_conf('antenna2_bearing_elec', (double)$_POST['bo_antenna2_bearing_elec']);
 		}
 		
 		echo '<h3>'._BL('Manual antenna calibration').'</h3>';
 		
-		echo '<form action="'.bo_insert_url(array()).'" method="POST" class="bo_admin_user_form">';
+		echo '<form action="'.bo_insert_url().'" method="POST" class="bo_admin_user_form">';
 
 		echo '<fieldset class="bo_admin_user_fieldset">';
 		echo '<legend>'._BL('admin_calibrate_manual_legend').'</legend>';
@@ -627,233 +636,234 @@ function bo_show_calibrate_antennas()
 	}
 
 	/*** Auto-calibration begins here ***/
-	
-	$dist = intval($_POST['bo_max_dist']) * 1000;
-	$age = (double)$_POST['bo_max_age'];
-	$limit = intval($_POST['bo_limit']);
-	$limit = $limit ? $limit : 5000;
-
-	if (!$dist && intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST))
-		$dist = intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST) * 1000;
-	
-	echo '<h3>'._BL('Automatic antenna calibration').'</h3>';
-	
-	echo '<form action="'.bo_insert_url(array()).'" method="POST" class="bo_admin_user_form">';
-
-	echo '<fieldset class="bo_admin_user_fieldset">';
-	echo '<legend>'._BL('admin_calibrate_legend').'</legend>';
-
-	echo '<span class="bo_form_descr">'._BL('Limit').':</span>';
-	echo '<input type="text" name="bo_limit" value="'.$limit.'" id="bo_calibrate_limit" class="bo_form_text bo_form_input">';
-
-	echo '<span class="bo_form_descr">'._BL('Max Distance (Kilometers)').':</span>';
-	echo '<input type="text" name="bo_max_dist" value="'.($dist ? $dist/1000 : '').'" id="bo_calibrate_dist" class="bo_form_text bo_form_input">';
-
-	echo '<span class="bo_form_descr">'._BL('Max Age (Days)').':</span>';
-	echo '<input type="text" name="bo_max_age" value="'.($age ? $age : '').'" id="bo_calibrate_age" class="bo_form_text bo_form_input">';
-
-
-	echo '<input type="submit" name="bo_calibrate" value="'._BL('Calculate').'" id="bo_admin_submit" class="bo_form_submit">';
-
-	echo '</fieldset>';
-	echo '</form>';
-
-	$count = null;
-	if ($_POST['bo_calibrate'])
+	if ($channels == 2)
 	{
-		$min_sig = 0.1;
-		$count = 0;
-		$ant_alpha[0] = array();
-		$ant_alpha[1] = array();
 
-		$sql = "SELECT r.id raw_id, s.time strike_time, s.lat lat, s.lon lon, s.current current, r.data data
-				FROM ".BO_DB_PREF."raw r, ".BO_DB_PREF."strikes s
-				WHERE r.strike_id=s.id
-					".($dist ? " AND s.distance < $dist " : '')."
-					".($age ? " AND s.time > '".gmdate('Y-m-d H:i:s', time() - 3600 * 24 * $age)."' " : '')."
-				ORDER BY RAND()
-				LIMIT $limit";
-		$res = bo_db($sql);
-		while ($row = $res->fetch_assoc())
+		$dist = intval($_POST['bo_max_dist']) * 1000;
+		$age = (double)$_POST['bo_max_age'];
+		$limit = intval($_POST['bo_limit']);
+		$limit = $limit ? $limit : 5000;
+
+		if (!$dist && intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST))
+			$dist = intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST) * 1000;
+		
+		echo '<h3>'._BL('Automatic antenna calibration').'</h3>';
+		
+		echo '<form action="'.bo_insert_url().'" method="POST" class="bo_admin_user_form">';
+
+		echo '<fieldset class="bo_admin_user_fieldset">';
+		echo '<legend>'._BL('admin_calibrate_legend').'</legend>';
+
+		echo '<span class="bo_form_descr">'._BL('Limit').':</span>';
+		echo '<input type="text" name="bo_limit" value="'.$limit.'" id="bo_calibrate_limit" class="bo_form_text bo_form_input">';
+
+		echo '<span class="bo_form_descr">'._BL('Max Distance (Kilometers)').':</span>';
+		echo '<input type="text" name="bo_max_dist" value="'.($dist ? $dist/1000 : '').'" id="bo_calibrate_dist" class="bo_form_text bo_form_input">';
+
+		echo '<span class="bo_form_descr">'._BL('Max Age (Days)').':</span>';
+		echo '<input type="text" name="bo_max_age" value="'.($age ? $age : 10).'" id="bo_calibrate_age" class="bo_form_text bo_form_input">';
+
+
+		echo '<input type="submit" name="bo_calibrate" value="'._BL('Calculate').'" id="bo_admin_submit" class="bo_form_submit">';
+
+		echo '</fieldset>';
+		echo '</form>';
+
+		$count = null;
+		if ($_POST['bo_calibrate'])
 		{
-			$bearing = bo_latlon2bearing($row['lat'], $row['lon']);
+			$min_sig = 0.1;
+			$count = 0;
+			$ant_alpha[0] = array();
+			$ant_alpha[1] = array();
 
-			/*** find direction (0-180°) ***/
-			for($i=0;$i<2;$i++)
+			$sql = "SELECT r.id raw_id, s.time strike_time, s.lat lat, s.lon lon, s.current current, r.data data
+					FROM ".BO_DB_PREF."raw r, ".BO_DB_PREF."strikes s
+					WHERE r.strike_id=s.id
+						".($dist ? " AND s.distance < $dist " : '')."
+						".($age ? " AND s.time > '".gmdate('Y-m-d H:i:s', time() - 3600 * 24 * $age)."' " : '')."
+					ORDER BY RAND()
+					LIMIT $limit";
+			$res = bo_db($sql);
+			while ($row = $res->fetch_assoc())
 			{
-				//only the first sample of each channel
-				$signal = (ord(substr($row['data'],$i,1)) - 128) / 128;
-				$ant[$i] = $signal;
+				$bearing = bo_latlon2bearing($row['lat'], $row['lon']);
 
-			}
-
-			if ( ($ant[0] == 0 && $ant[1] == 0) || (abs($ant[0]) < $min_sig && abs($ant[1]) < $min_sig) )
-				continue;
-
-			if (abs($ant[0]) < abs($ant[1]))
-			{
-				$calc_ant = 0;
-				$ratio = $ant[0] / ($ant[1] ? $ant[1] : 1E-9);
-			}
-			else
-			{
-				$calc_ant = 1;
-				$ratio = $ant[1] / ($ant[0] ? $ant[0] : 1E-9);
-			}
-
-			if (abs($ratio) < 0.02)
-				$ant_alpha[$calc_ant][] = $bearing % 180;
-
-			/*
-			echo '<p><img src="'.BO_FILE.'?graph='.$row['raw_id'].'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px"></p>';
-			*/
-
-			for($i=0;$i<2;$i++)
-			{
-				if ($signal != 0)
+				/*** find direction (0-180°) ***/
+				for($i=0;$i<2;$i++)
 				{
-					$sign[$i][intval($bearing)][$signal > 0 ? 1 : -1]++;
-					$current[$i][intval($bearing)][$signal > 0 ? 1 : -1][] = $row['current'];
-				}
-			}
+					//only the first sample of each channel
+					$signal = (ord(substr($row['data'],$i,1)) - 128) / 128;
+					$ant[$i] = $signal;
 
-			$count++;
-		}
-	}
-
-
-
-	if ($count === 0)
-	{
-		echo '<h3>'._BL('Results').'</h3>';
-		echo '<ul>';
-		echo '<li>'._BL('No strikes found!').'</li>';
-		echo '</ul>';
-	}
-	elseif ($count)
-	{
-		$alpha[0] = null;
-		if (count($ant_alpha[0]))
-			$alpha[0] = round(array_sum($ant_alpha[0]) / count($ant_alpha[0]),1);
-
-		$alpha[1] = null;
-		if (count($ant_alpha[1]))
-			$alpha[1] = round(array_sum($ant_alpha[1]) / count($ant_alpha[1]),1);
-
-		echo '<h3>'._BL('Results').'</h3>';
-
-		echo '<ul>';
-		echo '<li>'._BL('Analyzed').': '.$count.' '._BL('random datasets').'</li>';
-		echo '</ul>';
-
-		echo '<h4>'._BL('Direction').'</h4>';
-		echo '<ul>';
-		echo '<li>'._BL('Antenna').' 1: '.$alpha[0].'&deg; ('._BL(bo_bearing2direction($alpha[0])).' <-> '._BL(bo_bearing2direction($alpha[0] + 180)).')</li>';
-		echo '<li>'._BL('Antenna').' 2: '.$alpha[1].'&deg; ('._BL(bo_bearing2direction($alpha[1])).' <-> '._BL(bo_bearing2direction($alpha[1] + 180)).')</li>';
-		echo '<li>'._BL('Difference').': '.abs($alpha[1]-$alpha[0]).'&deg;</li>';
-
-
-		if ((bo_user_get_level() & BO_PERM_ADMIN))
-		{
-			if ($alpha[0] !== null)
-				bo_set_conf('antenna1_bearing', $alpha[0]);
-
-			if ($alpha[1] !== null)
-				bo_set_conf('antenna2_bearing', $alpha[1]);
-
-			echo '<li>'._BL('Antenna directions saved to database').'.</li>';
-		}
-		else
-			echo '<li>'._BL('No permisson for saving to DB!').'</li>';
-
-
-		echo '</ul>';
-
-		//find polarity (+/-) from statistics (suppose: more negative lightning than positve)
-		echo '<h4>'._BL('Polarity').' ('._BL('Very experimental').')</h4>';
-
-		for ($i=0;$i<2;$i++)
-		{
-			echo '<h6>'._BL('Antenna').' '.($i+1)." (".$alpha[$i]."&deg;)</h6>";
-			echo '<ul>';
-
-
-			$deltas = array(90, 270);
-			$arc = 45;
-
-			$c = 0;
-			foreach($deltas as $delta)
-			{
-
-				//count positive/negative lighning in a arc verticaly to the antenna
-				$beta1 = ($alpha[$i] + $delta + $arc/2) % 360;
-				$beta2 = ($alpha[$i] + $delta - $arc/2) % 360;
-
-				if ($beta1 > $beta2)
-				{
-					$tmp = $beta2;
-					$beta2 = $beta1;
-					$beta1 = $tmp;
 				}
 
-				$neg = 0;
-				$pos = 0;
+				if ( ($ant[0] == 0 && $ant[1] == 0) || (abs($ant[0]) < $min_sig && abs($ant[1]) < $min_sig) )
+					continue;
 
-				$j = 0;
-				for ($a=$beta1;$a<$beta2;$a++)
+				if (abs($ant[0]) < abs($ant[1]))
 				{
-					$neg += $sign[$i][$a][-1];
-					$pos += $sign[$i][$a][1];
-
-					$cur_neg += count($current[$i][$a][-1]) ? array_sum($current[$i][$a][-1]) / count($current[$i][$a][-1]) : 0;
-					$cur_pos += count($current[$i][$a][1]) ? array_sum($current[$i][$a][1]) / count($current[$i][$a][1]) : 0;
-
-					$j++;
-				}
-
-				$cur_neg /= $j;
-				$cur_pos /= $j;
-
-				if ($neg)
-					$pol_ratio[$c] = $pos / $neg;
-
-				$c++;
-
-				echo '<li>'.round($beta1).'&deg; to '.round($beta2).'&deg; :';
-				echo ' '._BL('Positive').": $pos / "._BL('Negative').": $neg ";
-				//echo " (Current: ".round($cur_pos,1)." / ".round($cur_neg,1)." kA/perStrike) ";
-				echo '</li>';
-			}
-
-			if ($pol_ratio[0] > 1 && $pol_ratio[1] < 1)
-				$pos_dir[$i] = ($alpha[$i] + $deltas[1]) % 360;
-			else if ($pol_ratio[0] < 1 && $pol_ratio[1] > 1)
-				$pos_dir[$i] = ($alpha[$i] + $deltas[0]) % 360;
-			else
-				$pos_dir[$i] = null;
-
-			echo '<li>'._BL('Positive electrical direction').': ';
-
-			if ($pos_dir[$i] === null)
-				echo _BL('Not definite').' :-(';
-			else
-			{
-
-				echo $pos_dir[$i].'&deg';
-
-				if ((bo_user_get_level() & BO_PERM_ADMIN))
-				{
-					echo ' ('._BL('Saved to DB').')';
-					bo_set_conf('antenna'.($i+1).'_bearing_elec', $pos_dir[$i]);
+					$calc_ant = 0;
+					$ratio = $ant[0] / ($ant[1] ? $ant[1] : 1E-9);
 				}
 				else
-					echo ' ('._BL('No permisson for saving to DB!').')';
-			}
+				{
+					$calc_ant = 1;
+					$ratio = $ant[1] / ($ant[0] ? $ant[0] : 1E-9);
+				}
 
+				if (abs($ratio) < 0.02)
+					$ant_alpha[$calc_ant][] = $bearing % 180;
+
+				/*
+				echo '<p><img src="'.BO_FILE.'?graph='.$row['raw_id'].'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px"></p>';
+				*/
+
+				for($i=0;$i<2;$i++)
+				{
+					if ($signal != 0)
+					{
+						$sign[$i][intval($bearing)][$signal > 0 ? 1 : -1]++;
+						$current[$i][intval($bearing)][$signal > 0 ? 1 : -1][] = $row['current'];
+					}
+				}
+
+				$count++;
+			}
+		}
+
+		if ($count === 0)
+		{
+			echo '<h3>'._BL('Results').'</h3>';
+			echo '<ul>';
+			echo '<li>'._BL('No strikes found!').'</li>';
+			echo '</ul>';
+		}
+		elseif ($count)
+		{
+			$alpha[0] = null;
+			if (count($ant_alpha[0]))
+				$alpha[0] = round(array_sum($ant_alpha[0]) / count($ant_alpha[0]),1);
+
+			$alpha[1] = null;
+			if (count($ant_alpha[1]))
+				$alpha[1] = round(array_sum($ant_alpha[1]) / count($ant_alpha[1]),1);
+			
+			echo '<form action="'.bo_insert_url().'" method="POST" class="bo_admin_user_form">';
+			
+			echo '<h3>'._BL('Results').'</h3>';
+
+			echo '<ul>';
+			echo '<li>'._BL('Analyzed').': '.$count.' '._BL('random datasets').'</li>';
+			echo '</ul>';
+
+			echo '<h4>'._BL('Direction').'</h4>';
+			echo '<ul>';
+			echo '<li>'._BL('Antenna').' 1: '.$alpha[0].'&deg; ('._BL(bo_bearing2direction($alpha[0])).' <-> '._BL(bo_bearing2direction($alpha[0] + 180)).')';
+
+			if ((bo_user_get_level() & BO_PERM_ADMIN))
+				echo '<input type="text" name="bo_antenna1_bearing" value="'.$alpha[0].'" id="bo_antenna1_bearing_id" class="bo_form_text bo_form_input">';
+			
 			echo '</li>';
+			echo '<li>'._BL('Antenna').' 2: '.$alpha[1].'&deg; ('._BL(bo_bearing2direction($alpha[1])).' <-> '._BL(bo_bearing2direction($alpha[1] + 180)).')';
+
+			if ((bo_user_get_level() & BO_PERM_ADMIN))
+				echo '<input type="text" name="bo_antenna2_bearing" value="'.$alpha[1].'" id="bo_antenna2_bearing_id" class="bo_form_text bo_form_input">';
+				
+			echo '</li>';
+			echo '<li>'._BL('Difference').': '.abs($alpha[1]-$alpha[0]).'&deg;</li>';
 
 			echo '</ul>';
 
+			
+				
+
+			//find polarity (+/-) from statistics (suppose: more negative lightning than positve)
+			echo '<h4>'._BL('Polarity').' ('._BL('Very experimental').')</h4>';
+
+			for ($i=0;$i<2;$i++)
+			{
+				echo '<h6>'._BL('Antenna').' '.($i+1)." (".$alpha[$i]."&deg;)</h6>";
+				echo '<ul>';
+
+
+				$deltas = array(90, 270);
+				$arc = 45;
+
+				$c = 0;
+				foreach($deltas as $delta)
+				{
+
+					//count positive/negative lighning in a arc verticaly to the antenna
+					$beta1 = ($alpha[$i] + $delta + $arc/2) % 360;
+					$beta2 = ($alpha[$i] + $delta - $arc/2) % 360;
+
+					if ($beta1 > $beta2)
+					{
+						$tmp = $beta2;
+						$beta2 = $beta1;
+						$beta1 = $tmp;
+					}
+
+					$neg = 0;
+					$pos = 0;
+
+					$j = 0;
+					for ($a=$beta1;$a<$beta2;$a++)
+					{
+						$neg += $sign[$i][$a][-1];
+						$pos += $sign[$i][$a][1];
+
+						$cur_neg += count($current[$i][$a][-1]) ? array_sum($current[$i][$a][-1]) / count($current[$i][$a][-1]) : 0;
+						$cur_pos += count($current[$i][$a][1]) ? array_sum($current[$i][$a][1]) / count($current[$i][$a][1]) : 0;
+
+						$j++;
+					}
+
+					$cur_neg /= $j;
+					$cur_pos /= $j;
+
+					if ($neg)
+						$pol_ratio[$c] = $pos / $neg;
+
+					$c++;
+
+					echo '<li>'.round($beta1).'&deg; to '.round($beta2).'&deg; :';
+					echo ' '._BL('Positive').": $pos / "._BL('Negative').": $neg ";
+					//echo " (Current: ".round($cur_pos,1)." / ".round($cur_neg,1)." kA/perStrike) ";
+					echo '</li>';
+				}
+
+				if ($pol_ratio[0] > 1 && $pol_ratio[1] < 1)
+					$pos_dir[$i] = ($alpha[$i] + $deltas[1]) % 360;
+				else if ($pol_ratio[0] < 1 && $pol_ratio[1] > 1)
+					$pos_dir[$i] = ($alpha[$i] + $deltas[0]) % 360;
+				else
+					$pos_dir[$i] = null;
+
+				echo '<li>'._BL('Positive electrical direction').': ';
+
+				if ($pos_dir[$i] === null)
+				{
+					echo _BL('Not definite').' :-(';
+				}
+				else
+				{
+					echo $pos_dir[$i].'&deg';
+					
+					if ((bo_user_get_level() & BO_PERM_ADMIN))
+						echo '<input type="text" name="bo_antenna'.($i+1).'_bearing_elec" value="'.$pos_dir[$i].'" id="bo_antenna'.($i+1).'_elec_bearing_id" class="bo_form_text bo_form_input">';
+				}
+
+				echo '</li>';
+
+				echo '</ul>';
+
+			}
+			
+			echo '<input type="submit" name="bo_calibrate_manual" value="'._BL('Ok').'" id="bo_admin_submit" class="bo_form_submit">';
+			
+			echo '</form>';
 		}
 	}
 }
