@@ -287,7 +287,7 @@ function bo_show_lightning_map()
 				'default_show' => false,
 				'sel_name' => $data['name'],
 				'only_loggedin' => true,
-				'to_mercator' => $data['to_mercator'] ? true : false,
+				'to_mercator' => $data['proj'] == 'plate' ? true : false,
 				'opacity' => 50,
 				'is_map' => true
 				);

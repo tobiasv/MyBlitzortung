@@ -169,7 +169,7 @@ $_BO['tpl_imgmap_default']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap_default']['col_smooth'] = 24;
 
 
-//an animation template4
+//an animation template
 $_BO['tpl_gif_animation_mini']['minutes'] = 60 * 3;
 $_BO['tpl_gif_animation_mini']['count'] = 12;
 $_BO['tpl_gif_animation_mini']['range'] = 120;
