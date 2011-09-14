@@ -2636,10 +2636,13 @@ function bo_update_tracks($force = false, $max_time = 0)
 		}
 
 		$data = array('time' => $time, 'cells_time' => $cells_time, 'cells' => $cells);
-		
-		echo '<pre>';
-		print_r($data);
-		echo '</pre>';
+
+		if ($force)
+		{
+			echo '<pre>';
+			print_r($data);
+			echo '</pre>';
+		}
 		
 		bo_set_conf('strike_cells', gzdeflate(serialize($data)));
 	}
