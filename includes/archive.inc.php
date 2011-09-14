@@ -163,7 +163,7 @@ function bo_show_archive_map()
 		
 	if (!$hour_from && !$hour_to)
 	{
-		$hour_time_from = time() - 3600 * $ani_default_range - $ani_pic_range * 60;
+		$hour_time_from = time() - 3600 * $ani_default_range;
 		$hour_time_to   = $hour_time_from + 3600 * $ani_default_range;
 		$hour_from = (int)date('H', $hour_time_from);
 		$hour_to = (int)date('H', $hour_time_to);
@@ -317,7 +317,7 @@ function bo_show_archive_map()
 				$hour_to += 24; //next day
 			
 			$images = '';
-			for ($i=$hour_from*60; $i<= $hour_to * 60; $i+= $ani_div)
+			for ($i=$hour_from*60-$ani_pic_range; $i<= $hour_to * 60; $i+= $ani_div)
 			{
 				$minutes = $i;
 				$time = strtotime("$year-$month-$day 00:00:00 +$minutes minutes");
