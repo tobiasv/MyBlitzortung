@@ -2034,6 +2034,10 @@ function bo_update_densities($max_time)
 				{
 					if (!$date_start_add || $row['date_start'] == $date_start_add)
 					{
+						
+						if (!$info['date_start_real']) // save start time info to display in map
+							$info['date_start_real'] = $row['date_start'];
+							
 						$date_start_add = date('Y-m-d', strtotime($row['date_end'].' + 1 day'));
 						
 						$OLDDATA = gzinflate($row['data']);
