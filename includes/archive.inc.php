@@ -944,6 +944,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$only_strikes = $_GET['bo_only_strikes'] == 1;
 	$only_participated = $_GET['bo_only_participated'] == 1;
 	$strike_id = intval($_GET['bo_strike_id']);	
+	$date = $_GET['bo_datetime_to'];
 	
 	$channels = bo_get_conf('raw_channels');
 	
@@ -952,16 +953,22 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	else if ($page > $max_pages)
 		$page = $max_pages;
 	
+	$sql_where = '';
+	$date_end_max_sec = 0;
+	$datetime_to = 0;
+	
 	if (!$perm)
 	{
 		$show_empty_sig = false;
 		$strike_id = 0;
 	}
+	else if ($date)
+	{
+		$datetime_to = strtotime($date);
+	}
 	
 	echo '<form action="" method="GET">';	
 	
-	$sql_where = '';
-	$date_end_max_sec = 0;
 	
 	if ($lat !== null && $lon !== null)
 	{
@@ -978,7 +985,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$lonW = $lon - $fuzzy;
 		$lonE = $lon + $fuzzy;
 
-		$sql_where = " AND NOT (s.lat < '$latS' OR s.lat > '$latN' OR s.lon < '$lonW' OR s.lon > '$lonE') ";
+		$sql_where .= " AND NOT (s.lat < '$latS' OR s.lat > '$latN' OR s.lon < '$lonW' OR s.lon > '$lonE') ";
 		$show_empty_sig = true;
 
 		$hours_back = 24 * 50;
@@ -1007,6 +1014,13 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '<label for="check_only_participated"> '._BL('check_only_participated').'</label> &nbsp; ';
 		}
 		
+		if ($perm)
+		{
+			echo ' &nbsp; <span class="bo_form_descr">'._BL('Time').':</span> ';
+			echo '<input type="text" name="bo_datetime_to" value="'._BC($date).'" id="bo_archive_date" class="bo_archive_date">';
+			echo ' &nbsp; <input type="submit" value="'._BL('Ok').'">';
+		}
+		
 		echo '</fieldset>';
 		$hours_back = 24;
 		
@@ -1015,9 +1029,19 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 	$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
 
-	$time_end  = strtotime($row['time'].' UTC');
-	$date_end  = gmdate('Y-m-d H:i:s', $time_end - $date_end_max_sec);
-	$date_start    = gmdate('Y-m-d H:i:s', time() - 3600 * $hours_back);
+	if ($datetime_to)
+	{
+		$time_end = $datetime_to;
+	}
+	else
+	{
+		$time_end  = strtotime($row['time'].' UTC') - $date_end_max_sec;
+	}
+	
+	$date_end  = gmdate('Y-m-d H:i:s', $time_end);
+	$date_start    = gmdate('Y-m-d H:i:s', $time_end - 3600 * $hours_back);
+	
+	
 	$c = 299792458;
 
 	if ($show_empty_sig)
@@ -1028,13 +1052,13 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$table = 's';
 		
 		if ($only_participated)
-			$sql_where = " AND s.part>0 ";
+			$sql_where .= " AND s.part>0 ";
 	}
 	elseif ($only_strikes)
 	{
 		$sql_join = BO_DB_PREF."raw r JOIN ".BO_DB_PREF."strikes s ON s.raw_id=r.id ";
 		$table = 'r';
-		$sql_where = " AND s.part != 0 ";
+		$sql_where .= " AND s.part != 0 ";
 	}
 	else
 	{
