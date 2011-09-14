@@ -1058,12 +1058,12 @@ function bo_get_density_image()
 	
 	//dates 
 	if ($info['date_start_real'])
-		$date_start = $row['date_start_real'];
+		$date_start = $info['date_start_real'];
 	else
 		$date_start = $row['date_start'];
 	
 	$date_end = $row['date_end'];
-	$time_string = date(_BL('_date'), strtotime($row['date_start'])).' - '.date(_BL('_date'), strtotime($row['date_end']));
+	$time_string = date(_BL('_date'), strtotime($date_start)).' - '.date(_BL('_date'), strtotime($row['date_end']));
 	$last_changed = $row['changed'];
 	
 	//coordinates
