@@ -271,7 +271,12 @@ function bo_update_strikes($force = false)
 		else if ($last_strike <= 0 || !$last_strike)
 			$last_strike = strtotime('2000-01-01');
 		
-		$time_update = $last_strike - 300;
+		$last_modified = bo_get_conf('uptime_strikes_modified');
+		
+		if ($last_modified)
+			$time_update = $last_modified - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60;
+		else
+			$time_update = $last_strike - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60;
 
 		
 		
@@ -281,13 +286,13 @@ function bo_update_strikes($force = false)
 		$sql = "SELECT COUNT(*) cnt_lines, SUM(users) sum_users
 				FROM ".BO_DB_PREF."strikes
 				WHERE 1
-					AND time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $time_update - 60)."'
-					AND status>0
+					AND time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins)."' AND '".gmdate('Y-m-d H:i:s', $time_update)."'
+					AND status>0	
 				";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
-		$calc_range = $row['cnt_lines'] * 64 + $row['sum_users'] * 9;
-		$calc_range = $calc_range * 0.98 - 2000; //some margin to be sure
+		$calc_range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
+		//$calc_range = $calc_range * 0.98; //some margin to be sure
 		
 		$range = $calc_range;
 		
@@ -313,7 +318,6 @@ function bo_update_strikes($force = false)
 		$sent_range = $range;
 		
 		//send a last modified header
-		$last_modified = bo_get_conf('uptime_strikes_modified');
 		$modified = $last_modified; //!!
 		
 		//get the file
