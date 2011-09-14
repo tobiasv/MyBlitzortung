@@ -280,7 +280,10 @@ function bo_update_strikes($force = false)
 		$date_file_begins = strtotime('now -2 hours');
 		$sql = "SELECT COUNT(*) cnt_lines, SUM(users) sum_users
 				FROM ".BO_DB_PREF."strikes
-				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $time_update - 60)."'";
+				WHERE 1
+					AND time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins + 60)."' AND '".gmdate('Y-m-d H:i:s', $time_update - 60)."'
+					AND status>0
+				";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$calc_range = $row['cnt_lines'] * 64 + $row['sum_users'] * 9;
@@ -304,8 +307,8 @@ function bo_update_strikes($force = false)
 			}
 		}
 		
-		if ($range < 8000)
-			$range = 8000;
+		if ($range < 5000)
+			$range = 0;
 
 		$sent_range = $range;
 		
@@ -348,7 +351,7 @@ function bo_update_strikes($force = false)
 			$modified = $last_modified; //!!
 			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range, $modified);
 
-			echo "\n<p>Using partial download FAILED! Fallback to normal download (".strlen($file)." bytes). ";
+			echo "\n<p>Using partial download FAILED (Range $range)! Fallback to normal download (".strlen($file)." bytes). ";
 
 			
 			if ($code == 304) //wasn't modified
