@@ -2326,7 +2326,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	
 	$graph->xaxis->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
 	$graph->yaxis->title->SetColor(BO_GRAPH_STAT_COLOR_YAXIS_TITLE);
-	$graph->yaxis->SetLabelMargin(1);
+	$graph->yaxis->SetLabelMargin(3);
 	$graph->yaxis->SetTitleMargin(35);
 	$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,BO_GRAPH_STAT_FONTSIZE_XAXIS);
 	$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,BO_GRAPH_STAT_FONTSIZE_YAXIS);

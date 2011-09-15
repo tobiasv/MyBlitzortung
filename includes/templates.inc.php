@@ -383,7 +383,7 @@ $_BO['tpl_imgmap']['europe_mini']['gif_animation'] = $_BO['tpl_gif_animation_min
 
 
 //Europe (mini) - with stations
-$_BO['tpl_imgmap']['europe_mini_stations']['name'] = 'Europe (mini)';
+$_BO['tpl_imgmap']['europe_mini_stations']['name'] = 'Stations (mini)';
 $_BO['tpl_imgmap']['europe_mini_stations']['menu'] = false;
 $_BO['tpl_imgmap']['europe_mini_stations']['file'] = 'map_europe_mini_dark.png';
 $_BO['tpl_imgmap']['europe_mini_stations']['coord'] = array(71.1, 44.5, 31.8, -14.0); //North, East, South, West (Degrees)

@@ -361,14 +361,14 @@ function bo_tile()
 		$twidth = bo_imagetextwidth($textsize, $bold, $strike_count);
 		$theight = bo_imagetextheight($textsize, $bold, $strike_count);
 		$white = imagecolorallocatealpha($I, 255,255,255,0);
-		imagefilledrectangle( $I, 0, 0, $twidth+2, $theight+2, $col);
+		imagefilledrectangle( $I, 0, 0, $twidth+5, $theight+2, $col);
 		bo_imagestring($I, $textsize, 2, 2, $strike_count, $white, $bold);
 		
 		if ($only_own && intval($whole_strike_count))
 		{
 			$ratio = round($strike_count / $whole_strike_count * 100).'%';
 			$twidth = bo_imagetextwidth($textsize, false, $ratio);
-			imagefilledrectangle( $I, 0, $theight+3, $twidth+4, 2*$theight+4, $col);
+			imagefilledrectangle( $I, 0, $theight+3, $twidth+6, 2*$theight+4, $col);
 			bo_imagestring($I, $textsize, 2, $theight+4, $ratio, $white, $bold);
 		}
 		
@@ -387,7 +387,7 @@ function bo_tile()
 
 				$twidth = bo_imagetextwidth($textsize-1, $bold, $text);
 				
-				imagefilledrectangle($I, 0, ($theight+3)*$i, $twidth, ($theight+3)*($i+1)-1, $col);
+				imagefilledrectangle($I, 0, ($theight+3)*$i, $twidth+10, ($theight+3)*($i+1), $col);
 				bo_imagestring($I, $textsize-1, 2, ($theight+3)*$i+3, $text, $white, false);
 				
 				if ($i >= BO_MAP_COUNT_STATIONS)
