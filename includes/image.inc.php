@@ -340,7 +340,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	
 	if ($transparent)
+	{
+		$use_truecolor = BO_IMAGE_USE_TRUECOLOR_TRANSPARENT;
 		$extension = "png";
+	}
 	
 	//Headers
 	header("Pragma: ");
@@ -391,6 +394,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$file = '';
 	}
 	
+	
 	$I = null;
 	
 	//Dimensions are given, but no file (or transparent)
@@ -403,7 +407,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 		if ($transparent)
 		{
-			$back = imagecolorallocate($I, 1, 2, 3);
+			$back = imagecolorallocate($I, 140, 142, 144);
 			imagefilledrectangle($I, 0, 0, $w, $h, $back);
 			imagecolortransparent($I, $back);
 		}
@@ -420,7 +424,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		{
 			list($w, $h) = getimagesize(BO_DIR.'images/'.$file);
 			$I = imagecreate($w, $h);
-			$blank = imagecolorallocate($I, 1, 2, 3);
+			$blank = imagecolorallocate($I, 140, 142, 144);
 			imagefilledrectangle( $I, 0, 0, $w, $h, $blank);
 			imagecolortransparent($I, $blank);
 		}
@@ -647,7 +651,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 		if ($transparent)
 		{
-			$back = imagecolorallocate($J, 1, 2, 3);
+			$back = imagecolorallocate($J, 140, 142, 144);
 			imagefilledrectangle( $J, 0, 0, $w, $h, $back);
 			imagecolortransparent($J, $back);
 		}
@@ -1683,7 +1687,9 @@ function bo_value2color($value, &$colors)
 
 function bo_image_reduce_colors(&$I, $density_map=false, $transparent=false)
 {
-	if ($density_map)
+	if ($transparent)
+		$colors = intval(BO_IMAGE_PALETTE_COLORS_TRANSPARENT);
+	elseif ($density_map)
 		$colors = intval(BO_IMAGE_PALETTE_COLORS_DENSITIES);
 	else
 		$colors = intval(BO_IMAGE_PALETTE_COLORS_MAPS);
@@ -1709,7 +1715,7 @@ function bo_image_reduce_colors(&$I, $density_map=false, $transparent=false)
 				
 				if ($transparent)
 				{
-					$back = imagecolorallocate($Itmp, 1, 2, 3);
+					$back = imagecolorallocate($Itmp, 140, 142, 144);
 					imagefilledrectangle($Itmp, 0, 0, $width, $height, $back);
 					imagecolortransparent($Itmp, $back);
 				}
@@ -1718,7 +1724,7 @@ function bo_image_reduce_colors(&$I, $density_map=false, $transparent=false)
 			}
 			
 			//reduce colors: imagecolormatch doesn't exist in some PHP-GD modules (i.e. Ubuntu)
-			if (function_exists('imagecolormatch'))
+			if (!$transparent && function_exists('imagecolormatch'))
 			{
 				$colors_handle = ImageCreateTrueColor($width, $height);
 				ImageCopyMerge($colors_handle, $I, 0, 0, 0, 0, $width, $height, 100 );

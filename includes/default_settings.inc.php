@@ -282,16 +282,28 @@
 @define('BO_MAPS_ORDER', ''); 
 
 //use true color images for internal drawing
+//gives nicer transparency effects - higer CPU usage and bigger files size
 @define('BO_IMAGE_USE_TRUECOLOR', true); 
 
+//use truecolor images for drawing transparent images
+@define('BO_IMAGE_USE_TRUECOLOR_TRANSPARENT', false); 
+
 //use palette images for MAPS with defined colors for output (0 disables)
+// --> reduces colors to defined for smaller file sizes
+// may cause some problems with colors on different images!!!
 @define('BO_IMAGE_PALETTE_COLORS_MAPS', 256);
 
 //use palette images for DENSITY MAPS with defined colors for output (0 disables)
+// --> reduces colors to defined for smaller file sizes
 @define('BO_IMAGE_PALETTE_COLORS_DENSITIES', 0); 
+
+//use palette images for TRANSPARENT MAPS with defined colors for output (0 disables)
+// --> reduces colors to defined for smaller file sizes
+@define('BO_IMAGE_PALETTE_COLORS_TRANSPARENT', 0); 
 
 //automatically use true color if colorcount in palette image is above 256
 //set BO_IMAGE_PALETTE_COLORS_MAPS to 256
+//you will automatically get the smallest file, but also truecolor images when needed
 @define('BO_IMAGE_PALETTE_AUTO', true); 
 
 //PNG compression: the highter the slower!!!
