@@ -3,6 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.2b (2011-09-15)
+---------------------------
+- fix: now working with "best channel mode"
+- fix: transparency and font issues with bundled or newer PHP-GD versions
+- improved partial strike downloads again
+- some other minor fixes and improvements
+
 Version 0.7.2a (2011-09-12)
 ---------------------------
 - added some more overlay templates for dynamic map
