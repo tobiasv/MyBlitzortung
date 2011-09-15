@@ -209,6 +209,16 @@ $_BO['tpl_overlay']['wetterinfo_radar_small']['to_mercator'] = false;
 $_BO['tpl_overlay']['wetterinfo_radar_small']['opacity'] = 60;
 
 
+//ESTOFEX
+//Creative Commons
+//Map not mercator and not plate :-(
+$_BO['tpl_overlay']['estofex']['img'] = 'http://www.estofex.org/forecasts/tempmap/.png';
+$_BO['tpl_overlay']['estofex']['coord'] = array(71, 43, 25, -22); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['estofex']['default_show'] = false;
+$_BO['tpl_overlay']['estofex']['sel_name'] = 'ESTOFEX';
+$_BO['tpl_overlay']['estofex']['only_loggedin'] = true;
+$_BO['tpl_overlay']['estofex']['to_mercator'] = false;
+$_BO['tpl_overlay']['estofex']['opacity'] = 50;
 
 
 ?>
