@@ -46,7 +46,7 @@ $_BL['en']['Aug'] = 'Aug';
 $_BL['en']['Sep'] = 'Sep';
 $_BL['en']['Oct'] = 'Oct';
 $_BL['en']['Nov'] = 'Nov';
-$_BL['en']['Dec'] = 'Dez';
+$_BL['en']['Dec'] = 'Dec';
 
 $_BL['en']['January'] = 'January';
 $_BL['en']['February'] = 'February';

@@ -23,9 +23,9 @@
 if (!defined('BO_VER'))
 	exit('No BO_VER');
 
-function bo_show_map()
+function bo_show_map($var1=null,$var2=null)
 {
-	bo_show_lightning_map();
+	bo_show_lightning_map($var1,$var2);
 	
 	bo_copyright_footer();
 }
@@ -169,63 +169,72 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 
 // GoogleMap with Markers
-function bo_show_lightning_map()
+function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 {
 	global $_BO;
 	
-	$disabled = (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !bo_user_get_level());
+	$disabled = ((defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !bo_user_get_level())) || $show_gmap === 0;
 	$no_google = isset($_GET['bo_showmap']) || $disabled;
-	$last_update = bo_get_conf('uptime_strikes');
+	$static_map_id = intval($show_static_maps) > 0 ? intval($show_static_maps) : intval($_GET['bo_showmap']);
+	$show_menu = intval($show_static_maps) == 0;
+	$show_static_maps = ($show_static_maps === null) || $show_static_maps > 0;
+	$last_update = bo_get_conf('uptime_strikes_modified');
 	
-	$static_map_id = intval($_GET['bo_showmap']);
-	$menu_text = '';
-
-	foreach($_BO['mapimg'] as $id => $d)
+	if ($show_static_maps)
 	{
-		if (!$d['name'] || !$d['menu'])
-			continue;
-		
-		$menu_text .= '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), "$id").'" class="bo_navi'.($no_google && $static_map_id == $id ? '_active' : '').'">'._BL($d['name']).'</a></li>';
-	}
-	
-	if ($menu_text)
-	{
-		echo '<ul id="bo_menu">';
-		
-		if (!$disabled)
-			echo '<li><a href="'.bo_insert_url(array('bo_*')).'" class="bo_navi'.(!$no_google ? '_active' : '').'">'._BL('Dynamic map').'</a></li>';
-		
-		echo $menu_text;
-		echo '</ul>';
-	}
+		$menu_text = '';
 
-	if ($no_google)
-	{	
-		$footer = $_BO['mapimg'][$static_map_id]['footer'];
-		$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
-		
-		//image dimensions
-		$img_dim = bo_archive_get_dim($static_map_id);
-		
-		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
-
-		if ($archive_maps_enabled && intval(BO_ANIMATIONS_INTERVAL))
+		foreach($_BO['mapimg'] as $id => $d)
 		{
-			echo '<div class="bo_arch_map_links">';
-			echo '<a href="'.BO_ARCHIVE_URL.'&bo_map='.$static_map_id.'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
-			echo '</div>';
+			if (!$d['name'] || !$d['menu'])
+				continue;
+			
+			$menu_text .= '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), "$id").'" class="bo_navi'.($no_google && $static_map_id == $id ? '_active' : '').'">'._BL($d['name']).'</a></li>';
 		}
 
-		$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name']).' '.date(_BL('_datetime'), $last_update);
-		echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
-		echo '<img src="'.BO_FILE.'?map='.$static_map_id.'&bo_lang='._BL().'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.BO_FILE.'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
-		echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
-		echo '</div>';
+		if ($menu_text && $show_menu)
+		{
+			echo '<ul id="bo_menu">';
+			
+			if (!$disabled)
+				echo '<li><a href="'.bo_insert_url(array('bo_*')).'" class="bo_navi'.(!$no_google ? '_active' : '').'">'._BL('Dynamic map').'</a></li>';
+			
+			echo $menu_text;
+			echo '</ul>';
+		}
 
-		echo '</div>';
-		
-		return;
+		if ($no_google)
+		{	
+			$cfg = $_BO['mapimg'][$static_map_id];
+			$footer = $cfg['footer'];
+			$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
+			
+			//image dimensions
+			$img_dim = bo_archive_get_dim($static_map_id);
+			
+			echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
+
+			if ($archive_maps_enabled && intval(BO_ANIMATIONS_INTERVAL) && $cfg['archive'])
+			{
+				echo '<div class="bo_arch_map_links">';
+				echo '<a href="'.BO_ARCHIVE_URL.'&bo_map='.$static_map_id.'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
+				echo '</div>';
+			}
+
+			$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name']).' '.date(_BL('_datetime'), $last_update);
+			echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
+			echo '<img src="'.BO_FILE.'?map='.$static_map_id.'&bo_lang='._BL().'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.BO_FILE.'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
+			echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
+			echo '</div>';
+
+			echo '</div>';
+			
+			return;
+		}
 	}
+	
+	if ($disabled)
+		return;
 	
 	//Max,min striketime
 	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
