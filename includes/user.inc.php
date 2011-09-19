@@ -870,9 +870,9 @@ function bo_show_calibrate_antennas()
 
 function bo_cache_info()
 {
-	$dirs['Tiles'] = array('cache/tiles/', 3);
-	$dirs['Icons'] = array('cache/icons/', 0);
-	$dirs['Maps']  = array('cache/maps/', 3, 1);
+	$dirs['Tiles'] = array('cache/tiles/', 5);
+	$dirs['Icons'] = array('cache/icons/', 5);
+	$dirs['Maps']  = array('cache/maps/', 5, 1);
 	
 	if (BO_CACHE_SUBDIRS === true)
 		$dirs['Density maps'] = array('cache/densitymap/', 2);
