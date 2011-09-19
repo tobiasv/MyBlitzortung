@@ -1139,7 +1139,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$alt = _BL('rawgraph');
 		echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 		if ($row['raw_id'])
-			echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'">';
+		{
+			$url = BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL();
+			echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
+		}
 		else
 			echo _BL('No signal recieved.');
 		echo '</td>';
@@ -1148,7 +1151,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		{
 			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 			if ($row['raw_id'])
-				echo '<img src="'.BO_FILE.'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL().'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'">';
+			{
+				$url = BO_FILE.'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL();
+				echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_spec_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
+			}
 			else
 				echo _BL('No signal recieved.');
 			echo '</td>';

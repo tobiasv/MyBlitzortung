@@ -84,6 +84,7 @@ function bo_graph_raw($id, $spec = false)
 
 	$graph->SetMargin(24,1,1,1);
 
+	$fullscale = isset($_GET['full']);
 	
 	if ($spec)
 	{
@@ -98,7 +99,7 @@ function bo_graph_raw($id, $spec = false)
 		$utime    = bo_get_conf('raw_ntime') / 1000;
 		$values   = bo_get_conf('raw_values');
 		
-		$graph->SetScale("textlin", 0, BO_GRAPH_RAW_SPEC_MAX_Y, 0, BO_GRAPH_RAW_SPEC_MAX_X * $values * $utime / 1000);
+		$graph->SetScale("textlin", 0, $fullscale ? null : BO_GRAPH_RAW_SPEC_MAX_Y, 0, BO_GRAPH_RAW_SPEC_MAX_X * $values * $utime / 1000);
 
 		
 		$plot1=new BarPlot($data['spec'][0]);
@@ -171,7 +172,17 @@ function bo_graph_raw($id, $spec = false)
 		$xmin = $datax[0];
 		$xmax = $datax[$n-1];
 
-		$graph->SetScale("linlin",-BO_MAX_VOLTAGE,BO_MAX_VOLTAGE,$xmin,$xmax);
+		if ($fullscale)
+		{
+			$ymax = $ymin = null;
+		}
+		else
+		{
+			$ymin = -BO_MAX_VOLTAGE;
+			$ymax = BO_MAX_VOLTAGE;
+		}
+		
+		$graph->SetScale("linlin",$ymin,$ymax,$xmin,$xmax);
 		
 		if (max($data['signal'][0]) || min($data['signal'][0]))
 		{
@@ -209,17 +220,19 @@ function bo_graph_raw($id, $spec = false)
 		else
 			$graph->ygrid->Show(false,false);
 
-
-		$graph->yaxis->SetTextTickInterval(0.5);
-
-		for($i=-BO_MAX_VOLTAGE;$i<=BO_MAX_VOLTAGE;$i+=0.5)
+		if (!$fullscale)
 		{
-			if (abs($i) != 0.5)
-				$yt[] = $i;
+			$graph->yaxis->SetTextTickInterval(0.5);
+
+			for($i=-BO_MAX_VOLTAGE;$i<=BO_MAX_VOLTAGE;$i+=0.5)
+			{
+				if (abs($i) != 0.5)
+					$yt[] = $i;
+			}
+
+			$graph->yaxis->SetTickPositions(array(-2,-1,0,1,2),$yt,array('-2V','-1V','0V','1V','2V'));
 		}
-
-		$graph->yaxis->SetTickPositions(array(-2,-1,0,1,2),$yt,array('-2V','-1V','0V','1V','2V'));
-
+		
 		$sline  = new PlotLine(HORIZONTAL,  BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR3, 1);
 		$graph->AddLine($sline);
 
