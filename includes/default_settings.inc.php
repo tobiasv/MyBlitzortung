@@ -831,6 +831,9 @@
 @define('BO_UP_STRIKES_FUZZY_KM',   50);
 
 // Timeouts (Seconds)
+// If you your station sends a lot of signals or strike rate is very high
+// and not all strikes are displayed set BO_UP_MAX_TIME higher (i.e 120)
+// and lower BO_UP_MAX_SLEEP (i.e. 5).
 @define('BO_UP_MAX_TIME',  55); // max. exec time
 @define('BO_UP_MAX_SLEEP', 30); // max. sleep time in seconds before importing
 

@@ -140,7 +140,6 @@ function bo_graph_raw($id, $spec = false)
 		$graph->xaxis->SetTickLabels($tickLabels);
 		$graph->xaxis->SetTextLabelInterval(2);
 		$graph->xaxis->SetTextTickInterval(2);
-		$graph->Stroke();
 		
 	}
 	else
@@ -229,8 +228,20 @@ function bo_graph_raw($id, $spec = false)
 
 		$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 		$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-		$graph->Stroke();
 	}
+
+	$time = strtotime($row['time'].' UTC');
+	
+	header("Content-Type: image/png");
+	header("Pragma: ");
+	header("Cache-Control: public, max-age=".(3600 * 24));
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $time)." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $time + 3600 * 24)." GMT");
+
+
+	$I = $graph->Stroke(_IMG_HANDLER);
+	imagepng($I);
+
 	
 	exit;
 }

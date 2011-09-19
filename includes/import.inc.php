@@ -91,7 +91,7 @@ function bo_get_archive($args='', $bo_login_id=false)
 }
 
 // Get raw data from blitzortung.org
-function bo_update_raw_signals($force = false)
+function bo_update_raw_signals($force = false, $max_time = false)
 {
 	echo "<h3>Raw-Data</h3>\n";
 
@@ -111,14 +111,41 @@ function bo_update_raw_signals($force = false)
 	{
 		$file = bo_get_archive('lang=de&page=3&subpage_3=1&mode=4');
 
+		$start_time = time();
+		
 		if ($file === false)
 			return false;
 
 		$loadcount = bo_get_conf('upcount_raw');
 		bo_set_conf('upcount_raw', $loadcount+1);
 
+		
+		$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
+		$res = bo_db($sql);
+		$row = $res->fetch_assoc();
+		$last_signal = strtotime($row['mtime'].' UTC');
+		
+		if (!$last_signal)
+			$last_signal = time() - 3600 * 2;
 
-		$old_data = null;
+			
+		// anti-duplicate without using unique-db keys
+		$old_times = array();
+		
+		$date_start = gmdate('Y-m-d H:i:s', $last_signal - 10); //10s back to be sure
+		$date_end = gmdate('Y-m-d H:i:s', $last_signal + 3600 * 6); //6h to the future to be sure 
+		
+		//Searching for old Strikes (to avoid duplicates)
+		//ToDo: fuzzy search for lat/lon AND time
+		$sql = "SELECT id, time, time_ns
+				FROM ".BO_DB_PREF."raw
+				WHERE time BETWEEN '$date_start' AND '$date_end'";
+		$res = bo_db($sql);
+		while ($row = $res->fetch_assoc())
+		{
+			$id = $row['id'];
+			$old_times[$row['id']] = $row['time'].'.'.$row['time_ns'];
+		}		
 		
 		$lines = explode("\n", $file);
 		foreach($lines as $l)
@@ -131,32 +158,12 @@ function bo_update_raw_signals($force = false)
 				$utime = strtotime("$date $time UTC");
 
 				// update strike-data only some seconds *before* the *last download*
-				if ($utime < $last - 120)
+				if ($utime < $last_signal - 120)
 				{
 					$a++;
 					continue;
 				}
 
-				if ($old_data === null) // anti-duplicate without using unique-db keys
-				{
-					$old_data['time'] = array();
-					
-					$date_start = gmdate('Y-m-d H:i:s', $utime - 120); //120s back to be sure
-					$date_end = gmdate('Y-m-d H:i:s', $utime + 3600 * 6); //6h to the future to be sure 
-					
-					//Searching for old Strikes (to avoid duplicates)
-					//ToDo: fuzzy search for lat/lon AND time
-					$sql = "SELECT id, time, time_ns
-							FROM ".BO_DB_PREF."raw
-							WHERE time BETWEEN '$date_start' AND '$date_end'";
-					$res = bo_db($sql);
-					while ($row = $res->fetch_assoc())
-					{
-						$id = $row['id'];
-						$old_data['time'][$row['id']] = $row['time'].'.'.$row['time_ns'];
-					}
-				}
-				
 				$time_ns = intval($r[3]);
 				$lat = $r[4];
 				$lon = $r[5];
@@ -186,7 +193,7 @@ function bo_update_raw_signals($force = false)
 				
 				$sql .= ",".bo_examine_signal($bdata);
 
-				$id = array_search("$date $time.$time_ns", $old_data['time']);
+				$id = array_search("$date $time.$time_ns", $old_times);
 				
 				if ($id)
 				{
@@ -199,6 +206,14 @@ function bo_update_raw_signals($force = false)
 					$sql = "INSERT INTO ".BO_DB_PREF."raw SET $sql";
 					bo_db($sql, false);
 					$i++;
+				}
+				
+				//Timeout
+				if ($max_time != false && time() - $start_time > $max_time - 3)
+				{
+					echo '<p>TIMEOUT!</p>';
+					$timeout = true;
+					break;
 				}
 			}
 		}
@@ -217,10 +232,17 @@ function bo_update_raw_signals($force = false)
 		$count = bo_get_conf('count_raw_signals');
 		bo_set_conf('count_raw_signals', $count + $i);
 		
-		bo_set_conf('uptime_raw', time());
-		bo_match_strike2raw();
-		bo_update_status_files('signals');
-		$updated = true;
+		if (!$timeout)
+		{
+			bo_set_conf('uptime_raw', time());
+			bo_match_strike2raw();
+			bo_update_status_files('signals');
+			$updated = true;
+		}
+		else
+			$updated = false;
+		
+		
 	}
 	else
 	{
@@ -232,7 +254,7 @@ function bo_update_raw_signals($force = false)
 }
 
 // Get new strikes from blitzortung.org
-function bo_update_strikes($force = false)
+function bo_update_strikes($force = false, $max_time = 0)
 {
 	global $_BO;
 	
@@ -242,6 +264,8 @@ function bo_update_strikes($force = false)
 
 	if (time() - $last > BO_UP_INTVL_STRIKES * 60 - 30 || $force)
 	{
+		$start_time = time();
+		
 		$stations = bo_stations('user');
 		$own_id = bo_station_id();
 
@@ -259,7 +283,7 @@ function bo_update_strikes($force = false)
 		$min_dist_all = 9E12;
 		$max_dist_own = 0;
 		$min_dist_own = 9E12;
-		
+		$timeout = false;
 		
 		/***** PREPARATIONS BEFORE READING *****/
 		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
@@ -641,6 +665,15 @@ function bo_update_strikes($force = false)
 				$max_dist_all = max($dist, $max_dist_all);
 				$min_dist_all = min($dist, $min_dist_all);
 
+				
+				//Timeout
+				if ($max_time != false && time() - $start_time > $max_time - 3)
+				{
+					echo '<p>TIMEOUT!</p>';
+					$timeout = true;
+					break;
+				}
+				
 			}
 		}
 		
@@ -729,10 +762,16 @@ function bo_update_strikes($force = false)
 		if (!$min || $min > $min_dist_own)
 			bo_set_conf('longtime_min_dist_own', $min_dist_own);
 
-		$updated = true;
-		bo_set_conf('uptime_strikes', time());
-		bo_update_status_files('strikes');
-		
+		if ($timeout)
+		{
+			$updated = false;
+		}
+		else
+		{
+			$updated = true;
+			bo_set_conf('uptime_strikes', time());
+			bo_update_status_files('strikes');
+		}
 	}
 	else
 	{
@@ -919,7 +958,7 @@ function bo_match_strike2raw()
 }
 
 // Get stations-data and statistics from blitzortung.org
-function bo_update_stations($force = false)
+function bo_update_stations($force = false, $max_time = 0)
 {
 	$last = bo_get_conf('uptime_stations');
 
@@ -1623,16 +1662,16 @@ function bo_update_all($force = false)
 	flush();
 	$t = time();
 
-	$strikes_imported = bo_update_strikes($force);
+	$strikes_imported = bo_update_strikes($force, $max_time + $start_time - time());
 	
 	//Update signals/stations only after strikes where imported
 	if ($strikes_imported !== false || $async || $force)
 	{	
 		flush();
-		$stations_imported = bo_update_stations($force);
+		$stations_imported = bo_update_stations($force, $max_time + $start_time - time());
 		
 		flush();
-		$signals_imported = bo_update_raw_signals($force);
+		$signals_imported = bo_update_raw_signals($force, $max_time + $start_time - time());
 		
 		bo_update_daily_stat($max_time + $start_time - time());
 		
