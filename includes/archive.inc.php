@@ -1173,11 +1173,22 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '<span class="bo_descr">';
 			echo _BL('Runtime').': ';
 			echo '</span>';
-			echo '<span class="bo_value">';
+			echo '<span class="bo_value" title="';
+			
 			if ($row['raw_id'])
+			{
+				$cdev = $row['distance'] / $time_diff / $c;
+				echo number_format($cdev, 7, _BL('.'), _BL(',')).'c';
+				echo ' / '.round(($cdev-1)*$row['distance']).'m';
+				echo '">';
 				echo number_format($time_diff * 1000, 4, _BL('.'), _BL(','))._BL('unit_millisec');
+			}
 			else
+			{
+				echo '">';
 				echo '-';
+			}
+			
 			echo '</span>';
 			echo '</li>';
 
@@ -1305,17 +1316,52 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		{
 			echo '<tr><td class="bo_sig_table_strikeinfo" colspan="3" style="font-size:60%">';
 			
-			$i = 0;
+			
+			$dists = array();
+			$bears = array();
+			$users = array();
 			$sql2 = "SELECT ss.station_id id
 				FROM ".BO_DB_PREF."stations_strikes ss
 				WHERE ss.strike_id='".$row['strike_id']."'
 				";
 			$res2 = bo_db($sql2);
-
 			while ($row2 = $res2->fetch_assoc())
 			{
+				$sdata = $stations[$row2['id']];
+				$dists[$row2['id']] = bo_latlon2dist($row['lat'], $row['lon'], $sdata['lat'], $sdata['lon']);
+				$bears[$row2['id']] = bo_latlon2bearing($row['lat'], $row['lon'], $sdata['lat'], $sdata['lon']);
+				$users[$row2['id']] = $sdata['user'];
+			}
+			
+			asort($dists);
+			$i = 0;
+			foreach ($dists as $sid => $dist)
+			{
 				echo $i ? ', ' : '';
-				echo $stations[$row2['id']]['user'];
+				echo '<a ';
+				echo ' href="'.BO_STATISTICS_URL.'&bo_station_id='.$sid.'" ';
+				echo ' title="';
+				echo round($dist/1000).'km / ';
+				echo round($bears[$sid]).'&deg; '.bo_bearing2direction($bears[$sid]);
+				
+				echo '" style="';
+				
+				if ($i < BO_MIN_PARTICIPANTS)
+					echo 'font-weight: bold;';
+
+				if ($i < BO_MAX_PARTICIPANTS)
+					echo 'text-decoration:underline;';
+				else
+					echo 'text-decoration:none;';
+				
+				if ($sid == bo_station_id())
+					echo 'color:red;';
+				else
+					echo 'color:inherit;';
+				
+				echo '">';
+				echo $users[$sid];
+				echo '</a>';
 				$i++;
 			}
 			

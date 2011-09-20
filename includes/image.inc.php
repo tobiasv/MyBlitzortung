@@ -1840,10 +1840,13 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 				WHERE id='$strike_id'";
 		$erg = bo_db($sql);
 		$row = $erg->fetch_assoc();
-		list($px, $py) = bo_latlon2projection($cfg['proj'], $row['lat'], $row['lon']);
+		$strike_lat = $row['lat'];
+		$strike_lon = $row['lon'];
+		list($px, $py) = bo_latlon2projection($cfg['proj'], $strike_lat, $strike_lon);
 		$strike_x =      ($px - $x1) * $w_x;
 		$strike_y = $h - ($py - $y1) * $h_y;
 	
+		$strike_dists = array();
 		$sql = "SELECT ss.station_id id
 				FROM ".BO_DB_PREF."stations_strikes ss
 				WHERE ss.strike_id='$strike_id'
@@ -1852,16 +1855,32 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 		while ($row = $erg->fetch_assoc())
 		{
 			$stations[$row['id']]['part'] = 1;
+			$strike_dists[$row['id']] = bo_latlon2dist($strike_lat, $strike_lon, $stations[$row['id']]['lat'], $stations[$row['id']]['lon']);
 		}
 		
-		$tmp = $cfg['stations'][0];
-		unset($cfg['stations']);
-		if (0 && !is_array($tmp))
-			$cfg['stations'][0] = $tmp;
-		else
+		//sort stations by distance
+		$tmp = $stations;
+		$stations = array();
+		asort($strike_dists);
+		foreach($strike_dists as $sid => $dist)
+			$stations[$sid] = $tmp[$sid];
+		
+		foreach($tmp as $sid => $data)
+		{
+			if (!isset($station[$sid]))
+				$stations[$sid] = $tmp[$sid];
+		}
+		
+		
+		//$tmp = $cfg['stations'][0];
+		//unset($cfg['stations']);
+		//if (!is_array($tmp))
+		//	$cfg['stations'][0] = $tmp;
+		//else
 			$cfg['stations'][0] = $_BO['points'][BO_ARCHIVE_STR_DETAILS_DEFAULT_POINT];
 	}
 	
+	$part=0;
 	foreach($stations as $id => $d)
 	{
 		$type = $d['status'];
@@ -1899,8 +1918,16 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 		
 		if ($strike_id && $d['part'])
 		{
-			imageline($I, $strike_x, $strike_y, $x, $y, bo_hex2color($I, BO_ARCHIVE_STR_DETAILS_LINECOLOR));
+			if ($part < BO_MAX_PARTICIPANTS)
+				$col = BO_ARCHIVE_STR_DETAILS_LINECOLOR;
+			else
+				$col = BO_ARCHIVE_STR_DETAILS_LINECOLOR_NOCALC;
+			
+			imageline($I, $strike_x, $strike_y, $x, $y, bo_hex2color($I, $col));
+			$part++;
 		}
+		
+		
 	
 	}
 	
