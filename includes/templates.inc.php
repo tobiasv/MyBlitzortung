@@ -443,6 +443,7 @@ $_BO['tpl_region']['germany']['rect_rem'] = array(	56, 8.2, 53.9, 5,
 													50.6, 15.08, 50.2, 13.35,
 													);
 
+
 //Bavaria
 $_BO['tpl_region']['bavaria']['name']   = 'Bavaria';
 $_BO['tpl_region']['bavaria']['visible']= true;
@@ -455,5 +456,19 @@ $_BO['tpl_region']['bavaria']['rect_rem'] = array(	49.4, 9.5, 47.7, 10,
 													50.2, 13.08, 49.4, 12.7,
 													);
 
-													
+
+
+//France
+$_BO['tpl_region']['france']['name']     = 'France';
+$_BO['tpl_region']['france']['visible']  = true;
+$_BO['tpl_region']['france']['rect_add'] = array(	
+													50.6, 12.08, 47.2, 9.5,
+													50.15, 9.5, 49.55, 9,
+													50.2, 13.08, 47.4, 12.08,
+													49.3, 13.9, 48.2, 13.08,
+	);
+$_BO['tpl_region']['france']['rect_rem'] = array(	
+													49.4, 9.5, 47.7, 10,
+													50.2, 13.08, 49.4, 12.7,
+	);
 ?>

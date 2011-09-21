@@ -746,18 +746,31 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 		
 		foreach($Overlays as $ovlid => $cfg)
 		{
-			echo '
-            bo_ExtraOverlay['.$ovlid.'] = {
-			    bo_image: "'.$cfg['img'].'",
-			    bo_bounds: new google.maps.LatLngBounds(
-                               new google.maps.LatLng('.(double)$cfg['coord'][2].','.(double)$cfg['coord'][3].'),
-                               new google.maps.LatLng('.(double)$cfg['coord'][0].','.(double)$cfg['coord'][1].')),
-			    bo_show: '.($cfg['default_show'] ? 'true' : 'false').',
-			    bo_opacity: '.((double)$cfg['opacity']).',
-				bo_tomercator: '.($cfg['to_mercator'] ? 'true' : 'false').'
+			if (isset($cfg['img']))
+			{
+				echo '
+					bo_ExtraOverlay['.$ovlid.'] = {
+						bo_image: "'.$cfg['img'].'",
+						bo_bounds: new google.maps.LatLngBounds(
+									   new google.maps.LatLng('.(double)$cfg['coord'][2].','.(double)$cfg['coord'][3].'),
+									   new google.maps.LatLng('.(double)$cfg['coord'][0].','.(double)$cfg['coord'][1].')),
+						bo_show: '.($cfg['default_show'] ? 'true' : 'false').',
+						bo_opacity: '.((double)$cfg['opacity']).',
+						bo_tomercator: '.($cfg['to_mercator'] ? 'true' : 'false').'
 
-			};
-			';
+				};
+				';
+			}
+			else if (isset($cfg['kml']))
+			{
+				echo '
+					bo_ExtraOverlay['.$ovlid.'] = {
+						bo_kml: "'.$cfg['kml'].'",
+						bo_show: '.($cfg['default_show'] ? 'true' : 'false').'
+				};
+				';
+			}
+
 		}
 		
 
@@ -1072,7 +1085,11 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 		{
 			for (i in bo_ExtraOverlay)
 			{
-				if (bo_ExtraOverlay[i].bo_tomercator)
+				if (bo_ExtraOverlay[i].bo_kml)
+				{
+					bo_ExtraOverlayMaps[i] = new google.maps.KmlLayer(bo_ExtraOverlay[i].bo_kml, {preserveViewport: true} );
+				}
+				else if (bo_ExtraOverlay[i].bo_tomercator)
 				{
 					bo_ExtraOverlayMaps[i] = new google.maps.GroundOverlay(bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds);
 					bo_ExtraOverlayMaps[i].clickable = false;
