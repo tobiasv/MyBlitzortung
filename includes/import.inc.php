@@ -2485,7 +2485,7 @@ function bo_update_tracks($force = false, $max_time = 0)
 		
 	$last = bo_get_conf('uptime_tracks');
 
-	echo "<h3>Tracks</h3>\n";
+	echo "\n<h3>Tracks</h3>\n";
 
 	if (time() - $last > BO_UP_INTVL_TRACKS * 60 - 30 || $force)
 	{

@@ -445,16 +445,16 @@ function bo_alert_settings_form()
 
 function bo_alert_send()
 {
-	echo '<h3>Strike alerts</h3>';
+	echo "\n<h3>Strike alerts</h3>\n";
 
 	ini_set('default_socket_timeout', 2); // should be enough!
 	
 	$is_sending = bo_get_conf('is_sending_alerts');
 
 	//Check if sth. went wrong on the last update (if older than 120sec continue)
-	if ($is_sending && time() - $is_sending < 120)
+	if ($is_sending && time() - $is_sending < 300)
 	{
-		echo '<p>Error: Another update is running</p>';
+		echo "\n<p>Error: Another alert is running</p>\n";
 		return false;
 	}
 
@@ -684,10 +684,10 @@ function bo_alert_send()
 			
 			bo_set_conf('alerts_log', serialize($newlog));
 		
-			echo '<p>Sent '.count($log).' alerts.</p>';
+			echo "\n<p>Sent ".count($log)." alerts.</p>\n";
 		}
 		else
-			echo '<p>No alerts sent.</p>';
+			echo "\n<p>No alerts sent.</p>\n";
 		
 	}
 	
