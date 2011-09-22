@@ -1377,7 +1377,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '<fieldset>';
 		echo bo_archive_select_map($map);
 		
-		echo ' &bull; <a href="'.bo_insert_url().'&bo_strikes_before=100">'._BL('Animation').'</a>';
+		echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $strike_id).'&bo_strikes_before=100">'._BL('Animation').'</a>';
 		
 		echo '</fieldset>';
 		$img_file = BO_FILE.'?map='.$map.'&strike_id='.$strike_id.'&bo_lang='._BL();
