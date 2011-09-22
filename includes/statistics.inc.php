@@ -803,6 +803,10 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		}
 		
 	}
+
+	echo '<a name="graph_signals_all"></a>';
+	echo '<h4>'._BL('h4_graph_signals_all').'</h4>';
+	bo_show_graph('signals_all', $add_graph);
 	
 	echo '</div>';
 

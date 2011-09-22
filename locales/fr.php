@@ -1,9 +1,5 @@
 <?php 
 
-/*
-* French translation for MyBlitzortung
-*/
-
 $_BL['locale'] = 'fr';
 
 
@@ -21,11 +17,15 @@ $_BL['fr']['MyBlitzortung_notags'] = 'Mon détecteur de foudre';
 $_BL['fr']['MyBlitzortung_original'] = 'MyBlitzortung';
 
 
+
+
+
 $_BL['fr']['.'] = ',';
 $_BL['fr'][','] = '.';
 $_BL['fr']['_date'] = 'd/m/Y';
 $_BL['fr']['_dateshort'] = 'd/m';
 $_BL['fr']['_datetime'] = 'd/m/Y H:i:s';
+
 
 $_BL['fr']['_before'] = 'depuis ';
 $_BL['fr']['_minutes_ago'] = 'minutes';
@@ -34,6 +34,21 @@ $_BL['fr']['unit_meters'] = 'm';
 $_BL['fr']['unit_minutes'] = 'minutes';
 $_BL['fr']['unit_hours'] = 'heures';
 $_BL['fr']['unit_us_short'] = 'µs';
+$_BL['fr']['unit_ksps'] = 'Ksp/second';
+$_BL['fr']['unit_days'] = 'jours';
+$_BL['fr']['unit_kilometers'] = 'km';
+$_BL['fr']['days'] = 'jours';
+$_BL['fr']['number_every_minutes'] = 'toutes les {NUMBER} minutes';
+$_BL['fr']['number_1every_minute'] = 'toutes les minutes';
+$_BL['fr']['number_minutes'] = 'minutes';
+$_BL['fr']['number_1minute'] = 'une minute';
+
+
+$_BL['fr']['CEST'] = 'CEST';
+$_BL['fr']['CET'] = 'CET';
+$_BL['fr']['unit_strikesperminute'] = ' coups/mn';
+$_BL['fr']['unit_strikesperminute_one'] = ' coups/mn';
+
 
 $_BL['fr']['Jan'] = 'Jan';
 $_BL['fr']['Feb'] = 'Fev';
@@ -48,6 +63,7 @@ $_BL['fr']['Oct'] = 'Oct';
 $_BL['fr']['Nov'] = 'Nov';
 $_BL['fr']['Dec'] = 'Dec';
 
+
 $_BL['fr']['January'] = 'Janvier';
 $_BL['fr']['February'] = 'Février';
 $_BL['fr']['March'] = 'Mars';
@@ -59,6 +75,7 @@ $_BL['fr']['September'] = 'Septembre';
 $_BL['fr']['October'] = 'Octobre';
 $_BL['fr']['November'] = 'Novembre';
 $_BL['fr']['December'] = 'Décembre';
+
 
 $_BL['fr']['Language'] = 'Langue';
 $_BL['fr']['Languages'] = 'Langues';
@@ -76,14 +93,11 @@ $_BL['fr']['day'] = 'Jour';
 $_BL['fr']['no'] = 'non';
 $_BL['fr']['yes'] = 'oui';
 $_BL['fr']['distance'] = 'Distance';
-$_BL['fr']['unit_kilometers'] = 'km';
 $_BL['fr']['Bearing'] = 'Direction';
 $_BL['fr']['Deviation'] = 'Déviation';
 $_BL['fr']['copyright_footer'] = 'Généré par {MYBO_ORIG}';
 $_BL['fr']['for_station'] = 'pour la station';
 $_BL['fr']['Entries'] = 'Entrées';
-$_BL['fr']['days'] = 'jours';
-$_BL['fr']['unit_days'] = 'jours';
 
 $_BL['fr']['Advanced'] = 'Avancé';
 $_BL['fr']['Lightning data'] = 'Source de données';
@@ -164,7 +178,74 @@ $_BL['fr']['Text'] = 'Texte';
 $_BL['fr']['Error'] = 'Erreur';
 $_BL['fr']['Back'] = 'Retour';
 $_BL['fr']['Participants'] = 'Participants';
+$_BL['fr']['oclock'] = 'heures';
+$_BL['fr']['On'] = 'Marche';
+$_BL['fr']['Available stations'] = 'Stations disponibles';
+$_BL['fr']['strikes'] = 'foudres';
+$_BL['fr']['Usage'] = 'Utilisation';
+$_BL['fr']['Last signal'] = 'Dernière signal';
+$_BL['fr']['Never before'] = 'Jamais depuis';
+$_BL['fr']['no_strike_yet'] = 'Pas encore';
+$_BL['fr']['Current strike rate'] = 'Taux de foudre actuel';
+$_BL['fr']['Last detected strike'] = 'Dernier coup de foudre détecté';
+$_BL['fr']['Not yet'] = 'Pas encore';
+$_BL['fr']['Evaluated'] = 'Evalué';
+$_BL['fr']['Channels'] = 'Canaux';
+$_BL['fr']['Samples per Channel'] = 'Exemple par canal';
+$_BL['fr']['Recording time'] = 'Heure d\'enregistrement';
+$_BL['fr']['Bits per Sample'] = 'Echantillonage Bits';
+$_BL['fr']['Sample rate'] = 'Taux d échantillonage';
+$_BL['fr']['Average'] = 'Moyenne';
+$_BL['fr']['Off'] = 'Off';
+$_BL['fr']['Activated'] = 'Activé';
+$_BL['fr']['Traffic'] = 'Trafic';
+$_BL['fr']['Other'] = 'Autre';
+$_BL['fr']['Total'] = 'Total';
+$_BL['fr']['Min'] = 'Min';
+$_BL['fr']['Max'] = 'Max';
+$_BL['fr']['Retry'] = 'Recommencer';
+$_BL['fr']['Continue'] = 'Continuer';
+$_BL['fr']['Deviations'] = 'Déviations';
+$_BL['fr']['Values'] = 'Valeurs';
+$_BL['fr']['Channel'] = 'Canal';
+$_BL['fr']['Show'] = 'Montrer';
+$_BL['fr']['Frequency'] = 'Fréquence';
+$_BL['fr']['Amplitude'] = 'Amplitude';
+$_BL['fr']['Score'] = 'Classement';
+$_BL['fr']['No limit'] = 'Pas de limite';
+$_BL['fr']['Region'] = 'Région';
+$_BL['fr']['Thunder cells'] = 'Cellules orageuses';
+$_BL['fr']['Id'] = 'Id';
 
+$_BL['fr']['Strike count per minute'] = 'Coups/mn';
+$_BL['fr']['total strikes station2'] = 'Total des coups de foudre de la station {STATION_CITY}';
+$_BL['fr']['time_year_month'] = 'Année et mois';
+$_BL['fr']['stat_advanced_show_strike_ratios'] = 'Taux';
+$_BL['fr']['With strikes connected'] = 'Avec les coups liés';
+$_BL['fr']['dontcare'] = 'Ne pas en tenir compte';
+$_BL['fr']['participated_assigned'] = 'Assigné';
+$_BL['fr']['_participated'] = 'a participé';
+$_BL['fr']['not_participated'] = 'n\'a pas participé';
+$_BL['fr']['amp_first'] = 'Premier échantillon';
+$_BL['fr']['with_strikes'] = 'avec coup de foudre';
+$_BL['fr']['with_participation'] = 'avec participation';
+$_BL['fr']['without_strikes'] = 'sans coup de foudre';
+$_BL['fr']['Mean value channel'] = 'Valeur moyenne du canal';
+$_BL['fr']['Mean amplitude'] = 'Moyenne amplitude';
+$_BL['fr']['amp_first_signal'] = '1er échantillon';
+$_BL['fr']['amp_max_signal'] = 'Amplitude max.';
+$_BL['fr']['amp_spec'] = 'Depuis l\'analyseur';
+$_BL['fr']['Signal count'] = 'Compteur signal';
+$_BL['fr']['signal not found'] = 'signal non trouvé';
+$_BL['fr']['Participated stations'] = 'Stations ayant participées';
+$_BL['fr']['Statistics'] = 'Statistiques';
+$_BL['fr']['check_only_participated'] = 'Seulement avec participation';
+$_BL['fr']['Lightning data imports'] = 'Importation des données de foudre';
+$_BL['fr']['Traffic to Blitzortung.org'] = 'Trafic vers Blitzortung.org';
+
+
+
+$_BL['fr']['timezone_is'] = 'Heure du fuseau horaire utilisé:';
 
 /*************************************************************/
 /* Main Menu (Standalone)                                    */
@@ -201,45 +282,84 @@ $_BL['fr']['show tracks'] = 'Montrer les traces (!!!experimental!!!)';
 $_BL['fr']['Own maps'] = 'Cartes perso';
 $_BL['fr']['Extra overlays'] = 'Extra ';
 $_BL['fr']['show strike counter'] = 'Compteur de foudres';
+$_BL['fr']['tile_time_range_na_err'] = 'La période de temps selectionnée \n ne vous est pas autorisé';
+$_BL['fr']['tile_wrong_time_range_err'] = 'La 2éme date \n doit être plus grande que la 1ère \n';
+$_BL['fr']['tile_maximum_time_range_err'] = 'Période trops grande! Le maximum est de {HOURS} heures ';
+
 
 /*************************************************************/
 /* Graphs                                                    */
 /*************************************************************/
 
 $_BL['fr']['graph_stat_title_strikes'] = 'Statistique des coups de foudre';
+$_BL['fr']['graph_stat_title_signals'] = 'Statistique des signaux';
+$_BL['fr']['graph_stat_title_ratio'] = 'Taux de localisation de la foudre';
+$_BL['fr']['graph_stat_title_stations'] = 'Nombre de stations';
+$_BL['fr']['graph_stat_title_ratio_distance'] = 'Taux de foudre par distance';
+$_BL['fr']['graph_stat_title_ratio_bearing'] = 'Taux de foudre par direction';
+$_BL['fr']['graph_stat_title_distance'] = 'Distance moyenne de la foudre';
+$_BL['fr']['graph_stat_title_strikes_time'] = 'Coups de foudre';
+$_BL['fr']['graph_stat_title_participants'] = 'Nombre de détections par participant';
+$_BL['fr']['graph_stat_title_strikes_participants'] = 'Coups de foudres avec {PARTICIPANTS} participants';
+$_BL['fr']['graph_stat_title_strikes_deviations'] = 'Coupss avec déviations {DEVIATIONS}';
+$_BL['fr']['graph_stat_title_strikes_now'] = 'Taux coup de foudre';
+$_BL['fr']['graph_stat_title_amplitudes_time'] = 'Historique des amplitudes de signal';
+$_BL['fr']['graph_stat_title_frequencies_time'] = 'Historique des fréquences de crête';
+$_BL['fr']['graph_stat_title_amplitudes_time_average'] = 'Moyenne des amplitudes';
+$_BL['fr']['graph_stat_title_frequencies_time_average'] = 'Moyenne des pics de fréquence';
+$_BL['fr']['graph_stat_title_spectrum'] = 'Spectre';
+$_BL['fr']['graph_stat_title_deviations'] = 'Détections par déviation';
+$_BL['fr']['graph_stat_title_strikes_participants_avg'] = 'Moyenne du nombre de stations';
+$_BL['fr']['graph_stat_title_strikes_deviations_avg'] = 'Moyenne des déviations';
+$_BL['fr']['graph_stat_title_amplitude'] = 'Amplitudes';
+$_BL['fr']['graph_stat_title_all_signals'] = 'Signaux de toutes les stations';
+$_BL['fr']['graph_stat_title_evaluated_signals'] = 'taux de foudre';
+
 $_BL['fr']['graph_legend_strikes_sum'] = 'Total foudre';
 $_BL['fr']['graph_legend_strikes_avg_all'] = 'Moyenne de toutes les stations';
 $_BL['fr']['graph_legend_strikes_own'] = 'Foudre détectée par {STATION}';
-$_BL['fr']['graph_stat_title_signals'] = 'Statistique des signaux';
 $_BL['fr']['graph_legend_signals_avg_all'] = 'Moyenne des signaux par station';
 $_BL['fr']['graph_legend_signals_own'] = 'Signaux de {STATION}';
-$_BL['fr']['graph_stat_title_ratio'] = 'Taux de localisation de la foudre';
 $_BL['fr']['graph_legend_ratio_sig_all'] = 'Taux de détection global';
 $_BL['fr']['graph_legend_ratio_sig_own'] = 'Taux de localisation de {STATION}';
 $_BL['fr']['graph_legend_ratio_str_all'] = 'Taux de détection de la foudre';
 $_BL['fr']['graph_legend_ratio_str_own'] = 'Taux de foudre de {STATION}';
-$_BL['fr']['graph_stat_title_stations'] = 'Nombre de stations';
 $_BL['fr']['graph_legend_stations_active'] = 'Stations actives';
 $_BL['fr']['graph_legend_stations_active_signals'] = 'Stations avec signaux';
 $_BL['fr']['graph_legend_stations_max_active_signal'] = 'Plus grand nombre de stations actives';
-$_BL['fr']['graph_stat_title_ratio_distance'] = 'Taux de foudre par distance';
 $_BL['fr']['graph_legend_ratio_distance'] = 'Taux de foudre {STATION}';
-$_BL['fr']['graph_stat_title_ratio_bearing'] = 'Taux de foudre par direction';
 $_BL['fr']['graph_legend_stations_max_active'] = 'Highest station count ever';
 $_BL['fr']['graph_legend_count_distance'] = 'Total foudre';
 $_BL['fr']['graph_legend_ratio_bearing'] = 'Taux par direction {STATION}';
 $_BL['fr']['graph_legend_count_bearing'] = 'Total foudre';
 $_BL['fr']['graph_legend_strikes_time_all'] = 'Tous les coups de foudre du réseau';
 $_BL['fr']['graph_legend_strikes_time_own'] = 'Coups de foudre {STATION}';
-$_BL['fr']['graph_stat_title_distance'] = 'Distance moyenne de la foudre';
 $_BL['fr']['graph_legend_distance_all'] = 'Toute la foudre';
 $_BL['fr']['graph_legend_distance_own'] = 'Foudres de {STATION}';
-$_BL['fr']['graph_stat_title_strikes_time'] = 'Coups de foudre';
 $_BL['fr']['graph_legend_stations_available'] = 'Stations disponibles';
 $_BL['fr']['graph_legend_participants_all'] = 'Nombre de coups de foudres';
 $_BL['fr']['graph_legend_participants_own'] = 'Nombre de coups de foudre de la station';
 $_BL['fr']['graph_legend_participants_ratio'] = 'Taux de foudre de la station';
-$_BL['fr']['graph_stat_title_participants'] = 'Nombre de détections par participant';
+$_BL['fr']['graph_legend_strikes_now_all'] = 'Tous les coups';
+$_BL['fr']['graph_legend_strikes_now_own'] = 'Coups de foudre de la station {STATION}';
+$_BL['fr']['graph_legend_signals_time_percent'] = 'Pourcentage de signaux';
+$_BL['fr']['graph_legend_frequencies_time_average'] = 'Moyenne des crêtes de fréquence';
+$_BL['fr']['graph_legend_amplitudes_time_average'] = 'Moyenne des amplitudes';
+$_BL['fr']['graph_legend_participants_time_all'] = 'Pourcentage de participants';
+$_BL['fr']['graph_legend_participants_time_own'] = 'Pourcentage station {STATION}';
+$_BL['fr']['graph_legend_deviatinons_time_all'] = 'Nombre relatif';
+$_BL['fr']['graph_legend_deviations_time_own'] = 'Nombre relatif de la station {STATION}';
+$_BL['fr']['graph_legend_evaluated_signals_part_ratio'] = 'Taux de foudre';
+$_BL['fr']['graph_legend_evaluated_signals_part_all_ratio'] = 'Strike ratio with supplementary assignment';
+$_BL['fr']['graph_legend_deviations_own'] = 'Déviation station {STATION}';
+$_BL['fr']['graph_legend_deviations_all'] = 'Déviation';
+$_BL['fr']['graph_legend_deviations_ratio'] = 'Pourcentage station {STATION}';
+$_BL['fr']['graph_legend_participants_time_avg_all'] = 'Moyenne du nombre de participants';
+$_BL['fr']['graph_legend_participants_time_avg_own'] = 'Moyenne du nombre de participations de la station de {STATION}';
+$_BL['fr']['graph_legend_deviatinons_time_avg_all'] = 'Moyenne des déviations';
+$_BL['fr']['graph_legend_deviations_time_avg_own'] = 'Moyenne des déviations pour la station de {STATION}';
+$_BL['fr']['graph_legend_all_signals'] = 'Signaux';
+
 
 $_BL['fr']['h3_graphs'] = 'Graphes';
 $_BL['fr']['h4_graph_strikes'] = 'Nombre de coups de foudre';
@@ -251,6 +371,22 @@ $_BL['fr']['h4_graph_stations'] = 'Nombre de stations disponibles';
 $_BL['fr']['h4_graph_ratio_distance_longtime'] = 'Taux de foudre par distance';
 $_BL['fr']['h4_graph_ratio_bearing_longtime'] = 'Taux de foudre par direction';
 $_BL['fr']['h4_graph_participants'] = 'Participants';
+$_BL['fr']['h4_graph_participants_time'] = 'Historique du nombre de participants';
+$_BL['fr']['h4_graph_strikes_time'] = 'Tous les coups de foudre';
+$_BL['fr']['h4_graph_strikes_time_radius'] = 'Foudre à une distance maximum de la station {STATION}';
+$_BL['fr']['h4_graph_frequencies_time'] = 'Options';
+$_BL['fr']['h4_graph_deviations'] = 'Détection des déviations';
+$_BL['fr']['h4_graph_amplitudes_time'] = 'Historique de l\'amplitude';
+$_BL['fr']['h4_graph_distance'] = 'Distance';
+$_BL['fr']['h4_graph_deviations_time'] = 'Historique des déviations';
+$_BL['fr']['h4_graph_evaluated_signals'] = 'Taux de foudre / signaux évalués';
+$_BL['fr']['h4_graph_signals_all'] = 'Signals de toutes les stations';
+$_BL['fr']['h4_graph_amplitudes'] = 'Amplitudes';
+$_BL['fr']['h4_graph_spectrum'] = 'Spectre des fréquences';
+
+$_BL['fr']['graph_stat_spectrum_yaxis_title'] = 'Somme des amplitudes';
+$_BL['fr']['graph_stat_yaxis_title'] = 'Amplitude';
+
 
 /*************************************************************/
 /* Archive                                                   */
@@ -286,7 +422,7 @@ $_BL['fr']['Max time'] = 'Max time';
 $_BL['fr']['enter_time_hint'] = 'Entrer la date sous le format "AAAA-MM-JJ HH:MM:SS". Vous pouvez omettre la dernière valeur, par exemple "AAAA-MM" est une valeur possible.';
 $_BL['fr']['Time range'] = 'Période';
 $_BL['fr']['archive_search_info'] = 'Ici vous pouvez chercher les {COUNT} coups de foudre dans votre zone. Pour définir cette zone, déplacez le pointeur sur la carte et entrer un rayon de recherche à l\'intérieur. Les coups de foudre seront visualisés comme des points colorés sur la carte. Vous pouvez cliquer dessus pour voir plus d\'informations sur ce coup de foudre. Vous ne pouvez rechercher que dans la zone de couleur rouge autour de la station.';
-
+$_BL['fr']['arch_navi_strikes'] = 'Coups';
 
 /*************************************************************/
 /* Statistics                                                */
@@ -305,8 +441,15 @@ $_BL['fr']['h3_stat_network'] = 'Statistiques du réseau de détection';
 $_BL['fr']['h3_stat_longtime'] = 'Statistiques à long terme';
 $_BL['fr']['h3_stat_database'] = 'Statistiques de la base de données locale';
 $_BL['fr']['h4_stat_other_antennas'] = 'Direction de l\'antenne';
-$_BL['fr']['h4_graph_strikes_time'] = 'Tous les coups de foudre';
-$_BL['fr']['h4_graph_strikes_time_radius'] = 'Foudre à une distance maximum de la station {STATION}';
+$_BL['fr']['h4_stat_signals'] = 'Signaux';
+$_BL['fr']['h4_new_stations'] = 'Nouvelles stations';
+$_BL['fr']['h3_arch_last_strikes'] = 'Derniers coups';
+$_BL['fr']['h3_stat_strikes_now'] = 'Foudre actuelle';
+$_BL['fr']['h3_stat_strikes_time'] = 'Compteur mensuel et annuel';
+$_BL['fr']['h3_stat_advanced'] = 'Statistiques avancées';
+
+$_BL['fr']['stat_advanced_show_strikes'] = 'Stat.foudre';
+$_BL['fr']['stat_advanced_show_signals'] = 'Stat.signal';
 
 $_BL['fr']['since begin of data logging'] = 'depuis début de l\'enregistrement de données';
 $_BL['fr']['update every'] = 'Mise à jour tous les';
@@ -342,7 +485,6 @@ $_BL['fr']['Currently no GPS coordinates available!'] = 'Coordonnées GPS non dis
 $_BL['fr']['stat_navi_strikes'] = 'Foudre';
 $_BL['fr']['total strikes'] = ' Coups de foudre';
 $_BL['fr']['total strikes station'] = ' Coups de foudre {STATION}';
-$_BL['fr']['legend_stat_strikes'] = 'Période';
 $_BL['fr']['Strikes station'] = 'Coups station {STATION}';
 $_BL['fr']['_in_radius'] = ' (max. {RADIUS}km) ';
 $_BL['fr']['available_of'] = 'sur';
@@ -354,6 +496,16 @@ $_BL['fr']['Last active'] = 'Dernière active';
 $_BL['fr']['Signals detected'] = 'Signaux détectés';
 $_BL['fr']['Signal ratio'] = 'Taux de localisation';
 $_BL['fr']['Strikes station min participants'] = 'Min. de stations pour la foudre';
+
+$_BL['fr']['legend_stat_strikes_now'] = 'Région';
+$_BL['fr']['legend_stat_amplitudes_time'] = 'Options';
+$_BL['fr']['legend_stat_strikes'] = 'Période';
+$_BL['fr']['legend_stat_frequencies_time'] = 'Options';
+$_BL['fr']['legend_stat_spectrum'] = 'Options';
+$_BL['fr']['legend_stat_amplitudes'] = 'Options';
+$_BL['fr']['legend_stat_advanced_options'] = 'Options avancées';
+$_BL['fr']['legend_stat_participants_time'] = 'Options';
+$_BL['fr']['legend_stat_deviations_time'] = 'Options';
 
 
 /*************************************************************/
@@ -468,6 +620,8 @@ Blitzortung.org est un réseau privé de stations de détection de la foudre. Elles
 Vous pouvez trouver plus d\'informations sur le site du projet: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
 
 ';
+
+
 $_BL['fr']['info_accuracy_text'] = '
 La précision est très bonne,inférieur à 1km,équivalent aux sociétés professionelles de détection de la foudre.
 ';
@@ -525,6 +679,24 @@ $_BL['fr']['bo_graph_descr_strikes_time_radius'] = 'Idem ci-dessus, mais seuleme
 $_BL['fr']['bo_graph_stations'] = 'Les stations actives envoyent et de participent activement au réseau de détection de la foudre. Des stations disponibles sont actuellement déconnectées,en raison de difficultés techniques ou autres.';
 $_BL['fr']['bo_graph_participants'] = 'Pour détecter et localiser la foudre, un minimum de {MIN_PARTICIPANTS} stations doivent recevoir le signal.';
 $_BL['fr']['bo_graph_log_warn'] = 'L\'échelle est logarithmique';
+$_BL['fr']['bo_graph_participants_time'] = 'Nombre de participants. Vous pouvez voir l\'historique du nombre de participants et la moyenne .';
+$_BL['fr']['bo_graph_descr_radi_adv'] = 'La même chose que le taux de foudre dans les statistiques , mais ici, vous pouvez sélectionner le canal.';
+$_BL['fr']['bo_graph_descr_bear_adv'] = 'La même chose que le taux de foudre dans les statistiques , mais ici, vous pouvez sélectionner le canal.';
+$_BL['fr']['bo_graph_spectrum'] = 'Dans chaque spectre unique d\'un signal il y a une fréquence avec un pic maximal. La somme des amplitudes de ces pics pour chaque fréquence sont affichés ici.';
+$_BL['fr']['bo_graph_amplitudes'] = 'Amplitudes des signaux. Vous pouvez changer entre l\'amplitude du premier échantillon ou de l\'amplitude maximale.';
+$_BL['fr']['bo_graph_amplitudes_time'] = 'Historique de l\'amplitude des signaux. Vous pouvez choisir entre l\'amplitude maximale du signal ou l\'amplitude du premier échantillon.';
+$_BL['fr']['bo_graph_frequencies_time'] = 'Historique des pics de fréquence';
+$_BL['fr']['bo_graph_deviations'] = 'Pour chaque coup de foudre la déviation est calculée';
+$_BL['fr']['bo_graph_evaluated_signals'] = 'Les signaux de la station {STATION} qui ne peuvent être attribués à un coup de foudre par Blitzortung.org sont de nouveau analysés par MyLightningDetection. Dans certains cas, la foudre peut être réaffecté à un signal. Plus cela arrive, plus la probabilité qu\'il y ait un problème avec la station existe.';
+$_BL['fr']['bo_graph_deviations_time'] = 'Évolution dans le temps de la déviation moyenne de la foudre.';
+$_BL['fr']['bo_graph_distance'] = 'Historique de la distance moyenne avec la station {STATION}. Vous pouvez estimer la sensibilité des stations en comparant les deux lignes.';
+$_BL['fr']['bo_descr_strikes_now'] = 'Les données sur la foudre sont récupérées toutes les {UPDATE_INTERVAL} minutes de Blitzortung.org, les informations présentées ici sont donc éventuellement quelque peu retardées. L\'intervalle de rafraichissement est de {RATE_INTERVAL} minutes . ';
+$_BL['fr']['bo_stat_advanced_info'] = 'Statistiques avancées, principalement pour l\'exploitant de la station.';
+$_BL['fr']['bo_stat_other_station_info'] = 'Information! Les statistiques de la station de {STATION_CITY} sont affichées. Pour des raisons techniques seul une partie des informations peuvent être affichée. Quelques données peuvent être demandé à la station de {STATION}! ';
+$_BL['fr']['bo_stat_other_station_info_back'] = 'Retourner à la station {STATION}';
+
+
+
 
 
 /*************************************************************/
@@ -591,6 +763,9 @@ $_BL['fr']['Start'] = 'Accueil';
 $_BL['fr']['No log entries'] = 'Pas de log';
 
 
+
+
+
 /*************************************************************/
 /* MyBo station linking                                      */
 /*************************************************************/
@@ -639,6 +814,9 @@ Votre station doit avoir envoyée au moins un signal depuis les 2 dernières heure
 
 
 
+
+
+
 /*************************************************************/
 /* Update                                                    */
 /*************************************************************/
@@ -648,6 +826,10 @@ $_BL['fr']['FAIL'] = 'Erreur!';
 $_BL['fr']['Update done!'] = 'Mise à jour faite!';
 $_BL['fr']['Update-Info: Setting version number to'] = 'Info de mise à jour: Choisir la version';
 $_BL['fr']['Click to update'] = 'Cliquez pour effectuer la mise à jour!';
+$_BL['fr']['Update failed!'] = 'Erreur de mise à jour!';
+
+
+
 
 
 /*************************************************************/
@@ -656,6 +838,10 @@ $_BL['fr']['Click to update'] = 'Cliquez pour effectuer la mise à jour!';
 $_BL['fr']['Not enough data available!'] = 'Pas suffisament de données valides!';
 $_BL['fr']['Lightning data from Blitzortung.org'] = 'Données issues de Blitzortung.org';
 $_BL['fr']['No data available!'] = 'Pas de données!';
+
+
+
+
 
 /*************************************************************/
 /* Translations for templates                                */
@@ -682,6 +868,9 @@ $_BL['fr']['Spain'] = 'Espagne';
 $_BL['fr']['Sweden'] = 'Suéde';
 $_BL['fr']['The Netherlands'] = 'Pays bas';
 $_BL['fr']['United Kingdom'] = 'Royaume unis';
+$_BL['fr']['Bulgaria'] = 'Bulgarie';
+$_BL['fr']['Albania'] = 'Aghbanie';
+$_BL['fr']['Russia'] = 'Russie';
 
 //Europe
 $_BL['fr']['Europe'] = 'Europe';
@@ -691,163 +880,7 @@ $_BL['fr']['Western Europe'] = 'Europe de l\'Ouest';
 $_BL['fr']['Bavaria'] = 'Bavière';
 $_BL['fr']['NRW'] = 'Rhénanie-du-Nord-Westphalie';
 
+//Others
 $_BL['fr']['Meteox rain radar'] = 'Radar pluies (meteox.com)';
-
-
-// Not sorted
-
-$_BL['fr']['Score'] = 'Classement';
-$_BL['fr']['Strike count per minute'] = 'Coups/mn';
-$_BL['fr']['graph_legend_strikes_now_all'] = 'Tous les coups';
-$_BL['fr']['graph_legend_strikes_now_own'] = 'Coups de foudre de la station {STATION}';
-$_BL['fr']['graph_stat_title_strikes_now'] = 'Taux coup de foudre';
-$_BL['fr']['No limit'] = 'Pas de limite';
-$_BL['fr']['Region'] = 'Région';
-$_BL['fr']['legend_stat_strikes_now'] = 'Région';
-$_BL['fr']['h3_stat_strikes_now'] = 'Foudre actuelle';
-$_BL['fr']['h3_stat_strikes_time'] = 'Compteur mensuel et annuel';
-$_BL['fr']['bo_descr_strikes_now'] = 'Les données sur la foudre sont récupérées toutes les {UPDATE_INTERVAL} minutes de Blitzortung.org, les informations présentées ici sont donc éventuellement quelque peu retardées. L\'intervalle de rafraichissement est de {RATE_INTERVAL} minutes . ';
-
-$_BL['fr']['CEST'] = 'CEST';
-$_BL['fr']['CET'] = 'CET';
-$_BL['fr']['timezone_is'] = 'Heure du fuseau horaire utilisé:';
-$_BL['fr']['Current strike rate'] = 'Taux de foudre actuel';
-$_BL['fr']['unit_strikesperminute'] = ' coups/mn';
-$_BL['fr']['unit_strikesperminute_one'] = ' coups/mn';
-$_BL['fr']['Last detected strike'] = 'Dernier coup de foudre détecté';
-$_BL['fr']['Not yet'] = 'Pas encore';
-$_BL['fr']['h3_stat_advanced'] = 'Statistiques avancées';
-$_BL['fr']['Thunder cells'] = 'Cellules orageuses';
-$_BL['fr']['graph_stat_title_strikes_participants'] = 'Coups de foudres avec {PARTICIPANTS} participants';
-$_BL['fr']['Evaluated'] = 'Evalué';
-$_BL['fr']['bo_stat_advanced_info'] = 'Statistiques avancées, principalement pour l\'exploitant de la station.';
-$_BL['fr']['Channels'] = 'Canaux';
-$_BL['fr']['Samples per Channel'] = 'Exemple par canal';
-$_BL['fr']['Recording time'] = 'Heure d\'enregistrement';
-$_BL['fr']['Bits per Sample'] = 'Echantillonage Bits';
-$_BL['fr']['Sample rate'] = 'Taux d échantillonage';
-$_BL['fr']['unit_ksps'] = 'Ksp/second';
-$_BL['fr']['h4_graph_participants_time'] = 'Historique du nombre de participants';
-$_BL['fr']['bo_graph_participants_time'] = 'Nombre de participants. Vous pouvez voir l\'historique du nombre de participants et la moyenne .';
-$_BL['fr']['Average'] = 'Moyenne';
-$_BL['fr']['h4_graph_deviations'] = 'Détection des déviations';
-$_BL['fr']['bo_graph_deviations'] = 'Pour chaque coup de foudre la déviation est calculée';
-$_BL['fr']['h4_graph_distance'] = 'Distance';
-$_BL['fr']['bo_graph_distance'] = 'Historique de la distance moyenne avec la station {STATION}. Vous pouvez estimer la sensibilité des stations en comparant les deux lignes.';
-$_BL['fr']['graph_legend_participants_time_all'] = 'Pourcentage de participants';
-$_BL['fr']['graph_legend_participants_time_own'] = 'Pourcentage station {STATION}';
-$_BL['fr']['Min'] = 'Min';
-$_BL['fr']['Max'] = 'Max';
-$_BL['fr']['Update failed!'] = 'Erreur de mise à jour!';
-$_BL['fr']['Retry'] = 'Recommencer';
-$_BL['fr']['Continue'] = 'Continuer';
-$_BL['fr']['total strikes station2'] = 'Total des coups de foudre de la station {STATION_CITY}';
-$_BL['fr']['graph_legend_deviatinons_time_all'] = 'Nombre relatif';
-$_BL['fr']['graph_legend_deviations_time_own'] = 'Nombre relatif de la station {STATION}';
-$_BL['fr']['graph_stat_title_strikes_deviations'] = 'Coupss avec déviations {DEVIATIONS}';
-$_BL['fr']['h4_graph_evaluated_signals'] = 'Taux de foudre / signaux évalués';
-$_BL['fr']['bo_graph_evaluated_signals'] = 'Les signaux de la station {STATION} qui ne peuvent être attribués à un coup de foudre par Blitzortung.org sont de nouveau analysés par MyLightningDetection. Dans certains cas, la foudre peut être réaffecté à un signal. Plus cela arrive, plus la probabilité qu\'il y ait un problème avec la station existe.';
-$_BL['fr']['h4_graph_deviations_time'] = 'Historique des déviations';
-$_BL['fr']['bo_graph_deviations_time'] = 'Évolution dans le temps de la déviation moyenne de la foudre.';
-$_BL['fr']['graph_legend_evaluated_signals_part_ratio'] = 'Taux de foudre';
-$_BL['fr']['graph_legend_evaluated_signals_part_all_ratio'] = 'Strike ratio with supplementary assignment';
-$_BL['fr']['graph_stat_title_evaluated_signals'] = 'taux de foudre';
-$_BL['fr']['graph_legend_deviations_own'] = 'Déviation station {STATION}';
-$_BL['fr']['graph_legend_deviations_all'] = 'Déviation';
-$_BL['fr']['graph_legend_deviations_ratio'] = 'Pourcentage station {STATION}';
-$_BL['fr']['Deviations'] = 'Déviations';
-$_BL['fr']['graph_stat_title_deviations'] = 'Détections par déviation';
-$_BL['fr']['graph_legend_participants_time_avg_all'] = 'Moyenne du nombre de participants';
-$_BL['fr']['graph_legend_participants_time_avg_own'] = 'Moyenne du nombre de participations de la station de {STATION}';
-$_BL['fr']['graph_stat_title_strikes_participants_avg'] = 'Moyenne du nombre de stations';
-$_BL['fr']['graph_legend_deviatinons_time_avg_all'] = 'Moyenne des déviations';
-$_BL['fr']['graph_legend_deviations_time_avg_own'] = 'Moyenne des déviations pour la station de {STATION}';
-$_BL['fr']['graph_stat_title_strikes_deviations_avg'] = 'Moyenne des déviations';
-$_BL['fr']['bo_stat_other_station_info'] = 'Information! Les statistiques de la station de {STATION_CITY} sont affichées. Pour des raisons techniques seul une partie des informations peuvent être affichée. Quelques données peuvent être demandé à la station de {STATION}! ';
-$_BL['fr']['legend_stat_advanced_options'] = 'Options avancées';
-$_BL['fr']['legend_stat_participants_time'] = 'Options';
-$_BL['fr']['legend_stat_deviations_time'] = 'Options';
-$_BL['fr']['bo_stat_other_station_info_back'] = 'Retourner à la station {STATION}';
-$_BL['fr']['Values'] = 'Valeurs';
-$_BL['fr']['time_year_month'] = 'Année et mois';
-$_BL['fr']['Channel'] = 'Canal';
-$_BL['fr']['Show'] = 'Montrer';
-$_BL['fr']['stat_advanced_show_strikes'] = 'Stat.foudre';
-$_BL['fr']['stat_advanced_show_signals'] = 'Stat.signal';
-$_BL['fr']['h4_stat_signals'] = 'Signaux';
-$_BL['fr']['bo_graph_descr_radi_adv'] = 'La même chose que le taux de foudre dans les statistiques , mais ici, vous pouvez sélectionner le canal.';
-$_BL['fr']['bo_graph_descr_bear_adv'] = 'La même chose que le taux de foudre dans les statistiques , mais ici, vous pouvez sélectionner le canal.';
-$_BL['fr']['stat_advanced_show_strike_ratios'] = 'Taux';
-$_BL['fr']['Frequency'] = 'Fréquence';
-$_BL['fr']['graph_stat_title_spectrum'] = 'Spectre';
-$_BL['fr']['graph_stat_yaxis_title'] = 'Amplitude';
-$_BL['fr']['h4_graph_spectrum'] = 'Spectre des fréquences';
-$_BL['fr']['bo_graph_spectrum'] = 'Dans chaque spectre unique d\'un signal il y a une fréquence avec un pic maximal. La somme des amplitudes de ces pics pour chaque fréquence sont affichés ici.';
-$_BL['fr']['Amplitude'] = 'Amplitude';
-$_BL['fr']['graph_stat_title_amplitude'] = 'Amplitudes';
-$_BL['fr']['h4_graph_amplitudes'] = 'Amplitudes';
-$_BL['fr']['bo_graph_amplitudes'] = 'Amplitudes des signaux. Vous pouvez changer entre l\'amplitude du premier échantillon ou de l\'amplitude maximale.';
-$_BL['fr']['graph_stat_spectrum_yaxis_title'] = 'Somme des amplitudes';
-$_BL['fr']['With strikes connected'] = 'Avec les coups liés';
-$_BL['fr']['dontcare'] = 'Ne pas en tenir compte';
-$_BL['fr']['participated_assigned'] = 'Assigné';
-$_BL['fr']['_participated'] = 'a participé';
-$_BL['fr']['not_participated'] = 'n\'a pas participé';
-$_BL['fr']['legend_stat_spectrum'] = 'Options';
-$_BL['fr']['legend_stat_amplitudes'] = 'Options';
-$_BL['fr']['amp_first'] = 'Premier échantillon';
-$_BL['fr']['with_strikes'] = 'avec coup de foudre';
-$_BL['fr']['with_participation'] = 'avec participation';
-$_BL['fr']['without_strikes'] = 'sans coup de foudre';
-$_BL['fr']['Mean value channel'] = 'Valeur moyenne du canal';
-$_BL['fr']['graph_legend_signals_time_percent'] = 'Pourcentage de signaux';
-$_BL['fr']['graph_stat_title_amplitudes_time'] = 'Historique des amplitudes de signal';
-$_BL['fr']['graph_stat_title_frequencies_time'] = 'Historique des fréquences de crête';
-$_BL['fr']['graph_legend_frequencies_time_average'] = 'Moyenne des crêtes de fréquence';
-$_BL['fr']['graph_stat_title_frequencies_time_average'] = 'Moyenne des pics de fréquence';
-$_BL['fr']['graph_legend_amplitudes_time_average'] = 'Moyenne des amplitudes';
-$_BL['fr']['graph_stat_title_amplitudes_time_average'] = 'Moyenne des amplitudes';
-$_BL['fr']['h4_graph_amplitudes_time'] = 'Historique de l\'amplitude';
-$_BL['fr']['bo_graph_amplitudes_time'] = 'Historique de l\'amplitude des signaux. Vous pouvez choisir entre l\'amplitude maximale du signal ou l\'amplitude du premier échantillon.';
-$_BL['fr']['legend_stat_amplitudes_time'] = 'Options';
-$_BL['fr']['h4_graph_frequencies_time'] = 'Options';
-$_BL['fr']['bo_graph_frequencies_time'] = 'Historique des pics de fréquence';
-$_BL['fr']['legend_stat_frequencies_time'] = 'Options';
-$_BL['fr']['Mean amplitude'] = 'Moyenne amplitude';
-$_BL['fr']['amp_first_signal'] = '1er échantillon';
-$_BL['fr']['amp_max_signal'] = 'Amplitude max.';
-$_BL['fr']['amp_spec'] = 'Depuis l\'analyseur';
-$_BL['fr']['Signal count'] = 'Compteur signal';
-$_BL['fr']['signal not found'] = 'signal non trouvé';
-$_BL['fr']['number_every_minutes'] = 'toutes les {NUMBER} minutes';
-$_BL['fr']['number_1every_minute'] = 'toutes les minutes';
-$_BL['fr']['number_minutes'] = 'minutes';
-$_BL['fr']['number_1minute'] = 'une minute';
-$_BL['fr']['h4_new_stations'] = 'Nouvelles stations';
-$_BL['fr']['arch_navi_strikes'] = 'Coups';
-$_BL['fr']['h3_arch_last_strikes'] = 'Derniers coups';
-$_BL['fr']['Participated stations'] = 'Stations ayant participées';
-$_BL['fr']['Statistics'] = 'Statistiques';
-$_BL['fr']['Off'] = 'Off';
-$_BL['fr']['tile_time_range_na_err'] = 'La période de temps selectionnée \n ne vous est pas autorisé';
-$_BL['fr']['tile_wrong_time_range_err'] = 'La 2éme date \n doit être plus grande que la 1ère \n';
-$_BL['fr']['tile_maximum_time_range_err'] = 'Période trops grande! Le maximum est de {HOURS} heures ';
-$_BL['fr']['Activated'] = 'Activé';
-$_BL['fr']['check_only_participated'] = 'Seulement avec participation';
-$_BL['fr']['Traffic'] = 'Trafic';
-$_BL['fr']['Other'] = 'Autre';
-$_BL['fr']['Total'] = 'Total';
-$_BL['fr']['Lightning data imports'] = 'Importation des données de foudre';
-$_BL['fr']['Traffic to Blitzortung.org'] = 'Trafic vers Blitzortung.org';
-$_BL['fr']['oclock'] = 'heures';
-$_BL['fr']['On'] = 'Marche';
-$_BL['fr']['Available stations'] = 'Stations disponibles';
-$_BL['fr']['strikes'] = 'foudres';
-$_BL['fr']['Usage'] = 'Utilisation';
-$_BL['fr']['Last signal'] = 'Dernière signal';
-$_BL['fr']['Never before'] = 'Jamais depuis';
-$_BL['fr']['no_strike_yet'] = 'Pas encore';
-
-
 
 

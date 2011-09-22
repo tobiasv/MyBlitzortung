@@ -607,10 +607,10 @@
 
 //Statistics-Graph: Strikes (now)
 @define('BO_GRAPH_STAT_STRIKES_NOW_COLOR_L1', '#55f@1');
-@define('BO_GRAPH_STAT_STRIKES_NOW_COLOR_F1', '#66f@0.7');
-@define('BO_GRAPH_STAT_STRIKES_NOW_WIDTH_1',  2);
-@define('BO_GRAPH_STAT_STRIKES_NOW_COLOR_L2', '#66f@0.2');
-@define('BO_GRAPH_STAT_STRIKES_NOW_COLOR_F2', false);
+@define('BO_GRAPH_STAT_STRIKES_NOW_COLOR_F1', '#aaf@0.5');
+@define('BO_GRAPH_STAT_STRIKES_NOW_WIDTH_1',  1);
+@define('BO_GRAPH_STAT_STRIKES_NOW_COLOR_L2', '#66f@1');
+@define('BO_GRAPH_STAT_STRIKES_NOW_COLOR_F2', '#77f@0.6');
 @define('BO_GRAPH_STAT_STRIKES_NOW_WIDTH_2',  1);
 @define('BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES',  15);
 
@@ -623,12 +623,12 @@
 
 //Statistics-Graph: Strikes (Station)
 @define('BO_GRAPH_STAT_STR_COLOR_L1', '#99f@1');
-@define('BO_GRAPH_STAT_STR_COLOR_F1', '#99f@0.7');
+@define('BO_GRAPH_STAT_STR_COLOR_F1', '#aaf@0.5');
 @define('BO_GRAPH_STAT_STR_WIDTH_1',  1);
-@define('BO_GRAPH_STAT_STR_COLOR_L2', '#00f@0.1');
-@define('BO_GRAPH_STAT_STR_COLOR_F2', false);
+@define('BO_GRAPH_STAT_STR_COLOR_L2', '#00f@1');
+@define('BO_GRAPH_STAT_STR_COLOR_F2', '#77f@0.6');
 @define('BO_GRAPH_STAT_STR_WIDTH_2',  2);
-@define('BO_GRAPH_STAT_STR_COLOR_L3', '#f00@0.5');
+@define('BO_GRAPH_STAT_STR_COLOR_L3', '#00f@0.5');
 @define('BO_GRAPH_STAT_STR_COLOR_F3', false);
 @define('BO_GRAPH_STAT_STR_WIDTH_3',  1);
 

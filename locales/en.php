@@ -1,9 +1,5 @@
 <?php 
 
-/*
-* English translation for MyBlitzortung
-*/
-
 $_BL['locale'] = 'en';
 
 
@@ -21,11 +17,15 @@ $_BL['en']['MyBlitzortung_notags'] = 'MyLightningDetection';
 $_BL['en']['MyBlitzortung_original'] = 'MyBlitzortung';
 
 
+
+
+
 $_BL['en']['.'] = '.';
 $_BL['en'][','] = ',';
 $_BL['en']['_date'] = 'Y-m-d';
 $_BL['en']['_dateshort'] = 'm/d';
 $_BL['en']['_datetime'] = 'Y-m-d H:i:s';
+
 
 $_BL['en']['_before'] = false;
 $_BL['en']['_minutes_ago'] = 'minutes ago';
@@ -34,6 +34,21 @@ $_BL['en']['unit_meters'] = 'm';
 $_BL['en']['unit_minutes'] = 'minutes';
 $_BL['en']['unit_hours'] = 'hours';
 $_BL['en']['unit_us_short'] = 'µs';
+$_BL['en']['unit_ksps'] = 'Kilosamples per second';
+$_BL['en']['unit_days'] = 'days';
+$_BL['en']['unit_kilometers'] = 'km';
+$_BL['en']['days'] = 'days';
+$_BL['en']['number_every_minutes'] = 'every {NUMBER} minutes';
+$_BL['en']['number_1every_minute'] = 'every minute';
+$_BL['en']['number_minutes'] = '{NUMBER} minutes';
+$_BL['en']['number_1minute'] = 'one minute';
+
+
+$_BL['en']['CEST'] = 'CEST';
+$_BL['en']['CET'] = 'CET';
+$_BL['en']['unit_strikesperminute'] = ' strikes per minute';
+$_BL['en']['unit_strikesperminute_one'] = ' strike per minute';
+
 
 $_BL['en']['Jan'] = 'Jan';
 $_BL['en']['Feb'] = 'Feb';
@@ -48,6 +63,7 @@ $_BL['en']['Oct'] = 'Oct';
 $_BL['en']['Nov'] = 'Nov';
 $_BL['en']['Dec'] = 'Dec';
 
+
 $_BL['en']['January'] = 'January';
 $_BL['en']['February'] = 'February';
 $_BL['en']['March'] = 'March';
@@ -59,6 +75,7 @@ $_BL['en']['September'] = 'September';
 $_BL['en']['October'] = 'October';
 $_BL['en']['November'] = 'November';
 $_BL['en']['December'] = 'December';
+
 
 $_BL['en']['Language'] = 'Language';
 $_BL['en']['Languages'] = 'Languages';
@@ -76,14 +93,11 @@ $_BL['en']['day'] = 'Day';
 $_BL['en']['no'] = 'no';
 $_BL['en']['yes'] = 'yes';
 $_BL['en']['distance'] = 'Distance';
-$_BL['en']['unit_kilometers'] = 'km';
 $_BL['en']['Bearing'] = 'Bearing';
 $_BL['en']['Deviation'] = 'Deviation';
 $_BL['en']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['en']['for_station'] = 'for station';
 $_BL['en']['Entries'] = 'Entries';
-$_BL['en']['days'] = 'days';
-$_BL['en']['unit_days'] = 'days';
 
 $_BL['en']['Advanced'] = 'Advanced';
 $_BL['en']['Lightning data'] = 'Lightning data';
@@ -164,7 +178,74 @@ $_BL['en']['Text'] = 'Text';
 $_BL['en']['Error'] = 'Error';
 $_BL['en']['Back'] = 'Back';
 $_BL['en']['Participants'] = 'Participants';
+$_BL['en']['oclock'] = 'o\'clock';
+$_BL['en']['On'] = 'On';
+$_BL['en']['Available stations'] = 'Available stations';
+$_BL['en']['strikes'] = 'strikes';
+$_BL['en']['Usage'] = 'Usage';
+$_BL['en']['Last signal'] = 'Last signal';
+$_BL['en']['Never before'] = 'Never before';
+$_BL['en']['no_strike_yet'] = 'None';
+$_BL['en']['Current strike rate'] = 'Current strike rate';
+$_BL['en']['Last detected strike'] = 'Last detected strike';
+$_BL['en']['Not yet'] = 'Not yet';
+$_BL['en']['Evaluated'] = 'Evaluated';
+$_BL['en']['Channels'] = 'Channels';
+$_BL['en']['Samples per Channel'] = 'Samples per Channel';
+$_BL['en']['Recording time'] = 'Recording time';
+$_BL['en']['Bits per Sample'] = 'Bits per Sample';
+$_BL['en']['Sample rate'] = 'Sample rate';
+$_BL['en']['Average'] = 'Average';
+$_BL['en']['Off'] = 'Off';
+$_BL['en']['Activated'] = 'Activated';
+$_BL['en']['Traffic'] = 'Traffic';
+$_BL['en']['Other'] = 'Other';
+$_BL['en']['Total'] = 'Total';
+$_BL['en']['Min'] = 'Min';
+$_BL['en']['Max'] = 'Max';
+$_BL['en']['Retry'] = 'Retry';
+$_BL['en']['Continue'] = 'Continue';
+$_BL['en']['Deviations'] = 'Deviations';
+$_BL['en']['Values'] = 'Values';
+$_BL['en']['Channel'] = 'Channel';
+$_BL['en']['Show'] = 'Show';
+$_BL['en']['Frequency'] = 'Frequency';
+$_BL['en']['Amplitude'] = 'Amplitude';
+$_BL['en']['Score'] = 'Score';
+$_BL['en']['No limit'] = 'No limit';
+$_BL['en']['Region'] = 'Region';
+$_BL['en']['Thunder cells'] = 'Thunder cells';
+$_BL['en']['Id'] = 'Id';
 
+$_BL['en']['Strike count per minute'] = 'Strike count per minute';
+$_BL['en']['total strikes station2'] = 'Total strikes station {STATION_CITY}';
+$_BL['en']['time_year_month'] = 'Year an month';
+$_BL['en']['stat_advanced_show_strike_ratios'] = 'Ratios';
+$_BL['en']['With strikes connected'] = 'With strikes connected';
+$_BL['en']['dontcare'] = 'Don\'t care';
+$_BL['en']['participated_assigned'] = 'Assigned';
+$_BL['en']['_participated'] = 'Participated';
+$_BL['en']['not_participated'] = 'Not participated';
+$_BL['en']['amp_first'] = 'First sample';
+$_BL['en']['with_strikes'] = 'with strikes';
+$_BL['en']['with_participation'] = 'with participation';
+$_BL['en']['without_strikes'] = 'without strikes';
+$_BL['en']['Mean value channel'] = 'Mean value channel';
+$_BL['en']['Mean amplitude'] = 'Mean amplitude';
+$_BL['en']['amp_first_signal'] = 'Signal: First sample';
+$_BL['en']['amp_max_signal'] = 'Signal: Max. apmlitude';
+$_BL['en']['amp_spec'] = 'From spectrum';
+$_BL['en']['Signal count'] = 'Signal count';
+$_BL['en']['signal not found'] = 'signal not found';
+$_BL['en']['Participated stations'] = 'Participated stations';
+$_BL['en']['Statistics'] = 'Statistics';
+$_BL['en']['check_only_participated'] = 'Only participated';
+$_BL['en']['Lightning data imports'] = 'Lightning data imports';
+$_BL['en']['Traffic to Blitzortung.org'] = 'Traffic to Blitzortung.org';
+
+
+
+$_BL['en']['timezone_is'] = 'Current date/time and default timezone:';
 
 /*************************************************************/
 /* Main Menu (Standalone)                                    */
@@ -203,45 +284,84 @@ $_BL['en']['show tracks'] = 'Show tracks (experimental!)';
 $_BL['en']['Own maps'] = 'Own maps';
 $_BL['en']['Extra overlays'] = 'Extra overlays';
 $_BL['en']['show strike counter'] = 'Strike counter';
+$_BL['en']['tile_time_range_na_err'] = 'Selecting time ranges\nis not allowed for you!';
+$_BL['en']['tile_wrong_time_range_err'] = 'Second date/time\nhas to be greater\nthan the first one!';
+$_BL['en']['tile_maximum_time_range_err'] = 'Time range too big!\nMaximum is {HOURS} hours.';
+
 
 /*************************************************************/
 /* Graphs                                                    */
 /*************************************************************/
 
 $_BL['en']['graph_stat_title_strikes'] = 'Strike statistics';
+$_BL['en']['graph_stat_title_signals'] = 'Signal statistics';
+$_BL['en']['graph_stat_title_ratio'] = 'Locating and strike ratios';
+$_BL['en']['graph_stat_title_stations'] = 'Stations count';
+$_BL['en']['graph_stat_title_ratio_distance'] = 'Strike ratio by distance';
+$_BL['en']['graph_stat_title_ratio_bearing'] = 'Strike ratio by bearing';
+$_BL['en']['graph_stat_title_distance'] = 'Average strike distance';
+$_BL['en']['graph_stat_title_strikes_time'] = 'Strikes';
+$_BL['en']['graph_stat_title_participants'] = 'Detections per participation count';
+$_BL['en']['graph_stat_title_strikes_participants'] = 'Strikes with {PARTICIPANTS} participants';
+$_BL['en']['graph_stat_title_strikes_deviations'] = 'Strikes with deviations {DEVIATIONS}';
+$_BL['en']['graph_stat_title_strikes_now'] = 'Strike rate';
+$_BL['en']['graph_stat_title_amplitudes_time'] = 'Development of signal amplitudes';
+$_BL['en']['graph_stat_title_frequencies_time'] = 'Development of peak frequencies';
+$_BL['en']['graph_stat_title_amplitudes_time_average'] = 'Mean of amplitudes';
+$_BL['en']['graph_stat_title_frequencies_time_average'] = 'Mean of peak frequencies';
+$_BL['en']['graph_stat_title_spectrum'] = 'Spectrum';
+$_BL['en']['graph_stat_title_deviations'] = 'Detections per deviation';
+$_BL['en']['graph_stat_title_strikes_participants_avg'] = 'Average number of participants';
+$_BL['en']['graph_stat_title_strikes_deviations_avg'] = 'Average deviations';
+$_BL['en']['graph_stat_title_amplitude'] = 'Amplitudes';
+$_BL['en']['graph_stat_title_all_signals'] = 'Signals of all stations';
+$_BL['en']['graph_stat_title_evaluated_signals'] = 'Strike ratios';
+
 $_BL['en']['graph_legend_strikes_sum'] = 'Whole strike cound';
 $_BL['en']['graph_legend_strikes_avg_all'] = 'Mean of all stations';
 $_BL['en']['graph_legend_strikes_own'] = 'Detected strikes station {STATION}';
-$_BL['en']['graph_stat_title_signals'] = 'Signal statistics';
 $_BL['en']['graph_legend_signals_avg_all'] = 'Mean signals per station';
 $_BL['en']['graph_legend_signals_own'] = 'Signals station {STATION}';
-$_BL['en']['graph_stat_title_ratio'] = 'Locating and strike ratios';
 $_BL['en']['graph_legend_ratio_sig_all'] = 'Whole locating ratio';
 $_BL['en']['graph_legend_ratio_sig_own'] = 'Locating ratio station {STATION}';
 $_BL['en']['graph_legend_ratio_str_all'] = 'Whole strike ratio';
 $_BL['en']['graph_legend_ratio_str_own'] = 'Strike ratio station {STATION}';
-$_BL['en']['graph_stat_title_stations'] = 'Stations count';
 $_BL['en']['graph_legend_stations_active'] = 'Active stations';
 $_BL['en']['graph_legend_stations_active_signals'] = 'Stations with signals';
 $_BL['en']['graph_legend_stations_max_active_signal'] = 'Highest count of active stations ever';
-$_BL['en']['graph_stat_title_ratio_distance'] = 'Strike ratio by distance';
 $_BL['en']['graph_legend_ratio_distance'] = 'Strike ratio station {STATION}';
-$_BL['en']['graph_stat_title_ratio_bearing'] = 'Strike ratio by bearing';
 $_BL['en']['graph_legend_stations_max_active'] = 'Highest station count ever';
 $_BL['en']['graph_legend_count_distance'] = 'Whole strike count';
 $_BL['en']['graph_legend_ratio_bearing'] = 'Locating ratio station {STATION}';
 $_BL['en']['graph_legend_count_bearing'] = 'Whole strike count';
 $_BL['en']['graph_legend_strikes_time_all'] = 'All strikes of the lightning network';
 $_BL['en']['graph_legend_strikes_time_own'] = 'Only strikes detected by station {STATION}';
-$_BL['en']['graph_stat_title_distance'] = 'Average strike distance';
 $_BL['en']['graph_legend_distance_all'] = 'All Strikes';
 $_BL['en']['graph_legend_distance_own'] = 'Strikes of station {STATION}';
-$_BL['en']['graph_stat_title_strikes_time'] = 'Strikes';
 $_BL['en']['graph_legend_stations_available'] = 'Available stations';
 $_BL['en']['graph_legend_participants_all'] = 'Strike count';
 $_BL['en']['graph_legend_participants_own'] = 'Strike count station {STATION}';
 $_BL['en']['graph_legend_participants_ratio'] = 'Strike ratio station {STATION}';
-$_BL['en']['graph_stat_title_participants'] = 'Detections per participation count';
+$_BL['en']['graph_legend_strikes_now_all'] = 'All strikes';
+$_BL['en']['graph_legend_strikes_now_own'] = 'Strikes of station {STATION}';
+$_BL['en']['graph_legend_signals_time_percent'] = 'Percentage of signals';
+$_BL['en']['graph_legend_frequencies_time_average'] = 'Mean of peak frequencies';
+$_BL['en']['graph_legend_amplitudes_time_average'] = 'Mean of amplitudes';
+$_BL['en']['graph_legend_participants_time_all'] = 'Percentage';
+$_BL['en']['graph_legend_participants_time_own'] = 'Percentage station {STATION}';
+$_BL['en']['graph_legend_deviatinons_time_all'] = 'Relative count';
+$_BL['en']['graph_legend_deviations_time_own'] = 'Relative count station {STATION}';
+$_BL['en']['graph_legend_evaluated_signals_part_ratio'] = 'Strike ratio';
+$_BL['en']['graph_legend_evaluated_signals_part_all_ratio'] = 'Strike ratio with supplementary assignment';
+$_BL['en']['graph_legend_deviations_own'] = 'Deviation station {STATION}';
+$_BL['en']['graph_legend_deviations_all'] = 'Deviation';
+$_BL['en']['graph_legend_deviations_ratio'] = 'Percentage station {STATION}';
+$_BL['en']['graph_legend_participants_time_avg_all'] = 'Average number of participants';
+$_BL['en']['graph_legend_participants_time_avg_own'] = 'Average number of participants station {STATION}';
+$_BL['en']['graph_legend_deviatinons_time_avg_all'] = 'Average deviations';
+$_BL['en']['graph_legend_deviations_time_avg_own'] = 'Average deviations station {STATION}';
+$_BL['en']['graph_legend_all_signals'] = 'Signals';
+
 
 $_BL['en']['h3_graphs'] = 'Graphs';
 $_BL['en']['h4_graph_strikes'] = 'Strike count';
@@ -253,6 +373,22 @@ $_BL['en']['h4_graph_stations'] = 'Active stations count';
 $_BL['en']['h4_graph_ratio_distance_longtime'] = 'Strike ratio by distance';
 $_BL['en']['h4_graph_ratio_bearing_longtime'] = 'Strike ratio by bearing';
 $_BL['en']['h4_graph_participants'] = 'Participants';
+$_BL['en']['h4_graph_participants_time'] = 'Development of participant count';
+$_BL['en']['h4_graph_strikes_time'] = 'All strikes';
+$_BL['en']['h4_graph_strikes_time_radius'] = 'Strikes with a max. distance to Station {STATION}';
+$_BL['en']['h4_graph_frequencies_time'] = 'Options';
+$_BL['en']['h4_graph_deviations'] = 'Detection per deviation';
+$_BL['en']['h4_graph_amplitudes_time'] = 'Development of amplitudes';
+$_BL['en']['h4_graph_distance'] = 'Distance';
+$_BL['en']['h4_graph_deviations_time'] = 'Development of deviations';
+$_BL['en']['h4_graph_evaluated_signals'] = 'Strike ratios / evaluated signals';
+$_BL['en']['h4_graph_signals_all'] = 'Signals of all stations';
+$_BL['en']['h4_graph_amplitudes'] = 'Amplitudes';
+$_BL['en']['h4_graph_spectrum'] = 'Frequency spectrum';
+
+$_BL['en']['graph_stat_spectrum_yaxis_title'] = 'Average of amplitudes';
+$_BL['en']['graph_stat_yaxis_title'] = 'Amplitude';
+
 
 /*************************************************************/
 /* Archive                                                   */
@@ -288,7 +424,7 @@ $_BL['en']['Max time'] = 'Max time';
 $_BL['en']['enter_time_hint'] = 'Enter time values like "YYYY-MM-DD HH:MM:SS". You can omit the smaller time units, for example "YYYY-MM" is also possible.';
 $_BL['en']['Time range'] = 'Time range';
 $_BL['en']['archive_search_info'] = 'Here you search for the last {COUNT} strikes in an area. To define that area, move the marker on the map and enter a radius to search within. Strikes will be visualized as colored dots on the map. You can click on it to see more information about that strike. You can only search for strikes in the red colored area around the station.';
-
+$_BL['en']['arch_navi_strikes'] = 'Strikes';
 
 /*************************************************************/
 /* Statistics                                                */
@@ -307,8 +443,15 @@ $_BL['en']['h3_stat_network'] = 'Lightning network statistics';
 $_BL['en']['h3_stat_longtime'] = 'Longtime statistics';
 $_BL['en']['h3_stat_database'] = 'Statistics from the local database';
 $_BL['en']['h4_stat_other_antennas'] = 'Antenna bearing';
-$_BL['en']['h4_graph_strikes_time'] = 'All strikes';
-$_BL['en']['h4_graph_strikes_time_radius'] = 'Strikes with a max. distance to Station {STATION}';
+$_BL['en']['h4_stat_signals'] = 'Signals';
+$_BL['en']['h4_new_stations'] = 'New stations';
+$_BL['en']['h3_arch_last_strikes'] = 'Last strikes';
+$_BL['en']['h3_stat_strikes_now'] = 'Current lightning';
+$_BL['en']['h3_stat_strikes_time'] = 'Monthly and yearly strike count';
+$_BL['en']['h3_stat_advanced'] = 'Advanced statistics';
+
+$_BL['en']['stat_advanced_show_strikes'] = 'Strike statistics';
+$_BL['en']['stat_advanced_show_signals'] = 'Signal statistics';
 
 $_BL['en']['since begin of data logging'] = 'since begin of data logging';
 $_BL['en']['update every'] = 'Update every';
@@ -344,7 +487,6 @@ $_BL['en']['Currently no GPS coordinates available!'] = 'Currently no GPS coordi
 $_BL['en']['stat_navi_strikes'] = 'Strikes';
 $_BL['en']['total strikes'] = 'total strikes';
 $_BL['en']['total strikes station'] = 'total strikes station {STATION}';
-$_BL['en']['legend_stat_strikes'] = 'Time range';
 $_BL['en']['Strikes station'] = 'Strikes station {STATION}';
 $_BL['en']['_in_radius'] = ' (max. {RADIUS}km) ';
 $_BL['en']['available_of'] = 'of';
@@ -356,6 +498,16 @@ $_BL['en']['Last active'] = 'Last active';
 $_BL['en']['Signals detected'] = 'Signals detected';
 $_BL['en']['Signal ratio'] = 'Locating ratio';
 $_BL['en']['Strikes station min participants'] = 'Strikes station min participants';
+
+$_BL['en']['legend_stat_strikes_now'] = 'Region';
+$_BL['en']['legend_stat_amplitudes_time'] = 'Options';
+$_BL['en']['legend_stat_strikes'] = 'Time range';
+$_BL['en']['legend_stat_frequencies_time'] = 'Options';
+$_BL['en']['legend_stat_spectrum'] = 'Options';
+$_BL['en']['legend_stat_amplitudes'] = 'Options';
+$_BL['en']['legend_stat_advanced_options'] = 'Options';
+$_BL['en']['legend_stat_participants_time'] = 'Options';
+$_BL['en']['legend_stat_deviations_time'] = 'Options';
 
 
 /*************************************************************/
@@ -529,6 +681,22 @@ $_BL['en']['bo_graph_descr_strikes_time_radius'] = 'Same as above, but only stri
 $_BL['en']['bo_graph_stations'] = 'Active stations are sending signales and participate actively in the lightning detection network. Available stations are currently offline, because of technical difficulties and so on.';
 $_BL['en']['bo_graph_participants'] = 'For detecting and locating a strike, a minimum of {MIN_PARTICIPANTS} stations have to receive a signal.';
 $_BL['en']['bo_graph_log_warn'] = 'Hint: The scale is logarithmic!';
+$_BL['en']['bo_graph_participants_time'] = 'Count of participants. You can view the development per participation count value or the mean participation count.';
+$_BL['en']['bo_graph_descr_radi_adv'] = 'The same as strike ratios in the station statistics, but here you can select the channel.';
+$_BL['en']['bo_graph_descr_bear_adv'] = 'The same as strike ratios in the station statistics, but here you can select the channel.';
+$_BL['en']['bo_graph_spectrum'] = 'In each single spectrum of a singnal is a frequency with a maximum peak. The sum of the amplitudes of these peaks for each frequency are displayed here.';
+$_BL['en']['bo_graph_amplitudes'] = 'Amplitudes of Signals. You can change between the amplitude of the first sample or the maximum amplitude.';
+$_BL['en']['bo_graph_amplitudes_time'] = 'The development of the amplitudes of the signals. You can choose between the maximum amplitude of the signal or the amplitude of the first sample.';
+$_BL['en']['bo_graph_frequencies_time'] = 'The development of the frequency peaks by time.';
+$_BL['en']['bo_graph_deviations'] = 'For every strike a deviation is calculated';
+$_BL['en']['bo_graph_evaluated_signals'] = 'Signals of the station {STATION} that could not be assigned to a strike by Blitzortung.org are rescanned by {MYBO}. In some cases a strike could be reassigned to a signal. The more this happens the higher is the probability	that there is a problem with the station.';
+$_BL['en']['bo_graph_deviations_time'] = 'Development by time of mean deviation or development of a specific deviation';
+$_BL['en']['bo_graph_distance'] = 'Development of the mean distance to the station {STATION}. You can estimate the stations sensitivity by comparing the two lines.';
+$_BL['en']['bo_descr_strikes_now'] = 'The information displayed here are not live, because lightning data is downloaded {UPDATE_INTERVAL} from
+Blitzortung.org. The interval for the calculation of the strike rate is {RATE_INTERVAL}. ';
+$_BL['en']['bo_stat_advanced_info'] = 'Advanced statistics, mainly for the station operator.';
+$_BL['en']['bo_stat_other_station_info'] = 'Hint: Statistics of station {STATION_CITY} are displayed. Due to technical reasons only parts of the information can be displayed. Some information could still refer to the station {STATION}! ';
+$_BL['en']['bo_stat_other_station_info_back'] = 'Back to station {STATION}';
 
 
 /*************************************************************/
@@ -653,6 +821,7 @@ $_BL['en']['FAIL'] = 'Failure!';
 $_BL['en']['Update done!'] = 'Update done!';
 $_BL['en']['Update-Info: Setting version number to'] = 'Update info: Setting version number to';
 $_BL['en']['Click to update'] = 'Click to update!';
+$_BL['en']['Update failed!'] = 'Update failed!';
 
 
 /*************************************************************/
@@ -661,6 +830,7 @@ $_BL['en']['Click to update'] = 'Click to update!';
 $_BL['en']['Not enough data available!'] = 'Not enough data available!';
 $_BL['en']['Lightning data from Blitzortung.org'] = 'Lightning data from Blitzortung.org';
 $_BL['en']['No data available!'] = 'No data available!';
+
 
 /*************************************************************/
 /* Translations for templates                                */
@@ -687,6 +857,9 @@ $_BL['en']['Spain'] = 'Spain';
 $_BL['en']['Sweden'] = 'Sweden';
 $_BL['en']['The Netherlands'] = 'The Netherlands';
 $_BL['en']['United Kingdom'] = 'United Kingdom	';
+$_BL['en']['Bulgaria'] = 'Bulgaria';
+$_BL['en']['Albania'] = 'Albania';
+$_BL['en']['Russia'] = 'Russia';
 
 //Europe
 $_BL['en']['Europe'] = 'Europe';
@@ -696,181 +869,9 @@ $_BL['en']['Western Europe'] = 'Western Europe';
 $_BL['en']['Bavaria'] = 'Bavaria';
 $_BL['en']['NRW'] = 'NRW';
 
+//Others
 $_BL['en']['Meteox rain radar'] = 'Rain radar (meteox.com)';
 
 
-// Not sorted
-
-$_BL['en']['Score'] = 'Score';
-$_BL['en']['Strike count per minute'] = 'Strike count per minute';
-$_BL['en']['graph_legend_strikes_now_all'] = 'All strikes';
-$_BL['en']['graph_legend_strikes_now_own'] = 'Strikes of station {STATION}';
-$_BL['en']['graph_stat_title_strikes_now'] = 'Strike rate';
-$_BL['en']['No limit'] = 'No limit';
-$_BL['en']['Region'] = 'Region';
-$_BL['en']['legend_stat_strikes_now'] = 'Region';
-$_BL['en']['h3_stat_strikes_now'] = 'Current lightning';
-$_BL['en']['h3_stat_strikes_time'] = 'Monthly and yearly strike count';
-$_BL['en']['bo_descr_strikes_now'] = 'The information displayed here are not live, because lightning data is downloaded {UPDATE_INTERVAL} from
-Blitzortung.org. The interval for the calculation of the strike rate is {RATE_INTERVAL}. ';
-
-$_BL['en']['CEST'] = 'CEST';
-$_BL['en']['CET'] = 'CET';
-$_BL['en']['timezone_is'] = 'Current date/time and default timezone:';
-$_BL['en']['Current strike rate'] = 'Current strike rate';
-$_BL['en']['unit_strikesperminute'] = ' strikes per minute';
-$_BL['en']['unit_strikesperminute_one'] = ' strike per minute';
-$_BL['en']['Last detected strike'] = 'Last detected strike';
-$_BL['en']['Not yet'] = 'Not yet';
-$_BL['en']['h3_stat_advanced'] = 'Advanced statistics';
-$_BL['en']['Thunder cells'] = 'Thunder cells';
-$_BL['en']['graph_stat_title_strikes_participants'] = 'Strikes with {PARTICIPANTS} participants';
-$_BL['en']['Evaluated'] = 'Evaluated';
-$_BL['en']['bo_stat_advanced_info'] = 'Advanced statistics, mainly for the station operator.';
-$_BL['en']['Channels'] = 'Channels';
-$_BL['en']['Samples per Channel'] = 'Samples per Channel';
-$_BL['en']['Recording time'] = 'Recording time';
-$_BL['en']['Bits per Sample'] = 'Bits per Sample';
-$_BL['en']['Sample rate'] = 'Sample rate';
-$_BL['en']['unit_ksps'] = 'Kilosamples per second';
-$_BL['en']['h4_graph_participants_time'] = 'Development of participant count';
-$_BL['en']['bo_graph_participants_time'] = 'Count of participants. You can view the development per participation count value or the mean participation count.';
-$_BL['en']['Average'] = 'Average';
-$_BL['en']['h4_graph_deviations'] = 'Detection per deviation';
-$_BL['en']['bo_graph_deviations'] = 'For every strike a deviation is calculated';
-$_BL['en']['h4_graph_distance'] = 'Distance';
-$_BL['en']['bo_graph_distance'] = 'Development of the mean distance to the station {STATION}. You can estimate the stations sensitivity by comparing the two lines.';
-$_BL['en']['graph_legend_participants_time_all'] = 'Percentage';
-$_BL['en']['graph_legend_participants_time_own'] = 'Percentage station {STATION}';
-$_BL['en']['Min'] = 'Min';
-$_BL['en']['Max'] = 'Max';
-$_BL['en']['Update failed!'] = 'Update failed!';
-$_BL['en']['Retry'] = 'Retry';
-$_BL['en']['Continue'] = 'Continue';
-$_BL['en']['total strikes station2'] = 'Total strikes station {STATION_CITY}';
-$_BL['en']['graph_legend_deviatinons_time_all'] = 'Relative count';
-$_BL['en']['graph_legend_deviations_time_own'] = 'Relative count station {STATION}';
-$_BL['en']['graph_stat_title_strikes_deviations'] = 'Strikes with deviations {DEVIATIONS}';
-$_BL['en']['h4_graph_evaluated_signals'] = 'Strike ratios / evaluated signals';
-$_BL['en']['bo_graph_evaluated_signals'] = 'Signals of the station {STATION} that could not be assigned to a strike by Blitzortung.org are rescanned by {MYBO}. In some cases a strike could be reassigned to a signal. The more this happens the higher is the probability	that there is a problem with the station.';
-$_BL['en']['h4_graph_deviations_time'] = 'Development of deviations';
-$_BL['en']['bo_graph_deviations_time'] = 'Development by time of mean deviation or development of a specific deviation';
-$_BL['en']['graph_legend_evaluated_signals_part_ratio'] = 'Strike ratio';
-$_BL['en']['graph_legend_evaluated_signals_part_all_ratio'] = 'Strike ratio with supplementary assignment';
-$_BL['en']['graph_stat_title_evaluated_signals'] = 'Strike ratios';
-$_BL['en']['graph_legend_deviations_own'] = 'Deviation station {STATION}';
-$_BL['en']['graph_legend_deviations_all'] = 'Deviation';
-$_BL['en']['graph_legend_deviations_ratio'] = 'Percentage station {STATION}';
-$_BL['en']['Deviations'] = 'Deviations';
-$_BL['en']['graph_stat_title_deviations'] = 'Detections per deviation';
-$_BL['en']['graph_legend_participants_time_avg_all'] = 'Average number of participants';
-$_BL['en']['graph_legend_participants_time_avg_own'] = 'Average number of participants station {STATION}';
-$_BL['en']['graph_stat_title_strikes_participants_avg'] = 'Average number of participants';
-$_BL['en']['graph_legend_deviatinons_time_avg_all'] = 'Average deviations';
-$_BL['en']['graph_legend_deviations_time_avg_own'] = 'Average deviations station {STATION}';
-$_BL['en']['graph_stat_title_strikes_deviations_avg'] = 'Average deviations';
-$_BL['en']['bo_stat_other_station_info'] = 'Hint: Statistics of station {STATION_CITY} are displayed. Due to technical reasons only parts of the information can be displayed. Some information could still refer to the station {STATION}! ';
-$_BL['en']['legend_stat_advanced_options'] = 'Options';
-$_BL['en']['legend_stat_participants_time'] = 'Options';
-$_BL['en']['legend_stat_deviations_time'] = 'Options';
-$_BL['en']['bo_stat_other_station_info_back'] = 'Back to station {STATION}';
-$_BL['en']['Values'] = 'Values';
-$_BL['en']['time_year_month'] = 'Year an month';
-$_BL['en']['Channel'] = 'Channel';
-$_BL['en']['Show'] = 'Show';
-$_BL['en']['stat_advanced_show_strikes'] = 'Strike statistics';
-$_BL['en']['stat_advanced_show_signals'] = 'Signal statistics';
-$_BL['en']['h4_stat_signals'] = 'Signals';
-$_BL['en']['bo_graph_descr_radi_adv'] = 'The same as strike ratios in the station statistics, but here you can select the channel.';
-$_BL['en']['bo_graph_descr_bear_adv'] = 'The same as strike ratios in the station statistics, but here you can select the channel.';
-$_BL['en']['stat_advanced_show_strike_ratios'] = 'Ratios';
-$_BL['en']['Frequency'] = 'Frequency';
-$_BL['en']['graph_stat_title_spectrum'] = 'Spectrum';
-$_BL['en']['graph_stat_yaxis_title'] = 'Amplitude';
-$_BL['en']['h4_graph_spectrum'] = 'Frequency spectrum';
-$_BL['en']['bo_graph_spectrum'] = 'In each single spectrum of a singnal is a frequency with a maximum peak. The sum of the amplitudes of these peaks for each frequency are displayed here.';
-$_BL['en']['Amplitude'] = 'Amplitude';
-$_BL['en']['graph_stat_title_amplitude'] = 'Amplitudes';
-$_BL['en']['h4_graph_amplitudes'] = 'Amplitudes';
-$_BL['en']['bo_graph_amplitudes'] = 'Amplitudes of Signals. You can change between the amplitude of the first sample or the maximum amplitude.';
-$_BL['en']['graph_stat_spectrum_yaxis_title'] = 'Average of amplitudes';
-$_BL['en']['With strikes connected'] = 'With strikes connected';
-$_BL['en']['dontcare'] = 'Don\'t care';
-$_BL['en']['participated_assigned'] = 'Assigned';
-$_BL['en']['_participated'] = 'Participated';
-$_BL['en']['not_participated'] = 'Not participated';
-$_BL['en']['legend_stat_spectrum'] = 'Options';
-$_BL['en']['legend_stat_amplitudes'] = 'Options';
-$_BL['en']['amp_first'] = 'First sample';
-$_BL['en']['with_strikes'] = 'with strikes';
-$_BL['en']['with_participation'] = 'with participation';
-$_BL['en']['without_strikes'] = 'without strikes';
-$_BL['en']['Mean value channel'] = 'Mean value channel';
-$_BL['en']['graph_legend_signals_time_percent'] = 'Percentage of signals';
-$_BL['en']['graph_stat_title_amplitudes_time'] = 'Development of signal amplitudes';
-$_BL['en']['graph_stat_title_frequencies_time'] = 'Development of peak frequencies';
-$_BL['en']['graph_legend_frequencies_time_average'] = 'Mean of peak frequencies';
-$_BL['en']['graph_stat_title_frequencies_time_average'] = 'Mean of peak frequencies';
-$_BL['en']['graph_legend_amplitudes_time_average'] = 'Mean of amplitudes';
-$_BL['en']['graph_stat_title_amplitudes_time_average'] = 'Mean of amplitudes';
-$_BL['en']['h4_graph_amplitudes_time'] = 'Development of amplitudes';
-$_BL['en']['bo_graph_amplitudes_time'] = 'The development of the amplitudes of the signals. You can choose between the maximum amplitude of the signal or the amplitude of the first sample.';
-$_BL['en']['legend_stat_amplitudes_time'] = 'Options';
-$_BL['en']['h4_graph_frequencies_time'] = 'Options';
-$_BL['en']['bo_graph_frequencies_time'] = 'The development of the frequency peaks by time.';
-$_BL['en']['legend_stat_frequencies_time'] = 'Options';
-$_BL['en']['Mean amplitude'] = 'Mean amplitude';
-$_BL['en']['amp_first_signal'] = 'Signal: First sample';
-$_BL['en']['amp_max_signal'] = 'Signal: Max. apmlitude';
-$_BL['en']['amp_spec'] = 'From spectrum';
-$_BL['en']['Signal count'] = 'Signal count';
-$_BL['en']['signal not found'] = 'signal not found';
-$_BL['en']['number_every_minutes'] = 'every {NUMBER} minutes';
-$_BL['en']['number_1every_minute'] = 'every minute';
-$_BL['en']['number_minutes'] = '{NUMBER} minutes';
-$_BL['en']['number_1minute'] = 'one minute';
-$_BL['en']['h4_new_stations'] = 'New stations';
-$_BL['en']['arch_navi_strikes'] = 'Strikes';
-$_BL['en']['h3_arch_last_strikes'] = 'Last strikes';
-$_BL['en']['Participated stations'] = 'Participated stations';
-$_BL['en']['Statistics'] = 'Statistics';
-$_BL['en']['Off'] = 'Off';
-$_BL['en']['tile_time_range_na_err'] = 'Selecting time ranges\nis not allowed for you!';
-$_BL['en']['tile_wrong_time_range_err'] = 'Second date/time\nhas to be greater\nthan the first one!';
-$_BL['en']['tile_maximum_time_range_err'] = 'Time range too big!\nMaximum is {HOURS} hours.';
-$_BL['en']['Activated'] = 'Activated';
-$_BL['en']['check_only_participated'] = 'Only participated';
-$_BL['en']['Traffic'] = 'Traffic';
-$_BL['en']['Other'] = 'Other';
-$_BL['en']['Total'] = 'Total';
-$_BL['en']['Lightning data imports'] = 'Lightning data imports';
-$_BL['en']['Traffic to Blitzortung.org'] = 'Traffic to Blitzortung.org';
-$_BL['en']['oclock'] = 'o\'clock';
-$_BL['en']['On'] = 'On';
-$_BL['en']['Available stations'] = 'Available stations';
-$_BL['en']['strikes'] = 'strikes';
-$_BL['en']['Usage'] = 'Usage';
-$_BL['en']['Last signal'] = 'Last signal';
-$_BL['en']['Never before'] = 'Never before';
-$_BL['en']['no_strike_yet'] = 'None';
 
 
-
-
-$_BL['en']['Roßtal'] = '';
-$_BL['en']['Germany 2'] = '';
-$_BL['en']['Sat (HRV)'] = '';
-$_BL['en']['Sat (IR)'] = '';
-$_BL['en']['Scandi'] = '';
-$_BL['en']['Sat (MPE)'] = '';
-$_BL['en']['Sat TEST'] = '';
-$_BL['en']['Webcam Sicht'] = '';
-$_BL['en']['Wetter.info Radar (21:30)'] = '';
-$_BL['en']['Wetter.info Radar (animiert)'] = '';
-$_BL['en']['EUCLID'] = '';
-$_BL['en']['BLIDS Germany'] = '';
-$_BL['en']['Meteox rain radar (Scandinavia)'] = '';
-$_BL['en'][''] = '';
-$_BL['en']['Europe (mini)'] = '';
-$_BL['en']['Germany (mini)'] = '';
-$_BL['en']['Wetter.info Radar (21:45)'] = '';

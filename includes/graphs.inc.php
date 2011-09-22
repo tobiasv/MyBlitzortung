@@ -1386,10 +1386,12 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				if ($index < 0)
 					continue;
 
+				$Y[$data_id]['cnt'][$index] = $row['cnt']; //count
 				$Y[$data_id]['sig'][$index]  = $row['sig'];  //average signals
+				$Y[$data_id]['ssig'][$index] = $row['sig'] * $row['cnt'];  //sum of signals
 				$Y[$data_id]['astr'][$index] = $row['astr']; //average strikes
 				$Y[$data_id]['mstr'][$index] = $row['mstr']; //maximum strikes
-				$Y[$data_id]['cnt'][$index] = $row['cnt']; //count
+				
 
 				if ($data_id > 0)
 				{
@@ -1424,6 +1426,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				if ($no_data_count > 1)
 				{
 					$Y[$data_id]['sig'][$i] = 0;
+					$Y[$data_id]['ssig'][$i] = 0;
 					$Y[$data_id]['astr'][$i] = 0;
 					$Y[$data_id]['mstr'][$i] = 0;
 					$Y[$data_id]['cnt'][$i] = 0;
@@ -1434,6 +1437,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				{
 					//JpGraph wants equal number of x and y data points
 					if (!isset($Y[$data_id]['sig'][$i])) $Y[$data_id]['sig'][$i] = $Y[$data_id]['sig'][$i-1];
+					if (!isset($Y[$data_id]['ssig'][$i])) $Y[$data_id]['ssig'][$i] = $Y[$data_id]['ssig'][$i-1];
 					if (!isset($Y[$data_id]['astr'][$i])) $Y[$data_id]['astr'][$i] = $Y[$data_id]['astr'][$i-1];
 					if (!isset($Y[$data_id]['mstr'][$i])) $Y[$data_id]['mstr'][$i] = $Y[$data_id]['mstr'][$i-1];
 					if (!isset($Y[$data_id]['cnt'][$i])) $Y[$data_id]['cnt'][$i] = $Y[$data_id]['cnt'][$i-1];
@@ -1722,7 +1726,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			break;
 
 		case 'signals':
-
 			$graph->title->Set(_BL('graph_stat_title_signals').$add_title);
 
 			$plot=new LinePlot($Y[2]['sig'], $X);
@@ -1739,6 +1742,22 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$plot->SetFillColor(BO_GRAPH_STAT_SIG_COLOR_F2);
 			$plot->SetWeight(BO_GRAPH_STAT_SIG_WIDTH_2);
 			$plot->SetLegend(_BL('graph_legend_signals_own'));
+			$graph->Add($plot);
+
+			$graph->xaxis->title->Set(_BL('Time'));
+			$graph->yaxis->title->Set(_BL('Count per hour'));
+			break;
+			
+		case 'signals_all':
+
+			$graph->title->Set(_BL('graph_stat_title_all_signals').$add_title);
+
+			$plot=new LinePlot($Y[0]['ssig'], $X);
+			$plot->SetColor(BO_GRAPH_STAT_SIG_COLOR_L2);
+			if (BO_GRAPH_STAT_SIG_COLOR_F2)
+				$plot->SetFillColor(BO_GRAPH_STAT_SIG_COLOR_F2);
+			$plot->SetWeight(BO_GRAPH_STAT_SIG_WIDTH_2);
+			$plot->SetLegend(_BL('graph_legend_all_signals'));
 			$graph->Add($plot);
 
 			$graph->xaxis->title->Set(_BL('Time'));
