@@ -520,7 +520,7 @@ function bo_tile()
 				break;
 
 			case 2:
-				if ($p[3] == null) //plot circle (no polarity known)
+				if (!$p[3]) //plot circle (no polarity known)
 				{
 					imagesetthickness($I, 1);
 					imagefilledellipse($I, $p[0], $p[1], $s, $s, $color[$p[2]]);
@@ -540,7 +540,7 @@ function bo_tile()
 				imagesetthickness($I, 1);
 				imagefilledellipse($I, $p[0], $p[1], $s, $s, $color[$p[2]]);
 
-				if ($p[3] != null && BO_EXPERIMENTAL_POLARITY_CHECK == true)
+				if ($p[3] && BO_EXPERIMENTAL_POLARITY_CHECK == true)
 				{
 					$t = intval($s / 2);
 					imageline($I, $p[0]-$t+1, $p[1], $p[0]+$t-1, $p[1], $white);
