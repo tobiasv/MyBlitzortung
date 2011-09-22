@@ -311,30 +311,27 @@ function bo_show_archive_map()
 				$bo_file_url = BO_FILE.'?map='.$map.'&transparent&bo_lang='._BL().'&date=';
 			}
 
-			$first_image = ""; //$bo_file_url.sprintf('%04d%02d%02d%02d00-%d', $year, $month, $day, $hour_from, $ani_pic_range).'&bo_lang='._BL();
+			
 			
 			if ($hour_from >= $hour_to)
 				$hour_to += 24; //next day
 			
-			$images = '';
+			
+			
+			$images = array();
 			for ($i=$hour_from*60-$ani_pic_range; $i<= $hour_to * 60; $i+= $ani_div)
 			{
 				$minutes = $i;
 				$time = strtotime("$year-$month-$day 00:00:00 +$minutes minutes");
-
-				if (!$first_image)
-					$first_image = $bo_file_url.gmdate('YmdHi', $time).'-'.$ani_pic_range;
-				
+				$images[] .= gmdate('YmdHi', $time).'-'.$ani_pic_range;
+			
 				if ($time + 60 * $ani_pic_range > $end_time)
 					break;
-				
-				$images .= ($images ? ',' : '').'"'.gmdate('YmdHi', $time).'-'.$ani_pic_range.'"';
 			}
 
 			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time).' ('._BL('Animation').')';
 			
-			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
-			echo '<img style="position:absolute;top:1px;left:1px;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.$first_image.'" alt="'.htmlspecialchars($alt).'">';
+			bo_insert_animation_js($images, $bo_file_url, $img_file, $ani_delay, $ani_delay_end, $img_dim, $alt);
 		}
 		else
 		{
@@ -350,61 +347,19 @@ function bo_show_archive_map()
 		echo '</div>';
 		
 	}
+
 	
+
 ?>
-	
 <script type="text/javascript">
-
-var bo_maps_pics   = new Array(<?php echo $images ?>);
-var bo_maps_img    = new Array();
-var bo_maps_loaded = 0;
-
-function bo_maps_animation(nr)
-{
-	var timeout = <?php echo intval($ani_delay); ?>;
-	document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[nr].src;
-	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += <?php echo intval($ani_delay_end); ?>; }
-	window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
-	
-}
-
-function bo_maps_load()
-{
-	for (var i=0; i<bo_maps_pics.length; i++)
-	{
-		bo_maps_img[i] = new Image();
-		bo_maps_img[i].onload=bo_maps_animation_start;
-		bo_maps_img[i].onerror=bo_maps_animation_start;
-		bo_maps_img[i].src = "<?php echo $bo_file_url ?>" + bo_maps_pics[i];
-	}
-}
-
-function bo_maps_animation_start()
-{
-	bo_maps_loaded++;
-	
-	if (bo_maps_loaded+1 >= bo_maps_pics.length && bo_maps_loaded > 0)
-	{
-		bo_maps_animation(0);
-		bo_maps_loaded = -1;
-	}
-	else
-	{
-		document.getElementById('bo_arch_map_img_ani').src = bo_maps_img[bo_maps_loaded-1].src;
-	}
-}
-
 function bo_enable_timerange(enable, s)
 {
 	document.getElementById('bo_arch_strikes_select_hour_from').disabled=!enable;
 	document.getElementById('bo_arch_strikes_select_hour_to').disabled=!enable;
 	if (s) document.getElementById('bo_arch_strikes_maps_form').submit();
 }
-
-window.setTimeout("bo_maps_load();", 500);
 bo_enable_timerange(<?php echo $ani ? 'true' : 'false'; ?>);
 </script>
-
 <?php
 	
 	
@@ -943,7 +898,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$zoom = intval($_GET['bo_zoom']);
 	$only_strikes = $_GET['bo_only_strikes'] == 1;
 	$only_participated = $_GET['bo_only_participated'] == 1;
-	$strike_id = intval($_GET['bo_strike_id']);	
+	$strike_id = intval($_GET['bo_strike_id']);
+	$strikes_before = intval($_GET['bo_strikes_before']);
 	$date = $_GET['bo_datetime_to'];
 	
 	$channels = bo_get_conf('raw_channels');
@@ -961,6 +917,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	{
 		$show_empty_sig = false;
 		$strike_id = 0;
+		$strike_id_to = 0;
 	}
 	else if ($date)
 	{
@@ -989,6 +946,24 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$show_empty_sig = true;
 
 		$hours_back = 24 * 50;
+	}
+	else if ($strike_id && $strikes_before)
+	{
+		//Special effects ;-)
+		$map = intval($_GET['bo_map']);
+		
+		$images = array();
+		for($i=$strike_id-$strikes_before;$i<=$strike_id;$i++)
+			$images[] = $i;
+		
+		$img_file = BO_FILE.'?map='.$map.'&blank&bo_lang='._BL().'';
+		$bo_file_url = BO_FILE.'?map='.$map.'&transparent&bo_lang='._BL().'&strike_id=';
+
+		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
+		bo_insert_animation_js($images, $bo_file_url, $img_file);
+		echo '</div>';
+		
+		return;
 	}
 	else if ($strike_id)
 	{
@@ -1401,6 +1376,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo bo_insert_html_hidden(array('bo_map'));
 		echo '<fieldset>';
 		echo bo_archive_select_map($map);
+		
+		echo ' &bull; <a href="'.bo_insert_url().'&bo_strikes_before=100">'._BL('Animation').'</a>';
+		
 		echo '</fieldset>';
 		$img_file = BO_FILE.'?map='.$map.'&strike_id='.$strike_id.'&bo_lang='._BL();
 		echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
@@ -1467,6 +1445,67 @@ function bo_archive_get_dim($map, $addx=0)
 		$img_dim = '';
 		
 	return $img_dim;
+}
+
+
+
+
+function bo_insert_animation_js($images, $bo_file_url, $img_file, $ani_delay=BO_ANIMATIONS_WAITTIME, $ani_delay_end=BO_ANIMATIONS_WAITTIME_END, $img_dim='', $alt="")
+{
+	echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
+	echo '<img style="position:absolute;top:1px;left:1px;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.$bo_file_url.$images[0].'" alt="'.htmlspecialchars($alt).'">';
+
+	$js_img = '';
+	foreach($images as $image)
+		$js_img .= ($js_img ? ',' : '').'"'.$image.'"';
+	
+?>
+	
+<script type="text/javascript">
+
+var bo_maps_pics   = new Array(<?php echo $js_img ?>);
+var bo_maps_img    = new Array();
+var bo_maps_loaded = 0;
+
+function bo_maps_animation(nr)
+{
+	var timeout = <?php echo intval($ani_delay); ?>;
+	document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[nr].src;
+	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += <?php echo intval($ani_delay_end); ?>; }
+	window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
+	
+}
+
+function bo_maps_load()
+{
+	for (var i=0; i<bo_maps_pics.length; i++)
+	{
+		bo_maps_img[i] = new Image();
+		bo_maps_img[i].onload=bo_maps_animation_start;
+		bo_maps_img[i].onerror=bo_maps_animation_start;
+		bo_maps_img[i].src = "<?php echo $bo_file_url ?>" + bo_maps_pics[i];
+	}
+}
+
+function bo_maps_animation_start()
+{
+	bo_maps_loaded++;
+	
+	if (bo_maps_loaded+1 >= bo_maps_pics.length && bo_maps_loaded > 0)
+	{
+		bo_maps_animation(0);
+		bo_maps_loaded = -1;
+	}
+	else
+	{
+		document.getElementById('bo_arch_map_img_ani').src = bo_maps_img[bo_maps_loaded-1].src;
+	}
+}
+
+window.setTimeout("bo_maps_load();", 500);
+</script>
+<?php
+
 }
 
 

@@ -1441,7 +1441,14 @@ function bo_hex2color(&$I, $str, $use_alpha = true)
 	if (count($rgb) == 4 && imageistruecolor($I) && $use_alpha)
 		return imagecolorallocatealpha($I, $rgb[0], $rgb[1], $rgb[2], $rgb[3]);
 	else
-		return imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
+	{
+		$col = imagecolorexact($I, $rgb[0], $rgb[1], $rgb[2]);
+		
+		if ($col === -1)
+			return imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
+		else
+			return $col;
+	}
 }
 
 function bo_hex2rgb($str) 

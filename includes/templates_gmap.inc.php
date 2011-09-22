@@ -221,4 +221,16 @@ $_BO['tpl_overlay']['estofex']['to_mercator'] = false;
 $_BO['tpl_overlay']['estofex']['opacity'] = 50;
 
 
+//Meteox Strike&Cloud Overlay
+//WARNING: Copyright! Only internal private usage!
+//Map not mercator and not plate :-(
+$_BO['tpl_overlay']['meteox_clouds_strikes']['img'] = 'http://world.meteox.com/onweer/loop_onweer.gif';
+$_BO['tpl_overlay']['meteox_clouds_strikes']['coord'] = array(68, 43, 25, -22); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['meteox_clouds_strikes']['default_show'] = false;
+$_BO['tpl_overlay']['meteox_clouds_strikes']['sel_name'] = 'Meteox strikes/clouds';
+$_BO['tpl_overlay']['meteox_clouds_strikes']['only_loggedin'] = true;
+$_BO['tpl_overlay']['meteox_clouds_strikes']['to_mercator'] = false;
+$_BO['tpl_overlay']['meteox_clouds_strikes']['opacity'] = 50;
+
+
 ?>

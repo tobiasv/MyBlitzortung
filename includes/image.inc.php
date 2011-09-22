@@ -553,7 +553,12 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	//default color
 	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
 
-	if (!$transparent)
+	
+	if ($transparent && $strike_id)
+	{
+		bo_add_stations2image($I, $cfg, $w, $h, $strike_id);
+	}
+	elseif (!$transparent)
 	{
 		//Borders
 		if ($cfg['borders'][0] && file_exists(BO_DIR.'images/'.$cfg['borders'][0]))
@@ -1936,6 +1941,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 
 function bo_drawpoint($I, $x, $y, &$style, $color = null, $use_alpha = true, $strikedata = null)
 {
+
 	if ($color == null && $style[2]) //fillcolor
 		$color = bo_hex2color($I, $style[2], $use_alpha);
 
