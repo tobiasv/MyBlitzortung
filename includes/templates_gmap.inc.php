@@ -123,17 +123,6 @@ $_BO['tpl_overlay']['meteox_radar_scandinavia']['sel_name'] = 'Meteox rain radar
 $_BO['tpl_overlay']['meteox_radar_scandinavia']['only_loggedin'] = true;
 $_BO['tpl_overlay']['meteox_radar_scandinavia']['to_mercator'] = true;
 
-//EUCLID (you can check strike polarity with this map)
-//WARNING: Copyright! Only internal private usage!
-//It's calibrated only for germany!
-$_BO['tpl_overlay']['euclid']['img'] = 'http://www.meteorage.fr/euclid/euclid_last_lightnings.gif';
-$_BO['tpl_overlay']['euclid']['coord'] = array(68, 43, 33.7, -22); //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['euclid']['default_show'] = false;
-$_BO['tpl_overlay']['euclid']['sel_name'] = 'EUCLID';
-$_BO['tpl_overlay']['euclid']['only_loggedin'] = true;
-$_BO['tpl_overlay']['euclid']['to_mercator'] = false;
-$_BO['tpl_overlay']['euclid']['opacity'] = 50;
-
 //BLIDS GERMANY Lightning Overlay
 //WARNING: Copyright! Only internal private usage!
 $_BO['tpl_overlay']['blids_de']['img'] = 'http://www.blids.de/spion/bilder/aktkartegergrau.jpg';
@@ -209,6 +198,40 @@ $_BO['tpl_overlay']['wetterinfo_radar_small']['to_mercator'] = false;
 $_BO['tpl_overlay']['wetterinfo_radar_small']['opacity'] = 60;
 
 
+//World Wide Lightning Location Network (wwlln.net) 
+//Copyright?
+
+//KML
+$_BO['tpl_overlay']['wwlln']['kml'] = 'http://flash3.ess.washington.edu/lightning_src.kmz';
+$_BO['tpl_overlay']['wwlln']['default_show'] = false;
+$_BO['tpl_overlay']['wwlln']['sel_name'] = 'WWLLN';
+$_BO['tpl_overlay']['wwlln']['only_loggedin'] = false;
+
+//Image with clouds
+$_BO['tpl_overlay']['wwlln_clouds']['img'] = 'http://webflash.ess.washington.edu/EurAfricaL_plot_weather_map.jpg';
+$_BO['tpl_overlay']['wwlln_clouds']['coord'] = array(77.5, 71, -45, -36.7);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['wwlln_clouds']['default_show'] = false;
+$_BO['tpl_overlay']['wwlln_clouds']['sel_name'] = 'WWLLN with clouds';
+$_BO['tpl_overlay']['wwlln_clouds']['only_loggedin'] = false;
+$_BO['tpl_overlay']['wwlln_clouds']['to_mercator'] = false;
+$_BO['tpl_overlay']['wwlln_clouds']['opacity'] = 50;
+
+
+/*** Overlays that don't fit ***/
+
+
+//EUCLID (you can check strike polarity with this map)
+//WARNING: Copyright! Only internal private usage!
+//It's calibrated only for germany!
+$_BO['tpl_overlay']['euclid']['img'] = 'http://www.meteorage.fr/euclid/euclid_last_lightnings.gif';
+$_BO['tpl_overlay']['euclid']['coord'] = array(68, 43, 33.7, -22); //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['euclid']['default_show'] = false;
+$_BO['tpl_overlay']['euclid']['sel_name'] = 'EUCLID';
+$_BO['tpl_overlay']['euclid']['only_loggedin'] = true;
+$_BO['tpl_overlay']['euclid']['to_mercator'] = false;
+$_BO['tpl_overlay']['euclid']['opacity'] = 50;
+
+
 //ESTOFEX
 //Creative Commons
 //Map not mercator and not plate :-(
@@ -231,6 +254,8 @@ $_BO['tpl_overlay']['meteox_clouds_strikes']['sel_name'] = 'Meteox strikes/cloud
 $_BO['tpl_overlay']['meteox_clouds_strikes']['only_loggedin'] = true;
 $_BO['tpl_overlay']['meteox_clouds_strikes']['to_mercator'] = false;
 $_BO['tpl_overlay']['meteox_clouds_strikes']['opacity'] = 50;
+
+
 
 
 ?>

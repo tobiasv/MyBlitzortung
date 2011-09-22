@@ -575,7 +575,9 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 	echo '<div id="bo_gmap" class="bo_map" style="width:500px; height:400px;"></div>';
 
 	?>
+	
 	<script type="text/javascript">
+	
 	var bo_OverlayMaps = new Array();
 	var bo_OverlayCount;
 	var bo_OverlayTracks;
