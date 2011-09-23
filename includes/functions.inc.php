@@ -659,6 +659,8 @@ function bo_gpc_prepare($text)
 //recursive delete function
 function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 {
+	flush();
+	
 	$dir .= '/';
 	
 	if ($delete_dir_depth === false)

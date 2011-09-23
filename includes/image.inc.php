@@ -69,7 +69,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	$archive_maps_enabled = (BO_DISABLE_ARCHIVE !== true && defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS)
 								|| (bo_user_get_level() & BO_PERM_ARCHIVE);
 
-	if (intval(BO_CACHE_PURGE_MAPS_RAND) > 0 && rand(0, BO_CACHE_PURGE_MAPS_RAND) == 1 && $id !== false)
+	if (intval(BO_CACHE_PURGE_MAPS_RAND) > 0 && rand(0, BO_CACHE_PURGE_MAPS_RAND) == 1 && $id === false)
 	{	
 		register_shutdown_function('bo_delete_files', BO_DIR.'cache/maps/', intval(BO_CACHE_PURGE_MAPS_HOURS), 3);
 	}
@@ -855,7 +855,6 @@ function bo_get_map_image_ani()
 
 	
 	$gif = new GIFEncoder($frames, $framed, $loops, $disposal, 0, 0, 0, "url"); 
-	
 
 	header('Content-type: image/gif'); 
 	if ($caching)
