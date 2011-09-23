@@ -336,7 +336,7 @@ function bo_copyright_footer()
 		echo _BL('Languages').': ';
 		foreach($languages as $lang)
 		{
-			if (BO_SHOW_LANG_FLAGS == true)
+			if (BO_SHOW_LANG_FLAGS == true && file_exists(BO_DIR.'images/flags/'.$lang.'.png'))
 				$a_lang = '<img src="'.BO_FILE.'?image=flag_'.$lang.'" class="bo_flag">';
 			else
 				$a_lang = $lang;
