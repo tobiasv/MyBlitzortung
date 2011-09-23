@@ -1,13 +1,83 @@
 <?php
 
-$in  = 'de';
+
+//Input language
+$in  = 'en';
+
+//Ouput language
 $out = 'fr';
+
+
+/*
+	HELPER FILE FOR TRANSLATING MyBlitzortung
+	-----------------------------------------
+	
+	Howto:
+	
+	1. Above, change the $in and $out values according to your translation.
+	2. Create a new file for your language code like 'xx.php' in the locales directory.
+	   --> Read the warning below if the file already exists.
+	3. Call helper.php in your browser, i.e. http://www.example.com/blitzortung/locales/helper.php
+	   --> You will get a sorted output of translations
+	4. Copy the output to your desired editor and change/add the translations.
+	5. Save the whole edited text in the file created in step 1 --> "xx.php"
+	   --> Check the translations in MyBlitzortung
+	   --> Be careful: No spaces/newlines before "<?php" and after "?>"
+	       at beginning or end of file!
+	6. Again, call the helper.php URL, as described in step 3.
+	   --> Your new translations will be ordered as in the input file.
+	7. You can now repeat steps 4-6 and add more and more translations. 
+	
+	
+	WARNING!
+	--------
+	BE CAREFUL IF YOU UPDATE MYBLITZORTUNG! YOUR OWN LANGUAGE FILE COULD BE OVERWITTEN!
+	
+	The above description is for creating new translations. If you want to change or add existing 
+	translations, you should use the "own.php" file. You can put all your changes/additions in there. 
+	Leave the $out value (don't insert "own"). The output of helper.php will be the same,
+	as if you would edit the original language file. Everything in "own.php" will overwrite the
+	original files.
+	
+	
+
+	NOTES
+	-----
+	
+	Be careful: Currently you can not use UTF-8 in language files!
+
+	
+	Even if you didn't have finished translating, you can send the new translation file
+	to the maintainer at <mail@myblitzortung.de> 
+
+	
+	You may change one or more of the following settings in config.php:
+	
+	define('BO_LOCALE', 'en'); // <-- enter your new language-code here
+	define('BO_LOCALE2', '');  // <-- second lang. if no translation of 1st locale is present (default: en)
+	define('BO_LANGUAGES', 'de,en,fr'); 
+	define('BO_SHOW_LANGUAGES', true); 
+	define('BO_SHOW_LANG_FLAGS', true);
+	define('BO_FORCE_MAP_LANG', true); // <-- set to false if languages in images can be changed too
+	
+	//For changing texts in images/graphs (change back to false after you've finished!)
+	define('BO_CACHE_DISABLE', true); 
+	
+
+	
+*/
+
+
+
+
+
 
 error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 1);
 
 include($in.'.php');
 include($out.'.php');
+
 if (file_exists('own.php'))
 	include('own.php');
 
