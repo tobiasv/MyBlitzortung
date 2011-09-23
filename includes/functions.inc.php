@@ -1110,7 +1110,7 @@ if (!function_exists('hypot'))
 }
 
 // transform from time domine to frequency domine using FFT
-function bo_time2freq($d)
+function bo_time2freq($d, &$phase=array())
 {
 	$n = count($d);
 
@@ -1127,13 +1127,19 @@ function bo_time2freq($d)
 
 	bo_fft(1, $d, $im);
 	
+	$amp = array();
 	for ($i=0; $i<=$n/2; $i++) 
 	{
-	  // Calculate the modulus (as length of the hypotenuse)
-	  $h[$i] = hypot($d[$i], $im[$i]);
+		// Calculate the modulus (as length of the hypotenuse)
+		$amp[$i] = hypot($d[$i], $im[$i]);
+		
+		if (!$d[$i])
+			$phase[$i] = ($im[$i] < 0 ? -1 : 1) * M_PI / 2;
+		else
+			$phase[$i] = atan($im[$i] / $d[$i]);
 	} 
 	
-	return $h; 
+	return $amp; 
 }
 
 //Raw hexadecimal signal to array

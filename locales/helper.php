@@ -3,6 +3,9 @@
 $in  = 'de';
 $out = 'fr';
 
+error_reporting(E_ALL & ~E_NOTICE);
+ini_set('display_errors', 1);
+
 include($in.'.php');
 include($out.'.php');
 if (file_exists('own.php'))
