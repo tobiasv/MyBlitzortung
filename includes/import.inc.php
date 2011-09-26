@@ -167,7 +167,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 				$time_ns = intval($r[3]);
 				$lat = $r[4];
 				$lon = $r[5];
-				$height = $r[6];
+				$height = (double)$r[6];
 				$channels = $r[7];
 				$values = $r[8];
 				$bpv = $r[9];
@@ -1196,7 +1196,8 @@ function bo_update_stations($force = false, $max_time = 0)
 		$row = bo_db($sql)->fetch_assoc();
 		$strike_count = $row['cnt'];
 		bo_db("INSERT INTO ".BO_DB_PREF."stations_stat
-				SET station_id='0', time='$datetime', signalsh='$signal_count', strikesh='$strike_count'");
+				SET station_id='0', time='$datetime', 
+					signalsh='".intval($signal_count)."', strikesh='".intval($strike_count)."'");
 
 
 		/*** Update Longtime statistics ***/
