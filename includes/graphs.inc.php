@@ -243,6 +243,9 @@ function bo_graph_raw($id, $spec = false)
 		$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 	}
 
+	
+	BoDb::close();
+	
 	$time = strtotime($row['time'].' UTC');
 	
 	header("Content-Type: image/png");
@@ -251,10 +254,8 @@ function bo_graph_raw($id, $spec = false)
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $time)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $time + 3600 * 24)." GMT");
 
-
 	$I = $graph->Stroke(_IMG_HANDLER);
 	imagepng($I);
-
 	
 	exit;
 }
@@ -650,6 +651,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$ticks = max($ticks, $row['val']);
 			}
 		}
+		
+		if ($type == 'ratio_bearing')
+			$ticks = 360 / $bear_div;
 
 		for($i=0;$i<$ticks;$i++)
 		{
@@ -2408,6 +2412,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		}
 	}
 	
+	BoDb::close();
+	
 	header("Content-Type: image/png");
 	header("Pragma: ");
 	header("Cache-Control: public, max-age=".($time_end + BO_UP_INTVL_STATIONS * 60 - time()));
@@ -2513,6 +2519,7 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 	{
 		$alpha = 360 / $div * $i + 180;
 
+		
 		krsort($d); //Rückwärts durchgehen!
 		$startval = array_sum($d);
 		$nr = count($d)-1;

@@ -853,6 +853,7 @@ function bo_get_map_image_ani()
 	$loops = 0;
 	$disposal = 2;
 
+	BoDb::close();
 	
 	$gif = new GIFEncoder($frames, $framed, $loops, $disposal, 0, 0, 0, "url"); 
 
@@ -1435,7 +1436,7 @@ function bo_get_density_image()
 	
 	
 
-
+	BoDb::close();
 	bo_image_reduce_colors($I, true);
 
 	header("Content-Type: $mime");
@@ -1644,6 +1645,8 @@ function bo_get_image($img)
 	$exp_time = time() + 3600 * 24 * 7;
 	$age      = $exp_time - time();
 
+	BoDb::close();
+	
 	header("Content-Type: image/".$ext);
 	header("Pragma: ");
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");

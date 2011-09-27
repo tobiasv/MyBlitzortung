@@ -1,0 +1,37 @@
+A to-do and suggestion list for MyBlitzortung...
+
+
+Bugs / Improvements
+-------------------
+- new switch: use SMTP instead of mail()
+- cache for graphs
+- create maps/tiles/graphs at defined time intervals --> no creation on demand --> faster
+- cell/track detection
+- improve duplicate strike handling (statistics...)
+
+
+
+
+Features
+--------
+- GUI for config
+- auto zoom-out if not enough strikes in map
+- tool for converting borders -> regions (GoogleEarth-Polygon -> boxes)
+- Statistics/graphs: strike current/polarity
+- yearly statistics grouped by month
+- better/faster time handling: "SET time_zone = '+00:00';" and use UNIX_TIMESTAMP (faster than strtotime?)
+- limit at many datasets
+- current lighning density / heatmap
+- lightning alerts based on position of Smartphone
+   * Google Latitude: http://code.google.com/apis/latitude/
+      for iPhone    : http://itunes.apple.com/de/app/google-latitude/id306586497?mt=8
+   * Find my iPhone : https://github.com/tylerhall/sosumi/
+
+- Alerts by push notifications
+   * http://boxcar.io/
+   * http://www.prowlapp.com/
+   * http://notifo.com/ (outdated)
+   --> Android versions???
+   
+- two or more ranges for alerts
+
