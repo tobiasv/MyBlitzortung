@@ -230,6 +230,7 @@ if (!defined("BO_VER"))
 		bo_get_map_image_ani();
 		exit;
 	}
+
 	
 	//Order maps
 	if (defined('BO_MAPS_ORDER') && strlen(BO_MAPS_ORDER))
@@ -250,6 +251,12 @@ if (!defined("BO_VER"))
 		}
 		
 		$_BO['mapimg'] = $tmp;
+	}
+
+	if (isset($_GET['kml']))
+	{
+		bo_output_kml();
+		exit;
 	}
 	
 	

@@ -1505,4 +1505,87 @@ function bo_owner_mail($subject, $text)
 	return $ret;
 }
 
+function bo_output_kml()
+{
+	global $_BO;
+	
+	$type = intval($_GET['kml']);
+	
+	$host = $_SERVER["SERVER_NAME"] ? $_SERVER["SERVER_NAME"] : $_SERVER["HTTP_HOST"];
+	$p = parse_url($_SERVER["REQUEST_URI"]);
+	$url = 'http://'.$host.$p['path'];
+
+	header("Content-type: application/vnd.google-earth.kml+xml"); 
+	header("Content-Disposition: attachment; filename=\"MyBlitzortung.kml\"");
+	
+	echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+	echo '<kml xmlns="http://www.opengis.net/kml/2.2">'."\n";
+	
+	switch($type)
+	{
+	
+		case 1:
+		
+			echo "<Folder>\n";
+			echo "<name>"._BL($d['name'])."</name>\n";
+			echo "<description></description>\n";
+			echo "<visibility>0</visibility>\n";
+			echo "<refreshVisibility>0</refreshVisibility>\n";
+			
+			foreach($_BO['mapimg'] as $id => $d)
+			{
+				if (!$d['kml'])
+					continue;
+				
+				$imgurl = $url."?map=".$id."&amp;bo_lang="._BL();
+				
+				if (!$d['file'])
+					$imgurl .= "&amp;transparent";
+				
+				echo "<GroundOverlay>\n";
+				echo "<name>"._BL($d['name'])."</name>\n";
+				echo "<description></description>\n";
+				echo "<Icon>\n";
+				echo "<href>".$imgurl."</href>\n";
+				echo "</Icon>\n";
+				echo "<LatLonBox>\n";
+				echo "<north>".$d['coord'][0]."</north>\n";
+				echo "<south>".$d['coord'][2]."</south>\n";
+				echo "<east>".$d['coord'][1]."</east>\n";
+				echo "<west>".$d['coord'][3]."</west>\n";
+				echo "<rotation>0</rotation>\n";
+				echo "<visibility>0</visibility>\n";
+				echo "<refreshVisibility>0</refreshVisibility>\n";
+				echo "</LatLonBox>\n";
+				echo "</GroundOverlay>\n";
+				
+
+			}
+			
+			echo "</Folder>\n";
+		
+			break;
+			
+		default:
+		
+			
+			echo "<NetworkLink>\n";
+			echo "<name>"._BL('MyBlitzortung_notags')."</name>\n";
+			echo "<visibility>0</visibility>\n";
+			echo "<open>0</open>\n";
+			echo "<description></description>\n";
+			echo "<refreshVisibility>0</refreshVisibility>\n";
+			echo "<flyToView>0</flyToView>\n";
+			echo "<Link>\n";
+			echo "  <href>".$url."?kml=1&amp;bo_lang="._BL()."</href>\n";
+			echo "</Link>\n";
+			echo "</NetworkLink>\n";
+
+	}
+	
+	echo '</kml>';
+	
+	exit;
+}
+
 ?>

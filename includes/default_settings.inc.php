@@ -33,9 +33,11 @@
 	
 
 /*******************************************************************/
-/*** Main File and path for creating graphs and images           ***/
+/*** Main file for creating graphs and images (URL!).            ***/
 /*   You can use relative or absolute (with leading "/") paths:    */
-/*   Only "blitzortung.php" should be ok in most cases             */
+/*   Only "blitzortung.php" should be ok in most cases.            */
+/*   You can also use http://.../blitzortung.php                   */
+/*                                                                 */
 /*   Example: http://myhomepage.com/strikes/blitzortung.php        */
 /*             ==> BO_FILE = "/strikes/blitzortung.php"            */
 

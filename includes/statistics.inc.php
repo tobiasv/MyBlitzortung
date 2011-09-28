@@ -484,6 +484,9 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$strikesh = $row['strikesh'];
 	$time = strtotime($row['time'].' UTC');
 
+	if (!$own_station)
+		$sinfo = bo_station_info($station_id);
+	
 	// currently available stations
 	$sql = "SELECT COUNT(*) cnt
 			FROM ".BO_DB_PREF."stations
@@ -502,6 +505,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	$D = array();
 	$res = bo_db("SELECT a.id sid, a.city city, a.country country, a.distance distance, a.user user,
+						 a.lat lat, a.lon lon,
 							b.signalsh signalsh, b.strikesh strikesh
 					FROM ".BO_DB_PREF."stations a, ".BO_DB_PREF."stations_stat b
 					WHERE 1
@@ -513,6 +517,9 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		$D[$row['sid']] = $row;
 		$D[$row['sid']]['country'] = _BL(strtr($row['country'], array(chr(160) => ' ')));
 
+		if (!$own_station)
+			$D[$row['sid']]['distance'] = bo_latlon2dist($row['lat'], $row['lon'], $sinfo['lat'], $sinfo['lon']);
+		
 		if ($row['signalsh'])
 		{
 			$D[$row['sid']]['signalsh_ratio'] = $row['strikesh'] / $row['signalsh'];
