@@ -145,6 +145,17 @@
 
 
 
+/*******************************************************************/
+/*** Session handling                                            ***/
+
+//close sessions before output
+//so the browser use more that one concurrent connection at once
+//hint: set it to 0 or 1 if you have problems
+//0: never close (let php do it)
+//1: late
+//2: early
+@define('BO_SESSION_CLOSE', 2); 
+
 
 
 

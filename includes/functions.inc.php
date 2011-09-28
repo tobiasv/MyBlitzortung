@@ -1588,4 +1588,16 @@ function bo_output_kml()
 	exit;
 }
 
+function bo_session_close($force = false)
+{
+	$c = intval(BO_SESSION_CLOSE);
+	
+	if (!$c)
+		return;
+	
+	if ($c == 2 || ($c == 1 && $force))
+		@session_write_close();
+	
+}
+
 ?>

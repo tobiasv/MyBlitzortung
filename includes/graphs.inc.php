@@ -29,6 +29,8 @@ function bo_graph_raw($id, $spec = false)
 	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
 		bo_graph_error(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
 
+	bo_session_close();
+		
 	$id = intval($id);
 
 	$sql = "SELECT id, time, time_ns, lat, lon, height, data
@@ -245,6 +247,7 @@ function bo_graph_raw($id, $spec = false)
 
 	
 	BoDb::close();
+	bo_session_close(true);
 	
 	$time = strtotime($row['time'].' UTC');
 	
@@ -267,7 +270,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
 		bo_graph_error(BO_GRAPH_STAT_W, BO_GRAPH_STAT_H);
 
-	session_write_close();
+	bo_session_close();
 
 	if (!$hours_back)
 	{
@@ -2413,6 +2416,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	}
 	
 	BoDb::close();
+	bo_session_close(true);
 	
 	header("Content-Type: image/png");
 	header("Pragma: ");

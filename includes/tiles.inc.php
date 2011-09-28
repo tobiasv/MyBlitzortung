@@ -28,7 +28,7 @@ function bo_tile()
 
 	global $_BO;
 
-	session_write_close();
+	bo_session_close();
 	
 	if (intval(BO_CACHE_PURGE_TILES_RAND) > 0 && rand(0, BO_CACHE_PURGE_TILES_RAND) == 1)
 	{
@@ -341,6 +341,7 @@ function bo_tile()
 		}
 		
 		BoDb::close();
+		bo_session_close(true);
 		
 		//create tile image
 		$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
@@ -474,8 +475,6 @@ function bo_tile()
 	if (BO_WAIT_SIM_TILE_CREATION)
 		bo_set_conf('is_creating_tile', 0);
 	
-	BoDb::close();
-
 	//no points --> blank tile
 	if (count($points) == 0)
 	{
@@ -565,7 +564,7 @@ function bo_tile()
 function bo_tile_tracks()
 {
 	global $_BO;
-	session_write_close();
+	bo_session_close();
 
 	if (!intval(BO_TRACKS_SCANTIME)) //disabled
 		exit;
@@ -759,7 +758,9 @@ function bo_tile_tracks()
 
 function bo_tile_output($file='', $caching=false, &$I=null)
 {
-
+	BoDb::close();
+	bo_session_close(true);
+	
 	if ($caching && BO_CACHE_SUBDIRS === true)
 	{
 		$dir = dirname($file);

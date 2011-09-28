@@ -112,7 +112,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	else
 	{
-		session_write_close();
+		bo_session_close();
 		
 		if ($transparent)
 			@set_time_limit(5);
@@ -756,6 +756,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	
 	BoDb::close();
+	bo_session_close(true);
 	
 	bo_image_reduce_colors($I, false, $transparent);
 
@@ -854,6 +855,7 @@ function bo_get_map_image_ani()
 	$disposal = 2;
 
 	BoDb::close();
+	bo_session_close(true);
 	
 	$gif = new GIFEncoder($frames, $framed, $loops, $disposal, 0, 0, 0, "url"); 
 
@@ -903,7 +905,7 @@ function bo_get_density_image()
 	
 	
 	@set_time_limit(30);
-	session_write_close();
+	bo_session_close();
 	
 	
 	global $_BO;
@@ -1437,6 +1439,7 @@ function bo_get_density_image()
 	
 
 	BoDb::close();
+	bo_session_close(true);
 	bo_image_reduce_colors($I, true);
 
 	header("Content-Type: $mime");
@@ -1646,6 +1649,7 @@ function bo_get_image($img)
 	$age      = $exp_time - time();
 
 	BoDb::close();
+	bo_session_close(true);
 	
 	header("Content-Type: image/".$ext);
 	header("Pragma: ");
