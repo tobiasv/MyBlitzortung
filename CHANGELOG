@@ -5,7 +5,8 @@
 
 Version 0.7.2c-dev ???
 ----------------------
-- new: kml overlays
+- new: kml overlays on dynamic map
+- new: kml output to display maps in google earth
 - new: some special effects ;-)
 - fix: windroses
 - graph colors adjusted
