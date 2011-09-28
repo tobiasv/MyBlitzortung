@@ -361,6 +361,9 @@
 // (kilometers) limits strike display to radius around station
 @define('BO_RADIUS', 50);             
 
+// (kilometers) radius for statistics
+@define('BO_RADIUS_STAT', 50);             
+
 // when zoom reaches this level, strike display is limited to max. distance around station (BO_RADIUS)
 @define('BO_MAX_ZOOM_LIMIT', 8);      
 

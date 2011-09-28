@@ -394,7 +394,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		if ($radius)
 		{
 			$rad = 2;
-			$add_title .= ' '.strtr(_BL('_in_radius'), array('{RADIUS}' => BO_RADIUS));
+			$add_title .= ' '.strtr(_BL('_in_radius'), array('{RADIUS}' => BO_RADIUS_STAT));
 		}
 
 		if ($month == -1)
@@ -466,7 +466,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$sql = "SELECT COUNT(id) cnt, $sql_part participated
 						FROM ".BO_DB_PREF."strikes s
 						WHERE time BETWEEN '".gmdate('Y-m-d 00:00:00')."' AND '".gmdate('Y-m-d 23:59:59')."'
-						".($radius ? " AND distance < '".(BO_RADIUS * 1000)."'" : "")."
+						".($radius ? " AND distance < '".(BO_RADIUS_STAT * 1000)."'" : "")."
 						GROUP BY participated";
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())

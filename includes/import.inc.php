@@ -1310,7 +1310,7 @@ function bo_update_daily_stat($max_time)
 	{
 		echo "\n<h2>Updating daily statistics</h2>\n";
 		
-		$radius = BO_RADIUS * 1000;
+		$radius = BO_RADIUS_STAT * 1000;
 		$yesterday_start = gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 00:00:00', $ytime)));
 		$yesterday_end =   gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 23:59:59', $ytime)));
 		

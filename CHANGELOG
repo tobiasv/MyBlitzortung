@@ -8,8 +8,10 @@ Version 0.7.2c-dev ???
 - new: kml overlays on dynamic map
 - new: kml output to display maps in google earth
 - new: some special effects ;-)
+- new: mouseover on signal graphs to zoom in
+- new: BO_RADIUS_STAT for statistics
 - fix: windroses
-- graph colors adjusted
+- graph colors adjusted (blue = lightning ...)
 - changes behaviour of session closing
 
 Version 0.7.2b (2011-09-15)

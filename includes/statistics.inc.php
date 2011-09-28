@@ -277,7 +277,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	echo '<a name="graph_strikes"></a>';
 	echo '<h4>'._BL('h4_graph_strikes_time_radius').'</h4>';
 	echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time_radius">';
-	echo strtr(_BL('bo_graph_descr_strikes_time_radius'), array('{RADIUS}' => BO_RADIUS));
+	echo strtr(_BL('bo_graph_descr_strikes_time_radius'), array('{RADIUS}' => BO_RADIUS_STAT));
 	echo '</p>';
 	bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&radius=1');
 	
@@ -472,15 +472,18 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 function bo_show_statistics_network($station_id = 0, $own_station = true, $add_graph = '')
 {
 	$sort = $_GET['bo_sort'];
-
-
 	$date_1h = gmdate('Y-m-d H:i:s', time() - 3600);
 
 	$row = bo_db("SELECT MAX(users) max_users, AVG(users) avg_users FROM ".BO_DB_PREF."strikes WHERE time > '$date_1h'")->fetch_assoc();
 	$max_part = $row['max_users'];
 	$avg_part = $row['avg_users'];
 
-	$row = bo_db("SELECT strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='0' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
+	
+	$sql = "SELECT strikesh, time 
+			FROM ".BO_DB_PREF."stations_stat 
+			WHERE station_id='0' 
+			AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE time < NOW() - INTERVAL 10 SECOND)";
+	$row = bo_db($sql)->fetch_assoc();
 	$strikesh = $row['strikesh'];
 	$time = strtotime($row['time'].' UTC');
 
@@ -893,7 +896,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	echo '<li><span class="bo_descr">'._BL('Inactive').': </span><span class="bo_value">'.number_format($inactive_days, 1, _BL('.'), _BL(',')).' '._BL('days').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'.number_format($max_str_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_own[0], 0, _BL('.'), _BL(',')).($max_str_day_own[1] ? ' ('.date(_BL('_date'), strtotime($max_str_day_own[1])).')' : '' ).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_own[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_own[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_own[1])).')' : '').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS_STAT.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_own[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_own[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_own[1])).')' : '').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'.number_format($min_dist_own, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'.number_format($max_dist_own, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Signals detected').': </span><span class="bo_value">'.number_format($signals, 0, _BL('.'), _BL(',')).'</span>';
@@ -907,7 +910,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'.number_format($max_str_all, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_all[0], 0, _BL('.'), _BL(',')).($max_str_day_all[1] ? ' ('.date(_BL('_date'), strtotime($max_str_day_all[1])).')' : '').'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_all[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_all[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_all[1])).')' : '').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS_STAT.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_all[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_all[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_all[1])).')' : '').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'.number_format($min_dist_all, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'.number_format($max_dist_all, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'.number_format($max_sig_all, 0, _BL('.'), _BL(',')).'</span>';
