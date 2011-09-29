@@ -587,18 +587,8 @@ function bo_show_archive_search()
 			list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($delta_dist * sqrt(2), 225, $lat, $lon);
 			list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($delta_dist * sqrt(2), 45, $lat, $lon);
 
-			//for database index
-			$lat2min = floor($str_lat_min);
-			$lon2min = floor($str_lon_min/180 * 128);
-			$lat2max = ceil($str_lat_max);
-			$lon2max = ceil($str_lon_max/180 * 128);
-
-			
 			$sql_where .= " AND ".bo_strikes_sqlkey($index_sql, $utime_from, $utime_to, $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
-
 			$sql_where .= ($radius ? "AND distance < $radius" : "");
-			
-
 		}
 		
 		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,

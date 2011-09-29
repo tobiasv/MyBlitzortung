@@ -38,7 +38,8 @@ function bo_check_for_update()
 						'0.5.5' => 505,
 						'0.6.1' => 601,
 						'0.6.2' => 602,
-						'0.7.2' => 702,);
+						'0.7.2' => 702,
+						'0.7.3' => 703,);
 
 	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
 	{
@@ -79,6 +80,9 @@ function bo_check_for_update()
 	{
 		if ($cur_version_num >= $number)
 			continue;
+		
+		bo_set_conf('is_updating', time());
+		register_shutdown_function('bo_update_shutdown');
 		
 		$db_update = true;
 		
@@ -303,10 +307,48 @@ function bo_check_for_update()
 					$ok = true;
 				}
 				
-				flush();	
-			
-			
+				flush();
 				
+				break;
+			
+			case '0.7.3':
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP INDEX `latlon2`';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP INDEX `time_latlon`';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP INDEX `time`';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+				
+				$res = bo_db("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='timelatlon'");
+				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD INDEX `timelatlon` (`time`,`lat`,`lon`)";
+				echo '<li><em>'.$sql.'</em>: <b>';
+				if (!$res->num_rows)
+				{
+					$ok = bo_db($sql);
+					echo _BL($ok ? 'OK' : 'FAIL');
+				}
+				else
+				{
+					echo _BL('Already DONE BEFORE');
+				}
+				echo '</b></li>';
+				flush();
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP `time_key`, DROP `lat2`, DROP `lon2`';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+				
+				break;
 			
 			default:
 				$ok = true;

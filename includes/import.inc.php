@@ -473,7 +473,6 @@ function bo_update_strikes($force = false, $max_time = 0)
 				
 				//The data for the strike
 				$time_ns = intval($r[3]);
-				$time_key = floor($utime / (3600*12));
 				$lat = $r[4];
 				$lon = $r[5];
 				$cur = $r[6];
@@ -483,15 +482,11 @@ function bo_update_strikes($force = false, $max_time = 0)
 				$part = strpos($r[8], BO_USER) !== false ? 1 : 0;
 				$dist = bo_latlon2dist($lat, $lon);
 				$bear = bo_latlon2bearing($lat, $lon);
-				$lat2 = floor($lat);
-				$lon2 = floor($lon/180 * 128);
 				
 				$sql = "
 							time='$date $time',
 							time_ns='$time_ns',
-							time_key='$time_key',
 							lat='$lat',lon='$lon',
-							lat2='$lat2',lon2='$lon2',
 							distance='$dist',
 							bearing='$bear',
 							deviation='$deviation',
