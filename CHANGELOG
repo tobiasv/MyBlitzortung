@@ -3,8 +3,9 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.2c-dev ???
-----------------------
+Version 0.7.3 (2011-10-??)
+--------------------------
+- new: Hungarian translation (by Gabor)
 - new: kml overlays on dynamic map
 - new: kml output to display maps in google earth
 - new: some special effects ;-)
@@ -13,6 +14,7 @@ Version 0.7.2c-dev ???
 - fix: windroses
 - graph colors adjusted (blue = lightning ...)
 - changes behaviour of session closing
+- changed some database keys (NOTE: Update can take several minutes)
 
 Version 0.7.2b (2011-09-15)
 ---------------------------

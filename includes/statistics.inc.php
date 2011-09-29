@@ -292,7 +292,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	$city = _BC($stInfo['city']);
 	
 	if ($stInfo['country'] != $own_station_info['country'])
-		$city .= ' ('._BL(strtr($stInfo['country'], array(chr(160) => ' '))).')';
+		$city .= ' ('._BL($stInfo['country']).')';
 	
 	$sql = "SELECT signalsh, strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id')";
 	$row = bo_db($sql)->fetch_assoc();
@@ -518,7 +518,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	while($row = $res->fetch_assoc())
 	{
 		$D[$row['sid']] = $row;
-		$D[$row['sid']]['country'] = _BL(strtr($row['country'], array(chr(160) => ' ')));
+		$D[$row['sid']]['country'] = _BL($row['country']);
 
 		if (!$own_station)
 			$D[$row['sid']]['distance'] = bo_latlon2dist($row['lat'], $row['lon'], $sinfo['lat'], $sinfo['lon']);
@@ -761,17 +761,15 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	if (intval(BO_STATISTICS_SHOW_NEW_STATIONS))
 	{
 		$user_stations = bo_stations('user');
-
 		$data = unserialize(bo_get_conf('stations_new_date'));
-		
 		$new_stations = array();
+
 		foreach($data as $user => $time)
 		{
 			if ($time)
 			{
-				$country = _BL(strtr($user_stations[$user]['country'], array(chr(160) => ' ')));
 				$id = $user_stations[$user]['id'];
-				$new_stations[$id] = array($time, $user_stations[$user]['city'].' ('.$country.')');
+				$new_stations[$id] = array($time, $user_stations[$user]['city'], $user_stations[$user]['country']);
 			}
 		}
 		
@@ -792,11 +790,11 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
 				{
 					echo '<a href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">';
-					echo _BC($d[1]);
+					echo _BC($d[1]).' ('._BL($d[2]).')';
 					echo '</a>';
 				}
 				else
-					echo _BC($d[1]);
+					echo _BC($d[1]).' ('._BL($d[2]).')';
 					
 				echo '</span>';
 				echo '<span class="bo_value">';

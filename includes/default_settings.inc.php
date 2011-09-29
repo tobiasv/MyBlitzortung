@@ -127,7 +127,7 @@
 @define('BO_LOCALE2', '');
 
 //available locales
-@define('BO_LANGUAGES', 'de,en,fr');
+@define('BO_LANGUAGES', 'de,en,fr,hu');
 
 //show links in the footer   
 @define('BO_SHOW_LANGUAGES', true); 

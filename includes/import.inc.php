@@ -1036,8 +1036,8 @@ function bo_update_stations($force = false, $max_time = 0)
 				continue;
 
 			$stUser 	= $cols[1];
-			$stCity 	= html_entity_decode($cols[3]);
-			$stCountry 	= html_entity_decode($cols[4]);
+			$stCity 	= strtr(html_entity_decode($cols[3]), array(chr(160) => ' '));
+			$stCountry 	= strtr(html_entity_decode($cols[4]), array(chr(160) => ' '));
 			$stLat	 	= $cols[5];
 			$stLon 		= $cols[6];
 			$stTime 	= substr($cols[7], 0, 10).' '.substr($cols[7], 16, 8);

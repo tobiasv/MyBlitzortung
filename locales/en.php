@@ -646,7 +646,7 @@ Visualisation on this page is done by a software called
 {MYBO} ({MYBO_ORIG}). 
 Nobody can guarantee, that this software shows always the correct information!
 The responsibility is on your side!
-{MYBO} ({MYBO_ORIG}) is free software. You can find
+{MYBO} is free software. You can find
 more information here: 
 <a href="http://www.myblitzortung.de?lang=en" target="_blank">www.myblitzortung.de</a>.
 ';
@@ -661,7 +661,6 @@ of the station. Calculations:
 <br>locating ratio = (detected strikes of the station) / (signals of the station)
 <br>strike ratio = (detected strikes of the station) / (network strike count)
 ';
-
 $_BL['en']['bo_stat_network_descr_lasth'] = 'All information applies to the time range 60 minutes before the last update.';
 $_BL['en']['bo_stat_network_descr_table'] = 'Here you can see all active stations of the lightning detection network. You can sort the table by clicking on the links in the first row.';
 $_BL['en']['bo_graph_descr_bear'] = 'Own locating ratio over the geographic direction. For better comparision, there is also the whole strike count visible.';
