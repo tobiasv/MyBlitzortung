@@ -80,8 +80,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}strikes` (
   KEY `part` (`part`),
   KEY `raw_id` (`raw_id`),
   KEY `time` (`time`),
-  KEY `latlon2` (`lat2`,`lon2`),
-  KEY `time_latlon` (`time_key`,`lat2`,`lon2`)
+  KEY `time_latlon` (`time`,`lat`,`lon`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 

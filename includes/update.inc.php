@@ -322,11 +322,6 @@ function bo_check_for_update()
 				$ok = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
-
-				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP INDEX `time`';
-				$ok = bo_db($sql, false);
-				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
-				flush();
 				
 				$res = bo_db("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='timelatlon'");
 				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD INDEX `timelatlon` (`time`,`lat`,`lon`)";
@@ -344,8 +339,8 @@ function bo_check_for_update()
 				flush();
 				
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP `time_key`, DROP `lat2`, DROP `lon2`';
-				$ok = bo_db($sql, false);
-				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				$ok2 = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok2 ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 				
 				break;
