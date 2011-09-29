@@ -223,7 +223,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 
 			$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name']).' '.date(_BL('_datetime'), $last_update);
 			echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
-			echo '<img src="'.BO_FILE.'?map='.$static_map_id.'&bo_lang='._BL().'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.BO_FILE.'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
+			echo '<img src="'.bo_bofile_url().'?map='.$static_map_id.'&bo_lang='._BL().'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.bo_bofile_url().'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
 			echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 			echo '</div>';
 
@@ -291,7 +291,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 		foreach($_BO['mapimg'] as $id => $data)
 		{
 			$_BO['mapovl'][] = array(
-				'img' => BO_FILE.'?map='.$id,
+				'img' => bo_bofile_url().'?map='.$id,
 				'coord' => $data['coord'],
 				'default_show' => false,
 				'sel_name' => $data['name'],
@@ -1149,7 +1149,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 	
 	function bo_get_tile(zoom, coord, type, interval)
 	{
-		var url = "<?php echo BO_FILE ?>?tile&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y;
+		var url = "<?php echo bo_bofile_url() ?>?tile&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y;
 		var now = new Date();
 		var add = "";
 		
@@ -1195,20 +1195,20 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 		}
 		
 		
-		return "<?php echo BO_FILE ?>?tile&count="+types+"&stat="+bo_show_count+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
+		return "<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
 	}
 	
 	function bo_get_tile_tracks(zoom, coord)
 	{
 		if (zoom < <?php echo (int)BO_TRACKS_MAP_ZOOM_MIN; ?> || zoom > <?php echo (int)BO_TRACKS_MAP_ZOOM_MAX; ?>)
-			return "<?php echo BO_FILE ?>?image=bt";
+			return "<?php echo bo_bofile_url() ?>?image=bt";
 		
 		var interval=<?php echo intval(BO_UP_INTVL_TRACKS) ?>;
 
 		var now = new Date();
 		var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
 		
-		return "<?php echo BO_FILE ?>?tile&tracks&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
+		return "<?php echo bo_bofile_url() ?>?tile&tracks&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
 	}
 	
 	function bo_reload_mapinfo() 
@@ -1252,7 +1252,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				if (bo_manual_timerange)
 					add = "from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2)+"&" + add;
 				
-				infoImg.src = "<?php echo BO_FILE ?>?tile&info&type="+bo_OverlayMaps[i].bo_mapid+"&"+add+now.getTime();
+				infoImg.src = "<?php echo bo_bofile_url() ?>?tile&info&type="+bo_OverlayMaps[i].bo_mapid+"&"+add+now.getTime();
 				infoImg.style.paddingTop = '5px';
 				infoImg.style.display = 'block';
 				infoImg.style.opacity = 0.7;

@@ -37,7 +37,7 @@ function bo_show_info()
 	
 	echo '<h3>'._BL('h3_info_general').'</h3>';
 	echo '<p>';
-	echo '<img src="'.BO_FILE.'?image=logo" class="bo_bo_logo">';
+	echo '<img src="'.bo_bofile_url().'?image=logo" class="bo_bo_logo">';
 	echo _BL('info_general_text');
 	echo '</p>';
 	
@@ -53,7 +53,7 @@ function bo_show_info()
 
 	echo '<h3>MyBlitzortung</h3>';
 	echo '<p>';
-	echo '<img src="'.BO_FILE.'?image=myblitzortung" class="bo_my_logo">';
+	echo '<img src="'.bo_bofile_url().'?image=myblitzortung" class="bo_my_logo">';
 	echo _BL('info_myblitzortung_text');
 	echo '</p>';
 

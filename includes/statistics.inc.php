@@ -604,7 +604,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	echo '<div id="bo_stat_network">';
 
-	echo '<img src="'.BO_FILE.'?map=stations_mini&blank" id="bo_stat_network_stations_map">';
+	echo '<img src="'.bo_bofile_url().'?map=stations_mini&blank" id="bo_stat_network_stations_map">';
 	
 	echo '<p class="bo_stat_description" id="bo_stat_network_descr_lasth">';
 	echo _BL('bo_stat_network_descr_lasth');
@@ -1620,9 +1620,9 @@ function bo_show_graph($type, $add_graph='', $width=BO_GRAPH_STAT_W, $height=BO_
 	
 	$alt = _BL('h3_graphs').$alt;
 	
-	echo '<img src="'.BO_FILE.'?graph_statistics='.$type.'&bo_lang='._BL().$add_graph.'" 
+	echo '<img src="'.bo_bofile_url().'?graph_statistics='.$type.'&bo_lang='._BL().$add_graph.'" 
 			class="bo_graph_img" 
-			style="width:'.$width.'px;height:'.$height.'px;background-image:url(\''.BO_FILE.'?image=wait\');"
+			style="width:'.$width.'px;height:'.$height.'px;background-image:url(\''.bo_bofile_url().'?image=wait\');"
 			id="bo_graph_'.$type.'_img"
 			alt="'.htmlspecialchars($alt).'"
 			>';

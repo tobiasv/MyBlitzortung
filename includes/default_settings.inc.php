@@ -44,6 +44,16 @@
 @define('BO_FILE', 'blitzortung.php');
 
 
+/*** No-cookie URL                                                 */
+/*   For faster retrieving of tiles and images                     */
+/*   Enter complete URL with http://...                            */
+/*                                                                 */
+/*   Example: http://nocookie.domain.com/path/blitzortung.php       */
+
+@define('BO_FILE_NOCOOKIE', '');
+
+
+
 /*******************************************************************/
 /*** UTF8-Encoding                                               ***/
 /*   Most Content-Management-Systems use UTF8-encoding.            */

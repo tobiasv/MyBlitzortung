@@ -302,13 +302,13 @@ function bo_show_archive_map()
 			//use transparency?
 			if ($ani_cfg['transparent'] === false)
 			{
-				$img_file = BO_FILE.'?image=bt'; //blank "tile"
-				$bo_file_url = BO_FILE.'?map='.$map.'&bo_lang='._BL().'&date=';
+				$img_file = bo_bofile_url().'?image=bt'; //blank "tile"
+				$bo_file_url = bo_bofile_url().'?map='.$map.'&bo_lang='._BL().'&date=';
 			}
 			else
 			{
-				$img_file = BO_FILE.'?map='.$map.'&blank&bo_lang='._BL().'';
-				$bo_file_url = BO_FILE.'?map='.$map.'&transparent&bo_lang='._BL().'&date=';
+				$img_file = bo_bofile_url().'?map='.$map.'&blank&bo_lang='._BL().'';
+				$bo_file_url = bo_bofile_url().'?map='.$map.'&transparent&bo_lang='._BL().'&date=';
 			}
 
 			
@@ -336,8 +336,8 @@ function bo_show_archive_map()
 		else
 		{
 			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time);
-			$img_file = BO_FILE.'?map='.$map.'&date='.sprintf('%04d%02d%02d', $year, $month, $day).'&bo_lang='._BL();
-			echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
+			$img_file = bo_bofile_url().'?map='.$map.'&date='.sprintf('%04d%02d%02d', $year, $month, $day).'&bo_lang='._BL();
+			echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
 		}
 		
 		$footer = $_BO['mapimg'][$map]['footer'];
@@ -491,12 +491,12 @@ function bo_show_archive_density()
 	$alt = $ratio ? _BL('Strike ratio') : _BL('arch_navi_density');
 	$alt .= $station_id ? ' ('._BL('Station').' '._BC($station_infos[$station_id]['city']).')' : '';
 	$alt .= ' '.$mapname.' '.$year.' '.($month ? _BL(date('F', strtotime("2000-$month-01"))) : '');
-	$img_file = BO_FILE.'?density&map='.$map.'&bo_year='.$year.'&bo_month='.$month.'&id='.$station_id.($ratio ? '&ratio' : '').'&bo_lang='._BL();
+	$img_file = bo_bofile_url().'?density&map='.$map.'&bo_year='.$year.'&bo_month='.$month.'&id='.$station_id.($ratio ? '&ratio' : '').'&bo_lang='._BL();
 	$footer = $_BO['mapimg'][$map]['footer'];
 
 	// The map
 	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
-	echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
+	echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
 	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
 	echo '</div>';
 	
@@ -641,7 +641,7 @@ function bo_show_archive_search()
 			if ($row['raw_id'])
 			{
 				$alt = _BL('Signals');
-				$description .= '<img src=\''.BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL().'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\' alt=\''.htmlspecialchars($alt).'\'>';
+				$description .= '<img src=\''.bo_bofile_url().'?graph='.$row['raw_id'].'&bo_lang='._BL().'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\' alt=\''.htmlspecialchars($alt).'\'>';
 			}
 
 			$description .= '</div>';
@@ -821,7 +821,7 @@ function bo_show_archive_search()
 					d = d.toString(16);
 					d = d.length == 1 ? '0'+d : d;
 
-					images[i+j*img_count] = new google.maps.MarkerImage("<?php echo  BO_FILE ?>?icon=ff"+d+"00"+(j ? '1' : ''),
+					images[i+j*img_count] = new google.maps.MarkerImage("<?php echo  bo_bofile_url() ?>?icon=ff"+d+"00"+(j ? '1' : ''),
 									new google.maps.Size(11,11),
 									new google.maps.Point(0,0),
 									new google.maps.Point(5, 5));
@@ -956,8 +956,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		for($i=$strike_id-$strikes_before;$i<=$strike_id;$i++)
 			$images[] = $i;
 		
-		$img_file = BO_FILE.'?map='.$map.'&blank&bo_lang='._BL().'';
-		$bo_file_url = BO_FILE.'?map='.$map.'&transparent&bo_lang='._BL().'&strike_id=';
+		$img_file = bo_bofile_url().'?map='.$map.'&blank&bo_lang='._BL().'';
+		$bo_file_url = bo_bofile_url().'?map='.$map.'&transparent&bo_lang='._BL().'&strike_id=';
 
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 		bo_insert_animation_js($images, $bo_file_url, $img_file);
@@ -1115,7 +1115,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 		if ($row['raw_id'])
 		{
-			$url = BO_FILE.'?graph='.$row['raw_id'].'&bo_lang='._BL();
+			$url = bo_bofile_url().'?graph='.$row['raw_id'].'&bo_lang='._BL();
 			echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
 		}
 		else
@@ -1127,7 +1127,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 			if ($row['raw_id'])
 			{
-				$url = BO_FILE.'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL();
+				$url = bo_bofile_url().'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL();
 				echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_spec_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
 			}
 			else
@@ -1380,8 +1380,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $strike_id).'&bo_strikes_before=100">'._BL('Animation').'</a>';
 		
 		echo '</fieldset>';
-		$img_file = BO_FILE.'?map='.$map.'&strike_id='.$strike_id.'&bo_lang='._BL();
-		echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
+		$img_file = bo_bofile_url().'?map='.$map.'&strike_id='.$strike_id.'&bo_lang='._BL();
+		echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
 	}
 }
 
@@ -1452,7 +1452,7 @@ function bo_archive_get_dim($map, $addx=0)
 
 function bo_insert_animation_js($images, $bo_file_url, $img_file, $ani_delay=BO_ANIMATIONS_WAITTIME, $ani_delay_end=BO_ANIMATIONS_WAITTIME_END, $img_dim='', $alt="")
 {
-	echo '<img style="position:relative;background-image:url(\''.BO_FILE.'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
+	echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
 	echo '<img style="position:absolute;top:1px;left:1px;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.$bo_file_url.$images[0].'" alt="'.htmlspecialchars($alt).'">';
 
 	$js_img = '';

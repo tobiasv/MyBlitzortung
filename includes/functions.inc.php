@@ -304,7 +304,7 @@ function bo_copyright_footer()
 	echo '<div id="bo_footer">';
 	
 	echo '<a href="http://www.blitzortung.org/" target="_blank">';
-	echo '<img src="'.BO_FILE.'?image=logo" id="bo_copyright_logo">';
+	echo '<img src="'.bo_bofile_url().'?image=logo" id="bo_copyright_logo">';
 	echo '</a>';
 
 	if (BO_LOGIN_SHOW === true)
@@ -337,7 +337,7 @@ function bo_copyright_footer()
 		foreach($languages as $lang)
 		{
 			if (BO_SHOW_LANG_FLAGS == true && file_exists(BO_DIR.'images/flags/'.$lang.'.png'))
-				$a_lang = '<img src="'.BO_FILE.'?image=flag_'.$lang.'" class="bo_flag">';
+				$a_lang = '<img src="'.bo_bofile_url().'?image=flag_'.$lang.'" class="bo_flag">';
 			else
 				$a_lang = $lang;
 				
@@ -1598,6 +1598,14 @@ function bo_session_close($force = false)
 	if ($c == 2 || ($c == 1 && $force))
 		@session_write_close();
 	
+}
+
+function bo_bofile_url()
+{
+	if (!bo_user_get_id() && defined('BO_FILE_NOCOOKIE') && BO_FILE_NOCOOKIE)
+		return BO_FILE_NOCOOKIE;
+	else
+		return BO_FILE;
 }
 
 ?>

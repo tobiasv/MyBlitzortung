@@ -14,6 +14,7 @@ Bugs / Improvements
 
 Features
 --------
+- Submenu on "Info" page: Overview / Participate -> Small howto + images/descriptions of existing stations
 - GUI for config
 - auto zoom-out if not enough strikes in map
 - tool for converting borders -> regions (GoogleEarth-Polygon -> boxes)
