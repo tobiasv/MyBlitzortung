@@ -529,15 +529,22 @@ function bo_update_strikes($force = false, $max_time = 0)
 						}
 					
 						//couldn't find any previous strikes to update
-						if ($d['t'] - $utime >= 2)
+						else if ($d['t'] - $utime >= 2)
 						{
 							break;
 						}
 						
-						$nreftime = $d['n'] * 1E-9;
-						
-						if ($search_from <= $d['t'] && $d['t'] <= $search_to) //found seconds match
+						//found exactly the same strike
+						elseif ($d['t'] == $utime && $d['n'] == $time_ns)
 						{
+							$ids_found[] = $oldid;
+							continue;
+						}
+						
+						//FUZZY-SEARCH -> found seconds match
+						else if ($search_from <= $d['t'] && $d['t'] <= $search_to) 
+						{
+							$nreftime = $d['n'] * 1E-9;
 						
 							//echo "<br>".gmdate("H:i:s", $search_from)."$nsearch_from <= ".gmdate("H:i:s", $d['t'])." <= ".gmdate("H:i:s", $search_to)."$nsearch_to ::: ";
 							//echo " ".gmdate("H:i:s", $d['t']).".$d[n] ::: ";
@@ -545,7 +552,7 @@ function bo_update_strikes($force = false, $max_time = 0)
 							$is_old_strike = false;
 							
 							//search for nseconds match
-							if ($nsearch_from > $nsearch_to && ($search_from <= $nreftime || $nreftime <= $search_to) )
+							if ($nsearch_from > $nsearch_to && ($nsearch_from <= $nreftime || $nreftime <= $nsearch_to) )
 							{
 								//echo ' Found2! ';
 								$is_old_strike = true;

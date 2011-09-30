@@ -1040,6 +1040,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
 					s.deviation deviation, s.current current, s.polarity polarity,
 					s.time stime, s.time_ns stimens, s.users users, s.part part,
+					s.status status,
 					r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data,
 					r.amp1 amp1, r.amp2 amp2, r.amp1_max amp1_max, r.amp2_max amp2_max
 			FROM $sql_join
@@ -1094,11 +1095,16 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			$ttime = date(_BL('_datetime'), $rtime).'.'.sprintf('%09d', $row['rtimens']);
 
 		if (!$strike_id && $perm && $row['strike_id'])
-			echo '<a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'&bo_strike_id='.$row['strike_id'].'" target="_blank">'.$ttime.'</a>';
+		{
+			echo '<a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'&bo_strike_id='.$row['strike_id'].'" target="_blank" ';
+			echo ' title="Confirmed: '.$row['status'].'" ';
+			echo '>'.$ttime.'</a>';
+		}
 		else
 			echo $ttime;
 			
 		echo '</span>';
+		
 		echo '</td>';
 
 		$alt = _BL('rawgraph');
