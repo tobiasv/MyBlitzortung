@@ -870,7 +870,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 		
 <?php  if (bo_user_get_level()) { ?>
 		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
-		if (bo_map.getZoom() > 7)
+		if (bo_map.getZoom() > 3)
 		{
 			window.open("<?php echo BO_ARCHIVE_URL ?>&bo_show=strikes&bo_lat="+event.latLng.lat()+"&bo_lon="+event.latLng.lng()+"&bo_zoom="+bo_map.getZoom(), '_blank');
 		}

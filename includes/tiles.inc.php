@@ -765,7 +765,7 @@ function bo_tile_output($file='', $caching=false, &$I=null)
 	{
 		$dir = dirname($file);
 		if (!file_exists($dir))
-			mkdir($dir, 0777, true);
+			@mkdir($dir, 0777, true);
 	}
 
 
