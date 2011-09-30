@@ -163,7 +163,7 @@ $_BO['tpl_imgmap_default']['legend_font'] = array(10, true, array('00000077', 0,
 $_BO['tpl_imgmap_default']['menu'] = true;
 $_BO['tpl_imgmap_default']['archive'] = true;
 $_BO['tpl_imgmap_default']['trange'] = 2; //hours!
-$_BO['tpl_imgmap_default']['upd_intv'] = 15; //minutes
+$_BO['tpl_imgmap_default']['upd_intv'] = 1; //minutes
 $_BO['tpl_imgmap_default']['textcolor'] = array(255,255,255);
 $_BO['tpl_imgmap_default']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap_default']['col_smooth'] = 24;
@@ -224,8 +224,6 @@ $_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitere
 $_BO['tpl_imgmap']['germany_lkr'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['germany_lkr']['name'] = 'Germany';
 $_BO['tpl_imgmap']['germany_lkr']['footer'] = 'Kartenmaterial: <a href="http://de.wikipedia.org/w/index.php?title=Datei:Landkreise,_Kreise_und_kreisfreie_St%C3%A4dte_in_Deutschland.svg" target="_blank">Wikipedia</a> &bull; Achtung: Positionen sind nicht exakt (nur bei dieser Karte!)';
-$_BO['tpl_imgmap']['germany_lkr']['menu'] = true;
-$_BO['tpl_imgmap']['germany_lkr']['archive'] = true;
 $_BO['tpl_imgmap']['germany_lkr']['file'] = 'map_germany_lkr.png';
 $_BO['tpl_imgmap']['germany_lkr']['coord'] = array(55.065, 15.11, 47.380, 5.85); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['germany_lkr']['show_station'] = array(5, 125,120,215, 9,true, 2,-12);
@@ -256,12 +254,6 @@ $_BO['tpl_imgmap']['germany_bavaria']['footer'] = 'Kartenmaterial: <a href="http
 $_BO['tpl_imgmap']['germany_bavaria']['file'] = 'map_germany_bavaria.png';
 $_BO['tpl_imgmap']['germany_bavaria']['borders'] = array('map_germany_bavaria_borders.png', 50);
 $_BO['tpl_imgmap']['germany_bavaria']['coord'] = array(50.62, 14.059753, 47.25, 8.897552); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['germany_bavaria']['trange'] = 2; //hours!
-$_BO['tpl_imgmap']['germany_bavaria']['upd_intv'] = 5; //minutes
-$_BO['tpl_imgmap']['germany_bavaria']['textcolor'] = array(255,255,255);
-$_BO['tpl_imgmap']['germany_bavaria']['textsize'] = 5;
-$_BO['tpl_imgmap']['germany_bavaria']['legend'] = array(5, 100, 80, 4, 4, 1);
-$_BO['tpl_imgmap']['germany_bavaria']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap']['germany_bavaria']['show_station'] = array(5, 125,120,215, 9,true, 2,-12);
 $_BO['tpl_imgmap']['germany_bavaria']['density'] = true;
 $_BO['tpl_imgmap']['germany_bavaria']['density_blocksize'] = 4;
@@ -272,12 +264,13 @@ $_BO['tpl_imgmap']['germany_bavaria']['cities'][2] = $_BO['points']['whitered1']
 $_BO['tpl_imgmap']['germany_bavaria']['cities'][5] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['germany_bavaria']['cities'][6] = $_BO['points']['whitered1'];
 
-
 //Germany Bavaria dark
 $_BO['tpl_imgmap']['germany_bavaria_dark'] = $_BO['tpl_imgmap']['germany_bavaria'];
 $_BO['tpl_imgmap']['germany_bavaria_dark']['file'] = 'map_germany_bavaria_dark.png';
 $_BO['tpl_imgmap']['germany_bavaria_dark']['borders'] = array('map_germany_bavaria_dark_borders.png', 50);
 $_BO['tpl_imgmap']['germany_bavaria_dark']['show_station'] = array(5, 255,100,100,8,true, 2,3);
+
+
 
 
 //Germany NRW: not exact, maximum deviation about 2km
@@ -286,12 +279,7 @@ $_BO['tpl_imgmap']['germany_nrw']['name'] = 'NRW';
 $_BO['tpl_imgmap']['germany_nrw']['footer'] = 'Kartenmaterial: <a href="http://commons.wikimedia.org/wiki/File:North_Rhine-Westphalia_location_map_03.svg" target="_blank">Wikipedia</a>';
 $_BO['tpl_imgmap']['germany_nrw']['file'] = 'map_germany_nrw_color.png';
 $_BO['tpl_imgmap']['germany_nrw']['coord'] = array(52.552, 9.481 , 50.295 , 5.84); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['germany_nrw']['trange'] = 2; //hours!
-$_BO['tpl_imgmap']['germany_nrw']['upd_intv'] = 3; //minutes
-$_BO['tpl_imgmap']['germany_nrw']['textcolor'] = array(255,255,255);
-$_BO['tpl_imgmap']['germany_nrw']['textsize'] = 5;
-$_BO['tpl_imgmap']['germany_nrw']['legend'] = array(5, 100, 80, 4, 4, 1);
-$_BO['tpl_imgmap']['germany_nrw']['col'] = $_BO['tpl_color']['standard'];
+$_BO['tpl_imgmap']['germany_nrw']['show_station'] = array(5, 125,120,215, 9,true, 2,-12);
 $_BO['tpl_imgmap']['germany_nrw']['density'] = true;
 $_BO['tpl_imgmap']['germany_nrw']['density_blocksize'] = 10;
 $_BO['tpl_imgmap']['germany_nrw']['density_colors'] = $_BO['tpl_density_colors'];
@@ -300,8 +288,6 @@ $_BO['tpl_imgmap']['germany_nrw']['cities'][1] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['germany_nrw']['cities'][2] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['germany_nrw']['cities'][5] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['germany_nrw']['cities'][6] = $_BO['points']['whitered1'];
-
-
 
 //Germany NRW dark
 $_BO['tpl_imgmap']['germany_nrw_dark'] = $_BO['tpl_imgmap']['germany_nrw'];
@@ -319,19 +305,10 @@ $_BO['tpl_imgmap']['france']['name'] = 'France';
 $_BO['tpl_imgmap']['france']['file'] = 'map_france.png';
 $_BO['tpl_imgmap']['france']['borders'] = array('map_france_borders.png', 70);
 $_BO['tpl_imgmap']['france']['coord'] = array(51.8,9,41.51,-6); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['france']['trange'] = 2; //hours!
-$_BO['tpl_imgmap']['france']['upd_intv'] = 5; //minutes
-$_BO['tpl_imgmap']['france']['textcolor'] = array(0,0,60);
-$_BO['tpl_imgmap']['france']['textsize'] = 5;
 $_BO['tpl_imgmap']['france']['density'] = true;
 $_BO['tpl_imgmap']['france']['density_blocksize'] = 40;
 $_BO['tpl_imgmap']['france']['density_darken'] = 70;
-$_BO['tpl_imgmap']['france']['density_colors'][] = array(150, 150, 250, 95);
-$_BO['tpl_imgmap']['france']['density_colors'][] = array(50, 150, 155, 90);
-$_BO['tpl_imgmap']['france']['density_colors'][] = array(205, 205, 50, 85);
-$_BO['tpl_imgmap']['france']['density_colors'][] = array(230, 0, 0, 80);
-$_BO['tpl_imgmap']['france']['density_colors'][] = array(255, 0, 255, 75);
-$_BO['tpl_imgmap']['france']['density_colors'][] = array(255, 190, 255, 70);
+$_BO['tpl_imgmap']['france']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap']['france']['cities'][1] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['france']['cities'][2] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['france']['cities'][5] = $_BO['points']['whitered1'];
@@ -372,7 +349,7 @@ $_BO['tpl_imgmap']['europe_mini']['menu'] = false;
 $_BO['tpl_imgmap']['europe_mini']['file'] = 'map_europe_mini.png';
 $_BO['tpl_imgmap']['europe_mini']['coord'] = array(71.1, 44.5, 31.8, -14.0); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['europe_mini']['trange'] = 2; //hours!
-$_BO['tpl_imgmap']['europe_mini']['upd_intv'] = 15; //minutes
+$_BO['tpl_imgmap']['europe_mini']['upd_intv'] = 5; //minutes
 $_BO['tpl_imgmap']['europe_mini']['textcolor'] = array(255,255,255);
 $_BO['tpl_imgmap']['europe_mini']['textsize'] = 1;
 $_BO['tpl_imgmap']['europe_mini']['point_style'] = array(3, 1, 'f008', 0);
