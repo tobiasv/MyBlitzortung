@@ -283,6 +283,8 @@ function bo_update_strikes($force = false, $max_time = 0)
 		$min_dist_all = 9E12;
 		$max_dist_own = 0;
 		$min_dist_own = 9E12;
+		$min_participants = 1000;
+		$max_participants = 0;
 		$timeout = false;
 		
 		/***** PREPARATIONS BEFORE READING *****/
@@ -431,7 +433,7 @@ function bo_update_strikes($force = false, $max_time = 0)
 		
 		foreach($lines as $l)
 		{
-			if (preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9\.]+)kA.* ([0-9]+)m [0-9]+ (.*)/', $l, $r))
+			if (preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9\.]+)kA.* ([0-9]+)m ([0-9]+) (.*)/', $l, $r))
 			{
 				$date = $r[1];
 				$time = $r[2];
@@ -458,7 +460,8 @@ function bo_update_strikes($force = false, $max_time = 0)
 					//ToDo: fuzzy search for lat/lon AND time
 					$sql = "SELECT id, part, time, time_ns, lat, lon, users
 							FROM ".BO_DB_PREF."strikes
-							WHERE time BETWEEN '$date_start' AND '$date_end'";
+							WHERE time BETWEEN '$date_start' AND '$date_end'
+							ORDER BY time";
 					$res = bo_db($sql);
 					while ($row = $res->fetch_assoc())
 					{
@@ -477,9 +480,10 @@ function bo_update_strikes($force = false, $max_time = 0)
 				$lon = $r[5];
 				$cur = $r[6];
 				$deviation = $r[7];
-				$participants = explode(' ', $r[8]);
+				$participants_calc = $r[8];
+				$participants = explode(' ', $r[9]);
 				$users = count($participants);
-				$part = strpos($r[8], BO_USER) !== false ? 1 : 0;
+				$part = strpos($r[9], BO_USER) !== false ? 1 : 0;
 				$dist = bo_latlon2dist($lat, $lon);
 				$bear = bo_latlon2bearing($lat, $lon);
 				
@@ -498,8 +502,15 @@ function bo_update_strikes($force = false, $max_time = 0)
 				//for statistics
 				$bear_id = intval($bear);
 				$dist_id = intval($dist / 10 / 1000);
-
-							
+				$min_participants = min($participants_calc, $min_participants);
+				$max_participants = max($participants_calc, $max_participants);
+				
+				//sometimes two strikes with same time one after another --> ignore 2nd one
+				if ("$time.$time_ns" === $time_last_strike)
+					continue;
+				
+				$time_last_strike = "$time.$time_ns";
+				
 				//search for older entries of the same strike
 				$id = false;
 				$ids_found = array();
@@ -537,8 +548,10 @@ function bo_update_strikes($force = false, $max_time = 0)
 						//found exactly the same strike
 						elseif ($d['t'] == $utime && $d['n'] == $time_ns)
 						{
+							unset($old_data[$i]); //remove it from the search array!
+							unset($ids_found); //only update the strike with the same time
 							$ids_found[] = $oldid;
-							continue;
+							break; //end search!
 						}
 						
 						//FUZZY-SEARCH -> found seconds match
@@ -570,7 +583,10 @@ function bo_update_strikes($force = false, $max_time = 0)
 
 								//could be a new one if participant count differs too much
 								if ($old_dist < BO_UP_STRIKES_FUZZY_KM * 1000) // && $users * 0.9 <= $d['users'] && $d['users'] <= $users * 1.5)
+								{
 									$ids_found[] = $oldid;
+									unset($old_data[$i]);
+								}
 								//else
 								//	echo " Distance didn't match ($oldid) ::: ";
 							}
@@ -622,6 +638,7 @@ function bo_update_strikes($force = false, $max_time = 0)
 					$new_strike = false;
 				}
 
+				//echo "\n".($new_strike ? 'I' : 'U')." $time.$time_ns $id";
 				
 
 				//Update Strike <-> All Participated Stations
@@ -774,6 +791,31 @@ function bo_update_strikes($force = false, $max_time = 0)
 			bo_set_conf('uptime_strikes', time());
 			bo_update_status_files('strikes');
 		}
+		
+		
+		//Minimum Participants (Update every 24h)
+		$tmp = unserialize(bo_get_conf('bo_participants_locating_min'));
+		if (time() - $tmp['time'] > 3600 * 24)
+		{
+			$row = bo_db("SELECT MIN(users) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*24)."'")->fetch_assoc();
+			$tmp['time'] = time();
+			$tmp['value'] = $row['minusers'];
+			bo_set_conf('bo_participants_locating_min', serialize($tmp));
+		}
+
+		
+		//Maximum Participants (Update every 24h)
+		$tmp = unserialize(bo_get_conf('bo_participants_locating_max'));
+		$tmp['value_24h'] = max($tmp['value_24h'], $max_participants);
+		if (time() - $tmp['time'] > 3600 * 24)
+		{
+			$tmp['time'] = time();
+			$tmp['value'] = $tmp['value_24h'];
+			$tmp['value_24h'] = 0; //if max value shrinks!
+		}
+		bo_set_conf('bo_participants_locating_max', serialize($tmp));
+		
+		
 	}
 	else
 	{

@@ -371,7 +371,7 @@ function bo_copyright_footer()
 	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
 	{
 		echo '<div id="bo_copyright_own">';
-		echo BO_OWN_COPYRIGHT;
+		echo _BC(BO_OWN_COPYRIGHT);
 		echo '</div>';
 	}
 
@@ -1561,6 +1561,38 @@ function bo_bofile_url()
 		return BO_FILE_NOCOOKIE;
 	else
 		return BO_FILE;
+}
+
+function bo_participants_locating_min()
+{
+	static $value=false;
+	
+	if ($value === false)
+	{
+		$tmp = unserialize(bo_get_conf('bo_participants_locating_min'));
+		$value = intval($tmp['value']);
+	}
+
+	if (!$value)
+		$value = BO_MIN_PARTICIPANTS;
+	
+	return intval($value);
+}
+
+function bo_participants_locating_max()
+{
+	static $value=false;
+	
+	if ($value === false)
+	{
+		$tmp = unserialize(bo_get_conf('bo_participants_locating_max'));
+		$value = intval($tmp['value']);
+	}
+	
+	if (!$value)
+		$value = BO_MAX_PARTICIPANTS;
+	
+	return intval($value);
 }
 
 ?>

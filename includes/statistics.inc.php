@@ -311,7 +311,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	{
 		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."strikes 
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $time)."'
-						AND part>0 AND users='".BO_MIN_PARTICIPANTS."'";
+						AND part>0 AND users='".bo_participants_locating_min()."'";
 		$row = bo_db($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
 		
@@ -325,7 +325,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 				JOIN ".BO_DB_PREF."stations_strikes ss
 				ON s.id=ss.strike_id AND ss.station_id='$station_id'
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $time)."'
-						AND users='".BO_MIN_PARTICIPANTS."'";
+						AND users='".bo_participants_locating_min()."'";
 		$row = bo_db($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
 		
@@ -344,7 +344,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	echo '<div id="bo_stat_station">';
 
 	echo '<p class="bo_stat_description" id="bo_stat_station_descr_lasth">';
-	echo strtr(_BL('bo_stat_station_descr_lasth'), array('{STATION_CITY}' => $city, '{MIN_PARTICIPANTS}' => BO_MIN_PARTICIPANTS));
+	echo strtr(_BL('bo_stat_station_descr_lasth'), array('{STATION_CITY}' => $city, '{MIN_PARTICIPANTS}' => bo_participants_locating_min()));
 	echo '</p>';
 	
 	echo '<ul class="bo_stat_overview">';
@@ -1340,7 +1340,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 			echo '<a name="graph_participants"></a>';
 			echo '<h4>'._BL('h4_graph_participants').'</h4>';
 			echo '<p class="bo_graph_description" id="bo_graph_participants">';
-			echo strtr(_BL('bo_graph_participants'), array('{MIN_PARTICIPANTS}' => BO_MIN_PARTICIPANTS));
+			echo strtr(_BL('bo_graph_participants'), array('{MIN_PARTICIPANTS}' => bo_participants_locating_min()));
 			echo '</p>';
 			if (BO_GRAPH_STAT_PARTICIPANTS_LOG === true)
 				echo '<p class="bo_graph_description bo_graph_log_warn" ><strong>'._BL('bo_graph_log_warn').'</strong></p>';
@@ -1364,14 +1364,14 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 			echo '<span class="bo_form_descr">'._BL('Min').':</span> ';
 			echo '<select name="bo_participants_min" onchange="bo_change_value(this.value, \'participants_time\');" id="bo_stat_participants_time_min" disabled>';
 			//echo '<option value="0">'._BL('Average').'</option>';
-			for($i=BO_MIN_PARTICIPANTS;$i<150;$i+=$i<20?1:10)
+			for($i=bo_participants_locating_min();$i<150;$i+=$i<20?1:10)
 				echo '<option value="'.$i.'">'.$i.'</option>';
 			echo '</select> ';
 			echo '</span>';
 			echo '<span class="bo_form_group">';
 			echo '<span class="bo_form_descr">'._BL('Max').':</span>';
 			echo '<select name="bo_participants_max" onchange="bo_change_value(this.value, \'participants_time\', \'value_max\');" id="bo_stat_participants_time_max" disabled>';
-			for($i=BO_MIN_PARTICIPANTS;$i<150;$i+=$i<20?1:10)
+			for($i=bo_participants_locating_min();$i<150;$i+=$i<20?1:10)
 				echo '<option value="'.$i.'">'.$i.'</option>';
 			echo '</select> ';
 			echo '</span>';

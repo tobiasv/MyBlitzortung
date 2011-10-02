@@ -1317,10 +1317,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				
 				echo '" style="';
 				
-				if ($i < BO_MIN_PARTICIPANTS)
+				if ($i < bo_participants_locating_min())
 					echo 'font-weight: bold;';
 
-				if ($i < BO_MAX_PARTICIPANTS)
+				if ($i < bo_participants_locating_max())
 					echo 'text-decoration:underline;';
 				else
 					echo 'text-decoration:none;';

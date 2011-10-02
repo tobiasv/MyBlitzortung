@@ -38,7 +38,7 @@ if (!defined("BO_VER"))
 	define("BO_PERM_COUNT",	8);
 
 	define("BO_TILE_SIZE", 256);
-	define("BO_MIN_PARTICIPANTS", 7);
+	define("BO_MIN_PARTICIPANTS", 8);
 	define("BO_MAX_PARTICIPANTS", 12);
 	define("BO_MAX_VOLTAGE", 2.5);
 	define("BO_TRIGGER_VOLTAGE", 0.45);

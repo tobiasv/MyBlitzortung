@@ -163,7 +163,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$time_min = $time_max = strtotime($row['time'].' UTC');
-		$time_string = date('H:i:s', $time_min).'.'.substr($row['time_ns'], 0, 6);
+		$time_string = date(_BL('_date').' H:i:s', $time_min).'.'.substr($row['time_ns'], 0, 6);
 		
 		$file_by_time = true;
 		$caching = false;
@@ -1509,13 +1509,14 @@ function bo_image_banner_top($I, $w, $h, $cfg, $time_string = null, $extra = nul
 	//Own Copyright
 	if (defined('BO_OWN_COPYRIGHT') && $copy)
 	{
-		$copy_width = bo_imagetextwidth($fontsize, $tbold, BO_OWN_COPYRIGHT);
+		$text = strip_tags(BO_OWN_COPYRIGHT);
+		$copy_width = bo_imagetextwidth($fontsize, $tbold, $text);
 		$info_text_width = bo_imagetextwidth($fontsize, $tbold, $time_string.'         '.$strike_text);
 		
 		if ($w - $info_text_width > $copy_width)
 		{
 			$copy_pos = $w / 2 - $copy_width / 2;
-			bo_imagestring($I, $fontsize, $copy_pos, 2+$tdy, BO_OWN_COPYRIGHT, $tcol, $tbold);
+			bo_imagestring($I, $fontsize, $copy_pos, 2+$tdy, $text, $tcol, $tbold);
 		}
 	}
 }
@@ -1579,11 +1580,12 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 	//Own copyright
 	if (defined('BO_OWN_COPYRIGHT') && $copy)
 	{
-		$bo_width2 = bo_imagetextwidth($fontsize, $tbold, BO_OWN_COPYRIGHT);
+		$text = strip_tags(BO_OWN_COPYRIGHT);
+		$bo_width2 = bo_imagetextwidth($fontsize, $tbold, $text);
 		$bo_pos2 = $bo_width + $fontsize * 5;
 		
 		if ($bo_width2+$bo_pos2 < $w - $legend_width - 5)
-			bo_imagestring($I, $fontsize, $bo_pos2, $h - $tdy, BO_OWN_COPYRIGHT, $tcol, $tbold);
+			bo_imagestring($I, $fontsize, $bo_pos2, $h - $tdy, $text, $tcol, $tbold);
 	}
 }
 
@@ -1929,7 +1931,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 		
 		if ($strike_id && $d['part'])
 		{
-			if ($part < BO_MAX_PARTICIPANTS)
+			if ($part < bo_participants_locating_max())
 				$col = BO_ARCHIVE_STR_DETAILS_LINECOLOR;
 			else
 				$col = BO_ARCHIVE_STR_DETAILS_LINECOLOR_NOCALC;

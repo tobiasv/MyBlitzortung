@@ -756,7 +756,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		{
 			case 'participants':
 				$groupby = "s.users";
-				$xmin = BO_MIN_PARTICIPANTS;
+				$xmin = bo_participants_locating_min();
 				$is_logarithmic = BO_GRAPH_STAT_PARTICIPANTS_LOG === true;
 				break;
 
@@ -793,6 +793,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		{
 			$index = $row['groupby'];
 			$xmax = max($row['groupby'], $max);
+			$xmin = min($row['groupby'], $xmin);
 			
 			if ($row['spart'])
 				$tmp['own'][$index] = $row['cnt'];
@@ -852,7 +853,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			case 'participants_time':
 
 				if (!$value)
-					$value = BO_MIN_PARTICIPANTS;
+					$value = bo_participants_locating_min();
 
 				if (!$value_max || $value_max <= $value)
 					$value_max = 0;
@@ -2343,7 +2344,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
 	{
-		$graph->footer->left->Set(BO_OWN_COPYRIGHT);
+		$graph->footer->left->Set(strip_tags(BO_OWN_COPYRIGHT));
 		$graph->footer->left->SetColor('#999999');
 		$graph->footer->left->SetFont(FF_DV_SANSSERIF,FS_NORMAL,BO_OWN_COPYRIGHT_SIZE);
 
@@ -2680,8 +2681,9 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 		if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
 		{
 			//Copyright
+			$text = strip_tags(BO_OWN_COPYRIGHT);
 			$color = imagecolorallocate($I, 128,128,128);
-			bo_imagestring($I, $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_FONTSIZE_OTHER, $size * 0.75, $size * 0.94, BO_OWN_COPYRIGHT, $color);
+			bo_imagestring($I, $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_FONTSIZE_OTHER, $size * 0.75, $size * 0.94, $text, $color);
 		}
 		
 		
