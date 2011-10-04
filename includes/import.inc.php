@@ -830,12 +830,12 @@ function bo_update_strikes($force = false, $max_time = 0)
 function bo_match_strike2raw()
 {
 	//not really physical values but determined empirical
-	$c = 299792458;
-	$fuzz = 0.00001; //minimum fuzzy-seconds
-	$dist_fuzz = 0.0001; //fuzzy-seconds per meter (seconds)
-	$offset_fuzz = 0;
+	$c = BO_STR2SIG_C;
+	$fuzz = BO_STR2SIG_FUZZ_SEC ; //minimum fuzzy-seconds
+	$dist_fuzz = BO_STR2SIG_FUZZ_SECM; //fuzzy-seconds per meter (seconds)
+	$offset_fuzz = BO_STR2SIG_FUZZ_OFFSET;
 	
-	$amp_trigger = (BO_TRIGGER_VOLTAGE * 0.90 / BO_MAX_VOLTAGE) * 256 / 2;
+	$amp_trigger = (BO_TRIGGER_VOLTAGE * BO_STR2SIG_TRIGGER_FACTOR / BO_MAX_VOLTAGE) * 256 / 2;
 
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 	$row = bo_db($sql)->fetch_assoc();

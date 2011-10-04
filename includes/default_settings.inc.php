@@ -295,6 +295,9 @@
 @define('BO_STATISTICS_ALL_STATIONS', 0); // 0 = disable, 1 = with specific link, 2 = links from table for everyone
 
 
+// Default order of stations table
+// possible values: country,city,strikes,signals,signals_ratio,efficiency,distance
+@define('BO_STATISTICS_STATIONS_SORT', 'distance');
 
 
 /*******************************************************************/
@@ -871,6 +874,45 @@
 // use experimental mysql key for faster strike search
 // by time *and* latlon                                         
 @define('BO_DB_USE_LATLON_TIME_INDEX', false);
+
+
+
+
+/*******************************************************************/
+/*** Some special settings which shouldn't be changed            ***/
+
+//Tile dimensions (pixels)
+@define("BO_TILE_SIZE", 256);
+
+//Min and max count of participants - values are only used if
+//automatic getting from participants.txt failed
+@define('BO_MIN_PARTICIPANTS', 8);
+@define('BO_MAX_PARTICIPANTS', 12);
+
+//max. signal level
+@define('BO_MAX_VOLTAGE', 2.5);
+
+//trigger voltage
+@define('BO_TRIGGER_VOLTAGE', 0.45);
+
+//data in participants.txt can change for strikes younger
+//than given minutes
+@define('BO_MIN_MINUTES_STRIKE_CONFIRMED', 5);
+
+//needed for auto linking stations
+@define('BO_LINK_HOST', 'www.myblitzortung.de');
+@define('BO_LINK_URL',  '/blitzortung/bo.php');
+
+//for finding signal to strike
+@define('BO_STR2SIG_C', 299792458); //speed of light
+@define('BO_STR2SIG_FUZZ_SEC', 0.00001); //minimum fuzzy-seconds
+@define('BO_STR2SIG_FUZZ_SECM', 0.0001); //fuzzy-seconds per meter
+@define('BO_STR2SIG_FUZZ_OFFSET', 0); //fuzzy offset
+@define('BO_STR2SIG_TRIGGER_FACTOR', 0.9); //factor for BO_TRIGGER_VOLTAGE 
+
+//speed of light for runtime in archive table (and perhaps other display)
+@define('BO_C', 299792458); // Blitzortung.org uses c/1.000198
+
 
 
 

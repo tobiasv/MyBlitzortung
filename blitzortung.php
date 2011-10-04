@@ -25,7 +25,7 @@ if (!defined("BO_VER"))
 	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.7.3-dev');
+	define("BO_VER", '0.7.3-dev2');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -35,19 +35,9 @@ if (!defined("BO_VER"))
 	define("BO_PERM_ALERT_SMS",		32);
 	define("BO_PERM_ALERT_URL",		64);
 	define("BO_PERM_ARCHIVE", 		128);
-	define("BO_PERM_COUNT",	8);
-
-	define("BO_TILE_SIZE", 256);
-	define("BO_MIN_PARTICIPANTS", 8);
-	define("BO_MAX_PARTICIPANTS", 12);
-	define("BO_MAX_VOLTAGE", 2.5);
-	define("BO_TRIGGER_VOLTAGE", 0.45);
-	define("BO_MIN_MINUTES_STRIKE_CONFIRMED", 5);
+	define("BO_PERM_COUNT",	        8);
 	
-	//Do not change these values (needed for auto linking stations)
-	define('BO_LINK_HOST', 'www.myblitzortung.de');
-	define('BO_LINK_URL',  '/blitzortung/bo.php');
-
+	
 	
 	//Some default PHP-Options
 	ini_set('magic_quotes_runtime', 0);

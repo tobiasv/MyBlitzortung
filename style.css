@@ -336,9 +336,14 @@ float: left;
 width: 160px;
 margin: 2px 0px;
 padding: 0;
-line-height: 13px;
+line-height: 9px;
 white-space: nowrap;
 text-align:left;
+}
+
+#myblitzortung .bo_sig_table td ul li .bo_value,
+#myblitzortung .bo_sig_table td ul li .bo_descr {
+font-size:11px;
 }
 
 #myblitzortung #bo_arch_map_img {

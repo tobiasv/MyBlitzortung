@@ -1006,9 +1006,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$date_end  = gmdate('Y-m-d H:i:s', $time_end);
 	$date_start    = gmdate('Y-m-d H:i:s', $time_end - 3600 * $hours_back);
 	
-	
-	$c = 299792458;
-
 	if ($show_empty_sig)
 	{
 		$sql_join = BO_DB_PREF."strikes s 
@@ -1076,11 +1073,47 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		{
 			$rtime = strtotime($row['rtime'].' UTC') + 1;
 			$time_diff = $rtime - $stime + ($row['rtimens'] - $row['stimens']) * 1E-9;
-			$dist_sig  = $c * $time_diff / 1000;
+			$dist_sig  = BO_C * $time_diff / 1000;
 		}
 
 		$bearing = bo_latlon2bearing($row['lat'], $row['lon']);
 
+		$loc_angle = null;
+		if ((bo_user_get_level() & BO_PERM_ARCHIVE) && $row['strike_id'])
+		{
+			$s_dists = array();
+			$s_bears = array();
+			$s_users = array();
+			$sql2 = "SELECT ss.station_id id
+				FROM ".BO_DB_PREF."stations_strikes ss
+				WHERE ss.strike_id='".$row['strike_id']."'
+				";
+			$res2 = bo_db($sql2);
+			while ($row2 = $res2->fetch_assoc())
+			{
+				$sdata = $stations[$row2['id']];
+				$s_dists[$row2['id']] = bo_latlon2dist($row['lat'], $row['lon'], $sdata['lat'], $sdata['lon']);
+				$s_bears[$row2['id']] = bo_latlon2bearing($sdata['lat'], $sdata['lon'], $row['lat'], $row['lon']);
+				$s_users[$row2['id']] = $sdata['user'];
+				$s_cities[$row2['id']] = $sdata['city'];
+			}
+			
+			asort($s_dists);
+			asort($s_bears);
+
+			end($s_bears);
+			list($sid, $lastbear) = each($s_bears);
+			$s_bear_diffs = array();
+			$lastbear -=360;
+			foreach($s_bears as $sid => $bear)
+			{
+				$s_bear_diffs[$sid] = $bear - $lastbear;
+				$lastbear = $bear;
+			}
+			
+			$loc_angle = max($s_bear_diffs);
+		}
+		
 		echo '<tr>';
 
 		echo '<td class="bo_sig_table_time">';
@@ -1148,8 +1181,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			
 			if ($row['raw_id'])
 			{
-				$cdev = $row['distance'] / $time_diff / $c;
-				echo number_format($cdev, 7, _BL('.'), _BL(',')).'c';
+				$cdev = $row['distance'] / $time_diff / BO_C;
+				echo number_format($cdev, 5, _BL('.'), _BL(',')).'c';
 				echo ' / '.round(($cdev-1)*$row['distance']).'m';
 				echo '">';
 				echo number_format($time_diff * 1000, 4, _BL('.'), _BL(','))._BL('unit_millisec');
@@ -1269,6 +1302,20 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 		}
 		
+		if ($loc_angle)
+		{
+			echo '<li>';
+			echo '<span class="bo_descr">';
+			echo 'Locating angle: ';
+			echo '</span>';
+			echo '<span class="bo_value">';
+			echo number_format($loc_angle, 0, _BL('.'), _BL(','));
+			echo '&deg;';
+			echo '</span>';
+			echo '</li>';
+		
+		}
+		
 		echo '</ul>';
 		
 		echo '<div style="clear:both"></div>';
@@ -1283,37 +1330,21 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		}
 
 		
-		if (bo_user_get_id() == 1 && ($strike_id || ($row['strike_id'] && isset($_GET['bo_show_part']))) )
+		if ( (bo_user_get_level() & BO_PERM_ARCHIVE) && ($strike_id || ($row['strike_id'] && isset($_GET['bo_show_part']))) )
 		{
-			echo '<tr><td class="bo_sig_table_strikeinfo" colspan="3" style="font-size:60%">';
-			
-			
-			$dists = array();
-			$bears = array();
-			$users = array();
-			$sql2 = "SELECT ss.station_id id
-				FROM ".BO_DB_PREF."stations_strikes ss
-				WHERE ss.strike_id='".$row['strike_id']."'
-				";
-			$res2 = bo_db($sql2);
-			while ($row2 = $res2->fetch_assoc())
-			{
-				$sdata = $stations[$row2['id']];
-				$dists[$row2['id']] = bo_latlon2dist($row['lat'], $row['lon'], $sdata['lat'], $sdata['lon']);
-				$bears[$row2['id']] = bo_latlon2bearing($row['lat'], $row['lon'], $sdata['lat'], $sdata['lon']);
-				$users[$row2['id']] = $sdata['user'];
-			}
-			
-			asort($dists);
+				
 			$i = 0;
-			foreach ($dists as $sid => $dist)
+			echo '<tr><td class="bo_sig_table_strikeinfo" colspan="3" style="font-size:60%">';
+			echo '<p>'._BL('Stations').':</p> ';
+			foreach ($s_dists as $sid => $dist)
 			{
 				echo $i ? ', ' : '';
 				echo '<a ';
 				echo ' href="'.BO_STATISTICS_URL.'&bo_station_id='.$sid.'" ';
 				echo ' title="';
+				echo htmlentities($s_cities[$sid]).': ';
 				echo round($dist/1000).'km / ';
-				echo round($bears[$sid]).'&deg; '.bo_bearing2direction($bears[$sid]);
+				echo round($s_bears[$sid]).'&deg; '.bo_bearing2direction($s_bears[$sid]);
 				
 				echo '" style="';
 				
@@ -1331,10 +1362,16 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					echo 'color:inherit;';
 				
 				echo '">';
-				echo $users[$sid];
+				
+				if (bo_user_get_id() == 1)
+					echo $s_users[$sid];
+				else
+					echo _BC($s_cities[$sid]);
+					
 				echo '</a>';
 				$i++;
 			}
+			echo '</p>';
 			
 			echo '</td></tr>';
 		}

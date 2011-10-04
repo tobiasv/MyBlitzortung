@@ -553,9 +553,11 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 		$whole_sig_count += $row['signalsh'];
 
+		if (!$sort)
+			$sort = BO_STATISTICS_STATIONS_SORT;
+		
 		switch($sort)
 		{
-			default: $sort = 'strikes';
 			case 'strikes':
 				$S[$row['sid']] = $row['strikesh'];
 				break;
@@ -568,6 +570,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				$S[$row['sid']] = $row['country'];
 				break;
 
+			default: $sort = 'distance';
 			case 'distance':
 				$S[$row['sid']] = $row['distance'];
 				break;
