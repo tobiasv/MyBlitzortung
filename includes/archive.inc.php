@@ -891,6 +891,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$strike_id = intval($_GET['bo_strike_id']);
 	$strikes_before = intval($_GET['bo_strikes_before']);
 	$date = $_GET['bo_datetime_to'];
+	$show_details = $_GET['bo_show_details'];
 	
 	$channels = bo_get_conf('raw_channels');
 	
@@ -981,9 +982,13 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		if ($perm)
 		{
+			echo '<input type="checkbox" name="bo_show_details" value="1" '.($show_details ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_show_details">';
+			echo '<label for="check_show_details"> '._BL('Details').'</label> &nbsp; ';
+
 			echo ' &nbsp; <span class="bo_form_descr">'._BL('Time').':</span> ';
 			echo '<input type="text" name="bo_datetime_to" value="'._BC($date).'" id="bo_archive_date" class="bo_archive_date">';
-			echo ' &nbsp; <input type="submit" value="'._BL('Ok').'">';
+			echo ' &nbsp; <input type="submit" value="'._BL('Ok').'"> &nbsp; ';
+
 		}
 		
 		echo '</fieldset>';
@@ -1379,7 +1384,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '</tr>';
 
 		
-		if ( (bo_user_get_level() & BO_PERM_ARCHIVE) && ($strike_id || ($row['strike_id'] && isset($_GET['bo_show_part']))) )
+		if ( (bo_user_get_level() & BO_PERM_ARCHIVE) && ($strike_id || ($row['strike_id'] && $show_details)) )
 		{
 				
 			$i = 0;
@@ -1390,7 +1395,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			{
 				echo $i ? ', ' : '';
 				echo '<a ';
-				echo ' href="'.BO_STATISTICS_URL.'&bo_station_id='.$sid.'" ';
+				echo ' href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$sid.'" ';
 				echo ' title="';
 				echo htmlentities($s_data[$sid]['city']).': ';
 				echo round($dist/1000).'km / ';

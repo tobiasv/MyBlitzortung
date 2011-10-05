@@ -316,8 +316,9 @@ font-size: 12px;
 color: #666;
 }
 
-#myblitzortung .bo_sig_table_stations {
+#myblitzortung td.bo_sig_table_stations {
 font-size: 10px;
+background: #fffff0;
 }
 
 #myblitzortung .bo_sig_table_stations h5 {
@@ -358,6 +359,11 @@ font-size:11px;
 #myblitzortung .bo_archive_station_dist {
 border-collapse: collapse;
 margin-bottom: 15px;
+border:1px solid #ddd;
+}
+
+#myblitzortung .bo_archive_station_dist td {
+background: transparent;
 }
 
 #myblitzortung .bo_archive_station_dist th {

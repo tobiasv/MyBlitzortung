@@ -493,8 +493,8 @@
 @define('BO_ARCHIVE_SHOW_SPECTRUM', true);
 
 //Strike details
-@define('BO_ARCHIVE_STR_DETAILS_LINECOLOR', '6f62');
-@define('BO_ARCHIVE_STR_DETAILS_LINECOLOR_NOCALC', 'fa02');
+@define('BO_ARCHIVE_STR_DETAILS_LINECOLOR', '6f64');
+@define('BO_ARCHIVE_STR_DETAILS_LINECOLOR_NOCALC', 'fa09');
 @define('BO_ARCHIVE_STR_DETAILS_DEFAULT_POINT', 'stations_strikedetails');
 
 //Animations (not the gif-animations!)
