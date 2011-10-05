@@ -872,4 +872,12 @@ $_BL['en']['Meteox rain radar'] = 'Rain radar (meteox.com)';
 
 
 
+/*************************************************************/
+/* Unsorted / New translations                               */
+/*************************************************************/
+
+$_BL['en']['Stations under construction'] = 'Stations under construction';
+$_BL['en']['Unknown'] = 'Unknown';
+$_BL['en']['Unknown or longer'] = 'Unknown or longer';
+$_BL['en']['Up to'] = 'Up to';
 

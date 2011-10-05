@@ -195,6 +195,10 @@
 // if error persits, send mail max. every defined minutes
 @define('BO_UP_ERR_SEND_INTERVAL', 60);  
 
+// if new station count is too low -> don't read new data
+@define('BO_UP_STATION_DIFFER',   0.9);     
+
+
 
 
 /*******************************************************************/

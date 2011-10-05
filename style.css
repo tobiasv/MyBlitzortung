@@ -625,6 +625,7 @@ background: #fd9;
 
 #myblitzortung table#bo_network_stations td.bo_numbers {
 text-align: right;
+white-space:nowrap;
 }
 
 #myblitzortung table#bo_network_stations td.bo_marked {

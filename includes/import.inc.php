@@ -1058,7 +1058,7 @@ function bo_update_stations($force = false, $max_time = 0)
 		$all_stations = bo_stations();
 		
 		//check if sth went wrong
-		if ($lines < count($all_stations) * 0.9)
+		if ($lines < count($all_stations) * BO_UP_STATION_DIFFER)
 		{
 			bo_update_error('stationcount', 'Station count differs too much: '.count($all_stations).'Database / '.$lines.' stations.txt');
 			bo_set_conf('uptime_stations', time());
@@ -1156,6 +1156,10 @@ function bo_update_stations($force = false, $max_time = 0)
 			//station was deleted in stations.txt :(
 			if (!isset($Count[$id]))
 			{
+				$deleted_stations = unserialize(bo_get_conf('stations_deleted'));
+				$deleted_stations[] = $all_stations[$id];
+				bo_set_conf('stations_deleted', serialize($deleted_stations));
+				
 				bo_db("DELETE FROM ".BO_DB_PREF."stations WHERE id='$id'", false);
 				echo "\n<p>Deleted station $id: Data ".serialize($all_stations[$id])."</p>\n";
 			}
@@ -1173,20 +1177,33 @@ function bo_update_stations($force = false, $max_time = 0)
 		else
 		{
 			$new = false;
+			$cdata_tmp = array();
+			
 			foreach($activebyuser as $user => $d)
 			{
-				if (!isset($data[$user]) && $d['sig'] && $d['lat'] && $d['lon']) //no old entry but new signals and a fixed
+				if (!isset($data[$user]) && $d['sig'] && $d['lat'] && $d['lon']) //no old entry but new signals and gps fixed
 				{
-					$data[$user] = time(); // mark as NEW STATION
+					// mark as NEW STATION
+					$data[$user] = time(); 
+					
+					//construction time if mybo installation is not too new ;-)
+					$changed = strtotime($all_stations[$d['id']]['changed']);
+					if ($changed - bo_get_conf('first_update_time') > 3600 * 24);
+						$cdata_tmp[$user] = time() - $changed;
+					
 					$new = true;
 					
-					echo "<p>Found NEW station: <b>$user</b></p>\n";
+					echo "<p>Found NEW station: <b>$user</b> Construction time: ".round($cdata_tmp[$user]/3600/24)."days</p>\n";
 				}
 			}
 		
 			if ($new)
 			{
 				bo_set_conf('stations_new_date', serialize($data));
+				
+				//extra data
+				$cdata = unserialize(bo_get_conf('stations_new_data'));
+				bo_set_conf('stations_new_data', serialize(array_merge($cdata, $cdata_tmp)));
 			}
 		}
 		

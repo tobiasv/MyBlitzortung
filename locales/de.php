@@ -895,3 +895,12 @@ $_BL['de']['NRW'] = 'NRW';
 $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
 
 
+
+/*************************************************************/
+/* Unsorted / New translations                               */
+/*************************************************************/
+
+$_BL['de']['Stations under construction'] = 'Stationen im Aufbau';
+$_BL['de']['Unknown'] = 'Unbekannt oder länger';
+$_BL['de']['Up to'] = 'Bis zu';
+

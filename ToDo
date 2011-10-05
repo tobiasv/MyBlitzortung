@@ -35,4 +35,5 @@ Features
    --> Android versions???
    
 - two or more ranges for alerts
-
+- amcharts instead of jpgraph (www.amcharts.com)
+- top-list of strike currents (calc. of current has to be improved first!)

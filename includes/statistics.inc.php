@@ -471,14 +471,24 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 //show network-statistics
 function bo_show_statistics_network($station_id = 0, $own_station = true, $add_graph = '')
 {
-	$sort = $_GET['bo_sort'];
-	$date_1h = gmdate('Y-m-d H:i:s', time() - 3600);
+	$sort 					= $_GET['bo_sort'];
+	$date_1h 				= gmdate('Y-m-d H:i:s', time() - 3600);
+	$mybo_first_update		= gmdate('Y-m-d H:i:s', bo_get_conf('first_update_time'));
+	$whole_sig_count 		= 0;
+	$whole_sig_ratio 		= 0;
+	$whole_sig_ratio_cnt 	= 0;
+	$whole_strike_ratio 	= 0;
+	$whole_strike_ratio_cnt = 0;
+	$under_construction     = array();
 
+	
+	//participants
 	$row = bo_db("SELECT MAX(users) max_users, AVG(users) avg_users FROM ".BO_DB_PREF."strikes WHERE time > '$date_1h'")->fetch_assoc();
 	$max_part = $row['max_users'];
 	$avg_part = $row['avg_users'];
 
 	
+	//Strikes/h and last update
 	$sql = "SELECT strikesh, time 
 			FROM ".BO_DB_PREF."stations_stat 
 			WHERE station_id='0' 
@@ -486,9 +496,8 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$row = bo_db($sql)->fetch_assoc();
 	$strikesh = $row['strikesh'];
 	$time = strtotime($row['time'].' UTC');
-
-	if (!$own_station)
-		$sinfo = bo_station_info($station_id);
+	$last_update = (time()-$time)/60;
+	
 	
 	// currently available stations
 	$sql = "SELECT COUNT(*) cnt
@@ -497,14 +506,33 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$res = bo_db($sql);
 	$row = $res->fetch_assoc();
 	$available = $row['cnt'];
-	
-	$last_update = (time()-$time)/60;
 
-	$whole_sig_count = 0;
-	$whole_sig_ratio = 0;
-	$whole_sig_ratio_cnt = 0;
-	$whole_strike_ratio = 0;
-	$whole_strike_ratio_cnt = 0;
+	
+	// stations under construction
+	$sql = "SELECT COUNT(*) cnt, 
+					CASE 
+						WHEN TO_DAYS(changed) - TO_DAYS('$mybo_first_update') <= 7 THEN -1
+						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 7 THEN 7
+						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 30 THEN 30
+						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 30*3 THEN 30*3
+						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 30*6 THEN 30*6
+						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 365  THEN 365
+						ELSE 0
+					END type
+			FROM ".BO_DB_PREF."stations
+			WHERE last_time = '1970-01-01 00:00:00'
+			GROUP BY type";
+	$res = bo_db($sql);
+	while($row = $res->fetch_assoc())
+	{
+		$under_construction[$row['type']] = $row['cnt'];
+	}
+	krsort($under_construction);
+	
+	
+	if (!$own_station)
+		$sinfo = bo_station_info($station_id);
+	
 
 	$D = array();
 	$res = bo_db("SELECT a.id sid, a.city city, a.country country, a.distance distance, a.user user,
@@ -522,7 +550,9 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 		if (!$own_station)
 			$D[$row['sid']]['distance'] = bo_latlon2dist($row['lat'], $row['lon'], $sinfo['lat'], $sinfo['lon']);
-		
+		else
+			$D[$row['sid']]['distance'] = $row['distance'];
+			
 		if ($row['signalsh'])
 		{
 			$D[$row['sid']]['signalsh_ratio'] = $row['strikesh'] / $row['signalsh'];
@@ -572,7 +602,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 			default: $sort = 'distance';
 			case 'distance':
-				$S[$row['sid']] = $row['distance'];
+				$S[$row['sid']] = $D[$row['sid']]['distance'];
 				break;
 
 			case 'user':
@@ -615,8 +645,6 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(',')).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikesh, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.number_format($avg_part, 1, _BL('.'), _BL(',')).'</span>';
@@ -627,6 +655,26 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo $whole_strike_ratio ? number_format($whole_strike_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.number_format($whole_sig_count, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span>';
+	
+	echo '<li><span class="bo_descr">'._BL('Stations under construction').': </span>';
+	echo '<span class="bo_value" title="';
+	foreach($under_construction as $days => $cnt)
+	{
+		if ($days == -1)
+			echo _BL('Unknown or longer').': ';
+		else if ($days == 0)
+			echo _BL('More').': ';
+		else
+			echo _BL('Up to').' '.$days.' '._BL('days').': ';
+		echo $cnt;
+		echo ' &bull; ';
+	}
+	echo '">';
+	echo number_format(array_sum($under_construction), 0, _BL('.'), _BL(','));
+	echo '</span>';
+	
 	echo '</ul>';
 
 	echo '<a name="table_network"></a>';
@@ -742,7 +790,12 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'efficiency' ? 'bo_marked' : '').'">';
-		echo number_format($d['efficiency'] * 100, 1, _BL('.'), _BL(',')).'%';
+		
+		if ($d['efficiency'] <= -10)
+			echo '< -'.number_format(999, 0, _BL('.'), _BL(',')).'%';
+		else
+			echo number_format($d['efficiency'] * 100, 1, _BL('.'), _BL(',')).'%';
+			
 		echo '</td>';
 
 		echo '</tr>';
@@ -1412,14 +1465,14 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 			echo '<span class="bo_form_group">';
 			echo '<span class="bo_form_descr">'._BL('Min').':</span>';
 			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'deviations_time\');" id="bo_stat_deviations_time_min" disabled>';
-			for($i=0;$i<6000;$i+=100)
+			for($i=0;$i<20000;$i+=100)
 				echo '<option value="'.$i.'">'.number_format($i / 1000, 1, _BL('.'), _BL(',')).'</option>';
 			echo '</select> ';
 			echo '</span>';
 			echo '<span class="bo_form_group">';
 			echo '<span class="bo_form_descr">'._BL('Max').':</span>';
 			echo '<select onchange="bo_change_value(this.value, \'deviations_time\', \'value_max\');" id="bo_stat_deviations_time_max" disabled>';
-			for($i=0;$i<6000;$i+=100)
+			for($i=0;$i<20000;$i+=100)
 				echo '<option value="'.$i.'" '.($i == 1000 ? 'selected' : '').'>'.number_format($i / 1000, 1, _BL('.'), _BL(',')).'</option>';
 			echo '</select> ';
 			echo '</span>';
