@@ -432,7 +432,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			echo '<option value="'.$i.'" '.($i == $hour1 ? 'selected' : '').'>'.sprintf('%02d', $i).'</option>';
 		echo '</select> : ';
 		echo '<select id="bo_map_select_minute1" disabled>';
-		for($i=0;$i<=59;$i++)
+		for($i=0;$i<=59;$i+=5)
 			echo '<option value="'.$i.'" '.($i == $minute1 ? 'selected' : '').'>'.sprintf('%02d', $i).'</option>';
 		echo '</select>';
 		echo ' - ';
@@ -453,7 +453,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			echo '<option value="'.$i.'" '.($i == $hour2 ? 'selected' : '').'>'.sprintf('%02d', $i).'</option>';
 		echo '</select> : ';
 		echo '<select id="bo_map_select_minute2" disabled>';
-		for($i=0;$i<=59;$i++)
+		for($i=0;$i<=59;$i+=5)
 			echo '<option value="'.$i.'" '.($i == $minute2 ? 'selected' : '').'>'.sprintf('%02d', $i).'</option>';
 		echo '</select>';
 		

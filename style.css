@@ -316,6 +316,15 @@ font-size: 12px;
 color: #666;
 }
 
+#myblitzortung .bo_sig_table_stations {
+font-size: 10px;
+}
+
+#myblitzortung .bo_sig_table_stations h5 {
+font-size:11px;
+text-decoration:underline;
+color: #000;
+}
 
 #myblitzortung .bo_sig_table_head {
 font-weight: bold;
@@ -344,6 +353,15 @@ text-align:left;
 #myblitzortung .bo_sig_table td ul li .bo_value,
 #myblitzortung .bo_sig_table td ul li .bo_descr {
 font-size:11px;
+}
+
+#myblitzortung .bo_archive_station_dist {
+border-collapse: collapse;
+margin-bottom: 15px;
+}
+
+#myblitzortung .bo_archive_station_dist th {
+border:1px solid #ddd;
 }
 
 #myblitzortung #bo_arch_map_img {

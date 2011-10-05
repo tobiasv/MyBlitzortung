@@ -1028,7 +1028,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$table = 'r';
 	}
 	
-	if (bo_user_get_id() == 1)
+	if (bo_user_get_id())
 	{
 		$stations = bo_stations();
 	}
@@ -1059,7 +1059,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	echo '<table class="bo_sig_table'.(BO_ARCHIVE_SHOW_SPECTRUM ? ' bo_sig_table_spectrum' : '').'">';
 
 	
-
 	while($row = $res->fetch_assoc())
 	{
 
@@ -1078,41 +1077,83 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 		$bearing = bo_latlon2bearing($row['lat'], $row['lon']);
 
+		
+		
+		//Calculate angles and distances 
 		$loc_angle = null;
 		if ((bo_user_get_level() & BO_PERM_ARCHIVE) && $row['strike_id'])
 		{
 			$s_dists = array();
+			$s_sdists = array();
 			$s_bears = array();
-			$s_users = array();
+			$s_data  = array();
+			
+			//Participated stations
 			$sql2 = "SELECT ss.station_id id
 				FROM ".BO_DB_PREF."stations_strikes ss
-				WHERE ss.strike_id='".$row['strike_id']."'
-				";
+				WHERE ss.strike_id='".$row['strike_id']."'";
 			$res2 = bo_db($sql2);
 			while ($row2 = $res2->fetch_assoc())
 			{
-				$sdata = $stations[$row2['id']];
-				$s_dists[$row2['id']] = bo_latlon2dist($row['lat'], $row['lon'], $sdata['lat'], $sdata['lon']);
-				$s_bears[$row2['id']] = bo_latlon2bearing($sdata['lat'], $sdata['lon'], $row['lat'], $row['lon']);
-				$s_users[$row2['id']] = $sdata['user'];
-				$s_cities[$row2['id']] = $sdata['city'];
+				$sid = $row2['id'];
+				
+				$s_data[$sid] = $stations[$row2['id']];
+				$s_dists[0][$sid] = bo_latlon2dist($row['lat'], $row['lon'], $s_data[$sid]['lat'], $s_data[$sid]['lon']);
+				$s_bears[0][$sid] = bo_latlon2bearing($s_data[$sid]['lat'], $s_data[$sid]['lon'], $row['lat'], $row['lon']);
 			}
 			
-			asort($s_dists);
-			asort($s_bears);
+			
 
-			end($s_bears);
-			list($sid, $lastbear) = each($s_bears);
-			$s_bear_diffs = array();
-			$lastbear -=360;
-			foreach($s_bears as $sid => $bear)
+			//Get stations that participated in calculation
+			asort($s_dists[0]);
+			$i=0;
+			foreach($s_dists[0] as $sid => $dist)
 			{
-				$s_bear_diffs[$sid] = $bear - $lastbear;
-				$lastbear = $bear;
+				if ($i < bo_participants_locating_max())
+				{
+					$s_dists[1][$sid] = $s_dists[0][$sid];
+					$s_bears[1][$sid] = $s_bears[0][$sid];
+				}
+				else
+					break;
+					
+				$i++;
+			}
+
+			//Calculate distances and angles for calc and non-calc stations
+			for ($i=0;$i<=1;$i++)
+			{
+				
+				//Distances between stations
+				$s_data_tmp = $s_data;
+				foreach($s_data as $sid1 => $d1)
+				{
+					foreach($s_data_tmp as $sid2 => $d2)
+					{
+						$s_sdists[$i][$sid1.'.'.$sid2] = bo_latlon2dist($d1['lat'], $d1['lon'], $d2['lat'], $d2['lon']);
+					}
+				}
+				asort($s_sdists[$i]);
+
+				
+				//Locating angles
+				asort($s_bears[$i]);
+				end($s_bears[$i]);
+				list($sid, $lastbear) = each($s_bears[$i]);
+				$s_bear_diffs = array();
+				$lastbear -=360;
+				foreach($s_bears[$i] as $sid => $bear)
+				{
+					$s_bear_diffs[$sid] = $bear - $lastbear;
+					$lastbear = $bear;
+				}
+				
+				$loc_angle[$i] = 360 - max($s_bear_diffs);
 			}
 			
-			$loc_angle = max($s_bear_diffs);
 		}
+
+
 		
 		echo '<tr>';
 
@@ -1302,15 +1343,20 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 		}
 		
-		if ($loc_angle)
+		if ($loc_angle[0])
 		{
 			echo '<li>';
 			echo '<span class="bo_descr">';
-			echo 'Locating angle: ';
+			echo _BL('Locating angle').': ';
 			echo '</span>';
 			echo '<span class="bo_value">';
-			echo number_format($loc_angle, 0, _BL('.'), _BL(','));
-			echo '&deg;';
+			
+			echo number_format($loc_angle[1], 0, _BL('.'), _BL(','));
+			echo '&deg; ';
+
+			echo '('.number_format($loc_angle[0], 0, _BL('.'), _BL(','));
+			echo '&deg;)';
+			
 			echo '</span>';
 			echo '</li>';
 		
@@ -1329,22 +1375,26 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo _BL('no strike detected');
 		}
 
+		echo '</td>';
+		echo '</tr>';
+
 		
 		if ( (bo_user_get_level() & BO_PERM_ARCHIVE) && ($strike_id || ($row['strike_id'] && isset($_GET['bo_show_part']))) )
 		{
 				
 			$i = 0;
-			echo '<tr><td class="bo_sig_table_strikeinfo" colspan="3" style="font-size:60%">';
-			echo '<p>'._BL('Stations').':</p> ';
-			foreach ($s_dists as $sid => $dist)
+			echo '<tr><td class="bo_sig_table_strikeinfo bo_sig_table_stations" colspan="3">';
+			
+			echo '<h5>'._BL('Stations').':</h5> ';
+			foreach ($s_dists[0] as $sid => $dist)
 			{
 				echo $i ? ', ' : '';
 				echo '<a ';
 				echo ' href="'.BO_STATISTICS_URL.'&bo_station_id='.$sid.'" ';
 				echo ' title="';
-				echo htmlentities($s_cities[$sid]).': ';
+				echo htmlentities($s_data[$sid]['city']).': ';
 				echo round($dist/1000).'km / ';
-				echo round($s_bears[$sid]).'&deg; '.bo_bearing2direction($s_bears[$sid]);
+				echo round($s_bears[0][$sid]).'&deg; '.bo_bearing2direction($s_bears[0][$sid]);
 				
 				echo '" style="';
 				
@@ -1364,22 +1414,100 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '">';
 				
 				if (bo_user_get_id() == 1)
-					echo $s_users[$sid];
+					echo $s_data[$sid]['user'];
 				else
-					echo _BC($s_cities[$sid]);
+					echo _BC($s_data[$sid]['city']);
 					
 				echo '</a>';
 				$i++;
 			}
 			echo '</p>';
 			
+			
+			//if ($show_empty_sig && $count == 1 && $strike_id)
+			{
+				$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;
+				$img_dim = bo_archive_get_dim($map);
+				echo '<h5>'._BL('Participated stations').'</h5>';
+				echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
+				echo bo_insert_html_hidden(array('bo_map'));
+				echo '<fieldset>';
+				echo bo_archive_select_map($map);
+				echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $row['strike_id']).'&bo_strikes_before=100">'._BL('Animation').'</a>';
+				echo '</fieldset>';
+				$img_file = bo_bofile_url().'?map='.$map.'&strike_id='.$row['strike_id'].'&bo_lang='._BL();
+				echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
+			}
+			
+			
+			$start = 1; //$s_dists[0] == $s_dists[1] ? 1 : 0;
+			for($i=$start;$i<=1;$i++)
+			{
+				if ($i == 0)
+					echo '<h5>'._BL('Distances between all stations').':</h5>';
+				else
+					echo '<h5>'._BL('Distances between stations used for locating').':</h5>';
+					
+					
+				echo '<table class="bo_archive_station_dist">';
+				
+				echo '<tr><th></th><th>'._BL('Id').'</th>';
+				foreach($s_dists[$i] as $sid2 => $d2)
+				{
+					echo '<th>'.$sid2.'</th>';
+				}
+				echo '</tr>';
+
+				foreach($s_dists[$i] as $sid1 => $d1)
+				{
+					$nd = false;
+					
+					echo '<tr>';
+					echo '<th>'._BC($s_data[$sid1]['city']).'</th>';
+					echo '<th>'.$sid1.'</th>';
+					foreach($s_dists[$i] as $sid2 => $d2)
+					{
+						echo '<td>';
+						
+						if ($sid1 == $sid2 || $nd)
+						{
+							echo '&nbsp;';
+							$nd = true;
+						}
+						else
+						{
+							$dist = round($s_sdists[$i][$sid1.'.'.$sid2]/1000);
+							
+							echo '<span style="';
+							
+							if ($dist < 20)
+								echo 'color: red';
+							elseif ($dist < 50)
+								echo 'color: #fa0';
+							elseif ($dist < 100)
+								echo 'color: #53f';
+							elseif ($dist < 200)
+								echo 'color: #06f';
+							
+							echo '">';
+							echo $dist;
+							echo '</span>';
+						}
+							
+						echo '</td>';
+					}
+					echo '</tr>';
+				}
+				
+				echo '</table>';
+			}
+			
+			
 			echo '</td></tr>';
+			
 		}
 
-		
-		echo '</td>';
-		echo '</tr>';
-
+	
 		if ($count == $per_page)
 			break;
 	}
@@ -1400,22 +1528,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	echo '</form>';
 	
 	
-	if ($show_empty_sig && $count == 1 && $strike_id)
-	{
-		$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;
-		$img_dim = bo_archive_get_dim($map);
-		echo '<h4>'._BL('Participated stations').'</h4>';
-		echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
-		echo bo_insert_html_hidden(array('bo_map'));
-		echo '<fieldset>';
-		echo bo_archive_select_map($map);
-		
-		echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $strike_id).'&bo_strikes_before=100">'._BL('Animation').'</a>';
-		
-		echo '</fieldset>';
-		$img_file = bo_bofile_url().'?map='.$map.'&strike_id='.$strike_id.'&bo_lang='._BL();
-		echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
-	}
 }
 
 
