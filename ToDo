@@ -14,6 +14,7 @@ Bugs / Improvements
 
 Features
 --------
+- General Overlay for locating accuracy (created manually, hosted on Blitzortung.org?)
 - Submenu on "Info" page: Overview / Participate -> Small howto + images/descriptions of existing stations
 - GUI for config
 - auto zoom-out if not enough strikes in map

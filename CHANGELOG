@@ -14,10 +14,12 @@ Version 0.7.3 (2011-10-05)
 - new: stations under construction
 - new: more strike locating info
 - new: some special effects ;-)
+- new: possibility to add no-cookie domain
 - fix: windroses
 - fix: another strike duplicate issue
 - graph colors adjusted (blue = lightning ...)
 - changes behaviour of session closing
+- cleanups, other fixes, small improvements
 
 Version 0.7.2b (2011-09-15)
 ---------------------------
