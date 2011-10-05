@@ -880,4 +880,4 @@ $_BL['en']['Stations under construction'] = 'Stations under construction';
 $_BL['en']['Unknown'] = 'Unknown';
 $_BL['en']['Unknown or longer'] = 'Unknown or longer';
 $_BL['en']['Up to'] = 'Up to';
-
+$_BL['en']['h4_stations_under_construction'] = 'Stations under construction';

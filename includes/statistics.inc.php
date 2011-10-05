@@ -473,7 +473,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 {
 	$sort 					= $_GET['bo_sort'];
 	$date_1h 				= gmdate('Y-m-d H:i:s', time() - 3600);
-	$mybo_first_update		= gmdate('Y-m-d H:i:s', bo_get_conf('first_update_time'));
+	$mybo_first_update		= bo_get_conf('first_update_time');
 	$whole_sig_count 		= 0;
 	$whole_sig_ratio 		= 0;
 	$whole_sig_ratio_cnt 	= 0;
@@ -511,7 +511,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	// stations under construction
 	$sql = "SELECT COUNT(*) cnt, 
 					CASE 
-						WHEN TO_DAYS(changed) - TO_DAYS('$mybo_first_update') <= 7 THEN -1
+						WHEN TO_DAYS(changed) - TO_DAYS('".gmdate('Y-m-d H:i:s', $mybo_first_update)."') <= 7 THEN -1
 						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 7 THEN 7
 						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 30 THEN 30
 						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 30*3 THEN 30*3
@@ -644,36 +644,39 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo '</p>';
 
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(',')).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikesh, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.number_format($avg_part, 1, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(',')).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikesh, 0, _BL('.'), _BL(',')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.number_format($avg_part, 1, _BL('.'), _BL(',')).'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Mean locating ratio').': </span><span class="bo_value">';
 	echo $whole_sig_ratio ? number_format($whole_sig_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Mean strike ratio').': </span><span class="bo_value">';
 	echo $whole_strike_ratio ? number_format($whole_strike_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.number_format($whole_sig_count, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.number_format($whole_sig_count, 0, _BL('.'), _BL(',')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span></li>';
 	
-	echo '<li><span class="bo_descr">'._BL('Stations under construction').': </span>';
-	echo '<span class="bo_value" title="';
-	foreach($under_construction as $days => $cnt)
+	if (intval(BO_STATISTICS_SHOW_STATIONS_UNDER_CONSTR))
 	{
-		if ($days == -1)
-			echo _BL('Unknown or longer').': ';
-		else if ($days == 0)
-			echo _BL('More').': ';
-		else
-			echo _BL('Up to').' '.$days.' '._BL('days').': ';
-		echo $cnt;
-		echo ' &bull; ';
+		echo '<li><span class="bo_descr">'._BL('Stations under construction').': </span>';
+		echo '<span class="bo_value" title="';
+		foreach($under_construction as $days => $cnt)
+		{
+			if ($days == -1)
+				echo _BL('Unknown or longer').': ';
+			else if ($days == 0)
+				echo _BL('More').': ';
+			else
+				echo _BL('Up to').' '.$days.' '._BL('days').': ';
+			echo $cnt;
+			echo ' &bull; ';
+		}
+		echo '">';
+		echo number_format(array_sum($under_construction), 0, _BL('.'), _BL(','));
+		echo '</span></li>';
 	}
-	echo '">';
-	echo number_format(array_sum($under_construction), 0, _BL('.'), _BL(','));
-	echo '</span>';
 	
 	echo '</ul>';
 
@@ -836,7 +839,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			echo '<a name="new_stations"></a>';
 			echo '<h4>'._BL('h4_new_stations').'</h4>';
 
-			echo '<ul class="bo_stat_overview">';
+			echo '<ul class="bo_stat_overview" id="bo_new_stations">';
 			
 			$i = 0;
 			foreach($new_stations as $id => $d)
@@ -871,6 +874,49 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo '<a name="graph_signals_all"></a>';
 	echo '<h4>'._BL('h4_graph_signals_all').'</h4>';
 	bo_show_graph('signals_all', $add_graph);
+	
+	
+	// stations under construction
+	if (bo_user_get_id() == 1)
+	{
+		$station_under_constr = array();
+		$sql = "SELECT user, id
+				FROM ".BO_DB_PREF."stations
+				WHERE last_time = '1970-01-01 00:00:00'
+				ORDER BY changed DESC";
+		$res = bo_db($sql);
+		while($row = $res->fetch_assoc())
+			$station_under_constr[$row['id']] = $user_stations[$row['user']];
+		
+
+		echo '<a name="bo_stations_under_construction"></a>';
+		echo '<h4>'._BL('h4_stations_under_construction').'</h4>';
+		echo '<ul class="bo_stat_overview" id="bo_stations_under_constr">';
+				
+		$i = 0;
+		foreach($station_under_constr as $id => $d)
+		{
+			echo '<li><span class="bo_descr">';
+			echo $d['user'].' <span title="'._BL(htmlentities($d['country'])).'">('._BC($d['city']).')</span>';
+			echo '</span>';
+			
+			$changed = strtotime($d['changed']);
+			
+			echo '<span class="bo_value">';
+			if ($changed - $mybo_first_update < 48 * 3600 * 7)
+				echo '?';
+			else
+				echo date(_BL('_date'), $changed);
+			echo '</span>';
+			
+			$i++;
+		}
+		
+		echo '</ul>';
+
+	}
+	
+	
 	
 	echo '</div>';
 

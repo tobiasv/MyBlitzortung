@@ -3,18 +3,21 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.3 (2011-10-??)
+Version 0.7.3 (2011-10-05)
 --------------------------
+- IMPORTANT: changed some database keys (NOTE: Update can take several minutes)
 - new: Hungarian translation (by Gabor)
 - new: kml overlays on dynamic map
 - new: kml output to display maps in google earth
-- new: some special effects ;-)
 - new: mouseover on signal graphs to zoom in
 - new: BO_RADIUS_STAT for statistics
+- new: stations under construction
+- new: more strike locating info
+- new: some special effects ;-)
 - fix: windroses
+- fix: another strike duplicate issue
 - graph colors adjusted (blue = lightning ...)
 - changes behaviour of session closing
-- changed some database keys (NOTE: Update can take several minutes)
 
 Version 0.7.2b (2011-09-15)
 ---------------------------

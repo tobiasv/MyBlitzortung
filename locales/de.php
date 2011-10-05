@@ -903,4 +903,4 @@ $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
 $_BL['de']['Stations under construction'] = 'Stationen im Aufbau';
 $_BL['de']['Unknown'] = 'Unbekannt oder länger';
 $_BL['de']['Up to'] = 'Bis zu';
-
+$_BL['de']['h4_stations_under_construction'] = 'Stationen im Aufbau';

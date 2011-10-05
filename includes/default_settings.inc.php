@@ -295,6 +295,10 @@
 @define('BO_STATISTICS_SHOW_NEW_STATIONS', 0);
 
 
+// Show stations under construction
+@define('BO_STATISTICS_SHOW_STATIONS_UNDER_CONSTR', 1);
+
+
 // Statistics for all station                                  
 @define('BO_STATISTICS_ALL_STATIONS', 0); // 0 = disable, 1 = with specific link, 2 = links from table for everyone
 
