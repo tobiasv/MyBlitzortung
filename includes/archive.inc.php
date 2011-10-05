@@ -264,17 +264,17 @@ function bo_show_archive_map()
 
 		echo '<div class="bo_arch_map_links">';
 		echo _BL('Yesterday').': &nbsp; ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_ok')).'&bo_day_add=0" >'._BL('Picture').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_hour_from', 'bo_hour_to', 'bo_ok')).'&bo_day_add=0&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
 		
 		echo '  &nbsp;  &nbsp; &nbsp; ';
 		echo _BL('Today').': &nbsp; ';
-		echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_ok')).'&bo_day_add=1" >'._BL('Picture').'</a> ';
+		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url(array('bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_hour_from', 'bo_hour_to', 'bo_ok')).'&bo_day_add=1&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
 			
 		echo '</div>';
 
