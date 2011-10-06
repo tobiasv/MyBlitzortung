@@ -1391,7 +1391,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		}
 
-		if ($row['status'] == 0)
+		if ($row['strike_id'] && $row['status'] == 0)
 		{
 			echo '<li>';
 			echo '<span class="bo_value bo_strike_not_confirmed">';
