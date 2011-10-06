@@ -25,7 +25,7 @@ if (!defined("BO_VER"))
 	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.7.3');
+	define("BO_VER", '0.7.3a-dev');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);

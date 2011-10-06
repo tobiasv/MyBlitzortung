@@ -3,6 +3,10 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.3a-dev
+------------------
+- new: drawing of hyperbolic curves - you can see how locating is done
+
 Version 0.7.3 (2011-10-05)
 --------------------------
 - IMPORTANT: changed some database keys (NOTE: Update can take several minutes)
