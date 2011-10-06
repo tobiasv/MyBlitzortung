@@ -734,3 +734,8 @@ margin: 0px 0px 5px 5px;
 #myblitzortung .bo_select_region {
 width: 130px;
 }
+
+#myblitzortung .bo_strike_not_confirmed {
+color:red;
+font-weight:bold;
+}

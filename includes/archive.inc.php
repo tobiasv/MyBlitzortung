@@ -1024,6 +1024,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	{
 		$time_end = $datetime_to;
 	}
+	else if ($show_empty_sig && ($lat || $strike_id))
+	{
+		$time_end = time();
+	}
 	else
 	{
 		$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
@@ -1342,9 +1346,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '</span>';
 				echo '</li>';
 			}
-
-		
-			
 			
 		}
 		
@@ -1388,6 +1389,15 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</span>';
 			echo '</li>';
 		
+		}
+
+		if ($row['status'] == 0)
+		{
+			echo '<li>';
+			echo '<span class="bo_value bo_strike_not_confirmed">';
+			echo _BL('Strike is not confirmed');
+			echo '</span>';
+			echo '</li>';
 		}
 		
 		echo '</ul>';
