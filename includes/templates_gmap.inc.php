@@ -132,6 +132,7 @@ $_BO['tpl_overlay']['blids_de']['sel_name'] = 'BLIDS Germany';
 $_BO['tpl_overlay']['blids_de']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_de']['to_mercator'] = false;
 $_BO['tpl_overlay']['blids_de']['opacity'] = 50;
+$_BO['tpl_overlay']['blids_de']['layer'] = 1;
 
 //BLIDS BENELUX Lightning Overlay
 //WARNING: Copyright! Only internal private usage!
@@ -142,6 +143,7 @@ $_BO['tpl_overlay']['blids_benelux']['sel_name'] = 'BLIDS BeNeLux';
 $_BO['tpl_overlay']['blids_benelux']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_benelux']['to_mercator'] = false;
 $_BO['tpl_overlay']['blids_benelux']['opacity'] = 50;
+$_BO['tpl_overlay']['blids_benelux']['layer'] = 1;
 
 //BLIDS UK Lightning Overlay
 //WARNING: Copyright! Only internal private usage!
@@ -152,6 +154,7 @@ $_BO['tpl_overlay']['blids_uk']['sel_name'] = 'BLIDS UK';
 $_BO['tpl_overlay']['blids_uk']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_uk']['to_mercator'] = false;
 $_BO['tpl_overlay']['blids_uk']['opacity'] = 50;
+$_BO['tpl_overlay']['blids_uk']['layer'] = 1;
 
 //BLIDS POLAND Lightning Overlay
 //WARNING: Copyright! Only internal private usage!
@@ -162,6 +165,7 @@ $_BO['tpl_overlay']['blids_pl']['sel_name'] = 'BLIDS Poland';
 $_BO['tpl_overlay']['blids_pl']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_pl']['to_mercator'] = false;
 $_BO['tpl_overlay']['blids_pl']['opacity'] = 50;
+$_BO['tpl_overlay']['blids_pl']['layer'] = 1;
 
 //BLIDS SWITZERLAND Lightning Overlay
 //WARNING: Copyright! Only internal private usage!
@@ -172,7 +176,7 @@ $_BO['tpl_overlay']['blids_ch']['sel_name'] = 'BLIDS Switzerland';
 $_BO['tpl_overlay']['blids_ch']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_ch']['to_mercator'] = false;
 $_BO['tpl_overlay']['blids_ch']['opacity'] = 50;
-
+$_BO['tpl_overlay']['blids_ch']['layer'] = 1;
 
 //T-Online/wetter.info Radar
 //WARNING: Copyright! Only internal private usage!
@@ -196,7 +200,7 @@ $_BO['tpl_overlay']['wetterinfo_radar_small']['sel_name'] = 'Wetter.info Radar (
 $_BO['tpl_overlay']['wetterinfo_radar_small']['only_loggedin'] = true;
 $_BO['tpl_overlay']['wetterinfo_radar_small']['to_mercator'] = false;
 $_BO['tpl_overlay']['wetterinfo_radar_small']['opacity'] = 60;
-
+$_BO['tpl_overlay']['wetterinfo_radar_small']['layer'] = 1;
 
 //World Wide Lightning Location Network (wwlln.net) 
 //Copyright?
@@ -215,7 +219,7 @@ $_BO['tpl_overlay']['wwlln_clouds']['sel_name'] = 'WWLLN with clouds';
 $_BO['tpl_overlay']['wwlln_clouds']['only_loggedin'] = false;
 $_BO['tpl_overlay']['wwlln_clouds']['to_mercator'] = false;
 $_BO['tpl_overlay']['wwlln_clouds']['opacity'] = 50;
-
+$_BO['tpl_overlay']['wwlln_clouds']['layer'] = 1;
 
 /*** Overlays that don't fit ***/
 

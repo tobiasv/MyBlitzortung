@@ -264,14 +264,20 @@ function bo_show_archive_map()
 
 		echo '<div class="bo_arch_map_links">';
 		echo _BL('Yesterday').': &nbsp; ';
-		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0" >'._BL('Picture').'</a> ';
+		
+		if (!$ani_cfg['force'])
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
 			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
 		
 		echo '  &nbsp;  &nbsp; &nbsp; ';
+		
+		
 		echo _BL('Today').': &nbsp; ';
-		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1" >'._BL('Picture').'</a> ';
+		
+		if (!$ani_cfg['force'])
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
 			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
@@ -891,7 +897,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$strike_id = intval($_GET['bo_strike_id']);
 	$strikes_before = intval($_GET['bo_strikes_before']);
 	$date = $_GET['bo_datetime_to'];
+	$region = $_GET['bo_region'];
 	$show_details = $_GET['bo_show_details'];
+	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
 	
 	$channels = bo_get_conf('raw_channels');
 	
@@ -941,18 +949,26 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	else if ($strike_id && $strikes_before)
 	{
 		//Special effects ;-)
-		$map = intval($_GET['bo_map']);
+		$hyps = intval($_GET['bo_hyps']);
 		
 		$images = array();
 		for($i=$strike_id-$strikes_before;$i<=$strike_id;$i++)
 			$images[] = $i;
 		
 		$img_file = bo_bofile_url().'?map='.$map.'&blank&bo_lang='._BL().'';
-		$bo_file_url = bo_bofile_url().'?map='.$map.'&transparent&bo_lang='._BL().'&strike_id=';
+		$bo_file_url = bo_bofile_url().'?map='.$map.'&transparent&bo_lang='._BL().($hyps ? '&hyps' : '').'&strike_id=';
 
+		echo bo_insert_html_hidden(array('bo_show_hyp'));
+		echo '<fieldset>';
+		echo '<legend>'._BL('settings').'</legend>';
+		echo '<input type="checkbox" name="bo_hyps" value="1" '.($hyps ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="bo_check_hyps">';
+		echo '<label for="bo_check_hyps"> '._BL('check_show_hyps').'</label> &nbsp; ';
+			
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 		bo_insert_animation_js($images, $bo_file_url, $img_file);
 		echo '</div>';
+
+		echo '</form>';
 		
 		return;
 	}
@@ -965,7 +981,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	else
 	{
 
-		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes'));
+		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes', 'bo_show_details', 'bo_region'));
 		echo '<fieldset>';
 		echo '<legend>'._BL('settings').'</legend>';
 
@@ -984,27 +1000,32 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		{
 			echo '<input type="checkbox" name="bo_show_details" value="1" '.($show_details ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_show_details">';
 			echo '<label for="check_show_details"> '._BL('Details').'</label> &nbsp; ';
-
 			echo ' &nbsp; <span class="bo_form_descr">'._BL('Time').':</span> ';
 			echo '<input type="text" name="bo_datetime_to" value="'._BC($date).'" id="bo_archive_date" class="bo_archive_date">';
-			echo ' &nbsp; <input type="submit" value="'._BL('Ok').'"> &nbsp; ';
+			echo ' &nbsp; <span class="bo_form_descr">'._BL('Region').': ';
+			bo_show_select_region($region);
+			echo '</span>  &nbsp; ';
 
+			if ($show_details)
+				echo bo_archive_select_map($map);
+
+			echo ' &nbsp; <input type="submit" value="'._BL('Ok').'">';
 		}
 		
 		echo '</fieldset>';
-		$hours_back = 24;
-		
+
+		$hours_back = $show_empty_sig ? 24 * 30 : 24;
 		$date_end_max_sec = 180;
 	}
 
-	$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
-
+	
 	if ($datetime_to)
 	{
 		$time_end = $datetime_to;
 	}
 	else
 	{
+		$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
 		$time_end  = strtotime($row['time'].' UTC') - $date_end_max_sec;
 	}
 	
@@ -1049,6 +1070,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			WHERE 1
 					AND $table.time BETWEEN '$date_start' AND '$date_end'
 					$sql_where
+					".bo_region2sql($region)."
 			ORDER BY $table.time DESC, $table.time_ns DESC
 			LIMIT ".($page * $per_page).", ".($per_page+1)."";
 	$res = bo_db($sql);
@@ -1431,16 +1453,21 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			
 			//if ($show_empty_sig && $count == 1 && $strike_id)
 			{
-				$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;
+				
 				$img_dim = bo_archive_get_dim($map);
-				echo '<h5>'._BL('Participated stations').'</h5>';
-				echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
-				echo bo_insert_html_hidden(array('bo_map'));
-				echo '<fieldset>';
-				echo bo_archive_select_map($map);
-				echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $row['strike_id']).'&bo_strikes_before=100">'._BL('Animation').'</a>';
-				echo '</fieldset>';
-				$img_file = bo_bofile_url().'?map='.$map.'&strike_id='.$row['strike_id'].'&bo_lang='._BL();
+				echo '<h5>'._BL('Participated stations').':</h5>';
+				
+				if (!$show_details)
+				{
+					echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
+					echo bo_insert_html_hidden(array('bo_map'));
+					echo '<fieldset>';
+					echo bo_archive_select_map($map);
+					echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $row['strike_id']).'&bo_strikes_before=100">'._BL('Animation').'</a>';
+					echo '</fieldset>';
+				}
+				
+				$img_file = bo_bofile_url().'?map='.$map.'&strike_id='.$row['strike_id'].'&hyps&bo_lang='._BL();
 				echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
 			}
 			
@@ -1449,9 +1476,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			for($i=$start;$i<=1;$i++)
 			{
 				if ($i == 0)
-					echo '<h5>'._BL('Distances between all stations').':</h5>';
+					echo '<h5>'._BL('Distances between all stations').' [km]:</h5>';
 				else
-					echo '<h5>'._BL('Distances between stations used for locating').':</h5>';
+					echo '<h5>'._BL('Distances between stations used for locating').' [km]:</h5>';
 					
 					
 				echo '<table class="bo_archive_station_dist">';
@@ -1461,7 +1488,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				{
 					echo '<th>'.$sid2.'</th>';
 				}
-				echo '</tr>';
+				echo '<th>'._BL('Strike').'</th></tr>';
 
 				foreach($s_dists[$i] as $sid1 => $d1)
 				{
@@ -1469,10 +1496,12 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					
 					echo '<tr>';
 					echo '<th>'._BC($s_data[$sid1]['city']).'</th>';
+					
+					
 					echo '<th>'.$sid1.'</th>';
 					foreach($s_dists[$i] as $sid2 => $d2)
 					{
-						echo '<td>';
+						echo '<td style="text-align:right">';
 						
 						if ($sid1 == $sid2 || $nd)
 						{
@@ -1501,6 +1530,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 							
 						echo '</td>';
 					}
+					
+					echo '<th style="text-align:right">'.round($d1/1000).'km</th>';
+					
 					echo '</tr>';
 				}
 				
@@ -1543,8 +1575,8 @@ function bo_archive_select_map(&$map)
 	$map_ok = false;
 	$map_default = false;
 	
-	$ret = '<span class="bo_form_descr">'._BL('Map').':</span> ';
-	$ret .= '<select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
+	$ret = '<span class="bo_form_descr">'._BL('Map').':';
+	$ret .= ' <select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
 	foreach($_BO['mapimg'] as $id => $d)
 	{
 		if (!$d['name'] || !$d['archive'])
@@ -1561,7 +1593,7 @@ function bo_archive_select_map(&$map)
 		if ($map == $id)
 			$map_ok = true;
 	}
-	$ret .= '</select>';
+	$ret .= '</select></span> ';
 	
 	$map = $map_ok ? $map : $map_default;
 	

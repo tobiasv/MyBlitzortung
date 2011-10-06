@@ -442,6 +442,8 @@
 @define('BO_MAP_MYBO_CIRCLE_OPAC_FILL', '0.05');
 @define('BO_MAP_MYBO_ICON', 'http://labs.google.com/ridefinder/images/mm_20_blue.png');
 
+//Version of Google Maps API
+@define('BO_GMAP_API_VERSION', 'v=3.6');
 
 
 /*******************************************************************/
@@ -504,6 +506,10 @@
 @define('BO_ARCHIVE_STR_DETAILS_LINECOLOR', '6f64');
 @define('BO_ARCHIVE_STR_DETAILS_LINECOLOR_NOCALC', 'fa09');
 @define('BO_ARCHIVE_STR_DETAILS_DEFAULT_POINT', 'stations_strikedetails');
+@define('BO_ARCHIVE_STR_DETAILS_DEFAULT_POINT_STATION_CALC', 'stations_strikedetails_calc');
+@define('BO_ARCHIVE_STR_DETAILS_HYPCOLOR', 'f7f7');
+@define('BO_ARCHIVE_STR_DETAILS_STATION_COUNT_CALC', 4);
+
 
 //Animations (not the gif-animations!)
 @define('BO_ANIMATIONS_INTERVAL', 15); //Time in minutes between two frames - 0 disables animations

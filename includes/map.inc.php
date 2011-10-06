@@ -157,7 +157,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 	</script>
 
-        <script type="text/javascript" id="bo_script_google" src="http://maps.google.com/maps/api/js?v=3.4&sensor=false&callback=bo_gmap_init">
+        <script type="text/javascript" id="bo_script_google" src="http://maps.google.com/maps/api/js?sensor=false&callback=bo_gmap_init&<?php echo BO_GMAP_API_VERSION ?>">
         </script>
 
 
@@ -607,6 +607,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 	 this.addZ_ = opts.addZoom || '' ;				// Add the zoom to the image as a parameter
 	 this.id_ = opts.id || this.url_ ;				// Added to allow for multiple images
 	 this.percentOpacity_ = opts.opacity || 50 ;
+	 this.layer_ = opts.layer || 0;
 	 this.map_ = map;
 	}
 
@@ -655,8 +656,12 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			  // We add an overlay to a map via one of the map's panes.
 			  // We'll add this overlay to the overlayImage pane.
 			  var panes = this.getPanes();
-			  panes.overlayLayer.appendChild(div);
-			  //panes.mapPane.appendChild(div); //map pane = same as strikes
+			  
+			  if (this.layer_ == 1)
+				panes.mapPane.appendChild(div); //map pane = same as strikes
+			  else
+			    panes.overlayLayer.appendChild(div);
+				
 		}
 		
 		// Redraw based on the current projection and zoom level...
@@ -737,7 +742,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			echo '
 			bo_OverlayMaps['.$mapid.'] = {
 				getTileUrl: function (coord, zoom) { return bo_get_tile(zoom, coord, '.$cfg['id'].', '.intval($cfg['upd_intv']).'); },
-				tileSize: new google.maps.Size(256,256), 
+				tileSize: new google.maps.Size('.BO_TILE_SIZE.','.BO_TILE_SIZE.'), 
 				isPng:true, 
 				bo_show:'.($cfg['default_show'] ? 'true' : 'false').',
 				bo_interval:'.intval($cfg['upd_intv']).',
@@ -758,7 +763,8 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 									   new google.maps.LatLng('.(double)$cfg['coord'][0].','.(double)$cfg['coord'][1].')),
 						bo_show: '.($cfg['default_show'] ? 'true' : 'false').',
 						bo_opacity: '.((double)$cfg['opacity']).',
-						bo_tomercator: '.($cfg['to_mercator'] ? 'true' : 'false').'
+						bo_tomercator: '.($cfg['to_mercator'] ? 'true' : 'false').',
+						bo_layer: '.((int)$cfg['layer']).'
 
 				};
 				';
@@ -780,14 +786,14 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 
 		bo_OverlayCount = {
 			getTileUrl: function (coord, zoom) { return bo_get_tile_counts(zoom, coord); },
-			tileSize: new google.maps.Size(256,256), 
+			tileSize: new google.maps.Size(<?php echo BO_TILE_SIZE.','.BO_TILE_SIZE ?>), 
 			isPng:true, 
 			bo_show:false
 		};
 
 		bo_OverlayTracks = {
 			getTileUrl: function (coord, zoom) { return bo_get_tile_tracks(zoom, coord); },
-			tileSize: new google.maps.Size(256,256), 
+			tileSize: new google.maps.Size(<?php echo BO_TILE_SIZE.','.BO_TILE_SIZE ?>), 
 			isPng:true, 
 			opacity:<?php echo (double)BO_TRACKS_MAP_OPACITY; ?>,
 			minZoom:<?php echo (int)BO_TRACKS_MAP_ZOOM_MIN; ?>,
@@ -1082,7 +1088,8 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 	function bo_map_reload_overlays()
 	{
 		var i;
-
+		var bo_add_transparent_layer = false;
+		
 		if (bo_ExtraOverlayMaps.length == 0)
 		{
 			for (i in bo_ExtraOverlay)
@@ -1098,7 +1105,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				}
 				else
 				{
-					bo_ExtraOverlayMaps[i] = new ProjectedOverlay(bo_map, bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds, {opacity: bo_ExtraOverlay[i].bo_opacity}) ;
+					bo_ExtraOverlayMaps[i] = new ProjectedOverlay(bo_map, bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds, {opacity: bo_ExtraOverlay[i].bo_opacity, layer: bo_ExtraOverlay[i].bo_layer}) ;
 				}
 			}
 		}
@@ -1108,7 +1115,12 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			for (i in bo_ExtraOverlay)
 			{
 				if (bo_ExtraOverlay[i].bo_show)
+				{
+					if (bo_ExtraOverlay[i].bo_layer == 1)
+						bo_add_transparent_layer = true;
+
 					bo_ExtraOverlayMaps[i].setMap(bo_map);
+				}
 				else
 					bo_ExtraOverlayMaps[i].setMap(null);
 			}
@@ -1116,6 +1128,15 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 		
 		while (bo_map.overlayMapTypes.length)
 			bo_map.overlayMapTypes.pop();
+		
+		//adds a "dummy" layer when an overlay *behind* strikes is present
+		//this is a quick&dirty workaround due to googlemaps limitations (causes warnings in console!)
+		if (bo_add_transparent_layer)
+		{
+			
+			var tmp = [];
+			bo_map.overlayMapTypes.push(tmp);
+		}
 		
 		var overlay_count=0;
 		if (bo_manual_timerange == true)

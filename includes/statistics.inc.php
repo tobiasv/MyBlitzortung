@@ -1748,7 +1748,7 @@ function bo_show_select_region($region)
 
 	if (count($regions) > 1)
 	{
-		echo '<select name="bo_region" onchange="submit();" id="bo_stat_strikes_select_now">';
+		echo '<select name="bo_region" onchange="submit();" id="bo_stat_strikes_select_now" class="bo_select_region">';
 		foreach($regions as $i => $y)
 			echo '<option value="'.$i.'" '.($i === $region ? 'selected' : '').'>'.$y.'</option>';
 		echo '</select>';

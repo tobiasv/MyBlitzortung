@@ -1893,6 +1893,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 			$cfg['stations'][0] = $_BO['points'][BO_ARCHIVE_STR_DETAILS_DEFAULT_POINT];
 	}
 	
+	$show_hyp = $strike_id && isset($_GET['hyps']);
 	$part=0;
 	foreach($stations as $id => $d)
 	{
@@ -1927,7 +1928,12 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 			bo_imagestring($I, $c['font'][0], $font_x, $font_y, $d['city'], $c['font'][2], $c['font'][1]);
 		}
 		
-		bo_drawpoint($I, $x, $y, $c['point']);
+		if ($show_hyp && $d['part'] && $part < BO_ARCHIVE_STR_DETAILS_STATION_COUNT_CALC)
+			$pt = $_BO['points'][BO_ARCHIVE_STR_DETAILS_DEFAULT_POINT_STATION_CALC]['point'];
+		else
+			$pt = $c['point'];
+		
+		bo_drawpoint($I, $x, $y, $pt);
 		
 		if ($strike_id && $d['part'])
 		{
@@ -1939,8 +1945,83 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 			imageline($I, $strike_x, $strike_y, $x, $y, bo_hex2color($I, $col));
 			$part++;
 		}
+	}
+	
+	//display hyperbolic curves
+	if ($show_hyp)
+	{
+		$calc_stations = array_slice($strike_dists,0,BO_ARCHIVE_STR_DETAILS_STATION_COUNT_CALC,true);
+		$pcolor = bo_hex2color($I, BO_ARCHIVE_STR_DETAILS_HYPCOLOR);
 		
-		
+		foreach($calc_stations as $id1 => $dist1)
+		{
+			unset($calc_stations[$id1]);
+			
+			foreach($calc_stations as $id2 => $dist2)
+			{
+				//strike arrival difference (meters)
+				//station1 is always the one, that catches first --> use for center
+				$a = ($dist2 - $dist1) / 2;
+				
+				//distance between stations
+				$dist = bo_latlon2dist($stations[$id1]['lat'], $stations[$id1]['lon'], $stations[$id2]['lat'], $stations[$id2]['lon']);
+				$e = $dist / $a * 0.5;
+				
+				//angle from station1 to station2
+				$alpha = bo_latlon2bearing($stations[$id2]['lat'], $stations[$id2]['lon'], $stations[$id1]['lat'], $stations[$id1]['lon']);
+
+				//range of polar angle
+				$phi_start = -acos(-1/$e);
+				$phi_end   =  acos(-1/$e);
+				$phi_step  = abs($phi_start - $phi_end) / 10000000;
+				
+				if ($phi_step < 1E-10)
+				{
+					continue;
+				}
+				
+				$polyline = array();
+				$phi = $phi_start;
+				while($phi <= $phi_end)
+				{
+					
+					$phi += (abs(cos($phi))*100000+1) * $phi_step;
+					
+					//the radius r by angle phi
+					$divisor = 1+$e*cos($phi);
+					$r = $a * ($e*$e - 1) / $divisor;
+
+					if ($r > 15E6 || $r < 0)
+					{
+						$r = 10E6;
+					}
+					
+					list($lat, $lon) = bo_distbearing2latlong($r, rad2deg($phi)+$alpha, $stations[$id1]['lat'], $stations[$id1]['lon']);
+					
+					if ($lon < -180 || $lon > 180)
+						continue;
+					
+					list($px, $py) = bo_latlon2projection($cfg['proj'], $lat, $lon);
+					$x =      ($px - $x1) * $w_x;
+					$y = $h - ($py - $y1) * $h_y;
+					$polyline[] = array($x, $y);
+				}
+				
+				if (count($polyline) > 2)
+				{
+					list($xl, $yl) = $polyline[0];
+					foreach($polyline as $d)
+					{
+						list($x, $y) = $d;
+						imageline($I, $x, $y, $xl, $yl, $pcolor);
+						$xl = $x;
+						$yl = $y;
+					}
+				}
+				
+			}
+
+		}
 	
 	}
 	
@@ -2066,6 +2147,8 @@ function bo_drawpoint($I, $x, $y, &$style, $color = null, $use_alpha = true, $st
 			break;
 			
 	}
+	
+	imagesetthickness($I, 1);
 
 }
 
