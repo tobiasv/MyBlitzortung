@@ -906,3 +906,4 @@ $_BL['de']['Up to'] = 'Bis zu';
 $_BL['de']['h4_stations_under_construction'] = 'Stationen im Aufbau';
 $_BL['de']['Distances between all stations'] = 'Entfernungen zwischen allen Stationen';
 $_BL['de']['Distances between stations used for locating'] = 'Entfernungen zwischen Stationen zur Berechnung der Ortung';
+$_BL['de']['check_show_hyps'] = 'Hyperbeln einzeichnen';

@@ -125,7 +125,7 @@ $_BO['points']['stations_dots_nogps']['point']    = array(1, 1, '77f', 0, '04fe'
 
 
 $_BO['points']['stations_strikedetails']['point']  = array(2, 2, 'c04', 0, 'c04e');
-$_BO['points']['stations_strikedetails_calc']['point']  = array(2, 3, 'cc4', 2, 'c04e');
+$_BO['points']['stations_strikedetails_calc']['point']  = array(1, 5, 'fc4');
 
 
 /**************************************/

@@ -881,3 +881,6 @@ $_BL['en']['Unknown'] = 'Unknown';
 $_BL['en']['Unknown or longer'] = 'Unknown or longer';
 $_BL['en']['Up to'] = 'Up to';
 $_BL['en']['h4_stations_under_construction'] = 'Stations under construction';
+$_BL['en']['Distances between all stations'] = 'Distances between all stations';
+$_BL['en']['Distances between stations used for locating'] = 'Distances between stations used for locating';
+$_BL['en']['check_show_hyps'] = 'Show hyperbolic curves';

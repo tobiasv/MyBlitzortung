@@ -963,7 +963,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '<legend>'._BL('settings').'</legend>';
 		echo '<input type="checkbox" name="bo_hyps" value="1" '.($hyps ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="bo_check_hyps">';
 		echo '<label for="bo_check_hyps"> '._BL('check_show_hyps').'</label> &nbsp; ';
-			
+		echo '</fieldset>';
+		
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 		bo_insert_animation_js($images, $bo_file_url, $img_file);
 		echo '</div>';
