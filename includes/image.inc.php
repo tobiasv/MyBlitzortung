@@ -1973,7 +1973,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 				//range of polar angle
 				$phi_start = -acos(-1/$e);
 				$phi_end   =  acos(-1/$e);
-				$phi_step  = abs($phi_start - $phi_end) / 10000000;
+				$phi_step  = abs($phi_start - $phi_end) / 1000;
 				
 				if ($phi_step < 1E-10)
 				{
@@ -1985,20 +1985,20 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 				while($phi <= $phi_end)
 				{
 					
-					$phi += (abs(cos($phi))*100000+1) * $phi_step;
+					$phi += (pow(abs(cos(abs(2*$phi_start) - abs($phi))),2)*2+0.1) * $phi_step;
 					
 					//the radius r by angle phi
 					$divisor = 1+$e*cos($phi);
 					$r = $a * ($e*$e - 1) / $divisor;
 
-					if ($r > 15E6 || $r < 0)
+					if ($r > 10E6 || $r < 0)
 					{
 						$r = 10E6;
 					}
 					
 					list($lat, $lon) = bo_distbearing2latlong($r, rad2deg($phi)+$alpha, $stations[$id1]['lat'], $stations[$id1]['lon']);
 					
-					if ($lon < -180 || $lon > 180)
+					if ($lon < -170 || $lon > 170 || $lat < -90 || $lat > 90)
 						continue;
 					
 					list($px, $py) = bo_latlon2projection($cfg['proj'], $lat, $lon);
