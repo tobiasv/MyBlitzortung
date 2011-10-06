@@ -131,7 +131,7 @@ $_BO['tpl_overlay']['blids_de']['default_show'] = false;
 $_BO['tpl_overlay']['blids_de']['sel_name'] = 'BLIDS Germany';
 $_BO['tpl_overlay']['blids_de']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_de']['to_mercator'] = false;
-$_BO['tpl_overlay']['blids_de']['opacity'] = 50;
+$_BO['tpl_overlay']['blids_de']['opacity'] = 100;
 $_BO['tpl_overlay']['blids_de']['layer'] = 1;
 
 //BLIDS BENELUX Lightning Overlay
@@ -142,7 +142,7 @@ $_BO['tpl_overlay']['blids_benelux']['default_show'] = false;
 $_BO['tpl_overlay']['blids_benelux']['sel_name'] = 'BLIDS BeNeLux';
 $_BO['tpl_overlay']['blids_benelux']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_benelux']['to_mercator'] = false;
-$_BO['tpl_overlay']['blids_benelux']['opacity'] = 50;
+$_BO['tpl_overlay']['blids_benelux']['opacity'] = 100;
 $_BO['tpl_overlay']['blids_benelux']['layer'] = 1;
 
 //BLIDS UK Lightning Overlay
@@ -153,7 +153,7 @@ $_BO['tpl_overlay']['blids_uk']['default_show'] = false;
 $_BO['tpl_overlay']['blids_uk']['sel_name'] = 'BLIDS UK';
 $_BO['tpl_overlay']['blids_uk']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_uk']['to_mercator'] = false;
-$_BO['tpl_overlay']['blids_uk']['opacity'] = 50;
+$_BO['tpl_overlay']['blids_uk']['opacity'] = 100;
 $_BO['tpl_overlay']['blids_uk']['layer'] = 1;
 
 //BLIDS POLAND Lightning Overlay
@@ -164,7 +164,7 @@ $_BO['tpl_overlay']['blids_pl']['default_show'] = false;
 $_BO['tpl_overlay']['blids_pl']['sel_name'] = 'BLIDS Poland';
 $_BO['tpl_overlay']['blids_pl']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_pl']['to_mercator'] = false;
-$_BO['tpl_overlay']['blids_pl']['opacity'] = 50;
+$_BO['tpl_overlay']['blids_pl']['opacity'] = 100;
 $_BO['tpl_overlay']['blids_pl']['layer'] = 1;
 
 //BLIDS SWITZERLAND Lightning Overlay
@@ -175,7 +175,7 @@ $_BO['tpl_overlay']['blids_ch']['default_show'] = false;
 $_BO['tpl_overlay']['blids_ch']['sel_name'] = 'BLIDS Switzerland';
 $_BO['tpl_overlay']['blids_ch']['only_loggedin'] = true;
 $_BO['tpl_overlay']['blids_ch']['to_mercator'] = false;
-$_BO['tpl_overlay']['blids_ch']['opacity'] = 50;
+$_BO['tpl_overlay']['blids_ch']['opacity'] = 100;
 $_BO['tpl_overlay']['blids_ch']['layer'] = 1;
 
 //T-Online/wetter.info Radar
