@@ -1220,8 +1220,13 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			$url = bo_bofile_url().'?graph='.$row['raw_id'].'&bo_lang='._BL();
 			echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
 		}
+		else if ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
+		{
+			echo _BL('signal not found');
+		}
 		else
 			echo _BL('No signal recieved.');
+			
 		echo '</td>';
 
 		if (BO_ARCHIVE_SHOW_SPECTRUM)
@@ -1232,8 +1237,13 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				$url = bo_bofile_url().'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL();
 				echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_spec_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
 			}
+			elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
+			{
+				echo _BL('signal not found');
+			}
 			else
 				echo _BL('No signal recieved.');
+			
 			echo '</td>';
 		}
 		
@@ -1324,28 +1334,22 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</span>';
 			echo '</li>';
 
-			if ($row['raw_id'])
-			{
-				echo '<li>';
-				echo '<span class="bo_descr">';
-				echo _BL('Participated').': ';
-				echo '</span>';
-				echo '<span class="bo_value">';
-				echo $row['part'] > 0 ? _BL('yes') : '<span class="bo_archive_not_evaluated">'._BL('no').'</span>';
-				echo '</span>';
-				echo '</li>';
-			}
-			else if ($row['part'] > 0 && !$row['raw_id'])
-			{
-				echo '<li>';
-				echo '<span class="bo_descr">';
-				echo _BL('Participated').': ';
-				echo '</span>';
-				echo '<span class="bo_value">';
-				echo _BL('yes').' ('._BL('signal not found').')';
-				echo '</span>';
-				echo '</li>';
-			}
+			echo '<li>';
+			echo '<span class="bo_descr">';
+			echo _BL('Participated').': ';
+			echo '</span>';
+			echo '<span class="bo_value">';
+			
+			if ($row['part'] > 0)
+				echo _BL('yes');
+			elseif ($row['raw_id'])
+				echo '<span class="bo_archive_not_evaluated">'._BL('no').'</span>';
+			else
+				echo _BL('no');
+				
+			echo '</span>';
+			echo '</li>';
+
 			
 		}
 		
@@ -1404,11 +1408,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		echo '<div style="clear:both"></div>';
 		
-		if (!$row['strike_id'] && $row['part'] > 0)
-		{
-			echo _BL('participated but signal not found');
-		}
-		elseif (!$row['strike_id'])
+		if (!$row['strike_id'])
 		{
 			echo _BL('no strike detected');
 		}

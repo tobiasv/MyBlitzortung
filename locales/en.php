@@ -885,3 +885,4 @@ $_BL['en']['Distances between all stations'] = 'Distances between all stations';
 $_BL['en']['Distances between stations used for locating'] = 'Distances between stations used for locating';
 $_BL['en']['check_show_hyps'] = 'Show hyperbolic curves';
 $_BL['en']['Strike is not confirmed'] = 'Strike is not confirmed';
+$_BL['en']['Locating angle'] = 'Locating angle';

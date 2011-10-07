@@ -1838,6 +1838,8 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 	$latS = $cfg['coord'][2];
 	$lonW = $cfg['coord'][3];
 	
+	$pic_dim = bo_latlon2dist($latN, $lonE, $latS, $lonW);
+	
 	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $latS, $lonW);
 	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $latN, $lonE);
 	$w_x = $w / ($x2 - $x1);
@@ -1952,7 +1954,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 	{
 		$calc_stations = array_slice($strike_dists,0,BO_ARCHIVE_STR_DETAILS_STATION_COUNT_CALC,true);
 		$pcolor = bo_hex2color($I, BO_ARCHIVE_STR_DETAILS_HYPCOLOR);
-		
+
 		foreach($calc_stations as $id1 => $dist1)
 		{
 			unset($calc_stations[$id1]);
@@ -1970,52 +1972,42 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 				//angle from station1 to station2
 				$alpha = bo_latlon2bearing($stations[$id2]['lat'], $stations[$id2]['lon'], $stations[$id1]['lat'], $stations[$id1]['lon']);
 
-				//range of polar angle
-				$phi_start = -acos(-1/$e);
-				$phi_end   =  acos(-1/$e);
-				$phi_step  = abs($phi_start - $phi_end) / 1000;
-				
-				if ($phi_step < 1E-10)
-				{
-					continue;
-				}
+				//start values
+				$r = $a * ($e*$e - 1) / (1+$e);
+				$phi = 0;
 				
 				$polyline = array();
-				$phi = $phi_start;
-				while($phi <= $phi_end)
+				while($r < $pic_dim * 2)
 				{
-					
-					$phi += (pow(abs(cos(abs(2*$phi_start) - abs($phi))),2)*2+0.1) * $phi_step;
-					
-					//the radius r by angle phi
-					$divisor = 1+$e*cos($phi);
-					$r = $a * ($e*$e - 1) / $divisor;
-
-					if ($r > 10E6 || $r < 0)
+					foreach(array($phi, -$phi) as $i => $phi2)
 					{
-						$r = 10E6;
+						list($lat, $lon) = bo_distbearing2latlong($r, rad2deg($phi2)+$alpha, $stations[$id1]['lat'], $stations[$id1]['lon']);
+						
+						if ($lon < -170 || $lon > 170 || $lat < -90 || $lat > 90)
+							continue;
+						
+						list($px, $py) = bo_latlon2projection($cfg['proj'], $lat, $lon);
+						$x =      ($px - $x1) * $w_x;
+						$y = $h - ($py - $y1) * $h_y;
+						$polyline[$i][] = array($x, $y);
 					}
 					
-					list($lat, $lon) = bo_distbearing2latlong($r, rad2deg($phi)+$alpha, $stations[$id1]['lat'], $stations[$id1]['lon']);
-					
-					if ($lon < -170 || $lon > 170 || $lat < -90 || $lat > 90)
-						continue;
-					
-					list($px, $py) = bo_latlon2projection($cfg['proj'], $lat, $lon);
-					$x =      ($px - $x1) * $w_x;
-					$y = $h - ($py - $y1) * $h_y;
-					$polyline[] = array($x, $y);
+					$r += $pic_dim / 1000;
+					$phi = acos(($a * ($e*$e - 1) / $r - 1) / $e);
 				}
 				
-				if (count($polyline) > 2)
+				for ($i=0;$i<2;$i++)
 				{
-					list($xl, $yl) = $polyline[0];
-					foreach($polyline as $d)
+					if (count($polyline[$i]) > 2)
 					{
-						list($x, $y) = $d;
-						imageline($I, $x, $y, $xl, $yl, $pcolor);
-						$xl = $x;
-						$yl = $y;
+						list($xl, $yl) = $polyline[$i][0];
+						foreach($polyline[$i] as $d)
+						{
+							list($x, $y) = $d;
+							imageline($I, $x, $y, $xl, $yl, $pcolor);
+							$xl = $x;
+							$yl = $y;
+						}
 					}
 				}
 				
