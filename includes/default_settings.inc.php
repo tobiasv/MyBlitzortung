@@ -222,6 +222,8 @@
 @define('BO_LOGIN_URL', 'index.php?bo_page=login');
 
 
+
+
 /*******************************************************************/
 /*** Experimental Polarity                                       ***/
 
@@ -926,6 +928,11 @@
 
 //speed of light for runtime in archive table (and perhaps other display)
 @define('BO_C', 299792458); // Blitzortung.org uses c/1.000198
+
+//finding no of min participants / no of max. participants for calculation
+@define('BO_FIND_MIN_PARTICIPANTS_HOURS', 2); //update and search intervall for min participants
+@define('BO_FIND_MIN_PARTICIPANTS_COUNT', 4); //how often a new value has to be present to be saved
+@define('BO_FIND_MAX_PARTICIPANTS_HOURS', 24); //update and search intervall for max participants
 
 
 

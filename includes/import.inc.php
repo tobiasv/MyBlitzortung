@@ -793,28 +793,53 @@ function bo_update_strikes($force = false, $max_time = 0)
 		}
 		
 		
-		//Minimum Participants (Update every 24h)
-		$tmp = unserialize(bo_get_conf('bo_participants_locating_min'));
-		if (time() - $tmp['time'] > 3600 * 24)
+		//Minimum Participants
+		if (intval(BO_FIND_MIN_PARTICIPANTS_HOURS))
 		{
-			$row = bo_db("SELECT MIN(users) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*24)."'")->fetch_assoc();
-			$tmp['time'] = time();
-			$tmp['value'] = $row['minusers'];
-			bo_set_conf('bo_participants_locating_min', serialize($tmp));
-		}
+			$min_hours        = BO_FIND_MIN_PARTICIPANTS_HOURS;
+			$see_same         = BO_FIND_MIN_PARTICIPANTS_COUNT;
+			$tmp              = unserialize(bo_get_conf('bo_participants_locating_min'));
+			$min_participants = $tmp['value'];
 
-		
-		//Maximum Participants (Update every 24h)
-		$tmp = unserialize(bo_get_conf('bo_participants_locating_max'));
-		$tmp['value_24h'] = max($tmp['value_24h'], $max_participants);
-		if (time() - $tmp['time'] > 3600 * 24)
-		{
-			$tmp['time'] = time();
-			$tmp['value'] = $tmp['value_24h'];
-			$tmp['value_24h'] = 0; //if max value shrinks!
+			if (time() - $tmp['time'] > 3600 * BO_FIND_MIN_PARTICIPANTS_HOURS)
+			{
+				$row = bo_db("SELECT MIN(users) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*$min_hours)."'")->fetch_assoc();
+				
+				if ($row['minusers'] >= 4)
+				{
+					//reset counter if last value differs from new value
+					if ($tmp['last'] != $row['minusers'])
+						$tmp['count'] = 0;
+
+					//only save the value after some same values
+					if ($tmp['count'] >= $see_same)
+					{
+						$tmp['value'] = $row['minusers'];
+						$tmp['count'] = 0;
+					}
+					else
+						$tmp['count']++;
+					
+					$tmp['last'] = $row['minusers'];
+					$tmp['time'] = time();
+					bo_set_conf('bo_participants_locating_min', serialize($tmp));
+				}
+			}
 		}
-		bo_set_conf('bo_participants_locating_max', serialize($tmp));
 		
+		//Maximum Participants
+		if (intval(BO_FIND_MAX_PARTICIPANTS_HOURS) && $max_participants >= 4)
+		{
+			$tmp = unserialize(bo_get_conf('bo_participants_locating_max'));
+			$tmp['value_last'] = max($tmp['value_last'], $max_participants);
+			if (time() - $tmp['time'] > 3600 * BO_FIND_MAX_PARTICIPANTS_HOURS && $max_participants >= $min_participants)
+			{
+				$tmp['time'] = time();
+				$tmp['value'] = $tmp['value_last'];
+				$tmp['value_last'] = 0; //if max value shrinks!
+			}
+			bo_set_conf('bo_participants_locating_max', serialize($tmp));
+		}
 		
 	}
 	else

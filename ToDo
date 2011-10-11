@@ -38,3 +38,5 @@ Features
 - two or more ranges for alerts
 - amcharts instead of jpgraph (www.amcharts.com)
 - top-list of strike currents (calc. of current has to be improved first!)
+- statistics about GPS-status of own station/all stations (GPS yes/no, mean value and value w/o GPS)
+

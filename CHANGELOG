@@ -6,6 +6,7 @@
 Version 0.7.3a-dev
 ------------------
 - new: drawing of hyperbolic curves - you can see how locating is done
+- fix: method of finding global minimum participants improved
 
 Version 0.7.3 (2011-10-05)
 --------------------------

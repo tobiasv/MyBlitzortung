@@ -1567,7 +1567,7 @@ function bo_participants_locating_min()
 {
 	static $value=false;
 	
-	if ($value === false)
+	if ($value === false && intval(BO_FIND_MIN_PARTICIPANTS_HOURS))
 	{
 		$tmp = unserialize(bo_get_conf('bo_participants_locating_min'));
 		$value = intval($tmp['value']);
@@ -1583,7 +1583,7 @@ function bo_participants_locating_max()
 {
 	static $value=false;
 	
-	if ($value === false)
+	if ($value === false && intval(BO_FIND_MAX_PARTICIPANTS_HOURS))
 	{
 		$tmp = unserialize(bo_get_conf('bo_participants_locating_max'));
 		$value = intval($tmp['value']);
