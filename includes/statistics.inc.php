@@ -492,7 +492,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$sql = "SELECT strikesh, time 
 			FROM ".BO_DB_PREF."stations_stat 
 			WHERE station_id='0' 
-			AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE time < NOW() - INTERVAL 10 SECOND)";
+			AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE time < '".gmdate("Y-m-d H:i:s", time() - 10)."')";
 	$row = bo_db($sql)->fetch_assoc();
 	$strikesh = $row['strikesh'];
 	$time = strtotime($row['time'].' UTC');

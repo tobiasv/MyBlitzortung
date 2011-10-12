@@ -1507,16 +1507,22 @@ function bo_image_banner_top($I, $w, $h, $cfg, $time_string = null, $extra = nul
 		bo_imagestringright($I, $fontsize, $w - 2, 2+$tdy, $extra, $tcol, $tbold);
 	
 	//Own Copyright
-	if (defined('BO_OWN_COPYRIGHT') && $copy)
+	if (defined('BO_OWN_COPYRIGHT_MAPS') && trim(BO_OWN_COPYRIGHT_MAPS))
+		$copyright = strip_tags(BO_OWN_COPYRIGHT_MAPS);
+	elseif (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT) && BO_OWN_COPYRIGHT_MAPS !== false)
+		$copyright = strip_tags(BO_OWN_COPYRIGHT);
+	else
+		$copyright = '';
+	
+	if ($copyright && $copy)
 	{
-		$text = strip_tags(BO_OWN_COPYRIGHT);
-		$copy_width = bo_imagetextwidth($fontsize, $tbold, $text);
+		$copy_width = bo_imagetextwidth($fontsize, $tbold, $copyright);
 		$info_text_width = bo_imagetextwidth($fontsize, $tbold, $time_string.'         '.$strike_text);
 		
 		if ($w - $info_text_width > $copy_width)
 		{
 			$copy_pos = $w / 2 - $copy_width / 2;
-			bo_imagestring($I, $fontsize, $copy_pos, 2+$tdy, $text, $tcol, $tbold);
+			bo_imagestring($I, $fontsize, $copy_pos, 2+$tdy, $copyright, $tcol, $tbold);
 		}
 	}
 }
@@ -1578,14 +1584,20 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 	bo_imagestring($I, $fontsize, 4, $h - $tdy, $text, $tcol, $tbold);
 
 	//Own copyright
-	if (defined('BO_OWN_COPYRIGHT') && $copy)
+	if (defined('BO_OWN_COPYRIGHT_MAPS') && trim(BO_OWN_COPYRIGHT_MAPS))
+		$copyright = strip_tags(BO_OWN_COPYRIGHT_MAPS);
+	elseif (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT) && BO_OWN_COPYRIGHT_MAPS !== false)
+		$copyright = strip_tags(BO_OWN_COPYRIGHT);
+	else
+		$copyright = '';
+	
+	if ($copyright && $copy)
 	{
-		$text = strip_tags(BO_OWN_COPYRIGHT);
-		$bo_width2 = bo_imagetextwidth($fontsize, $tbold, $text);
+		$bo_width2 = bo_imagetextwidth($fontsize, $tbold, $copyright);
 		$bo_pos2 = $bo_width + $fontsize * 5;
 		
 		if ($bo_width2+$bo_pos2 < $w - $legend_width - 5)
-			bo_imagestring($I, $fontsize, $bo_pos2, $h - $tdy, $text, $tcol, $tbold);
+			bo_imagestring($I, $fontsize, $bo_pos2, $h - $tdy, $copyright, $tcol, $tbold);
 	}
 }
 

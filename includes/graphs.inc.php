@@ -2342,9 +2342,17 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	else
 		$graph->SetBox(false);
 
-	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
+	
+	if (defined('BO_OWN_COPYRIGHT_GRAPHS') && trim(BO_OWN_COPYRIGHT_GRAPHS))
+		$copyright = strip_tags(BO_OWN_COPYRIGHT_GRAPHS);
+	elseif (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT) && BO_OWN_COPYRIGHT_GRAPHS !== false)
+		$copyright = strip_tags(BO_OWN_COPYRIGHT);
+	else
+		$copyright = '';
+		
+	if ($copyright)
 	{
-		$graph->footer->left->Set(strip_tags(BO_OWN_COPYRIGHT));
+		$graph->footer->left->Set($copyright);
 		$graph->footer->left->SetColor('#999999');
 		$graph->footer->left->SetFont(FF_DV_SANSSERIF,FS_NORMAL,BO_OWN_COPYRIGHT_SIZE);
 
@@ -2678,12 +2686,19 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 
 	if ($atext)
 	{
-		if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
+		//Copyright
+		if (defined('BO_OWN_COPYRIGHT_GRAPHS') && trim(BO_OWN_COPYRIGHT_GRAPHS))
+			$copyright = strip_tags(BO_OWN_COPYRIGHT_GRAPHS);
+		elseif (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT) && BO_OWN_COPYRIGHT_GRAPHS !== false)
+			$copyright = strip_tags(BO_OWN_COPYRIGHT);
+		else
+			$copyright = '';
+
+		if ($copyright)
 		{
-			//Copyright
-			$text = strip_tags(BO_OWN_COPYRIGHT);
 			$color = imagecolorallocate($I, 128,128,128);
-			bo_imagestring($I, $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_FONTSIZE_OTHER, $size * 0.75, $size * 0.94, $text, $color);
+			$theight = bo_imagetextheight(BO_OWN_COPYRIGHT_SIZE * 2, $tbold, $copyright);
+			bo_imagestring($I, BO_OWN_COPYRIGHT_SIZE*2, 2, $size - $theight - 2, $copyright, $color);
 		}
 		
 		

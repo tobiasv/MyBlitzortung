@@ -101,6 +101,11 @@
 //Textsize for graphs
 @define('BO_OWN_COPYRIGHT_SIZE', 7);
 
+//Text for graphs
+@define('BO_OWN_COPYRIGHT_GRAPHS', ''); //empty string -> use above / false -> disable
+
+//Text for maps
+@define('BO_OWN_COPYRIGHT_MAPS', ''); //empty string -> use above / false -> disable
 
 
 /*******************************************************************/

@@ -107,7 +107,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 	$a = 0;
 	$u = 0;
 
-	if (time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force)
+	if (time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last)
 	{
 		$file = bo_get_archive('lang=de&page=3&subpage_3=1&mode=4');
 
@@ -262,7 +262,7 @@ function bo_update_strikes($force = false, $max_time = 0)
 
 	echo "<h3>Strikes</h3>\n";
 
-	if (time() - $last > BO_UP_INTVL_STRIKES * 60 - 30 || $force)
+	if (time() - $last > BO_UP_INTVL_STRIKES * 60 - 30 || $force || time() < $last)
 	{
 		$start_time = time();
 		
@@ -1033,7 +1033,7 @@ function bo_update_stations($force = false, $max_time = 0)
 
 	echo "<h3>Stations</h3>\n";
 
-	if (!defined('BO_UP_INTVL_STATIONS') || !BO_UP_INTVL_STATIONS)
+	if (!defined('BO_UP_INTVL_STATIONS') || !BO_UP_INTVL_STATIONS || time() < $last)
 	{
 		echo "<p>Disabled!</p>\n";
 	}
@@ -2574,7 +2574,7 @@ function bo_update_tracks($force = false, $max_time = 0)
 
 	echo "\n<h3>Tracks</h3>\n";
 
-	if (time() - $last > BO_UP_INTVL_TRACKS * 60 - 30 || $force)
+	if (time() - $last > BO_UP_INTVL_TRACKS * 60 - 30 || $force || time() < $last)
 	{
 		bo_set_conf('uptime_tracks', time());
 		$time = time();
