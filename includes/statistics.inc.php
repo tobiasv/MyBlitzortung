@@ -857,7 +857,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 					
 				echo '</span>';
 				echo '<span class="bo_value">';
-				echo date(_BL('_datetime'), $d[0]);
+				echo date(_BL('_date'), $d[0]).' '.date('H', $d[0]).' '._BL('oclock');
 				echo '</span>';
 				$i++;
 				
