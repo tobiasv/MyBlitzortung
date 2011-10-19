@@ -474,6 +474,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$sort 					= $_GET['bo_sort'];
 	$date_1h 				= gmdate('Y-m-d H:i:s', time() - 3600);
 	$mybo_first_update		= bo_get_conf('first_update_time');
+	$stations_nogps         = bo_get_conf('active_stations_nogps');
 	$whole_sig_count 		= 0;
 	$whole_sig_ratio 		= 0;
 	$whole_sig_ratio_cnt 	= 0;
@@ -655,7 +656,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo $whole_strike_ratio ? number_format($whole_strike_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.number_format($whole_sig_count, 0, _BL('.'), _BL(',')).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).' ('.number_format($stations_nogps, 0, _BL('.'), _BL(',')).' '._BL('w/o GPS-signal').')</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span></li>';
 	
 	if (intval(BO_STATISTICS_SHOW_STATIONS_UNDER_CONSTR))

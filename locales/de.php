@@ -916,5 +916,5 @@ $_BL['de']['Distances between stations used for locating'] = 'Entfernungen zwisc
 $_BL['de']['check_show_hyps'] = 'Hyperbeln einzeichnen';
 $_BL['de']['Strike is not confirmed'] = 'Blitz nicht bestätigt';
 $_BL['de']['Locating angle'] = 'Ortungswinkel';
-
+$_BL['de']['w/o GPS-signal'] = 'ohne GPS-Signal';
 

@@ -763,23 +763,38 @@ function bo_update_strikes($force = false, $max_time = 0)
 
 		$count = bo_get_conf('longtime_max_participants');
 		if ($count < $max_users)
+		{
 			bo_set_conf('longtime_max_participants', $max_users);
+			bo_set_conf('longtime_max_participants_time', time());
+		}
 
 		$max = bo_get_conf('longtime_max_dist_all');
 		if ($max < $max_dist_all)
+		{
 			bo_set_conf('longtime_max_dist_all', $max_dist_all);
+			bo_set_conf('longtime_max_dist_all_time', time());
+		}
 
 		$min = bo_get_conf('longtime_min_dist_all');
 		if (!$min || $min > $min_dist_all)
+		{
 			bo_set_conf('longtime_min_dist_all', $min_dist_all);
+			bo_set_conf('longtime_min_dist_all_time', time());
+		}
 
 		$max = bo_get_conf('longtime_max_dist_own');
 		if ($max < $max_dist_own)
+		{
 			bo_set_conf('longtime_max_dist_own', $max_dist_own);
+			bo_set_conf('longtime_max_dist_own_time', time());
+		}
 
 		$min = bo_get_conf('longtime_min_dist_own');
 		if (!$min || $min > $min_dist_own)
+		{
 			bo_set_conf('longtime_min_dist_own', $min_dist_own);
+			bo_set_conf('longtime_min_dist_own_time', time());
+		}
 
 		if ($timeout)
 		{
@@ -1134,6 +1149,9 @@ function bo_update_stations($force = false, $max_time = 0)
 			if ($stStatus != '-' && $stSignals == 0 && time() - $stTime > intval(BO_STATION_OFFLINE_HOURS) * 3600)
 				$stStatus = 'O';  //Special offline status
 			
+			//Save GPS "V" state
+			$Count[$stId]['nogps'] = $stStatus == 'V';
+			
 			$sql = " 	id='$stId',
 						user='$stUser',
 						city='$stCity',
@@ -1254,6 +1272,7 @@ function bo_update_stations($force = false, $max_time = 0)
 		$active_stations = 0;
 		$active_sig_stations = 0;
 		$active_avail_stations = 0;
+		$active_nogps = 0;
 		foreach($Count as $id => $data)
 		{
 			if ($only_own && $only_own != $id)
@@ -1262,7 +1281,9 @@ function bo_update_stations($force = false, $max_time = 0)
 			if ($id && ($data['sig'] || $data['strikes']))
 			{
 				bo_db("INSERT INTO ".BO_DB_PREF."stations_stat
-					SET station_id='$id', time='$datetime', signalsh='".intval($data['sig'])."', strikesh='".intval($data['strikes'])."'");
+					SET station_id='$id', time='$datetime', 
+					signalsh='".intval($data['sig'])."', 
+					strikesh='".intval($data['strikes'])."'");
 			}
 
 			if ($data['active']) //GPS is/was active
@@ -1273,8 +1294,13 @@ function bo_update_stations($force = false, $max_time = 0)
 
 			if ($data['available']) //Station is available (no dummy entry, has sent some data some time ago)
 				$active_avail_stations++;
+
+			if ($data['nogps']) //GPS is unavailable right now
+				$active_nogps++;
 		}
 
+		bo_set_conf('active_stations_nogps', $active_nogps);
+		
 		//Update whole strike count for dummy station "0"
 		$sql = "SELECT COUNT(id) cnt
 				FROM ".BO_DB_PREF."strikes
@@ -1289,23 +1315,43 @@ function bo_update_stations($force = false, $max_time = 0)
 		/*** Update Longtime statistics ***/
 		//max active stations ever
 		$max = bo_get_conf('longtime_count_max_active_stations');
-		bo_set_conf('longtime_count_max_active_stations', max($max, $active_stations));
+		if ($active_stations > $max)
+		{
+			bo_set_conf('longtime_count_max_active_stations', max($max, $active_stations));
+			bo_set_conf('longtime_count_max_active_stations_time', time());
+		}
 
 		//max active stations (sending signals) ever
 		$max = bo_get_conf('longtime_count_max_active_stations_sig');
-		bo_set_conf('longtime_count_max_active_stations_sig', max($max, $active_sig_stations));
+		if ($active_sig_stations > $max)
+		{
+			bo_set_conf('longtime_count_max_active_stations_sig', max($max, $active_sig_stations));
+			bo_set_conf('longtime_count_max_active_stations_sig_time', time());
+		}
 
 		//max available stations (had sent some signales, no matter when)
 		$max = bo_get_conf('longtime_count_max_avail_stations');
-		bo_set_conf('longtime_count_max_avail_stations', max($max, $active_avail_stations));
+		if ($active_avail_stations > $max)
+		{
+			bo_set_conf('longtime_count_max_avail_stations', max($max, $active_avail_stations));
+			bo_set_conf('longtime_count_max_avail_stations_time', time());
+		}
 
 		//max signals/h
 		$max = bo_get_conf('longtime_max_signalsh');
-		bo_set_conf('longtime_max_signalsh', max($max, $signal_count));
+		if ($signal_count > $max)
+		{		
+			bo_set_conf('longtime_max_signalsh', max($max, $signal_count));
+			bo_set_conf('longtime_max_signalsh_time', time());
+		}
 
 		//max strikes/h
 		$max = bo_get_conf('longtime_max_strikesh');
-		bo_set_conf('longtime_max_strikesh', max($max, $strike_count));
+		if ($strike_count > $max)
+		{		
+			bo_set_conf('longtime_max_strikesh', max($max, $strike_count));
+			bo_set_conf('longtime_max_strikesh_time', time());
+		}
 
 
 		/*** Longtime stat. for own Station ***/
@@ -1313,11 +1359,19 @@ function bo_update_stations($force = false, $max_time = 0)
 
 		//max signals/h (own)
 		$max = bo_get_conf('longtime_max_signalsh_own');
-		bo_set_conf('longtime_max_signalsh_own', max($max, $Count[$own_id]['sig']));
+		if ($Count[$own_id]['sig'] > $max)
+		{
+			bo_set_conf('longtime_max_signalsh_own', max($max, $Count[$own_id]['sig']));
+			bo_set_conf('longtime_max_signalsh_own_time', time());
+		}
 
 		//max strikes/h (own)
 		$max = bo_get_conf('longtime_max_strikesh_own');
-		bo_set_conf('longtime_max_strikesh_own', max($max, $Count[$own_id]['strikes']));
+		if ($Count[$own_id]['strikes'] > $max)
+		{
+			bo_set_conf('longtime_max_strikesh_own', max($max, $Count[$own_id]['strikes']));
+			bo_set_conf('longtime_max_strikesh_own_time', time());
+		}
 
 		//Activity/inactivity counter for own station
 		$time_interval = $last ? time() - $last : 0;
@@ -1332,7 +1386,23 @@ function bo_update_stations($force = false, $max_time = 0)
 			bo_set_conf('station_last_inactive', time());
 			$time_interval += bo_get_conf('longtime_station_inactive_time');
 			bo_set_conf('longtime_station_inactive_time', $time_interval);
+			$cnt = bo_get_conf('longtime_station_inactive_count');
+			bo_set_conf('longtime_station_inactive_count', $cnt);
 		}
+
+
+		//Activity/inactivity counter for own station (GPS V-state)
+		$time_interval = $last ? time() - $last : 0;
+		if ($Count[$own_id]['nogps'])
+		{
+			bo_set_conf('station_last_nogps', time());
+			$time_interval += bo_get_conf('longtime_station_nogps_time');
+			bo_set_conf('longtime_station_nogps_time', $time_interval);
+			$cnt = bo_get_conf('longtime_station_nogps_count');
+			bo_set_conf('longtime_station_nogps_count', $cnt);
+		}
+		
+		
 		
 		bo_set_conf('uptime_stations', time());
 		
