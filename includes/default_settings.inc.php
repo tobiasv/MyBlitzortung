@@ -497,6 +497,12 @@
 //Enables densities for guests (set the also next option to true)
 @define('BO_ENABLE_DENSITIES', false); 
 
+//Enables strike search
+@define('BO_ENABLE_ARCHIVE_SEARCH', true); 
+
+//Enable signal page
+@define('BO_ENABLE_ARCHIVE_SIGNALS', true); 
+
 //Calculates Densities 
 @define('BO_CALC_DENSITIES', false); 
 
@@ -508,6 +514,10 @@
 
 //show the spectrum for each signal in table
 @define('BO_ARCHIVE_SHOW_SPECTRUM', true);
+
+//entries in strike table per page
+@define('BO_ARCHIVE_TABLE_PER_PAGE', 10);
+
 
 //Strike details
 @define('BO_ARCHIVE_STR_DETAILS_LINECOLOR', '6f64');

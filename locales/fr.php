@@ -242,7 +242,10 @@ $_BL['fr']['Statistics'] = 'Statistiques';
 $_BL['fr']['check_only_participated'] = 'Seulement avec participation';
 $_BL['fr']['Lightning data imports'] = 'Importation des données de foudre';
 $_BL['fr']['Traffic to Blitzortung.org'] = 'Trafic vers Blitzortung.org';
-
+$_BL['fr']['Using auth ID'] = 'En utilisant l\'authentification d\'identité';
+$_BL['fr']['Read cities.txt'] = 'Lire le fichier cities.txt';
+$_BL['fr']['Satellite'] = 'Satellite';
+$_BL['fr']['Details'] = 'Détails';
 
 
 $_BL['fr']['timezone_is'] = 'Heure du fuseau horaire utilisé:';
@@ -659,7 +662,6 @@ de la station. Calcul:
 <br>Ratio de localisation = (coups de foudre détectés par la station) / (signaux de la station)
 <br>Taux d\'impact = (coups de foudre détectés par la station) / (coups du réseau)
 ';
-
 $_BL['fr']['bo_stat_network_descr_lasth'] = 'Tous les chiffres se rapportent à une période de 60 minutes avant la dernière mise à jour.';
 $_BL['fr']['bo_stat_network_descr_table'] = 'Ici vous pouvez voir toutes les stations actives du réseau de détection de la foudre. Vous pouvez faire des tris dans le tableau en cliquant sur les liens dans la première rangée.';
 $_BL['fr']['bo_graph_descr_bear'] = 'Taux de localisation géographique. Pour une meilleure comparaison, il y a aussi le nombre de coups de foudre détecté.';
@@ -694,9 +696,6 @@ $_BL['fr']['bo_descr_strikes_now'] = 'Les données sur la foudre sont récupérées 
 $_BL['fr']['bo_stat_advanced_info'] = 'Statistiques avancées, principalement pour l\'exploitant de la station.';
 $_BL['fr']['bo_stat_other_station_info'] = 'Information! Les statistiques de la station de {STATION_CITY} sont affichées. Pour des raisons techniques seul une partie des informations peuvent être affichée. Quelques données peuvent être demandé à la station de {STATION}! ';
 $_BL['fr']['bo_stat_other_station_info_back'] = 'Retourner à la station {STATION}';
-
-
-
 
 
 /*************************************************************/
@@ -763,9 +762,6 @@ $_BL['fr']['Start'] = 'Accueil';
 $_BL['fr']['No log entries'] = 'Pas de log';
 
 
-
-
-
 /*************************************************************/
 /* MyBo station linking                                      */
 /*************************************************************/
@@ -829,18 +825,12 @@ $_BL['fr']['Click to update'] = 'Cliquez pour effectuer la mise à jour!';
 $_BL['fr']['Update failed!'] = 'Erreur de mise à jour!';
 
 
-
-
-
 /*************************************************************/
 /* Images                                                    */
 /*************************************************************/
 $_BL['fr']['Not enough data available!'] = 'Pas suffisament de données valides!';
 $_BL['fr']['Lightning data from Blitzortung.org'] = 'Données issues de Blitzortung.org';
 $_BL['fr']['No data available!'] = 'Pas de données!';
-
-
-
 
 
 /*************************************************************/
@@ -871,6 +861,9 @@ $_BL['fr']['United Kingdom'] = 'Royaume unis';
 $_BL['fr']['Bulgaria'] = 'Bulgarie';
 $_BL['fr']['Albania'] = 'Aghbanie';
 $_BL['fr']['Russia'] = 'Russie';
+$_BL['fr']['Romania'] = 'Roumanie';
+$_BL['fr']['Rome'] = 'Rome';
+$_BL['fr']['Lithuania'] = 'Lithuanie';
 
 //Europe
 $_BL['fr']['Europe'] = 'Europe';
@@ -883,4 +876,35 @@ $_BL['fr']['NRW'] = 'Rhénanie-du-Nord-Westphalie';
 //Others
 $_BL['fr']['Meteox rain radar'] = 'Radar pluies (meteox.com)';
 
+
+
+/*************************************************************/
+/* Unsorted / New translations                               */
+/*************************************************************/
+
+$_BL['fr']['Stations under construction'] = 'Station à venir';
+$_BL['fr']['Up to'] = 'Plus de';
+$_BL['fr']['h4_stations_under_construction'] = 'Liste des stations à venir';
+$_BL['fr']['Distances between stations used for locating'] = 'Distances utilisées entre les stations pour la localisation';
+$_BL['fr']['Strike is not confirmed'] = 'Non comfirmé';
+$_BL['fr']['Locating angle'] = 'Angle de localisation';
+
+
+
+/********************/
+/*  NOT TRANSLATED  */
+/********************/
+
+
+//en: 'Unknown'
+$_BL['fr']['Unknown'] = '';
+
+//en: 'Unknown or longer'
+$_BL['fr']['Unknown or longer'] = '';
+
+//en: 'Distances between all stations'
+$_BL['fr']['Distances between all stations'] = '';
+
+//en: 'Show hyperbolic curves'
+$_BL['fr']['check_show_hyps'] = '';
 

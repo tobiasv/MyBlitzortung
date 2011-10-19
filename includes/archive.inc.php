@@ -28,38 +28,45 @@ function bo_show_archive()
 	if (BO_DISABLE_ARCHIVE === true)
 		return;
 	
-	$maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || (bo_user_get_level() & BO_PERM_ARCHIVE);
+	$show = $_GET['bo_show'];
+	$perm = (bo_user_get_level() & BO_PERM_ARCHIVE);
+	$enabled['maps']       = ($perm || (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS));
+	$enabled['density']    = ($perm || (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES)) && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES;
+	$enabled['search']     = ($perm || (defined('BO_ENABLE_ARCHIVE_SEARCH') && BO_ENABLE_ARCHIVE_SEARCH));
+	$enabled['signals']    = ($perm || (defined('BO_ENABLE_ARCHIVE_SIGNALS') && BO_ENABLE_ARCHIVE_SIGNALS));
 	
-	$densities_enabled = defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES
-							&& ((defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES) || (bo_user_get_level() & BO_PERM_ARCHIVE));
-
+	if (($show && !$enabled[$show]) || !$show )
+	{
+		foreach($enabled as $type => $e)
+		{
+			if ($e)
+			{
+				$show = $type;
+				break;
+			}
+		}
+	}
 	
-	if ($_GET['bo_show'])
-		$show = $_GET['bo_show'];
-	else if ($maps_enabled)
-		$show = 'maps';
-	else if ($densities_enabled)
-		$show = 'density';
-	else
-		$show = 'search';
-
-	if (!$maps_enabled && $show == 'maps')
-		$show = 'search';
-		
+	if (!$show)
+		return;
+	
+	
 	echo '<ul id="bo_menu">';
 
-	if ($maps_enabled)
+	if ($enabled['maps'])
 		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'maps').'" class="bo_navi'.($show == 'maps' ? '_active' : '').'">'._BL('arch_navi_maps').'</a></li>';
 
-	if ($densities_enabled)
+	if ($enabled['density'])
 		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'density').'" class="bo_navi'.($show == 'density' ? '_active' : '').'">'._BL('arch_navi_density').'</a></li>';
-		
-	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'search').'" class="bo_navi'.($show == 'search' ? '_active' : '').'">'._BL('arch_navi_search').'</a></li>';
+	
+	if ($enabled['search'])
+		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'search').'" class="bo_navi'.($show == 'search' ? '_active' : '').'">'._BL('arch_navi_search').'</a></li>';
 
-	if (bo_user_get_level() & BO_PERM_NOLIMIT)
+	if ($perm && bo_user_get_level() & BO_PERM_NOLIMIT)
 		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'" class="bo_navi'.($show == 'strikes' ? '_active' : '').'">'._BL('arch_navi_strikes').'</a></li>';
 
-	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'signals').'" class="bo_navi'.($show == 'signals' ? '_active' : '').'">'._BL('arch_navi_signals').'</a></li>';		
+	if ($enabled['signals'])
+		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'signals').'" class="bo_navi'.($show == 'signals' ? '_active' : '').'">'._BL('arch_navi_signals').'</a></li>';		
 
 	echo '</ul>';
 
@@ -885,7 +892,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 {
 	$perm = bo_user_get_level() & BO_PERM_ARCHIVE;
 
-	$per_page = 10;
+	$per_page = BO_ARCHIVE_TABLE_PER_PAGE;
 	$max_pages = $perm ? 1E9 : 10;
 
 	$page = intval($_GET['bo_action']);
@@ -901,7 +908,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$show_details = $_GET['bo_show_details'];
 	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
 	
-	$channels = bo_get_conf('raw_channels');
+	$channels   = bo_get_conf('raw_channels');
+	$raw_bpv    = bo_get_conf('raw_bitspervalue');
+	$raw_values = bo_get_conf('raw_values');
 	
 	if ($page < 0)
 		$page = 0;
@@ -1213,38 +1222,41 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		echo '</td>';
 
-		$alt = _BL('rawgraph');
-		echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
-		if ($row['raw_id'])
+		if ($raw_bpv == 8 && $raw_values > 10)
 		{
-			$url = bo_bofile_url().'?graph='.$row['raw_id'].'&bo_lang='._BL();
-			echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
-		}
-		else if ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
-		{
-			echo _BL('signal not found');
-		}
-		else
-			echo _BL('No signal recieved.');
-			
-		echo '</td>';
-
-		if (BO_ARCHIVE_SHOW_SPECTRUM)
-		{
+			$alt = _BL('rawgraph');
 			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 			if ($row['raw_id'])
 			{
-				$url = bo_bofile_url().'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL();
-				echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_spec_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
+				$url = bo_bofile_url().'?graph='.$row['raw_id'].'&bo_lang='._BL();
+				echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
 			}
-			elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
+			else if ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
 			{
 				echo _BL('signal not found');
 			}
 			else
 				echo _BL('No signal recieved.');
-			
+				
 			echo '</td>';
+
+			if (BO_ARCHIVE_SHOW_SPECTRUM)
+			{
+				echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
+				if ($row['raw_id'])
+				{
+					$url = bo_bofile_url().'?graph='.$row['raw_id'].'&spectrum&bo_lang='._BL();
+					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_spec_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
+				}
+				elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
+				{
+					echo _BL('signal not found');
+				}
+				else
+					echo _BL('No signal recieved.');
+				
+				echo '</td>';
+			}
 		}
 		
 		echo '</tr><tr>';
@@ -1353,6 +1365,25 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			
 		}
 		
+		if ($loc_angle[0])
+		{
+			echo '<li>';
+			echo '<span class="bo_descr">';
+			echo _BL('Locating angle').': ';
+			echo '</span>';
+			echo '<span class="bo_value">';
+			
+			echo number_format($loc_angle[1], 0, _BL('.'), _BL(','));
+			echo '&deg; ';
+
+			echo '('.number_format($loc_angle[0], 0, _BL('.'), _BL(','));
+			echo '&deg;)';
+			
+			echo '</span>';
+			echo '</li>';
+		
+		}
+
 		if ($row['raw_id'] && $channels == 1)
 		{
 			echo '<li>';
@@ -1375,26 +1406,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</li>';
 
 		}
-		
-		if ($loc_angle[0])
-		{
-			echo '<li>';
-			echo '<span class="bo_descr">';
-			echo _BL('Locating angle').': ';
-			echo '</span>';
-			echo '<span class="bo_value">';
-			
-			echo number_format($loc_angle[1], 0, _BL('.'), _BL(','));
-			echo '&deg; ';
 
-			echo '('.number_format($loc_angle[0], 0, _BL('.'), _BL(','));
-			echo '&deg;)';
-			
-			echo '</span>';
-			echo '</li>';
 		
-		}
-
 		if ($row['strike_id'] && $row['status'] == 0)
 		{
 			echo '<li>';

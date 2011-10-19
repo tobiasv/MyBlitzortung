@@ -242,7 +242,10 @@ $_BL['en']['Statistics'] = 'Statistics';
 $_BL['en']['check_only_participated'] = 'Only participated';
 $_BL['en']['Lightning data imports'] = 'Lightning data imports';
 $_BL['en']['Traffic to Blitzortung.org'] = 'Traffic to Blitzortung.org';
-
+$_BL['en']['Using auth ID'] = 'Using auth ID';
+$_BL['en']['Read cities.txt'] = 'Read cities.txt';
+$_BL['en']['Satellite'] = 'Satellite';
+$_BL['en']['Details'] = 'Details';
 
 
 $_BL['en']['timezone_is'] = 'Current date/time and default timezone:';
@@ -858,6 +861,9 @@ $_BL['en']['United Kingdom'] = 'United Kingdom	';
 $_BL['en']['Bulgaria'] = 'Bulgaria';
 $_BL['en']['Albania'] = 'Albania';
 $_BL['en']['Russia'] = 'Russia';
+$_BL['de']['Romania'] = 'Romania';
+$_BL['de']['Rome'] = 'Rome';
+$_BL['de']['Lithuania'] = 'Lithuania';
 
 //Europe
 $_BL['en']['Europe'] = 'Europe';

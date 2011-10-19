@@ -337,12 +337,12 @@ background: #e8e8e8;
 
 #myblitzortung .bo_sig_table td ul {
 list-style: none;
-margin: 0;
+margin: 0 0 3px 0;
 padding: 0;
 }
 
 #myblitzortung .bo_sig_table td ul li {
-float: left;
+display: inline-block;
 width: 160px;
 margin: 2px 0px;
 padding: 0;
