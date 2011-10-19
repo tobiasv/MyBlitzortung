@@ -1600,23 +1600,23 @@ function bo_update_daily_stat($max_time)
 		/*** Longtime statistics ***/
 		$D = unserialize(bo_get_conf('longtime_max_strikes_day_all'));
 		if ($D[0] < $row_all['cnt'])
-			bo_set_conf('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $yesterday)));
+			bo_set_conf('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $ytime)));
 
 		$D = unserialize(bo_get_conf('longtime_max_strikes_day_all_rad'));
 		if ($D[0] < $row_all_rad['cnt'])
-			bo_set_conf('longtime_max_strikes_day_all_rad', serialize(array($row_all_rad['cnt'], $yesterday)));
+			bo_set_conf('longtime_max_strikes_day_all_rad', serialize(array($row_all_rad['cnt'], $ytime)));
 
 		$D = unserialize(bo_get_conf('longtime_max_strikes_day_own'));
 		if ($D[0] < $row_own['cnt'])
-			bo_set_conf('longtime_max_strikes_day_own', serialize(array($row_own['cnt'], $yesterday)));
+			bo_set_conf('longtime_max_strikes_day_own', serialize(array($row_own['cnt'], $ytime)));
 
 		$D = unserialize(bo_get_conf('longtime_max_strikes_day_own_rad'));
 		if ($D[0] < $row_own_rad['cnt'])
-			bo_set_conf('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $yesterday)));
+			bo_set_conf('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $ytime)));
 
 		$D = unserialize(bo_get_conf('longtime_max_signals_day_own'));
 		if ($D[0] < $signals_exact['cnt'])
-			bo_set_conf('longtime_max_signals_day_own', serialize(array($signals_exact['cnt'], $yesterday)));
+			bo_set_conf('longtime_max_signals_day_own', serialize(array($signals_exact['cnt'], $ytime)));
 			
 		$ret = true;
 	}

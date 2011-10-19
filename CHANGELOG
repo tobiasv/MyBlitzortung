@@ -8,6 +8,7 @@ Version 0.7.3a-dev
 - new: drawing of hyperbolic curves - you can see how locating is done
 - new: individual copyright text for graphs / maps
 - fix: method of finding global minimum participants improved
+- fix: don't display signals for 12bit firmwares
 
 Version 0.7.3 (2011-10-05)
 --------------------------
