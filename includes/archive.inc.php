@@ -34,6 +34,7 @@ function bo_show_archive()
 	$enabled['density']    = ($perm || (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES)) && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES;
 	$enabled['search']     = ($perm || (defined('BO_ENABLE_ARCHIVE_SEARCH') && BO_ENABLE_ARCHIVE_SEARCH));
 	$enabled['signals']    = ($perm || (defined('BO_ENABLE_ARCHIVE_SIGNALS') && BO_ENABLE_ARCHIVE_SIGNALS));
+	$enabled['strikes']    = ($perm || (bo_user_get_level() & BO_PERM_NOLIMIT));
 	
 	if (($show && !$enabled[$show]) || !$show )
 	{
@@ -62,7 +63,7 @@ function bo_show_archive()
 	if ($enabled['search'])
 		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'search').'" class="bo_navi'.($show == 'search' ? '_active' : '').'">'._BL('arch_navi_search').'</a></li>';
 
-	if ($perm && bo_user_get_level() & BO_PERM_NOLIMIT)
+	if ($enabled['strikes'])
 		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'" class="bo_navi'.($show == 'strikes' ? '_active' : '').'">'._BL('arch_navi_strikes').'</a></li>';
 
 	if ($enabled['signals'])

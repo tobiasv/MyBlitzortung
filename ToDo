@@ -39,4 +39,4 @@ Features
 - amcharts instead of jpgraph (www.amcharts.com)
 - top-list of strike currents (calc. of current has to be improved first!)
 - statistics about GPS-status of own station/all stations (GPS yes/no, mean value and value w/o GPS)
-- add date to longtime vars (per day values are already saved with date) and maybe a link to archive map (if enabled)
+- add date to longtime vars (values are already saved with date) and maybe a link to archive map (if enabled)
