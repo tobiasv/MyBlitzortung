@@ -989,7 +989,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$show_empty_sig = true;
 		$hours_back = time() / 3600;
 	}
-	else
+	
+	if (!$strike_id)
 	{
 
 		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes', 'bo_show_details', 'bo_region'));
@@ -1009,14 +1010,22 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		if ($perm)
 		{
-			echo '<input type="checkbox" name="bo_show_details" value="1" '.($show_details ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_show_details">';
-			echo '<label for="check_show_details"> '._BL('Details').'</label> &nbsp; ';
+			if ($show_empty_sig || $only_strikes)
+			{
+				echo '<input type="checkbox" name="bo_show_details" value="1" '.($show_details ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_show_details">';
+				echo '<label for="check_show_details"> '._BL('Details').'</label> &nbsp; ';
+			}
+			
 			echo ' &nbsp; <span class="bo_form_descr">'._BL('Time').':</span> ';
 			echo '<input type="text" name="bo_datetime_to" value="'._BC($date).'" id="bo_archive_date" class="bo_archive_date">';
-			echo ' &nbsp; <span class="bo_form_descr">'._BL('Region').': ';
-			bo_show_select_region($region);
-			echo '</span>  &nbsp; ';
-
+			
+			if ($show_empty_sig || $only_strikes)
+			{
+				echo ' &nbsp; <span class="bo_form_descr">'._BL('Region').': ';
+				bo_show_select_region($region);
+				echo '</span>  &nbsp; ';
+			}
+			
 			if ($show_details)
 				echo bo_archive_select_map($map);
 
