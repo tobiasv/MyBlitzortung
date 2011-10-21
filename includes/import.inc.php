@@ -705,7 +705,7 @@ function bo_update_strikes($force = false, $max_time = 0)
 			}
 		}
 		
-		echo "\n<p>Lines: ".count($lines)." *** New Strikes: $i *** Updated: $u *** Already read: $a</p>\n";
+		echo "\n<p>Lines: ".count($file)." *** New Strikes: $i *** Updated: $u *** Already read: $a</p>\n";
 
 		$count = bo_get_conf('count_strikes');
 		bo_set_conf('count_strikes', $count + $i);
