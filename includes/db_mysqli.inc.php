@@ -50,7 +50,7 @@ class BoDb
 		
 		self::$dbh = new mysqli(BO_DB_HOST, BO_DB_USER, BO_DB_PASS, "", $port);
 
-		if (mysqli_connect_error() && $die_on_error)
+		if (mysqli_connect_error())
 			die('Database: Connect ERROR (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
 
 		if ($prepare_all)

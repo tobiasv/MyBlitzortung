@@ -34,9 +34,15 @@ function bo_db($query = '', $die_on_errors = true)
 
 	$erg = BoDb::query($query);
 
-	if ($die_on_errors && $erg === false)
-		die("<p>Database Query Error:</p><pre>" . htmlspecialchars(BoDb::error()) .
-			"</pre> <p>for query</p> <pre>" . htmlspecialchars($query) . "</pre>");
+	if ($erg === false)
+	{
+		if ($die_on_errors !== false)
+			echo("<p>Database Query Error:</p><pre>" . htmlspecialchars(BoDb::error()) .
+				"</pre> <p>for query</p> <pre>" . htmlspecialchars($query) . "</pre>");
+	
+		if ($die_on_errors === true)
+			die();
+	}
 
 	$qtype = strtolower(substr(trim($query), 0, 6));
 	switch ($qtype)

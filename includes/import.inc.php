@@ -125,7 +125,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 		$row = $res->fetch_assoc();
 		$last_signal = strtotime($row['mtime'].' UTC');
 		
-		if (!$last_signal)
+		if (!$last_signal || $last_signal > time())
 			$last_signal = time() - 3600 * 2;
 
 			
@@ -150,72 +150,73 @@ function bo_update_raw_signals($force = false, $max_time = false)
 		$lines = explode("\n", $file);
 		foreach($lines as $l)
 		{
-			if (preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $l, $r))
+			if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $l, $r))
+				continue;
+			
+			$date = $r[1];
+			$time = $r[2];
+
+			$utime = strtotime("$date $time UTC");
+
+			// update strike-data only some seconds *before* the *last download*
+			if ($utime < $last_signal - 120)
 			{
-				$date = $r[1];
-				$time = $r[2];
-
-				$utime = strtotime("$date $time UTC");
-
-				// update strike-data only some seconds *before* the *last download*
-				if ($utime < $last_signal - 120)
-				{
-					$a++;
-					continue;
-				}
-
-				$time_ns = intval($r[3]);
-				$lat = $r[4];
-				$lon = $r[5];
-				$height = (double)$r[6];
-				$channels = $r[7];
-				$values = $r[8];
-				$bpv = $r[9];
-				$ntime = $r[10];
-				$data = $r[11];
-
-
-				/*** signal examinations ***/
-				//from hex to binary
-				$bdata = '';
-				for ($j=0;$j < strlen($data);$j+=2)
-				{
-					$bdata .= chr(hexdec(substr($data,$j,2)));
-				}
-		
-				$sql = "	time='$date $time',
-							time_ns='$time_ns',
-							lat='$lat',lon='$lon',
-							height='$height',
-							strike_id='0',
-							data=x'$data'
-							";
-				
-				$sql .= ",".bo_examine_signal($bdata);
-
-				$id = array_search("$date $time.$time_ns", $old_times);
-				
-				if ($id)
-				{
-					$sql = "UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'";
-					bo_db($sql, false);
-					$u++;
-				}
-				else
-				{
-					$sql = "INSERT INTO ".BO_DB_PREF."raw SET $sql";
-					bo_db($sql, false);
-					$i++;
-				}
-				
-				//Timeout
-				if ($max_time != false && time() - $start_time > $max_time - 3)
-				{
-					echo '<p>TIMEOUT!</p>';
-					$timeout = true;
-					break;
-				}
+				$a++;
+				continue;
 			}
+
+			$time_ns = intval($r[3]);
+			$lat = $r[4];
+			$lon = $r[5];
+			$height = (double)$r[6];
+			$channels = $r[7];
+			$values = $r[8];
+			$bpv = $r[9];
+			$ntime = $r[10];
+			$data = $r[11];
+
+
+			/*** signal examinations ***/
+			//from hex to binary
+			$bdata = '';
+			for ($j=0;$j < strlen($data);$j+=2)
+			{
+				$bdata .= chr(hexdec(substr($data,$j,2)));
+			}
+	
+			$sql = "	time='$date $time',
+						time_ns='$time_ns',
+						lat='$lat',lon='$lon',
+						height='$height',
+						strike_id='0',
+						data=x'$data'
+						";
+			
+			$sql .= ",".bo_examine_signal($bdata);
+
+			$id = array_search("$date $time.$time_ns", $old_times);
+			
+			if ($id)
+			{
+				$sql = "UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'";
+				bo_db($sql, 1);
+				$u++;
+			}
+			else
+			{
+				$sql = "INSERT INTO ".BO_DB_PREF."raw SET $sql";
+				bo_db($sql, 1);
+				$i++;
+			}
+			
+			//Timeout
+			if ($max_time != false && time() - $start_time > $max_time - 3)
+			{
+				echo '<p>TIMEOUT!</p>';
+				$timeout = true;
+				break;
+			}
+
 		}
 
 		echo "\n<p>Lines: ".count($lines)." *** New Raw Data: $i *** Updated: $u *** Already read: $a</p>\n";
