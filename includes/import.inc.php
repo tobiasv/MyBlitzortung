@@ -48,7 +48,7 @@ function bo_get_login_str()
 
 
 // Get archive data from blitzortung cgi
-function bo_get_archive($args='', $bo_login_id=false)
+function bo_get_archive($args='', $bo_login_id=false, $as_array=false)
 {
 	if (!$bo_login_id)
 	{
@@ -56,7 +56,7 @@ function bo_get_archive($args='', $bo_login_id=false)
 		$auto_id = true;
 	}
 
-	$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&'.$args, $code, 'archive');
+	$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&'.$args, $code, 'archive', $d1, $d2, $as_array);
 
 	if ($file === false)
 	{
@@ -67,7 +67,7 @@ function bo_get_archive($args='', $bo_login_id=false)
 	
 	bo_update_error('archivedata', true);
 
-	if (strlen($file) < 100) //Login not successful --> new login ID
+	if (($as_array && count($file)<3) || (!$as_array && strlen($file) < 100)) //Login not successful --> new login ID
 	{
 		if ($auto_id)
 		{
@@ -109,7 +109,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 
 	if (time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last)
 	{
-		$file = bo_get_archive('lang=de&page=3&subpage_3=1&mode=4');
+		$file = bo_get_archive('lang=de&page=3&subpage_3=1&mode=4', false, true);
 
 		$start_time = time();
 		
@@ -147,11 +147,16 @@ function bo_update_raw_signals($force = false, $max_time = false)
 			$old_times[$row['id']] = $row['time'].'.'.$row['time_ns'];
 		}		
 		
-		$lines = explode("\n", $file);
-		foreach($lines as $l)
+		foreach($file as $line)
 		{
-			if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $l, $r))
+			if (!$line)
 				continue;
+				
+			if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $line, $r))
+			{
+				echo "<p>Wrong line format: <i>$line</i></p>";
+				continue;
+			}
 			
 			$date = $r[1];
 			$time = $r[2];
@@ -219,7 +224,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 
 		}
 
-		echo "\n<p>Lines: ".count($lines)." *** New Raw Data: $i *** Updated: $u *** Already read: $a</p>\n";
+		echo "\n<p>Lines: ".count($file)." *** New Raw Data: $i *** Updated: $u *** Already read: $a</p>\n";
 
 		if ($channels && $values && $bpv)
 		{
@@ -348,7 +353,7 @@ function bo_update_strikes($force = false, $max_time = 0)
 		$modified = $last_modified; //!!
 		
 		//get the file
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range, $modified);
+		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range, $modified, true);
 		
 		
 		//check the date of the 2nd line (1st may be truncated!)
@@ -365,8 +370,8 @@ function bo_update_strikes($force = false, $max_time = 0)
 		}
 		else
 		{
-			$lines = explode("\n", $file);
-			$first_strike_file = strtotime(substr($lines[1],0,19).' UTC');
+			unset($file[0]); //is always chunked
+			$first_strike_file = strtotime(substr($file[1],0,19).' UTC');
 		}
 
 			
@@ -374,16 +379,16 @@ function bo_update_strikes($force = false, $max_time = 0)
 		if ($file !== false && empty($range))
 		{
 			echo "\n<p>Partial download didn't work, got whole file instead (sent range $sent_range got ".strlen($file)." bytes)</p>\n";
-			bo_set_conf('import_strike_filelength', serialize(array(strlen($file), time(), 0)));
+			bo_set_conf('import_strike_filelength', serialize(array(strlen(implode($file)), time(), 0)));
 		}
 		else if ($file === false || $first_strike_file > $last_strike)
 		{
 			/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
 			$modified = $last_modified; //!!
-			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range, $modified);
+			$drange = 0;
+			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $drange, $modified, true);
 
-			echo "\n<p>Using partial download FAILED (Range $range)! Fallback to normal download (".strlen($file)." bytes). ";
-
+			echo "\n<p>Using partial download FAILED (Range $sent_range)! Fallback to normal download (".strlen(implode($file))." bytes). ";
 			
 			if ($code == 304) //wasn't modified
 			{
@@ -404,8 +409,6 @@ function bo_update_strikes($force = false, $max_time = 0)
 				echo "<p>ERROR: Couldn't get file for strikes! Code: $code</p>\n";
 				return false;
 			}
-			
-			$lines = explode("\n", $file);
 		}
 		else
 		{
@@ -432,268 +435,273 @@ function bo_update_strikes($force = false, $max_time = 0)
 				' *** Importing only strikes newer than: '.date('Y-m-d H:i:s', $time_update).
 				' *** This is update #'.$loadcount.'</p>'."\n";
 		
-		foreach($lines as $l)
+		foreach($file as $l)
 		{
-			if (preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9\.]+)kA.* ([0-9]+)m ([0-9]+) (.*)/', $l, $r))
+			if (!$l)
+				continue;
+			
+			if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9\.]+)k?A?.* ([0-9]+)m? ([0-9]+) (.*)/', $l, $r))
 			{
-				$date = $r[1];
-				$time = $r[2];
+				echo "<p>Wrong line format: <i>$l</i></p>";
+				continue;
+			}
 
-				$utime = strtotime("$date $time UTC");
+			$date = $r[1];
+			$time = $r[2];
 
-				// update strike-data only some seconds *before* the *last strike in Database*
-				if ($utime < $time_update)
-				{
-					$a++;
-					continue;
-				}
+			$utime = strtotime("$date $time UTC");
+
+			// update strike-data only some seconds *before* the *last strike in Database*
+			if ($utime < $time_update)
+			{
+				$a++;
+				continue;
+			}
+			
+			//get older strike data to avoid duplicates
+			if ($old_data === null)
+			{
+				$old_data = array();
 				
-				//get older strike data to avoid duplicates
-				if ($old_data === null)
+				//get the range out of the time of the first line
+				$date_start = gmdate('Y-m-d H:i:s', $time_update - 10); //a small margin to be sure
+				$date_end = gmdate('Y-m-d H:i:s', $utime + 3600 * 3); //3h to the future to be sure
+				
+				//Searching for old Strikes (to avoid duplicates)
+				//ToDo: fuzzy search for lat/lon AND time
+				$sql = "SELECT id, part, time, time_ns, lat, lon, users
+						FROM ".BO_DB_PREF."strikes
+						WHERE time BETWEEN '$date_start' AND '$date_end'
+						ORDER BY time";
+				$res = bo_db($sql);
+				while ($row = $res->fetch_assoc())
 				{
-					$old_data = array();
-					
-					//get the range out of the time of the first line
-					$date_start = gmdate('Y-m-d H:i:s', $time_update - 10); //a small margin to be sure
-					$date_end = gmdate('Y-m-d H:i:s', $utime + 3600 * 3); //3h to the future to be sure
-					
-					//Searching for old Strikes (to avoid duplicates)
-					//ToDo: fuzzy search for lat/lon AND time
-					$sql = "SELECT id, part, time, time_ns, lat, lon, users
-							FROM ".BO_DB_PREF."strikes
-							WHERE time BETWEEN '$date_start' AND '$date_end'
-							ORDER BY time";
-					$res = bo_db($sql);
-					while ($row = $res->fetch_assoc())
+					$id = $row['id'];
+					$old_data[$id]['t'] = strtotime($row['time'].' UTC');
+					$old_data[$id]['n'] = $row['time_ns'];
+					$old_data[$id]['loc'] = array($row['lat'], $row['lon']);
+					$old_data[$id]['users'] = $row['users'];
+				}
+			}
+			
+			
+			//The data for the strike
+			$time_ns = intval($r[3]);
+			$lat = $r[4];
+			$lon = $r[5];
+			$cur = $r[6];
+			$deviation = $r[7];
+			$participants_calc = $r[8];
+			$participants = explode(' ', $r[9]);
+			$users = count($participants);
+			$part = strpos($r[9], BO_USER) !== false ? 1 : 0;
+			$dist = bo_latlon2dist($lat, $lon);
+			$bear = bo_latlon2bearing($lat, $lon);
+			
+			$sql = "
+						time='$date $time',
+						time_ns='$time_ns',
+						lat='$lat',lon='$lon',
+						distance='$dist',
+						bearing='$bear',
+						deviation='$deviation',
+						current='$cur',
+						users='$users',
+						part='$part'
+						";
+
+			//for statistics
+			$bear_id = intval($bear);
+			$dist_id = intval($dist / 10 / 1000);
+			$min_participants = min($participants_calc, $min_participants);
+			$max_participants = max($participants_calc, $max_participants);
+			
+			//sometimes two strikes with same time one after another --> ignore 2nd one
+			if ("$time.$time_ns" === $time_last_strike)
+				continue;
+			
+			$time_last_strike = "$time.$time_ns";
+			
+			//search for older entries of the same strike
+			$id = false;
+			$ids_found = array();
+			$nreftime = 0;
+
+			if ($utime < $last_strike + 2)
+			{
+				$search_from  = $utime;
+				$search_to    = $utime;
+				$nsearch_from = ($time_ns - BO_UP_STRIKES_FUZZY_NSEC) * 1E-9;
+				$nsearch_to   = ($time_ns + BO_UP_STRIKES_FUZZY_NSEC) * 1E-9;
+
+				if ($nsearch_from < 0) { $nsearch_from++; $search_from--; }
+				else if ($nsearch_from > 1) { $nsearch_from--; $search_from++; }
+
+				if ($nsearch_to < 0) { $nsearch_to++; $search_to--; }
+				else if ($nsearch_to > 1) { $nsearch_to--; $search_to++; }
+
+				
+				foreach($old_data as $oldid => $d)
+				{
+					//remove entries, which are too old
+					if ($utime - $d['t'] >= 2)
 					{
-						$id = $row['id'];
-						$old_data[$id]['t'] = strtotime($row['time'].' UTC');
-						$old_data[$id]['n'] = $row['time_ns'];
-						$old_data[$id]['loc'] = array($row['lat'], $row['lon']);
-						$old_data[$id]['users'] = $row['users'];
+						unset($old_data[$i]);
+						continue;
 					}
-				}
 				
-				
-				//The data for the strike
-				$time_ns = intval($r[3]);
-				$lat = $r[4];
-				$lon = $r[5];
-				$cur = $r[6];
-				$deviation = $r[7];
-				$participants_calc = $r[8];
-				$participants = explode(' ', $r[9]);
-				$users = count($participants);
-				$part = strpos($r[9], BO_USER) !== false ? 1 : 0;
-				$dist = bo_latlon2dist($lat, $lon);
-				$bear = bo_latlon2bearing($lat, $lon);
-				
-				$sql = "
-							time='$date $time',
-							time_ns='$time_ns',
-							lat='$lat',lon='$lon',
-							distance='$dist',
-							bearing='$bear',
-							deviation='$deviation',
-							current='$cur',
-							users='$users',
-							part='$part'
-							";
-
-				//for statistics
-				$bear_id = intval($bear);
-				$dist_id = intval($dist / 10 / 1000);
-				$min_participants = min($participants_calc, $min_participants);
-				$max_participants = max($participants_calc, $max_participants);
-				
-				//sometimes two strikes with same time one after another --> ignore 2nd one
-				if ("$time.$time_ns" === $time_last_strike)
-					continue;
-				
-				$time_last_strike = "$time.$time_ns";
-				
-				//search for older entries of the same strike
-				$id = false;
-				$ids_found = array();
-				$nreftime = 0;
-
-				if ($utime < $last_strike + 2)
-				{
-					$search_from  = $utime;
-					$search_to    = $utime;
-					$nsearch_from = ($time_ns - BO_UP_STRIKES_FUZZY_NSEC) * 1E-9;
-					$nsearch_to   = ($time_ns + BO_UP_STRIKES_FUZZY_NSEC) * 1E-9;
-
-					if ($nsearch_from < 0) { $nsearch_from++; $search_from--; }
-					else if ($nsearch_from > 1) { $nsearch_from--; $search_from++; }
-
-					if ($nsearch_to < 0) { $nsearch_to++; $search_to--; }
-					else if ($nsearch_to > 1) { $nsearch_to--; $search_to++; }
-
-					
-					foreach($old_data as $oldid => $d)
+					//couldn't find any previous strikes to update
+					else if ($d['t'] - $utime >= 2)
 					{
-						//remove entries, which are too old
-						if ($utime - $d['t'] >= 2)
-						{
-							unset($old_data[$i]);
-							continue;
-						}
-					
-						//couldn't find any previous strikes to update
-						else if ($d['t'] - $utime >= 2)
-						{
-							break;
-						}
-						
-						//found exactly the same strike
-						elseif ($d['t'] == $utime && $d['n'] == $time_ns)
-						{
-							unset($old_data[$i]); //remove it from the search array!
-							unset($ids_found); //only update the strike with the same time
-							$ids_found[] = $oldid;
-							break; //end search!
-						}
-						
-						//FUZZY-SEARCH -> found seconds match
-						else if ($search_from <= $d['t'] && $d['t'] <= $search_to) 
-						{
-							$nreftime = $d['n'] * 1E-9;
-						
-							//echo "<br>".gmdate("H:i:s", $search_from)."$nsearch_from <= ".gmdate("H:i:s", $d['t'])." <= ".gmdate("H:i:s", $search_to)."$nsearch_to ::: ";
-							//echo " ".gmdate("H:i:s", $d['t']).".$d[n] ::: ";
-							
-							$is_old_strike = false;
-							
-							//search for nseconds match
-							if ($nsearch_from > $nsearch_to && ($nsearch_from <= $nreftime || $nreftime <= $nsearch_to) )
-							{
-								//echo ' Found2! ';
-								$is_old_strike = true;
-							}
-							elseif ($nsearch_from <= $nsearch_to && $nsearch_from <= $nreftime && $nreftime <= $nsearch_to)
-							{
-								//echo ' Found1! ';
-								$is_old_strike = true;
-							}
-							
-							if ($is_old_strike)
-							{
-								//was strike in the same area?
-								$old_dist = bo_latlon2dist($lat, $lon, $d['loc'][0], $d['loc'][1]);
-
-								//could be a new one if participant count differs too much
-								if ($old_dist < BO_UP_STRIKES_FUZZY_KM * 1000) // && $users * 0.9 <= $d['users'] && $d['users'] <= $users * 1.5)
-								{
-									$ids_found[] = $oldid;
-									unset($old_data[$i]);
-								}
-								//else
-								//	echo " Distance didn't match ($oldid) ::: ";
-							}
-							
-						}
-						
+						break;
 					}
 					
-					
-					if (!empty($ids_found))
+					//found exactly the same strike
+					elseif ($d['t'] == $utime && $d['n'] == $time_ns)
 					{
-						$id = $ids_found[0];
-						
-						//if (count($ids_found) > 1)
-						//	echo "$id: Found multiple old strikes!<br>";
+						unset($old_data[$i]); //remove it from the search array!
+						unset($ids_found); //only update the strike with the same time
+						$ids_found[] = $oldid;
+						break; //end search!
 					}
-					//else
-					//	echo " NEW STRIKE !!!";
+					
+					//FUZZY-SEARCH -> found seconds match
+					else if ($search_from <= $d['t'] && $d['t'] <= $search_to) 
+					{
+						$nreftime = $d['n'] * 1E-9;
+					
+						//echo "<br>".gmdate("H:i:s", $search_from)."$nsearch_from <= ".gmdate("H:i:s", $d['t'])." <= ".gmdate("H:i:s", $search_to)."$nsearch_to ::: ";
+						//echo " ".gmdate("H:i:s", $d['t']).".$d[n] ::: ";
 						
-					//echo "<p>";
-				}
-		
-				// either an updated strike or a new one
-				if (!$id)
-				{
-					if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
-						$sql .= " , status=2 ";
-					else
-						$sql .= " , status=0 ";
-					
-					$id = bo_db("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
-					$i++;
+						$is_old_strike = false;
+						
+						//search for nseconds match
+						if ($nsearch_from > $nsearch_to && ($nsearch_from <= $nreftime || $nreftime <= $nsearch_to) )
+						{
+							//echo ' Found2! ';
+							$is_old_strike = true;
+						}
+						elseif ($nsearch_from <= $nsearch_to && $nsearch_from <= $nreftime && $nreftime <= $nsearch_to)
+						{
+							//echo ' Found1! ';
+							$is_old_strike = true;
+						}
+						
+						if ($is_old_strike)
+						{
+							//was strike in the same area?
+							$old_dist = bo_latlon2dist($lat, $lon, $d['loc'][0], $d['loc'][1]);
 
-					$new_strike = true;
+							//could be a new one if participant count differs too much
+							if ($old_dist < BO_UP_STRIKES_FUZZY_KM * 1000) // && $users * 0.9 <= $d['users'] && $d['users'] <= $users * 1.5)
+							{
+								$ids_found[] = $oldid;
+								unset($old_data[$i]);
+							}
+							//else
+							//	echo " Distance didn't match ($oldid) ::: ";
+						}
+						
+					}
 					
-					//Long-Time Statistics
-					$bear_data[$bear_id]++;
-					$dist_data[$dist_id]++;
 				}
+				
+				
+				if (!empty($ids_found))
+				{
+					$id = $ids_found[0];
+					
+					//if (count($ids_found) > 1)
+					//	echo "$id: Found multiple old strikes!<br>";
+				}
+				//else
+				//	echo " NEW STRIKE !!!";
+					
+				//echo "<p>";
+			}
+	
+			// either an updated strike or a new one
+			if (!$id)
+			{
+				if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
+					$sql .= " , status=2 ";
 				else
+					$sql .= " , status=0 ";
+				
+				$id = bo_db("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
+				$i++;
+
+				$new_strike = true;
+				
+				//Long-Time Statistics
+				$bear_data[$bear_id]++;
+				$dist_data[$dist_id]++;
+			}
+			else
+			{
+				if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
+					$sql .= " , status=2 ";
+				else
+					$sql .= " , status=1 ";
+				
+				bo_db("UPDATE ".BO_DB_PREF."strikes SET $sql WHERE id='$id'");
+				$u++;
+				$new_strike = false;
+			}
+
+			//echo "\n".($new_strike ? 'I' : 'U')." $time.$time_ns $id";
+			
+
+			//Update Strike <-> All Participated Stations
+			if ($id && !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true) )
+			{
+				$sql = '';
+				foreach($participants as $user)
 				{
-					if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
-						$sql .= " , status=2 ";
-					else
-						$sql .= " , status=1 ";
+					$stId = $stations[$user]['id'];
+					$stLat = $stations[$user]['lat'];
+					$stLon = $stations[$user]['lon'];
 					
-					bo_db("UPDATE ".BO_DB_PREF."strikes SET $sql WHERE id='$id'");
-					$u++;
-					$new_strike = false;
+					$last_strikes[$stId] = array($utime, $time_ns, $id);
+
+					$sql .= ($sql ? ',' : '')." ('$id', '$stId') ";
 				}
 
-				//echo "\n".($new_strike ? 'I' : 'U')." $time.$time_ns $id";
-				
-
-				//Update Strike <-> All Participated Stations
-				if ($id && !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true) )
+				if ($sql)
 				{
-					$sql = '';
-					foreach($participants as $user)
-					{
-						$stId = $stations[$user]['id'];
-						$stLat = $stations[$user]['lat'];
-						$stLon = $stations[$user]['lon'];
-						
-						$last_strikes[$stId] = array($utime, $time_ns, $id);
-
-						$sql .= ($sql ? ',' : '')." ('$id', '$stId') ";
-					}
-
-					if ($sql)
-					{
-						$sql = "REPLACE INTO ".BO_DB_PREF."stations_strikes (strike_id, station_id) VALUES $sql";
-						bo_db($sql);
-					}
+					$sql = "REPLACE INTO ".BO_DB_PREF."stations_strikes (strike_id, station_id) VALUES $sql";
+					bo_db($sql);
 				}
+			}
 
 
-				//Own Long-Time Statistics
-				if ($new_strike && $part)
-				{
-					$bear_data_own[$bear_id]++;
-					$dist_data_own[$dist_id]++;
+			//Own Long-Time Statistics
+			if ($new_strike && $part)
+			{
+				$bear_data_own[$bear_id]++;
+				$dist_data_own[$dist_id]++;
 
-					$max_dist_own = max($dist, $max_dist_own);
-					$min_dist_own = min($dist, $min_dist_own);
+				$max_dist_own = max($dist, $max_dist_own);
+				$min_dist_own = min($dist, $min_dist_own);
 
-					$last_strikes[$own_id] = array($utime, $time_ns, $id);
-					
-					$own++;
-				}
-
+				$last_strikes[$own_id] = array($utime, $time_ns, $id);
 				
-				//some more statistics
-				$max_users = max($max_users, $users);
-				$max_dist_all = max($dist, $max_dist_all);
-				$min_dist_all = min($dist, $min_dist_all);
+				$own++;
+			}
 
-				
-				//Timeout
-				if ($max_time != false && time() - $start_time > $max_time - 3)
-				{
-					echo '<p>TIMEOUT!</p>';
-					$timeout = true;
-					break;
-				}
-				
+			
+			//some more statistics
+			$max_users = max($max_users, $users);
+			$max_dist_all = max($dist, $max_dist_all);
+			$min_dist_all = min($dist, $min_dist_all);
+
+			
+			//Timeout
+			if ($max_time != false && time() - $start_time > $max_time - 3)
+			{
+				echo '<p>TIMEOUT!</p>';
+				$timeout = true;
+				break;
 			}
 		}
 		
@@ -1066,6 +1074,7 @@ function bo_update_stations($force = false, $max_time = 0)
 
 		//send a last modified header
 		$modified = bo_get_conf('uptime_stations_modified');
+		$range = 0;
 		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt', $code, 'stations', $range, $modified);
 
 		
@@ -1119,12 +1128,18 @@ function bo_update_stations($force = false, $max_time = 0)
 		foreach($lines as $l)
 		{
 			$cols = explode(" ", $l);
-
 			$stId 		= intval($cols[0]);
 
-			if (!$stId)
+			if (!$l || !$stId)
 				continue;
 
+			if (!$stId || count($cols) < 10)
+			{
+				echo "<p>Wrong line format: <i>$l</i></p>";
+				continue;
+			}
+
+			
 			$stUser 	= $cols[1];
 			$stCity 	= strtr(html_entity_decode($cols[3]), array(chr(160) => ' '));
 			$stCountry 	= strtr(html_entity_decode($cols[4]), array(chr(160) => ' '));
@@ -2980,6 +2995,32 @@ function bo_update_status_files($type)
 	}
 	
 	return $i;	
+}
+
+
+function bo_readline(&$text = null, $searchlen = 1000)
+{
+	static $line_nr=0, $pos=0;
+	
+	if (!$text)
+	{
+		$line_nr=0;
+		$pos=0;
+		return;
+	}
+	
+	$textpart = substr($text, $pos, $searchlen);
+	$newpos = strpos($textpart, "\n");
+	
+	if ($newpos === false)
+		return false;
+	
+	$line = substr($textpart, 0, $newpos);
+	$pos += $newpos + 1;
+	$line_nr++;
+	
+	return $line;
+
 }
 
 ?>

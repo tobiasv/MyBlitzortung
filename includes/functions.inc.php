@@ -753,17 +753,24 @@ function bo_load_locale($locale = '')
 
 }
 
-function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0)
+function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0, $as_array = false)
 {
-	$content = ''; 
-	$err = 0;
-		
 	if (BO_USE_PHPURLWRAPPER === true)
 	{
 		$content = file_get_contents($url);
+		$content_size = strlen($content);
+		
+		if ($as_array)
+			$content = explode("\n", $content);
 	}
 	else
 	{
+		ini_set("auto_detect_line_endings", "1");
+		
+		$err = 0;
+		$content_size = 0;
+		$content = $as_array ? array() : '';
+
 		$parsedurl = @parse_url($url); 
 		$host = $parsedurl['host'];
 		$user = $parsedurl['user'];
@@ -782,7 +789,11 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 		}
 		else
 		{
-			$out =  "GET ".$path."?".$query." HTTP/1.1\r\n";
+			// only HTTP1.1 if range request
+			// otherwise we could get a chunked response!
+			$http_ver = $range > 0 ? "1.1" : "1.0";
+			
+			$out =  "GET ".$path."?".$query." HTTP/".$http_ver."\r\n";
 			$out .= "Host: ".$host."\r\n";
 			$out .= "User-Agent: MyBlitzortung ".BO_VER."\r\n";
 			
@@ -802,15 +813,13 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 			$accepted_range = false;
 			$content_length = 0;
 			
-			//echo nl2br($out);
-			
 			if (fwrite($fp, $out) !== false)
 			{
 				//Header
 				do 
 				{ 
 					$header = chop(fgets($fp)); 
-					//echo $header.'<br>';
+
 					if ($first) //Check the first line (=Response)
 					{
 						preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
@@ -841,8 +850,15 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 				while (!empty($header) and !feof($fp)); 
 					
 				//Get the Content
-				while (!feof($fp)) { 
-					$content .= fgets($fp); 
+				while (!feof($fp)) 
+				{
+					$line = fgets($fp);
+					$content_size += strlen($line);
+					
+					if ($as_array)
+						$content[] = $line; 
+					else
+						$content  .= $line;
 				} 
 			}
 			else
@@ -871,9 +887,9 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 		$data = unserialize(bo_get_conf('download_statistics'));
 		$data[$type]['count'][$err]++;
 		
-		if ($content)
+		if ($content_size)
 		{
-			$data[$type]['traffic'] += strlen($content);
+			$data[$type]['traffic'] += $content_size;
 			
 			$today = date('Ymd');
 			
@@ -884,7 +900,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 			}
 			
 			$data[$type]['traffic_today_date'] = $today;
-			$data[$type]['traffic_today'] += strlen($content);
+			$data[$type]['traffic_today'] += $content_size;
 			$data[$type]['count_today']++;
 		}
 		
