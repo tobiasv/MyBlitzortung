@@ -127,7 +127,8 @@ function bo_update_raw_signals($force = false, $max_time = false)
 		
 		if (!$last_signal || $last_signal > time())
 			$last_signal = time() - 3600 * 2;
-
+		
+		$last_signal -= 120; 
 			
 		// anti-duplicate without using unique-db keys
 		$old_times = array();
@@ -145,7 +146,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 		{
 			$id = $row['id'];
 			$old_times[$row['id']] = $row['time'].'.'.$row['time_ns'];
-		}		
+		}
 		
 		foreach($file as $line)
 		{
@@ -164,7 +165,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 			$utime = strtotime("$date $time UTC");
 
 			// update strike-data only some seconds *before* the *last download*
-			if ($utime < $last_signal - 120)
+			if ($utime < $last_signal)
 			{
 				$a++;
 				continue;
@@ -200,7 +201,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 			$sql .= ",".bo_examine_signal($bdata);
 
 			$id = array_search("$date $time.$time_ns", $old_times);
-			
+
 			if ($id)
 			{
 				$sql = "UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'";
