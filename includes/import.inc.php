@@ -116,28 +116,24 @@ function bo_update_raw_signals($force = false, $max_time = false)
 		if ($file === false)
 			return false;
 
-		$loadcount = bo_get_conf('upcount_raw');
-		bo_set_conf('upcount_raw', $loadcount+1);
-
-		
+		// Search last signal
 		$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$last_signal = strtotime($row['mtime'].' UTC');
-		
 		if (!$last_signal || $last_signal > time())
+		{
+			echo "<p>No last signal found! Last time: ".$row['mtime'].". Setting to now -2 hours.</p>";
 			$last_signal = time() - 3600 * 2;
+		}
 		
-		$last_signal -= 120; 
+		$update_time = $last_signal - 120;
 			
 		// anti-duplicate without using unique-db keys
+		//Searching for old Signals (to avoid duplicates)
 		$old_times = array();
-		
-		$date_start = gmdate('Y-m-d H:i:s', $last_signal - 10); //10s back to be sure
+		$date_start = gmdate('Y-m-d H:i:s', $update_time - 10); //some secs. back to be sure
 		$date_end = gmdate('Y-m-d H:i:s', $last_signal + 3600 * 6); //6h to the future to be sure 
-		
-		//Searching for old Strikes (to avoid duplicates)
-		//ToDo: fuzzy search for lat/lon AND time
 		$sql = "SELECT id, time, time_ns
 				FROM ".BO_DB_PREF."raw
 				WHERE time BETWEEN '$date_start' AND '$date_end'";
@@ -148,6 +144,16 @@ function bo_update_raw_signals($force = false, $max_time = false)
 			$old_times[$row['id']] = $row['time'].'.'.$row['time_ns'];
 		}
 		
+		
+		//Debug output
+		$loadcount = bo_get_conf('upcount_raw');
+		bo_set_conf('upcount_raw', $loadcount+1);
+		echo "\n".'<p>Last signal: '.date('Y-m-d H:i:s', $last_signal). 
+				' *** Importing only signals newer than: '.date('Y-m-d H:i:s', $update_time).
+				' *** This is update #'.$loadcount.'</p>'."\n";
+
+		
+		//Read the signals
 		foreach($file as $line)
 		{
 			if (!$line)
@@ -161,11 +167,10 @@ function bo_update_raw_signals($force = false, $max_time = false)
 			
 			$date = $r[1];
 			$time = $r[2];
-
 			$utime = strtotime("$date $time UTC");
 
 			// update strike-data only some seconds *before* the *last download*
-			if ($utime < $last_signal)
+			if ($utime < $update_time)
 			{
 				$a++;
 				continue;
@@ -1117,9 +1122,13 @@ function bo_update_stations($force = false, $max_time = 0)
 			return;
 		}
 
+		
+		//Debug output
 		$loadcount = bo_get_conf('upcount_stations');
 		bo_set_conf('upcount_stations', $loadcount+1);
-		
+		echo "\n".'<p>Last update: '.date('Y-m-d H:i:s', $last). 
+			' *** This is update #'.$loadcount.'</p>'."\n";
+
 		//reset error counter
 		bo_update_error('stationdata', true); 
 		bo_update_error('stationcount', true); 
