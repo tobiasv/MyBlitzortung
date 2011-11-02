@@ -3,12 +3,15 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.3a-dev
-------------------
+Version 0.7.3a (2011-11-02)
+---------------------------
 - new: drawing of hyperbolic curves - you can see how locating is done
 - new: individual copyright text for graphs / maps
 - fix: method of finding global minimum participants improved
 - fix: don't display signals for 12bit firmwares
+- fix: problem with signal download fixed (got chunked HTTP-data from archive.cgi, switched to HTTP 1.0)
+- improved importing (faster, lower memory consumption)
+- minor fixes / improvements
 
 Version 0.7.3 (2011-10-05)
 --------------------------

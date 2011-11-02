@@ -10,6 +10,7 @@ if (defined('BO_UTF8') && BO_UTF8 && !headers_sent())
 ?><!DOCTYPE html>
 <html>
 	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
 		<title><?php echo strip_tags(_BL('MyBlitzortung')) ?>: <?php echo $title ?></title>
 		<link rel="stylesheet" href="style.css?ver=<?php echo BO_VER ?>" type="text/css"> 
 		<?php echo file_exists('own.css') ? '<link rel="stylesheet" href="own.css" type="text/css"> ' : '' ?>

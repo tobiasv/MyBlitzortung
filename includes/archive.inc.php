@@ -1134,9 +1134,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$loc_angle = null;
 		if ((bo_user_get_level() & BO_PERM_ARCHIVE) && $row['strike_id'])
 		{
-			$s_dists = array();
-			$s_sdists = array();
-			$s_bears = array();
+			$s_dists = array(array(),array());
+			$s_sdists = array(array(),array());
+			$s_bears = array(array(),array());
 			$s_data  = array();
 			
 			//Participated stations
