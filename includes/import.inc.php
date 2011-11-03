@@ -241,7 +241,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 			//Timeout
 			if ($max_time != false && time() - $start_time > $max_time - 3)
 			{
-				echo '<p>TIMEOUT!</p>';
+				echo '<p>TIMEOUT! We will continue the next time.</p>';
 				$timeout = true;
 				break;
 			}
@@ -723,7 +723,7 @@ function bo_update_strikes($force = false, $max_time = 0)
 			//Timeout
 			if ($max_time != false && time() - $start_time > $max_time - 3)
 			{
-				echo '<p>TIMEOUT!</p>';
+				echo '<p>TIMEOUT! We will continue the next time.</p>';
 				$timeout = true;
 				break;
 			}
@@ -1920,7 +1920,7 @@ function bo_update_all($force = false)
 	{
 		$last = bo_get_conf('purge_time');
 
-		if ( (defined('BO_PURGE_MAIN_INTVL') && BO_PURGE_MAIN_INTVL && time() - $last > 3600 * BO_PURGE_MAIN_INTVL) || $force)
+		if (defined('BO_PURGE_MAIN_INTVL') && BO_PURGE_MAIN_INTVL && time() - $last > 3600 * BO_PURGE_MAIN_INTVL)
 		{
 			bo_set_conf('purge_time', time());
 			
