@@ -26,8 +26,9 @@ if (!defined('BO_VER'))
 // Login to blitzortung.org an return login-string
 function bo_get_login_str()
 {
-	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&username='.BO_USER.'&password='.BO_PASS, $code, 'login');
+	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&username='.BO_USER.'&password='.BO_PASS, $code, 'login');
 
+	
 	if ($file === false)
 	{
 		echo "<p>ERROR: Couldn't get file to login! Code: $code</p>\n";
@@ -50,33 +51,50 @@ function bo_get_login_str()
 // Get archive data from blitzortung cgi
 function bo_get_archive($args='', $bo_login_id=false, $as_array=false)
 {
+	$file = false;
+	
 	if (!$bo_login_id)
 	{
 		$bo_login_id = bo_get_conf('bo_login_id');
 		$auto_id = true;
 	}
 
-	$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&'.$args, $code, 'archive', $d1, $d2, $as_array);
-
-	if ($file === false)
+	if ($bo_login_id)
 	{
-		echo "<p>ERROR: Couldn't get file from archive! Code: $code</p>\n";
-		bo_update_error('archivedata', 'Download of archive data failed. '.$code);
-		return false;
+		$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&lang=en&'.$args, $code, 'archive', $d1, $d2, $as_array);
+
+		if ($file === false)
+		{
+			echo "<p>ERROR: Couldn't get file from archive! Code: $code</p>\n";
+			bo_update_error('archivedata', 'Download of archive data failed. '.$code);
+			return false;
+		}
+		
+		bo_update_error('archivedata', true);
 	}
 	
-	bo_update_error('archivedata', true);
-
-	if (($as_array && count($file)<3) || (!$as_array && strlen($file) < 100)) //Login not successful --> new login ID
+	if ($file && $as_array)
+		$text_line = $file[0];
+	elseif ($file)
+		$text_line = substr($file, 0, 100);
+	else
+		$text_line = false;
+	
+	//Login seems not successful --> new login ID
+	if (!$text_line || strpos($text_line, 'denied') !== false || !$file )
 	{
+		
 		if ($auto_id)
 		{
 			$bo_login_id = bo_get_login_str();
 			
-			echo "\n<p>New Login ID: ".substr($bo_login_id,0,4)."...</p>\n";
+			echo "\n<p>Old Login-Id outdated. Got new Login-Id: ".substr($bo_login_id,0,8)."...</p>\n";
 			
 			if ($bo_login_id)
-				return bo_get_archive($args,$bo_login_id);
+			{
+				$file = bo_get_archive($args,$bo_login_id, $as_array);
+				return $file;
+			}
 			else
 				return false;
 		}
@@ -109,7 +127,7 @@ function bo_update_raw_signals($force = false, $max_time = false)
 
 	if (time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last)
 	{
-		$file = bo_get_archive('lang=de&page=3&subpage_3=1&mode=4', false, true);
+		$file = bo_get_archive('page=3&subpage_3=1&mode=4', false, true);
 
 		$start_time = time();
 		
