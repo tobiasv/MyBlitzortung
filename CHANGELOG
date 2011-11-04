@@ -3,6 +3,10 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.3b (2011-11-04)
+---------------------------
+- fix: getting login-id could fail in 0.7.3a
+
 Version 0.7.3a (2011-11-02)
 ---------------------------
 - new: drawing of hyperbolic curves - you can see how locating is done
