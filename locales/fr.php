@@ -883,28 +883,30 @@ $_BL['fr']['Meteox rain radar'] = 'Radar pluies (meteox.com)';
 /*************************************************************/
 
 $_BL['fr']['Stations under construction'] = 'Station à venir';
+$_BL['fr']['Unknown'] = 'Inconnu';
+$_BL['fr']['Unknown or longer'] = 'Inconnu ou plus';
 $_BL['fr']['Up to'] = 'Plus de';
 $_BL['fr']['h4_stations_under_construction'] = 'Liste des stations à venir';
+$_BL['fr']['Distances between all stations'] = 'Distances entre les stations';
 $_BL['fr']['Distances between stations used for locating'] = 'Distances utilisées entre les stations pour la localisation';
+$_BL['fr']['check_show_hyps'] = 'Montrer les courbes hyperboliques';
 $_BL['fr']['Strike is not confirmed'] = 'Non comfirmé';
 $_BL['fr']['Locating angle'] = 'Angle de localisation';
+$_BL['fr']['w/o GPS-signal'] = 'Sans signal GPS';
 
 
 
-/********************/
-/*  NOT TRANSLATED  */
-/********************/
+/*******************************/
+/*  NOT AVAILABLE IN ORIGINAL  */
+/*******************************/
 
-
-//en: 'Unknown'
-$_BL['fr']['Unknown'] = '';
-
-//en: 'Unknown or longer'
-$_BL['fr']['Unknown or longer'] = '';
-
-//en: 'Distances between all stations'
-$_BL['fr']['Distances between all stations'] = '';
-
-//en: 'Show hyperbolic curves'
-$_BL['fr']['check_show_hyps'] = '';
+$_BL['fr']['España / Spain'] = 'Espagne';
+$_BL['fr']['Deutschland'] = 'Allemagne';
+$_BL['fr']['Danmark'] = 'Danemark';
+$_BL['fr']['Slowenien'] = 'Slovénie';
+$_BL['fr']['Czech Repubic'] = 'République Tchéque';
+$_BL['fr']['Importing cities'] = 'Importation des villes';
+$_BL['fr']['Cities read'] = 'Villes lues';
+$_BL['fr']['Deleting existing cities from DB'] = 'Suppression des villes existantes de la base de données';
+$_BL['fr']['Cities imported'] = 'Villes importées';
 

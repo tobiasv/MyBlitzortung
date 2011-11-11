@@ -534,7 +534,9 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	if (!$own_station)
 		$sinfo = bo_station_info($station_id);
 	
-
+	//Stations by user
+	$user_stations = bo_stations('user');
+	
 	$D = array();
 	$res = bo_db("SELECT a.id sid, a.city city, a.country country, a.distance distance, a.user user,
 						 a.lat lat, a.lon lon,
@@ -820,7 +822,6 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	if (intval(BO_STATISTICS_SHOW_NEW_STATIONS))
 	{
-		$user_stations = bo_stations('user');
 		$data = unserialize(bo_get_conf('stations_new_date'));
 		$new_stations = array();
 
@@ -889,35 +890,35 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		while($row = $res->fetch_assoc())
 			$station_under_constr[$row['id']] = $user_stations[$row['user']];
 		
-
-		echo '<a name="bo_stations_under_construction"></a>';
-		echo '<h4>'._BL('h4_stations_under_construction').'</h4>';
-		echo '<ul class="bo_stat_overview" id="bo_stations_under_constr">';
-				
-		$i = 0;
-		foreach($station_under_constr as $id => $d)
+		if (count($station_under_constr) > 0)
 		{
-			echo '<li><span class="bo_descr">';
-			echo $d['user'].' <span title="'._BL(htmlentities($d['country'])).'">('._BC($d['city']).')</span>';
-			echo '</span>';
+			echo '<a name="bo_stations_under_construction"></a>';
+			echo '<h4>'._BL('h4_stations_under_construction').'</h4>';
+			echo '<ul class="bo_stat_overview" id="bo_stations_under_constr">';
+					
+			$i = 0;
+			foreach($station_under_constr as $id => $d)
+			{
+				echo '<li><span class="bo_descr">';
+				echo $d['user'].' <span title="'._BL(htmlentities($d['country'])).'">('._BC($d['city']).')</span>';
+				echo '</span>';
+				
+				$changed = strtotime($d['changed']);
+				
+				echo '<span class="bo_value">';
+				if ($changed - $mybo_first_update < 48 * 3600 * 7)
+					echo '?';
+				else
+					echo date(_BL('_date'), $changed);
+				echo '</span>';
+				
+				$i++;
+			}
 			
-			$changed = strtotime($d['changed']);
-			
-			echo '<span class="bo_value">';
-			if ($changed - $mybo_first_update < 48 * 3600 * 7)
-				echo '?';
-			else
-				echo date(_BL('_date'), $changed);
-			echo '</span>';
-			
-			$i++;
+			echo '</ul>';
 		}
 		
-		echo '</ul>';
-
 	}
-	
-	
 	
 	echo '</div>';
 

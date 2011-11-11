@@ -903,7 +903,6 @@ function bo_get_density_image()
 	$station_id = intval($_GET['id']);
 	$ratio = isset($_GET['ratio']) && $station_id;
 	
-	
 	@set_time_limit(30);
 	bo_session_close();
 	
@@ -1005,7 +1004,18 @@ function bo_get_density_image()
 	
 	if ($cfg['density_darken'])
 	{
-		$color = imagecolorallocatealpha($I, 0, 0, 0, (1 - $cfg['density_darken'] / 100) * 127);
+		if (is_array($cfg['density_darken']))
+		{
+			$dark = $cfg['density_darken'][0];
+			$grey = intval($cfg['density_darken'][1]);
+		}
+		else
+		{
+			$dark = $cfg['density_darken'];
+			$grey = 20;
+		}
+			
+		$color = imagecolorallocatealpha($I, $grey, $grey, $grey, (1 - $dark / 100) * 127);
 		imagefilledrectangle($I, 0,0, $w, $h, $color);
 	}
 
@@ -1224,37 +1234,61 @@ function bo_get_density_image()
 		$DensLat += $dlat;
 	}
 
+	//calculate mean and find max strikes per block
+	foreach($STRIKE_COUNT as $pos_id => $value)
+	{
+		$STRIKE_COUNT[$pos_id] /= $VAL_COUNT[$pos_id];
+	}
+	
 	if ($ratio)
 	{
-		$max_count_block = 1; //always 100%
+		$max_display_block = $max_count_block = 1; //always 100%
 	}
 	else
 	{
-		//find max strikes per block
-		foreach($STRIKE_COUNT as $pos_id => $value)
+		$max_count_block = max($STRIKE_COUNT);
+		
+		//ignore runaway values
+		if (count($STRIKE_COUNT) >= 2)
 		{
-			if ($STRIKE_COUNT[$pos_id]/$VAL_COUNT[$pos_id] > $max_count_block)
+			$avg = array_sum($STRIKE_COUNT) / count($STRIKE_COUNT);
+			
+			asort($STRIKE_COUNT);
+			list($max_display_block) = array_slice($STRIKE_COUNT, floor(count($STRIKE_COUNT) * 0.999), 1);
+			
+			/*
+			$sdev = 0;
+			foreach($STRIKE_COUNT as $value)
 			{
-				$max_count_pos = $pos_id;
-				$max_count_block = $STRIKE_COUNT[$pos_id]/$VAL_COUNT[$pos_id];
+				$sdev += pow($avg - $value, 2);
 			}
+			
+			$sdev = 1 / (count($STRIKE_COUNT) - 1) * $sdev;
+			$sdev = sqrt($sdev);
+			
+			$max_display_block = $avg + 3 * $sdev; // avg +/- 3*sdev should countain 99.7% of the values of a normal distribution
+			*/
+			
 		}
+
+		if ($max_display_block > $max_count_block || $max_display_block <= 0)
+			$max_display_block = $max_count_block;
 	}
 	
-	if ($max_count_block)
+	if ($max_display_block)
 	{
 		foreach($STRIKE_COUNT as $pos_id => $value)
 		{
 			$x = ($pos_id % $w);
 			$y = ($pos_id-$x) / $w;
 
-			//mean value of a block
-			$value /= $VAL_COUNT[$pos_id];
-			
 			if (!$ratio)
 			{
 				//strike count to relative count 0 to 1 for colors
-				$value /= $max_count_block;
+				$value /= $max_display_block;
+				
+				if ($value > 1)
+					$value = 1;
 			}
 			
 			$x *= $min_block_size;
@@ -1406,10 +1440,13 @@ function bo_get_density_image()
 	}
 	else
 	{
-		$max_density = $max_count_block / $area;
-		$text_top = number_format($max_density, 3, _BL('.'), _BL(','));
-		$text_middle = number_format($max_density/2, 3, _BL('.'), _BL(','));
+		$max_density = $max_display_block / $area;
+		$text_top = number_format($max_density, 2, _BL('.'), _BL(','));
+		$text_middle = number_format($max_density/2, 2, _BL('.'), _BL(','));
 		$text_bottom = '0';
+		
+		if ($max_display_block < $max_count_block)
+			$text_top = '> '.$text_top;
 	}
 	
 	imagestring($I, 3, $ColorBarX+$ColorBarWidth+6, $ColorBarY+3, $text_top, $text_col);
