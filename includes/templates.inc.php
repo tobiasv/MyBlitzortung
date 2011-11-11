@@ -99,7 +99,7 @@ $_BO['tpl_density_colors'][] = array(100, 200,   0,  15);
 $_BO['tpl_density_colors'][] = array(125, 125,   0,  15);
 $_BO['tpl_density_colors'][] = array(250,   0,   0,  15);
 $_BO['tpl_density_colors'][] = array(255,   0, 255,  15);
-$_BO['tpl_density_colors'][] = array(255, 190, 255,  15);
+$_BO['tpl_density_colors'][] = array(255, 100, 255,  15);
 
 
 /**************************************/
