@@ -143,6 +143,8 @@ if (!defined("BO_VER"))
 
 		$do_update = true;
 		$force_update = isset($_GET['force']);
+		
+		header("Content-Type: text/plain");
 	}
 	else if (isset($argv))
 	{

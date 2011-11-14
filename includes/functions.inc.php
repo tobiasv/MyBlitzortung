@@ -1617,4 +1617,16 @@ function bo_participants_locating_max()
 	return intval($value);
 }
 
+
+
+function bo_echod($text = '')
+{
+	echo date('Y-m-d H:i:s | ');
+	echo $text;
+	echo "\n";
+	flush();
+}
+
+
+
 ?>

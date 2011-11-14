@@ -105,10 +105,9 @@ function bo_show_login()
 				
 				if ( (BO_PERM_ADMIN & $level) )
 				{
-					echo flush();
-					echo '<div style="font-family: Courier; font-size: 0.7em; border: 1px solid #999; padding: 10px; ">';
+					echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
 					bo_update_all(true);
-					echo '</div>';
+					echo '</div></pre>';
 				}
 				break;
 			
