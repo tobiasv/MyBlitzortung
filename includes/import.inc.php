@@ -62,6 +62,9 @@ function bo_update_all($force = false)
 
 	bo_update_all2($force);
 	
+	bo_echod("Import finished. Exiting...");
+	bo_echod("");
+	
 	bo_set_conf('is_updating', 0);
 
 	return;
@@ -2690,6 +2693,10 @@ function bo_update_tracks($force = false)
 		
 		bo_set_conf('strike_cells', gzdeflate(serialize($data)));
 	}
+	else
+	{
+		bo_echod("Nothing to do.");
+	}
 }
 
 
@@ -2986,11 +2993,15 @@ function bo_purge_olddata($force = false)
 			}
 			
 		}
+		else
+		{
+			bo_echod('Purged nothing.');
+		}
 
 	}
 	else
 	{
-		//bo_echod("Purging disabled!");
+		bo_echod("Purging disabled.");
 	}
 }
 
