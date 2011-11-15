@@ -1153,9 +1153,16 @@ function bo_match_strike2raw()
 		//bo_echod("Strike: ".$row['time'].".".$row['time_ns']." <-> Your Station: ".$row2['time'].".".$row2['time_ns']." Num Rows: ".$num);
 	}
 
-	bo_echod("Assign raw data to strikes: ".
-			(count($u) + count($n) + count($m))." strikes analyzed".
-			" *** Own strikes: ".$own_strikes." *** Own unique found: ".$own_found." (Rate ".round($own_strikes ? $own_found / $own_strikes * 100 : 0,1)."%) *** Unique found: ".count($u)." *** Not found: ".count($n)." *** Multiple Signals to Strike: ".count($m)." *** Multiple Strikes to Signal: ".count($d2)."");
+	bo_echod(" ");
+	bo_echod("== Assign raw data to strikes ==");
+	bo_echod("Strikes: ".(count($u) + count($n) + count($m)).
+			" | Own: ".$own_strikes.
+			" || Found:".
+			" | Unique: ".count($u).
+			" | Own unique: ".$own_found." (Rate ".round($own_strikes ? $own_found / $own_strikes * 100 : 0,1)."%)".
+			" | Not found: ".count($n).
+			" | Multiple Sig->Str: ".count($m).
+			" | Multiple Str->Sig: ".count($d2));
 			
 	//Update matched
 	foreach($u as $data)
@@ -1891,9 +1898,16 @@ function bo_update_densities()
 
 	if (!defined('BO_CALC_DENSITIES') || !BO_CALC_DENSITIES)
 		return true;
-	
+
+	bo_echod(" ");
+	bo_echod("=== Updating densities ===");
+
+		
 	if (!is_array($_BO['density']))
+	{
+		bo_echod("Densities enabled, but no settings available!");
 		return true;
+	}
 	
 	$stations = array();
 	$stations[0] = 0;
@@ -1905,9 +1919,6 @@ function bo_update_densities()
 		foreach($tmp as $station_id)
 			$stations[$station_id] = $station_id;
 	}
-	
-	bo_echod(" ");
-	bo_echod("=== Updating densities ===");
 	
 	//Min/Max strike times
 	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
@@ -2150,7 +2161,8 @@ function bo_update_densities()
 				$time_min = strtotime($b['date_start'].' 00:00:00 UTC');
 				$time_max = strtotime($b['date_end'].' 23:59:59 UTC');
 		
-				$text .= " *** Database! *** Start: $lat&deg; / $lon&deg; *** End: $lat_end&deg; / $lon_end&deg; *** <em>... Calculating ...</em>";
+				bo_echod("Calculating from database ...");
+				$text .= " *** Start: $lat / $lon *** End: $lat_end / $lon_end";
 				bo_echod($text);
 				$text = '';
 				
@@ -3003,7 +3015,7 @@ function bo_purge_olddata($force = false)
 	}
 	else
 	{
-		bo_echod("Purging disabled.");
+		//bo_echod("Purging disabled.");
 	}
 }
 
@@ -3029,9 +3041,15 @@ function bo_getset_timeout($set_max_time = 60)
 
 function bo_exit_on_timeout()
 {
+	static $ptext = false;
+	
 	if (bo_getset_timeout())
 	{
-		bo_echod("TIMEOUT! We will continue the next time.");
+		if ($ptext == false)
+			bo_echod("TIMEOUT! We will continue the next time.");
+		
+		$ptext = true;
+		
 		return true;
 	}
 	else
@@ -3048,7 +3066,8 @@ function bo_update_get_timeout()
 	if (!$overall_timeout)
 		$overall_timeout = 55;
 	
-	$max_time = intval(ini_get('max_execution_time')) - 10;
+	$exec_timeout = intval(ini_get('max_execution_time'));
+	$max_time = $exec_timeout - 10;
 	
 	if ($debug)
 		$max_time = 300;
@@ -3060,16 +3079,15 @@ function bo_update_get_timeout()
 	@set_time_limit($max_time+10);
 	
 	//recheck the new timeout
-	$exec_timeout = intval(ini_get('max_execution_time'));
+	$max_time = intval(ini_get('max_execution_time'));
 	
-	$max_time = $exec_timeout - 10;
-	if ($max_time < 5)
+	if ($max_time < 15)
 		$max_time = 20;
 	else if ($max_time > $overall_timeout)
 		$max_time = $overall_timeout;
 
 	bo_echod( "Information: PHP Execution timeout is ".$exec_timeout.'s '.
-				($exec_timeout < 15 ? ' - Not good :( ' : ' --> Fine :) ').
+				($exec_timeout < 25 ? ' - Not good :(' : ' --> Fine :)').
 				' *** Setting MyBlitzortung timeout to: '.$max_time."s");
 	
 	return $max_time;

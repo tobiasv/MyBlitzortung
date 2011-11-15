@@ -329,7 +329,9 @@ switch($step)
 		flush();
 
 		echo '<div style="font-family: Courier; font-size: 0.8em; border: 1px solid #999; padding: 10px; ">';
+		echo '<pre>';
 		bo_update_all(true);
+		echo '</pre>';
 		echo '</div>';
 
 		echo '<p><a href="?step=4">Finish installation &gt;</a></p>';
