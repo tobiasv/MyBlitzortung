@@ -28,6 +28,7 @@ function bo_update_all($force = false)
 {
 	bo_echod(" ");
 	bo_echod("***** Getting lightning data from blitzortung.org *****");
+	bo_echod(" ");
 	
 	session_write_close();
 	ignore_user_abort(true);
@@ -62,8 +63,9 @@ function bo_update_all($force = false)
 
 	bo_update_all2($force);
 	
+	bo_echod(" ");
 	bo_echod("Import finished. Exiting...");
-	bo_echod("");
+	bo_echod(" ");
 	
 	bo_set_conf('is_updating', 0);
 
@@ -404,7 +406,7 @@ function bo_update_raw_signals($force = false)
 	}
 	else
 	{
-		bo_echod("No update, because the last update was ".(time() - $last)." seconds ago. This is normal and no error message!");
+		bo_echod("No update. Last update ".(time() - $last)." seconds ago. This is normal and no error message!");
 		$updated = false;
 	}
 
@@ -998,7 +1000,7 @@ function bo_update_strikes($force = false)
 	}
 	else
 	{
-		bo_echod("No update. Last update was ".(time() - $last)." seconds ago. This is normal and no error message!");
+		bo_echod("No update. Last update ".(time() - $last)." seconds ago. This is normal and no error message!");
 		$updated = false;
 	}
 
@@ -1594,7 +1596,7 @@ function bo_update_stations($force = false)
 	}
 	else
 	{
-		bo_echod("Internal timer says: No update, because the last update was ".(time() - $last)." seconds ago. This is normal and no error message!");
+		bo_echod("No update. Last update ".(time() - $last)." seconds ago. This is normal and no error message!");
 		$updated = false;
 	}
 
