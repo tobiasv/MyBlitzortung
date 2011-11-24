@@ -1651,7 +1651,14 @@ function bo_archive_get_dim($map, $addx=0)
 		$file = BO_DIR.'images/'.$cfg['file'];
 		if (file_exists($file) && !is_dir($file))
 		{
-			list($x,$y,,$img_dim) = getimagesize($file);
+			list($x,$y) = getimagesize($file);
+			
+			if (isset($cfg['resize']) && $cfg['resize'] > 0)
+			{
+				$y = $y * ($cfg['resize'] / $y);
+				$x = $cfg['resize'];
+			}
+			
 		}
 	}
 	

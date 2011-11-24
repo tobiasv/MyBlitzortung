@@ -420,9 +420,18 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	else if ($file) 	//Filename is given
 	{
+		list($w, $h) = getimagesize(BO_DIR.'images/'.$file);
+		
+		$resize = false;
+		if (isset($cfg['resize']) && $cfg['resize'] > 0)
+		{
+			$h = $h * ($cfg['resize'] / $w);
+			$w = $cfg['resize'];
+			$resize = true;
+		}
+		
 		if ($transparent) //transpatent image
 		{
-			list($w, $h) = getimagesize(BO_DIR.'images/'.$file);
 			$I = imagecreate($w, $h);
 			$blank = imagecolorallocate($I, 140, 142, 144);
 			imagefilledrectangle( $I, 0, 0, $w, $h, $blank);
@@ -431,8 +440,23 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		else //normal image
 		{
 			$I = bo_imagecreatefromfile(BO_DIR.'images/'.$file);
-			$w = imagesx($I);
-			$h = imagesy($I);
+			
+			if ($resize)
+			{
+				if (imageistruecolor($I))
+				{
+					$tmpImage = imagecreatetruecolor($w, $h);
+					imagecopyresampled($tmpImage,$I,0,0,0,0,$w,$h,imagesx($I),imagesy($I));
+				}
+				else
+				{
+					$tmpImage = imagecreate($w, $h);
+					imagecopyresized($tmpImage,$I,0,0,0,0,$w,$h,imagesx($I),imagesy($I));
+				}
+		
+				imagedestroy($I);
+				$I = $tmpImage;
+			}
 		}
 	}
 
