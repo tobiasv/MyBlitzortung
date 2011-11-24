@@ -389,8 +389,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$month = intval($_GET['month']);
 		$radius = intval($_GET['radius']);
 		
-		$add_title .= '';
-		
 		if ($radius)
 		{
 			$rad = 2;
@@ -433,8 +431,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$tickMajPositions[] = $i;
 			}
 			
-			$Y[$i] = 0;
+			$Y[$i]  = 0;
 			$Y2[$i] = 0;
+			$Y3[$i] = 0;
 		}
 
 		$sql = "SELECT DISTINCT SUBSTRING(name, 9) time, data, changed
@@ -444,18 +443,16 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$res = bo_db($sql);
 		while($row = $res->fetch_assoc())
 		{
-
 			$y = substr($row['time'], 0, 4);
 			$m = substr($row['time'], 4, 2);
 			$d = substr($row['time'], 6, 2);
 			$time = strtotime("$y-$m-$d");
-
 			$i = date('z', $time) - $day_offset;
-
 			$d = unserialize($row['data']);
 
-			$Y2[$i] = $d[0 + $rad] - $d[1 + $rad];
-			$Y[$i] = $d[1 + $rad];
+			$Y[$i] = $d[1 + $rad]; //participanted
+			$Y2[$i] = $d[0 + $rad] - $d[1 + $rad]; //other
+			$Y3[$i] = $d[0 + $rad]; //Sum
 		}
 
 		
@@ -475,12 +472,19 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					$Y[$i] = $row['cnt'];
 				else
 					$Y2[$i] = $row['cnt'];
+				
+				$Y3[$i] += $row['cnt'];
 			}
 		}
 		
 		$caption  = (array_sum($Y) + array_sum($Y2)).' '._BL('total strikes');
 		$caption .= "\n";
 		$caption .= array_sum($Y).' '._BL('total strikes station');
+		
+		$title_no_hours = true;
+		
+		$ymin = 0;
+		$ymax = max(10, max($Y3) * 1.1);
 		
 		$graph_type = 'textlin';
 	}
