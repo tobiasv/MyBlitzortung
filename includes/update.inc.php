@@ -82,7 +82,7 @@ function bo_check_for_update()
 			continue;
 		
 		bo_set_conf('is_updating', time());
-		register_shutdown_function('bo_update_shutdown');
+		register_shutdown_function('bo_set_conf', 'is_updating', 0);
 		
 		$db_update = true;
 		

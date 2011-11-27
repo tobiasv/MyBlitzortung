@@ -99,7 +99,7 @@ function bo_update_all2($force = false, $only = '')
 	
 	
 	//Strikes
-	if ($only && $only == 'strikes')
+	if (!$only || $only == 'strikes')
 		$strikes_imported = bo_update_strikes($force);
 	
 	
@@ -109,21 +109,21 @@ function bo_update_all2($force = false, $only = '')
 		//Stations
 		if (bo_exit_on_timeout()) return;
 		
-		if ($only && $only == 'stations')
+		if (!$only || $only == 'stations')
 			$stations_imported = bo_update_stations($force);
 		
 		
 		//Signals
 		if (bo_exit_on_timeout()) return;
 		
-		if ($only && $only == 'signals')
+		if (!$only || $only == 'signals')
 			$signals_imported  = bo_update_raw_signals($force);
 
 		
 		//Daily statistics
 		if (bo_exit_on_timeout()) return;
 		
-		if ($only && $only == 'daily')
+		if (!$only || $only == 'daily')
 			bo_update_daily_stat();
 
 		
@@ -132,7 +132,7 @@ function bo_update_all2($force = false, $only = '')
 		{
 			if (bo_exit_on_timeout()) return;
 			
-			if ($only && $only == 'alerts')
+			if (!$only || $only == 'alerts')
 				bo_alert_send();
 		}
 	}
@@ -142,13 +142,13 @@ function bo_update_all2($force = false, $only = '')
 	/*** Update strike tracks ***/
 	if ($strikes_imported)
 	{
-		if ($only && $only == 'tracks')
+		if (!$only || $only == 'tracks')
 			bo_update_tracks($force);
 	}
 	/*** Update MyBlitzortung stations ***/
 	else if (!$strikes_imported && !$stations_imported && !$signals_imported)
 	{
-		if ($only && $only == 'mbstations')
+		if (!$only || $only == 'mbstations')
 			bo_my_station_autoupdate($force);
 	}
 
@@ -156,14 +156,14 @@ function bo_update_all2($force = false, $only = '')
 	/*** Purge old data ***/
 	if (bo_exit_on_timeout()) return;
 	
-	if ($only && $only == 'purge')
+	if (!$only || $only == 'purge')
 		bo_purge_olddata();
 
 	
 	/*** Densities ***/
 	if (bo_exit_on_timeout()) return;
 	
-	if ($only && $only == 'density')
+	if (!$only || $only == 'density')
 		bo_update_densities();
 	
 	return;
@@ -2166,32 +2166,12 @@ function bo_update_densities()
 			else //calculate from strike database
 			{
 
-				if ($info && isset($info['last_lat']) && isset($info['last_lon']))
-				{
-					// get start position from var settings (begin southwest)
-					$lat = $info['last_lat'];
-					$lon = $info['last_lon'];
-					
-					//collect old data and decompress
-					$sql = "SELECT data FROM ".BO_DB_PREF."densities WHERE id='$id'";
-					$row = bo_db($sql)->fetch_assoc();
-					$OLDDATA = $row['data'] ? gzinflate($row['data']) : '';
-					
-					$max_count = $info['max'];
-				}
-				else
-				{
-					//start positions from database
-					$lat = $a['coord'][2];
-					$lon = $a['coord'][3];
-					$OLDDATA = '';
-					
-					$max_count = 0;
-				}
-
+				//start positions from database
+				$lat = $a['coord'][2];
+				$lon = $a['coord'][3];
 				$lat_end = $a['coord'][0];
 				$lon_end = $a['coord'][1];
-
+				$max_count = 0;
 				$time_min = strtotime($b['date_start'].' 00:00:00 UTC');
 				$time_max = strtotime($b['date_end'].' 23:59:59 UTC');
 		
@@ -2217,10 +2197,8 @@ function bo_update_densities()
 				}
 
 				
-				$DATA = '';
 				
 				
-				/*** NEW METHOD ***/
 				$S = array();
 				$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat, $lat_end, $lon, $lon_end);
 				
@@ -2247,6 +2225,7 @@ function bo_update_densities()
 
 				
 				//save data to a hex-string
+				$DATA = '';
 				$lat_id_max = floor(bo_latlon2dist($lat, $lon, $lat_end, $lon) / $length);
 				for($lat_id=0; $lat_id<=$lat_id_max; $lat_id++)
 				{
@@ -2275,12 +2254,8 @@ function bo_update_densities()
 					// new line (= new lat)
 					$DATA .= str_repeat('ff', $bps);				
 				}
-
 				
 				$text .= "New data collected: ".(strlen($DATA) / 2)." bytes *** ";
-				
-				//new data string
-				$DATA = $OLDDATA.$DATA;
 			}
 			
 			$text .= "Whole data: ".(strlen($DATA) / 2).'bytes *** ';
