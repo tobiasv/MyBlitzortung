@@ -408,7 +408,7 @@ function bo_show_archive_density()
 	$start_time = strtotime($row['mindate']);
 	$end_time = strtotime($row['maxdate_end']);
 	
-	$station_infos = bo_stations();
+	$station_infos = bo_stations('id', '', false);
 	$station_infos[0]['city'] = _BL('All', false);
 
 	$stations = array();
@@ -417,9 +417,17 @@ function bo_show_archive_density()
 	
 	if (defined('BO_DENSITY_STATIONS') && BO_DENSITY_STATIONS)
 	{
-		$tmp = explode(',', BO_DENSITY_STATIONS);
-		foreach($tmp as $id)
-			$stations[$id] = $id;
+		if (BO_DENSITY_STATIONS == 'all')
+		{
+			foreach($station_infos as $id => $dummy)
+				$stations[$id] = $id;
+		}
+		else
+		{
+			$tmp = explode(',', BO_DENSITY_STATIONS);
+			foreach($tmp as $id)
+				$stations[$id] = $id;
+		}
 	}
 	
 	echo '<div id="bo_dens_maps">';
@@ -458,7 +466,7 @@ function bo_show_archive_density()
 	echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
 	echo '<select name="bo_station" id="bo_arch_dens_select_station" onchange="submit();">';
 	foreach ($stations as $id )
-		echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>'._BC($station_infos[$id]['city']).'</option>';
+		echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>'._BC($station_infos[$id]['city']).($id ? ' ('._BL($station_infos[$id]['country']).')' : '').'</option>';
 	echo '</select>';
 	
 	echo '<input type="checkbox" name="bo_ratio" value="1" '.($ratio && $station_id ? 'checked="checked"' : '').' '.($station_id ? '' : 'disabled').' onchange="submit();" onclick="submit();" id="bo_arch_dens_ratio">';

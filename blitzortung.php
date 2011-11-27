@@ -25,7 +25,7 @@ if (!defined("BO_VER"))
 	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.7.3c-dev');
+	define("BO_VER", '0.7.3c-dev2');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -163,7 +163,7 @@ if (!defined("BO_VER"))
 	//decisions what to do begins...
 	if ($do_update)
 	{
-		bo_update_all($force_update);
+		bo_update_all($force_update, strtolower($_GET['only']));
 		exit;
 	}
 	else if (isset($_POST['bo_do_login']))

@@ -938,7 +938,10 @@ function bo_get_density_image()
 	if (!is_array($cfg) || !$cfg['density'])
 		bo_image_error('Missing image data!');
 
-	$min_block_size = max($cfg['density_blocksize'], intval($_GET['bo_blocksize']), 1);	
+	$min_block_size = max($cfg['density_blocksize'], intval($_GET['bo_blocksize']), 1);
+	
+	if (bo_user_get_id() == 1 && intval($_GET['bo_blocksize']))
+		$min_block_size = intval($_GET['bo_blocksize']);
 	
 	
 	//Caching
@@ -1118,7 +1121,6 @@ function bo_get_density_image()
 	$DensLon_end   = $row['lon_max'];
 	$length    = $row['length'];
 	$area      = pow($length, 2);
-	$distance = $length * sqrt(2) * 1000;
 	
 	//SECOND DATABASE CALL
 	if ($ratio)
@@ -1137,6 +1139,7 @@ function bo_get_density_image()
 		}
 	}
 	
+	BoDb::close();
 	unset($row['data']);
 	unset($row_own['data']);
 
@@ -1167,11 +1170,7 @@ function bo_get_density_image()
 		exit;
 	}
 
-	
-	
-	//pointer on current part of string
-	$string_pos = 0;
-	
+	$string_pos = 0; //pointer on current part of string
 	$STRIKE_COUNT = array();
 	$VAL_COUNT = array();
 	$strike_count = 0;
@@ -1180,18 +1179,19 @@ function bo_get_density_image()
 	$max_count_pos = 0;
 	$last_y = $h;
 	
-	BoDb::close();
 	
-	while ($DensLat < $DensLat_end)
+	
+	
+	$lat_id_max = floor(bo_latlon2dist($DensLat, $DensLon, $DensLat_end, $DensLon) / $length / 1000);
+	for($lat_id=0; $lat_id<=$lat_id_max; $lat_id++)
 	{
+		list($lat_act,) = bo_distbearing2latlong_rhumb($length * $lat_id * 1000, 0, $DensLat, $DensLon);
+		$lon_id_max     = floor(bo_latlon2dist_rhumb($lat_act, $DensLon, $lat_act, $DensLon_end) / $length / 1000);
+		$dlon = ($DensLon_end - $DensLon) / ($lon_id_max+1);
 		
-		//density: difference to current lat/lon
-		list($dlat, $dlon) = bo_distbearing2latlong($distance, 45, $DensLat, $DensLon);
-		$dlat -= $DensLat;
-		$dlon -= $DensLon;
 		
 		// check if latitude lies in picture
-		if ($DensLat + $dlat >= $PicLatS)
+		if ($lat_act >= $PicLatS)
 		{
 			//select correct data segment from data string
 			$lon_start_pos  = floor(($PicLonW-$DensLon)/$dlon) * 2 * $bps;
@@ -1200,7 +1200,7 @@ function bo_get_density_image()
 			$lon_data = substr($DATA, $string_pos + $lon_start_pos, $lon_string_len);
 			
 			//image coordinates (left side of image, height is current latitude)
-			list($px, $py) = bo_latlon2projection($cfg['proj'], $DensLat, $PicLonE);
+			list($px, $py) = bo_latlon2projection($cfg['proj'], $lat_act, $PicLonE);
 			$y  = $h - ($py - $y1) * $h_y; //image y
 			$ay = round(($y / $min_block_size)); //block number y
 			$dx = $dlon / ($PicLonE - $PicLonW) * $w; //delta x
@@ -1249,15 +1249,13 @@ function bo_get_density_image()
 			}
 		}
 
-		$string_pos += (floor(($DensLon_end-$DensLon)/$dlon)+2) * 2 * $bps;
-		
-		// stop if picture is full
-		if ($DensLat > $PicLatN)
+		if ($lat_act > $PicLatN)
 			break;
-			
-		$DensLat += $dlat;
+		
+		$string_pos += ($lon_id_max+2) * 2 * $bps;
 	}
-
+	
+	
 	//calculate mean and find max strikes per block
 	foreach($STRIKE_COUNT as $pos_id => $value)
 	{
@@ -1268,7 +1266,7 @@ function bo_get_density_image()
 	{
 		$max_display_block = $max_count_block = 1; //always 100%
 	}
-	else
+	elseif (count($STRIKE_COUNT))
 	{
 		$max_count_block = max($STRIKE_COUNT);
 		
@@ -1299,7 +1297,7 @@ function bo_get_density_image()
 			$max_display_block = $max_count_block;
 	}
 	
-	if ($max_display_block)
+	if ($max_display_block && count($STRIKE_COUNT))
 	{
 		foreach($STRIKE_COUNT as $pos_id => $value)
 		{

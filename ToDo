@@ -14,6 +14,8 @@ Bugs / Improvements
 
 Features
 --------
+- Add some sort of "GetStrikes" Class (for internal usage and as an API for external apps)
+- implement Openstreetmap as a 2nd dynamic map
 - General Overlay for locating accuracy (created manually, hosted on Blitzortung.org?)
 - Submenu on "Info" page: Overview / Participate -> Small howto + images/descriptions of existing stations
 - GUI for config

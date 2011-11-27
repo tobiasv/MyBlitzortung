@@ -484,7 +484,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$title_no_hours = true;
 		
 		$ymin = 0;
-		$ymax = max(10, max($Y3) * 1.1);
+		$ymax = max(10, max($Y3) * 1.2);
 		
 		$graph_type = 'textlin';
 	}

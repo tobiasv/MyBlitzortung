@@ -102,12 +102,30 @@ function bo_latlon2dist($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
 	if ($lat1 == $lat2 && $lon1 == $lon2)
 		return 0;
 
-	$dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($lon1 - $lon2));
-	$dist = rad2deg(acos($dist));
-
-	return $dist * 60 * 1.1515 * 1.609344 * 1000;
+	return acos(sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($lon1 - $lon2))) * 6371000;
 }
 
+
+function bo_latlon2dist_rhumb($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
+{
+	$R = 6371000;
+	
+	$lat1     = deg2rad($lat1);
+	$lat2     = deg2rad($lat2);
+
+	$dlat     = deg2rad($lat2 - $lat1);
+	$dlon     = abs(deg2rad($lon2 - $lon1));
+	
+	$dPhi = log(tan($lat2/2 + M_PI/4) / tan($lat1/2 + M_PI/4));
+	$q    = $dPhi != 0 ? $dlat / $dPhi : cos($lat1);  // E-W line gives dPhi=0
+	
+	// if dLon over 180° take shorter rhumb across 180° meridian:
+	if ($dlon > M_PI) $dlon = 2*M_PI - $dlon;
+	
+	$dist = sqrt($dlat*$dlat + $q*$q*$dlon*$dlon) * $R; 
+
+	return $dist;
+}
 
 // latitude, longitude to bearing (Rhumb Line!)
 function bo_latlon2bearing($lat2, $lon2, $lat1 = BO_LAT, $lon1 = BO_LON)
@@ -179,15 +197,47 @@ function bo_distbearing2latlong($dist, $bearing, $lat = BO_LAT, $lon = BO_LON)
 	return array($lat2, $lon2);
 }
 
+//return latitude from given position, distance and bearing (Rhumb line = constant bearing = not the shortest way)
+function bo_distbearing2latlong_rhumb($dist, $bearing, $lat = BO_LAT, $lon = BO_LON)
+{
+	$lat     = deg2rad($lat);
+	$lon     = deg2rad($lon);
+	
+	$d    = $dist / 6371000;
+	$lat2 = $lat + $d * cos($bearing);
+	$dLat = $lat2-$lat;
+	$dPhi = log(tan($lat2/2 + M_PI/4) / tan($lat/2 + M_PI/4));
+	$q    = $dPhi != 0 ? $dLat/$dPhi : cos($lat);  // E-W line gives dPhi=0
+	$dLon = $dist * sin($bearing) / $q;
+	
+	// check for some daft bugger going past the pole, normalise latitude if so
+	if (abs($lat2) > M_PI/2) 
+		$lat2 = $lat2 > 0 ? M_PI-$lat2 : -(M_PI-$lat2);
+	
+	$lon2 = ($lon + $dLon + M_PI) % (2 * M_PI) - M_PI;
+
+	
+	$lat2 = rad2deg($lat2);
+	$lon2 = rad2deg($lon2);
+	
+	return array($lat2, $lon2);
+}
+
+
 // returns array of all stations with index from database column
-function bo_stations($index = 'id', $only = '')
+function bo_stations($index = 'id', $only = '', $under_constr = true)
 {
 	$S = array();
 
+	$sql .= '';
+	
 	if ($only)
-		$sql = " WHERE $index='".BoDb::esc($only)."' ";
+		$sql .= " AND $index='".BoDb::esc($only)."' ";
 
-	$sql = "SELECT * FROM ".BO_DB_PREF."stations $sql";
+	if (!$under_constr)
+		$sql .= " AND last_time != '1970-01-01 00:00:00' ";
+		
+	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql";
 	$res = bo_db($sql);
 	while($row = $res->fetch_assoc())
 		$S[$row[$index]] = $row;

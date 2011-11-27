@@ -24,7 +24,7 @@ if (!defined('BO_VER'))
 	exit('No BO_VER');
 
 	
-function bo_update_all($force = false)
+function bo_update_all($force = false, $only = '')
 {
 	bo_echod(" ");
 	bo_echod("***** Getting lightning data from blitzortung.org *****");
@@ -43,7 +43,9 @@ function bo_update_all($force = false)
 	//Check if sth. went wrong on the last update (if older continue)
 	if ($is_updating && time() - $is_updating < $max_time*5 + 60 && !($force && $debug))
 	{
-		bo_echod("ERROR: Another update is running *** Begin: ".date('Y-m-d H:i:s', $is_updating)." *** Now: ".date('Y-m-d H:i:s'));
+		bo_echod("Another update is running *** Begin: ".date('Y-m-d H:i:s', $is_updating));
+		bo_echod(" ");
+		bo_echod("Exiting...");
 		return;
 	}
 
@@ -61,7 +63,7 @@ function bo_update_all($force = false)
 	}
 	
 
-	bo_update_all2($force);
+	bo_update_all2($force, $only);
 	
 	bo_echod(" ");
 	bo_echod("Import finished. Exiting...");
@@ -73,7 +75,7 @@ function bo_update_all($force = false)
 }
 
 
-function bo_update_all2 ($force)
+function bo_update_all2($force = false, $only = '')
 {
 
 	if (!bo_get_conf('first_update_time'))
@@ -97,7 +99,8 @@ function bo_update_all2 ($force)
 	
 	
 	//Strikes
-	$strikes_imported = bo_update_strikes($force);
+	if ($only && $only == 'strikes')
+		$strikes_imported = bo_update_strikes($force);
 	
 	
 	//Update signals/stations only after strikes where imported
@@ -105,24 +108,32 @@ function bo_update_all2 ($force)
 	{	
 		//Stations
 		if (bo_exit_on_timeout()) return;
-		$stations_imported = bo_update_stations($force);
+		
+		if ($only && $only == 'stations')
+			$stations_imported = bo_update_stations($force);
 		
 		
 		//Signals
 		if (bo_exit_on_timeout()) return;
-		$signals_imported  = bo_update_raw_signals($force);
+		
+		if ($only && $only == 'signals')
+			$signals_imported  = bo_update_raw_signals($force);
 
 		
 		//Daily statistics
 		if (bo_exit_on_timeout()) return;
-		bo_update_daily_stat();
+		
+		if ($only && $only == 'daily')
+			bo_update_daily_stat();
 
 		
 		// Alerts
 		if (defined('BO_ALERTS') && BO_ALERTS)
 		{
 			if (bo_exit_on_timeout()) return;
-			bo_alert_send();
+			
+			if ($only && $only == 'alerts')
+				bo_alert_send();
 		}
 	}
 	
@@ -131,23 +142,29 @@ function bo_update_all2 ($force)
 	/*** Update strike tracks ***/
 	if ($strikes_imported)
 	{
-		bo_update_tracks($force);
+		if ($only && $only == 'tracks')
+			bo_update_tracks($force);
 	}
 	/*** Update MyBlitzortung stations ***/
 	else if (!$strikes_imported && !$stations_imported && !$signals_imported)
 	{
-		bo_my_station_autoupdate($force);
+		if ($only && $only == 'mbstations')
+			bo_my_station_autoupdate($force);
 	}
 
 	
 	/*** Purge old data ***/
 	if (bo_exit_on_timeout()) return;
-	bo_purge_olddata();
+	
+	if ($only && $only == 'purge')
+		bo_purge_olddata();
 
 	
 	/*** Densities ***/
 	if (bo_exit_on_timeout()) return;
-	bo_update_densities();
+	
+	if ($only && $only == 'density')
+		bo_update_densities();
 	
 	return;
 }
@@ -1915,9 +1932,18 @@ function bo_update_densities()
 	
 	if (defined('BO_DENSITY_STATIONS') && BO_DENSITY_STATIONS)
 	{
-		$tmp = explode(',', BO_DENSITY_STATIONS);
-		foreach($tmp as $station_id)
-			$stations[$station_id] = $station_id;
+		if (BO_DENSITY_STATIONS == 'all')
+		{
+			$st_temp = bo_stations('id', '', false);
+			foreach($st_temp as $id => $dummy)
+				$stations[$id] = $id;
+		}
+		else
+		{
+			$tmp = explode(',', BO_DENSITY_STATIONS);
+			foreach($tmp as $station_id)
+				$stations[$station_id] = $station_id;
+		}
 	}
 	
 	//Min/Max strike times
@@ -1937,7 +1963,7 @@ function bo_update_densities()
 		$ranges[] = array(strtotime( (gmdate('Y')-1).'-01-01'), strtotime( (gmdate('Y')-1).'-12-31'), -1 ); 
 
 	//current month and year
-	if (defined('BO_CALC_DENSITIES_CURRENT') && BO_CALC_DENSITIES_CURRENT)
+	if (defined('BO_CALC_DENSITIES_CURRENT') && BO_CALC_DENSITIES_CURRENT && gmdate('d') != 1)
 	{
 		$end_time = gmmktime(0,0,0,gmdate('m'),gmdate('d'),gmdate('Y'))-1;
 		
@@ -2032,7 +2058,9 @@ function bo_update_densities()
 		//zero strikes
 		$zero = str_repeat('00', $bps);
 		
-		bo_echod($a['name'].": Length: $length m / Area: $area square meters / Bytes per Area: $bps");
+		bo_echod(" ");
+		bo_echod("== ".$a['name'].": Length: $length m / Area: $area square meters / Bytes per Area: $bps ==");
+		
 		
 		//calculate densities for every pending database entry
 		foreach($pending[$type_id] as $id => $b)
@@ -2040,6 +2068,8 @@ function bo_update_densities()
 			//create entries with higher status first
 			if ($b['status'] != $max_status)
 				continue;
+		
+			bo_echod(" ");
 		
 			$calc_count++;
 			$info = unserialize($b['info']);
@@ -2050,7 +2080,7 @@ function bo_update_densities()
 			{
 				$max_count = 0;
 				
-				$text .=  ' Calculate from month data! ';
+				$text .= ' Calculate from month data! ';
 				
 				if ($info['calc_date_start']) // there was a timeout the last run
 				{
@@ -2123,7 +2153,7 @@ function bo_update_densities()
 					}
 					
 					//Check for timeout
-					if (bo_exit_on_timeout())
+					if (bo_getset_timeout())
 					{
 						$info['calc_date_start'] = $date_start_add;
 						$timeout = true;
@@ -2146,6 +2176,8 @@ function bo_update_densities()
 					$sql = "SELECT data FROM ".BO_DB_PREF."densities WHERE id='$id'";
 					$row = bo_db($sql)->fetch_assoc();
 					$OLDDATA = $row['data'] ? gzinflate($row['data']) : '';
+					
+					$max_count = $info['max'];
 				}
 				else
 				{
@@ -2153,6 +2185,8 @@ function bo_update_densities()
 					$lat = $a['coord'][2];
 					$lon = $a['coord'][3];
 					$OLDDATA = '';
+					
+					$max_count = 0;
 				}
 
 				$lat_end = $a['coord'][0];
@@ -2161,10 +2195,12 @@ function bo_update_densities()
 				$time_min = strtotime($b['date_start'].' 00:00:00 UTC');
 				$time_max = strtotime($b['date_end'].' 23:59:59 UTC');
 		
-				bo_echod("Calculating from database ...");
+				
 				$text .= " *** Start: $lat / $lon *** End: $lat_end / $lon_end";
 				bo_echod($text);
 				$text = '';
+				bo_echod("Calculating from database ...");
+				
 				
 				$sql_where = '';
 				$sql_join  = '';
@@ -2180,65 +2216,66 @@ function bo_update_densities()
 					$sql_where_station = " AND ss.strike_id=s.id AND ss.station_id='".intval($b['station_id'])."'";
 				}
 
-				$max_count = 0;
+				
 				$DATA = '';
 				
-				// counting strikes from west to east and south to north
-				$i = 500000;
-				while ($lat < $lat_end)
+				
+				/*** NEW METHOD ***/
+				$S = array();
+				$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat, $lat_end, $lon, $lon_end);
+				
+				$sql = "SELECT COUNT(*) cnt,
+							FLOOR(ACOS(SIN(RADIANS($lat))*SIN(RADIANS(lat)) + COS(RADIANS($lat))*COS(RADIANS(lat))) *6371000/$length) lat_id,
+							FLOOR(SQRT(POW(COS(RADIANS(lat)),2) * POW(RADIANS(lon-$lon),2) )                        *6371000/$length) lon_id
+				
+						FROM ".BO_DB_PREF."strikes s 
+							$index_sql
+							$sql_join
+							
+						WHERE 
+							$sql_where
+							$sql_where_station
+							
+						GROUP BY lon_id, lat_id
+						";
+				$res = bo_db($sql);
+				while ($row = $res->fetch_assoc())
 				{
-					//difference to current lat/lon
-					list($dlat, $dlon) = bo_distbearing2latlong($length * sqrt(2), 45, $lat, $lon);
-					$dlat -= $lat;
-					$dlon -= $lon;
-
-					$last_lon_id = 0;
-					
-					//the where clause
-					$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat, $lat+$dlat, $lon, $lon_end);
-
-					
-					// line by line
-					$sql = "SELECT COUNT(*) cnt, FLOOR((s.lon+".(-$lon).")/(".$dlon.")) lon_id
-							FROM ".BO_DB_PREF."strikes s $index_sql
-								$sql_join
-							WHERE 
-								$sql_where
-								$sql_where_station
-							GROUP BY lon_id
-							";
-					$res = bo_db($sql);
-					while ($row = $res->fetch_assoc())
-					{
-						$max_count = max($max_count, $row['cnt']);
-						
-						//add zero strikes
-						$DATA .= str_repeat($zero, ($row['lon_id'] - $last_lon_id));
-
-						if ($row['cnt'] >= pow(2, $bps * 8)-1)
-							$row['cnt'] = pow(2, $bps * 8)-2;
-						
-						//add strike count
-						$DATA .= sprintf("%0".(2*$bps)."s", dechex($row['cnt']));
-						
-						$last_lon_id = $row['lon_id'] + 1;
-					}
-
-					// fill rest of the string
-					$DATA .= str_repeat($zero, floor(($lon_end-$lon)/$dlon) - $last_lon_id + 1);
-					
-					// new line (= new lat)
-					$DATA .= str_repeat('ff', $bps);
-
-					$lat += $dlat;
-					
-					if ($i-- <= 0 || bo_exit_on_timeout())
-					{
-						bo_echod("Stopped at $lat&deg / $lon_end&deg (delta: $dlat&deg / $dlon&deg)");
-						$timeout = true;
-						break;
-					}
+					$max_count = max($max_count, $row['cnt']);
+					$S[$row['lat_id']][$row['lon_id']] = $row['cnt'];
 				}
+
+				
+				//save data to a hex-string
+				$lat_id_max = floor(bo_latlon2dist($lat, $lon, $lat_end, $lon) / $length);
+				for($lat_id=0; $lat_id<=$lat_id_max; $lat_id++)
+				{
+					list($lat_act,) = bo_distbearing2latlong_rhumb($length * $lat_id, 0, $lat, $lon);
+					$lon_id_max     = floor(bo_latlon2dist_rhumb($lat_act, $lon, $lat_act, $lon_end) / $length);
+					
+					for($lon_id=0; $lon_id<=$lon_id_max; $lon_id++)
+					{
+						if (!isset($S[$lat_id][$lon_id])) //No strikes for this area
+						{
+							$DATA .= $zero;
+						}
+						else 
+						{
+							$cnt = 0;
+							
+							if ($S[$lat_id][$lon_id] >= pow(2, $bps * 8)-1) //strike count is too high -> set maximum
+								$cnt = pow(2, $bps * 8)-2;
+							else //OK!
+								$cnt = $S[$lat_id][$lon_id];
+						
+							$DATA .= sprintf("%0".(2*$bps)."s", dechex($cnt)); //add strike count
+						}
+					}
+				
+					// new line (= new lat)
+					$DATA .= str_repeat('ff', $bps);				
+				}
+
 				
 				$text .= "New data collected: ".(strlen($DATA) / 2)." bytes *** ";
 				
@@ -2247,7 +2284,7 @@ function bo_update_densities()
 			}
 			
 			$text .= "Whole data: ".(strlen($DATA) / 2).'bytes *** ';
-			
+
 			//database storage 
 			$DATA = BoDb::esc(gzdeflate($DATA));
 			
@@ -2259,7 +2296,7 @@ function bo_update_densities()
 				$status = abs($b['status']) + 1;
 			
 			$info['last_lat'] = $lat;
-			$info['last_lon'] = $lon; // currently no change from start value
+			$info['last_lon'] = $lon;
 			$info['bps'] = $bps;
 			$info['max'] = max($max_count, $info['max']);
 			
@@ -2293,20 +2330,22 @@ function bo_update_densities()
 			$res = bo_db($sql);
 			
 			$text .= ' Max strike count: '.$info['max'].' *** Whole data compressed: '.(strlen($DATA)).'bytes *** ';
+			bo_echod($text);
 			
 			if ($timeout)
-				$text .= ' NOT YET READY! ';
+				bo_echod('NOT YET READY!');
 			else
-				$text .= ' FINISHED! ';
+				bo_echod('FINISHED!');
 			
-			bo_echod($text);
+			
 
+			
 			//Check again for timeout
 			if (bo_exit_on_timeout())
-				$timeout = true;
-			
-			if ($timeout)
+			{
 				return;
+			}
+			
 			
 			if ($delete_time)
 			{
