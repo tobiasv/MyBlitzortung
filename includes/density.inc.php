@@ -104,10 +104,14 @@ function bo_update_densities($force = false)
 				$calc_count++;
 				$info = unserialize($b['info']);
 				
-				if ($info['bps'])
-					$info['bps'] = $bps;
-					
 				$text = 'Station: #'.$b['station_id'].' *** Range: '.$b['date_start'].' to '.$b['date_end'].' ';
+
+				$cbps = $bps;
+				if ($info['bps'] && $cbps != $info['bps'])
+				{
+					$cbps = $info['bps'];
+					$text .= " *** Switched to $cbps bps ";
+				}
 				
 				//with status -1/-3 ==> calculate from other density data
 				if ($b['status'] == -1 || $b['status'] == -3 || $b['status'] == -4)
@@ -119,7 +123,7 @@ function bo_update_densities($force = false)
 						$date_start_add = $info['calc_date_start'];
 						$b['date_start'] = $info['calc_date_start'];
 						
-						$text .= ' Starting at '.$b['date_start'];
+						$text .= ' *** Starting at '.$b['date_start'];
 						
 						$sql = "SELECT data FROM ".BO_DB_PREF."densities WHERE id='$id'";
 						$row = bo_db($sql)->fetch_assoc();
@@ -146,7 +150,7 @@ function bo_update_densities($force = false)
 					bo_echod($text);
 					$text = '';
 					
-					$sql = "SELECT data, date_start, date_end
+					$sql = "SELECT data, date_start, date_end, info
 							FROM ".BO_DB_PREF."densities 
 							WHERE 1
 								AND type='$type_id' 
@@ -158,43 +162,6 @@ function bo_update_densities($force = false)
 					$res = bo_db($sql);
 					while ($row = $res->fetch_assoc())
 					{
-						if (!$date_start_add || $row['date_start'] == $date_start_add)
-						{
-							
-							if (!$info['date_start_real']) // save start time info to display in map
-								$info['date_start_real'] = $row['date_start'];
-								
-							$date_start_add = date('Y-m-d', strtotime($row['date_end'].' + 1 day'));
-							
-							$OLDDATA = gzinflate($row['data']);
-							$NEWDATA = $DATA;
-							$DATA = '';
-							
-							for ($i=0; $i<=strlen($OLDDATA) / $bps / 2; $i++)
-							{
-								$val  = substr($OLDDATA, $i * $bps * 2, $bps * 2);
-								
-								// combine the two data streams
-								if (strtolower($val) != str_repeat('ff', $bps))
-								{
-									$val = hexdec($val);
-									
-									if ($NEWDATA)
-										$val += hexdec(substr($NEWDATA, $i * $bps * 2, $bps * 2));
-									
-									if ($val >= pow(2, $bps * 8)-1)
-										$val = pow(2, $bps * 8)-2;
-									
-									$max_count = max($max_count, $val);
-						
-									$val = sprintf("%0".(2*$bps)."s", dechex($val));
-								}
-								
-								$DATA .= $val;
-							}
-							
-						}
-						
 						//Check for timeout
 						if (bo_getset_timeout())
 						{
@@ -202,7 +169,59 @@ function bo_update_densities($force = false)
 							$timeout = true;
 							break;
 						}
+
+						if (!$date_start_add || $row['date_start'] == $date_start_add)
+						{
+							$info2 = unserialize($row['info']);
+							
+							if ($info2['bps'] && $cbps != $info2['bps'])
+							{
+								if (!$DATA)
+								{
+									$cbps = $info2['bps'];
+									bo_echod("Switched to $cbps bps !");
+								}
+								else
+									bo_echod("Wrong bps value ($cbps -> ".$info2['bps'].")!");
+							}
+							
+							if (!$info['date_start_real']) // save start time info to display in map
+								$info['date_start_real'] = $row['date_start'];
+							
+							bo_echod(" - Current time range: ".$row['date_start'].' to '.$row['date_end']);
+							
+							$date_start_add = date('Y-m-d', strtotime($row['date_end'].' + 1 day'));
+							
+							$OLDDATA = gzinflate($row['data']);
+							$NEWDATA = $DATA;
+							$DATA = '';
+							
+							for ($i=0; $i<=strlen($OLDDATA) / $cbps / 2; $i++)
+							{
+								$val  = substr($OLDDATA, $i * $cbps * 2, $cbps * 2);
+								
+								// combine the two data streams
+								if (strtolower($val) != str_repeat('ff', $cbps))
+								{
+									$val = hexdec($val);
+									
+									if ($NEWDATA)
+										$val += hexdec(substr($NEWDATA, $i * $cbps * 2, $cbps * 2));
+									
+									if ($val >= pow(2, $cbps * 8)-1)
+										$val = pow(2, $cbps * 8)-2;
+									
+									$max_count = max($max_count, $val);
 						
+									$val = sprintf("%0".(2*$cbps)."s", dechex($val));
+								}
+								
+								$DATA .= $val;
+							}
+							
+						}
+						
+	
 					}
 					
 				}
@@ -232,16 +251,18 @@ function bo_update_densities($force = false)
 					if (intval($b['station_id']) == -1) //select mean of participants
 					{
 						$sql_select = ' SUM(users) ';
-						$bps += 1;
+						$cbps = $bps + 1;
 					}					
 					elseif (intval($b['station_id']) && $b['station_id'] == bo_station_id())
 					{
 						$sql_where_station = " AND s.part > 0 ";
+						$cbps = $bps;
 					}
 					elseif ($b['station_id'])
 					{
 						$sql_join  = ",".BO_DB_PREF."stations_strikes ss ";
 						$sql_where_station = " AND ss.strike_id=s.id AND ss.station_id='".intval($b['station_id'])."'";
+						$cbps = $bps;
 					}
 					
 					$S = array();
@@ -281,23 +302,23 @@ function bo_update_densities($force = false)
 						{
 							if (!isset($S[$lat_id][$lon_id])) //No strikes for this area
 							{
-								$DATA .= str_repeat('00', $bps);;
+								$DATA .= str_repeat('00', $cbps);
 							}
 							else 
 							{
 								$cnt = 0;
 								
-								if ($S[$lat_id][$lon_id] >= pow(2, $bps * 8)-1) //strike count is too high -> set maximum
-									$cnt = pow(2, $bps * 8)-2;
+								if ($S[$lat_id][$lon_id] >= pow(2, $cbps * 8)-1) //strike count is too high -> set maximum
+									$cnt = pow(2, $cbps * 8)-2;
 								else //OK!
 									$cnt = $S[$lat_id][$lon_id];
 							
-								$DATA .= sprintf("%0".(2*$bps)."s", dechex($cnt)); //add strike count
+								$DATA .= sprintf("%0".(2*$cbps)."s", dechex($cnt)); //add strike count
 							}
 						}
 					
 						// new line (= new lat)
-						$DATA .= str_repeat('ff', $bps);				
+						$DATA .= str_repeat('ff', $cbps);				
 					}
 					
 					$text .= "New data collected: ".(strlen($DATA) / 2)." bytes *** ";
@@ -317,7 +338,7 @@ function bo_update_densities($force = false)
 				
 				$info['last_lat'] = $lat;
 				$info['last_lon'] = $lon;
-				$info['bps'] = $bps;
+				$info['bps'] = $cbps;
 				$info['max'] = max($max_count, $info['max']);
 				
 				//for displaying antenna direction in ratio map
@@ -349,7 +370,7 @@ function bo_update_densities($force = false)
 								WHERE id='$id'";
 				$res = bo_db($sql);
 				
-				$text .= ' Max strike count: '.$info['max'].' *** Whole data compressed: '.(strlen($DATA)).'bytes *** ';
+				$text .= ' Max strike count: '.$info['max'].' *** Whole data compressed: '.(strlen($DATA)).'bytes *** BPS: '.$cbps;
 				bo_echod($text);
 				
 				if ($timeout)
