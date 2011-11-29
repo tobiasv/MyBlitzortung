@@ -1375,7 +1375,7 @@ function bo_imagestring_max(&$I, $size, $x, $y, $text, $color, $maxwidth, $bold 
 		{
 			$width = bo_imagetextwidth($size, $bold, $line) + $blankwidth;
 			
-			if ($x2+$width+3 > $x+$maxwidth)
+			if ($x2+$width+9 > $x+$maxwidth)
 			{
 				$y += $line_height;
 				$x2 = $x;

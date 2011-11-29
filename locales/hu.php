@@ -244,7 +244,6 @@ $_BL['hu']['Lightning data imports'] = 'Villám adatok importálása';
 $_BL['hu']['Traffic to Blitzortung.org'] = 'Forgalom a Blitzortung.org';
 
 
-
 $_BL['hu']['timezone_is'] = 'Aktuális dátum/idö, alapértelmezett idözóna:';
 
 /*************************************************************/
@@ -423,8 +422,9 @@ $_BL['hu']['Min time'] = 'Mi. Idö';
 $_BL['hu']['Max time'] = 'Max. Idö';
 $_BL['hu']['enter_time_hint'] = 'Adja meg az idöszakot"YYYY-MM-DD HH:MM:SS" Kihagyhatja a kissebb idöegységet"YYYY-MM"';
 $_BL['hu']['Time range'] = 'Idötartam';
-$_BL['hu']['archive_search_info'] = 'Itt keresheted meg az utolsó villámlást {COUNT} a területen. Mozgassa a mutatót a térképen és adja meg a kör sugarát amin bellül keressen. A piros pontok jelzik a villámlás helyét. Ha rákattint, megtud több információt.';
 $_BL['hu']['arch_navi_strikes'] = 'Villámok';
+
+
 
 /*************************************************************/
 /* Statistics                                                */
@@ -544,7 +544,7 @@ $_BL['hu']['Positive'] = 'Pozitív';
 $_BL['hu']['Negative'] = 'Negatív';
 $_BL['hu']['Positive electrical direction'] = 'Pozitív elektromos összehangolás';
 $_BL['hu']['Not definite'] = 'Kétes';
-$_BL['hu']['No signal recieved.'] = 'Nincs fogadott jel';
+$_BL['hu']['No signal recieved'] = 'Nincs fogadott jel';
 $_BL['hu']['stat_navi_alarm'] = 'Villám figyelmeztetö jelzés';
 $_BL['hu']['user_welcome_text'] = 'Felhasználó üdvözlö szöveg';
 $_BL['hu']['MyBlitzortung version'] = '{MYBO_ORIG} Verzió';
@@ -656,6 +656,7 @@ Sem a szoláltató, sem a honlap üzemeltetö nem vállal felelöséget!
 /*************************************************************/
 
 $_BL['hu']['bo_graph_descr_ratio'] = 'A villám és a felismerési arány fontos paraméterek a helyes beállításhoz! A felismerési arány kiszámítása az állomáson észlelt jelek és villámlások aránya. A villámlás ráta az állomáson észlelt villámlások és az összes villámlás aránya.';
+
 $_BL['hu']['bo_stat_network_descr_lasth'] = 'Minden adat az utolsó frissítés elötti 60 percre vonatkozik.';
 $_BL['hu']['bo_stat_network_descr_table'] = 'Itt a hállózatban szereplö minden aktív állomás szerepel. Kattintson az oszlop fejlécére a rendezéshez.';
 $_BL['hu']['bo_graph_descr_bear'] = 'Felderítési arány iránytól függöen. Összehasonlitásképpen az összes villám.';
@@ -690,6 +691,19 @@ $_BL['hu']['bo_descr_strikes_now'] = 'A villám adatok a Blitzortung.org-ról tölt
 $_BL['hu']['bo_stat_advanced_info'] = 'Haladó statisztika, elsösorban üzemeltetöknek.';
 $_BL['hu']['bo_stat_other_station_info'] = 'Tipp: Állomás {STATION_CITY} statisztika. Technikai okok miatt, csak az információk egy része jeleníthetö meg';
 $_BL['hu']['bo_stat_other_station_info_back'] = 'Vissza az állomásra {STATION}';
+
+
+/*************************************************************/
+/* Archives descriptions                                     */
+/*************************************************************/
+
+$_BL['hu']['archive_search_info'] = 'Itt keresheted meg az utolsó villámlást {COUNT} a területen. Mozgassa a mutatót a térképen és adja meg a kör sugarát amin bellül keressen. A piros pontok jelzik a villámlás helyét. Ha rákattint, megtud több információt.';
+
+
+
+
+
+
 
 
 /*************************************************************/
@@ -870,4 +884,209 @@ $_BL['hu']['Meteox rain radar'] = 'Eso radar (meteox.com)';
 
 
 
+
+/*************************************************************/
+/* Unsorted / New translations                               */
+/*************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+/********************/
+/*  NOT TRANSLATED  */
+/********************/
+
+
+//en: 'Using auth ID'
+$_BL['hu']['Using auth ID'] = '';
+
+//en: 'Read cities.txt'
+$_BL['hu']['Read cities.txt'] = '';
+
+//en: 'Importing cities'
+$_BL['hu']['Importing cities'] = '';
+
+//en: 'Cities read'
+$_BL['hu']['Cities read'] = '';
+
+//en: 'Deleting existing cities from DB'
+$_BL['hu']['Deleting existing cities from DB'] = '';
+
+//en: 'Cities imported'
+$_BL['hu']['Cities imported'] = '';
+
+//en: 'Satellite'
+$_BL['hu']['Satellite'] = '';
+
+//en: 'Details'
+$_BL['hu']['Details'] = '';
+
+//en: 'Unknown'
+$_BL['hu']['Unknown'] = '';
+
+//en: 'Unknown or longer'
+$_BL['hu']['Unknown or longer'] = '';
+
+//en: 'Up to'
+$_BL['hu']['Up to'] = '';
+
+//en: 'Locating angle'
+$_BL['hu']['Locating angle'] = '';
+
+//en: 'Distances between all stations'
+$_BL['hu']['Distances between all stations'] = '';
+
+//en: 'Distances between stations used for locating'
+$_BL['hu']['Distances between stations used for locating'] = '';
+
+//en: 'Show hyperbolic curves'
+$_BL['hu']['check_show_hyps'] = '';
+
+//en: 'Strike is not confirmed'
+$_BL['hu']['Strike is not confirmed'] = '';
+
+//en: 'Map'
+$_BL['hu']['map_options_static'] = '';
+
+//en: 'Mean participants'
+$_BL['hu']['Mean participants'] = '';
+
+//en: 'Total density'
+$_BL['hu']['Total density'] = '';
+
+//en: 'Station density'
+$_BL['hu']['Station density'] = '';
+
+//en: 'Station ratio'
+$_BL['hu']['Station ratio'] = '';
+
+//en: 'View'
+$_BL['hu']['View'] = '';
+
+//en: 'Avg. participants per strike locating'
+$_BL['hu']['Avg. participants per strike locating'] = '';
+
+//en: 'Maximum mean participants'
+$_BL['hu']['Maximum mean participants'] = '';
+
+//en: 'Stations under construction'
+$_BL['hu']['Stations under construction'] = '';
+
+//en: 'Stations under construction'
+$_BL['hu']['h4_stations_under_construction'] = '';
+
+//en: 'w/o GPS'
+$_BL['hu']['w/o GPS-signal'] = '';
+
+//en: 'Administration'
+$_BL['hu']['Administration'] = '';
+
+//en: 'Documentation'
+$_BL['hu']['Documentation'] = '';
+
+//en: 'Import/update data'
+$_BL['hu']['Import/update data'] = '';
+
+//en: 'Last Login'
+$_BL['hu']['user_lastlogin_text'] = '';
+
+//en: 'Current session time'
+$_BL['hu']['user_sessiontime_text'] = '';
+
+//en: 'Update only strikes'
+$_BL['hu']['Update only strikes'] = '';
+
+//en: 'Update only stations'
+$_BL['hu']['Update only stations'] = '';
+
+//en: 'Update only signals'
+$_BL['hu']['Update only signals'] = '';
+
+//en: 'Update only daily statistics'
+$_BL['hu']['Update only daily statistics'] = '';
+
+//en: 'Update only densities'
+$_BL['hu']['Update only densities'] = '';
+
+//en: 'Update only tracks'
+$_BL['hu']['Update only tracks'] = '';
+
+//en: 'Force data purge only'
+$_BL['hu']['Force data purge only'] = '';
+
+//en: 'Check alerts only'
+$_BL['hu']['Check alerts only'] = '';
+
+//en: 'Here you can display the lightning strikes for each day on different maps.
+// It is also possible to view animated maps, but consider that it will take some time to load them. 
+// Lightning data is available from {DATE_START} to {DATE_END}. There\'s no guarantee for completeness.
+// '
+$_BL['hu']['archive_map_info'] = '';
+
+//en: '
+// Here you can display lightning densities for different regions. This data is saved independently from
+// the other strike data. 
+// <br>
+// <br>
+// Some hints: The data displayed here is not standardized, 
+// so the results can not be compared over longer time ranges or bigger regions!
+// This is due to different station coverage and improved lightning detection. 
+// You can switch to a detection station and select between different views.
+// '
+$_BL['hu']['archive_density_info'] = '';
+
+//en: '
+// Ever lightning detection stations of the Blitzortung.org network receives signal from strikes and also 
+// more or less noise. Here you can see some of the signals, that where received from the station {STATION} 
+// during the last minutes. 
+// If other stations receives the same signal during a very short time range then maybe a lightning can be 
+// located out of the correspondending times (time of arrival method - TOA). 
+// In this case additional information about the lightning strike will be displayed here.
+// '
+$_BL['hu']['archive_signaltable_info'] = '';
+
+//en: 'Here you can see the same information as on the site "signals" but also
+// strikes where no signal was detected by you station. To stay in common with the Blitzortung.org rules,
+// this page can only be accessed with an user account.
+// <br><br>
+// Hint: The hyperbolic curves displayed in the map are only informative and don\'t represent the actual
+// calculation ({MYBO_ORIG} doesn\'t actually know the times of the other stations).
+// '
+$_BL['hu']['archive_striketable_info'] = '';
+
+//en: '
+// <p>
+// If a lightning strike was detected, some additional information correspondending to the station {STATION} will be displayed. 
+// </p>
+// <ul>
+// <li><span class="bo_descr">Runtime:</span> Difference between time of strike and reception</li>
+// <li><span class="bo_descr">Distance:</span> Distance strike to station {STATION} calculated from runtime (1ms = 300km)</li>
+// <li><span class="bo_descr">Direction:</span> Approximate direction (exact value won\' be displayed due to usage limitations)</li>
+// <li><span class="bo_descr">Deviation:</span> The smaller, the better the locating</li>
+// <li><span class="bo_descr">Current:</span> Current of the strike. Very experimental! Currently almost no informative value!</li>
+// <li><span class="bo_descr">Polarity:</span> Positive/negative lightning. Is determined out of signal. Very experimental, only suitable for near lightning!</li>
+// <li><span class="bo_descr">Participants:</span> Number of stations that received the lightning strike. The more, the better.</li>
+// <li><span class="bo_descr">Participanted:</span> Did the station {STATION} participate? If "no" is colored, then a signal has been received but it wasn\'t used for the calculation</li>
+// <li><span class="bo_descr">Locating angle:</span> Max. angle of participated station around lightning position (in parenthesis: stations that weren\'t used for calculation). A value of 270° would be ideal, but a good locating is also possibe on much smaller values.
+// <li><span class="bo_descr">Channel:</span> Recorded channel in the graph (if station operates in "Best Channel Mode")
+// </ul>
+// '
+$_BL['hu']['archive_signaltable_info_bottom'] = '';
+
+//en: 'Romania'
+$_BL['hu']['Romania'] = '';
+
+//en: 'Rome'
+$_BL['hu']['Rome'] = '';
+
+//en: 'Lithuania'
+$_BL['hu']['Lithuania'] = '';
 

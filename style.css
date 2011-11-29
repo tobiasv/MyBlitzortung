@@ -236,9 +236,15 @@ font-weight: normal;
 font-size: 12px;
 }
 
-#myblitzortung .bo_map_footer {
+#myblitzortung .bo_map_footer,
+#myblitzortung .bo_map_header {
 font-size: 11px;
 color: #666;
+}
+
+#myblitzortung .bo_map_header {
+margin: 0px 2px 4px 2px;
+padding-top:8px;
 }
 
 /*** Raw-Signals ***/
@@ -370,7 +376,8 @@ background: transparent;
 border:1px solid #ddd;
 }
 
-#myblitzortung #bo_arch_map_img {
+#myblitzortung #bo_arch_map_img,
+#myblitzortung #bo_arch_map_img_station {
 border: 1px solid #eee;
 }
 
@@ -465,7 +472,9 @@ float: right;
 #myblitzortung .bo_arch_map_links {
 font-size: 11px;
 text-align:center;
-margin-bottom: 2px;
+padding: 4px 10px 3px 10px;
+margin: 0 1px 0 1px;
+background: #eee;
 }
 
 #myblitzortung #bo_arch_maps #bo_arch_strikes_select_map {
@@ -505,6 +514,13 @@ text-decoration: none;
 #myblitzortung #bo_archive_density_yearmonth_container .bo_archive_density_monthurl {
 display: inline-block;
 padding: 0 5px 0 5px;
+}
+
+#myblitzortung .bo_dens_map_toggle {
+}
+
+#myblitzortung a.bo_dens_map_toggle_active {
+color:red;
 }
 
 #myblitzortung .bo_archive_density_active {
@@ -661,12 +677,22 @@ color: #666;
 color: #666;
 }
 
-#myblitzortung p.bo_graph_description,
-#myblitzortung p.bo_stat_description  {
-width: 550px;
+#myblitzortung .bo_general_description,
+#myblitzortung .bo_graph_description,
+#myblitzortung .bo_stat_description  {
 font-size: 11px;
 color: #444;
 }
+
+#myblitzortung .bo_graph_description,
+#myblitzortung .bo_stat_description  {
+width: 550px;
+}
+
+#myblitzortung .bo_general_description  {
+width: 650px;
+}
+
 
 #myblitzortung .bo_map_gps {
 margin-left: 10px;

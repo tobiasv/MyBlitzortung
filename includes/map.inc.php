@@ -26,7 +26,6 @@ if (!defined('BO_VER'))
 function bo_show_map($var1=null,$var2=null)
 {
 	bo_show_lightning_map($var1,$var2);
-	
 	bo_copyright_footer();
 }
 
@@ -206,14 +205,33 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 		if ($no_google)
 		{	
 			$cfg = $_BO['mapimg'][$static_map_id];
-			$footer = $cfg['footer'];
 			$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
-			
-			//image dimensions
+			$url = bo_bofile_url().'?map='.$static_map_id.'&bo_lang='._BL();
 			$img_dim = bo_archive_get_dim($static_map_id);
+			$interval = $cfg['upd_intv'];
+			
+			
+			
+			
+			
+			
+			
+			$interval = 1;
+			
+			echo '<fieldset class="bo_map_options_static">';
+			echo '<legend>'._BL("map_options_static").'</legend>';
+			echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_static(); return false;" id="bo_map_reload">';
+			echo '<span class="bo_form_checkbox_text">';
+			echo '<input type="checkbox" onclick="bo_toggle_autoupdate_static(this.checked);" id="bo_check_autoupdate"> ';
+			echo '<label for="bo_check_autoupdate">'._BL('auto update').'</label> ';
+			echo '</span>';
+			echo '</fieldset>';
 			
 			echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
-
+			
+			if ($cfg['header'])
+				echo '<div class="bo_map_header">'._BC($cfg['header'], true).'</div>';
+			
 			if ($archive_maps_enabled && intval(BO_ANIMATIONS_INTERVAL) && $cfg['archive'])
 			{
 				echo '<div class="bo_arch_map_links">';
@@ -223,11 +241,42 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 
 			$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name']).' '.date(_BL('_datetime'), $last_update);
 			echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
-			echo '<img src="'.bo_bofile_url().'?map='.$static_map_id.'&bo_lang='._BL().'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.bo_bofile_url().'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
-			echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
-			echo '</div>';
+			echo '<img src="'.$url.'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.bo_bofile_url().'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
+
+			if ($cfg['footer'])
+				echo '<div class="bo_map_footer">'._BC($cfg['footer'], true).'</div>';
 
 			echo '</div>';
+			echo '</div>';
+
+
+?>
+
+<script type="text/javascript">
+
+var bo_autoupdate_running = false;
+function bo_toggle_autoupdate_static(on)
+{
+	if (on && bo_autoupdate_running)
+		return;
+		
+	bo_autoupdate_running = on;
+
+	if (on)
+	{
+		window.setTimeout("bo_map_reload_static();", <?php echo 1000 * 60 * ceil($interval / 2) ?>);
+	}
+}
+
+function bo_map_reload_static()
+{
+	var now = new Date();
+	document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo $interval; ?>);
+}
+
+</script>
+
+<?php
 			
 			return;
 		}

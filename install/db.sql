@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (
   `last_time` datetime NOT NULL,
   `last_time_ns` int(11) NOT NULL,
   `status` varchar(1) NOT NULL,
+  `first_seen` datetime NOT NULL,
   `changed` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -100,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}densities` (
   `date_start` date default NULL,
   `date_end` date default NULL,
   `status` tinyint(4) NOT NULL,
-  `station_id` smallint(5) unsigned NOT NULL,
+  `station_id` smallint(5) NOT NULL,
   `length` decimal(4,1) NOT NULL,
   `lat_min` decimal(5,2) NOT NULL,
   `lon_min` decimal(5,2) NOT NULL,

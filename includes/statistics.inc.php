@@ -339,6 +339,9 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	$last_update = (time()-$time)/60;
 	$last_active = $time_own ? (time()-$time_own)/60 : false;
 
+	if (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES)
+		$dens_stations = bo_get_density_stations();
+	
 	echo '<h3>'.strtr(_BL('h3_stat_station'), array('{STATION_CITY}' => $city)).'</h3>';
 	
 	echo '<div id="bo_stat_station">';
@@ -384,6 +387,10 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo '</span></li>';
 		echo '<li><span class="bo_descr">'._BL('Strike ratio').': </span><span class="bo_value">';
 		echo $strikesh ? number_format($strikesh_own / $strikesh * 100, 1, _BL('.'), _BL(',')).'%' : '-';
+		
+		if ($dens_stations[$station_id])
+			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=density&bo_station='.$station_id.'&bo_ratio">'._BL('Map').'</a>)';
+		
 		echo '</span></li>';
 		
 		echo '<li><span class="bo_descr">'._BL('Strikes station min participants').': </span>';
@@ -512,12 +519,12 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	// stations under construction
 	$sql = "SELECT COUNT(*) cnt, 
 					CASE 
-						WHEN TO_DAYS(changed) - TO_DAYS('".gmdate('Y-m-d H:i:s', $mybo_first_update)."') <= 7 THEN -1
-						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 7 THEN 7
-						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 30 THEN 30
-						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 30*3 THEN 30*3
-						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 30*6 THEN 30*6
-						WHEN TO_DAYS(NOW()) - TO_DAYS(changed) <= 365  THEN 365
+						WHEN TO_DAYS(first_seen) - TO_DAYS('".gmdate('Y-m-d H:i:s', $mybo_first_update)."') <= 7 THEN -1
+						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 7 THEN 7
+						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 30 THEN 30
+						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 30*3 THEN 30*3
+						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 30*6 THEN 30*6
+						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 365  THEN 365
 						ELSE 0
 					END type
 			FROM ".BO_DB_PREF."stations
@@ -885,7 +892,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		$sql = "SELECT user, id
 				FROM ".BO_DB_PREF."stations
 				WHERE last_time = '1970-01-01 00:00:00'
-				ORDER BY changed DESC";
+				ORDER BY first_seen DESC";
 		$res = bo_db($sql);
 		while($row = $res->fetch_assoc())
 			$station_under_constr[$row['id']] = $user_stations[$row['user']];
@@ -903,13 +910,13 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				echo $d['user'].' <span title="'._BL(htmlentities($d['country'])).'">('._BC($d['city']).')</span>';
 				echo '</span>';
 				
-				$changed = strtotime($d['changed']);
+				$first_seen = strtotime($d['first_seen']);
 				
 				echo '<span class="bo_value">';
-				if ($changed - $mybo_first_update < 48 * 3600 * 7)
+				if ($first_seen - $mybo_first_update < 48 * 3600 * 7)
 					echo '?';
 				else
-					echo date(_BL('_date'), $changed);
+					echo date(_BL('_date'), $first_seen);
 				echo '</span>';
 				
 				$i++;
@@ -1368,9 +1375,8 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 	$bpv      = bo_get_conf('raw_bitspervalue');
 	$values   = bo_get_conf('raw_values');
 	$utime    = bo_get_conf('raw_ntime') / 1000;
-
 	$last_update = bo_get_conf('uptime_raw');
-	$last_update_minutes = round((time()-$last_update)/60,1);
+	
 	
 	echo '<div id="bo_stat_advanced">';
 
@@ -1578,21 +1584,8 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 		case 'signals':
 			
 			echo '<h4>'._BL('h4_stat_signals').'</h4>';
-			echo '<ul class="bo_stat_overview">';
-			echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
-			echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
-			echo '<li><span class="bo_descr">'._BL('Channels').': </span>';
-			echo '<span class="bo_value">'.$channels.'</span></li>';
-			echo '<li><span class="bo_descr">'._BL('Samples per Channel').': </span>';
-			echo '<span class="bo_value">'.$values.'</span></li>';
-			echo '<li><span class="bo_descr">'._BL('Recording time').': </span>';
-			echo '<span class="bo_value">'.number_format($utime * $values, 0, _BL('.'), _BL(','))._BL('unit_us_short').'</span></li>';
-			echo '<li><span class="bo_descr">'._BL('Bits per Sample').': </span>';
-			echo '<span class="bo_value">'.$bpv.'</span></li>';
-			echo '<li><span class="bo_descr">'._BL('Sample rate').': </span>';
-			echo '<span class="bo_value">'.number_format(1 / $utime * 1000, 0, _BL('.'), _BL(',')).' '._BL('unit_ksps').'</span></li>';
-			echo '</ul>';
-
+			bo_signal_info_list();
+			
 			if ($bpv == 8 && $values > 10)
 			{
 				/*** SPECTRUM ***/
@@ -1773,6 +1766,33 @@ function bo_show_select_strike_connected($id)
 	echo '<option value="-1">'._BL('not_participated').'</option>';
 	echo '</select> ';
 	echo '</span>';
+}
+
+
+function bo_signal_info_list()
+{
+
+	$channels = BO_ANTENNAS;
+	$bpv      = bo_get_conf('raw_bitspervalue');
+	$values   = bo_get_conf('raw_values');
+	$utime    = bo_get_conf('raw_ntime') / 1000;
+	$last_update = bo_get_conf('uptime_raw');
+	$last_update_minutes = round((time()-$last_update)/60,1);
+	
+	echo '<ul class="bo_stat_overview">';
+	echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
+	echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Channels').': </span>';
+	echo '<span class="bo_value">'.$channels.'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Samples per Channel').': </span>';
+	echo '<span class="bo_value">'.$values.'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Recording time').': </span>';
+	echo '<span class="bo_value">'.number_format($utime * $values, 0, _BL('.'), _BL(','))._BL('unit_us_short').'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Bits per Sample').': </span>';
+	echo '<span class="bo_value">'.$bpv.'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Sample rate').': </span>';
+	echo '<span class="bo_value">'.number_format(1 / $utime * 1000, 0, _BL('.'), _BL(',')).' '._BL('unit_ksps').'</span></li>';
+	echo '</ul>';
 }
 
 ?>

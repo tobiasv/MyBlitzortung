@@ -39,7 +39,8 @@ function bo_check_for_update()
 						'0.6.1' => 601,
 						'0.6.2' => 602,
 						'0.7.2' => 702,
-						'0.7.3' => 703,);
+						'0.7.3' => 703,
+						'0.7.4' => 704,);
 
 	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
 	{
@@ -342,6 +343,66 @@ function bo_check_for_update()
 				$ok2 = bo_db($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok2 ? 'OK' : 'FAIL').'</b></li>';
 				flush();
+				
+				break;
+			
+			case '0.7.4':
+			
+				switch ($_GET['bo_action2'])
+				{
+					default:
+						echo '<li>Should the densities be cleaned? Due to some major changes, the old data cannot be used any more. 
+								If you didn\'t purge your strike data, the densities will be rebuild during the next imports.<br>
+							<a href="'.bo_insert_url(array('bo_action', 'bo_action2')).'&bo_action=do_update&bo_action2=clear_dens_yes">Yes, clear!</a> 
+							<a href="'.bo_insert_url(array('bo_action', 'bo_action2')).'&bo_action=do_update&bo_action2=clear_dens_no">No, do not clear!</a> 
+							</li></ul>';
+						return true;
+						break 2;
+					
+					case 'clear_dens_yes':
+						$sql = 'TRUNCATE TABLE `'.BO_DB_PREF.'densities`';
+						$ok = bo_db($sql, false);
+						echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+						break;
+						
+					case 'clear_dens_no':
+						$ok = true;
+						break;
+				}
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'densities` CHANGE  `station_id`  `station_id` SMALLINT( 5 ) NOT NULL';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+				
+				$res = bo_db("SHOW COLUMNS FROM `".BO_DB_PREF."stations` WHERE Field='first_seen'");
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` ADD `first_seen` datetime NOT NULL ';
+				echo '<li><em>'.$sql.'</em>: <b>';
+				flush();
+				if (!$res->num_rows)
+				{
+					$ok = bo_db($sql);
+					echo _BL($ok ? 'OK' : 'FAIL');
+					echo '</b></li>';
+					flush();
+					
+					if ($ok)
+					{
+						$sql = "UPDATE `".BO_DB_PREF."stations` SET first_seen=changed";
+						echo '<li><em>'.$sql.'</em>: <b>';
+						flush();
+						$ok = bo_db($sql, false);
+						echo _BL($ok ? 'OK' : 'FAIL');
+						echo '</b></li>';
+					}
+					
+				}
+				else
+				{
+					echo _BL('Already DONE BEFORE');
+					echo '</b></li>';
+					$ok = true;
+				}
 				
 				break;
 			

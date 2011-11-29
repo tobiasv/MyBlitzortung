@@ -244,8 +244,16 @@ $_BL['de']['Lightning data imports'] = 'Anzahl Akualisierungen der Blitzdaten';
 $_BL['de']['Traffic to Blitzortung.org'] = 'Datenverkehr mit Blitzortung.org';
 $_BL['de']['Using auth ID'] = 'Authentifizierung mittels Id';
 $_BL['de']['Read cities.txt'] = 'Einlesen von cities.txt';
+$_BL['de']['Importing cities'] = 'Importiere Städte';
+$_BL['de']['Cities read'] = 'Städte/Orte gelesen';
+$_BL['de']['Deleting existing cities from DB'] = 'Lösche vorhandene Städte aus der Datenbank';
+$_BL['de']['Cities imported'] = 'Städte/Orte importiert';
 $_BL['de']['Satellite'] = 'Satellit';
 $_BL['de']['Details'] = 'Details';
+$_BL['de']['Unknown'] = 'Unbekannt';
+$_BL['de']['Unknown or longer'] = 'Unbekannt oder länger';
+$_BL['de']['Up to'] = 'Bis zu';
+$_BL['de']['Locating angle'] = 'Ortungswinkel';
 
 
 $_BL['de']['timezone_is'] = 'Aktuelle Uhrzeit sowie verwendete Zeitzone bei allen Zeitangaben: ';
@@ -424,8 +432,21 @@ $_BL['de']['Min time'] = 'Min Zeit';
 $_BL['de']['Max time'] = 'Max Zeit';
 $_BL['de']['enter_time_hint'] = 'Zeitangaben im Format "JJJJ-MM-TT HH:MM:SS", wobei kleinere Zeiteinheiten auch weggelassen werden können, z.B. "JJJJ-MM".';
 $_BL['de']['Time range'] = 'Zeitbereich';
-$_BL['de']['archive_search_info'] = 'Hier können die letzten {COUNT} Blitze für einen bestimmten Bereich auf der Karte abgefragt werden. Dazu den Marker an die gewünschte Stelle ziehen um die Koordinaten zu setzen, einen Radius angeben und auf Suchen klicken. Die Blitze werden anschließend in der Karte als farbige Punkte angezeigt. Durch Klick auf einen Punkt lassen sich weitere Informationen abrufen. Die Suche ist nur innerhalb des rot markierten Kreises um die Station möglich!';
 $_BL['de']['arch_navi_strikes'] = 'Blitze';
+$_BL['de']['Distances between all stations'] = 'Entfernungen zwischen allen Stationen';
+$_BL['de']['Distances between stations used for locating'] = 'Entfernungen zwischen Stationen zur Berechnung der Ortung';
+$_BL['de']['check_show_hyps'] = 'Hyperbeln einzeichnen';
+$_BL['de']['Strike is not confirmed'] = 'Blitz nicht bestätigt';
+$_BL['de']['map_options_static'] = 'Karte';
+$_BL['de']['Mean participants'] = 'Mittlere Teilnehmerzahl';
+$_BL['de']['Total density'] = 'Blitzdichte gesamt';
+$_BL['de']['Station density'] = 'Blitzdichte Station';
+$_BL['de']['Station ratio'] = 'Blitzquote Station';
+$_BL['de']['View'] = 'Ansicht';
+$_BL['de']['Avg. participants per strike locating'] = 'Mittl. Teilnehmerzahl pro Ortung';
+$_BL['de']['Maximum mean participants'] = 'Max. mittlere Anzahl Teilnehmer';
+
+
 
 /*************************************************************/
 /* Statistics                                                */
@@ -499,6 +520,9 @@ $_BL['de']['Last active'] = 'Zuletzt aktiv';
 $_BL['de']['Signals detected'] = 'Signale empfangen';
 $_BL['de']['Signal ratio'] = 'Ortungsquote';
 $_BL['de']['Strikes station min participants'] = '"Eigene" Blitze';
+$_BL['de']['Stations under construction'] = 'Stationen im Aufbau';
+$_BL['de']['h4_stations_under_construction'] = 'Stationen im Aufbau';
+$_BL['de']['w/o GPS-signal'] = 'ohne GPS-Signal';
 
 $_BL['de']['legend_stat_strikes_now'] = 'Auswahl der Region';
 $_BL['de']['legend_stat_amplitudes_time'] = 'Optionen';
@@ -545,7 +569,7 @@ $_BL['de']['Positive'] = 'Positiv';
 $_BL['de']['Negative'] = 'Negativ';
 $_BL['de']['Positive electrical direction'] = 'Positive elektrische Ausrichtung';
 $_BL['de']['Not definite'] = 'Nicht eindeutig';
-$_BL['de']['No signal recieved.'] = 'Kein Signal empfangen';
+$_BL['de']['No signal recieved'] = 'Kein Signal empfangen';
 $_BL['de']['stat_navi_alarm'] = 'Blitz-Alarm';
 $_BL['de']['user_welcome_text'] = 'Du bist angemeldet als';
 $_BL['de']['MyBlitzortung version'] = '{MYBO_NOTAGS} Version';
@@ -582,6 +606,19 @@ $_BL['de']['Files'] = 'Dateien';
 $_BL['de']['Click here to delete all files'] = 'Hier klicken um alle Dateien zu löschen';
 $_BL['de']['Clear all files'] = 'Dateien bereinigen.';
 $_BL['de']['stay logged in'] = 'Speichern';
+$_BL['de']['Administration'] = '';
+$_BL['de']['Documentation'] = 'Dokumentation';
+$_BL['de']['Import/update data'] = 'Datenimport und -update';
+$_BL['de']['user_lastlogin_text'] = 'Letzter Login';
+$_BL['de']['user_sessiontime_text'] = 'Dauer der aktuellen Session';
+$_BL['de']['Update only strikes'] = 'Importiere Blitzdaten';
+$_BL['de']['Update only stations'] = 'Importiere Stationsdaten';
+$_BL['de']['Update only signals'] = 'Importiere Signaldaten';
+$_BL['de']['Update only daily statistics'] = 'Erstelle Tagesstatistiken';
+$_BL['de']['Update only densities'] = 'Berechne Blitzdichten';
+$_BL['de']['Update only tracks'] = 'Berechne Zugrichtungen';
+$_BL['de']['Force data purge only'] = 'Erzwinge Datenbankbereinigung';
+$_BL['de']['Check alerts only'] = 'Überprüfe auf Alarme';
 
 $_BL['de']['user_perm0'] = 'Administration';
 $_BL['de']['user_perm1'] = 'Andere Einstellungen';
@@ -719,6 +756,81 @@ $_BL['de']['bo_descr_strikes_now'] = 'Die Blitzdaten werden {UPDATE_INTERVAL} vo
 $_BL['de']['bo_stat_advanced_info'] = 'Erweiterte Statistiken, welche für den Stationsbetreiber hilfreich sein könnten um die Auswertungen zu optimieren. Im Gegensatz zur den Statistiken unter "Station" werden genauere Daten zur Berechnung verwendet.';
 $_BL['de']['bo_stat_other_station_info'] = 'Hinweis: Es werden Statistiken der <strong>Station {STATION_CITY}</strong> angezeigt. Aus technischen Gründen kann nur eine Auswahl der sonst vorhandenen Informationen angezeigt werden. Einzelne Informationen können sich auch weiterhin noch auf die Station {STATION} beziehen!';
 $_BL['de']['bo_stat_other_station_info_back'] = 'Zurück zur Station {STATION}';
+
+
+/*************************************************************/
+/* Archives descriptions                                     */
+/*************************************************************/
+
+$_BL['de']['archive_search_info'] = 'Hier können die letzten {COUNT} Blitze für einen bestimmten Bereich 
+auf der Karte abgefragt werden. Dazu den Marker an die gewünschte Stelle ziehen um die Koordinaten zu setzen, 
+einen Radius angeben und auf Suchen klicken. Die Blitze werden anschließend in der Karte als farbige Punkte 
+angezeigt. Durch Klick auf einen Punkt lassen sich weitere Informationen abrufen. Die Suche ist nur innerhalb 
+des rot markierten Kreises um die Station möglich!';
+
+$_BL['de']['archive_map_info'] = 'Hier können Blitze tagweise auf verschiedenen Karten dargestellt werden. 
+Alternativ stehen auch Animationen zur Verfügung. Beachten Sie hierbei entsprechend längere Ladezeiten. 
+Die Blitzdaten sind von {DATE_START} bis {DATE_END} verfügbar. Vollständigkeit kann nicht garantiert werden.';
+
+$_BL['de']['archive_density_info'] = 'Für verschiedene Regionen können hier die Blitzdichten angezeigt werden. 
+Dies ist unabhängig von den im Archiv vorhanden Einzelblitzen möglich, da die Dichten separat gespeichert werden.
+Die Blitzdichten sind nicht normiert, d. h. durch regional unterschiedliche Stationsdichten weichen die angegebenen
+Daten mehr oder weniger stark von der Realität ab.
+Auch im zeitlichen Verlauf ist dies der Fall, da die Ortungen des Stationsnetzwerkes immer weiter optimiert werden und somit 
+immer mehr Blitze registriert werden. 
+Ein Vergleich der absoluten Zahlen über einen größeren Zeitraum ist von daher nicht immer sinnvoll. 
+Innerhalb einer Region mit entsprechender Anzahl an Stationen sowie innerhalb eines kurzen Zeitraums ist dies dagegen sehr gut möglich.
+<br><br>
+Bei der Auswahl einer Ortungsstation werden nur von dieser registrierte Blitze einbezogen. 
+Somit lässt sich deren Blitzquote anzeigen, d.h. die Regionen in denen die Station Blitze mehr oder weniger gut empfängt. 
+Dies kann Aufschluss über Empfangseigenschaften der Station sowie auf atmosphärische Einflüsse geben.
+';
+
+$_BL['de']['archive_signaltable_info'] = '
+Jede Ortungsstation von blitzortung.org empfängt die Signale von Blitzen sowie auch Störsignale 
+aus der Umgebung - so auch die Station {STATION}. 
+Auf dieser Seite sind die zuletzt empfangenen Signale der Station {STATION} zu sehen. 
+Nur ein gewisser Prozentsatz dieser Signale werden letztendlich als Blitz registriert, nämlich dann, 
+wenn diese auch andere Stationen zum richtigen Zeitpunkt empfangen (TOA-Methode - Time of arrival).
+Informationen zum Blitz werden dann entsprechend mit angegeben. Erläuterungen zu den Angaben
+sind am Ende der Seite zu finden.
+';
+
+$_BL['de']['archive_striketable_info'] = '
+Die hier gezeigten Informationen entsprechen denen auf der Seite "Signale", es werden jedoch alle Blitze angezeigt. 
+Um im Einklang mit den Blitzortung.org-Teilnehmer-Nutzungsbedingungen zu bleiben, wird diese Seite nur für
+User eingeblendet.
+<br><br>
+Bei der Anzeige der "Details" werden die teilgenommen Stationen in der Reihenfolge der Entfernung zum berechneten Blitzort angezeigt.
+Die Stationen werden zudem markiert, entsprechend der Reihenfolge "Mindestteilnehmerzahl", "Zusätzliche Teilnehmer" und
+"Teilgenommen, aber nicht in Berechnung eingeflossen". 
+Die Hyperbeln in der Karte werden aus den vorhandenen Entfernung 
+zwischen station Station und Blitz berechnet und NICHT aus den Signaldaten der Stationen, 
+da diese {MYBO_ORIG} unbekannt sind. 
+Sie dienen allein der Veranschaulichung, 
+stellen aber nicht die eigentliche Berechnung über Hyperbelschnittpunkte (mit Fehlern) dar. 
+Die Hyperbeln werden jeweils zwischen allen markierten Stationen berechnet, 
+dies müssen aber nicht die selben sein wie vom Blitzortung.org-Rechenserver.
+';
+
+$_BL['de']['archive_signaltable_info_bottom'] = '
+<p>
+Wurde ein Blitz registriert, erscheinen weitere Infos bezogen auf die Station {STATION}:
+</p>
+<ul>
+<li><span class="bo_descr">Laufzeit:</span> Differenz von Blitz- und Empfangszeitpunkt</li>
+<li><span class="bo_descr">Entfernung:</span> Distanz Blitz <-> Station {STATION} aus der Laufzeit (1ms = 300km)</li>
+<li><span class="bo_descr">Richtung:</span> Grobe Himmelsrichtung (dieser Wert wird absichtlich nicht genauer angegeben)</li>
+<li><span class="bo_descr">Abweichung:</span> Maß für die Ortungsgenauigkeit</li>
+<li><span class="bo_descr">Blitzstrom:</span> Experimenteller Wert, hat momentan kaum Aussagekraft!</li>
+<li><span class="bo_descr">Polarität:</span> Positiver oder negativer Blitz. Wird aus dem nebenstehenden Diagramm ermittelt, ist momentan sehr experimentell und nur für nahe Blitze brauchbar.</li>
+<li><span class="bo_descr">Teilnehmer:</span> Anzahl der Stationen, welche den Blitz registriert haben. Je mehr, desto zuverlässiger.</li>
+<li><span class="bo_descr">Teilgenommen:</span> Hat die Station {STATION} an der Ortung teilgenommen? Wenn das "nein" eingefärbt ist, so wurde ein passendes Signal empfangen, welches jedoch nicht in die Berechnung mit einging.</li>
+<li><span class="bo_descr">Ortungswinkel:</span> Max. Winkel der Stationen um den Blitzort, welche aktiv an der Berechnung der Position teilgenommen haben (in Klammern: Stationen die nicht aktiv teilgenommen haben). Der Winkel ist ein Maß für die Genauigkeit der Position. Ein Wert von 270° wäre ideal, aber bereits bei viel kleineren Winkeln ist eine sehr gute Ortung möglich.
+<li><span class="bo_descr">Kanal:</span> Aufgezeichneter Kanal im Signaldiagramm (falls "Best Channel Mode" gewählt)
+</ul>
+';
+
 
 
 /*************************************************************/
@@ -902,19 +1014,15 @@ $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
 
 
 
+
+
 /*************************************************************/
 /* Unsorted / New translations                               */
 /*************************************************************/
 
-$_BL['de']['Stations under construction'] = 'Stationen im Aufbau';
-$_BL['de']['Unknown'] = 'Unbekannt';
-$_BL['de']['Unknown or longer'] = 'Unbekannt oder länger';
-$_BL['de']['Up to'] = 'Bis zu';
-$_BL['de']['h4_stations_under_construction'] = 'Stationen im Aufbau';
-$_BL['de']['Distances between all stations'] = 'Entfernungen zwischen allen Stationen';
-$_BL['de']['Distances between stations used for locating'] = 'Entfernungen zwischen Stationen zur Berechnung der Ortung';
-$_BL['de']['check_show_hyps'] = 'Hyperbeln einzeichnen';
-$_BL['de']['Strike is not confirmed'] = 'Blitz nicht bestätigt';
-$_BL['de']['Locating angle'] = 'Ortungswinkel';
-$_BL['de']['w/o GPS-signal'] = 'ohne GPS-Signal';
+
+
+
+
+
 

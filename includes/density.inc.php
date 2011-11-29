@@ -1,0 +1,1457 @@
+<?php
+/*
+    MyBlitzortung - a tool for participants of blitzortung.org
+	to display lightning data on their web sites.
+
+    Copyright (C) 2011  Tobias Volgnandt
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+if (!defined('BO_VER'))
+	exit('No BO_VER');
+
+
+	
+
+function bo_update_densities($force = false)
+{
+	global $_BO;
+	
+	$start_time = time();
+
+	if (!defined('BO_CALC_DENSITIES') || !BO_CALC_DENSITIES)
+		return true;
+
+	bo_echod(" ");
+	bo_echod("=== Updating densities ===");
+		
+	if (!is_array($_BO['density']))
+	{
+		bo_echod("Densities enabled, but no settings available!");
+		return true;
+	}
+
+	//check for new time-range and insert them
+	$last = bo_get_conf('uptime_densities');
+	if (time() - $last > 3600 || $force)
+	{
+		bo_set_conf('uptime_densities', time());
+		$ranges = bo_get_new_density_ranges(0,0);
+		bo_density_insert_ranges($ranges, $force);
+	}
+
+	
+
+	//check which densities are pending
+	$pending = array();
+	$res = bo_db("SELECT id, type, date_start, date_end, station_id, info, status
+					FROM ".BO_DB_PREF."densities 
+					WHERE status<=0 
+					ORDER BY status DESC, date_start, date_end");
+	while ($row = $res->fetch_assoc())
+	{
+		$max_status = max($max_status, $row['status']);
+		$pending[$row['type']][$row['id']] = $row;
+	}
+	
+	if (!empty($pending))
+	{
+		$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+		$strike_min = strtotime($row['mintime'].' UTC');
+	
+		//create densities by type
+		$timeout = false;
+		$calc_count = 0;
+		foreach($_BO['density'] as $type_id => $a)
+		{
+			if (!isset($pending[$type_id]) || empty($a))
+				continue;
+			
+			// length in meters of an element
+			$length = $a['length'] * 1000;
+			
+			// area of each element
+			$area = pow($length, 2);
+			
+			// data bytes of each sample
+			$bps = $a['bps'];
+			
+			bo_echod(" ");
+			bo_echod("== ".$a['name'].": Length: $length m / Area: $area square meters / Bytes per Area: $bps ==");
+			
+			//calculate densities for every pending database entry
+			foreach($pending[$type_id] as $id => $b)
+			{
+				//create entries with higher status first
+				if ($b['status'] != $max_status)
+					continue;
+			
+				bo_echod(" ");
+			
+				$calc_count++;
+				$info = unserialize($b['info']);
+				
+				if ($info['bps'])
+					$info['bps'] = $bps;
+					
+				$text = 'Station: #'.$b['station_id'].' *** Range: '.$b['date_start'].' to '.$b['date_end'].' ';
+				
+				//with status -1/-3 ==> calculate from other density data
+				if ($b['status'] == -1 || $b['status'] == -3 || $b['status'] == -4)
+				{
+					$max_count = 0;
+					
+					if ($info['calc_date_start']) // there was a timeout the last run
+					{
+						$date_start_add = $info['calc_date_start'];
+						$b['date_start'] = $info['calc_date_start'];
+						
+						$text .= ' Starting at '.$b['date_start'];
+						
+						$sql = "SELECT data FROM ".BO_DB_PREF."densities WHERE id='$id'";
+						$row = bo_db($sql)->fetch_assoc();
+						$DATA = $row['data'] ? gzinflate($row['data']) : '';
+
+					}
+					else
+					{
+						$date_start_add = 0;
+						$DATA = '';
+					}
+
+					if ($b['status'] == -4)
+					{
+						$sqlstatus = "status=2";
+						$text .= ' *** Calculate from year data! ';
+					}
+					else
+					{
+						$sqlstatus = "status=1 OR status=3";
+						$text .= ' *** Calculate from month data! ';
+					}
+					
+					bo_echod($text);
+					$text = '';
+					
+					$sql = "SELECT data, date_start, date_end
+							FROM ".BO_DB_PREF."densities 
+							WHERE 1
+								AND type='$type_id' 
+								AND ($sqlstatus)
+								AND date_start >= '".$b['date_start']."'
+								AND date_end   <= '".$b['date_end']."'
+								AND station_id = '".$b['station_id']."'
+							ORDER BY status, date_start, date_end DESC";
+					$res = bo_db($sql);
+					while ($row = $res->fetch_assoc())
+					{
+						if (!$date_start_add || $row['date_start'] == $date_start_add)
+						{
+							
+							if (!$info['date_start_real']) // save start time info to display in map
+								$info['date_start_real'] = $row['date_start'];
+								
+							$date_start_add = date('Y-m-d', strtotime($row['date_end'].' + 1 day'));
+							
+							$OLDDATA = gzinflate($row['data']);
+							$NEWDATA = $DATA;
+							$DATA = '';
+							
+							for ($i=0; $i<=strlen($OLDDATA) / $bps / 2; $i++)
+							{
+								$val  = substr($OLDDATA, $i * $bps * 2, $bps * 2);
+								
+								// combine the two data streams
+								if (strtolower($val) != str_repeat('ff', $bps))
+								{
+									$val = hexdec($val);
+									
+									if ($NEWDATA)
+										$val += hexdec(substr($NEWDATA, $i * $bps * 2, $bps * 2));
+									
+									if ($val >= pow(2, $bps * 8)-1)
+										$val = pow(2, $bps * 8)-2;
+									
+									$max_count = max($max_count, $val);
+						
+									$val = sprintf("%0".(2*$bps)."s", dechex($val));
+								}
+								
+								$DATA .= $val;
+							}
+							
+						}
+						
+						//Check for timeout
+						if (bo_getset_timeout())
+						{
+							$info['calc_date_start'] = $date_start_add;
+							$timeout = true;
+							break;
+						}
+						
+					}
+					
+				}
+				else //calculate from strike database
+				{
+
+					//start positions from database
+					$lat = $a['coord'][2];
+					$lon = $a['coord'][3];
+					$lat_end = $a['coord'][0];
+					$lon_end = $a['coord'][1];
+					$max_count = 0;
+					$time_min = strtotime($b['date_start'].' 00:00:00 UTC');
+					$time_max = strtotime($b['date_end'].' 23:59:59 UTC');
+					$info['date_start_real'] = date('Y-m-d', $strike_min > $time_min ? $strike_min : $time_min);
+					
+					$text .= " *** Start: $lat / $lon *** End: $lat_end / $lon_end";
+					bo_echod($text);
+					$text = '';
+					bo_echod("Calculating from database ...");
+					
+					$sql_where = '';
+					$sql_join  = '';
+					$sql_where_station = '';
+					$sql_select = ' COUNT(*) ';
+
+					if (intval($b['station_id']) == -1) //select mean of participants
+					{
+						$sql_select = ' SUM(users) ';
+						$bps += 1;
+					}					
+					elseif (intval($b['station_id']) && $b['station_id'] == bo_station_id())
+					{
+						$sql_where_station = " AND s.part > 0 ";
+					}
+					elseif ($b['station_id'])
+					{
+						$sql_join  = ",".BO_DB_PREF."stations_strikes ss ";
+						$sql_where_station = " AND ss.strike_id=s.id AND ss.station_id='".intval($b['station_id'])."'";
+					}
+					
+					$S = array();
+					$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat, $lat_end, $lon, $lon_end);
+					
+					$sql = "SELECT $sql_select cnt,
+								FLOOR(ACOS(SIN(RADIANS($lat))*SIN(RADIANS(lat)) + COS(RADIANS($lat))*COS(RADIANS(lat))) *6371000/$length) lat_id,
+								FLOOR(SQRT(POW(COS(RADIANS(lat)),2) * POW(RADIANS(lon-$lon),2) )                        *6371000/$length) lon_id
+					
+							FROM ".BO_DB_PREF."strikes s 
+								$index_sql
+								$sql_join
+								
+							WHERE 
+								$sql_where
+								$sql_where_station
+								
+							GROUP BY lon_id, lat_id
+							";
+					$res = bo_db($sql);
+					while ($row = $res->fetch_assoc())
+					{
+						$max_count = max($max_count, $row['cnt']);
+						$S[$row['lat_id']][$row['lon_id']] = $row['cnt'];
+					}
+
+					
+					//save data to a hex-string
+					$DATA = '';
+					$lat_id_max = floor(bo_latlon2dist($lat, $lon, $lat_end, $lon) / $length);
+					for($lat_id=0; $lat_id<=$lat_id_max; $lat_id++)
+					{
+						list($lat_act,) = bo_distbearing2latlong_rhumb($length * $lat_id, 0, $lat, $lon);
+						$lon_id_max     = floor(bo_latlon2dist_rhumb($lat_act, $lon, $lat_act, $lon_end) / $length);
+						
+						for($lon_id=0; $lon_id<=$lon_id_max; $lon_id++)
+						{
+							if (!isset($S[$lat_id][$lon_id])) //No strikes for this area
+							{
+								$DATA .= str_repeat('00', $bps);;
+							}
+							else 
+							{
+								$cnt = 0;
+								
+								if ($S[$lat_id][$lon_id] >= pow(2, $bps * 8)-1) //strike count is too high -> set maximum
+									$cnt = pow(2, $bps * 8)-2;
+								else //OK!
+									$cnt = $S[$lat_id][$lon_id];
+							
+								$DATA .= sprintf("%0".(2*$bps)."s", dechex($cnt)); //add strike count
+							}
+						}
+					
+						// new line (= new lat)
+						$DATA .= str_repeat('ff', $bps);				
+					}
+					
+					$text .= "New data collected: ".(strlen($DATA) / 2)." bytes *** ";
+				}
+				
+				$text .= "Whole data: ".(strlen($DATA) / 2).'bytes *** ';
+
+				//database storage 
+				$DATA = BoDb::esc(gzdeflate($DATA));
+				
+				if ($timeout)
+					$status = $b['status'];
+				else if ($b['status'] == 0)
+					$status = 1;
+				else
+					$status = abs($b['status']) + 1;
+				
+				$info['last_lat'] = $lat;
+				$info['last_lon'] = $lon;
+				$info['bps'] = $bps;
+				$info['max'] = max($max_count, $info['max']);
+				
+				//for displaying antenna direction in ratio map
+				if ($b['station_id'] == bo_station_id())
+				{
+					$ant = array();
+					
+					$ant[0] = bo_get_conf('antenna1_bearing');
+					if ($ant[0] !== '' && $ant[0] !== null)
+					{
+						$info['antennas']['bearing'][0] = $ant[0];
+						$info['antennas']['bearing_elec'][0] = bo_get_conf('antenna1_bearing_elec');
+					}
+
+					if (BO_ANTENNAS == 2)
+					{
+						$ant[1] = bo_get_conf('antenna2_bearing');
+						if ($ant[1] !== '' && $ant[1] !== null)
+						{
+							$info['antennas']['bearing'][1] = $ant[1];
+							$info['antennas']['bearing_elec'][1] = bo_get_conf('antenna2_bearing_elec');
+						}
+					}
+					
+				}
+
+				$sql = "UPDATE ".BO_DB_PREF."densities 
+								SET data='$DATA', info='".serialize($info)."', status='$status'
+								WHERE id='$id'";
+				$res = bo_db($sql);
+				
+				$text .= ' Max strike count: '.$info['max'].' *** Whole data compressed: '.(strlen($DATA)).'bytes *** ';
+				bo_echod($text);
+				
+				if ($timeout)
+					bo_echod('NOT YET READY!');
+				else
+					bo_echod('FINISHED!');
+				
+				
+
+				
+				//Check again for timeout
+				if (bo_exit_on_timeout())
+				{
+					return;
+				}
+				
+			
+			}
+		}
+	}
+	
+	if (!$calc_count)
+		bo_echod('Nothing to do');
+	
+	return;
+}
+
+
+
+function bo_show_archive_density()
+{
+	global $_BO;
+
+	$level = bo_user_get_level();
+	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
+	$year = intval($_GET['bo_year']) ? intval($_GET['bo_year']) : date('Y');
+	$month = intval($_GET['bo_month']);
+	$station_id = intval($_GET['bo_station']);
+	$ratio = isset($_GET['bo_ratio']);
+
+	// Map infos
+	$cfg = $_BO['mapimg'][$map];
+	$latN = $cfg['coord'][0];
+	$lonE = $cfg['coord'][1];
+	$latS = $cfg['coord'][2];
+	$lonW = $cfg['coord'][3];
+
+	
+	$sql = "SELECT MIN(date_start) mindate, MAX(date_start) maxdate, MAX(date_end) maxdate_end 
+			FROM ".BO_DB_PREF."densities 
+			WHERE (status=1 OR status=3)
+			";
+	$res = bo_db($sql);
+	$row = $res->fetch_assoc();
+	$start_time = strtotime($row['mindate']);
+	$end_time = strtotime($row['maxdate_end']);
+	
+	$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities WHERE status=5")->fetch_assoc();
+	$show_whole_timerange = $row['cnt'] ? true : false;
+
+	
+	$station_infos = bo_stations('id', '', false);
+	$station_infos[0]['city'] = _BL('All', false);
+
+	$stations = bo_get_density_stations();
+	
+	
+	echo '<div id="bo_dens_maps">';
+
+	echo '<p class="bo_general_description" id="bo_archive_density_info">';
+	echo _BL('archive_density_info');
+	echo '</p>';
+	
+	echo '<a name="bo_arch_strikes_form"></a>';
+	echo '<form action="?#bo_arch_strikes_form" method="GET" class="bo_arch_strikes_form">';
+	echo bo_insert_html_hidden(array('bo_year', 'bo_map', 'bo_station', 'bo_ratio'));
+
+	echo '<fieldset>';
+	echo '<legend>'._BL('legend_arch_densities').'</legend>';
+
+	
+	echo '<span class="bo_form_descr">'._BL('Map').':</span> ';
+	echo '<select name="bo_map" id="bo_arch_dens_select_map" onchange="submit();">';
+	foreach($_BO['mapimg'] as $id => $d)
+	{
+		if (!$d['name'] || !$d['density'])
+			continue;
+			
+		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
+		
+		if ($map < 0)
+			$map = $id;
+	}
+	echo '</select>';
+	
+	
+	//image dimensions
+	$img_dim = bo_archive_get_dim($map, 150);
+	
+	echo '<span class="bo_form_descr">'._BL('Year').':</span> ';
+	echo '<select name="bo_year" id="bo_arch_dens_select_year" onchange="submit();">';
+	
+	if ($show_whole_timerange)
+		echo '<option value="-1" '.($i == -1 ? 'selected' : '').'>'._BL('Total').'</option>';
+		
+	for($i=date('Y', $start_time); $i<=date('Y');$i++)
+		echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$i.'</option>';
+	echo '</select>';
+
+	echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
+	echo '<select name="bo_station" id="bo_arch_dens_select_station" onchange="submit();">';
+	foreach ($stations as $id )
+	{
+		if ($id >= 0)
+			echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>'._BC($station_infos[$id]['city']).($id ? ' ('._BL($station_infos[$id]['country']).')' : '').'</option>';
+	}
+	echo '</select>';
+	
+	/*
+	echo '<input type="checkbox" name="bo_ratio" value="1" '.($ratio && $station_id ? 'checked="checked"' : '').' '.($station_id ? '' : 'disabled').' onchange="submit();" onclick="submit();" id="bo_arch_dens_ratio">';
+	echo '<label for="bo_arch_dens_ratio"> '._BL('Strike ratio').'</label> &nbsp; ';
+	*/
+	
+	echo '<input type="submit" name="bo_ok" value="'._BL('Ok').'" id="bo_archive_density_submit" class="bo_form_submit">';
+	
+	if ($year > 0)
+	{
+		echo '<div id="bo_archive_density_yearmonth_container">';
+		echo ' <a href="'.bo_insert_url(array('bo_year', 'bo_month'), $year).'#bo_arch_strikes_form" class="bo_archive_density_yearurl';
+		echo !$month ? ' bo_archive_density_active' : '';
+		echo '">';
+		echo date('Y', strtotime($year."-01-01"));
+		echo '</a> &nbsp; ';
+		
+		for($i=1;$i<=12;$i++)
+		{
+			if ( ($year == date('Y', $end_time) && $i > date('m', $end_time))
+				 || strtotime("$year-$i-01") < $start_time
+			   )
+			{
+				echo '<span class="bo_archive_density_monthurl">';
+				echo _BL(date('M', strtotime("2000-$i-01")));
+				echo '</span>';
+			}
+			else
+			{
+				echo ' <a href="'.bo_insert_url('bo_month', $i).'#bo_arch_strikes_form" class="bo_archive_density_monthurl';
+				echo $month == $i ? ' bo_archive_density_active' : '';
+				echo '">';
+				echo _BL(date('M', strtotime("2000-$i-01")));
+				echo '</a> ';
+			}
+		}
+
+		echo '</div>';
+	}
+	
+	echo '</fieldset>';
+
+	echo '</form>';
+
+	$mapname = _BL($_BO['mapimg'][$map]['name']);
+	
+	
+	$alt = $ratio ? _BL('Strike ratio') : _BL('arch_navi_density');
+	$alt .= $station_id ? ' ('._BL('Station').' '._BC($station_infos[$station_id]['city']).')' : '';
+	$alt .= ' '.$mapname.' '.($year > 0 ? $year : '').' '.($month ? _BL(date('F', strtotime("2000-$month-01"))) : '');
+	
+	$img_file  = bo_bofile_url().'?density&map='.$map;
+	if ($year > 0)
+		$img_file .= '&bo_year='.$year.'&bo_month='.$month;
+	$img_file .= '&bo_lang='._BL();
+	$img_file .= '&'.floor(time() / 60);
+	
+	$footer = $_BO['mapimg'][$map]['footer'];
+	$header = $_BO['mapimg'][$map]['header'];
+
+	echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
+	
+	echo '<div class="bo_map_header">'._BC($header, true).'</div>';
+
+	if ($station_id > 0)
+	{	
+		echo '<div class="bo_arch_map_links">';
+		echo '<strong>'._BL('View').': &nbsp;</strong> ';
+		echo '<a href="javascript:void(0);" id="bo_dens_map_toggle2" class="bo_dens_map_toggle'.($ratio ? '' : '_active').'" onclick="bo_toggle_dens_map(2, \'&id='.$station_id.'\');">'._BL('Station density').'</a> &nbsp; ';
+		echo '<a href="javascript:void(0);" id="bo_dens_map_toggle3" class="bo_dens_map_toggle'.($ratio ? '_active' : '').'" onclick="bo_toggle_dens_map(3, \'&id='.$station_id.'&ratio\');">'._BL('Station ratio').'</a> &nbsp; ';
+		echo '<a href="javascript:void(0);" id="bo_dens_map_toggle1" class="bo_dens_map_toggle" onclick="bo_toggle_dens_map(1, \'\');">'._BL('Total density').'</a> &nbsp; ';
+		echo '<a href="javascript:void(0);" id="bo_dens_map_toggle4" class="bo_dens_map_toggle" onclick="bo_toggle_dens_map(4, \'&id=-1\');">'._BL('Mean participants').'</a> &nbsp; ';
+		echo '</div>';
+		
+		$img_file_start = $img_file.'&id='.$station_id.($ratio ? '&ratio' : '');
+	}
+	else
+		$img_file_start = $img_file;
+
+
+?>
+<script type="text/javascript">
+function bo_toggle_dens_map(id, url)
+{
+	var i=0;
+	for (i=1;i<=4;i++)
+		document.getElementById('bo_dens_map_toggle' + i).className="bo_dens_map_toggle" + (id == i ? '_active' : '');
+
+	document.getElementById('bo_arch_map_img').src='<?php echo bo_bofile_url().'?image=blank'; ?>';
+	window.setTimeout("bo_toggle_dens_map2('"+url+"');", 10);
+}
+
+function bo_toggle_dens_map2(url)
+{
+	document.getElementById('bo_arch_map_img').src='<?php echo $img_file; ?>' + url;
+}
+
+</script>
+<?php
+			
+	
+	// The map
+	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
+	echo '<img style="background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file_start.'" alt="'.htmlspecialchars($alt).'">';
+	echo '</div>';
+	
+	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
+	echo '</div>';
+	echo '</div>';
+}
+
+
+
+
+//render a map with strike positions and strike-bar-plot
+function bo_get_density_image()
+{
+	$densities_enabled = defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES
+							&& ((defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES) || (bo_user_get_level() & BO_PERM_ARCHIVE))
+							&& BO_DISABLE_ARCHIVE !== true;
+
+	if (!$densities_enabled)
+		bo_image_error('Forbidden');
+
+	if (intval(BO_CACHE_PURGE_DENS_RAND) > 0 && rand(0, BO_CACHE_PURGE_DENS_RAND) == 1)
+	{
+		if (BO_CACHE_SUBDIRS === true)
+			register_shutdown_function('bo_delete_files', BO_DIR.'cache/densitymap', intval(BO_CACHE_PURGE_DENS_HOURS), 3);
+		else
+			register_shutdown_function('bo_delete_files', BO_DIR.'cache', intval(BO_CACHE_PURGE_DENS_HOURS), 0);
+	}
+	
+	if (BO_FORCE_MAP_LANG === true)
+		bo_load_locale(BO_LOCALE);
+
+	
+	$year = intval($_GET['bo_year']);
+	$month = intval($_GET['bo_month']);
+	$map_id = intval($_GET['map']);
+	$station_id = intval($_GET['id']);
+	$ratio = isset($_GET['ratio']) && $station_id > 0;
+	$participants = $station_id == -1;
+	
+	@set_time_limit(30);
+	bo_session_close();
+	
+	
+	global $_BO;
+
+	//Image settings
+	$cfg = $_BO['mapimg'][$map_id];
+	if (!is_array($cfg) || !$cfg['density'])
+		bo_image_error('Missing image data!');
+
+	$min_block_size = max($cfg['density_blocksize'], intval($_GET['bo_blocksize']), 1);
+	
+	if (bo_user_get_id() == 1 && intval($_GET['bo_blocksize']))
+		$min_block_size = intval($_GET['bo_blocksize']);
+	
+	
+	//Caching
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+	$cache_file = BO_DIR.'cache/';
+	
+	if (BO_CACHE_SUBDIRS === true)
+		$cache_file .= 'densitymap/'.$map_id.'/';
+	else
+		$cache_file .= 'densitymap_'.$map_id.'_';
+		
+	$cache_file .= _BL().'_'.sprintf('station%d_%d_b%d_%04d%02d', $station_id, $ratio ? 1 : 0, $min_block_size, $year, $month);
+
+	
+	//file format
+	$file = $cfg['file'];
+	$extension = strtolower(substr($file, strrpos($file, '.')+1));
+	 
+	if ($extension == 'jpg' || $extension == 'jpeg')
+	{
+		$cache_file .= '.jpg';
+		$mime = "image/jpeg";
+	}
+	elseif ($extension == 'gif')
+	{
+		$cache_file .= '.gif';
+		$mime = "image/gif";
+	}
+	else // PNG is default
+	{
+		$cache_file .= '.png';
+		$mime = "image/png";
+		$extension = "png";
+	}
+	
+	
+	//todo: needs adjustments
+	$last_update = strtotime('today +  4 hours');
+	$expire      = strtotime('today + 28 hours');
+	
+	
+	//Headers
+	header("Pragma: ");
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
+	header("Cache-Control: public, max-age=".($expire - time()));
+	header("Content-Disposition: inline; filename=\"MyBlitzortungDensity.".$extension."\"");
+
+	
+	//Cache - First cache try
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
+	{
+		header("Content-Type: $mime");
+		readfile($cache_file);
+		exit;
+	}
+	
+	
+	//Image: Size, colors	
+	$PicLatN = $cfg['coord'][0];
+	$PicLonE = $cfg['coord'][1];
+	$PicLatS = $cfg['coord'][2];
+	$PicLonW = $cfg['coord'][3];
+	$colors = is_array($cfg['density_colors']) ? $cfg['density_colors'] : $_BO['tpl_density_colors'];
+
+	$tmpImage = bo_imagecreatefromfile(BO_DIR.'images/'.$file);
+	$w = imagesx($tmpImage);
+	$h = imagesy($tmpImage);
+
+	
+	//Legend
+	$LegendWidth = 150;
+	$ColorBarWidth  = 10;
+	$ColorBarHeight = $h - 70;
+	$ColorBarX = $w + 10;
+	$ColorBarY = 50;
+	$ColorBarStep = 15;
+	
+	
+	//create new trucolor image (always needed because of legend!)
+	$I = imagecreatetruecolor($w+$LegendWidth, $h);
+	imagecopy($I,$tmpImage,0,0,0,0,$w,$h);
+	imagedestroy($tmpImage);
+	imagealphablending($I, true);
+	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
+	$fontsize = $w / 100;	
+	
+	if ($cfg['density_darken'])
+	{
+		if (is_array($cfg['density_darken']))
+		{
+			$dark = $cfg['density_darken'][0];
+			$grey = intval($cfg['density_darken'][1]);
+		}
+		else
+		{
+			$dark = $cfg['density_darken'];
+			$grey = 20;
+		}
+			
+		$color = imagecolorallocatealpha($I, $grey, $grey, $grey, (1 - $dark / 100) * 127);
+		imagefilledrectangle($I, 0,0, $w, $h, $color);
+	}
+
+	
+	//Legend
+	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
+	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
+	
+	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $PicLatS, $PicLonW);
+	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $PicLatN, $PicLonE);
+	$w_x = $w / ($x2 - $x1);
+	$h_y = $h / ($y2 - $y1);
+
+	if ($month)
+	{
+		$date_start = "$year-$month-01";
+		$date_end   = date('Y-m-d', mktime(0,0,0,$month+1,0,$year));
+		$sql_status = " (status=1 OR status=3) ";
+		$sql_status .= " AND date_start = '$date_start'	AND date_end   <= '$date_end' ";
+
+	}
+	elseif ($year > 0)
+	{
+		$date_start = "$year-01-01";
+		$date_end   = "$year-12-31";
+		$sql_status = " (status=2 OR status=4) ";
+		$sql_status .= " AND date_start = '$date_start'	AND date_end   <= '$date_end' ";
+	}
+	else
+	{
+		$date_start = "1970-01-01";
+		$date_end   = date('Y')."-12-31";
+		$sql_status = " status=5 ";
+	}
+	
+	
+	//find density to image
+	$sql = "SELECT 	id, station_id, type, info, data, 
+					lat_max, lon_max, lat_min, lon_min, length,
+					date_start, date_end, status,
+					UNIX_TIMESTAMP(changed) changed
+					FROM ".BO_DB_PREF."densities 
+					WHERE 1 
+						AND $sql_status
+						AND 
+							(station_id = $station_id
+							".($ratio || $participants ? " OR station_id=0 " : "")."
+							)
+						AND lat_max >= '$PicLatN'
+						AND lon_max >= '$PicLonE'
+						AND lat_min <= '$PicLatS'
+						AND lon_min <= '$PicLonW'
+					ORDER BY length ASC, date_end DESC, ABS(station_id) ASC
+					LIMIT 2
+						";
+	$res = bo_db($sql);
+	$row = $res->fetch_assoc();
+
+	
+	$exit_msg = '';
+	if (!$row['id'])
+		$exit_msg = _BL('No data available!', true);
+	
+	//Data and info
+	$DATA = gzinflate($row['data']);
+	$info = unserialize($row['info']);
+	$bps = $info['bps'];
+	$type = $row['type'];
+	$max_real_count = $info['max']; //max strike count for area elements
+
+	if (strtotime($info['date_start_real']) > 3600 * 24)
+		$date_start = $info['date_start_real'];
+	else
+		$date_start = $row['date_start'];
+	
+	$date_end = $row['date_end'];
+	$time_string = date(_BL('_date'), strtotime($date_start)).' - '.date(_BL('_date'), strtotime($row['date_end']));
+	$last_changed = $row['changed'];
+	
+	//coordinates
+	$DensLat       = $row['lat_min'];
+	$DensLon       = $row['lon_min'];
+	$DensLat_end   = $row['lat_max'];
+	$DensLon_end   = $row['lon_max'];
+	$length        = $row['length'];
+	$area          = pow($length, 2);
+	
+	//SECOND DATABASE CALL
+	if ($ratio || $participants)
+	{
+		$row_own = $res->fetch_assoc();
+		if ($station_id != $row_own['station_id'] || $date_end != $row_own['date_end'] || $type != $row_own['type'])
+		{
+			$exit_msg = _BL('Not enough data available!', true);	
+		}
+		else
+		{
+			$DATA2 = gzinflate($row_own['data']);
+			$info = unserialize($row_own['info']);
+			$max_real_own_count = $info['max']; //max strike count
+			$bps2 = $info['bps'];
+			$last_changed = max($row['changed'], $last_changed);
+		}
+	}
+	
+	BoDb::close();
+	unset($row['data']);
+	unset($row_own['data']);
+
+	if ($station_id)
+	{
+		$stinfo = bo_station_info($station_id);
+		list($px, $py) = bo_latlon2projection($cfg['proj'], $stinfo['lat'], $stinfo['lon']);
+		$StX =      ($px - $x1) * $w_x;
+		$StY = $h - ($py - $y1) * $h_y;
+	}
+
+	if (!$exit_msg && $length < 0.1)
+		$exit_msg = 'Error: Length!';
+	
+	// Exit if not enough data
+	if ($exit_msg)
+	{
+		$fw = imagefontwidth($fontsize) * strlen($exit_msg);
+		imagestring($I, $fontsize, $w/2 - $fw/2 - 1, $h / 2, $exit_msg, $text_col);
+		header("Content-Type: image/png");
+		imagepng($I);
+		exit;
+	}
+	
+	//Cache - Second cache try
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_changed)
+	{
+		header("Content-Type: $mime");
+		readfile($cache_file);
+		exit;
+	}
+
+		
+	$string_pos = 0; //pointer on current part of string
+	$string_pos2 = 0; // 2nd string for ratio/participants (maybe other bps-value!)
+	$VAL_COUNT1 = array();
+	$VAL_COUNT2 = array();
+	$COUNT1 = 0;
+	$COUNT2 = 0;
+	$max_count_block = 0;
+	
+	
+	$lat_id_max = floor(bo_latlon2dist($DensLat, $DensLon, $DensLat_end, $DensLon) / $length / 1000);
+	for($lat_id=0; $lat_id<=$lat_id_max; $lat_id++)
+	{
+		list($lat_act,) = bo_distbearing2latlong_rhumb($length * $lat_id * 1000, 0, $DensLat, $DensLon);
+		$lon_id_max     = floor(bo_latlon2dist_rhumb($lat_act, $DensLon, $lat_act, $DensLon_end) / $length / 1000);
+		$dlon = ($DensLon_end - $DensLon) / ($lon_id_max+1);
+		
+		
+		// check if latitude lies in picture
+		if ($lat_act >= $PicLatS)
+		{
+			//select correct data segment from data string
+			$lon_start_pos  = floor(($PicLonW-$DensLon)/$dlon) ;
+			$lon_string_len = floor(($PicLonE-$DensLon)/$dlon) - $lon_start_pos;
+		
+			$lon_data = substr($DATA, $string_pos + $lon_start_pos * 2*$bps, $lon_string_len *2*$bps);
+			
+			//image coordinates (left side of image, height is current latitude)
+			list($px, $py) = bo_latlon2projection($cfg['proj'], $lat_act, $PicLonE);
+			$y  = $h - ($py - $y1) * $h_y; //image y
+			$ay = round(($y / $min_block_size)); //block number y
+			$dx = $dlon / ($PicLonE - $PicLonW) * $w; //delta x
+			
+			//get the data!
+			for($j=0; $j<$lon_string_len; $j++)
+			{
+				//image x
+				$x = $j * $dx;
+				
+				//x coordinates to picture "block-numbers"
+				$ax = round(($x / $min_block_size));
+				$pos_id = $ax+$ay*$w;
+				
+				//strikes per square kilometer
+				$value = hexdec(substr($lon_data, $j *2*$bps, 2*$bps));
+			
+				if ($ratio || $participants)
+				{
+					if ($value)	
+					{
+						$lon_data2 = substr($DATA2, $string_pos2 + $lon_start_pos *2*$bps2, $lon_string_len *2*$bps2);
+						$value2 = hexdec(substr($lon_data2, $j *2*$bps2, 2*$bps2));
+						
+						$VAL_COUNT1[$pos_id] += $value2;  //Save station-strike-count/participants to 1. Data array
+						$VAL_COUNT2[$pos_id] += $value;   //Save total count to 2. array
+						$COUNT2 += $value2;
+					}
+				}
+				else
+				{
+					if ($value)
+						$VAL_COUNT1[$pos_id] += $value; //Save strike-count to 1. Data array
+					
+					$VAL_COUNT2[$pos_id]++;         //Save count of datasets to 2. array
+				}
+				
+				$COUNT1 += $value; // total strike count
+			}
+		}
+
+		if ($lat_act > $PicLatN)
+			break;
+		
+		$string_pos += ($lon_id_max+2) *2*$bps;
+		$string_pos2 += ($lon_id_max+2) *2*$bps2;
+	}
+	
+	//calculate mean and find max strikes per block
+	foreach($VAL_COUNT1 as $pos_id => $value)
+	{
+		$VAL_COUNT1[$pos_id] /= $VAL_COUNT2[$pos_id];
+	}
+	
+	if ($ratio)
+	{
+		$max_display_block = $max_count_block = 1; //always 100%
+	}
+	elseif (count($VAL_COUNT1))
+	{
+		$max_count_block = max($VAL_COUNT1);
+		
+		//ignore runaway values
+		if (count($VAL_COUNT1) >= 2)
+		{
+			if ($participants)
+			{
+				$sdev = 0;
+				foreach($VAL_COUNT1 as $value)
+				{
+					$sdev += pow($avg - $value, 2);
+				}
+				
+				$sdev = 1 / (count($VAL_COUNT1) - 1) * $sdev;
+				$sdev = sqrt($sdev);
+				
+				$max_display_block = $avg + 1.5 * $sdev; // avg +/- 3*sdev should countain 99.7% of the values of a normal distribution
+			}
+			else
+			{
+				$avg = array_sum($VAL_COUNT1) / count($VAL_COUNT1);
+				
+				asort($VAL_COUNT1);
+				list($max_display_block) = array_slice($VAL_COUNT1, floor(count($VAL_COUNT1) * 0.999), 1);
+			}
+			
+		}
+
+		if ($max_display_block > $max_count_block || $max_display_block <= 0)
+			$max_display_block = $max_count_block;
+	}
+	
+	if (count($VAL_COUNT1))
+	{
+		foreach($VAL_COUNT1 as $pos_id => $value)
+		{
+			$x = ($pos_id % $w);
+			$y = ($pos_id-$x) / $w;
+
+			if (!$ratio)
+			{
+				//strike count to relative count 0 to 1 for colors
+				$value /= $max_display_block;
+				
+				if ($value > 1)
+					$value = 1;
+			}
+			
+			$x *= $min_block_size;
+			$y *= $min_block_size;
+			
+			list($red, $green, $blue, $alpha) = bo_value2color($value, $colors);
+			$color = imagecolorallocatealpha($I, $red, $green, $blue, $alpha);
+			imagefilledrectangle($I, $x, $y, $x+$min_block_size-1, $y+$min_block_size-1, $color);
+
+		}
+	}
+
+	//Borders
+	if ($cfg['borders'][0] && file_exists(BO_DIR.'images/'.$cfg['borders'][0]))
+	{
+		$tmpImage = bo_imagecreatefromfile(BO_DIR.'images/'.$cfg['borders'][0]);
+		if ($tmpImage)
+			imagecopymerge($I, $tmpImage, 0,0, 0,0, $w, $h, $cfg['borders'][1]);
+	}
+	
+	//add cities
+	bo_add_cities2image($I, $cfg, $w, $h);
+
+	//Antennas
+	if ($ratio && $station_id == bo_station_id() && isset($info['antennas']) && is_array($info['antennas']['bearing']))
+	{
+		$col1 = imagecolorallocatealpha($I, 255, 255, 255, 127);
+		$col2 = imagecolorallocatealpha($I, 255, 255, 255, 30);
+		$style = array($col1, $col1, $col1, $col1, $col2, $col2, $col2, $col2);
+		imagesetstyle($I, $style);
+		
+		$size = 0.3 * ($w + $h) / 2;
+		
+		foreach($info['antennas']['bearing'] as $bear)
+		{
+			list($lat, $lon) = bo_distbearing2latlong(100000, $bear, $stinfo['lat'], $stinfo['lon']);
+			list($px, $py) = bo_latlon2projection($cfg['proj'], $lat, $lon);
+			$ant_x =      ($px - $x1) * $w_x - $StX;
+			$ant_y = $h - ($py - $y1) * $h_y - $StY;
+			
+			$ant_xn = $ant_x / sqrt(pow($ant_x,2) + pow($ant_y,2)) * $size;
+			$ant_yn = $ant_y / sqrt(pow($ant_x,2) + pow($ant_y,2)) * $size;
+			
+			imageline($I, $StX, $StY, $StX + $ant_xn *  1, $StY + $ant_yn *  1, IMG_COLOR_STYLED);
+			imageline($I, $StX, $StY, $StX + $ant_xn * -1, $StY + $ant_yn * -1, IMG_COLOR_STYLED);
+		}
+	}
+
+	
+	//Legend (again!)
+	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
+	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
+
+	//Legend: Text
+	$PosX = $w + 5;
+	$PosY = 10;
+	$MarginX = 8;
+
+	$size_title = 8;
+	$size_text = 9;
+	$size_title_legend = 12;
+	
+	if ($ratio)
+	{
+		$legend_text = 'Strike ratio';
+		$extra_text  = 'Strike ratio';
+	}
+	elseif ($participants)
+	{
+		$legend_text = 'Avg. participants per strike locating';
+		$extra_text  = 'Participants';
+	}
+	else
+	{
+		$legend_text = 'Strikes per square kilometer';
+		$extra_text  = 'Strike density';
+	}	
+	
+	//Station name
+	if ($station_id > 0)
+	{
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Station', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, $stinfo['city'], $text_col, $LegendWidth, true);
+		$PosY += 10;
+	}
+	
+	//Strike count
+	$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Strikes', true).':', $text_col, $LegendWidth);
+	$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, $COUNT1, $text_col, $LegendWidth, true);
+	$PosY += 10;
+
+	
+	if ($ratio && intval($COUNT1))
+	{
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, strtr(_BL('densities_strikes_station', true), array('{STATION_CITY}' => $stinfo['city'])).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, $COUNT2, $text_col, $LegendWidth, true);
+		$PosY += 10;
+	
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Mean strike ratio', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, number_format($COUNT2 / $COUNT1 * 100, 1, _BL('.'), _BL(',')).'%', $text_col, $LegendWidth, true);
+		$PosY += 25;
+	}
+	else
+		$PosY += 15;
+	
+	/*
+	//Area elements (calculation)
+	$length_text = number_format($length, 1, _BL('.'), _BL(','));
+	$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL("Calculation basis are elements with area", true).':', $text_col, $LegendWidth);
+	$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, " ".$length_text.'km x '.$length_text.'km', $text_col, $LegendWidth);
+	$PosY += 10;
+
+	if (!$ratio && $area)
+	{
+		$max_real_density = $max_real_count / $area;
+		
+		//Strike density
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Maximum strike density calculated', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, " ".number_format($max_real_density, 1, _BL('.'), _BL(',')).'/km^2', $text_col, $LegendWidth);
+		$PosY += 10;
+	}
+	
+	$PosY += 15;
+	*/
+
+	if ($participants)
+	{
+		//Max. participants per block
+		$max_count = $max_count_block;
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Maximum mean participants', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, number_format($max_count, 1, _BL('.'), _BL(',')), $text_col, $LegendWidth, true);
+		$PosY += 15;
+	}
+	elseif (!$ratio)
+	{
+		//Max. density per block
+		$max_density = $max_count_block / $area;
+		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Maximum mean strike density displayed', true).':', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, number_format($max_density, 2, _BL('.'), _BL(',')).'/km²', $text_col, $LegendWidth, true);
+		$PosY += 15;
+	}
+	
+	$PosY += 10;
+	$PosY = bo_imagestring_max($I, $size_title_legend, $PosX, $PosY, _BL('Legend', true), $text_col, $LegendWidth);
+	$PosY = bo_imagestring_max($I, $size_title, $PosX+$MarginX, $PosY, '('._BL($legend_text, true).')', $text_col, $LegendWidth);
+	
+	if ($PosY + 15 > $ColorBarY)
+	{
+		$ColorBarHeight -= $PosY+15 - $ColorBarY;
+		$ColorBarY = $PosY+15;
+	}
+	
+	//Legend: Colorbar
+	for ($i=$ColorBarY; $i<= $ColorBarHeight+$ColorBarY; $i += $ColorBarStep)
+	{
+		$value = 1-($i-$ColorBarY)/$ColorBarHeight;
+		list($red, $green, $blue, $alpha) = bo_value2color($value, $colors);
+		$color = imagecolorallocatealpha($I, $red, $green, $blue, $alpha);	
+		imagefilledrectangle($I, $ColorBarX, $i, $ColorBarX+$ColorBarWidth, $i+$ColorBarStep-1, $color);
+	}
+	
+	//Legend: Colorbar Text
+	if ($ratio)
+	{
+		$max_ratio = $max_count_block;
+		$text_top = number_format($max_ratio*100, 1, _BL('.'), _BL(',')).'%';
+		$text_middle = '50%';
+		$text_bottom = '0%';
+	}
+	else
+	{
+		if (!$participants)
+		{
+			$max_density = $max_display_block / $area;
+			$decs = 2;
+		}
+		else
+		{
+			$max_density = $max_display_block;
+			$decs = 0;
+		}
+			
+		$text_top = number_format($max_density, $decs, _BL('.'), _BL(','));
+		$text_middle = number_format($max_density/2, $decs, _BL('.'), _BL(','));
+		$text_bottom = '0';
+		
+		if ($max_display_block < $max_count_block)
+			$text_top = '> '.$text_top;
+	}
+	
+	imagestring($I, 3, $ColorBarX+$ColorBarWidth+6, $ColorBarY+3, $text_top, $text_col);
+	imagestring($I, 3, $ColorBarX+$ColorBarWidth+6, $ColorBarY-8+$ColorBarHeight/2, $text_middle, $text_col);
+	imagestring($I, 3, $ColorBarX+$ColorBarWidth+6, $ColorBarY-5+$ColorBarHeight, $text_bottom, $text_col);
+	
+	
+	//Station Name
+	if ($station_id > 0)
+	{
+		imagestring($I, $fontsize, 1, 1 + $fontsize * 3, $text, $text_col);
+		
+		$size = 6;
+		$color = imagecolorallocate($I, 255,255,255);
+		imageline($I, $StX-$size, $StY, $StX+$size, $StY, $color);
+		imageline($I, $StX, $StY-$size, $StX, $StY+$size, $color);
+	}
+
+	//Banner
+	bo_image_banner_top($I, $w, $h, $cfg, $time_string, _BL($extra_text, true));
+	bo_image_banner_bottom($I, $w, $h, $cfg, 0);
+	
+	
+
+	BoDb::close();
+	bo_session_close(true);
+	bo_image_reduce_colors($I, true);
+
+	header("Content-Type: $mime");
+	if ($caching)
+	{
+		if (BO_CACHE_SUBDIRS === true)
+		{
+			$dir = dirname($cache_file);
+			if (!file_exists($dir))
+				mkdir($dir, 0777, true);
+		}
+
+		$ok = @bo_imageout($I, $extension, $cache_file);
+		
+		if (!$ok)
+			bo_image_cache_error($w, $h);
+
+		readfile($cache_file);
+	}
+	else
+		bo_imageout($I, $extension);
+
+	exit;
+	
+}
+
+
+function bo_get_density_stations()
+{
+	$station_infos = bo_stations('id', '', false);
+	$stations = array();
+	$stations[0] = 0;
+	$stations[-1] = -1;
+	$stations[bo_station_id()] = bo_station_id();
+	
+	if (defined('BO_DENSITY_STATIONS') && BO_DENSITY_STATIONS)
+	{
+		if (BO_DENSITY_STATIONS == 'all')
+		{
+			foreach($station_infos as $id => $dummy)
+				$stations[$id] = $id;
+		}
+		else
+		{
+			$tmp = explode(',', BO_DENSITY_STATIONS);
+			foreach($tmp as $id)
+				$stations[$id] = $id;
+		}
+	}
+	
+	return $stations;
+}
+
+
+function bo_get_new_density_ranges($year = 0, $month = 0)
+{
+	/* Status (>= 0 means to-do, otherwise ready)
+	 *   0 => 1 = Last month
+	 *  -1 => 2 = Last year
+	 *  -2 => 3 = Current month
+	 *  -3 => 4 = Current year
+	 *  -4 => 5 = Whole time range
+	 */
+	 
+	 
+	//Min/Max strike times
+	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+	$min_strike_time = strtotime($row['mintime'].' UTC');
+	$max_strike_time = strtotime($row['maxtime'].' UTC');
+	
+	$ranges = array();
+	
+	if ($year || $month) //create individual ranges
+	{
+		if ($month && $year)
+		{
+			$month_start = $month;
+			$year_start  = $year;
+			$month_end   = $month+1;
+			$year_end    = $year;
+		}
+		elseif ($year)
+		{
+			$month_start = 1;
+			$year_start  = $year;
+			$month_end   = 1;
+			$year_end    = $year+1;
+		}
+		else
+			return array();
+		
+		$ranges[] = array(
+						gmmktime(0,0,0, $month_start,1,$year_start),
+						gmmktime(0,0,-1,$month_end,  1,$year_end  )
+						);
+	}
+	else
+	{
+	
+		$min_year  = gmdate('Y', $min_strike_time);
+		$min_month = gmdate('m', $min_strike_time);
+		$max_year  = gmdate('Y', $max_strike_time);
+		$max_month = gmdate('m', $max_strike_time);
+
+		for ($y=$min_year;$y<=$max_year;$y++)
+		{
+			if ($y == $min_year)
+				$start_month = $min_month;
+			else
+				$start_month = 1;
+
+			if ($y == $max_year)
+				$end_month = $max_month-1; // not the current month
+			else
+				$end_month = 12;
+				
+			for ($m = $start_month; $m <= $end_month ;$m++)
+			{
+				$ranges[] = array(
+					gmmktime(0,0,0, $m,  1,$y),
+					gmmktime(0,0,-1,$m+1,1,$y)
+					);
+			}
+			
+			$ranges[] = array(
+				gmmktime(0,0,0, 1,1   ,$y),
+				gmmktime(0,0,-1,1,$m+1,$y)
+				);
+		}
+		
+		//current year (out from full months)
+		$ranges[] = array(strtotime( gmdate('Y').'-01-01 UTC'), gmmktime(0,0,-1,date('m'),1,gmdate('Y')), -1 ); 
+		
+		
+		//whole range (check only for years!)
+		$sql = "SELECT MIN(date_start) mindate, MAX(date_end) maxdate
+				FROM ".BO_DB_PREF."densities WHERE status=2";
+		$res = bo_db($sql);
+		$row = $res->fetch_assoc();
+		$ymin = substr($row['mindate'],0,4);
+		$ymax = substr($row['maxdate'],0,4);
+		if ($ymin && $ymax && $ymin < $ymax)
+			$ranges[] = array(strtotime($ymin.'-01-01 UTC'), strtotime($row['maxdate'].' UTC'), -4 ); 
+
+		
+		//current month and year to yesterday
+		if (defined('BO_CALC_DENSITIES_CURRENT') && BO_CALC_DENSITIES_CURRENT && gmdate('d') != 1)
+		{
+			$end_time = gmmktime(0,0,0,gmdate('m'),gmdate('d'),gmdate('Y'))-1;
+			
+			if (gmdate('t', $end_time) != gmdate('d', $end_time))
+			{
+				//current month to yesterday
+				$ranges[] = array(gmmktime(0,0,0,gmdate('m'),1,gmdate('Y')), $end_time, -2 ); //month
+				
+				//current year to yesterday
+				$ranges[] = array(gmmktime(0,0,0,1,1,gmdate('Y')),           $end_time, -3 ); //year
+			}
+			
+			
+			//delete old data, if it's not the end day of the month
+			$delete_time = gmmktime(0,0,0,gmdate('m'),gmdate('d')-3,gmdate('Y'));
+			if (gmdate('t', $delete_time) != gmdate('d', $delete_time))
+			{
+				$cnt = bo_db("DELETE FROM ".BO_DB_PREF."densities WHERE date_end='".date('Y-m-d', $delete_time)."'");
+				if ($cnt)
+					bo_echod("Deleted $cnt density entries from database!");
+			}
+
+		}
+	}
+	
+	//when end-date is bigger that max_strike time
+	foreach($ranges as $id => $r)
+	{
+		if ($r[1] > $max_strike_time || $r[1] < $min_strike_time || $r[1] - $r[2] < 3600 * 22) 
+			unset($ranges[$id]);
+	}
+	
+	return $ranges;
+}
+
+
+function bo_density_insert_ranges($ranges, $force = false, $stations = array())
+{
+	global $_BO;
+	
+	if (empty($stations))
+		$stations = bo_get_density_stations();
+
+	$count = 0;
+	
+	//insert the ranges
+	foreach($ranges as $r)
+	{
+		$date_start = gmdate('Y-m-d', $r[0]);
+		$date_end   = gmdate('Y-m-d', $r[1]);
+		$status  = intval($r[2]);
+		
+		if ($r[0] >= $r[1])
+			continue;
+
+		//check if rows already exists
+		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities 
+					WHERE date_start='$date_start' AND date_end='$date_end'";
+		$row = bo_db($sql)->fetch_assoc();
+
+		// if rows missing --> insert to prepare for getting the data
+		if ($force || count($stations) * count($_BO['density']) > $row['cnt'])
+		{
+			foreach($_BO['density'] as $type_id => $d)
+			{
+				if (!isset($d) || !is_array($d) || empty($d))
+					continue;
+				
+				$lat_min = $d['coord'][2];
+				$lon_min = $d['coord'][3];
+				$lat_max = $d['coord'][0];
+				$lon_max = $d['coord'][1];
+				$length  = $d['length'];
+				
+				foreach($stations as $station_id)
+				{
+					$sql = "INSERT IGNORE INTO ".BO_DB_PREF."densities 
+							SET date_start='$date_start', date_end='$date_end', 
+							type='$type_id', station_id='$station_id', status=$status,
+							lat_min='$lat_min',lon_min='$lon_min',
+							lat_max='$lat_max',lon_max='$lon_max',
+							length='$length', info='', data=''
+							";
+					if (bo_db($sql))
+						$count++;
+				}
+			}
+		}
+	}
+	
+	return $count;
+}
+
+
+?>

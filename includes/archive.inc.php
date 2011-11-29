@@ -204,7 +204,12 @@ function bo_show_archive_map()
 	
 	echo '<div id="bo_arch_maps">';
 
-	echo '<form action="?" method="GET" class="bo_arch_strikes_form" id="bo_arch_strikes_maps_form">';
+	echo '<p class="bo_general_description" id="bo_archive_density_info">';
+	echo strtr(_BL('archive_map_info'), array('{DATE_START}' => date(_BL('_date'), $start_time),'{DATE_END}' => date(_BL('_date'), $end_time)));
+	echo '</p>';
+
+	echo '<a name="bo_arch_strikes_maps_form"></a>';
+	echo '<form action="?#bo_arch_strikes_maps_form" method="GET" class="bo_arch_strikes_form" id="bo_arch_strikes_maps_form">';
 	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_ok', 'bo_oldmap'));
 	echo '<input type="hidden" name="bo_oldmap" value="'.$map.'">';
 	
@@ -268,6 +273,9 @@ function bo_show_archive_map()
 	
 	if ($cfg['archive'])
 	{
+		if ($_BO['mapimg'][$map]['header'])
+			echo '<div class="bo_map_header">'._BC($_BO['mapimg'][$map]['header'], true).'</div>';
+	
 		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 
 		echo '<div class="bo_arch_map_links">';
@@ -354,8 +362,8 @@ function bo_show_archive_map()
 			echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
 		}
 		
-		$footer = $_BO['mapimg'][$map]['footer'];
-		echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
+		if ($_BO['mapimg'][$map]['footer'])
+			echo '<div class="bo_map_footer">'._BC($_BO['mapimg'][$map]['footer'], true).'</div>';
 		
 		echo '</div>';
 		echo '</div>';
@@ -381,149 +389,7 @@ bo_enable_timerange(<?php echo $ani ? 'true' : 'false'; ?>);
 	
 }
 
-function bo_show_archive_density()
-{
-	global $_BO;
 
-	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
-	$year = intval($_GET['bo_year']) ? intval($_GET['bo_year']) : date('Y');
-	$month = intval($_GET['bo_month']);
-	$station_id = intval($_GET['bo_station']);
-	$ratio = isset($_GET['bo_ratio']);
-
-	// Map infos
-	$cfg = $_BO['mapimg'][$map];
-	$latN = $cfg['coord'][0];
-	$lonE = $cfg['coord'][1];
-	$latS = $cfg['coord'][2];
-	$lonW = $cfg['coord'][3];
-
-	
-	$sql = "SELECT MIN(date_start) mindate, MAX(date_start) maxdate, MAX(date_end) maxdate_end 
-			FROM ".BO_DB_PREF."densities 
-			WHERE (status=1 OR status=3)
-			";
-	$res = bo_db($sql);
-	$row = $res->fetch_assoc();
-	$start_time = strtotime($row['mindate']);
-	$end_time = strtotime($row['maxdate_end']);
-	
-	$station_infos = bo_stations('id', '', false);
-	$station_infos[0]['city'] = _BL('All', false);
-
-	$stations = array();
-	$stations[0] = 0;
-	$stations[bo_station_id()] = bo_station_id();
-	
-	if (defined('BO_DENSITY_STATIONS') && BO_DENSITY_STATIONS)
-	{
-		if (BO_DENSITY_STATIONS == 'all')
-		{
-			foreach($station_infos as $id => $dummy)
-				$stations[$id] = $id;
-		}
-		else
-		{
-			$tmp = explode(',', BO_DENSITY_STATIONS);
-			foreach($tmp as $id)
-				$stations[$id] = $id;
-		}
-	}
-	
-	echo '<div id="bo_dens_maps">';
-
-	echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
-	echo bo_insert_html_hidden(array('bo_year', 'bo_map', 'bo_station', 'bo_ratio'));
-
-	echo '<fieldset>';
-	echo '<legend>'._BL('legend_arch_densities').'</legend>';
-
-	
-	echo '<span class="bo_form_descr">'._BL('Map').':</span> ';
-	echo '<select name="bo_map" id="bo_arch_dens_select_map" onchange="submit();">';
-	foreach($_BO['mapimg'] as $id => $d)
-	{
-		if (!$d['name'] || !$d['density'])
-			continue;
-			
-		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
-		
-		if ($map < 0)
-			$map = $id;
-	}
-	echo '</select>';
-	
-	
-	//image dimensions
-	$img_dim = bo_archive_get_dim($map, 150);
-	
-	echo '<span class="bo_form_descr">'._BL('Year').':</span> ';
-	echo '<select name="bo_year" id="bo_arch_dens_select_year" onchange="submit();">';
-	for($i=date('Y', $start_time); $i<=date('Y');$i++)
-		echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$i.'</option>';
-	echo '</select>';
-
-	echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
-	echo '<select name="bo_station" id="bo_arch_dens_select_station" onchange="submit();">';
-	foreach ($stations as $id )
-		echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>'._BC($station_infos[$id]['city']).($id ? ' ('._BL($station_infos[$id]['country']).')' : '').'</option>';
-	echo '</select>';
-	
-	echo '<input type="checkbox" name="bo_ratio" value="1" '.($ratio && $station_id ? 'checked="checked"' : '').' '.($station_id ? '' : 'disabled').' onchange="submit();" onclick="submit();" id="bo_arch_dens_ratio">';
-	echo '<label for="bo_arch_dens_ratio"> '._BL('Strike ratio').'</label> &nbsp; ';
-	
-	echo '<input type="submit" name="bo_ok" value="'._BL('Ok').'" id="bo_archive_density_submit" class="bo_form_submit">';
-	
-	echo '<div id="bo_archive_density_yearmonth_container">';
-	echo ' <a href="'.bo_insert_url(array('bo_year', 'bo_month'), $year).'" class="bo_archive_density_yearurl';
-	echo !$month ? ' bo_archive_density_active' : '';
-	echo '">';
-	echo date('Y', strtotime($year."-01-01"));
-	echo '</a> &nbsp; ';
-
-	for($i=1;$i<=12;$i++)
-	{
-		if ( ($year == date('Y', $end_time) && $i > date('m', $end_time))
-		     || strtotime("$year-$i-01") < $start_time
-		   )
-		{
-			echo '<span class="bo_archive_density_monthurl">';
-			echo _BL(date('M', strtotime("2000-$i-01")));
-			echo '</span>';
-		}
-		else
-		{
-			echo ' <a href="'.bo_insert_url('bo_month', $i).'" class="bo_archive_density_monthurl';
-			echo $month == $i ? ' bo_archive_density_active' : '';
-			echo '">';
-			echo _BL(date('M', strtotime("2000-$i-01")));
-			echo '</a> ';
-		}
-	}
-
-	echo '</div>';
-	
-	echo '</fieldset>';
-
-	echo '</form>';
-
-	$mapname = _BL($_BO['mapimg'][$map]['name']);
-	
-	
-	$alt = $ratio ? _BL('Strike ratio') : _BL('arch_navi_density');
-	$alt .= $station_id ? ' ('._BL('Station').' '._BC($station_infos[$station_id]['city']).')' : '';
-	$alt .= ' '.$mapname.' '.$year.' '.($month ? _BL(date('F', strtotime("2000-$month-01"))) : '');
-	$img_file = bo_bofile_url().'?density&map='.$map.'&bo_year='.$year.'&bo_month='.$month.'&id='.$station_id.($ratio ? '&ratio' : '').'&bo_lang='._BL();
-	$footer = $_BO['mapimg'][$map]['footer'];
-
-	// The map
-	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
-	echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
-	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
-	echo '</div>';
-	
-	echo '</div>';
-}
 
 function bo_show_archive_search()
 {
@@ -534,7 +400,7 @@ function bo_show_archive_search()
 	$perm = (bo_user_get_level() & BO_PERM_NOLIMIT);
 	
 	echo '<div id="bo_archive">';
-	echo '<p class="bo_stat_description" id="bo_archive_search_info">';
+	echo '<p class="bo_general_description" id="bo_archive_search_info">';
 	echo strtr(_BL('archive_search_info'), array('{COUNT}' => $perm ? '' : $max_count));
 	echo '</p>';
 	echo '<h4>'._BL('Map').'</h4>';
@@ -941,8 +807,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$datetime_to = strtotime($date);
 	}
 	
-	echo '<form action="" method="GET">';	
-	
+	echo '<a name="bo_arch_table_form"></a>';
+	echo '<form action="?#bo_arch_table_form" method="GET" class="bo_arch_table_form" id="bo_arch_tableform">';	
 	
 	if ($lat !== null && $lon !== null)
 	{
@@ -996,6 +862,20 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$sql_where .= " AND s.id='$strike_id' ";
 		$show_empty_sig = true;
 		$hours_back = time() / 3600;
+	}
+	
+	if ($show_empty_sig)
+	{
+		echo '<p class="bo_general_description" id="bo_archive_striketable_info">';
+		echo _BL('archive_striketable_info');
+		echo '</p>';
+	}
+	else
+	{
+		echo '<p class="bo_general_description" id="bo_archive_signaltable_info">';
+		echo _BL('archive_signaltable_info');
+		echo '</p>';
+		bo_signal_info_list();
 	}
 	
 	if (!$strike_id)
@@ -1606,6 +1486,11 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	echo '</form>';
 	
+	
+	echo '<h4>'._BL('Additional information').'</h4>';
+	echo '<div id="bo_archive_signaltable_info_bottom" class="bo_general_description">';
+	echo _BL('archive_signaltable_info_bottom');
+	echo '</div>';
 	
 }
 

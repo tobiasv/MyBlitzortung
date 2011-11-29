@@ -3,6 +3,18 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.4-dev (2011-11-29)
+------------------------------
+- new: option to resize maps
+- new: more descriptions
+- new: header-text for maps
+- new: update-button above map
+- new: much faster calculation of strike densities! 
+       NOTE: * not compatible with old datasets! 
+             * old entries will be re-created if strike data is available
+- new: new colors and functions for densities
+- fix: SQL-error when inserting malformated signals
+
 Version 0.7.3b (2011-11-04)
 ---------------------------
 - fix: getting login-id could fail in 0.7.3a

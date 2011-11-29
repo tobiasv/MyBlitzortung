@@ -51,11 +51,10 @@ function bo_show_login()
 		
 		if (BO_PERM_ADMIN & $level)
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=user_settings" class="bo_navi'.($show == 'user_settings' ? '_active' : '').'">'._BL('Add/Remove User').'</a>';
-		
-		if (BO_PERM_SETTINGS & $level)
-			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=calibrate" class="bo_navi'.($show == 'calibrate' ? '_active' : '').'">'._BL('Calibrate Antennas').'</a>';
 
-
+		if (BO_PERM_ADMIN & $level)
+			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=admin" class="bo_navi'.($show == 'admin' ? '_active' : '').'">'._BL('Administration').'</a>';
+			
 		if (defined('BO_ALERTS') && BO_ALERTS && ($level & BO_PERM_ALERT))
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=alert" class="bo_navi'.($show == 'alert' ? '_active' : '').'" class="bo_navi'.($show == 'alert' ? '_active' : '').'">'._BL('Strike alert').'</a></li>';
 		
@@ -75,10 +74,14 @@ function bo_show_login()
 		switch($show)
 		{
 
-			case 'user_settings':
+			case 'admin':
 				if (BO_PERM_ADMIN & $level)
 					bo_user_show_admin();
+				break;
 
+			case 'user_settings':
+				if (BO_PERM_ADMIN & $level)
+					bo_user_show_useradmin();
 				break;
 
 			case 'password':
@@ -86,60 +89,30 @@ function bo_show_login()
 					bo_user_show_passw_change();
 				break;
 				
-			case 'calibrate':
-				if (BO_PERM_SETTINGS & $level)
-					bo_show_calibrate_antennas();
-				break;
-
 			case 'alert':
 				if (BO_PERM_ALERT & $level)
 					bo_alert_settings();
 				break;
-			
-			case 'mybo_station_update':
-				if (BO_PERM_ADMIN & $level)
-					bo_my_station_update_form();
-				break;
-			
-			case 'update':
-				
-				if ( (BO_PERM_ADMIN & $level) )
-				{
-					echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
-					bo_update_all(true);
-					echo '</div></pre>';
-				}
-				break;
-			
-			case 'cache_info':
-				if ( (BO_PERM_ADMIN & $level) )
-					bo_cache_info();
-				break;
 
-			case 'cities':
-				if ( (BO_PERM_ADMIN & $level) )
-					bo_import_cities();
-				break;
-				
 
 			
 			default:
+				
+				$lastlogin = bo_get_conf('user_lastlogin');
+				$sessiontime = time() - bo_get_conf('user_lastlogin_next');
+				
 				echo '<h3>'._BL('Welcome to MyBlitzortung user area').'!</h3>';
-				echo '<ul class="bo_login_info">
-						<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>';
+				echo '<ul class="bo_login_info">';
+				echo '<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>';
+				
+				if ($lastlogin)
+					echo '<li>'._BL('user_lastlogin_text').': <strong>'.date(_BL('_datetime'), $lastlogin).'</strong></li>';
+				
+				echo '<li>'._BL('user_sessiontime_text').': <strong>'.number_format($sessiontime / 60, 1, _BL('.'), _BL(',')).' '._BL('unit_minutes').'</strong></li>';
 				echo '</ul>';
 				
 				if (BO_PERM_ADMIN & $level)
 				{
-					echo '<h4>'._BL('Admin tools').'</h4>';
-					echo '<ul>';
-					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=update">'._BL('Do manual update').'</a></li>';
-					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=mybo_station_update">'._BL('Update MyBlitzortung Stations').'</a></li>';
-					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=cache_info">'._BL('File cache info').'</a></li>';
-					echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=cities">'._BL('Read cities.txt').'</a></li>';
-					echo '<li><a href="'.dirname(BO_FILE).'/README" target="_blank">README</a></li>';
-					echo '</ul>';
-					
 					if (file_exists(BO_DIR.'settings.php'))
 						echo '<p style="color:red"><strong>Warning: File <u>settings.php</u> found!</strong><br>Since version 0.3.1 standard values and settings are saved internally. For individual setting edit config.php and enter your individual settings there. Delete settings.php to hide this message.</p>';
 				}
@@ -173,6 +146,73 @@ function bo_show_login()
 
 }
 
+function bo_user_show_admin()
+{
+	$show = $_GET['bo_action_admin'];
+	$url = bo_insert_url(array('bo_*','login','id')).'&bo_action=admin&bo_action_admin=';
+	
+	switch($show)
+	{
+		case 'calibrate':
+			bo_show_calibrate_antennas();
+			break;
+			
+		case 'mybo_station_update':
+			bo_my_station_update_form();
+			break;
+		
+		case 'update':
+			echo '<h4>'._BL('Importing data...').'</h4>';
+			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
+			bo_update_all(true, $_GET['bo_only']);
+			echo '</div></pre>';
+			break;
+		
+		case 'cache_info':
+			bo_cache_info();
+			break;
+
+		case 'cities':
+			bo_import_cities();
+			break;
+		
+		default:
+
+			echo '<h4>'._BL('Admin tools').'</h4>';
+			
+			echo '<ul>';
+			echo '<li><a href="'.$url.'mybo_station_update">'._BL('Update MyBlitzortung Stations').'</a></li>';
+			echo '<li><a href="'.$url.'cache_info">'._BL('File cache info').'</a></li>';
+			echo '<li><a href="'.$url.'cities">'._BL('Read cities.txt').'</a></li>';
+			echo '<li><a href="'.$url.'calibrate" class="bo_navi'.($show == 'calibrate' ? '_active' : '').'">'._BL('Calibrate Antennas').'</a>';
+			echo '</ul>';
+
+			echo '<h5>'._BL('Import/update data').'</h5>';
+			echo '<ul>';
+			echo '<li><strong><a href="'.$url.'update">'._BL('Do manual update').'</strong></a></li>';
+			echo '<li><a href="'.$url.'update&bo_only=strikes">'._BL('Update only strikes').'</a></li>';
+			echo '<li><a href="'.$url.'update&bo_only=stations">'._BL('Update only stations').'</a></li>';
+			echo '<li><a href="'.$url.'update&bo_only=signals">'._BL('Update only signals').'</a></li>';
+			//echo '<li><a href="'.$url.'update&bo_only=daily">'._BL('Update only daily statistics').'</a></li>';
+			echo '<li><a href="'.$url.'update&bo_only=density">'._BL('Update only densities').'</a></li>';
+			echo '<li><a href="'.$url.'update&bo_only=tracks">'._BL('Update only tracks').'</a></li>';
+			echo '<li><a href="'.$url.'update&bo_only=purge">'._BL('Force data purge only').'</a></li>';
+			echo '<li><a href="'.$url.'update&bo_only=alerts">'._BL('Check alerts only').'</a></li>';
+			echo '</ul>';
+			
+			echo '<h5>'._BL('Documentation').'</h5>';
+			echo '<ul>';
+			echo '<li><a href="'.dirname(BO_FILE).'/README" target="_blank">README</a></li>';
+			echo '<li><a href="http://www.myblitzortung.de" target="_blank">www.myblitzortung.de</a></li>';
+			echo '<li><a href="http://www.wetter-board.de/index.php?page=Board&boardID=381" target="_blank">Board</a></li>';
+			echo '<li><a href="http://www.faq-blitzortung.org/index.php?sid=267611&lang=de&action=show&cat=18" target="_blank">FAQ</a></li>';
+			echo '</ul>';
+		
+			break;
+	}
+
+	
+}
 
 function bo_show_login_form($fail = false)
 {
@@ -284,9 +324,9 @@ function bo_user_do_logout()
 	$_SESSION['bo_logged_out'] = true;
 }
 
-function bo_user_set_session($user, $level, $cookie, $pass='')
+function bo_user_set_session($id, $level, $cookie, $pass='')
 {
-	$_SESSION['bo_user'] = $user;
+	$_SESSION['bo_user'] = $id;
 	$_SESSION['bo_user_level'] = $level;
 	$_SESSION['bo_logged_out'] = false;
 	
@@ -300,10 +340,14 @@ function bo_user_set_session($user, $level, $cookie, $pass='')
 			$data['uid'] = md5(uniqid('', true));
 
 		$data['pass'] = $pass;
-		bo_set_conf('user_cookie'.$user, serialize($data));
+		bo_set_conf('user_cookie'.$id, serialize($data));
 		
-		setcookie("bo_login", $user.'_'.$data['uid'], time()+3600*24*$cookie_days,'/');
+		setcookie("bo_login", $id.'_'.$data['uid'], time()+3600*24*$cookie_days,'/');
 	}
+	
+	$lastlogin = bo_get_conf('user_lastlogin_next');
+	bo_set_conf('user_lastlogin', $lastlogin);
+	bo_set_conf('user_lastlogin_next', time());
 }
 
 function bo_user_get_id()
@@ -404,7 +448,7 @@ function bo_user_show_passw_change()
 	echo '</form>';
 }
 
-function bo_user_show_admin()
+function bo_user_show_useradmin()
 {
 	$user_id = intval($_GET['id']);
 	$failure = false;

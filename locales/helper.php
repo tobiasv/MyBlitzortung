@@ -5,7 +5,7 @@
 $in  = 'en';
 
 //Ouput language
-$out = 'fr';
+$out = 'hu';
 
 
 /*
