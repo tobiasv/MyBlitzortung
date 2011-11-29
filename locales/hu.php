@@ -425,7 +425,6 @@ $_BL['hu']['Time range'] = 'Idötartam';
 $_BL['hu']['arch_navi_strikes'] = 'Villámok';
 
 
-
 /*************************************************************/
 /* Statistics                                                */
 /*************************************************************/
@@ -976,6 +975,9 @@ $_BL['hu']['Avg. participants per strike locating'] = '';
 
 //en: 'Maximum mean participants'
 $_BL['hu']['Maximum mean participants'] = '';
+
+//en: 'Additional information'
+$_BL['hu']['Additional information'] = '';
 
 //en: 'Stations under construction'
 $_BL['hu']['Stations under construction'] = '';

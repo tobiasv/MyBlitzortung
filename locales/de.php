@@ -445,7 +445,7 @@ $_BL['de']['Station ratio'] = 'Blitzquote Station';
 $_BL['de']['View'] = 'Ansicht';
 $_BL['de']['Avg. participants per strike locating'] = 'Mittl. Teilnehmerzahl pro Ortung';
 $_BL['de']['Maximum mean participants'] = 'Max. mittlere Anzahl Teilnehmer';
-
+$_BL['de']['Additional information'] = 'Weitere Informationen';
 
 
 /*************************************************************/

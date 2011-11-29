@@ -447,7 +447,7 @@ $_BL['en']['Station ratio'] = 'Station ratio';
 $_BL['en']['View'] = 'View';
 $_BL['en']['Avg. participants per strike locating'] = 'Avg. participants per strike locating';
 $_BL['en']['Maximum mean participants'] = 'Maximum mean participants';
-
+$_BL['en']['Additional information'] = 'Additional information';
 
 
 /*************************************************************/

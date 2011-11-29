@@ -439,7 +439,6 @@ $_BL['fr']['check_show_hyps'] = 'Montrer les courbes hyperboliques';
 $_BL['fr']['Strike is not confirmed'] = 'Non comfirmé';
 
 
-
 /*************************************************************/
 /* Statistics                                                */
 /*************************************************************/
@@ -954,6 +953,9 @@ $_BL['fr']['Avg. participants per strike locating'] = '';
 //en: 'Maximum mean participants'
 $_BL['fr']['Maximum mean participants'] = '';
 
+//en: 'Additional information'
+$_BL['fr']['Additional information'] = '';
+
 //en: 'Administration'
 $_BL['fr']['Administration'] = '';
 
@@ -1054,7 +1056,6 @@ $_BL['fr']['archive_signaltable_info_bottom'] = '';
 /*  NOT AVAILABLE IN ORIGINAL  */
 /*******************************/
 
-//misspelled -> shouldn't be translated
 $_BL['fr']['España / Spain'] = 'Espagne';
 $_BL['fr']['Deutschland'] = 'Allemagne';
 $_BL['fr']['Danmark'] = 'Danemark';
