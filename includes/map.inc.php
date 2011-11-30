@@ -618,6 +618,10 @@ function bo_map_reload_static()
 				echo _BL($cfg['sel_name']);
 			else
 				echo '<em>'._BL('Id').' '.$id.'</em>';
+			
+			if ($cfg['kml'])
+				echo ' <em>('._BL('KML').')</em>';
+			
 			echo '</label> &nbsp; ';
 			echo '</span>';
 		}

@@ -1012,7 +1012,13 @@ if (!isset($_BO['mapimg'][3]))
 if (!isset($_BO['mapimg']['stations_mini']))
 	$_BO['mapimg']['stations_mini'] = $_BO['tpl_imgmap']['europe_mini_stations'];
 
-	
+if (!isset($_BO['mapimg']['kml_eu2']))
+	$_BO['mapimg']['kml_eu2'] = $_BO['tpl_imgmap']['europe_kml_2h'];
+
+if (!isset($_BO['mapimg']['kml_eu24']))
+	$_BO['mapimg']['kml_eu24'] = $_BO['tpl_imgmap']['europe_kml_24h'];
+
+
 /*** Densities ***/
 if (!isset($_BO['density'][0]))
 	$_BO['density'][0] = $_BO['tpl_density']['europe'];

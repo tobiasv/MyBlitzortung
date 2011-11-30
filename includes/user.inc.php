@@ -199,7 +199,12 @@ function bo_user_show_admin()
 			echo '<li><a href="'.$url.'update&bo_only=purge">'._BL('Force data purge only').'</a></li>';
 			echo '<li><a href="'.$url.'update&bo_only=alerts">'._BL('Check alerts only').'</a></li>';
 			echo '</ul>';
-			
+
+			echo '<h5>'._BL('Specials').'</h5>';
+			echo '<ul>';
+			echo '<li><a href="'.bo_bofile_url().'?kml">Google Earth KML</a></li>';
+			echo '</ul>';
+
 			echo '<h5>'._BL('Documentation').'</h5>';
 			echo '<ul>';
 			echo '<li><a href="'.dirname(BO_FILE).'/README" target="_blank">README</a></li>';

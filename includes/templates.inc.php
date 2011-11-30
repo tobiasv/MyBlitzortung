@@ -391,6 +391,25 @@ $_BO['tpl_imgmap']['germany_mini']['gif_animation_enable'] = true;
 $_BO['tpl_imgmap']['germany_mini']['gif_animation'] = $_BO['tpl_gif_animation_mini'];
 
 
+/**************************************/
+/* Google Earth                       */
+/**************************************/
+
+
+$_BO['tpl_imgmap']['europe_kml_2h'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['europe_kml_2h']['dim'] = array(1600, 1200);
+$_BO['tpl_imgmap']['europe_kml_2h']['name'] = '2h';
+$_BO['tpl_imgmap']['europe_kml_2h']['menu'] = false;
+$_BO['tpl_imgmap']['europe_kml_2h']['archive'] = false;
+$_BO['tpl_imgmap']['europe_kml_2h']['trange'] = 2; //hours!
+$_BO['tpl_imgmap']['europe_kml_2h']['upd_intv'] = 10; //minutes
+$_BO['tpl_imgmap']['europe_kml_2h']['proj'] = 'plate';
+$_BO['tpl_imgmap']['europe_kml_2h']['coord'] = array(75, 40, 26, -14); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['europe_kml_2h']['kml'] = true;
+
+$_BO['tpl_imgmap']['europe_kml_24h'] = $_BO['tpl_imgmap']['europe_kml_2h'];
+$_BO['tpl_imgmap']['europe_kml_24h']['trange'] = 24; //hours!
+$_BO['tpl_imgmap']['europe_kml_24h']['name'] = '24h';
 
 
 /**************************************/
