@@ -464,9 +464,10 @@ function bo_map_reload_static()
 		$minute2 = (int)date('i', $today);
 		
 		
-		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
+		
 		
 		echo '<div class="bo_input_container" id="bo_map_timerange">';
+		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
 
 		echo '<select id="bo_map_select_year1" disabled>';
 		for($i=date('Y', $start_time); $i<=date('Y');$i++)
@@ -520,9 +521,9 @@ function bo_map_reload_static()
 		echo '</div>';
 	}
 	
+	echo '<div class="bo_input_container" id="bo_map_advanced_options">';
 	echo '<span class="bo_form_descr">'._BL('Advanced').':</span> ';
-
-	echo '<div class="bo_input_container">';
+	
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="checkbox" onclick="bo_map_toggle_own(this.checked);" id="bo_map_opt_own"> ';
 	echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label> &nbsp; ';
@@ -532,10 +533,9 @@ function bo_map_reload_static()
 	{
 		echo '</div>';
 		
+		echo '<div class="bo_input_container" id="bo_map_statistic_options">';
 		echo '<span class="bo_form_descr">'._BL('Statistics').':</span> ';
 		
-		echo '<div class="bo_input_container">';
-
 		echo '<span class="bo_form_checkbox_text">';
 		echo '<input type="radio" name="bo_map_counter" value="0" onclick="bo_map_toggle_count(this.value);" id="bo_map_opt_count0"> ';
 		echo '<label for="bo_map_opt_count0">'._BL("Off").'</label> &nbsp; ';
@@ -569,9 +569,8 @@ function bo_map_reload_static()
 	
 	echo '</div>';
 
-	
+	echo '<div class="bo_input_container" id="bo_map_stations_options">';
 	echo '<span class="bo_form_descr">'._BL('Show Stations').':</span> ';
-	echo '<div class="bo_input_container">';
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="1" name="bo_map_station" id="bo_map_station0" checked>';
 	echo '<label for="bo_map_station0">'._BL('None').'</label> &nbsp; ';
@@ -594,8 +593,9 @@ function bo_map_reload_static()
 	
 	if (count($Overlays))
 	{
+		
+		echo '<div class="bo_input_container" id="bo_map_overlay_options">';
 		echo '<span class="bo_form_descr">'._BL('Extra overlays').':</span> ';
-		echo '<div class="bo_input_container">';
 
 		$ovl_maps_showed = false;
 		
@@ -604,6 +604,7 @@ function bo_map_reload_static()
 			if (!$ovl_maps_showed && $cfg['is_map'])
 			{
 				echo '<a href="#" onclick="javascript:document.getElementById(\'bo_extra_ovl_maps\').style.display=\'inline\';this.style.display=\'none\';">'._BL('Own maps').'</a>';
+
 				echo '<span style="display:none" id="bo_extra_ovl_maps">';
 				$ovl_maps_showed = true;
 			}
@@ -612,7 +613,12 @@ function bo_map_reload_static()
 			echo '<input type="checkbox" onclick="bo_map_toggle_extraoverlay(this.checked, this.value);" value="'.$id.'" name="bo_map_overlay" id="bo_map_overlay'.$id.'" ';
 			echo $cfg['default_show'] ? ' checked="checked" ' : '';
 			echo '>';
-			echo '<label for="bo_map_overlay'.$id.'">'._BL($cfg['sel_name']).'</label> &nbsp; ';
+			echo '<label for="bo_map_overlay'.$id.'">';
+			if ($cfg['sel_name'])
+				echo _BL($cfg['sel_name']);
+			else
+				echo '<em>'._BL('Id').' '.$id.'</em>';
+			echo '</label> &nbsp; ';
 			echo '</span>';
 		}
 		

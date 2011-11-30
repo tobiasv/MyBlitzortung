@@ -412,23 +412,23 @@ max-width: none;
 width: auto;
 }
 
-#myblitzortung #bo_map_more_container .bo_form_descr {
-width: 160px;
-/* display: inline-block;*/
-float: left;
-clear: left;
-margin: 8px 0px;
-padding-top:6px;
-}
-
 #myblitzortung #bo_map_more_container .bo_input_container {
-padding-left: 165px;
+padding-left: 170px;
 }
 
 #myblitzortung #bo_map_more_container .bo_input_container,
 #myblitzortung .bo_arch_strikes_form .bo_input_container {
 border-top: 1px dotted #e4e4e4;
 padding-top:8px;
+}
+
+#myblitzortung #bo_map_more_container .bo_form_descr {
+width: 160px;
+/* display: inline-block;*/
+float: left;
+clear: left;
+margin: 0px 0px 8px -168px;
+padding-top:6px;
 }
 
 #myblitzortung #bo_map_timerange select{
@@ -499,7 +499,7 @@ font-size: 13px;
 }
 #myblitzortung #bo_dens_maps select {
 margin-right: 20px;
-max-width: 140px;
+max-width: 190px;
 }
 
 #myblitzortung #bo_archive_density_submit {

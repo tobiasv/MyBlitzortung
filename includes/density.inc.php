@@ -577,7 +577,7 @@ function bo_toggle_dens_map(id, url)
 		document.getElementById('bo_dens_map_toggle' + i).className="bo_dens_map_toggle" + (id == i ? '_active' : '');
 
 	document.getElementById('bo_arch_map_img').src='<?php echo bo_bofile_url().'?image=blank'; ?>';
-	window.setTimeout("bo_toggle_dens_map2('"+url+"');", 10);
+	window.setTimeout("bo_toggle_dens_map2('"+url+"');", 100);
 }
 
 function bo_toggle_dens_map2(url)
