@@ -295,7 +295,7 @@ function bo_show_archive_map()
 	echo '&nbsp;<input type="submit" name="bo_prev_hour" value=" &lt; " id="bo_archive_maps_prevhour" class="bo_form_submit">';
 	echo '&nbsp;<input type="submit" name="bo_next_hour" value=" &gt; " id="bo_archive_maps_nexthour" class="bo_form_submit">';
 
-	echo '<select name="bo_hour_range" id="bo_arch_strikes_select_hour_to" '.($ani ? '' : ' onchange="submit()"').'>';
+	echo ' <select name="bo_hour_range" id="bo_arch_strikes_select_hour_to" '.($ani ? '' : ' onchange="submit()"').'>';
 	for($i=$hours_interval;$i<=$max_range;$i+=$hours_interval)
 		echo '<option value="'.$i.'" '.($i == $hour_range ? 'selected' : '').'>+'.$i.' '._BL('hours').'</option>';
 	echo '</select> ';
@@ -330,10 +330,10 @@ function bo_show_archive_map()
 		echo _BL('Yesterday').': &nbsp; ';
 		
 		if (!$ani_cfg['force'])
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0" >'._BL('Picture').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_range=24&bo_animation=day" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
 		
 		echo '  &nbsp;  &nbsp; &nbsp; ';
 		
@@ -341,10 +341,10 @@ function bo_show_archive_map()
 		echo _BL('Today').': &nbsp; ';
 		
 		if (!$ani_cfg['force'])
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1" >'._BL('Picture').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
 			
 		echo '</div>';
 
@@ -854,7 +854,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$datetime_to = strtotime($date);
 	}
 	
-	echo '<a name="bo_arch_table_form"></a>';
 	echo '<form action="?#bo_arch_table_form" method="GET" class="bo_arch_table_form" id="bo_arch_tableform">';	
 	
 	if ($lat !== null && $lon !== null)
@@ -890,6 +889,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$bo_file_url = bo_bofile_url().'?map='.$map.'&transparent&bo_lang='._BL().($hyps ? '&hyps' : '').'&strike_id=';
 
 		echo bo_insert_html_hidden(array('bo_show_hyp'));
+		echo '<a name="bo_arch_table_form"></a>';
 		echo '<fieldset>';
 		echo '<legend>'._BL('settings').'</legend>';
 		echo '<input type="checkbox" name="bo_hyps" value="1" '.($hyps ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="bo_check_hyps">';
@@ -927,7 +927,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	if (!$strike_id)
 	{
-
+		echo '<a name="bo_arch_table_form"></a>';
 		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes', 'bo_show_details', 'bo_region'));
 		echo '<fieldset>';
 		echo '<legend>'._BL('settings').'</legend>';
@@ -1037,9 +1037,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	echo '<div class="bo_sig_navi">';
 
 	if ($res->num_rows > $per_page && $page < $max_pages)
-		echo '<a href="'.bo_insert_url('bo_action', $page+1).'" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
+		echo '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
 	if ($page)
-		echo '<a href="'.bo_insert_url('bo_action', $page-1).'" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
+		echo '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
 	echo '</div>';
 
 	echo '<table class="bo_sig_table'.(BO_ARCHIVE_SHOW_SPECTRUM ? ' bo_sig_table_spectrum' : '').'">';
@@ -1524,9 +1524,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	{
 		echo '<div class="bo_sig_navi">';
 		if ($count == $per_page && $page < $max_pages)
-			echo '<a href="'.bo_insert_url('bo_action', $page+1).'" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
+			echo '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
 		if ($page)
-			echo '<a href="'.bo_insert_url('bo_action', $page-1).'" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
+			echo '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
 		echo '</div>';
 	}
 
