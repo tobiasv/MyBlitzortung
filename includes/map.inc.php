@@ -264,14 +264,18 @@ function bo_toggle_autoupdate_static(on)
 
 	if (on)
 	{
-		window.setTimeout("bo_map_reload_static();", <?php echo 1000 * 60 * ceil($interval / 2) ?>);
+		bo_map_reload_static();
 	}
 }
 
 function bo_map_reload_static()
 {
-	var now = new Date();
-	document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo $interval; ?>);
+	if (bo_autoupdate_running)
+	{
+		var now = new Date();
+		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo $interval; ?>);
+		window.setTimeout("bo_map_reload_static();", <?php echo 1000 * 60 * ceil($interval / 2) ?>);
+	}
 }
 
 </script>
