@@ -114,6 +114,7 @@ function bo_show_archive_map()
 	$ani_div = intval(BO_ANIMATIONS_INTERVAL);
 	$ani_pic_range = intval(BO_ANIMATIONS_STRIKE_TIME);
 	$ani_default_range = intval(BO_ANIMATIONS_DEFAULT_RANGE);
+	$ani_max_range = intval(BO_ANIMATIONS_MAX_RANGE);
 	$ani_delay = BO_ANIMATIONS_WAITTIME;
 	$ani_delay_end = BO_ANIMATIONS_WAITTIME_END;
 	
@@ -122,26 +123,26 @@ function bo_show_archive_map()
 	$month = intval($_GET['bo_month']);
 	$day = intval($_GET['bo_day']);
 	$day_add = intval($_GET['bo_day_add']);
-	$ani = isset($_GET['bo_animation']) && $_GET['bo_animation'] !== '0';
+	$ani = isset($_GET['bo_animation']) && $_GET['bo_animation'] !== '0' ? 1 : 0;
+	$ani_preset = trim($_GET['bo_animation']);
 	$hour_from = intval($_GET['bo_hour_from']);
-	$hour_to = intval($_GET['bo_hour_to']);
+	$hour_range = intval($_GET['bo_hour_range']);
+	$map_changed = isset($_GET['bo_oldmap']) && $map != $_GET['bo_oldmap'];
+	$ani_changed = !isset($_GET['bo_oldani']) || $ani != $_GET['bo_oldani'] || $map_changed;
 	
 	//Map
 	$select_map = bo_archive_select_map($map);
-	
-	if (isset($_GET['bo_oldmap']) && $map != $_GET['bo_oldmap'])
-		$map_changed = true;
-	
+		
 	//image dimensions
 	$img_dim = bo_archive_get_dim($map);
 	
 	//Config
-	$cfg = $_BO['mapimg'][$map];
+	$cfg     = $_BO['mapimg'][$map];
 	$ani_cfg = $_BO['mapimg'][$map]['animation'];
-	
 	$mapname = _BL($cfg['name']);
 	
-	if ($ani_cfg['force'])
+	//Animation-config
+	if (isset($ani_cfg['force']) && $ani_cfg['force'])
 	{
 		$ani_forced = true;
 		$ani = true;
@@ -153,6 +154,29 @@ function bo_show_archive_map()
 	if (isset($ani_cfg['default_range']))
 		$ani_default_range = $ani_cfg['default_range'];
 
+	if (isset($ani_cfg['delay']))
+		$ani_delay = $ani_cfg['delay'];
+		
+	if (isset($ani_cfg['delay_end']))
+		$ani_delay_end = $ani_cfg['delay_end'];
+	
+	if (isset($ani_cfg['interval']))
+		$ani_div = $ani_cfg['interval'];
+
+	//Defaults...
+	if (isset($cfg['maxrange']) && intval($cfg['maxrange'])) //max. time range in one pic
+		$max_range = $cfg['maxrange'];
+	else
+		$max_range = BO_SMAP_MAX_RANGE;
+
+	if (isset($cfg['hoursinterval']) && intval($cfg['hoursinterval'])) //interval of hours
+		$hours_interval = $cfg['hoursinterval'];
+	elseif ($ani)
+		$hours_interval = BO_ANIMATIONS_RANGE_STEP;
+	else
+		$hours_interval = BO_SMAP_RANGE_STEP;
+		
+	//Date
 	if (!$year || $year < 0)
 		$year = date('Y');
 
@@ -167,41 +191,64 @@ function bo_show_archive_map()
 	else if ($_GET['bo_next'])
 		$day_add = +1;
 	
-	$time  = mktime(0,0,0,$month,$day+$day_add,$year);
-		
-	if (!$hour_from && !$hour_to)
+
+	//Hours & Range
+	if ($ani)
 	{
-		$hour_time_from = time() - 3600 * $ani_default_range;
-		$hour_time_to   = $hour_time_from + 3600 * $ani_default_range;
-		$hour_from = (int)date('H', $hour_time_from);
-		$hour_to = (int)date('H', $hour_time_to);
-		$hours_not_set = true;
-
-		//Today and start time lies on yesterday
-		if ($hour_time_from && date('Ymd', $time) == date('Ymd') && date('Ymd', $hour_time_from) != date('Ymd'))
-			$time -= 3600 * 24;
-
-	}
-	else if ($map_changed && $hour_from < $hour_to && $hour_from-$hour_to < $ani_default_range)
-		$hour_from = floor($hour_to - $ani_default_range);
-
-
+		if ($ani_changed)
+		{
+			if ($ani_preset == 'now')
+			{
+				$hour_from = date('H') - $ani_default_range;
+			}
+			elseif ($ani_preset == 'day')
+			{
+				$hour_from = 0;
+				$hour_range = 24;
+			}
+			else
+			{
+				$hour_from = 0;
+				$hour_range = $ani_default_range;
+			}
+		}
 		
-	$hour_from = abs(($hour_from+24)%24);
-	$hour_to   = abs(($hour_to+24)%24);
-	if ($hour_to == 0)
-		$hour_to = 24;
-	
-	
+		if ($hour_range < $ani_default_range)
+			$hour_range = $ani_default_range;
+		
+		if ($hour_range > $ani_max_range)
+			$hour_range = $ani_max_range;
+		
+		$max_range = $ani_max_range;
+	}
+	elseif (!$ani && $ani_changed)
+	{
+		$hour_from  = 0;
+		$hour_range = $max_range;
+	}
+
+	if ($_GET['bo_prev_hour'])
+		$hour_from -= $hours_interval;
+	else if ($_GET['bo_next_hour'])
+		$hour_from += $hours_interval;
+
+	$hour_from = floor($hour_from / $hours_interval) * $hours_interval;
+		
+	//Set to correct time
+	$time      = mktime($hour_from,0,0,$month,$day+$day_add,$year);
 	$year      = date('Y', $time);
 	$month     = date('m', $time);
 	$day       = date('d', $time);
+	$hour_from = date('H', $time);
 
 	
+	//min/max strike-time
 	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$start_time = strtotime($row['mintime'].' UTC');
 	$end_time = strtotime($row['maxtime'].' UTC');
 	
+	
+	//Output
 	echo '<div id="bo_arch_maps">';
 
 	echo '<p class="bo_general_description" id="bo_archive_density_info">';
@@ -210,8 +257,9 @@ function bo_show_archive_map()
 
 	echo '<a name="bo_arch_strikes_maps_form"></a>';
 	echo '<form action="?#bo_arch_strikes_maps_form" method="GET" class="bo_arch_strikes_form" id="bo_arch_strikes_maps_form">';
-	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_ok', 'bo_oldmap'));
+	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_ok', 'bo_oldmap'));
 	echo '<input type="hidden" name="bo_oldmap" value="'.$map.'">';
+	echo '<input type="hidden" name="bo_oldani" value="'.($ani ? 1 : 0).'">';
 	
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_arch_strikes').'</legend>';
@@ -237,33 +285,33 @@ function bo_show_archive_map()
 	echo '&nbsp;<input type="submit" name="bo_next" value=" &gt; " id="bo_archive_maps_nextday" class="bo_form_submit">';
 	echo '<input type="submit" name="bo_ok" value="'._BL('update map').'" id="bo_archive_maps_submit" class="bo_form_submit">';
 
+	echo '<div class="bo_input_container">';
+	echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
+	echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from">';
+	for($i=0;$i<=23;$i+=$hours_interval)
+		echo '<option value="'.$i.'" '.($i == $hour_from ? 'selected' : '').'>'.$i.' '._BL('oclock').'</option>';
+	echo '</select>';
+
+	echo '&nbsp;<input type="submit" name="bo_prev_hour" value=" &lt; " id="bo_archive_maps_prevhour" class="bo_form_submit">';
+	echo '&nbsp;<input type="submit" name="bo_next_hour" value=" &gt; " id="bo_archive_maps_nexthour" class="bo_form_submit">';
+
+	echo '<select name="bo_hour_range" id="bo_arch_strikes_select_hour_to" '.($ani ? '' : ' onchange="submit()"').'>';
+	for($i=$hours_interval;$i<=$max_range;$i+=$hours_interval)
+		echo '<option value="'.$i.'" '.($i == $hour_range ? 'selected' : '').'>+'.$i.' '._BL('hours').'</option>';
+	echo '</select> ';
+
+	
 	if ($ani_div)
 	{
-		echo '<div class="bo_input_container">';
-		
+		echo ' &nbsp;&nbsp;&nbsp; ';
 		echo '<span class="bo_form_descr">'._BL('Animation').':</span> ';
 		echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false, true);" '.($ani_forced ? ' disabled' : '').'>';
 		echo '<label for="bo_archive_maps_animation_off">'._BL('Off').'</label>';
 		echo '<input type="radio" name="bo_animation" value="1" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true, true);">';
 		echo '<label for="bo_archive_maps_animation_on">'._BL('On').'</label>';
-		echo ' &nbsp; ';
-		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
-		
-		echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from" disabled>';
-		for($i=0;$i<=23;$i++)
-			echo '<option value="'.$i.'" '.($i == $hour_from ? 'selected' : '').'>'.$i.'</option>';
-		echo '</select>';
-		echo ' - ';
-		echo '<select name="bo_hour_to" id="bo_arch_strikes_select_hour_to" disabled>';
-		for($i=1;$i<=24;$i++)
-			echo '<option value="'.$i.'" '.($i == $hour_to ? 'selected' : '').'>'.$i.'</option>';
-		echo '</select> ';
-		
-		echo _BL('oclock');
-		
-		echo '</div>';
 	}
 	
+	echo '</div>';	
 	echo '</fieldset>';
 	echo '</form>';
 
@@ -285,7 +333,7 @@ function bo_show_archive_map()
 			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_range=24&bo_animation=day" >'._BL('Animation').'</a> ';
 		
 		echo '  &nbsp;  &nbsp; &nbsp; ';
 		
@@ -296,7 +344,7 @@ function bo_show_archive_map()
 			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_to=24&bo_animation" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day" >'._BL('Animation').'</a> ';
 			
 		echo '</div>';
 
@@ -311,15 +359,6 @@ function bo_show_archive_map()
 		}
 		else if ($ani)
 		{
-			//individual settings
-			if (isset($ani_cfg['delay']))
-				$ani_delay = $ani_cfg['delay'];
-				
-			if (isset($ani_cfg['delay_end']))
-				$ani_delay_end = $ani_cfg['delay_end'];
-			
-			if (isset($ani_cfg['interval']))
-				$ani_div = $ani_cfg['interval'];
 
 			//use transparency?
 			if ($ani_cfg['transparent'] === false)
@@ -332,22 +371,14 @@ function bo_show_archive_map()
 				$img_file = bo_bofile_url().'?map='.$map.'&blank&bo_lang='._BL().'';
 				$bo_file_url = bo_bofile_url().'?map='.$map.'&transparent&bo_lang='._BL().'&date=';
 			}
-
-			
-			
-			if ($hour_from >= $hour_to)
-				$hour_to += 24; //next day
-			
-			
-			
+		
 			$images = array();
-			for ($i=$hour_from*60-$ani_pic_range; $i<= $hour_to * 60; $i+= $ani_div)
+			for ($i=$hour_from*60; $i< ($hour_from+$hour_range) * 60; $i+= $ani_div)
 			{
-				$minutes = $i;
-				$time = strtotime("$year-$month-$day 00:00:00 +$minutes minutes");
+				$time = strtotime("$year-$month-$day 00:00:00 +$i minutes");
 				$images[] .= gmdate('YmdHi', $time).'-'.$ani_pic_range;
 			
-				if ($time + 60 * $ani_pic_range > $end_time)
+				if ($time > $end_time)
 					break;
 			}
 
@@ -357,8 +388,24 @@ function bo_show_archive_map()
 		}
 		else
 		{
+			
+			if ($hour_range == 24 && $hour_from == 0)
+			{
+				$date_arg = sprintf('%04d%02d%02d', $year, $month, $day);
+			}
+			else
+			{
+				//image url needs UTC-time!
+				$uyear      = gmdate('Y', $time);
+				$umonth     = gmdate('m', $time);
+				$uday       = gmdate('d', $time);
+				$uhour_from = gmdate('H', $time);
+				$date_arg = sprintf('%04d%02d%02d', $uyear, $umonth, $uday);
+				$date_arg .= sprintf('%02d', $uhour_from).'00-'.($hour_range*60);
+			}
+		
 			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time);
-			$img_file = bo_bofile_url().'?map='.$map.'&date='.sprintf('%04d%02d%02d', $year, $month, $day).'&bo_lang='._BL();
+			$img_file = bo_bofile_url().'?map='.$map.'&date='.$date_arg.'&bo_lang='._BL();
 			echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
 		}
 		
@@ -376,8 +423,8 @@ function bo_show_archive_map()
 <script type="text/javascript">
 function bo_enable_timerange(enable, s)
 {
-	document.getElementById('bo_arch_strikes_select_hour_from').disabled=!enable;
-	document.getElementById('bo_arch_strikes_select_hour_to').disabled=!enable;
+	//document.getElementById('bo_arch_strikes_select_hour_from').disabled=!enable;
+	//document.getElementById('bo_arch_strikes_select_hour_to').disabled=!enable;
 	if (s) document.getElementById('bo_arch_strikes_maps_form').submit();
 }
 bo_enable_timerange(<?php echo $ani ? 'true' : 'false'; ?>);

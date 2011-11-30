@@ -235,7 +235,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			if ($archive_maps_enabled && intval(BO_ANIMATIONS_INTERVAL) && $cfg['archive'])
 			{
 				echo '<div class="bo_arch_map_links">';
-				echo '<a href="'.BO_ARCHIVE_URL.'&bo_map='.$static_map_id.'&bo_day_add=1&bo_animation" >'._BL('Animation').'</a> ';
+				echo '<a href="'.BO_ARCHIVE_URL.'&bo_map='.$static_map_id.'&bo_day_add=1&bo_animation=now" >'._BL('Animation').'</a> ';
 				echo '</div>';
 			}
 

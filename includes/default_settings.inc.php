@@ -527,14 +527,19 @@
 @define('BO_ARCHIVE_STR_DETAILS_HYPCOLOR', 'f7f7');
 @define('BO_ARCHIVE_STR_DETAILS_STATION_COUNT_CALC', 4);
 
+//Static map
+@define('BO_SMAP_MAX_RANGE', 24);  //Maximum time range bewteen start and end time (hours)
+@define('BO_SMAP_MIN_RANGE', 15);  //Maximum time range bewteen start and end time (minutes)
+@define('BO_SMAP_RANGE_STEP', 6);  //Step time in select box (hours)
 
 //Animations (not the gif-animations!)
 @define('BO_ANIMATIONS_INTERVAL', 15); //Time in minutes between two frames - 0 disables animations
 @define('BO_ANIMATIONS_STRIKE_TIME', 120); //Time range of displayed strikes per frame
-@define('BO_ANIMATIONS_DEFAULT_RANGE', 2);  //Default time range bewteen start and end time
+@define('BO_ANIMATIONS_DEFAULT_RANGE', 2);  //Default time range bewteen start and end time (hours)
+@define('BO_ANIMATIONS_MAX_RANGE', 24);  //Maximum time range bewteen start and end time (hours)
 @define('BO_ANIMATIONS_WAITTIME', 100); //Wait time between frames during animation (milliseconds)
 @define('BO_ANIMATIONS_WAITTIME_END', 1000); //Wait at the and of a loop (milliseconds)
-
+@define('BO_ANIMATIONS_RANGE_STEP', 4);  //Step time in select box (hours)
 
 
 

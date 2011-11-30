@@ -185,12 +185,12 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 		if (!bo_user_get_level() && $duration != $cfg['animation']['range'])
 		{
-			if ( ($duration > 60 * 24 || ($duration && $duration < 15)) )
+			if ( ($duration > 60 * BO_SMAP_MAX_RANGE || ($duration && $duration < BO_SMAP_MIN_RANGE)) )
 				bo_image_error('Time range not allowed!');
 			
 			//allow only specific settings for guests
-			$minute   = floor($minute / 15) * 15;
-			$duration = floor($duration / 15) * 15;
+			$minute   = floor($minute / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
+			$duration = floor($duration / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
 		}
 		
 		if ($duration)
@@ -203,6 +203,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		{
 			$time_min = strtotime("$year-$month-$day 00:00:00");
 			$time_max = strtotime("$year-$month-$day 23:59:59");
+			$duration = 24 * 60;
 		}
 
 		if (BO_CACHE_SUBDIRS === true)
@@ -210,20 +211,22 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 		$cache_file .= $id.'_'.gmdate('YmdHi', $time_min).'_'.$duration;
 		
+		$time_string = date(_BL('_date').' ', $time_min);
+		$time_string .= date('H:i', $time_min);
+		
 		if ($time_max > $last_update)
 		{
 			$time_max = $last_update;
+			$time_string .= ' - '.date('H:i', $time_max);
+			$expire = time() + $cfg['upd_intv'] / 1.5;
 		}
 		else
 		{
-			$last_update = $time_max + 3600;
+			$last_update  = $time_max + 3600;
+			$time_string .= ' +'.round($duration / 60).'h';
+			$expire       = time() + 3600;
 		}
 
-		$time_string = date(_BL('_date').' ', $time_min);
-		$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
-		
-		$expire = time() + 3600;
-		
 		$file_by_time = true;
 	}
 	else

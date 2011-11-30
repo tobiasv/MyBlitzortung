@@ -38,6 +38,7 @@ $_BL['de']['unit_ksps'] = 'Kilosamples pro Sekunde';
 $_BL['de']['unit_days'] = 'Tage';
 $_BL['de']['unit_kilometers'] = 'km';
 $_BL['de']['days'] = 'Tage';
+$_BL['de']['hours'] = 'Stunden';
 $_BL['de']['number_every_minutes'] = 'alle {NUMBER} Minuten';
 $_BL['de']['number_1every_minute'] = 'jede Minute';
 $_BL['de']['number_minutes'] = '{NUMBER} Minuten';

@@ -38,6 +38,7 @@ $_BL['fr']['unit_ksps'] = 'Ksp/second';
 $_BL['fr']['unit_days'] = 'jours';
 $_BL['fr']['unit_kilometers'] = 'km';
 $_BL['fr']['days'] = 'jours';
+$_BL['fr']['hours'] = 'heures';
 $_BL['fr']['number_every_minutes'] = 'toutes les {NUMBER} minutes';
 $_BL['fr']['number_1every_minute'] = 'toutes les minutes';
 $_BL['fr']['number_minutes'] = 'minutes';
