@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 $_BL['locale'] = 'fr';
 
@@ -145,7 +145,7 @@ $_BL['fr']['Current'] = 'Courant';
 $_BL['fr']['Polarity'] = 'Polarité';
 $_BL['fr']['Strike'] = 'Foudre';
 $_BL['fr']['experimental'] = '!!!expérimental!!!';
-$_BL['fr']['Participated'] = 'Participation de la station';
+$_BL['fr']['Participated'] = 'Participation station';
 $_BL['fr']['Received'] = 'Reçu';
 $_BL['fr']['positive'] = 'positive';
 $_BL['fr']['negative'] = 'négative';
@@ -161,7 +161,7 @@ $_BL['fr']['Ratio'] = 'Taux';
 $_BL['fr']['Pos.'] = 'Pos.';
 $_BL['fr']['Stations'] = 'Stations';
 $_BL['fr']['Search Options'] = 'Options de recherche';
-$_BL['fr']['no strike detected'] = 'Coup de foudre non détecté';
+$_BL['fr']['no strike detected'] = 'Non détecté';
 $_BL['fr']['Runtime'] = 'Durée';
 $_BL['fr']['unit_millisec'] = 'ms';
 $_BL['fr']['Older'] = 'Plus ancien';
@@ -403,7 +403,7 @@ $_BL['fr']['graph_stat_yaxis_title'] = 'Amplitude';
 /*************************************************************/
 /* Archive                                                   */
 /*************************************************************/
-$_BL['fr']['check_only_strikes'] = 'Seulement les coups de foudre validés';
+$_BL['fr']['check_only_strikes'] = 'Seulement la foudre détectée';
 $_BL['fr']['rawgraph'] = 'Graphique signaux';
 $_BL['fr']['lightning_info'] = 'Info sur la foudre';
 $_BL['fr']['strikedetected'] = 'Foudre détectée';
@@ -438,6 +438,14 @@ $_BL['fr']['Distances between all stations'] = 'Distances entre les stations';
 $_BL['fr']['Distances between stations used for locating'] = 'Distances utilisées entre les stations pour la localisation';
 $_BL['fr']['check_show_hyps'] = 'Montrer les courbes hyperboliques';
 $_BL['fr']['Strike is not confirmed'] = 'Non comfirmé';
+$_BL['fr']['map_options_static'] = 'Carte';
+$_BL['fr']['Mean participants'] = 'Moyenne des participants';
+$_BL['fr']['Total density'] = 'Densité totale';
+$_BL['fr']['Station density'] = 'Densité station';
+$_BL['fr']['Station ratio'] = 'Ratio la station';
+$_BL['fr']['View'] = 'Vue';
+$_BL['fr']['Maximum mean participants'] = 'Moyenne max participants';
+$_BL['fr']['Additional information'] = 'Informations additionnelles';
 
 
 /*************************************************************/
@@ -514,7 +522,7 @@ $_BL['fr']['Signal ratio'] = 'Taux de localisation';
 $_BL['fr']['Strikes station min participants'] = 'Min. de stations pour la foudre';
 $_BL['fr']['Stations under construction'] = 'Station à venir';
 $_BL['fr']['h4_stations_under_construction'] = 'Liste des stations à venir';
-$_BL['fr']['w/o GPS-signal'] = 'Sans signal GPS';
+$_BL['fr']['w/o GPS-signal'] = 'sans signal GPS';
 
 $_BL['fr']['legend_stat_strikes_now'] = 'Région';
 $_BL['fr']['legend_stat_amplitudes_time'] = 'Options';
@@ -561,7 +569,7 @@ $_BL['fr']['Positive'] = 'Positive';
 $_BL['fr']['Negative'] = 'Négative';
 $_BL['fr']['Positive electrical direction'] = 'Positive electrical direction';
 $_BL['fr']['Not definite'] = 'Non définie';
-$_BL['fr']['No signal received'] = 'Pas de signal reçu par la station de {STATION}';
+$_BL['fr']['No signal received'] = 'Pas de signaux reçus';
 $_BL['fr']['stat_navi_alarm'] = 'Alertes foudre';
 $_BL['fr']['user_welcome_text'] = 'Vous êtes connecté sous ';
 $_BL['fr']['MyBlitzortung version'] = 'Version de {MYBO_ORIG}';
@@ -588,7 +596,7 @@ $_BL['fr']['Password changed!'] = 'Mot de passe changé!';
 $_BL['fr']['No permission!'] = 'Pas d\'autorisation!';
 $_BL['fr']['Password was not changed!'] = 'Le mot de passe n\'a pas été changé!';
 $_BL['fr']['Welcome to MyBlitzortung user area'] = 'Bienvenu à {MYBO} espace utilisateur';
-$_BL['fr']['Admin tools'] = 'Outils admin';
+$_BL['fr']['Admin tools'] = 'Outils d\'administration';
 $_BL['fr']['File cache info'] = 'Info sur le fichier cache';
 $_BL['fr']['Version information'] = 'Version information';
 $_BL['fr']['PHP version'] = 'PHP Version';
@@ -598,6 +606,19 @@ $_BL['fr']['Files'] = 'Fichiers';
 $_BL['fr']['Click here to delete all files'] = 'Cliquez ici pour effacer tous les fichiers';
 $_BL['fr']['Clear all files'] = 'Nettoyer tous les fichiers.';
 $_BL['fr']['stay logged in'] = 'Restez connecté';
+$_BL['fr']['Administration'] = 'Administration';
+$_BL['fr']['Documentation'] = 'Documentation';
+$_BL['fr']['Import/update data'] = 'Importation et mise à jour des données';
+$_BL['fr']['user_lastlogin_text'] = 'Dernier identifiant';
+$_BL['fr']['user_sessiontime_text'] = 'Connecté depuis';
+$_BL['fr']['Update only strikes'] = 'Maj. des éclaires seulement';
+$_BL['fr']['Update only stations'] = 'Maj. des stations seulement';
+$_BL['fr']['Update only signals'] = 'Maj. des signaux seulement';
+$_BL['fr']['Update only daily statistics'] = 'Maj. des statistiques du jour';
+$_BL['fr']['Update only densities'] = 'Maj. des densités';
+$_BL['fr']['Update only tracks'] = 'Maj. uniquement pour les pistes';
+$_BL['fr']['Force data purge only'] = 'Forcer la purge des données';
+$_BL['fr']['Check alerts only'] = 'Vérifier les alertes';
 
 $_BL['fr']['user_perm0'] = 'Administration';
 $_BL['fr']['user_perm1'] = 'Autres réglages';
@@ -645,12 +666,12 @@ $_BL['fr']['info_accuracy_text'] = '
 La précision est très bonne,inférieur à 1km,équivalent aux sociétés professionelles de détection de la foudre.
 ';
 $_BL['fr']['info_participate_text'] = '
-Vous devez construire votre propre récepteur,et ainsi participer au réseau et obtenir l\'intégralité des données. 
+Vous devez construire votre propre récepteur,et ainsi participer au réseau et obtenir l\'intégralité des données.
 
-Plus d\'information ici: 
+Plus d\'information ici:
 <a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>.
 et ici:
-<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a> 
+<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a>
 ';
 
 $_BL['fr']['info_usage_text'] = '
@@ -659,12 +680,12 @@ Nous ne sommes pas un service d\'information commerciale pour les données de la 
 <a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=5" target="_blank">Blitzortung.org</a>
 ';
 $_BL['fr']['info_myblitzortung_text'] = '
-La visualisation de ces pages est faite par un logiciel appelé 
-{MYBO} ({MYBO_ORIG}). 
+La visualisation de ces pages est faite par un logiciel appelé
+{MYBO} ({MYBO_ORIG}).
 Personne ne peut garantir que ce logiciel affiche toujours des informations correctes!
 Vous êtes responsable de vous même!!!
 {MYBO} ({MYBO_ORIG}) est un logiciel libre. Vous pouvez trouver
-plus d\'informations ici: 
+plus d\'informations ici:
 <a href="http://www.myblitzortung.de?lang=en" target="_blank">www.myblitzortung.de</a>.
 ';
 
@@ -674,7 +695,7 @@ plus d\'informations ici:
 /*************************************************************/
 
 $_BL['fr']['bo_graph_descr_ratio'] = 'Les Taux de foudre et de localisation sont des paramètres importants pour un ajustement correct
-de la station. Calcul: 
+de la station. Calcul:
 <br>Ratio de localisation = (coups de foudre détectés par la station) / (signaux de la station)
 <br>Taux d\'impact = (coups de foudre détectés par la station) / (coups du réseau)
 ';
@@ -721,10 +742,47 @@ $_BL['fr']['bo_stat_other_station_info_back'] = 'Retourner à la station {STATION
 
 $_BL['fr']['archive_search_info'] = 'Ici vous pouvez chercher les {COUNT} coups de foudre dans votre zone. Pour définir cette zone, déplacez le pointeur sur la carte et entrer un rayon de recherche à l\'intérieur. Les coups de foudre seront visualisés comme des points colorés sur la carte. Vous pouvez cliquer dessus pour voir plus d\'informations sur ce coup de foudre. Vous ne pouvez rechercher que dans la zone de couleur rouge autour de la station.';
 
+$_BL['fr']['archive_map_info'] = 'Ici vous pouvez afficher la foudre pour chaque jour sur des cartes différentes.
+Il est également possible de visualiser des cartes animées, mais il faudra du temps pour les charger.
+Les données sont disponibles du {DATE_START} au {DATE_END}. Il n\'y aucune garantie d\'exhaustivité.';
 
+$_BL['fr']['archive_density_info'] = 'Ici vous pouvez afficher des densités de foudre pour les différentes régions. Ces données sont enregistrées de façon indépendante à partir des autres données
+<br>
+<br>
+Quelques conseils: Les données affichées ici ne sont pas normalisées,
+de sorte que les résultats ne peuvent être comparés sur des plages de temps ou de régions plus ou moins grandes!
+Cela est dû à la couverture différentes ainsi que la qualité entre les stations.
+Vous pouvez passer d\'une station de détection à l\autre et de choisir entre différentes vues.
+';
 
+$_BL['fr']['archive_signaltable_info'] = 'Toutes les stations de détection des éclairs du réseau Blitzortung.org reçoivent les signaux de la foudre et aussi
+plus ou moins de bruit parasite. Ici vous pouvez voir quelques-uns des signaux, reçu par la station de {STATION}
+durant les dernières minutes.
+Si d\'autres stations reçoivent le même signal pendant un intervalle de temps très court, la foudre peut-être localisée (temps de la méthode de l\'arrivée - TOA).
+Dans ce cas, des informations supplémentaires au sujet de la foudre seront affichées ici.';
 
+$_BL['fr']['archive_striketable_info'] = 'Ici vous pouvez voir les mêmes informations que sur l\'onglet «signaux», mais aussi
+la foudre où aucun signal n\'a été détecté par votre station. Pour respecter les règles de Blitzortung.org,cette page est accessible uniquement avec un compte utilisateur.
+<br><br>
+Astuce: Les courbes hyperboliques affichés sur la carte sont seulement informatives et ne représentent pas le calcul actuel
+({MYBO_ORIG} ne connait pas pour le moment l\'heure exacte des signaux des autres stations).';
 
+$_BL['fr']['archive_signaltable_info_bottom'] = '
+<p>
+Si la foudre a été détectée,quelques informations complémentaires correspondant à la station de {STATION} seront affichées
+</p>
+<ul>
+<li><span class="bo_descr">Durée:</span> Différence de temps entre la foudre et la réception du signal par la station</li>
+<li><span class="bo_descr">Distance:</span> Distance entre la foudre et la station de {STATION} calculée suivant le principe de 1ms = 300km</li>
+<li><span class="bo_descr">Direction:</span> Direction approximative (La valeur exacte ne peut être affichée pour des raisons d\usage)</li>
+<li><span class="bo_descr">Déviation:</span> Plus la valeur est petite,meilleure est la localisation</li>
+<li><span class="bo_descr">Courant:</span> Courant de la foudre. Très experimental! Seulement à titre d\'information!</li>
+<li><span class="bo_descr">Polarité:</span>Polarité positive ou négative de la foudre . Est déterminée par des signaux. Très expérimental, ne convient que pour la foudre proche!</li>
+<li><span class="bo_descr">Participants:</span> Nombre de stations ayant reçu les données. Plus le nombre est important meilleur c\'est.</li>
+<li><span class="bo_descr">Participation:</span> La station de {STATION} a t elle participée? Si "non" est en rouge, alors le signal a bien été reçu mais pas utilisé pour les calculs</li>
+<li><span class="bo_descr">Angle de localisation:</span> Angle max. des stations ayant participées autour de la position de foudre (entre parenthèses: les stations qui ne sont pas utilisées pour le calcul). Une valeur de 270 ° serait idéal, mais un bon repérage est aussi possibe sur des valeurs beaucoup plus petites.
+<li><span class="bo_descr">Canal:</span> Canaux enregistrés dans le graphique (si la station fonctionne en mode "Best channel")
+</ul>';
 
 
 
@@ -915,8 +973,8 @@ $_BL['fr']['Meteox rain radar'] = 'Radar pluies (meteox.com)';
 /*************************************************************/
 
 
-
-
+$_BL['fr']['Specials'] = 'Spécials';
+$_BL['fr']['Importing data...'] = 'Importation des données';
 
 
 
@@ -930,136 +988,7 @@ $_BL['fr']['Meteox rain radar'] = 'Radar pluies (meteox.com)';
 /********************/
 
 
-//en: 'Map'
-$_BL['fr']['map_options_static'] = '';
-
-//en: 'Mean participants'
-$_BL['fr']['Mean participants'] = '';
-
-//en: 'Total density'
-$_BL['fr']['Total density'] = '';
-
-//en: 'Station density'
-$_BL['fr']['Station density'] = '';
-
-//en: 'Station ratio'
-$_BL['fr']['Station ratio'] = '';
-
-//en: 'View'
-$_BL['fr']['View'] = '';
-
 //en: 'Avg. participants per strike locating'
 $_BL['fr']['Avg. participants per strike locating'] = '';
 
-//en: 'Maximum mean participants'
-$_BL['fr']['Maximum mean participants'] = '';
-
-//en: 'Additional information'
-$_BL['fr']['Additional information'] = '';
-
-//en: 'Administration'
-$_BL['fr']['Administration'] = '';
-
-//en: 'Documentation'
-$_BL['fr']['Documentation'] = '';
-
-//en: 'Import/update data'
-$_BL['fr']['Import/update data'] = '';
-
-//en: 'Last Login'
-$_BL['fr']['user_lastlogin_text'] = '';
-
-//en: 'Current session time'
-$_BL['fr']['user_sessiontime_text'] = '';
-
-//en: 'Update only strikes'
-$_BL['fr']['Update only strikes'] = '';
-
-//en: 'Update only stations'
-$_BL['fr']['Update only stations'] = '';
-
-//en: 'Update only signals'
-$_BL['fr']['Update only signals'] = '';
-
-//en: 'Update only daily statistics'
-$_BL['fr']['Update only daily statistics'] = '';
-
-//en: 'Update only densities'
-$_BL['fr']['Update only densities'] = '';
-
-//en: 'Update only tracks'
-$_BL['fr']['Update only tracks'] = '';
-
-//en: 'Force data purge only'
-$_BL['fr']['Force data purge only'] = '';
-
-//en: 'Check alerts only'
-$_BL['fr']['Check alerts only'] = '';
-
-//en: 'Here you can display the lightning strikes for each day on different maps.
-// It is also possible to view animated maps, but consider that it will take some time to load them. 
-// Lightning data is available from {DATE_START} to {DATE_END}. There\'s no guarantee for completeness.
-// '
-$_BL['fr']['archive_map_info'] = '';
-
-//en: '
-// Here you can display lightning densities for different regions. This data is saved independently from
-// the other strike data. 
-// <br>
-// <br>
-// Some hints: The data displayed here is not standardized, 
-// so the results can not be compared over longer time ranges or bigger regions!
-// This is due to different station coverage and improved lightning detection. 
-// You can switch to a detection station and select between different views.
-// '
-$_BL['fr']['archive_density_info'] = '';
-
-//en: '
-// Ever lightning detection stations of the Blitzortung.org network receives signal from strikes and also 
-// more or less noise. Here you can see some of the signals, that where received from the station {STATION} 
-// during the last minutes. 
-// If other stations receives the same signal during a very short time range then maybe a lightning can be 
-// located out of the correspondending times (time of arrival method - TOA). 
-// In this case additional information about the lightning strike will be displayed here.
-// '
-$_BL['fr']['archive_signaltable_info'] = '';
-
-//en: 'Here you can see the same information as on the site "signals" but also
-// strikes where no signal was detected by you station. To stay in common with the Blitzortung.org rules,
-// this page can only be accessed with an user account.
-// <br><br>
-// Hint: The hyperbolic curves displayed in the map are only informative and don\'t represent the actual
-// calculation ({MYBO_ORIG} doesn\'t actually know the times of the other stations).
-// '
-$_BL['fr']['archive_striketable_info'] = '';
-
-//en: '
-// <p>
-// If a lightning strike was detected, some additional information correspondending to the station {STATION} will be displayed. 
-// </p>
-// <ul>
-// <li><span class="bo_descr">Runtime:</span> Difference between time of strike and reception</li>
-// <li><span class="bo_descr">Distance:</span> Distance strike to station {STATION} calculated from runtime (1ms = 300km)</li>
-// <li><span class="bo_descr">Direction:</span> Approximate direction (exact value won\' be displayed due to usage limitations)</li>
-// <li><span class="bo_descr">Deviation:</span> The smaller, the better the locating</li>
-// <li><span class="bo_descr">Current:</span> Current of the strike. Very experimental! Currently almost no informative value!</li>
-// <li><span class="bo_descr">Polarity:</span> Positive/negative lightning. Is determined out of signal. Very experimental, only suitable for near lightning!</li>
-// <li><span class="bo_descr">Participants:</span> Number of stations that received the lightning strike. The more, the better.</li>
-// <li><span class="bo_descr">Participanted:</span> Did the station {STATION} participate? If "no" is colored, then a signal has been received but it wasn\'t used for the calculation</li>
-// <li><span class="bo_descr">Locating angle:</span> Max. angle of participated station around lightning position (in parenthesis: stations that weren\'t used for calculation). A value of 270° would be ideal, but a good locating is also possibe on much smaller values.
-// <li><span class="bo_descr">Channel:</span> Recorded channel in the graph (if station operates in "Best Channel Mode")
-// </ul>
-// '
-$_BL['fr']['archive_signaltable_info_bottom'] = '';
-
-
-/*******************************/
-/*  NOT AVAILABLE IN ORIGINAL  */
-/*******************************/
-
-$_BL['fr']['España / Spain'] = 'Espagne';
-$_BL['fr']['Deutschland'] = 'Allemagne';
-$_BL['fr']['Danmark'] = 'Danemark';
-$_BL['fr']['Slowenien'] = 'Slovénie';
-$_BL['fr']['Czech Repubic'] = 'République Tchéque';
 

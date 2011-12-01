@@ -607,7 +607,7 @@ $_BL['de']['Files'] = 'Dateien';
 $_BL['de']['Click here to delete all files'] = 'Hier klicken um alle Dateien zu löschen';
 $_BL['de']['Clear all files'] = 'Dateien bereinigen.';
 $_BL['de']['stay logged in'] = 'Speichern';
-$_BL['de']['Administration'] = '';
+$_BL['de']['Administration'] = 'Administration';
 $_BL['de']['Documentation'] = 'Dokumentation';
 $_BL['de']['Import/update data'] = 'Datenimport und -update';
 $_BL['de']['user_lastlogin_text'] = 'Letzter Login';
@@ -1022,8 +1022,7 @@ $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
 /*************************************************************/
 
 
-
-
-
+$_BL['de']['Specials'] = 'Specials';
+$_BL['de']['Importing data...'] = 'Importiere Daten...';
 
 

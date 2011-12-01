@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 $_BL['locale'] = 'en';
 
@@ -656,10 +656,10 @@ $_BL['en']['h3_info_usage'] = 'Data usage';
 $_BL['en']['h3_info_hint'] = 'Important notice';
 
 $_BL['en']['info_general_warning'] = '
-We are not liable for the completeness, timeliness, quality and accuracy of the information on our website. 
+We are not liable for the completeness, timeliness, quality and accuracy of the information on our website.
 We are not responsible for damages, resulting from trusting the content of our website or its use. ';
 $_BL['en']['info_general_text'] = '
-Blitzortung.org is a private network of lightning tracker stations. They catch the electromagnetic signals of strikes. 
+Blitzortung.org is a private network of lightning tracker stations. They catch the electromagnetic signals of strikes.
 Together with the timestamp the position of a strike can be calculated out of the signals (TOA - time of arrival method).
 
 You will find more information on the main site of the project: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
@@ -671,10 +671,10 @@ Accuracy is quite good and is sometimes lower than 1 kilometer. This is equal to
 $_BL['en']['info_participate_text'] = '
 You have to build your own receiver (costs about 150 Euro). With that, you can participate in the network and you
 will get access to all strike data.
-More information here: 
+More information here:
 <a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>.
 See also:
-<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a> 
+<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a>
 ';
 
 $_BL['en']['info_usage_text'] = '
@@ -683,12 +683,12 @@ We are not a commercial information service for lightning data! See more informa
 <a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=5" target="_blank">Blitzortung.org</a>
 ';
 $_BL['en']['info_myblitzortung_text'] = '
-Visualisation on this page is done by a software called 
-{MYBO} ({MYBO_ORIG}). 
+Visualisation on this page is done by a software called
+{MYBO} ({MYBO_ORIG}).
 Nobody can guarantee, that this software shows always the correct information!
 The responsibility is on your side!
 {MYBO} is free software. You can find
-more information here: 
+more information here:
 <a href="http://www.myblitzortung.de?lang=en" target="_blank">www.myblitzortung.de</a>.
 ';
 
@@ -698,7 +698,7 @@ more information here:
 /*************************************************************/
 
 $_BL['en']['bo_graph_descr_ratio'] = 'Strike and locating ratios are important parameters for the correct adjustment
-of the station. Calculations: 
+of the station. Calculations:
 <br>locating ratio = (detected strikes of the station) / (signals of the station)
 <br>strike ratio = (detected strikes of the station) / (network strike count)
 ';
@@ -730,7 +730,7 @@ $_BL['en']['bo_graph_amplitudes'] = 'Amplitudes of Signals. You can change betwe
 $_BL['en']['bo_graph_amplitudes_time'] = 'The development of the amplitudes of the signals. You can choose between the maximum amplitude of the signal or the amplitude of the first sample.';
 $_BL['en']['bo_graph_frequencies_time'] = 'The development of the frequency peaks by time.';
 $_BL['en']['bo_graph_deviations'] = 'For every strike a deviation is calculated';
-$_BL['en']['bo_graph_evaluated_signals'] = 'Signals of the station {STATION} that could not be assigned to a strike by Blitzortung.org are rescanned by {MYBO}. In some cases a strike could be reassigned to a signal. The more this happens the higher is the probability	that there is a problem with the station.';
+$_BL['en']['bo_graph_evaluated_signals'] = 'Signals of the station {STATION} that could not be assigned to a strike by Blitzortung.org are rescanned by {MYBO}. In some cases a strike could be reassigned to a signal. The more this happens the higher is the probability that there is a problem with the station.';
 $_BL['en']['bo_graph_deviations_time'] = 'Development by time of mean deviation or development of a specific deviation';
 $_BL['en']['bo_graph_distance'] = 'Development of the mean distance to the station {STATION}. You can estimate the stations sensitivity by comparing the two lines.';
 $_BL['en']['bo_descr_strikes_now'] = 'Lightning data is downloaded {UPDATE_INTERVAL} from Blitzortung.org servers. The interval for the calculation of the strike rate is {RATE_INTERVAL}. ';
@@ -746,27 +746,27 @@ $_BL['en']['bo_stat_other_station_info_back'] = 'Back to station {STATION}';
 $_BL['en']['archive_search_info'] = 'Here you search for the last {COUNT} strikes in an area. To define that area, move the marker on the map and enter a radius to search within. Strikes will be visualized as colored dots on the map. You can click on it to see more information about that strike. You can only search for strikes in the red colored area around the station.';
 
 $_BL['en']['archive_map_info'] = 'Here you can display the lightning strikes for each day on different maps.
-It is also possible to view animated maps, but consider that it will take some time to load them. 
+It is also possible to view animated maps, but consider that it will take some time to load them.
 Lightning data is available from {DATE_START} to {DATE_END}. There\'s no guarantee for completeness.
 ';
 
 $_BL['en']['archive_density_info'] = '
 Here you can display lightning densities for different regions. This data is saved independently from
-the other strike data. 
+the other strike data.
 <br>
 <br>
-Some hints: The data displayed here is not standardized, 
+Some hints: The data displayed here is not standardized,
 so the results can not be compared over longer time ranges or bigger regions!
-This is due to different station coverage and improved lightning detection. 
+This is due to different station coverage and improved lightning detection.
 You can switch to a detection station and select between different views.
 ';
 
 $_BL['en']['archive_signaltable_info'] = '
-Ever lightning detection stations of the Blitzortung.org network receives signal from strikes and also 
-more or less noise. Here you can see some of the signals, that where received from the station {STATION} 
-during the last minutes. 
-If other stations receives the same signal during a very short time range then maybe a lightning can be 
-located out of the correspondending times (time of arrival method - TOA). 
+Ever lightning detection stations of the Blitzortung.org network receives signal from strikes and also
+more or less noise. Here you can see some of the signals, that where received from the station {STATION}
+during the last minutes.
+If other stations receives the same signal during a very short time range then maybe a lightning can be
+located out of the correspondending times (time of arrival method - TOA).
 In this case additional information about the lightning strike will be displayed here.
 ';
 
@@ -780,7 +780,7 @@ calculation ({MYBO_ORIG} doesn\'t actually know the times of the other stations)
 
 $_BL['en']['archive_signaltable_info_bottom'] = '
 <p>
-If a lightning strike was detected, some additional information correspondending to the station {STATION} will be displayed. 
+If a lightning strike was detected, some additional information correspondending to the station {STATION} will be displayed.
 </p>
 <ul>
 <li><span class="bo_descr">Runtime:</span> Difference between time of strike and reception</li>
@@ -955,7 +955,7 @@ $_BL['en']['Poland'] = 'Poland';
 $_BL['en']['Spain'] = 'Spain';
 $_BL['en']['Sweden'] = 'Sweden';
 $_BL['en']['The Netherlands'] = 'The Netherlands';
-$_BL['en']['United Kingdom'] = 'United Kingdom	';
+$_BL['en']['United Kingdom'] = 'United Kingdom ';
 $_BL['en']['Bulgaria'] = 'Bulgaria';
 $_BL['en']['Albania'] = 'Albania';
 $_BL['en']['Russia'] = 'Russia';
@@ -983,8 +983,8 @@ $_BL['en']['Meteox rain radar'] = 'Rain radar (meteox.com)';
 /*************************************************************/
 
 
-
-
+$_BL['en']['Specials'] = 'Specials';
+$_BL['en']['Importing data...'] = 'Importing data...';
 
 
 
