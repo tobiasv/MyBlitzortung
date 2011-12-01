@@ -334,6 +334,7 @@ function bo_check_for_update()
 				}
 				else
 				{
+					$ok = true;
 					echo _BL('Already DONE BEFORE');
 				}
 				echo '</b></li>';

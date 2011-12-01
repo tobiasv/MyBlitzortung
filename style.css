@@ -293,6 +293,7 @@ padding: 2px 5px;
 #myblitzortung .bo_sig_table td.bo_sig_table_time {
 font-size: 12px;
 border-bottom: 1px dotted #eee;
+height: 21px;
 }
 
 #myblitzortung .bo_sig_table td.bo_sig_table_time a{
@@ -758,7 +759,7 @@ margin: 0px 0px 5px 5px;
 }
 
 #myblitzortung .bo_select_region {
-width: 130px;
+width: 175px;
 }
 
 #myblitzortung .bo_strike_not_confirmed {

@@ -469,7 +469,9 @@ function bo_show_archive_search()
 			$select_count = (int)$_GET['bo_count'];
 			$time_from = trim($_GET['bo_time_from']);
 			$time_to = trim($_GET['bo_time_to']);
-
+			$utime_from = 0;
+			$utime_to = 0;
+			
 			if (preg_match('/([0-9]{2,4})(-([0-9]{2}))?(-([0-9]{2}))? *([0-9]{2})?(:([0-9]{2}))?(:([0-9]{2}))?/', $time_from, $r))
 				$utime_from = mktime($r[6], $r[8], $r[10], $r[3], $r[5], $r[1]);
 			else
@@ -526,7 +528,7 @@ function bo_show_archive_search()
 			$sql_where .= ($radius ? "AND distance < $radius" : "");
 		}
 		
-		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
+		echo $sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
 						s.current current, s.deviation deviation, s.current current, s.polarity polarity, s.part part, s.raw_id raw_id
 				FROM ".BO_DB_PREF."strikes s $index_sql
 				WHERE 1
@@ -1088,55 +1090,55 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				$s_bears[0][$sid] = bo_latlon2bearing($s_data[$sid]['lat'], $s_data[$sid]['lon'], $row['lat'], $row['lon']);
 			}
 			
-			
-
-			//Get stations that participated in calculation
-			asort($s_dists[0]);
-			$i=0;
-			foreach($s_dists[0] as $sid => $dist)
+			if (count($s_data))
 			{
-				if ($i < bo_participants_locating_max())
+				//Get stations that participated in calculation
+				asort($s_dists[0]);
+				$i=0;
+				foreach($s_dists[0] as $sid => $dist)
 				{
-					$s_dists[1][$sid] = $s_dists[0][$sid];
-					$s_bears[1][$sid] = $s_bears[0][$sid];
-				}
-				else
-					break;
-					
-				$i++;
-			}
-
-			//Calculate distances and angles for calc and non-calc stations
-			for ($i=0;$i<=1;$i++)
-			{
-				
-				//Distances between stations
-				$s_data_tmp = $s_data;
-				foreach($s_data as $sid1 => $d1)
-				{
-					foreach($s_data_tmp as $sid2 => $d2)
+					if ($i < bo_participants_locating_max())
 					{
-						$s_sdists[$i][$sid1.'.'.$sid2] = bo_latlon2dist($d1['lat'], $d1['lon'], $d2['lat'], $d2['lon']);
+						$s_dists[1][$sid] = $s_dists[0][$sid];
+						$s_bears[1][$sid] = $s_bears[0][$sid];
 					}
+					else
+						break;
+						
+					$i++;
 				}
-				asort($s_sdists[$i]);
 
-				
-				//Locating angles
-				asort($s_bears[$i]);
-				end($s_bears[$i]);
-				list($sid, $lastbear) = each($s_bears[$i]);
-				$s_bear_diffs = array();
-				$lastbear -=360;
-				foreach($s_bears[$i] as $sid => $bear)
+				//Calculate distances and angles for calc and non-calc stations
+				for ($i=0;$i<=1;$i++)
 				{
-					$s_bear_diffs[$sid] = $bear - $lastbear;
-					$lastbear = $bear;
+					
+					//Distances between stations
+					$s_data_tmp = $s_data;
+					foreach($s_data as $sid1 => $d1)
+					{
+						foreach($s_data_tmp as $sid2 => $d2)
+						{
+							$s_sdists[$i][$sid1.'.'.$sid2] = bo_latlon2dist($d1['lat'], $d1['lon'], $d2['lat'], $d2['lon']);
+						}
+					}
+					asort($s_sdists[$i]);
+
+					
+					//Locating angles
+					asort($s_bears[$i]);
+					end($s_bears[$i]);
+					list($sid, $lastbear) = each($s_bears[$i]);
+					$s_bear_diffs = array();
+					$lastbear -=360;
+					foreach($s_bears[$i] as $sid => $bear)
+					{
+						$s_bear_diffs[$sid] = $bear - $lastbear;
+						$lastbear = $bear;
+					}
+					
+					$loc_angle[$i] = 360 - max($s_bear_diffs);
 				}
-				
-				$loc_angle[$i] = 360 - max($s_bear_diffs);
 			}
-			
 		}
 
 
@@ -1145,7 +1147,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 		echo '<td class="bo_sig_table_time">';
 		echo '<span class="bo_descr">';
-		echo ($show_empty_sig ? _BL('Time') : _BL('Recieved')).': ';
+		echo ($show_empty_sig ? _BL('Time') : _BL('Received')).': ';
 		echo '</span>';
 		echo '<span class="bo_value">';
 
@@ -1181,7 +1183,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo _BL('signal not found');
 			}
 			else
-				echo _BL('No signal recieved.');
+				echo _BL('No signal received');
 				
 			echo '</td>';
 
@@ -1198,7 +1200,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					echo _BL('signal not found');
 				}
 				else
-					echo _BL('No signal recieved.');
+					echo _BL('No signal received');
 				
 				echo '</td>';
 			}
@@ -1375,7 +1377,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '</tr>';
 
 		
-		if ( (bo_user_get_level() & BO_PERM_ARCHIVE) && ($strike_id || ($row['strike_id'] && $show_details)) )
+		if ( (bo_user_get_level() & BO_PERM_ARCHIVE) && count($s_data) && ($strike_id || ($row['strike_id'] && $show_details)) )
 		{
 				
 			$i = 0;

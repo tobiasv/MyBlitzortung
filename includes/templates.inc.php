@@ -406,6 +406,7 @@ $_BO['tpl_imgmap']['europe_kml_2h']['upd_intv'] = 10; //minutes
 $_BO['tpl_imgmap']['europe_kml_2h']['proj'] = 'plate';
 $_BO['tpl_imgmap']['europe_kml_2h']['coord'] = array(75, 40, 26, -14); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['europe_kml_2h']['kml'] = true;
+$_BO['tpl_imgmap']['europe_kml_2h']['density'] = false;
 
 $_BO['tpl_imgmap']['europe_kml_24h'] = $_BO['tpl_imgmap']['europe_kml_2h'];
 $_BO['tpl_imgmap']['europe_kml_24h']['trange'] = 24; //hours!

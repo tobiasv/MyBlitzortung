@@ -997,10 +997,15 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 
 function bo_times2sql($time_min = 0, $time_max = 0)
 {
+	
 	$time_min = intval($time_min);
 	$time_max = intval($time_max);
 
-	if (!$time_max)
+	if (!$time_min && !$time_max)
+	{
+		return " 1 ";
+	}
+	elseif (!$time_max)
 		$time_max = pow(2, 31) - 1;
 	
 	//date range

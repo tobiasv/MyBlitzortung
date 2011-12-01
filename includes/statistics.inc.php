@@ -260,7 +260,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 
 	echo '<select name="bo_month" onchange="submit();" id="bo_stat_strikes_select_month">';
 	foreach($months as $i => $m)
-		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').'>'.$m.'</option>';
+		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').' style="'.($i <= 0 ? 'font-weight:bold;' : '').'">'.$m.'</option>';
 	echo '</select>';
 	
 	echo '</fieldset>';
