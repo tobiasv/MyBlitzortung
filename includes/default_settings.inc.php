@@ -539,7 +539,7 @@
 @define('BO_ANIMATIONS_MAX_RANGE', 24);  //Maximum time range bewteen start and end time (hours)
 @define('BO_ANIMATIONS_WAITTIME', 100); //Wait time between frames during animation (milliseconds)
 @define('BO_ANIMATIONS_WAITTIME_END', 1000); //Wait at the and of a loop (milliseconds)
-@define('BO_ANIMATIONS_RANGE_STEP', 4);  //Step time in select box (hours)
+@define('BO_ANIMATIONS_RANGE_STEP', 1);  //Step time in select box (hours)
 
 
 

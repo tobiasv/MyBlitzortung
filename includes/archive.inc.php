@@ -199,7 +199,8 @@ function bo_show_archive_map()
 		{
 			if ($ani_preset == 'now')
 			{
-				$hour_from = date('H') - $ani_default_range;
+				$hour_from = date('H') - ($ani_pic_range / 60) * 2;
+				$hour_range = $ani_default_range + ($hours_interval <= 6 ? $hours_interval : 0);
 			}
 			elseif ($ani_preset == 'day')
 			{
@@ -377,8 +378,8 @@ function bo_show_archive_map()
 			{
 				$time = strtotime("$year-$month-$day 00:00:00 +$i minutes");
 				$images[] .= gmdate('YmdHi', $time).'-'.$ani_pic_range;
-			
-				if ($time > $end_time)
+
+				if ($time > $end_time - $ani_pic_range * 60)
 					break;
 			}
 
