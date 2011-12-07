@@ -529,7 +529,7 @@ function bo_show_archive_search()
 			$sql_where .= ($radius ? "AND distance < $radius" : "");
 		}
 		
-		echo $sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
+		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
 						s.current current, s.deviation deviation, s.current current, s.polarity polarity, s.part part, s.raw_id raw_id
 				FROM ".BO_DB_PREF."strikes s $index_sql
 				WHERE 1

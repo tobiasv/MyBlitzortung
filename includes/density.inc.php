@@ -409,7 +409,7 @@ function bo_show_archive_density()
 	$year = intval($_GET['bo_year']) ? intval($_GET['bo_year']) : date('Y');
 	$month = intval($_GET['bo_month']);
 	$station_id = intval($_GET['bo_station']);
-	$ratio = isset($_GET['bo_ratio']);
+	$ratio = intval($_GET['bo_ratio']);
 
 	// Map infos
 	$cfg = $_BO['mapimg'][$map];
@@ -430,28 +430,22 @@ function bo_show_archive_density()
 	
 	$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities WHERE status=5")->fetch_assoc();
 	$show_whole_timerange = $row['cnt'] ? true : false;
-
 	
 	$station_infos = bo_stations('id', '', false);
 	$station_infos[0]['city'] = _BL('All', false);
-
 	$stations = bo_get_density_stations();
 	
 	
 	echo '<div id="bo_dens_maps">';
-
 	echo '<p class="bo_general_description" id="bo_archive_density_info">';
 	echo _BL('archive_density_info');
 	echo '</p>';
-	
 	echo '<a name="bo_arch_strikes_form"></a>';
-	echo '<form action="?#bo_arch_strikes_form" method="GET" class="bo_arch_strikes_form">';
+	echo '<form action="?#bo_arch_strikes_form" method="GET" class="bo_arch_strikes_form" name="bo_arch_strikes_form">';
 	echo bo_insert_html_hidden(array('bo_year', 'bo_map', 'bo_station', 'bo_ratio'));
-
+	echo '<input type="hidden" value="'.($ratio ? 1 : 0).'" name="bo_ratio">';
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_arch_densities').'</legend>';
-
-	
 	echo '<span class="bo_form_descr">'._BL('Map').':</span> ';
 	echo '<select name="bo_map" id="bo_arch_dens_select_map" onchange="submit();">';
 	foreach($_BO['mapimg'] as $id => $d)
@@ -488,12 +482,6 @@ function bo_show_archive_density()
 			echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>'._BC($station_infos[$id]['city']).($id ? ' ('._BL($station_infos[$id]['country']).')' : '').'</option>';
 	}
 	echo '</select>';
-	
-	/*
-	echo '<input type="checkbox" name="bo_ratio" value="1" '.($ratio && $station_id ? 'checked="checked"' : '').' '.($station_id ? '' : 'disabled').' onchange="submit();" onclick="submit();" id="bo_arch_dens_ratio">';
-	echo '<label for="bo_arch_dens_ratio"> '._BL('Strike ratio').'</label> &nbsp; ';
-	*/
-	
 	echo '<input type="submit" name="bo_ok" value="'._BL('Ok').'" id="bo_archive_density_submit" class="bo_form_submit">';
 	
 	if ($year > 0)
@@ -529,11 +517,10 @@ function bo_show_archive_density()
 	}
 	
 	echo '</fieldset>';
-
 	echo '</form>';
 
-	$mapname = _BL($_BO['mapimg'][$map]['name']);
 	
+	$mapname = _BL($_BO['mapimg'][$map]['name']);
 	
 	$alt = $ratio ? _BL('Strike ratio') : _BL('arch_navi_density');
 	$alt .= $station_id ? ' ('._BL('Station').' '._BC($station_infos[$station_id]['city']).')' : '';
@@ -543,41 +530,68 @@ function bo_show_archive_density()
 	if ($year > 0)
 		$img_file .= '&bo_year='.$year.'&bo_month='.$month;
 	$img_file .= '&bo_lang='._BL();
-	$img_file .= '&'.floor(time() / 60);
+	$img_file .= '&'.floor(time() / 3600);
+	$img_file_start = $img_file.'&id='.$station_id.($ratio ? '&ratio' : '');
 	
 	$footer = $_BO['mapimg'][$map]['footer'];
 	$header = $_BO['mapimg'][$map]['header'];
 
 	echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
-	
 	echo '<div class="bo_map_header">'._BC($header, true).'</div>';
+	echo '<div class="bo_arch_map_links">';
+	echo '<strong>'._BL('View').': &nbsp;</strong> ';
 
 	if ($station_id > 0)
 	{	
-		echo '<div class="bo_arch_map_links">';
-		echo '<strong>'._BL('View').': &nbsp;</strong> ';
-		echo '<a href="javascript:void(0);" id="bo_dens_map_toggle2" class="bo_dens_map_toggle'.($ratio ? '' : '_active').'" onclick="bo_toggle_dens_map(2, \'&id='.$station_id.'\');">'._BL('Station density').'</a> &nbsp; ';
-		echo '<a href="javascript:void(0);" id="bo_dens_map_toggle3" class="bo_dens_map_toggle'.($ratio ? '_active' : '').'" onclick="bo_toggle_dens_map(3, \'&id='.$station_id.'&ratio\');">'._BL('Station ratio').'</a> &nbsp; ';
-		echo '<a href="javascript:void(0);" id="bo_dens_map_toggle1" class="bo_dens_map_toggle" onclick="bo_toggle_dens_map(1, \'\');">'._BL('Total density').'</a> &nbsp; ';
-		echo '<a href="javascript:void(0);" id="bo_dens_map_toggle4" class="bo_dens_map_toggle" onclick="bo_toggle_dens_map(4, \'&id=-1\');">'._BL('Mean participants').'</a> &nbsp; ';
-		echo '</div>';
-		
-		$img_file_start = $img_file.'&id='.$station_id.($ratio ? '&ratio' : '');
+		echo '<a href="javascript:void(0);" 
+				id="bo_dens_map_toggle1" 
+				class="bo_dens_map_toggle'.($station_id && !$ratio ? '_active' : '').'" 
+				onclick="bo_toggle_dens_map(1, '.$station_id.');"
+				>'._BL('Station density').'</a> &nbsp; ';
+				
+		echo '<a href="javascript:void(0);" 
+				id="bo_dens_map_toggle2" 
+				class="bo_dens_map_toggle'.($station_id && $ratio ? '_active' : '').'" 
+				onclick="bo_toggle_dens_map(2, '.$station_id.', true);"
+				>'._BL('Station ratio').'</a> &nbsp; ';
 	}
-	else
-		$img_file_start = $img_file;
-
+	
+	echo '<a href="javascript:void(0);" 
+			id="bo_dens_map_toggle3" 
+			class="bo_dens_map_toggle'.(!$station_id ? '_active' : '').'" 
+			onclick="bo_toggle_dens_map(3, 0);"
+			>'._BL('Total density').'</a> &nbsp; ';
+			
+	echo '<a href="javascript:void(0);" 
+			id="bo_dens_map_toggle4" 
+			class="bo_dens_map_toggle'.($station_id == -1? '_active' : '').'" 
+			onclick="bo_toggle_dens_map(4, -1);"
+			>'._BL('Mean participants').'</a> &nbsp; ';
+			
+	echo '</div>';
+		
+	// The map
+	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
+	echo '<img style="background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file_start.'" alt="'.htmlspecialchars($alt).'">';
+	echo '</div>';
+	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
+	echo '</div>';
+	echo '</div>';
+	
 
 ?>
 <script type="text/javascript">
-function bo_toggle_dens_map(id, url)
-{
-	var i=0;
-	for (i=1;i<=4;i++)
-		document.getElementById('bo_dens_map_toggle' + i).className="bo_dens_map_toggle" + (id == i ? '_active' : '');
 
+function bo_toggle_dens_map(id, sid, ratio)
+{
 	document.getElementById('bo_arch_map_img').src='<?php echo bo_bofile_url().'?image=blank'; ?>';
-	window.setTimeout("bo_toggle_dens_map2('"+url+"');", 100);
+	document.bo_arch_strikes_form.bo_ratio.value=ratio ? 1 : 0;
+	
+	if (sid != 0)
+		document.bo_arch_strikes_form.bo_station=sid;
+		
+	bo_toggle_dens_map_url(id);
+	window.setTimeout("bo_toggle_dens_map2('&id="+sid+(ratio ? '&ratio' : '')+"');", 100);
 }
 
 function bo_toggle_dens_map2(url)
@@ -585,18 +599,27 @@ function bo_toggle_dens_map2(url)
 	document.getElementById('bo_arch_map_img').src='<?php echo $img_file; ?>' + url;
 }
 
+function bo_toggle_dens_map_url(id)
+{
+	if (id)
+	{
+		for (var i=1;i<=4;i++)
+		{
+			if (document.getElementById('bo_dens_map_toggle' + i))
+				document.getElementById('bo_dens_map_toggle' + i).className="bo_dens_map_toggle" + (id == i ? '_active' : '');
+		}
+	}
+}
+
+//bo_toggle_dens_map_url();
+
 </script>
 <?php
-			
-	
-	// The map
-	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
-	echo '<img style="background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file_start.'" alt="'.htmlspecialchars($alt).'">';
-	echo '</div>';
-	
-	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
-	echo '</div>';
-	echo '</div>';
+
+
+
+
+	return;
 }
 
 

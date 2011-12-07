@@ -389,7 +389,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo $strikesh ? number_format($strikesh_own / $strikesh * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 		
 		if ($dens_stations[$station_id])
-			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=density&bo_station='.$station_id.'&bo_ratio">'._BL('Map').'</a>)';
+			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=density&bo_station='.$station_id.'&bo_ratio=1">'._BL('Map').'</a>)';
 		
 		echo '</span></li>';
 		
