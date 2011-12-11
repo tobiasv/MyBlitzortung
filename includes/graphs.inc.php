@@ -550,7 +550,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$title_no_hours = true;
 		
 		if (isset($own['time']) && $own['time'])
-			$add_title = ' '._BL('since').date(_BL('_date'),$own['time']);
+			$add_title = ' '._BL('since').' '.date(_BL('_date'),$own['time']);
 		else
 			$add_title = ' '._BL('since begin of data logging');
 		
@@ -613,7 +613,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 
 		if (isset($own['time']) && $own['time'])
-			$add_title = ' '._BL('since').date(_BL('_date'),$own['time']);
+			$add_title = ' '._BL('since').' '.date(_BL('_date'),$own['time']);
 		else
 			$add_title = ' '._BL('since begin of data logging');
 

@@ -460,7 +460,7 @@ $_BL['de']['h4_stat_longtime_network'] = 'Ortungsnetzwerk';
 $_BL['de']['h4_stat_other_database'] = 'Datenbankstatistik';
 $_BL['de']['h4_stat_other_gps'] = 'GPS';
 $_BL['de']['h4_stat_other_updates'] = 'Aktualisierungen';
-$_BL['de']['h4_stat_longtime_station'] = 'Station {STATION}';
+$_BL['de']['h4_stat_longtime_station'] = 'Station {STATION_CITY}';
 $_BL['de']['h4_table_network'] = 'Tabellarische Übersicht';
 $_BL['de']['h3_stat_network'] = 'Statistiken zum gesamten Ortungsnetzwerk';
 $_BL['de']['h3_stat_longtime'] = 'Langzeitstatistik';
@@ -716,7 +716,7 @@ $_BL['de']['bo_graph_descr_ratio'] = '
 $_BL['de']['bo_stat_network_descr_lasth'] = 'Alle Angaben beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung. ';
 $_BL['de']['bo_stat_network_descr_table'] = 'Hier sind alle aktiven Stationen des Ortungsnetzwerks aufgelistet. Durch Anklicken der Spaltenüberschriften kann die Tabelle entsprechend sortiert werden.';
 $_BL['de']['bo_graph_descr_bear'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Himmelsrichtung. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
-$_BL['de']['bo_stat_longtime_descr'] = 'Die hier dargestellten Angaben werden seit Beginn der Aufzeichnung von {MYBO} auf dieser Seite fortgeführt. Die Distanzen beziehen sich immer auf den Standort der Station {STATION}.';
+$_BL['de']['bo_stat_longtime_descr'] = 'Die hier dargestellten Angaben werden seit Beginn der Aufzeichnung von {MYBO} auf dieser Seite fortgeführt. Die Distanzen beziehen sich immer auf den Standort der Station {STATION_CITY}.';
 $_BL['de']['bo_stat_other_database_descr'] = 'Alle Blitze, Signal- und Stationsdaten uvm. auf dieser Internetseite werden in einer Datenbank gespeichert. Hier sind einige Angaben dazu:';
 $_BL['de']['bo_stat_other_updates_descr'] = 'In bestimmten Zeitintervallen werden alle notwendigen Daten von blitzortung.org geholt und auf dieser Seite gespeichert. Hier sind die Zeitpunkte der letzten Aktualisierung zu sehen:';
 $_BL['de']['bo_stat_other_gps_descr'] = 'Informationen zum GPS-Empfänger, welcher zur exakten Ermittlung der aktuellen Uhrzeit benötigt wird. Die Positionsdaten der letzten 24 Stunden sind in der Karte eingezeichnet. Falls die Antennenausrichtungen bekannt sind, so sind diese ebenfalls sichtbar.';
@@ -1024,5 +1024,4 @@ $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
 
 $_BL['de']['Specials'] = 'Specials';
 $_BL['de']['Importing data...'] = 'Importiere Daten...';
-
-
+$_BL['de']['since'] = 'seit';

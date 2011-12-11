@@ -940,6 +940,13 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 //show longtime statistics
 function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_graph = '')
 {
+	$own_station_info = bo_station_info();
+	$stInfo = bo_station_info($station_id);
+	$city = _BC($stInfo['city']);
+	
+	if ($stInfo['country'] != $own_station_info['country'])
+		$city .= ' ('._BL($stInfo['country']).')';
+
 	if (!$own_station)
 	{
 		$add .= '#'.$station_id.'#';
@@ -975,8 +982,8 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	$strikes	  		= bo_get_conf('count_strikes'.$add);
 	$min_dist_all 		= bo_get_conf('longtime_min_dist_all'.$add) / 1000;
 	$max_dist_all 		= bo_get_conf('longtime_max_dist_all'.$add) / 1000;
-	$max_str_all 		= (double)bo_get_conf('longtime_max_strikesh'.$add);
-	$max_sig_all 		= (double)bo_get_conf('longtime_max_signalsh'.$add);
+	$max_str_all 		= (double)bo_get_conf('longtime_max_strikesh');
+	$max_sig_all 		= (double)bo_get_conf('longtime_max_signalsh');
 	$max_active 		= (double)bo_get_conf('longtime_count_max_active_stations');
 	$max_active_sig		= (double)bo_get_conf('longtime_count_max_active_stations_sig');
 	$max_available		= (double)bo_get_conf('longtime_count_max_avail_stations');
@@ -1022,11 +1029,11 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	echo '<div id="bo_stat_longtime">';
 
 	echo '<p class="bo_stat_description" id="bo_stat_longtime_descr">';
-	echo _BL('bo_stat_longtime_descr');
+	echo strtr(_BL('bo_stat_longtime_descr'), array('{STATION_CITY}' => $city));
 	echo '</p>';
 
 	echo '<a name="longtime_station"></a>';
-	echo '<h4>'._BL('h4_stat_longtime_station').'</h4>';
+	echo '<h4>'.strtr(_BL('h4_stat_longtime_station'), array('{STATION_CITY}' => $city)).'</h4>';
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Strikes detected').': </span><span class="bo_value">'.number_format($str_own, 0, _BL('.'), _BL(',')).'</span>';

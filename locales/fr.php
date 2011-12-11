@@ -459,7 +459,7 @@ $_BL['fr']['h4_stat_longtime_network'] = 'Réseau de détection de la foudre';
 $_BL['fr']['h4_stat_other_database'] = 'Statistique de la base de données';
 $_BL['fr']['h4_stat_other_gps'] = 'GPS';
 $_BL['fr']['h4_stat_other_updates'] = 'Mises à jour';
-$_BL['fr']['h4_stat_longtime_station'] = 'Station {STATION}';
+$_BL['fr']['h4_stat_longtime_station'] = 'Station {STATION_CITY}';
 $_BL['fr']['h4_table_network'] = 'Tableau des stations';
 $_BL['fr']['h3_stat_network'] = 'Statistiques du réseau de détection';
 $_BL['fr']['h3_stat_longtime'] = 'Statistiques à long terme';
@@ -703,7 +703,7 @@ de la station. Calcul:
 $_BL['fr']['bo_stat_network_descr_lasth'] = 'Tous les chiffres se rapportent à une période de 60 minutes avant la dernière mise à jour.';
 $_BL['fr']['bo_stat_network_descr_table'] = 'Ici vous pouvez voir toutes les stations actives du réseau de détection de la foudre. Vous pouvez faire des tris dans le tableau en cliquant sur les liens dans la première rangée.';
 $_BL['fr']['bo_graph_descr_bear'] = 'Taux de localisation géographique. Pour une meilleure comparaison, il y a aussi le nombre de coups de foudre détecté.';
-$_BL['fr']['bo_stat_longtime_descr'] = 'Toutes les informations disponibles ici datent depuis la mise en service de {MYBO}. Les distances sont données par rapport à {STATION}.';
+$_BL['fr']['bo_stat_longtime_descr'] = 'Toutes les informations disponibles ici datent depuis la mise en service de {MYBO}. Les distances sont données par rapport à {STATION_CITY}.';
 $_BL['fr']['bo_stat_other_database_descr'] = 'Tous les coups de foudres, signaux et données de la station sont sauvegardés dans une base de données ';
 $_BL['fr']['bo_stat_other_updates_descr'] = 'Les nouvelles données sont collectées depuis blitzortung.org à intervalle régulier:';
 $_BL['fr']['bo_stat_other_gps_descr'] = 'Quelques informations du récepteur GPS , qui est utilisé pour connaitre le temps exact et la position. Si elles sont connues, les orientations des antennes sont aussi affichées (rouge, vert).';
@@ -975,7 +975,7 @@ $_BL['fr']['Meteox rain radar'] = 'Radar pluies (meteox.com)';
 
 $_BL['fr']['Specials'] = 'Spécials';
 $_BL['fr']['Importing data...'] = 'Importation des données';
-
+$_BL['fr']['since'] = 'depuis';
 
 
 
