@@ -490,16 +490,22 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	}
 	else if ($type == 'ratio_distance_longtime')
 	{
-		$station_id = 0;
+		if (BO_ENABLE_LONGTIME_ALL !== true)
+			$station_id = 0;
+			
+		if ($station_id > 0 && $station_id != bo_station_id())
+			$add = '#'.$station_id.'#';
+		else
+			$add = '';
 		
-		$own = unserialize(bo_get_conf('longtime_dist_own'));
-		$all = unserialize(bo_get_conf('longtime_dist'));
+		$own = unserialize(bo_get_conf('longtime_dist_own'.$add));
+		$all = unserialize(bo_get_conf('longtime_dist'.$add));
 
 		if (is_array($own) && is_array($all))
 		{
 			foreach($own as $dist => $cnt)
 			{
-				if ($cnt < 3) //don't display ratios with low strike counts
+				if ($cnt < 3 || !is_numeric($dist)) //don't display ratios with low strike counts
 					continue;
 					
 				$X[$dist] = $dist * 10;
@@ -514,8 +520,11 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 			foreach($all as $dist => $cnt)
 			{
-				$Y2[$dist] = $cnt;
-				$max_dist = max($max_dist, $dist);
+				if (is_numeric($dist))
+				{
+					$Y2[$dist] = $cnt;
+					$max_dist = max($max_dist, $dist);
+				}
 			}
 
 			for ($i=0;$i<=$max_dist;$i++)
@@ -539,24 +548,35 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 		$graph_type = 'textlin';
 		$title_no_hours = true;
-		$add_title = ' '._BL('since begin of data logging');
+		
+		if (isset($own['time']) && $own['time'])
+			$add_title = ' '._BL('since').date(_BL('_date'),$own['time']);
+		else
+			$add_title = ' '._BL('since begin of data logging');
 		
 		$ymin = 0;
 		$ymax = 100;
 	}
 	else if($type == 'ratio_bearing_longtime')
 	{
-		$station_id = 0;
+		if (BO_ENABLE_LONGTIME_ALL !== true)
+			$station_id = 0;
+			
+		if ($station_id > 0 && $station_id != bo_station_id())
+			$add = '#'.$station_id.'#';
+		else
+			$add = '';
+
 		$bear_div = 1;
 		
-		$own = unserialize(bo_get_conf('longtime_bear_own'));
-		$all = unserialize(bo_get_conf('longtime_bear'));
+		$own = unserialize(bo_get_conf('longtime_bear_own'.$add));
+		$all = unserialize(bo_get_conf('longtime_bear'.$add));
 		
 		if (is_array($own) && is_array($all))
 		{
 			foreach($own as $bear => $cnt)
 			{
-				if ($cnt < 3) //don't display ratios with low strike counts
+				if ($cnt < 3 || !is_numeric($bear)) //don't display ratios with low strike counts
 					continue;
 
 				$X[$bear] = $bear * 10;
@@ -569,7 +589,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 			foreach($all as $bear => $cnt)
 			{
-				$Y2[$bear] = $cnt;
+				if (is_numeric($bear))
+					$Y2[$bear] = $cnt;
 			}
 
 			for ($i=0;$i<360;$i++)
@@ -590,8 +611,13 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 		}
 
+
+		if (isset($own['time']) && $own['time'])
+			$add_title = ' '._BL('since').date(_BL('_date'),$own['time']);
+		else
+			$add_title = ' '._BL('since begin of data logging');
+
 		$graph_type = 'linlin';
-		$add_title = ' '._BL('since begin of data logging');
 		$title_no_hours = true;
 		$xmin = 0;
 		$xmax = 360;

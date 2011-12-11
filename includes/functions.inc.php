@@ -32,6 +32,20 @@ function bo_db($query = '', $die_on_errors = true)
 	if (!$query)
 		return $connid;
 
+	$qtype = strtolower(substr(trim($query), 0, 6));
+	
+	/*
+	switch ($qtype)
+	{
+		case 'insert': 
+		case 'delete':
+		case 'update':
+		case 'replace':
+			echo "<p>$query</p>";
+			return;
+	}
+	*/
+		
 	$erg = BoDb::query($query);
 
 	if ($erg === false)
@@ -44,12 +58,12 @@ function bo_db($query = '', $die_on_errors = true)
 			die();
 	}
 
-	$qtype = strtolower(substr(trim($query), 0, 6));
 	switch ($qtype)
 	{
 		case 'insert':
 			return BoDb::insert_id();
 
+		case 'replace':
 		case 'delete':
 		case 'update':
 			return BoDb::affected_rows();

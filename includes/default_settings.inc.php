@@ -911,8 +911,9 @@
 // by time *and* latlon                                         
 @define('BO_DB_USE_LATLON_TIME_INDEX', false);
 
-
-
+//enable longtime statistics for all stations
+//causes a LOT OF more load during importing
+@define('BO_ENABLE_LONGTIME_ALL', false);
 
 /*******************************************************************/
 /*** Some special settings which shouldn't be changed            ***/
