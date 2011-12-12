@@ -192,7 +192,7 @@ function bo_update_densities($force = false)
 							
 							$date_start_add = date('Y-m-d', strtotime($row['date_end'].' + 1 day'));
 							
-							if ($row['data'] != 0)
+							if (strlen($row['data']) > 10)
 							{
 								$OLDDATA = gzinflate($row['data']);
 								$NEWDATA = $DATA;
@@ -345,7 +345,7 @@ function bo_update_densities($force = false)
 					$status = abs($b['status']) + 1;
 				
 					if ($info['max'] == 0)
-						$DATA = 0;
+						$DATA = "0";
 				}
 					
 				
@@ -429,7 +429,7 @@ function bo_show_archive_density()
 	
 	$sql = "SELECT MIN(date_start) mindate, MAX(date_start) maxdate, MAX(date_end) maxdate_end 
 			FROM ".BO_DB_PREF."densities 
-			WHERE (status=1 OR status=3) AND data != 0
+			WHERE (status=1 OR status=3) AND data != '0'
 			".($station_id ? " AND station_id='$station_id' " : '')."
 			";
 	$res = bo_db($sql);
@@ -838,7 +838,7 @@ function bo_get_density_image()
 	$row = $res->fetch_assoc();
 
 	$exit_msg = '';
-	if (!$row['id'] || $row['data'] == 0)
+	if (!$row['id'] || strlen($row['data']) <= 10)
 	{
 		$exit_msg = _BL('No data available!', true);
 	}
@@ -872,7 +872,7 @@ function bo_get_density_image()
 		if ($ratio || $participants)
 		{
 			$row_own = $res->fetch_assoc();
-			if ($station_id != $row_own['station_id'] || $date_end != $row_own['date_end'] || $type != $row_own['type'] || $row_own['data'] == 0)
+			if ($station_id != $row_own['station_id'] || $date_end != $row_own['date_end'] || $type != $row_own['type'] || strlen($row['data']) <= 10)
 			{
 				$exit_msg = _BL('Not enough data available!', true);	
 			}

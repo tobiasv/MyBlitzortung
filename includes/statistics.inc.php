@@ -485,7 +485,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 function bo_show_statistics_network($station_id = 0, $own_station = true, $add_graph = '')
 {
 	$sort 					= $_GET['bo_sort'];
-	$date_1h 				= gmdate('Y-m-d H:i:s', time() - 3600);
+	$range                  = abs(intval($_GET['bo_hours']));
 	$mybo_first_update		= bo_get_conf('first_update_time');
 	$stations_nogps         = bo_get_conf('active_stations_nogps');
 	$whole_sig_count 		= 0;
@@ -495,23 +495,57 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$whole_strike_ratio_cnt = 0;
 	$under_construction     = array();
 
+	if ($range < 1)
+		$range = 1;
+
+	$date_range	= gmdate('Y-m-d H:i:s', time() - $range*3600);
+	
+	//Last update, time range
+	$row = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."stations_stat WHERE time < '".gmdate("Y-m-d H:i:s", time() - 10)."'")->fetch_assoc();
+	$time = strtotime($row['mtime'].' UTC');
+	$strikes_time_start = gmdate('Y-m-d H:i:s', $time - $range * 3600);
+	$table_time_start   = gmdate('Y-m-d H:i:s', $time - ($range>1 ? ($range-1)*3600 : 0) );
+	$table_time_end     = $row['mtime'];
+	$last_update = (time()-strtotime($row['mtime'].' UTC'))/60;
+
 	
 	//participants
-	$row = bo_db("SELECT MAX(users) max_users, AVG(users) avg_users FROM ".BO_DB_PREF."strikes WHERE time > '$date_1h'")->fetch_assoc();
+	$row = bo_db("SELECT MAX(users) max_users, AVG(users) avg_users 
+					FROM ".BO_DB_PREF."strikes 
+					WHERE time BETWEEN '$strikes_time_start' AND '$table_time_end'")->fetch_assoc();
 	$max_part = $row['max_users'];
 	$avg_part = $row['avg_users'];
 
 	
-	//Strikes/h and last update
-	$sql = "SELECT strikesh, time 
+	//Strikes in timerange 
+	$sql = "SELECT strikesh, DATE_FORMAT(time, '%Y%m%d%H') h 
 			FROM ".BO_DB_PREF."stations_stat 
 			WHERE station_id='0' 
-			AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE time < '".gmdate("Y-m-d H:i:s", time() - 10)."')";
-	$row = bo_db($sql)->fetch_assoc();
-	$strikesh = $row['strikesh'];
-	$time = strtotime($row['time'].' UTC');
-	$last_update = (time()-$time)/60;
+			AND time BETWEEN '$table_time_start' AND '$table_time_end' 
+			GROUP BY h";
+	$res = bo_db($sql);
+	while($row = $res->fetch_assoc())
+	{
+		$strikes_range += $row['strikesh'];
+	}
 	
+	
+	//Station statistics
+	$D = array();
+	$sql = "SELECT  AVG(signalsh) signalsh, 
+						 AVG(strikesh) strikesh,
+						 station_id,
+						 DATE_FORMAT(time, '%Y%m%d%H') h
+					FROM ".BO_DB_PREF."stations_stat
+					WHERE time BETWEEN '$table_time_start' AND '$table_time_end'
+					GROUP BY station_id, h";
+	$res = bo_db($sql);
+	while($row = $res->fetch_assoc())
+	{
+		$D[$row['station_id']]['strikesh'] += $row['strikesh'];
+		$D[$row['station_id']]['signalsh'] += $row['signalsh'];
+	}
+
 	
 	// currently available stations
 	$sql = "SELECT COUNT(*) cnt
@@ -550,55 +584,51 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	//Stations by user
 	$user_stations = bo_stations('user');
 	
-	$D = array();
-	$res = bo_db("SELECT a.id sid, a.city city, a.country country, a.distance distance, a.user user,
-						 a.lat lat, a.lon lon,
-							b.signalsh signalsh, b.strikesh strikesh
-					FROM ".BO_DB_PREF."stations a, ".BO_DB_PREF."stations_stat b
-					WHERE 1
-							AND a.id=b.station_id
-							AND a.id < ".intval(BO_DELETED_STATION_MIN_ID)."
-							AND b.time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)
-							-- AND b.signalsh > 0");
-	while($row = $res->fetch_assoc())
+	foreach($user_stations as $d)
 	{
-		$D[$row['sid']] = $row;
-		$D[$row['sid']]['country'] = _BL($row['country']);
+		if ($d['status'] != 'A')
+			continue;
+			
+		$id = $d['id'];
+		
+		$D[$id]['country'] = _BL($d['country']);
+		$D[$id]['city'] = $d['city'];
+		$D[$id]['user'] = $d['user'];
 
 		if (!$own_station)
-			$D[$row['sid']]['distance'] = bo_latlon2dist($row['lat'], $row['lon'], $sinfo['lat'], $sinfo['lon']);
+			$D[$id]['distance'] = bo_latlon2dist($d['lat'], $d['lon'], $sinfo['lat'], $sinfo['lon']);
 		else
-			$D[$row['sid']]['distance'] = $row['distance'];
+			$D[$id]['distance'] = $d['distance'];
 			
-		if ($row['signalsh'])
+		if ($D[$id]['signalsh'])
 		{
-			$D[$row['sid']]['signalsh_ratio'] = $row['strikesh'] / $row['signalsh'];
-			$whole_sig_ratio += $row['strikesh'] / $row['signalsh'];
+			$D[$id]['signalsh_ratio'] = $D[$id]['strikesh'] / $D[$id]['signalsh'];
+			$whole_sig_ratio += $D[$id]['strikesh'] / $D[$id]['signalsh'];
 			$whole_sig_ratio_cnt++;
 		}
 		else
 		{
-			$D[$row['sid']]['signalsh_ratio'] = null;
+			$D[$id]['signalsh_ratio'] = null;
 		}
 
-		if ($strikesh)
+		if ($strikes_range)
 		{
-			$D[$row['sid']]['strikesh_ratio'] = $row['strikesh'] / $strikesh;
-			$whole_strike_ratio += $row['strikesh'] / $strikesh;
+			$D[$id]['strikesh_ratio'] = $D[$id]['strikesh'] / $strikes_range;
+			$whole_strike_ratio += $D[$id]['strikesh'] / $strikes_range;
 			$whole_strike_ratio_cnt++;
 		}
 		else
 		{
-			$D[$row['sid']]['strikesh_ratio'] = null;
+			$D[$id]['strikesh_ratio'] = null;
 		}
 
 		//ToDo: Perhaps better algorithm
-		if ($row['strikesh'] == 0 && $row['signalsh'] && $strikesh)
-			$D[$row['sid']]['efficiency'] = -$row['signalsh'] / $strikesh;
+		if ($D[$id]['strikesh'] == 0 && $D[$id]['signalsh'] && $strikes_range)
+			$D[$id]['efficiency'] = -$D[$id]['signalsh'] / $strikes_range;
 		else
-			$D[$row['sid']]['efficiency'] = sqrt($D[$row['sid']]['strikesh_ratio'] * $D[$row['sid']]['signalsh_ratio']);
+			$D[$id]['efficiency'] = sqrt($D[$id]['strikesh_ratio'] * $D[$id]['signalsh_ratio']);
 
-		$whole_sig_count += $row['signalsh'];
+		$whole_sig_count += $D[$id]['signalsh'];
 
 		if (!$sort)
 			$sort = BO_STATISTICS_STATIONS_SORT;
@@ -606,40 +636,40 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		switch($sort)
 		{
 			case 'strikes':
-				$S[$row['sid']] = $row['strikesh'];
+				$S[$id] = $D[$id]['strikesh'];
 				break;
 
 			case 'city':
-				$S[$row['sid']] = $row['city'];
+				$S[$id] = $D[$id]['city'];
 				break;
 
 			case 'country':
-				$S[$row['sid']] = $row['country'];
+				$S[$id] = $D[$id]['country'];
 				break;
 
 			default: $sort = 'distance';
 			case 'distance':
-				$S[$row['sid']] = $D[$row['sid']]['distance'];
+				$S[$id] = $D[$id]['distance'];
 				break;
 
 			case 'user':
-				$S[$row['sid']] = $row['user'];
+				$S[$id] = $D[$id]['user'];
 				break;
 
 			case 'id':
-				$S[$row['sid']] = $row['sid'];
+				$S[$id] = $id;
 				break;
 
 			case 'signals':
-				$S[$row['sid']] = $row['signalsh'];
+				$S[$id] = $D[$id]['signalsh'];
 				break;
 
 			case 'signals_ratio':
-				$S[$row['sid']] = $D[$row['sid']]['signalsh_ratio'];
+				$S[$id] = $D[$id]['signalsh_ratio'];
 				break;
 
 			case 'efficiency':
-				$S[$row['sid']] = $D[$row['sid']]['efficiency'];
+				$S[$id] = $D[$id]['efficiency'];
 				break;
 
 		}
@@ -662,7 +692,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(',')).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikesh, 0, _BL('.'), _BL(',')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikes_range, 0, _BL('.'), _BL(',')).'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.number_format($avg_part, 1, _BL('.'), _BL(',')).'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Mean locating ratio').': </span><span class="bo_value">';
@@ -769,7 +799,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		if (bo_user_get_id() == 1)
 		{
 			echo '<td class="bo_text '.($sort == 'id' ? 'bo_marked' : '').'">';
-			echo $d['sid'];
+			echo $id;
 			echo '</td>';
 
 			echo '<td class="bo_text '.($sort == 'user' ? 'bo_marked' : '').'">';
@@ -794,7 +824,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'strikes' ? 'bo_marked' : '').'">';
-		echo $d['strikesh'];
+		echo round($d['strikesh']);
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'strikes' ? 'bo_marked' : '').'">';
@@ -802,7 +832,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'signals' ? 'bo_marked' : '').'">';
-		echo $d['signalsh'];
+		echo round($d['signalsh']);
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'signals_ratio' ? 'bo_marked' : '').'">';
