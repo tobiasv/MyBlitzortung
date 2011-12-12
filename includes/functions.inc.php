@@ -251,7 +251,7 @@ function bo_stations($index = 'id', $only = '', $under_constr = true)
 	if (!$under_constr)
 		$sql .= " AND last_time != '1970-01-01 00:00:00' ";
 		
-	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql";
+	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND id < ".intval(BO_DELETED_STATION_MIN_ID);
 	$res = bo_db($sql);
 	while($row = $res->fetch_assoc())
 		$S[$row[$index]] = $row;

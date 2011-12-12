@@ -29,7 +29,8 @@ function bo_update_all($force = false, $only = '')
 	bo_echod(" ");
 	bo_echod("***** Getting lightning data from blitzortung.org *****");
 	bo_echod(" ");
-	
+bo_delete_station(250);
+exit;	
 	session_write_close();
 	ignore_user_abort(true);
 	ini_set('default_socket_timeout', 10);
@@ -1410,12 +1411,9 @@ function bo_update_stations($force = false)
 					&& trim($stUser)
 				)
 			{
-				bo_db("UPDATE ".BO_DB_PREF."conf SET name=CONCAT('O', name) WHERE name LIKE '%#$stId#%'", false);
-				bo_db("DELETE FROM ".BO_DB_PREF."stations WHERE id='$stId'", false);
-				bo_echod("Deleted old station $id (user change ".$all_stations[$stId]['user']." -> $stUser: Old Data ".serialize($all_stations[$stId]));
+				bo_delete_station($id);
 				unset($all_stations[$stId]);
 			}
-
 			
 			if (isset($all_stations[$stId]))
 			{
@@ -1441,14 +1439,10 @@ function bo_update_stations($force = false)
 			//station was deleted in stations.txt :(
 			if (!isset($Count[$id]))
 			{
-				$deleted_stations = unserialize(bo_get_conf('stations_deleted'));
-				$deleted_stations[] = $all_stations[$id];
-				bo_set_conf('stations_deleted', serialize($deleted_stations));
-				
-				bo_db("DELETE FROM ".BO_DB_PREF."stations WHERE id='$id'", false);
-				bo_echod("Deleted station $id: Data ".serialize($all_stations[$id])."");
+				bo_delete_station($id);
 			}
 		}
+		
 		
 		//New stations (by user name)
 		$data = unserialize(bo_get_conf('stations_new_date'));
@@ -1610,8 +1604,11 @@ function bo_update_stations($force = false)
 			$add = $stId == $own_id ? '' : '#'.$stId.'#';
 			
 			//whole signals count (not exact)
-			$count = bo_get_conf('count_raw_signals2'.$add);
-			bo_set_conf('count_raw_signals2'.$add, $count + ($Count[$stId]['sig']*($time-$last)/3600));
+			if ($last > 0)
+			{
+				$count = bo_get_conf('count_raw_signals2'.$add);
+				bo_set_conf('count_raw_signals2'.$add, $count + ($Count[$stId]['sig']*($time-$last)/3600));
+			}
 			
 			//max signals/h (own)
 			$max = bo_get_conf('longtime_max_signalsh_own'.$add);
@@ -2750,5 +2747,48 @@ function bo_update_get_timeout()
 	
 	return $max_time;
 }
+
+
+
+function bo_delete_station($id = 0)
+{
+	$id = intval($id);
+	
+	if ($id > 0)
+	{
+		//get station info
+		$station_info = bo_station_info($id);
+		if ($station_info['id'] != $id)
+			return false;
+		
+		//find new ID
+		$row = bo_db("SELECT MAX(id) id FROM ".BO_DB_PREF."stations WHERE id >= ".intval(BO_DELETED_STATION_MIN_ID))->fetch_assoc();
+		$new_id = $row['id']+1;
+		if ($new_id < intval(BO_DELETED_STATION_MIN_ID))
+			$new_id = intval(BO_DELETED_STATION_MIN_ID);
+		
+		//save old data in extra variable
+		$deleted_stations = unserialize(bo_get_conf('stations_deleted'));
+		$deleted_stations[] = $station_info;
+		bo_set_conf('stations_deleted', serialize($deleted_stations));
+
+		//reassign IDs
+		bo_db("UPDATE ".BO_DB_PREF."conf SET name=REPLACE(name, '#".$id."#', '#".$new_id."#') WHERE name LIKE '%#".$id."#%'");
+		bo_db("UPDATE ".BO_DB_PREF."stations_stat    SET station_id='$new_id' WHERE station_id='$id'");
+		bo_db("UPDATE ".BO_DB_PREF."stations_strikes SET station_id='$new_id' WHERE station_id='$id'");
+		bo_db("UPDATE ".BO_DB_PREF."densities        SET station_id='$new_id' WHERE station_id='$id'");
+		
+		//last not least the station itself (last update, if former queries fail)
+		bo_db("UPDATE ".BO_DB_PREF."stations         SET id='$new_id', status='-' WHERE id='$id'");
+	
+		bo_echod("Deleted old station $id, reassigned new ID $new_id");
+		
+		return true;
+	}
+	
+	return false;
+}
+
+
 
 ?>

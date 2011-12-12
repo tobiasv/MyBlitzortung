@@ -915,6 +915,10 @@
 //causes a LOT OF more load during importing
 @define('BO_ENABLE_LONGTIME_ALL', false);
 
+
+
+
+
 /*******************************************************************/
 /*** Some special settings which shouldn't be changed            ***/
 
@@ -955,7 +959,8 @@
 @define('BO_FIND_MIN_PARTICIPANTS_COUNT', 4); //how often a new value has to be present to be saved
 @define('BO_FIND_MAX_PARTICIPANTS_HOURS', 24); //update and search intervall for max participants
 
-
+//when station deleted -> assign a new unique id from defined value and up (MySQL UNSIGNED SMALLINT!)
+@define('BO_DELETED_STATION_MIN_ID', 50000);
 
 
 /*******************************************************************/

@@ -328,18 +328,23 @@ function bo_update_densities($force = false)
 
 				//database storage 
 				$DATA = BoDb::esc(gzdeflate($DATA));
-				
-				if ($timeout)
-					$status = $b['status'];
-				else if ($b['status'] == 0)
-					$status = 1;
-				else
-					$status = abs($b['status']) + 1;
-				
 				$info['last_lat'] = $lat;
 				$info['last_lon'] = $lon;
 				$info['bps'] = $cbps;
 				$info['max'] = max($max_count, $info['max']);
+								
+				if ($timeout)
+				{
+					$status = $b['status'];
+				}
+				else
+				{
+					$status = abs($b['status']) + 1;
+				
+					if ($info['max'] == 0)
+						$DATA = 0;
+				}
+					
 				
 				//for displaying antenna direction in ratio map
 				if ($b['station_id'] == bo_station_id())
@@ -421,7 +426,8 @@ function bo_show_archive_density()
 	
 	$sql = "SELECT MIN(date_start) mindate, MAX(date_start) maxdate, MAX(date_end) maxdate_end 
 			FROM ".BO_DB_PREF."densities 
-			WHERE (status=1 OR status=3)
+			WHERE (status=1 OR status=3) AND data != 0
+			".($station_id ? " AND station_id='$station_id' " : '')."
 			";
 	$res = bo_db($sql);
 	$row = $res->fetch_assoc();
@@ -828,51 +834,68 @@ function bo_get_density_image()
 	$res = bo_db($sql);
 	$row = $res->fetch_assoc();
 
-	
 	$exit_msg = '';
-	if (!$row['id'])
-		$exit_msg = _BL('No data available!', true);
-	
-	//Data and info
-	$DATA = gzinflate($row['data']);
-	$info = unserialize($row['info']);
-	$bps = $info['bps'];
-	$type = $row['type'];
-	$max_real_count = $info['max']; //max strike count for area elements
-
-	if (strtotime($info['date_start_real']) > 3600 * 24)
-		$date_start = $info['date_start_real'];
-	else
-		$date_start = $row['date_start'];
-	
-	$date_end = $row['date_end'];
-	$time_string = date(_BL('_date'), strtotime($date_start)).' - '.date(_BL('_date'), strtotime($row['date_end']));
-	$last_changed = $row['changed'];
-	
-	//coordinates
-	$DensLat       = $row['lat_min'];
-	$DensLon       = $row['lon_min'];
-	$DensLat_end   = $row['lat_max'];
-	$DensLon_end   = $row['lon_max'];
-	$length        = $row['length'];
-	$area          = pow($length, 2);
-	
-	//SECOND DATABASE CALL
-	if ($ratio || $participants)
+	if (!$row['id'] || $row['data'] == 0)
 	{
-		$row_own = $res->fetch_assoc();
-		if ($station_id != $row_own['station_id'] || $date_end != $row_own['date_end'] || $type != $row_own['type'])
-		{
-			$exit_msg = _BL('Not enough data available!', true);	
-		}
+		$exit_msg = _BL('No data available!', true);
+	}
+	else
+	{
+		//Data and info
+		$DATA = gzinflate($row['data']);
+		$info = unserialize($row['info']);
+		$bps = $info['bps'];
+		$type = $row['type'];
+		$max_real_count = $info['max']; //max strike count for area elements
+
+		if (strtotime($info['date_start_real']) > 3600 * 24)
+			$date_start = $info['date_start_real'];
 		else
+			$date_start = $row['date_start'];
+		
+		$date_end = $row['date_end'];
+		$time_string = date(_BL('_date'), strtotime($date_start)).' - '.date(_BL('_date'), strtotime($row['date_end']));
+		$last_changed = $row['changed'];
+		
+		//coordinates
+		$DensLat       = $row['lat_min'];
+		$DensLon       = $row['lon_min'];
+		$DensLat_end   = $row['lat_max'];
+		$DensLon_end   = $row['lon_max'];
+		$length        = $row['length'];
+		$area          = pow($length, 2);
+		
+		//SECOND DATABASE CALL
+		if ($ratio || $participants)
 		{
-			$DATA2 = gzinflate($row_own['data']);
-			$info = unserialize($row_own['info']);
-			$max_real_own_count = $info['max']; //max strike count
-			$bps2 = $info['bps'];
-			$last_changed = max($row['changed'], $last_changed);
+			$row_own = $res->fetch_assoc();
+			if ($station_id != $row_own['station_id'] || $date_end != $row_own['date_end'] || $type != $row_own['type'] || $row_own['data'] == 0)
+			{
+				$exit_msg = _BL('Not enough data available!', true);	
+			}
+			else
+			{
+				$DATA2 = gzinflate($row_own['data']);
+				$info = unserialize($row_own['info']);
+				$max_real_own_count = $info['max']; //max strike count
+				$bps2 = $info['bps'];
+				$last_changed = max($row['changed'], $last_changed);
+			}
 		}
+		
+		if ($length < 0.02)
+			$exit_msg = 'Error: Length!';
+	}
+
+	
+	// Exit if not enough data
+	if ($exit_msg)
+	{
+		$fw = imagefontwidth($fontsize) * strlen($exit_msg);
+		imagestring($I, $fontsize, $w/2 - $fw/2 - 1, $h / 2, $exit_msg, $text_col);
+		header("Content-Type: image/png");
+		imagepng($I);
+		exit;
 	}
 	
 	BoDb::close();
@@ -885,19 +908,6 @@ function bo_get_density_image()
 		list($px, $py) = bo_latlon2projection($cfg['proj'], $stinfo['lat'], $stinfo['lon']);
 		$StX =      ($px - $x1) * $w_x;
 		$StY = $h - ($py - $y1) * $h_y;
-	}
-
-	if (!$exit_msg && $length < 0.1)
-		$exit_msg = 'Error: Length!';
-	
-	// Exit if not enough data
-	if ($exit_msg)
-	{
-		$fw = imagefontwidth($fontsize) * strlen($exit_msg);
-		imagestring($I, $fontsize, $w/2 - $fw/2 - 1, $h / 2, $exit_msg, $text_col);
-		header("Content-Type: image/png");
-		imagepng($I);
-		exit;
 	}
 	
 	//Cache - Second cache try
