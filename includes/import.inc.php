@@ -29,8 +29,7 @@ function bo_update_all($force = false, $only = '')
 	bo_echod(" ");
 	bo_echod("***** Getting lightning data from blitzortung.org *****");
 	bo_echod(" ");
-bo_delete_station(250);
-exit;	
+
 	session_write_close();
 	ignore_user_abort(true);
 	ini_set('default_socket_timeout', 10);
