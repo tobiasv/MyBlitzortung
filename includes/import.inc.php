@@ -985,17 +985,23 @@ function bo_update_strikes($force = false)
 			$count = bo_get_conf('count_strikes'.$add);
 			bo_set_conf('count_strikes'.$add, $count + $i);
 			
-			$dist_data_tmp = unserialize(bo_get_conf('longtime_dist'.$add));
-			if (!$dist_data_tmp) $dist_data_tmp['time'] = time();
-			foreach($dist_data[$stId] as $dist_id => $dist_count)
-				$dist_data_tmp[$dist_id] += $dist_count;
-			bo_set_conf('longtime_dist'.$add, serialize($dist_data_tmp));
-
-			$bear_data_tmp = unserialize(bo_get_conf('longtime_bear'.$add));
-			if (!$bear_data_tmp) $bear_data_tmp['time'] = time();
-			foreach($bear_data[$stId] as $bear_id => $bear_count)
-				$bear_data_tmp[$bear_id] += $bear_count;
-			bo_set_conf('longtime_bear'.$add, serialize($bear_data_tmp));
+			if (isset($dist_data[$stId]))
+			{
+				$dist_data_tmp = unserialize(bo_get_conf('longtime_dist'.$add));
+				if (!$dist_data_tmp) $dist_data_tmp['time'] = time();
+				foreach($dist_data[$stId] as $dist_id => $dist_count)
+					$dist_data_tmp[$dist_id] += $dist_count;
+				bo_set_conf('longtime_dist'.$add, serialize($dist_data_tmp));
+			}
+			
+			if (isset($bear_data[$stId]))
+			{
+				$bear_data_tmp = unserialize(bo_get_conf('longtime_bear'.$add));
+				if (!$bear_data_tmp) $bear_data_tmp['time'] = time();
+				foreach($bear_data[$stId] as $bear_id => $bear_count)
+					$bear_data_tmp[$bear_id] += $bear_count;
+				bo_set_conf('longtime_bear'.$add, serialize($bear_data_tmp));
+			}
 			
 			$max = bo_get_conf('longtime_max_dist_all'.$add);
 			if ($max < $max_dist_all[$stId])
