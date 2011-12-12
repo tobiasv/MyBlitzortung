@@ -185,38 +185,41 @@ function bo_update_densities($force = false)
 									bo_echod("Wrong bps value ($cbps -> ".$info2['bps'].")!");
 							}
 							
-							if (!$info['date_start_real']) // save start time info to display in map
+							if (!$info['date_start_real'] && $row['data']) // save start time info to display in map
 								$info['date_start_real'] = $row['date_start'];
 							
 							bo_echod(" - Current time range: ".$row['date_start'].' to '.$row['date_end']);
 							
 							$date_start_add = date('Y-m-d', strtotime($row['date_end'].' + 1 day'));
 							
-							$OLDDATA = gzinflate($row['data']);
-							$NEWDATA = $DATA;
-							$DATA = '';
-							
-							for ($i=0; $i<=strlen($OLDDATA) / $cbps / 2; $i++)
+							if ($row['data'] != 0)
 							{
-								$val  = substr($OLDDATA, $i * $cbps * 2, $cbps * 2);
+								$OLDDATA = gzinflate($row['data']);
+								$NEWDATA = $DATA;
+								$DATA = '';
 								
-								// combine the two data streams
-								if (strtolower($val) != str_repeat('ff', $cbps))
+								for ($i=0; $i<=strlen($OLDDATA) / $cbps / 2; $i++)
 								{
-									$val = hexdec($val);
+									$val  = substr($OLDDATA, $i * $cbps * 2, $cbps * 2);
 									
-									if ($NEWDATA)
-										$val += hexdec(substr($NEWDATA, $i * $cbps * 2, $cbps * 2));
+									// combine the two data streams
+									if (strtolower($val) != str_repeat('ff', $cbps))
+									{
+										$val = hexdec($val);
+										
+										if ($NEWDATA)
+											$val += hexdec(substr($NEWDATA, $i * $cbps * 2, $cbps * 2));
+										
+										if ($val >= pow(2, $cbps * 8)-1)
+											$val = pow(2, $cbps * 8)-2;
+										
+										$max_count = max($max_count, $val);
+							
+										$val = sprintf("%0".(2*$cbps)."s", dechex($val));
+									}
 									
-									if ($val >= pow(2, $cbps * 8)-1)
-										$val = pow(2, $cbps * 8)-2;
-									
-									$max_count = max($max_count, $val);
-						
-									$val = sprintf("%0".(2*$cbps)."s", dechex($val));
+									$DATA .= $val;
 								}
-								
-								$DATA .= $val;
 							}
 							
 						}
