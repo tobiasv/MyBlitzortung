@@ -1025,3 +1025,5 @@ $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
 $_BL['de']['Specials'] = 'Specials';
 $_BL['de']['Importing data...'] = 'Importiere Daten...';
 $_BL['de']['since'] = 'seit';
+$_BL['de']['Period'] = 'Zeitraum';
+$_BL['de']['bo_stat_network_descr'] = false;

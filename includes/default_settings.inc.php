@@ -314,6 +314,8 @@
 // possible values: country,city,strikes,signals,signals_ratio,efficiency,distance
 @define('BO_STATISTICS_STATIONS_SORT', 'distance');
 
+//Time-ranges for network statistics (1h is always present)
+@define('BO_STATISTICS_NETWORK_RANGES', ''); //hours, comma separated
 
 /*******************************************************************/
 /*** Image Maps: General settings                                ***/

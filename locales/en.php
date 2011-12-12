@@ -986,7 +986,7 @@ $_BL['en']['Meteox rain radar'] = 'Rain radar (meteox.com)';
 $_BL['en']['Specials'] = 'Specials';
 $_BL['en']['Importing data...'] = 'Importing data...';
 $_BL['en']['since'] = 'since';
-
-
+$_BL['en']['Period'] = 'Period';
+$_BL['en']['bo_stat_network_descr'] = false;
 
 

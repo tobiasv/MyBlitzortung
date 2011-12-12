@@ -495,9 +495,14 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$whole_strike_ratio_cnt = 0;
 	$under_construction     = array();
 
-	if ($range < 1)
+	if (intval(BO_STATISTICS_NETWORK_RANGES))
+		$ranges = explode(',', BO_STATISTICS_NETWORK_RANGES);
+		
+	$ranges[] = 1;
+	if ($range < 1 || array_search($range, $ranges) === false)
 		$range = 1;
-
+	
+		
 	$date_range	= gmdate('Y-m-d H:i:s', time() - $range*3600);
 	
 	//Last update, time range
@@ -685,11 +690,38 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo '<div id="bo_stat_network">';
 
 	echo '<img src="'.bo_bofile_url().'?map=stations_mini&blank" id="bo_stat_network_stations_map">';
-	
-	echo '<p class="bo_stat_description" id="bo_stat_network_descr_lasth">';
-	echo _BL('bo_stat_network_descr_lasth');
-	echo '</p>';
 
+	if (count($ranges) > 1)
+	{
+		echo '<p class="bo_stat_description" id="bo_stat_network_descr_range">';
+		echo _BL('bo_stat_network_descr');
+		echo '</p>';
+
+		echo '<p id="bo_stat_timeranges" class="bo_stat_description">';
+		echo _BL('Period').': ';
+		
+		sort($ranges);
+		foreach($ranges as $r)
+		{
+			
+			echo '<a href="'.bo_insert_url('bo_hours', $r).'" class="';
+			echo $r == $range ? 'bo_selected' : '';
+			echo '">';
+			echo $r.'h';
+			echo '</a>&nbsp;';
+		}
+		
+		echo '</p>';
+		
+		
+	}
+	else
+	{
+		echo '<p class="bo_stat_description" id="bo_stat_network_descr_lasth">';
+		echo _BL('bo_stat_network_descr_lasth');
+		echo '</p>';
+	}
+	
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(',')).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikes_range, 0, _BL('.'), _BL(',')).'</span></li>';

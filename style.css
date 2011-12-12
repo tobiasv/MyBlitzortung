@@ -766,3 +766,8 @@ width: 175px;
 color:red;
 font-weight:bold;
 }
+
+#myblitzortung a.bo_selected {
+font-weight: bold;
+font-size: 11px;
+}
