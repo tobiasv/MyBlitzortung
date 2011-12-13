@@ -1345,7 +1345,6 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 		else
 		{
 			$data = unserialize(bo_get_conf('station_data24h'.'#'.$station_id.'#'));
-			print_r($data);
 			if (isset($data) && is_array($data))
 			{
 				$tmp = array();
