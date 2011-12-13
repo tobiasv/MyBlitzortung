@@ -676,7 +676,7 @@ function bo_get_density_image()
 
 	$min_block_size = max($cfg['density_blocksize'], intval($_GET['bo_blocksize']), 1);
 	
-	if (bo_user_get_id() == 1 && intval($_GET['bo_blocksize']))
+	if ((bo_user_get_level() & BO_PERM_SETTINGS) && intval($_GET['bo_blocksize']))
 		$min_block_size = intval($_GET['bo_blocksize']);
 	
 	

@@ -304,9 +304,10 @@ function bo_map_reload_static()
 	{
 		if ($row['status'] == 'A')
 		{
+			$round = (bo_user_get_level() & BO_PERM_SETTINGS) ? 8 : 1;
 			$js_stations .= $js_stations ? ",\n" : '';
 			$js_stations .= '{';
-			$js_stations .= 'stid:'.$row['id'].', lat:'.round($row['lat'],1).', lon:'.round($row['lon'], 1).', city:"'._BC($row['city']).'"';
+			$js_stations .= 'stid:'.$row['id'].', lat:'.round($row['lat'],$round).', lon:'.round($row['lon'], $round).', city:"'._BC($row['city']).'"';
 			$js_stations .= '}';
 		}
 		
@@ -1018,14 +1019,14 @@ function bo_map_reload_static()
 		for (i in bo_station_markers)
 			bo_station_markers[i].setMap(null);
 
-		if (display == 0 && bo_map.getZoom() > 10)
+		if (display == 0 && bo_map.getZoom() > <?php echo (bo_user_get_level() & BO_PERM_SETTINGS) ? 20 : 10; ?>)
 		{
 			document.getElementById('bo_map_station1').disabled = true;
 			
 			if (bo_stations_display == 2)
 				return;
 		}
-		else if (display == 0 && bo_map.getZoom() <= 10)
+		else if (display == 0 && bo_map.getZoom() <= <?php echo (bo_user_get_level() & BO_PERM_SETTINGS) ? 20 : 10; ?>)
 		{
 			document.getElementById('bo_map_station1').disabled = false;
 			

@@ -1356,7 +1356,7 @@ function bo_update_stations($force = false)
 		foreach($lines as $l)
 		{
 			$cols = explode(" ", $l);
-			$stId 		= intval($cols[0]);
+			$stId = intval($cols[0]);
 
 			if (!$l || !$stId)
 				continue;
@@ -1378,9 +1378,11 @@ function bo_update_stations($force = false)
 			$stStatus 	= $cols[8];
 			$stDist 	= bo_latlon2dist($stLat, $stLon);
 			$stSignals	= (int)$cols[10];
+			$stTimeU    = strtotime($stTime.' UTC');
 			
-			$stTimeU = strtotime($stTime);
 			
+			//Data for statistics
+			$StData[$stId] = array('time' => $stTimeU, 'lat' => $stLat, 'lon' => $stLon);
 			$Count[$stId]['sig'] = $stSignals;
 			$Count[$stId]['active'] = $stStatus == 'A'; //GPS is (or was) active
 			$Count[$stId]['available'] = $stStatus != '-'; //has sent some data some time ago
@@ -1659,6 +1661,19 @@ function bo_update_stations($force = false)
 				$cnt = bo_get_conf('longtime_station_nogps_count'.$add);
 				bo_set_conf('longtime_station_nogps_count'.$add, $cnt);
 			}
+			
+			//Station positions for last 24h, every station-update interval (15min)
+			if (time() - $StData[$stId]['time'] < 3600 * 2)
+			{
+				$data = unserialize(bo_get_conf('station_data24h'.$add));
+				if ($data['time'] != $StData[$stId]['time'])
+				{
+					$time_floor = floor(date('Hi', $StData[$stId]['time']) / BO_UP_INTVL_STATIONS);
+					$data[$time_floor] = $StData[$stId];
+					bo_set_conf('station_data24h'.$add, serialize($data));
+				}
+			}
+			
 		}
 	
 		

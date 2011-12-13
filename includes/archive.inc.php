@@ -1412,7 +1412,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				
 				echo '">';
 				
-				if (bo_user_get_id() == 1)
+				if ((bo_user_get_level() & BO_PERM_SETTINGS))
 					echo $s_data[$sid]['user'];
 				else
 					echo _BC($s_data[$sid]['city']);

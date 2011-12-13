@@ -290,6 +290,11 @@
 // disable this option. So nobody can see your exact position.  
 @define('BO_SHOW_GPS_INFO', true);
 
+
+// Map type for GPS info
+@define('BO_STATISTICS_GPS_MAPTYPE', 'ROADMAP');
+
+
 // Disable station statistics (for slow servers)
 @define('BO_STATION_STAT_DISABLE', false);
 
@@ -308,6 +313,10 @@
 
 // Statistics for all station                                  
 @define('BO_STATISTICS_ALL_STATIONS', 0); // 0 = disable, 1 = with specific link, 2 = links from table for everyone
+
+
+// Map type for station-statistic page
+@define('BO_STATISTICS_STATION_MAPTYPE', 'HYBRID');
 
 
 // Default order of stations table
