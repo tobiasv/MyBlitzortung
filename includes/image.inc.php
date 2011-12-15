@@ -135,10 +135,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 	//find period ID
 	if ($period > 0)
-	{
 		$period_id = (int)array_search($period, $ranges);
-		$cache_file .= '_p'.$ranges[$period_id];
-	}
 	else
 		$period_id = 0; //set the default range!
 	
@@ -273,7 +270,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$time_string  = date(_BL('_date').' H:i', $time_max).' -'.round( ($time_max-$time_min)/3600).'h';
 		else
 			$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
-		
+
+		if ($period_id)
+			$cache_file .= '_p'.$ranges[$period_id];
+			
 		$cache_file .= $id;
 		
 		$file_by_time = false;
