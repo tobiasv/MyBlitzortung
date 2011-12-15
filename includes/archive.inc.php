@@ -225,7 +225,7 @@ function bo_show_archive_map()
 	elseif (!$ani && $ani_changed)
 	{
 		$hour_from  = 0;
-		$hour_range = $max_range;
+		$hour_range = $max_range < 24 ? $max_range : 24;
 	}
 
 	if ($_GET['bo_prev_hour'])
