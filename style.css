@@ -771,3 +771,18 @@ font-weight:bold;
 font-weight: bold;
 font-size: 11px;
 }
+
+#myblitzortung #bo_livemap_select_periods {
+margin-left: 15px;
+}
+
+#myblitzortung #bo_livemap_select_periods a {
+font-size: 14px;
+font-weight: bold;
+margin-left: 9px;
+}
+
+#myblitzortung #bo_livemap_select_periods a.bo_selected {
+color: red;
+text-decoration:none;
+}

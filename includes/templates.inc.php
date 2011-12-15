@@ -155,6 +155,7 @@ $_BO['tpl_density']['germany']['bps'] 		= 2; // bytes per area
 /* Some default settings              */
 /**************************************/
 
+
 //defaults
 $_BO['tpl_imgmap_default']['point_style'] = array(2, 4, 'f008', 0); //type,size,fillcolor,borderwidth,bordercolor
 $_BO['tpl_imgmap_default']['top_font'] = array(9, true, array('fff1', 1, '000a'));
@@ -165,8 +166,8 @@ $_BO['tpl_imgmap_default']['legend'] = array(5, 100, 80, 4, 4, 1);
 $_BO['tpl_imgmap_default']['legend_font'] = array(10, true, array('00000077', 0, '000000'),0,1);
 $_BO['tpl_imgmap_default']['menu'] = true;
 $_BO['tpl_imgmap_default']['archive'] = true;
-$_BO['tpl_imgmap_default']['trange'] = 2; //hours!
-$_BO['tpl_imgmap_default']['upd_intv'] = 1; //minutes
+$_BO['tpl_imgmap_default']['trange'] = array(2); //hours!
+$_BO['tpl_imgmap_default']['upd_intv'] = array(1); //minutes
 $_BO['tpl_imgmap_default']['textcolor'] = array(255,255,255);
 $_BO['tpl_imgmap_default']['col'] = $_BO['tpl_color']['standard'];
 $_BO['tpl_imgmap_default']['col_smooth'] = 24;

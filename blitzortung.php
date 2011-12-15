@@ -25,7 +25,7 @@ if (!defined("BO_VER"))
 	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.7.4-dev3');
+	define("BO_VER", '0.7.4-dev4');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -54,8 +54,9 @@ if (!defined("BO_VER"))
 	require_once 'includes/templates_gmap.inc.php';
 	require_once 'includes/templates.inc.php';
 	require_once 'config.php';
-	require_once 'includes/default_settings.inc.php';
-
+	require_once 'includes/default_settings.inc.php'; //after config.php!
+	require_once 'includes/default_templates.inc.php'; //after config.php!
+	
 	if (defined('BO_DEBUG') && BO_DEBUG)
 	{
 		error_reporting(E_ALL & ~E_NOTICE);

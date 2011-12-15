@@ -88,6 +88,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$blank 			= isset($_GET['blank']);
 		$region			= $_GET['mark'];
 		$strike_id		= intval($_GET['strike_id']);
+		$period         = (float)$_GET['period'];
 		
 		$cfg = $_BO['mapimg'][$id];
 	}
@@ -124,6 +125,30 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	
 	$last_update = bo_get_conf('uptime_strikes_modified');
+	
+	
+	//look for different time ranges for the live-view
+	if (!is_array($cfg['trange']))
+		$ranges[$cfg['trange']] = $cfg['trange'];
+	else
+		$ranges = $cfg['trange'];
+
+	//find period ID
+	if ($period > 0)
+	{
+		$period_id = (int)array_search($period, $ranges);
+		$cache_file .= '_p'.$ranges[$period_id];
+	}
+	else
+		$period_id = 0; //set the default range!
+	
+	//update intervals
+	if (!is_array($cfg['upd_intv']))
+		$update_interval = $cfg['upd_intv'] * 60;
+	elseif (!$cfg['upd_intv'][$period_id])
+		$update_interval = $cfg['upd_intv'][0] * 60;
+	else
+		$update_interval = $cfg['upd_intv'][$period_id] * 60;
 	
 	//Cache file naming
 	$cache_file = BO_DIR.'cache/maps/';
@@ -218,7 +243,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		{
 			$time_max = $last_update;
 			$time_string .= ' - '.date('H:i', $time_max);
-			$expire = time() + $cfg['upd_intv'] / 1.5;
+			$expire = time() + $update_interval / 1.5;
 		}
 		else
 		{
@@ -240,12 +265,14 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$time = $cfg['tstart'];
 		else
 			$time = $last_update;
-			
-		$time_min = $time - 3600 * $cfg['trange'];
+		
+		$time_min = $time - 3600 * $ranges[$period_id];
 		$time_max = $time;
 		
-		//$time_string  = date(_BL('_date').' ', $time_min);
-		$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
+		if ($time_max - $time_min > 3600 * 12)
+			$time_string  = date(_BL('_date').' H:i', $time_max).' -'.round( ($time_max-$time_min)/3600).'h';
+		else
+			$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
 		
 		$cache_file .= $id;
 		
@@ -254,6 +281,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 	if ($cfg['date_min'] && strtotime($cfg['date_min']) && $time_min < strtotime($cfg['date_min']))
 		bo_image_error('Minimum date is '.$cfg['date_min']);
+	
+	
 	
 	//find the correct file
 	$file = '';
@@ -356,7 +385,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.".$extension."\"");
 
 	//Caching
-	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update - intval($cfg['upd_intv'])*60 )
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update - $update_interval )
 	{
 		header("Content-Type: $mime");
 		readfile($cache_file);

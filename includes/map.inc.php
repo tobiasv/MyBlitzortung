@@ -175,6 +175,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 	$disabled = ((defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !bo_user_get_level())) || $show_gmap === 0;
 	$no_google = isset($_GET['bo_showmap']) || $disabled;
 	$static_map_id = intval($show_static_maps) > 0 ? intval($show_static_maps) : intval($_GET['bo_showmap']);
+	$period = (float)$_GET['bo_period'];
 	$show_menu = intval($show_static_maps) == 0;
 	$show_static_maps = ($show_static_maps === null) || $show_static_maps > 0;
 	$last_update = bo_get_conf('uptime_strikes_modified');
@@ -182,13 +183,13 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 	if ($show_static_maps)
 	{
 		$menu_text = '';
-
+		
 		foreach($_BO['mapimg'] as $id => $d)
 		{
 			if (!$d['name'] || !$d['menu'])
 				continue;
 			
-			$menu_text .= '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), "$id").'" class="bo_navi'.($no_google && $static_map_id == $id ? '_active' : '').'">'._BL($d['name']).'</a></li>';
+			$menu_text .= '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), "$id").'&bo_period='.$period.'" class="bo_navi'.($no_google && $static_map_id == $id ? '_active' : '').'">'._BL($d['name']).'</a></li>';
 		}
 
 		if ($menu_text && $show_menu)
@@ -205,18 +206,35 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 		if ($no_google)
 		{	
 			$cfg = $_BO['mapimg'][$static_map_id];
+			
+			//look for different time ranges for the live-view
+			if (!is_array($cfg['trange']))
+				$ranges[$cfg['trange']] = $cfg['trange'];
+			else
+				$ranges = $cfg['trange'];
+
+			//find period ID
+			if ($period > 0)
+			{
+				$period_id = (int)array_search($period, $ranges);
+				$cache_file .= '_p'.$ranges[$period_id];
+			}
+			else
+				$period_id = 0; //set the default range!
+			
+			//update intervals
+			if (!is_array($cfg['upd_intv']))
+				$update_interval = $cfg['upd_intv'] * 60;
+			elseif (!$cfg['upd_intv'][$period_id])
+				$update_interval = $cfg['upd_intv'][0] * 60;
+			else
+				$update_interval = $cfg['upd_intv'][$period_id] * 60;
+					
+
 			$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
-			$url = bo_bofile_url().'?map='.$static_map_id.'&bo_lang='._BL();
+			$url = bo_bofile_url().'?map='.$static_map_id.($period_id ? '&period='.$period : '').'&bo_lang='._BL();
 			$img_dim = bo_archive_get_dim($static_map_id);
-			$interval = $cfg['upd_intv'];
-			
-			
-			
-			
-			
-			
-			
-			$interval = 1;
+
 			
 			echo '<fieldset class="bo_map_options_static">';
 			echo '<legend>'._BL("map_options_static").'</legend>';
@@ -225,6 +243,30 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			echo '<input type="checkbox" onclick="bo_toggle_autoupdate_static(this.checked);" id="bo_check_autoupdate"> ';
 			echo '<label for="bo_check_autoupdate">'._BL('auto update').'</label> ';
 			echo '</span>';
+			
+			if (count($ranges) > 1)
+			{
+				echo '<span id="bo_livemap_select_periods">';
+				echo ' '._BL('Period').': ';
+				
+				asort($ranges);
+				foreach($ranges as $i => $r)
+				{
+					echo '<a href="'.bo_insert_url("bo_period", $r).'" class="';
+					echo $i == $period_id ? 'bo_selected' : ''; 
+					echo '">';
+					
+					if ($r < 2)
+						echo ($r * 60).'min';
+					else
+						echo $r.'h';
+						
+					echo '</a> &nbsp;';
+				
+				}
+				echo '</span>';
+			}
+			
 			echo '</fieldset>';
 			
 			echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
@@ -273,8 +315,8 @@ function bo_map_reload_static()
 	if (bo_autoupdate_running)
 	{
 		var now = new Date();
-		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo $interval; ?>);
-		window.setTimeout("bo_map_reload_static();", <?php echo 1000 * 60 * ceil($interval / 2) ?>);
+		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo $update_interval; ?>);
+		window.setTimeout("bo_map_reload_static();", <?php echo 1000 * 60 * ceil($update_interval / 2) ?>);
 	}
 }
 
