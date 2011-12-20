@@ -129,7 +129,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	//look for different time ranges for the live-view
 	if (!is_array($cfg['trange']))
-		$ranges[$cfg['trange']] = $cfg['trange'];
+		$ranges[0] = $cfg['trange'];
 	else
 		$ranges = $cfg['trange'];
 
