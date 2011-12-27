@@ -904,7 +904,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 		foreach($data as $user => $time)
 		{
-			if ($time)
+			if ($time && isset($user_stations[$user]))
 			{
 				$id = $user_stations[$user]['id'];
 				$new_stations[$id] = array($time, $user_stations[$user]['city'], $user_stations[$user]['country']);

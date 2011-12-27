@@ -1411,15 +1411,15 @@ function bo_update_stations($force = false)
 
 			$sql = strtr($sql, array('\null' => ''));
 
-
 			//user rename ==> station owner/city changed ==> new station ==> delete old data
-			if (isset($all_stations[$stId]) && $all_stations[$stId]['user'] != $stUser 
+			if (isset($all_stations[$stId]) 
+					&& $all_stations[$stId]['user'] != $stUser 
 					&& trim($all_stations[$stId]['user'])
 					&& trim($stUser)
 				)
 			{
-				bo_delete_station($id);
-				unset($all_stations[$stId]);
+				if (bo_delete_station($stId))
+					unset($all_stations[$stId]);
 			}
 			
 			if (isset($all_stations[$stId]))
