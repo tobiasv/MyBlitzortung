@@ -874,6 +874,9 @@ function bo_update_strikes($force = false)
 						$stLat = $sdata['lat'];
 						$stLon = $sdata['lon'];
 
+						if (!$stLat && !$stLon) //station has no position yet
+							continue;
+						
 						$dist_other    = bo_latlon2dist($lat, $lon, $stLat, $stLon);
 						$bear_other    = bo_latlon2bearing($lat, $lon, $stLat, $stLon);
 						$bear_id_other = intval($bear_other);
