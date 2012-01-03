@@ -437,6 +437,11 @@ function bo_show_archive_density()
 	$start_time = strtotime($row['mindate']);
 	$end_time = strtotime($row['maxdate_end']);
 	
+	if ($month && $month < date('m', $start_time) && $year == date('Y', $start_time))
+		$month = date('m', $start_time);
+	elseif ($month && $month > date('m', $end_time) && $year == date('Y', $end_time))
+		$month = date('m', $end_time);
+	
 	$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities WHERE status=5")->fetch_assoc();
 	$show_whole_timerange = $row['cnt'] ? true : false;
 	
@@ -1350,6 +1355,7 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 			$year_start  = $year;
 			$month_end   = $month+1;
 			$year_end    = $year;
+			$status      = -2;
 		}
 		elseif ($year)
 		{
@@ -1357,13 +1363,15 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 			$year_start  = $year;
 			$month_end   = 1;
 			$year_end    = $year+1;
+			$status      = -4;
 		}
 		else
 			return array();
 		
 		$ranges[] = array(
 						gmmktime(0,0,0, $month_start,1,$year_start),
-						gmmktime(0,0,-1,$month_end,  1,$year_end  )
+						gmmktime(0,0,-1,$month_end,  1,$year_end  ),
+						$status
 						);
 	}
 	else
@@ -1374,6 +1382,8 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 		$max_year  = gmdate('Y', $max_strike_time);
 		$max_month = gmdate('m', $max_strike_time);
 
+		
+		//insert full years/months
 		for ($y=$min_year;$y<=$max_year;$y++)
 		{
 			if ($y == $min_year)
@@ -1388,20 +1398,23 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 				
 			for ($m = $start_month; $m <= $end_month ;$m++)
 			{
+				//months
 				$ranges[] = array(
 					gmmktime(0,0,0, $m,  1,$y),
-					gmmktime(0,0,-1,$m+1,1,$y)
-					);
+					gmmktime(0,0,-1,$m+1,1,$y),
+					0);
 			}
 			
+			//year
 			$ranges[] = array(
-				gmmktime(0,0,0, 1,1   ,$y),
-				gmmktime(0,0,-1,1,$m+1,$y)
-				);
+				gmmktime(0,0,0, 1,         1,$y),
+				gmmktime(0,0,-1,$end_month+1,1,$y),
+				-1);
 		}
 		
+		
 		//current year (out from full months)
-		$ranges[] = array(strtotime( gmdate('Y').'-01-01 UTC'), gmmktime(0,0,-1,date('m'),1,gmdate('Y')), -1 ); 
+		$ranges[] = array(strtotime( gmdate('Y').'-01-01 UTC'), gmmktime(0,0,-1,gmdate('m'),1,gmdate('Y')), -1 ); 
 		
 		
 		//whole range (check only for years!)
@@ -1411,6 +1424,7 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 		$row = $res->fetch_assoc();
 		$ymin = substr($row['mindate'],0,4);
 		$ymax = substr($row['maxdate'],0,4);
+		
 		if ($ymin && $ymax && $ymin < $ymax)
 			$ranges[] = array(strtotime($ymin.'-01-01 UTC'), strtotime($row['maxdate'].' UTC'), -4 ); 
 
@@ -1467,11 +1481,12 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 	{
 		$date_start = gmdate('Y-m-d', $r[0]);
 		$date_end   = gmdate('Y-m-d', $r[1]);
-		$status  = intval($r[2]);
-		
+		$status     = intval($r[2]);
+		$new = false;
+
 		if ($r[0] >= $r[1])
 			continue;
-
+			
 		//check if rows already exists
 		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities 
 					WHERE date_start='$date_start' AND date_end='$date_end'";
@@ -1501,10 +1516,18 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 							length='$length', info='', data=''
 							";
 					if (bo_db($sql))
+					{
 						$count++;
+						$new = true;
+					}
+					
 				}
 			}
 		}
+		
+		if ($new)
+			bo_echod("New range: $date_start - $date_end * Type: ".(-$status+1));
+
 	}
 	
 	return $count;
