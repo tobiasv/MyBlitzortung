@@ -238,7 +238,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			
 			echo '<fieldset class="bo_map_options_static">';
 			echo '<legend>'._BL("map_options_static").'</legend>';
-			echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_static(); return false;" id="bo_map_reload">';
+			echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_static(1); return false;" id="bo_map_reload">';
 			echo '<span class="bo_form_checkbox_text">';
 			echo '<input type="checkbox" onclick="bo_toggle_autoupdate_static(this.checked);" id="bo_check_autoupdate"> ';
 			echo '<label for="bo_check_autoupdate">'._BL('auto update').'</label> ';
@@ -306,17 +306,21 @@ function bo_toggle_autoupdate_static(on)
 
 	if (on)
 	{
-		bo_map_reload_static();
+		bo_map_reload_static(0);
 	}
 }
 
-function bo_map_reload_static()
+function bo_map_reload_static(manual)
 {
-	if (bo_autoupdate_running)
+	if (bo_autoupdate_running || manual)
 	{
 		var now = new Date();
 		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo $update_interval; ?>);
-		window.setTimeout("bo_map_reload_static();", <?php echo 1000 * 60 * ceil($update_interval / 2) ?>);
+	}
+	
+	if (bo_autoupdate_running && !manual)
+	{
+		window.setTimeout("bo_map_reload_static(0);", <?php echo 1000 * 60 * ceil($update_interval / 2) ?>);
 	}
 }
 
