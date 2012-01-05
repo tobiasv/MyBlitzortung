@@ -315,7 +315,7 @@ function bo_map_reload_static(manual)
 	if (bo_autoupdate_running || manual)
 	{
 		var now = new Date();
-		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo $update_interval; ?>);
+		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo $update_interval; ?> / 60);
 	}
 	
 	if (bo_autoupdate_running && !manual)
