@@ -3,7 +3,7 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.4-dev3 (2011-12-12)
+Version 0.7.4-dev5 (2012-01-07)
 ------------------------------
 - new: option to resize maps
 - new: more descriptions
@@ -16,8 +16,10 @@ Version 0.7.4-dev3 (2011-12-12)
 - new: better navigation in archives (maps & animation)
 - new: time-ranges in network statistics (has to be enabled)
 - new: creation of longtime-statistics for all stations (causes high DB-load)
+- new: region select in statistics -> strikes -> year/month
 - improved: station deletion (no data deleted, only moved to another id)
 - fix: SQL-error when inserting malformated signals
+- fix: only current year selectable in statistics -> strikes
 - minor fixes and improvements
 
 Version 0.7.3b (2011-11-04)

@@ -809,7 +809,9 @@ function bo_get_density_image()
 	{
 		$date_start = "$year-01-01";
 		$date_end   = "$year-12-31";
-		$sql_status = " (status=2 OR status=4) ";
+		
+		$sql_status = " 1 ";
+		//$sql_status = " (status=2 OR status=4) "; //doesn't work with january (sama data exists as month-status -> unique dataset)
 		$sql_status .= " AND date_start = '$date_start'	AND date_end   <= '$date_end' ";
 	}
 	else
@@ -1038,7 +1040,7 @@ function bo_get_density_image()
 				$avg = array_sum($VAL_COUNT1) / count($VAL_COUNT1);
 				
 				asort($VAL_COUNT1);
-				list($max_display_block) = array_slice($VAL_COUNT1, floor(count($VAL_COUNT1) * 0.999), 1);
+				list($max_display_block) = array_slice($VAL_COUNT1, floor(count($VAL_COUNT1) * (1-BO_DENSITIES_GROUP_MAX/100000)), 1);
 			}
 			
 		}

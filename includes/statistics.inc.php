@@ -177,32 +177,36 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	
 	$years = array();
 	$months = array();
-	
 	$months[-1] = _BL('All');
-	
+
 	$res = bo_db("SELECT DISTINCT SUBSTRING(name, 9, 6) time
 					FROM ".BO_DB_PREF."conf
-					WHERE name LIKE 'strikes_".$year."%'
+					WHERE name LIKE 'strikes_%'
 					ORDER BY time");
 	while($row = $res->fetch_assoc())
 	{
 		$y = (int)substr($row['time'], 0, 4);
 		$m = (int)substr($row['time'], 4, 2);
 		
-		$years[$y] = $y;
-		$months[$m] = _BL(date('M', strtotime("$y-$m-01")));
+		if ($y)
+			$years[$y] = $y;
+		
+		if ($y == $year)
+			$months[$m] = _BL(date('M', strtotime("$y-$m-01")));
 	}
 
 	//Add current month
-	$years[(int)date('Y')] = date('Y');
-	$months[(int)date('m')] = _BL(date('M'));
-
-	
-	if (!$years[(int)$year] || !$months[(int)$month])
+	if (!$year || $year == date('Y'))
 	{
-		$year = $y;
-		$month = $m;
+		$years[(int)date('Y')] = date('Y');
+		$months[(int)date('m')] = _BL(date('M'));
 	}
+
+	if (!$years[(int)$year])
+		$year = max($years);
+		
+	if (!$months[(int)$month])
+		$month = max(array_flip($months));
 
 	
 	echo '<div id="bo_stat_strikes">';
@@ -269,6 +273,11 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').' style="'.($i <= 0 ? 'font-weight:bold;' : '').'">'.$m.'</option>';
 	echo '</select>';
 	
+	echo ' &nbsp; &bull; &nbsp; <span class="bo_form_descr">'._BL('Region').': </span>';
+	bo_show_select_region($region);
+	echo '</fieldset>';
+
+	
 	echo '</fieldset>';
 	
 	echo '</form>';
@@ -278,14 +287,17 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time">';
 	echo _BL('bo_graph_descr_strikes_time');
 	echo '</p>';
-	bo_show_graph('strikes_time', '&year='.$year.'&month='.$month);
+	bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&region='.$region);
 
-	echo '<a name="graph_strikes"></a>';
-	echo '<h4>'._BL('h4_graph_strikes_time_radius').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time_radius">';
-	echo strtr(_BL('bo_graph_descr_strikes_time_radius'), array('{RADIUS}' => BO_RADIUS_STAT));
-	echo '</p>';
-	bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&radius=1');
+	if (!$region)
+	{
+		echo '<a name="graph_strikes"></a>';
+		echo '<h4>'._BL('h4_graph_strikes_time_radius').'</h4>';
+		echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time_radius">';
+		echo strtr(_BL('bo_graph_descr_strikes_time_radius'), array('{RADIUS}' => BO_RADIUS_STAT));
+		echo '</p>';
+		bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&radius=1');
+	}
 	
 	echo '</div>';
 }

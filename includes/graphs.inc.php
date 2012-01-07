@@ -450,9 +450,18 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$i = date('z', $time) - $day_offset;
 			$d = unserialize($row['data']);
 
-			$Y[$i] = $d[1 + $rad]; //participanted
-			$Y2[$i] = $d[0 + $rad] - $d[1 + $rad]; //other
-			$Y3[$i] = $d[0 + $rad]; //Sum
+			if ($region)
+			{
+				$Y[$i] =  $d[7][$region]['own']; //participanted
+				$Y2[$i] = $d[7][$region]['all'] - $d[7][$region]['own']; //other
+				$Y3[$i] = $d[7][$region]['all']; //Sum
+			}
+			else
+			{
+				$Y[$i] = $d[1 + $rad]; //participanted
+				$Y2[$i] = $d[0 + $rad] - $d[1 + $rad]; //other
+				$Y3[$i] = $d[0 + $rad]; //Sum
+			}
 		}
 
 		

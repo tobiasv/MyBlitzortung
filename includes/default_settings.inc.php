@@ -522,6 +522,9 @@
 //Calculates Densities for current year/month
 @define('BO_CALC_DENSITIES_CURRENT', true); 
 
+//When displaying densities, group max values (higher =>more grouping, 0=no)
+@define('BO_DENSITIES_GROUP_MAX', 30); 
+
 //maximum no. of strikes displayed when searching for them
 @define('BO_ARCHIVE_SEARCH_STRIKECOUNT', 10);
 
