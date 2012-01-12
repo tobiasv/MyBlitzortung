@@ -2801,6 +2801,11 @@ function bo_delete_station($id = 0)
 		bo_db("UPDATE ".BO_DB_PREF."stations_strikes SET station_id='$new_id' WHERE station_id='$id'");
 		bo_db("UPDATE ".BO_DB_PREF."densities        SET station_id='$new_id' WHERE station_id='$id'");
 		
+		$last_strikes = unserialize(bo_get_conf('last_strikes_stations'));
+		$last_strikes[$new_id] = $last_strikes[$id];
+		unset($last_strikes[$id]);
+		bo_set_conf('last_strikes_stations', serialize($last_strikes));
+		
 		//last not least the station itself (last update, if former queries fail)
 		bo_db("UPDATE ".BO_DB_PREF."stations         SET id='$new_id', status='-' WHERE id='$id'");
 	

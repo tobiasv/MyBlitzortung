@@ -542,9 +542,9 @@ function bo_add_locale_msgid($locale, $msgid)
 
 }
 
-function bo_get_tile_dim($x,$y,$zoom)
+function bo_get_tile_dim($x,$y,$zoom, $size=BO_TILE_SIZE)
 {
-	$tilesZoom = 1 << $zoom;
+	$tilesZoom = ((1 << $zoom) * 256 / $size);
 	$lonW = 360.0 / $tilesZoom;
 	$lon = -180 + ($x * $lonW);
 
@@ -563,7 +563,7 @@ function bo_latlon2tile($lat, $lon, $zoom)
 	list($x, $y) = bo_latlon2mercator($lat, $lon);
 	$x += 0.5;
 	$y = abs($y-0.5);
-	$scale = (1 << ($zoom)) * BO_TILE_SIZE;
+	$scale = (1 << $zoom) * 256;
 
 	return array((int)($x * $scale), (int)($y * $scale));
 }
@@ -574,7 +574,7 @@ function bo_latlon2mercator($lat, $lon)
 		$lon -= 360;
 
 	$lon /= 360;
-	$lat = asinh(tan(deg2rad($lat)))/M_PI/2;
+	$lat = log(tan(M_PI/4 + deg2rad($lat)/2))/M_PI/2;
 	return array($lon, $lat);
 }
 
@@ -590,6 +590,24 @@ function bo_latlon2projection($proj, $lat, $lon)
 			return array($lon, $lat);
 	
 	}
+}
+
+function bo_sql_lat2tiley($name, $zoom)
+{
+	$scale = (1 << $zoom) * 256;
+	$lat_mercator = " (  LOG(TAN( PI()/4 + RADIANS($name)/2 )) / PI() / 2 ) ";
+	$y = " ROUND( ABS( $lat_mercator - 0.5 ) * $scale ) ";
+	
+	return $y;
+}
+
+function bo_sql_lon2tilex($name, $zoom)
+{
+	$scale = (1 << $zoom) * 256;
+	$lon_mercator = " ( $name / 360 ) ";
+	$x = " ROUND( ($lon_mercator+0.5) * $scale ) ";
+	
+	return $x;
 }
 
 function bo_strike2polarity($data, $bearing)

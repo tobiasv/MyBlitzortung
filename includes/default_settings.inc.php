@@ -438,7 +438,7 @@
 @define('BO_MAP_STRIKE_SIZE', 3);
 @define('BO_MAP_STRIKE_CIRCLE_SIZE', 4);
 @define('BO_MAP_STRIKE_CIRCLE_GROW', 0.5);
-@define('BO_MAP_MAX_STRIKES_PER_TILE', 20000);
+@define('BO_MAP_MAX_STRIKES_PER_TILE', 50000);
 
 //some other values, sizes etc...
 @define('BO_MAP_STATION_ICON', 'http://labs.google.com/ridefinder/images/mm_20_red.png');
@@ -939,7 +939,13 @@
 /*** Some special settings which shouldn't be changed            ***/
 
 //Tile dimensions (pixels)
-@define("BO_TILE_SIZE", 256);
+@define("BO_TILE_SIZE", 512);
+
+//Tile dimensions for strike counter
+@define("BO_TILE_SIZE_COUNT", 256);
+
+//waits when another tile is created
+define("BO_WAIT_SIM_TILE_CREATION", false); 
 
 //Min and max count of participants - values are only used if
 //automatic getting from participants.txt failed

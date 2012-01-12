@@ -896,7 +896,7 @@ function bo_map_reload_static(manual)
 
 		bo_OverlayCount = {
 			getTileUrl: function (coord, zoom) { return bo_get_tile_counts(zoom, coord); },
-			tileSize: new google.maps.Size(<?php echo BO_TILE_SIZE.','.BO_TILE_SIZE ?>), 
+			tileSize: new google.maps.Size(<?php echo BO_TILE_SIZE_COUNT.','.BO_TILE_SIZE_COUNT ?>), 
 			isPng:true, 
 			bo_show:false
 		};

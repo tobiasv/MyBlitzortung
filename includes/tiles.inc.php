@@ -20,8 +20,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define("BO_WAIT_SIM_TILE_CREATION", false); //waits when another tile is created (for testing)
-
 function bo_tile()
 {
 	@set_time_limit(5);
@@ -35,17 +33,23 @@ function bo_tile()
 		register_shutdown_function('bo_delete_files', BO_DIR.'cache/tiles/', BO_CACHE_PURGE_TILES_HOURS, 5);
 	}
 	
-	$x = intval($_GET['x']);
-	$y = intval($_GET['y']);
-	$zoom = intval($_GET['zoom']);
-	$only_own = intval($_GET['own']);
-	$only_info = isset($_GET['info']);
-	$type = intval($_GET['type']);
+	$x          = intval($_GET['x']);
+	$y          = intval($_GET['y']);
+	$zoom       = intval($_GET['zoom']);
+	$only_own   = intval($_GET['own']);
+	$only_info  = isset($_GET['info']);
+	$show_count = isset($_GET['count']);
+	$type       = intval($_GET['type']);
 	
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$time = time();
-
 	$cfg = $_BO['mapcfg'][$type];
+	
+	if ($show_count)
+		$tile_size = BO_TILE_SIZE_COUNT;
+	else
+		$tile_size = BO_TILE_SIZE;
+
 	
 	//manual time select
 	if (isset($_GET['from']) && isset($_GET['to']))
@@ -89,7 +93,7 @@ function bo_tile()
 
 	
 	//get config
-	if (isset($_GET['count'])) // display strike count
+	if ($show_count) // display strike count
 	{
 		$type = 0;
 		$time_range = 0;
@@ -141,7 +145,7 @@ function bo_tile()
 		$time_max   = $time_min + 60 * $time_range + 59;
 	}
 	
-	if (!$time_start || !$time_min || !$time_max)
+	if (!$time_start || !$time_min || !$time_max || !is_array($cfg))
 		bo_tile_output();
 
 	//calculate some time information
@@ -231,7 +235,7 @@ function bo_tile()
 		}
 	}
 
-	list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($x, $y, $zoom);
+	list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($x, $y, $zoom, $tile_size);
 	
 	//Check if zoom or position is in limit
 	$radius = $_BO['radius'] * 1000; //max. Distance
@@ -277,7 +281,7 @@ function bo_tile()
 	}
 	
 	//Display only strike count
-	if (isset($_GET['count'])) 
+	if ($show_count) 
 	{
 		$sql_where = '';
 		foreach($count_types as $i)
@@ -344,17 +348,17 @@ function bo_tile()
 		bo_session_close(true);
 		
 		//create tile image
-		$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
+		$I = imagecreate($tile_size, $tile_size);
 		imagealphablending($I, true); 
 		imagesavealpha($I, true);
 
 		$blank = imagecolorallocatealpha($I, 255, 255, 255, 127);
-		imagefilledrectangle($I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
+		imagefilledrectangle($I, 0, 0, $tile_size, $tile_size, $blank);
 	
 	
 		//border
 		$col = imagecolorallocatealpha($I, 100,100,100,50);
-		imagerectangle( $I, 0, 0, BO_TILE_SIZE-1, BO_TILE_SIZE-1, $col);
+		imagerectangle( $I, 0, 0, $tile_size-1, $tile_size-1, $col);
 		
 		//number
 		$textsize = BO_MAP_COUNT_FONTSIZE;
@@ -362,7 +366,7 @@ function bo_tile()
 		$twidth = bo_imagetextwidth($textsize, $bold, $strike_count);
 		$theight = bo_imagetextheight($textsize, $bold, $strike_count);
 		$white = imagecolorallocatealpha($I, 255,255,255,0);
-		imagefilledrectangle( $I, 0, 0, $twidth+5, $theight+2, $col);
+		imagefilledrectangle( $I, 0, 0, $twidth+3, $theight+2, $col);
 		bo_imagestring($I, $textsize, 2, 2, $strike_count, $white, $bold);
 		
 		if ($only_own && intval($whole_strike_count))
@@ -425,73 +429,60 @@ function bo_tile()
 
 	//the where clause
 	$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat1, $lat2, $lon1, $lon2);
+
+	//strike grouping
+	//no grouping for deviation-circle
+	if ($zoom >= $zoom_show_deviation) 
+	{
+		$sql_select = " s.time mtime, s.lat lat, s.lon lon  ";
+		$grouping   = false;
+	}
+	//Calculate tile coordinates in SQL and group them 
+	else
+	{
+		
+		$sql_select = " MAX(s.time) mtime, 
+						".bo_sql_lat2tiley('s.lat', $zoom)." y, 
+						".bo_sql_lon2tilex('s.lon', $zoom)." x  ";
+		$grouping   = true;
+	}
 	
 	//get the data!
 	$points = array();
 	$deviation = array();
-	$sql = "SELECT s.id id, s.time time, s.lat lat, s.lon lon, s.deviation deviation, s.polarity polarity
+	$sql = "SELECT s.id id, s.deviation deviation, s.polarity polarity,
+				$sql_select	
 			FROM ".BO_DB_PREF."strikes s
-			$index_sql
+				$index_sql
 			WHERE 1
 				".($radius ? "AND distance < $radius" : "")."
 				".($only_own ? " AND part>0 " : "")."
 				AND $sql_where
-			ORDER BY time ASC";
+			".($grouping ? " GROUP BY x, y" : "")."
+			ORDER BY mtime ASC";
 	$erg = bo_db($sql);
 	
 	//Max. strikes per tile
 	$num = $erg->num_rows;
 	$max = intval(BO_MAP_MAX_STRIKES_PER_TILE);
 	
-	while ($row = $erg->fetch_assoc())
-	{
-		//Max. strikes per tile handling
-		//This random thing is quick&easy but needs no further strike calculation (position/time/color)
-		//Problem: tile borders
-		if ($max && $num > $max)
-		{
-			if (rand(0, $num) > $max)
-				continue;
-		}
-		
-		list($px, $py) = bo_latlon2tile($row['lat'], $row['lon'], $zoom);
-
-		if ($zoom >= $zoom_show_deviation)
-		{
-			 list($dlat, $dlon) = bo_distbearing2latlong($row['deviation'], 0, $row['lat'], $row['lon']);
-			 list($dx, $dy)     = bo_latlon2tile($dlat, $dlon, $zoom);
-			 $deviation[]		= $py - $dy;
-		}
-
-		$px -= (BO_TILE_SIZE * $x);
-		$py -= (BO_TILE_SIZE * $y);
-
-		$strike_time = strtotime($row['time'].' UTC');
-		$col = floor(($time_max - $strike_time) / $color_intvl);
-		
-		$points[] = array($px, $py, $col, $row['polarity']);
-	}
-	
-	if (BO_WAIT_SIM_TILE_CREATION)
-		bo_set_conf('is_creating_tile', 0);
 	
 	//no points --> blank tile
-	if (count($points) == 0)
+	if ($num == 0)
 	{
 		bo_tile_output($file, $caching);
 	}
 
-
 	//create Image
-	$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
+	$I = imagecreate($tile_size, $tile_size);
 	$blank = imagecolorallocate($I, 0, 0, 0);
 	$white = imagecolorallocate($I, 255, 255, 255);
-	imagefilledrectangle( $I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
+	imagefilledrectangle( $I, 0, 0, $tile_size, $tile_size, $blank);
 
+	//prepare "brushes" and styles
 	foreach($c as $i => $rgb)
 		$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
 
-	
 	if ($zoom >= BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM) //circle (grows with zoom)
 	{
 		$s = floor((BO_MAP_STRIKE_CIRCLE_SIZE+BO_MAP_STRIKE_CIRCLE_GROW*$zoom)/2)*2-1;
@@ -507,44 +498,79 @@ function bo_tile()
 		$style = 1;
 	}
 
-	foreach($points as $i => $p)
+	// get the data and paint tile
+	while ($row = $erg->fetch_assoc())
 	{
+		//Max. strikes per tile handling
+		//This random thing is quick&easy 
+		//but needs no further strike calculation (position/time/color)
+		//Problem: tile borders
+		if ($max && $num > $max)
+		{
+			if (rand(0, $num) > $max)
+				continue;
+		}
+
+		if ($grouping)
+		{
+			$px = $row['x'];
+			$py = $row['y'];
+		}
+		else
+		{
+			list($px, $py)     = bo_latlon2tile($row['lat'], $row['lon'], $zoom);
+			
+			if ($zoom >= $zoom_show_deviation)
+			{
+				list($dlat, $dlon) = bo_distbearing2latlong($row['deviation'], 0, $row['lat'], $row['lon']);
+				list($dx, $dy)     = bo_latlon2tile($dlat, $dlon, $zoom);
+				$deviation[]  	   = $py - $dy;
+			}
+		}
+
+		$px -= ($tile_size * $x);
+		$py -= ($tile_size * $y);
+		
+		$strike_time = strtotime($row['mtime'].' UTC');
+		$col = $color[floor(($time_max - $strike_time) / $color_intvl)];
+		
+		//paint!
 		switch($style)
 		{
 			case 1: // plot a "+"
 				
 				imagesetthickness($I, 2);
-				imageline($I, $p[0]-$s, $p[1], $p[0]+$s-1, $p[1], $color[$p[2]]);
-				imageline($I, $p[0], $p[1]-$s, $p[0], $p[1]+$s-1, $color[$p[2]]);
+				imageline($I, $px-$s, $py, $px+$s-1, $py, $col);
+				imageline($I, $px, $py-$s, $px, $py+$s-1, $col);
 				break;
 
 			case 2:
-				if (!$p[3]) //plot circle (no polarity known)
+				if (!$row['polarity']) //plot circle (no polarity known)
 				{
 					imagesetthickness($I, 1);
-					imagefilledellipse($I, $p[0], $p[1], $s, $s, $color[$p[2]]);
+					imagefilledellipse($I, $px, $py, $s, $s, $col);
 				}
 				else //plot "+" or "-"
 				{
 					$t = $s - 2;
 					imagesetthickness($I, 2);
-					imageline($I, $p[0]-$t, $p[1], $p[0]+$t-1, $p[1], $color[$p[2]]);
-					if ($p[3] > 0)
-						imageline($I, $p[0], $p[1]-$t, $p[0], $p[1]+$t-1, $color[$p[2]]);
+					imageline($I, $px-$t, $py, $px+$t-1, $py, $col);
+					if ($row['polarity'] > 0)
+						imageline($I, $px, $py-$t, $px, $py+$t-1, $col);
 				}
 
 				break;
 
 			default: // plot circle
 				imagesetthickness($I, 1);
-				imagefilledellipse($I, $p[0], $p[1], $s, $s, $color[$p[2]]);
+				imagefilledellipse($I, $px, $py, $s, $s, $col);
 
-				if ($p[3] && BO_EXPERIMENTAL_POLARITY_CHECK == true)
+				if ($row['polarity'] && BO_EXPERIMENTAL_POLARITY_CHECK == true)
 				{
 					$t = intval($s / 2);
-					imageline($I, $p[0]-$t+1, $p[1], $p[0]+$t-1, $p[1], $white);
-					if ($p[3] > 0)
-						imageline($I, $p[0], $p[1]-$t+1, $p[0], $p[1]+$t-1, $white);
+					imageline($I, $px-$t+1, $py, $px+$t-1, $py, $white);
+					if ($row['polarity'] > 0)
+						imageline($I, $px, $py-$t+1, $px, $py+$t-1, $white);
 				}
 
 				break;
@@ -553,9 +579,14 @@ function bo_tile()
 		if ($zoom >= $zoom_show_deviation)
 		{
 			imagesetthickness($I, 1);
-			imageellipse($I, $p[0], $p[1], $deviation[$i], $deviation[$i], $color[$p[2]]);
+			imageellipse($I, $px, $py, $deviation[$i], $deviation[$i], $col);
 		}
+		
 	}
+	
+	if (BO_WAIT_SIM_TILE_CREATION)
+		bo_set_conf('is_creating_tile', 0);
+	
 
 	imagecolortransparent($I, $blank);
 	bo_tile_output($file, $caching, $I);
@@ -756,7 +787,7 @@ function bo_tile_tracks()
 	bo_tile_output($file, $caching, $I);
 }
 
-function bo_tile_output($file='', $caching=false, &$I=null)
+function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE_SIZE)
 {
 	BoDb::close();
 	bo_session_close(true);
@@ -775,7 +806,7 @@ function bo_tile_output($file='', $caching=false, &$I=null)
 		$ok = @file_put_contents($file, $img);
 		
 		if (!$ok && $caching)
-			bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
+			bo_image_cache_error($tile_size, $tile_size);
 		
 		header("Content-Type: image/png");
 		echo $img;
@@ -788,7 +819,7 @@ function bo_tile_output($file='', $caching=false, &$I=null)
 		$ok = @imagepng($I, $file);
 		
 		if (!$ok)
-			bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
+			bo_image_cache_error($tile_size, $tile_size);
 		
 		readfile($file);
 	}
@@ -801,7 +832,7 @@ function bo_tile_output($file='', $caching=false, &$I=null)
 }
 
 
-function bo_tile_message($text, $type, $caching=false, $replace = array())
+function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile_size = BO_TILE_SIZE)
 {
 	$dir = BO_DIR.'cache/tiles/';
 	
@@ -812,14 +843,14 @@ function bo_tile_message($text, $type, $caching=false, $replace = array())
 		bo_load_locale();
 		$text = strtr(_BL($text, true), $replace);
 		
-		$I = imagecreate(BO_TILE_SIZE, BO_TILE_SIZE);
+		$I = imagecreate($tile_size, $tile_size);
 
 		$blank = imagecolorallocate($I, 255, 255, 255);
 		$textcol = imagecolorallocate($I, 70, 70, 70);
 		$box_bg  = imagecolorallocate($I, 210, 210, 255);
 		$box_line  = imagecolorallocate($I, 255, 255, 255);
 
-		imagefilledrectangle( $I, 0, 0, BO_TILE_SIZE, BO_TILE_SIZE, $blank);
+		imagefilledrectangle( $I, 0, 0, $tile_size, $tile_size, $blank);
 		
 		$text = strtr($text, array('\n' => "\n"));
 		
@@ -850,7 +881,7 @@ function bo_tile_message($text, $type, $caching=false, $replace = array())
 		$ok = @imagepng($I, $file);
 		
 		if (!$ok)
-			bo_image_cache_error(BO_TILE_SIZE, BO_TILE_SIZE);
+			bo_image_cache_error($tile_size, $tile_size);
 
 	}
 
