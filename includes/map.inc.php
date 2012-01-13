@@ -46,6 +46,23 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 	<script type="text/javascript" id="bo_script_map">
 	
+	
+	
+	//bo_ProjectedOverlay
+	//Source: http://www.usnaviguide.com/v3maps/js/bo_ProjectedOverlay.js
+	var bo_ProjectedOverlay = function(map, imageUrl, bounds, opts)
+	{
+	 google.maps.OverlayView.call(this);
+	 this.url_ = imageUrl ;
+	 this.bounds_ = bounds ;
+	 this.addZ_ = opts.addZoom || '' ;				// Add the zoom to the image as a parameter
+	 this.id_ = opts.id || this.url_ ;				// Added to allow for multiple images
+	 this.percentOpacity_ = opts.opacity || 50 ;
+	 this.layer_ = opts.layer || 0;
+	 this.map_ = map;
+	}
+
+	
 	var bo_map;
 	var bo_home;
 	var bo_home_zoom;
@@ -101,6 +118,131 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 <?php
 	}
 ?>
+
+
+
+
+
+
+
+		bo_ProjectedOverlay.prototype = new google.maps.OverlayView();	
+		
+		// Remove the main DIV from the map pane
+		bo_ProjectedOverlay.prototype.remove = function()
+		{
+			 if (this.div_) 
+			 {
+			  this.div_.parentNode.removeChild(this.div_);
+			  this.div_ = null;
+			 }
+		}
+
+		bo_ProjectedOverlay.prototype.onAdd = function() 
+		{
+			  // Note: an overlay's receipt of onAdd() indicates that
+			  // the map's panes are now available for attaching
+			  // the overlay to the map via the DOM.
+
+			  // Create the DIV and set some basic attributes.
+			  var div = document.createElement('DIV');
+			  div.style.border = "none";
+			  div.style.borderWidth = "0px";
+			  div.style.position = "absolute";
+
+			  // Create an IMG element and attach it to the DIV.
+			  var img = document.createElement("img");
+			  img.src = this.url_;
+			  img.style.width = "100%";
+			  img.style.height = "100%";
+			  div.appendChild(img);
+
+			  // Set the overlay's div_ property to this DIV
+			  this.div_ = div;
+				  
+			  if( this.percentOpacity_ )
+			  {
+			   this.setOpacity(this.percentOpacity_) ;
+			  }
+			  
+			  // We add an overlay to a map via one of the map's panes.
+			  // We'll add this overlay to the overlayImage pane.
+			  var panes = this.getPanes();
+			  
+			  if (this.layer_ == 1)
+				panes.mapPane.appendChild(div); //map pane = same as strikes
+			  else
+			    panes.overlayLayer.appendChild(div);
+				
+		}
+		
+		// Redraw based on the current projection and zoom level...
+		bo_ProjectedOverlay.prototype.draw = function(firstTime)
+		{
+			 if (!this.div_)
+			 {
+			  return ;
+			 }
+
+			 var c1 = this.get('projection').fromLatLngToDivPixel(this.bounds_.getSouthWest());
+			 var c2 = this.get('projection').fromLatLngToDivPixel(this.bounds_.getNorthEast());
+
+			 if (!c1 || !c2) return;
+
+			 // Now position our DIV based on the DIV coordinates of our bounds
+			 this.div_.style.width = Math.abs(c2.x - c1.x) + "px";
+			 this.div_.style.height = Math.abs(c2.y - c1.y) + "px";
+			 this.div_.style.left = Math.min(c2.x, c1.x) + "px";
+			 this.div_.style.top = Math.min(c2.y, c1.y) + "px";
+
+			 // Do the rest only if the zoom has changed...
+			 if ( this.lastZoom_ == this.map_.getZoom() )
+			 {
+			  return ;
+			 }
+
+			 this.lastZoom_ = this.map_.getZoom() ;
+
+			 var url = this.url_ ;
+
+			 if ( this.addZ_ )
+			 {
+			  url += this.addZ_ + this.map_.getZoom() ;
+			 }
+
+			 this.div_.innerHTML = '<img src="' + url + '"  width=' + this.div_.style.width + ' height=' + this.div_.style.height + ' >' ;
+		}
+
+		bo_ProjectedOverlay.prototype.setOpacity=function(opacity)
+		{
+			 if (opacity < 0)
+			 {
+			  opacity = 0 ;
+			 }
+			 if(opacity > 100)
+			 {
+			  opacity = 100 ;
+			 }
+			 var c = opacity/100 ;
+
+			 if (typeof(this.div_.style.filter) =='string')
+			 {
+			  this.div_.style.filter = 'alpha(opacity:' + opacity + ')' ;
+			 }
+			 if (typeof(this.div_.style.KHTMLOpacity) == 'string' )
+			 {
+			  this.div_.style.KHTMLOpacity = c ;
+			 }
+			 if (typeof(this.div_.style.MozOpacity) == 'string')
+			 {
+			  this.div_.style.MozOpacity = c ;
+			 }
+			 if (typeof(this.div_.style.opacity) == 'string')
+			 {
+			  this.div_.style.opacity = c ;
+			 }
+		}
+
+
 
 		bo_gmap_init2();
 	}
@@ -707,143 +849,10 @@ function bo_map_reload_static(manual)
 	var bo_autoupdate_running = false;
 	var bo_manual_timerange = false;
 
-	//ProjectedOverlay
-	//Source: http://www.usnaviguide.com/v3maps/js/ProjectedOverlay.js
-	var ProjectedOverlay = function(map, imageUrl, bounds, opts)
-	{
-	 google.maps.OverlayView.call(this);
-	 this.url_ = imageUrl ;
-	 this.bounds_ = bounds ;
-	 this.addZ_ = opts.addZoom || '' ;				// Add the zoom to the image as a parameter
-	 this.id_ = opts.id || this.url_ ;				// Added to allow for multiple images
-	 this.percentOpacity_ = opts.opacity || 50 ;
-	 this.layer_ = opts.layer || 0;
-	 this.map_ = map;
-	}
-
 	function bo_gmap_init2()
 	{ 
 
-		ProjectedOverlay.prototype = new google.maps.OverlayView();	
-		
-		// Remove the main DIV from the map pane
-		ProjectedOverlay.prototype.remove = function()
-		{
-			 if (this.div_) 
-			 {
-			  this.div_.parentNode.removeChild(this.div_);
-			  this.div_ = null;
-			 }
-		}
-
-		ProjectedOverlay.prototype.onAdd = function() 
-		{
-			  // Note: an overlay's receipt of onAdd() indicates that
-			  // the map's panes are now available for attaching
-			  // the overlay to the map via the DOM.
-
-			  // Create the DIV and set some basic attributes.
-			  var div = document.createElement('DIV');
-			  div.style.border = "none";
-			  div.style.borderWidth = "0px";
-			  div.style.position = "absolute";
-
-			  // Create an IMG element and attach it to the DIV.
-			  var img = document.createElement("img");
-			  img.src = this.url_;
-			  img.style.width = "100%";
-			  img.style.height = "100%";
-			  div.appendChild(img);
-
-			  // Set the overlay's div_ property to this DIV
-			  this.div_ = div;
-				  
-			  if( this.percentOpacity_ )
-			  {
-			   this.setOpacity(this.percentOpacity_) ;
-			  }
-			  
-			  // We add an overlay to a map via one of the map's panes.
-			  // We'll add this overlay to the overlayImage pane.
-			  var panes = this.getPanes();
-			  
-			  if (this.layer_ == 1)
-				panes.mapPane.appendChild(div); //map pane = same as strikes
-			  else
-			    panes.overlayLayer.appendChild(div);
-				
-		}
-		
-		// Redraw based on the current projection and zoom level...
-		ProjectedOverlay.prototype.draw = function(firstTime)
-		{
-			 if (!this.div_)
-			 {
-			  return ;
-			 }
-
-			 var c1 = this.get('projection').fromLatLngToDivPixel(this.bounds_.getSouthWest());
-			 var c2 = this.get('projection').fromLatLngToDivPixel(this.bounds_.getNorthEast());
-
-			 if (!c1 || !c2) return;
-
-			 // Now position our DIV based on the DIV coordinates of our bounds
-			 this.div_.style.width = Math.abs(c2.x - c1.x) + "px";
-			 this.div_.style.height = Math.abs(c2.y - c1.y) + "px";
-			 this.div_.style.left = Math.min(c2.x, c1.x) + "px";
-			 this.div_.style.top = Math.min(c2.y, c1.y) + "px";
-
-			 // Do the rest only if the zoom has changed...
-			 if ( this.lastZoom_ == this.map_.getZoom() )
-			 {
-			  return ;
-			 }
-
-			 this.lastZoom_ = this.map_.getZoom() ;
-
-			 var url = this.url_ ;
-
-			 if ( this.addZ_ )
-			 {
-			  url += this.addZ_ + this.map_.getZoom() ;
-			 }
-
-			 this.div_.innerHTML = '<img src="' + url + '"  width=' + this.div_.style.width + ' height=' + this.div_.style.height + ' >' ;
-		}
-
-		ProjectedOverlay.prototype.setOpacity=function(opacity)
-		{
-			 if (opacity < 0)
-			 {
-			  opacity = 0 ;
-			 }
-			 if(opacity > 100)
-			 {
-			  opacity = 100 ;
-			 }
-			 var c = opacity/100 ;
-
-			 if (typeof(this.div_.style.filter) =='string')
-			 {
-			  this.div_.style.filter = 'alpha(opacity:' + opacity + ')' ;
-			 }
-			 if (typeof(this.div_.style.KHTMLOpacity) == 'string' )
-			 {
-			  this.div_.style.KHTMLOpacity = c ;
-			 }
-			 if (typeof(this.div_.style.MozOpacity) == 'string')
-			 {
-			  this.div_.style.MozOpacity = c ;
-			 }
-			 if (typeof(this.div_.style.opacity) == 'string')
-			 {
-			  this.div_.style.opacity = c ;
-			 }
-		}
-
-
 		var i;
-	
 		bo_infowindow = new google.maps.InfoWindow({content: ''});
 <?php
 		
@@ -1215,7 +1224,7 @@ function bo_map_reload_static(manual)
 				}
 				else
 				{
-					bo_ExtraOverlayMaps[i] = new ProjectedOverlay(bo_map, bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds, {opacity: bo_ExtraOverlay[i].bo_opacity, layer: bo_ExtraOverlay[i].bo_layer}) ;
+					bo_ExtraOverlayMaps[i] = new bo_ProjectedOverlay(bo_map, bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds, {opacity: bo_ExtraOverlay[i].bo_opacity, layer: bo_ExtraOverlay[i].bo_layer}) ;
 				}
 			}
 		}
