@@ -524,7 +524,7 @@ function bo_tile()
 			{
 				list($dlat, $dlon) = bo_distbearing2latlong($row['deviation'], 0, $row['lat'], $row['lon']);
 				list($dx, $dy)     = bo_latlon2tile($dlat, $dlon, $zoom);
-				$deviation[]  	   = $py - $dy;
+				$deviation  	   = $py - $dy;
 			}
 		}
 
@@ -579,7 +579,7 @@ function bo_tile()
 		if ($zoom >= $zoom_show_deviation)
 		{
 			imagesetthickness($I, 1);
-			imageellipse($I, $px, $py, $deviation[$i], $deviation[$i], $col);
+			imageellipse($I, $px, $py, $deviation, $deviation, $col);
 		}
 		
 	}
