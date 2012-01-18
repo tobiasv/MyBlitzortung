@@ -586,6 +586,9 @@ function bo_map_reload_static(manual)
 		$max_zoom = defined('BO_MAX_ZOOM_IN') ? intval(BO_MAX_ZOOM_IN) : 999;
 		$min_zoom = defined('BO_MIN_ZOOM_OUT') ? intval(BO_MIN_ZOOM_OUT) : 0;
 	}
+	
+	$min_zoom = max($min_zoom, round(BO_TILE_SIZE/256)-1);
+	
 
 	echo '<fieldset class="bo_map_options">';
 	echo '<legend>'._BL("map_options").'</legend>';
@@ -860,7 +863,7 @@ function bo_map_reload_static(manual)
 		{
 			echo '
 			bo_OverlayMaps['.$mapid.'] = {
-				getTileUrl: function (coord, zoom) { return bo_get_tile(zoom, coord, '.$cfg['id'].', '.intval($cfg['upd_intv']).'); },
+				getTileUrl: function (coord, zoom) { return bo_get_tile(zoom, coord, '.$cfg['id'].', '.intval($cfg['upd_intv']).', '.BO_TILE_SIZE.'); },
 				tileSize: new google.maps.Size('.BO_TILE_SIZE.','.BO_TILE_SIZE.'), 
 				isPng:true, 
 				bo_show:'.($cfg['default_show'] ? 'true' : 'false').',
@@ -904,14 +907,14 @@ function bo_map_reload_static(manual)
 ?>		
 
 		bo_OverlayCount = {
-			getTileUrl: function (coord, zoom) { return bo_get_tile_counts(zoom, coord); },
+			getTileUrl: function (coord, zoom) { return bo_get_tile_counts(zoom, coord, <?php echo BO_TILE_SIZE_COUNT ?>); },
 			tileSize: new google.maps.Size(<?php echo BO_TILE_SIZE_COUNT.','.BO_TILE_SIZE_COUNT ?>), 
 			isPng:true, 
 			bo_show:false
 		};
 
 		bo_OverlayTracks = {
-			getTileUrl: function (coord, zoom) { return bo_get_tile_tracks(zoom, coord); },
+			getTileUrl: function (coord, zoom) { return bo_get_tile_tracks(zoom, coord, <?php echo BO_TILE_SIZE ?>); },
 			tileSize: new google.maps.Size(<?php echo BO_TILE_SIZE.','.BO_TILE_SIZE ?>), 
 			isPng:true, 
 			opacity:<?php echo (double)BO_TRACKS_MAP_OPACITY; ?>,
@@ -1286,10 +1289,35 @@ function bo_map_reload_static(manual)
 		bo_reload_mapinfo();
 	}
 	
-	
-	function bo_get_tile(zoom, coord, type, interval)
+	function bo_tile_coord(zoom, coord, tile_size)
 	{
-		var url = "<?php echo bo_bofile_url() ?>?tile&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y;
+		this.failimg = "<?php echo bo_bofile_url() ?>?image=bt";
+		
+		var x = coord.x;
+		var y = coord.y;
+		var a = Math.pow(2,zoom - tile_size/256 + 1);
+		
+		if (y < 0 || y >= a)
+		{
+			this.ok = false;
+		}
+		else
+		{
+			x = x < 0 ? x%a+a : x;
+			x = x%a;
+			
+			this.x = x;
+			this.y = y;
+			this.ok = true;
+		}
+	}
+	
+	function bo_get_tile(zoom, coord, type, interval, tile_size)
+	{
+		c = new bo_tile_coord(zoom, coord, tile_size);
+		if (!c.ok) return c.failimg;
+		
+		var url = "<?php echo bo_bofile_url() ?>?tile&own="+bo_show_only_own+"&zoom="+zoom+"&x="+c.x+"&y="+c.y;
 		var now = new Date();
 		var add = "";
 		
@@ -1307,8 +1335,11 @@ function bo_map_reload_static(manual)
 		
 	}
 
-	function bo_get_tile_counts(zoom, coord)
+	function bo_get_tile_counts(zoom, coord, tile_size)
 	{
+		c = new bo_tile_coord(zoom, coord, tile_size);
+		if (!c.ok) return c.failimg;
+
 		var types='';
 		var interval=0;
 		var now = new Date();
@@ -1326,7 +1357,7 @@ function bo_map_reload_static(manual)
 			{
 				if (bo_OverlayMaps[i].bo_show)
 				{
-					types = types + (types ? ',' : '') + i;
+					types = types + (types ? ',' : '') + bo_OverlayMaps[i].bo_mapid;
 					
 					if (!interval || interval > bo_OverlayMaps[i].bo_interval)
 						interval = bo_OverlayMaps[i].bo_interval;
@@ -1335,20 +1366,22 @@ function bo_map_reload_static(manual)
 		}
 		
 		
-		return "<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
+		return "<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&"+add;
 	}
 	
-	function bo_get_tile_tracks(zoom, coord)
+	function bo_get_tile_tracks(zoom, coord, tile_size)
 	{
-		if (zoom < <?php echo (int)BO_TRACKS_MAP_ZOOM_MIN; ?> || zoom > <?php echo (int)BO_TRACKS_MAP_ZOOM_MAX; ?>)
-			return "<?php echo bo_bofile_url() ?>?image=bt";
-		
-		var interval=<?php echo intval(BO_UP_INTVL_TRACKS) ?>;
+		c = new bo_tile_coord(zoom, coord, tile_size);
+		if (!c.ok) return c.failimg;
 
+		if (zoom < <?php echo (int)BO_TRACKS_MAP_ZOOM_MIN; ?> || zoom > <?php echo (int)BO_TRACKS_MAP_ZOOM_MAX; ?>)
+			return c.failimg;
+
+		var interval=<?php echo intval(BO_UP_INTVL_TRACKS) ?>;
 		var now = new Date();
 		var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
 		
-		return "<?php echo bo_bofile_url() ?>?tile&tracks&zoom="+zoom+"&x="+coord.x+"&y="+coord.y+"&"+add;
+		return "<?php echo bo_bofile_url() ?>?tile&tracks&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&"+add;
 	}
 	
 	function bo_reload_mapinfo() 
@@ -1386,13 +1419,13 @@ function bo_map_reload_static(manual)
 			if ( ((i >= 0 && !bo_manual_timerange) || (bo_manual_timerange && i == -1)) && bo_OverlayMaps[i].bo_show)
 			{
 				var now = new Date();
-				var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / bo_OverlayMaps[i].bo_interval);
+				var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / bo_OverlayMaps[i].bo_interval) * 2;
 				var infoImg = document.createElement('IMG');
 				
 				if (bo_manual_timerange)
 					add = "from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2)+"&" + add;
 				
-				infoImg.src = "<?php echo bo_bofile_url() ?>?tile&info&type="+bo_OverlayMaps[i].bo_mapid+"&"+add+now.getTime();
+				infoImg.src = "<?php echo bo_bofile_url() ?>?tile&info&type="+bo_OverlayMaps[i].bo_mapid+"&"+add;
 				infoImg.style.paddingTop = '5px';
 				infoImg.style.display = 'block';
 				infoImg.style.opacity = 0.7;

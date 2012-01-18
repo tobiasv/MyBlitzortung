@@ -114,16 +114,18 @@ function bo_tile()
 			$type += pow(2, $i);
 			
 			if (!$time_manual_from)
-				$cfg = $_BO['mapcfg'][$i];
-			
-			if (!is_array($cfg) || !$cfg['upd_intv'])
+				$ccfg = $_BO['mapcfg'][$i];
+			else
+				$ccfg = $cfg;
+
+			if (!is_array($ccfg) || !$ccfg['upd_intv'])
 				continue;
 			
-			$time_start = $time - 60 * $cfg['tstart'];
+			$time_start = $time - 60 * $ccfg['tstart'];
 			
-			$update_intervals[$i] = $cfg['upd_intv'];
-			$times_min[$i]        = mktime(date('H', $time_start), ceil(date('i', $time_start) / $cfg['upd_intv']) * $cfg['upd_intv'], 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
-			$times_max[$i]        = $times_min[$i] + 60 * $cfg['trange'] + 59;
+			$update_intervals[$i] = $ccfg['upd_intv'];
+			$times_min[$i]        = mktime(date('H', $time_start), ceil(date('i', $time_start) / $ccfg['upd_intv']) * $ccfg['upd_intv'], 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
+			$times_max[$i]        = $times_min[$i] + 60 * $ccfg['trange'] + 59;
 		}
 		
 		$update_interval = count($update_intervals) ? min($update_intervals) : 0;
@@ -145,7 +147,7 @@ function bo_tile()
 		$time_max   = $time_min + 60 * $time_range + 59;
 	}
 	
-	if (!$time_start || !$time_min || !$time_max || !is_array($cfg))
+	if (!$time_start || !$time_min || !$time_max)
 		bo_tile_output();
 
 	//calculate some time information

@@ -3,7 +3,7 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.4-dev5 (2012-01-07)
+Version 0.7.4-dev6 (2012-01-18)
 ------------------------------
 - new: option to resize maps
 - new: more descriptions
@@ -17,9 +17,11 @@ Version 0.7.4-dev5 (2012-01-07)
 - new: time-ranges in network statistics (has to be enabled)
 - new: creation of longtime-statistics for all stations (causes high DB-load)
 - new: region select in statistics -> strikes -> year/month
+- new: larger tiles possible (new default value is 512x512 -> fewer load)
 - improved: station deletion (no data deleted, only moved to another id)
 - fix: SQL-error when inserting malformated signals
 - fix: only current year selectable in statistics -> strikes
+- fix: display lightnings everywhere on google maps, no loading of unnecessary tiles
 - minor fixes and improvements
 
 Version 0.7.3b (2011-11-04)
