@@ -109,10 +109,10 @@ $_BO['tpl_density_colors'][] = array(255, 100, 255,  15);
 //font-Array: fontsize, bold, style, xpos, ypos
 //point-Array: type,size,fillcolor,borderwidth,bordercolor
 
-$_BO['points']['whitered1']['font']          = array(7, 1, array('fff8',1,'000c'), 6, -11); 
+$_BO['points']['whitered1']['font']          = array(7, 1, array('fff6',1,'000a'), 6, -11); 
 $_BO['points']['whitered1']['point']         = array(3, 2, 'f008', 1, 'fff8'); 
 
-$_BO['points']['whitered2']['font']          = array(7, 1, array('fff8',0,'000c'), 5, -9); 
+$_BO['points']['whitered2']['font']          = array(7, 1, array('fffc',0,'000c'), 5, -9); 
 $_BO['points']['whitered2']['point']         = array(3, 2, 'f008', 1, 'fff8'); 
 
 $_BO['points']['stations_active']['point']   = array(10, 5, '0f4', 1, '0f4e'); 
@@ -214,9 +214,9 @@ $_BO['tpl_imgmap']['europe_west_central']['file'] = 'map_europe_west_central.png
 $_BO['tpl_imgmap']['europe_west_central']['borders'] = array('map_europe_west_central_borders.png', 60);
 $_BO['tpl_imgmap']['europe_west_central']['coord'] = array(57, 18, 42.2, -5); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['europe_west_central']['density_blocksize'] = 5;
-$_BO['tpl_imgmap']['europe_west_central']['cities'][1] = $_BO['points']['whitered2'];
-$_BO['tpl_imgmap']['europe_west_central']['cities'][5] = $_BO['points']['whitered2'];
-$_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitered2'];
+$_BO['tpl_imgmap']['europe_west_central']['cities'][1] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['europe_west_central']['cities'][5] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitered1'];
 
 
 

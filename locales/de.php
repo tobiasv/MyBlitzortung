@@ -1027,3 +1027,11 @@ $_BL['de']['Importing data...'] = 'Importiere Daten...';
 $_BL['de']['since'] = 'seit';
 $_BL['de']['Period'] = 'Zeitraum';
 $_BL['de']['bo_stat_network_descr'] = false;
+
+
+$_BL['de']['ani_play'] = 'Play';
+$_BL['de']['ani_pause'] = 'Pause';
+$_BL['de']['ani_next'] = 'Weiter';
+$_BL['de']['ani_prev'] = 'Zurück';
+
+

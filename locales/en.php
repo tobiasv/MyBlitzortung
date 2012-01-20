@@ -989,4 +989,8 @@ $_BL['en']['since'] = 'since';
 $_BL['en']['Period'] = 'Period';
 $_BL['en']['bo_stat_network_descr'] = false;
 
+$_BL['en']['ani_play'] = 'Play';
+$_BL['en']['ani_pause'] = 'Pause';
+$_BL['en']['ani_next'] = 'Next';
+$_BL['en']['ani_prev'] = 'Prev';
 

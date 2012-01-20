@@ -1271,11 +1271,13 @@ function bo_add_cities2image($I, $cfg, $w, $h)
 	$w_x = $w / ($x2 - $x1);
 	$h_y = $h / ($y2 - $y1);
 
-	$sql = "SELECT id, name, lat, lon, type
+	//get cities (group by -> no duplicates)
+	$sql = "SELECT id, name, lat, lon, MAX(type) type
 			FROM ".BO_DB_PREF."cities
 			WHERE 1
 				AND NOT (lat < '$latS' OR lat > '$latN' OR lon < '$lonW' OR lon > '$lonE')
 				AND (0 $sql_types)
+			GROUP BY lat, lon
 			ORDER BY type ASC";
 	$erg = bo_db($sql);
 	while ($row = $erg->fetch_assoc())

@@ -137,8 +137,8 @@ font-size: 12px;
 
 #myblitzortung fieldset {
 font-size: 14px;
-margin: 18px 2px 8px 10px;
-max-width: 660px;
+margin: 18px 2px 8px 0px;
+max-width: 680px;
 background: #f9f9f9;
 border: 1px solid #e4e4e4;
 font-size: 12px;
@@ -378,23 +378,55 @@ border:1px solid #ddd;
 }
 
 #myblitzortung #bo_arch_map_img,
-#myblitzortung #bo_arch_map_img_station {
-border: 1px solid #eee;
+#myblitzortung #bo_arch_map_img_station,
+#myblitzortung #bo_arch_map_nodata {
+border: 1px solid #aaa;
 }
 
 #myblitzortung #bo_arch_map_img,
+#myblitzortung #bo_arch_map_noimg,
 #myblitzortung .bo_graph_img {
 background-repeat:no-repeat;
 background-position:center;
 background-color:#fff;
 }
 
+#myblitzortung #bo_ani_loading_white,
+#myblitzortung #bo_arch_map_nodata_white {
+width:100%;
+height:100%;
+background:#ccc;
+filter:alpha(opacity=50); 
+-moz-opacity: 0.50; 
+opacity: 0.50;
+}
+
+#myblitzortung #bo_ani_loading_text,
+#myblitzortung #bo_arch_map_nodata_text {
+width:100%;
+text-align:center;
+padding-top:30%;
+}
+
+#myblitzortung #bo_ani_loading_text p,
+#myblitzortung #bo_arch_map_nodata_text  p {
+font-size: 14px;
+font-weight: bold;
+color: #900;
+border: 3px solid red;
+background:#eee;
+display:inline;
+padding: 20px 40px;
+filter:alpha(opacity=70); 
+-moz-opacity: 0.70; 
+opacity: 0.70;
+}
+
 /*** Google Strike Map ***/
 #myblitzortung .bo_map {
-width:780px !important; 
+width:790px !important; 
 height:800px !important; 
 border: 1px solid #ccc;
-margin-left: 10px;
 }
 
 
@@ -474,8 +506,10 @@ float: right;
 font-size: 11px;
 text-align:center;
 padding: 4px 10px 3px 10px;
-margin: 0 1px 0 1px;
+margin: 0 0px 0px 0px;
 background: #eee;
+border: 1px solid #bbb;
+border-bottom: 0;
 }
 
 #myblitzortung #bo_arch_maps #bo_arch_strikes_select_map {

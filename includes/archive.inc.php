@@ -313,6 +313,38 @@ function bo_show_archive_map()
 	}
 	
 	echo '</div>';	
+	
+	
+	echo '<div class="bo_input_container">';
+
+	echo '<div class="bo_arch_map_form_links">';
+	echo '<span class="bo_form_descr">';
+	echo _BL('Yesterday').': &nbsp; ';
+	echo '</span>';
+	
+	if (!$ani_cfg['force'])
+		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
+	
+	if ($ani_div)
+		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
+	
+	echo '  &nbsp;  &nbsp; &nbsp; ';
+	
+	echo '<span class="bo_form_descr">';
+	echo _BL('Today').': &nbsp; ';
+	echo '</span>';
+	
+	if (!$ani_cfg['force'])
+		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
+	
+	if ($ani_div)
+		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
+		
+	echo '</div>';
+	
+	
+	echo '</div>';	
+	
 	echo '</fieldset>';
 	echo '</form>';
 
@@ -327,36 +359,35 @@ function bo_show_archive_map()
 	
 		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 
-		echo '<div class="bo_arch_map_links">';
-		echo _BL('Yesterday').': &nbsp; ';
-		
-		if (!$ani_cfg['force'])
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
-		
-		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
-		
-		echo '  &nbsp;  &nbsp; &nbsp; ';
-		
-		
-		echo _BL('Today').': &nbsp; ';
-		
-		if (!$ani_cfg['force'])
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
-		
-		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
+		if ($ani)
+		{
+			echo '<div class="bo_arch_map_links">';
 			
-		echo '</div>';
-
+			echo ' <a href="javascript:bo_animation_prev();" id="bo_animation_doprev">&lt;&nbsp;'._BL('ani_prev').'</a>';
+			echo ' <a href="javascript:bo_animation_pause();" id="bo_animation_dopause">'._BL('ani_pause').'</a>';
+			echo ' <a href="javascript:bo_animation_next();" id="bo_animation_donext">'._BL('ani_next').'&nbsp;&gt;</a>';
+			
+			echo '</div>';
+		}
+		
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 		
 		if ($time < $start_time - 3600 * 24 || $time > $end_time)
 		{
 			$text = _BL('arch_select_dates_beween');
+			$img_file = bo_bofile_url().'?map='.$map.'&blank&bo_lang='._BL().'';
+			
+			echo '<div style="position:relative;'.bo_archive_get_dim($map, 0, true).'" id="bo_arch_map_nodata">';
+			
+			echo '<img style="position:absolute;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_noimg" src="'.$img_file.'">';
+			echo '<div style="position:absolute;top:0px;left:0px" id="bo_arch_map_nodata_white"></div>';
+			echo '<div style="position:absolute;top:0px;left:0px" id="bo_arch_map_nodata_text">';
 			echo '<p>';
 			echo strtr($text, array('{START}' => date(_BL('_date'), $start_time), '{END}' => date(_BL('_date'), $end_time) ));
 			echo '</p>';
+			echo '</div>';
+			
+			echo '</div>';
 		}
 		else if ($ani)
 		{
@@ -1578,7 +1609,7 @@ function bo_archive_select_map(&$map)
 }
 
 
-function bo_archive_get_dim($map, $addx=0)
+function bo_archive_get_dim($map, $addx=0, $css=false)
 {
 	global $_BO;
 	
@@ -1606,7 +1637,12 @@ function bo_archive_get_dim($map, $addx=0)
 	}
 	
 	if ($x && $y)
-		$img_dim = ' width="'.($x+$addx).'" height="'.$y.'" ';	
+	{
+		if ($css)
+			$img_dim = 'width:'.($x+$addx).'px;height:'.$y.'px;';	
+		else
+			$img_dim = ' width="'.($x+$addx).'" height="'.$y.'" ';	
+	}
 	else
 		$img_dim = '';
 		
@@ -1621,6 +1657,13 @@ function bo_insert_animation_js($images, $bo_file_url, $img_file, $ani_delay=BO_
 	echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
 	echo '<img style="position:absolute;top:1px;left:1px;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.$bo_file_url.$images[0].'" alt="'.htmlspecialchars($alt).'">';
 
+	echo '<div id="bo_ani_loading_container" style="display:none;">';
+	echo '<div id="bo_ani_loading_white" style="position:absolute;top:0px;left:0px;"></div>';
+	echo '<div id="bo_ani_loading_text"  style="position:absolute;top:0px;left:0px">';
+	echo '<p id="bo_ani_loading_text_percent" >'._BL('Loading...').'</p>';
+	echo '</div>';
+	echo '</div>';
+	
 	$js_img = '';
 	foreach($images as $image)
 		$js_img .= ($js_img ? ',' : '').'"'.$image.'"';
@@ -1632,18 +1675,24 @@ function bo_insert_animation_js($images, $bo_file_url, $img_file, $ani_delay=BO_
 var bo_maps_pics   = new Array(<?php echo $js_img ?>);
 var bo_maps_img    = new Array();
 var bo_maps_loaded = 0;
+var bo_maps_playing = false;
+var bo_maps_position = 0;
 
 function bo_maps_animation(nr)
 {
-	var timeout = <?php echo intval($ani_delay); ?>;
-	document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[nr].src;
-	if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += <?php echo intval($ani_delay_end); ?>; }
-	window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
-	
+	if (bo_maps_playing)
+	{
+		document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[nr].src;
+		var timeout = <?php echo intval($ani_delay); ?>;
+		if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += <?php echo intval($ani_delay_end); ?>; }
+		window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
+		bo_maps_position=nr;
+	}
 }
 
 function bo_maps_load()
 {
+	document.getElementById('bo_ani_loading_container').style.display='block';
 	for (var i=0; i<bo_maps_pics.length; i++)
 	{
 		bo_maps_img[i] = new Image();
@@ -1651,20 +1700,74 @@ function bo_maps_load()
 		bo_maps_img[i].onerror=bo_maps_animation_start;
 		bo_maps_img[i].src = "<?php echo $bo_file_url ?>" + bo_maps_pics[i];
 	}
+	
 }
 
 function bo_maps_animation_start()
 {
-	bo_maps_loaded++;
+	if (bo_maps_loaded >= 0)
+		bo_maps_loaded++;
 	
-	if (bo_maps_loaded+1 >= bo_maps_pics.length && bo_maps_loaded > 0)
+	if (bo_maps_loaded+1 >= bo_maps_pics.length && bo_maps_loaded >= 0)
 	{
-		bo_maps_animation(0);
 		bo_maps_loaded = -1;
+		bo_maps_playing = true;
+		document.getElementById('bo_ani_loading_container').style.display='none';
+		bo_maps_animation(0);
 	}
-	else
+	else if (bo_maps_loaded > 0)
 	{
+		if (bo_maps_pics.length > 0)
+			document.getElementById('bo_ani_loading_text_percent').innerHTML="<?php echo _BL('Loading...') ?> " + Math.round(bo_maps_loaded / bo_maps_pics.length * 100) + "%";
+		
 		document.getElementById('bo_arch_map_img_ani').src = bo_maps_img[bo_maps_loaded-1].src;
+	}
+}
+
+function bo_animation_pause()
+{
+	if (bo_maps_loaded == -1)
+	{
+		if (bo_maps_playing)
+		{
+			bo_maps_playing = false;
+			document.getElementById('bo_animation_dopause').innerHTML="<?php echo _BL('ani_play') ?>";
+		}
+		else
+		{
+			bo_maps_playing = true;
+			document.getElementById('bo_animation_dopause').innerHTML="<?php echo _BL('ani_pause') ?>";
+			bo_maps_animation(bo_maps_position);
+		}
+	}
+
+}
+
+function bo_animation_next()
+{
+	if (bo_maps_loaded == -1)
+	{
+		if (bo_maps_playing)
+			bo_animation_pause();
+		
+		if (++bo_maps_position >= bo_maps_img.length) bo_maps_position=0;
+		
+		document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[bo_maps_position].src;
+		
+	}
+}
+
+function bo_animation_prev()
+{
+	if (bo_maps_loaded == -1)
+	{
+		if (bo_maps_playing)
+			bo_animation_pause();
+		
+		if (--bo_maps_position < 0) bo_maps_position=bo_maps_img.length-1;
+		document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[bo_maps_position].src;
+		
+		
 	}
 }
 
