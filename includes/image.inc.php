@@ -822,8 +822,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		if (BO_CACHE_SUBDIRS === true)
 		{
 			$dir = dirname($cache_file);
+			clearstatcache();
 			if (!file_exists($dir))
-				mkdir($dir, 0777, true);
+				@mkdir($dir, 0777, true);
 		}
 
 		$ok = bo_imageout($I, $extension, $cache_file);

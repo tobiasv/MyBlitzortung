@@ -756,19 +756,22 @@ function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 		
 	$files = @scandir($dir);
 
-	foreach($files as $file)
+	if (is_array($files))
 	{
-		if (!is_dir($dir.$file) && substr($file,0,1) != '.' && ($min_age == 0 || @fileatime($dir.$file) < time() - 3600 * $min_age) )
+		foreach($files as $file)
 		{
-			
-			@unlink($dir.$file);
-		}
-		else if (is_dir($dir.$file) && substr($file,0,1) != '.' && $depth > 0)
-		{
-			bo_delete_files($dir.$file, $min_age, $depth-1,$delete_dir_depth-1);
+			if (!is_dir($dir.$file) && substr($file,0,1) != '.' && ($min_age == 0 || @fileatime($dir.$file) < time() - 3600 * $min_age) )
+			{
+				
+				@unlink($dir.$file);
+			}
+			else if (is_dir($dir.$file) && substr($file,0,1) != '.' && $depth > 0)
+			{
+				bo_delete_files($dir.$file, $min_age, $depth-1,$delete_dir_depth-1);
 
-			//if ($delete_dir_depth <= 0)
-			@rmdir($dir.$file.'/');
+				//if ($delete_dir_depth <= 0)
+				@rmdir($dir.$file.'/');
+			}
 		}
 	}
 }

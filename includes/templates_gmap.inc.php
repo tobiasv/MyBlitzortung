@@ -185,13 +185,21 @@ $i = sprintf('%02d', (string)intval(date('i', $time) / 15) * 15);
 $time = strtotime(gmdate('Y-m-d H:'.$i.':00', $time).' UTC');
 $date = gmdate('YmdHi', $time);
 
+//http://data.wetter.info/data/maps/basemaps/deutschland.jpg
+$_BO['tpl_overlay']['wetterinfo_strikes_de']['img'] = "http://data.wetter.info//data/layers/deutschland/deutschland_blitze_$date.gif";
+$_BO['tpl_overlay']['wetterinfo_strikes_de']['coord'] = array(55.5, 16.5, 46.15, 4.55);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['wetterinfo_strikes_de']['default_show'] = false;
+$_BO['tpl_overlay']['wetterinfo_strikes_de']['sel_name'] = 'Wetter.info Blitze ('.date('H:i', $time).')';
+$_BO['tpl_overlay']['wetterinfo_strikes_de']['only_loggedin'] = true;
+$_BO['tpl_overlay']['wetterinfo_strikes_de']['to_mercator'] = true;
+$_BO['tpl_overlay']['wetterinfo_strikes_de']['layer'] = 1;
+
 $_BO['tpl_overlay']['wetterinfo_radar']['img'] = "http://data.wetter.info//data/layers/xxlradar-de/xxlradar-de_radar_$date.gif"; //'http://data.wetter.info//data/maps/basemaps/xxlradar-de.jpg';
 $_BO['tpl_overlay']['wetterinfo_radar']['coord'] = array(55.5, 16.6, 46.2, 4.5);  //North, East, South, West (Degrees)
 $_BO['tpl_overlay']['wetterinfo_radar']['default_show'] = false;
 $_BO['tpl_overlay']['wetterinfo_radar']['sel_name'] = 'Wetter.info Radar ('.date('H:i', $time).')';
 $_BO['tpl_overlay']['wetterinfo_radar']['only_loggedin'] = true;
 $_BO['tpl_overlay']['wetterinfo_radar']['to_mercator'] = true;
-$_BO['tpl_overlay']['wetterinfo_radar']['opacity'] = 40;
 
 $_BO['tpl_overlay']['wetterinfo_radar_small']['img'] = 'http://data.wetter.info/data/teaser/radar_de.gif';
 $_BO['tpl_overlay']['wetterinfo_radar_small']['coord'] = array(55.4, 16.25, 46.55, 4.64);  //North, East, South, West (Degrees)
@@ -201,6 +209,11 @@ $_BO['tpl_overlay']['wetterinfo_radar_small']['only_loggedin'] = true;
 $_BO['tpl_overlay']['wetterinfo_radar_small']['to_mercator'] = false;
 $_BO['tpl_overlay']['wetterinfo_radar_small']['opacity'] = 60;
 $_BO['tpl_overlay']['wetterinfo_radar_small']['layer'] = 1;
+
+
+
+
+
 
 //World Wide Lightning Location Network (wwlln.net) 
 //Copyright?

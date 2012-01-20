@@ -284,7 +284,7 @@ function bo_show_archive_map()
 
 	echo '&nbsp;<input type="submit" name="bo_prev" value=" &lt; " id="bo_archive_maps_prevday" class="bo_form_submit">';
 	echo '&nbsp;<input type="submit" name="bo_next" value=" &gt; " id="bo_archive_maps_nextday" class="bo_form_submit">';
-	echo '<input type="submit" name="bo_ok" value="'._BL('update map').'" id="bo_archive_maps_submit" class="bo_form_submit">';
+	echo '<input type="submit" value="'._BL('update map').'" id="bo_archive_maps_submit" class="bo_form_submit">';
 
 	echo '<div class="bo_input_container">';
 	echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';

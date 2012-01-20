@@ -496,7 +496,7 @@ function bo_show_archive_density()
 			echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>'._BC($station_infos[$id]['city']).($id ? ' ('._BL($station_infos[$id]['country']).')' : '').'</option>';
 	}
 	echo '</select>';
-	echo '<input type="submit" name="bo_ok" value="'._BL('Ok').'" id="bo_archive_density_submit" class="bo_form_submit">';
+	echo '<input type="submit" value="'._BL('Ok').'" id="bo_archive_density_submit" class="bo_form_submit">';
 	
 	if ($year > 0)
 	{
