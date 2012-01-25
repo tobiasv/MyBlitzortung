@@ -172,25 +172,56 @@ function bo_update_all2($force = false, $only = '')
 // Login to blitzortung.org an return login-string
 function bo_get_login_str()
 {
-	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&username='.BO_USER.'&password='.BO_PASS, $code, 'login');
-
+	$fail = unserialize(bo_get_conf('login_string_fail'));
 	
-	if ($file === false)
+	if (isset($fail['last']) && isset($fail['count']))
 	{
-		bo_echod("ERROR: Couldn't get file to login! Code: $code");
-		bo_update_error('archivelogin', 'Login to archive failed. '.$code);
-		return false;
+		if ($fail['count'] > 5 && time() - $fail['last'] < 3600)
+		{
+			bo_echod("ERROR: Login to Blitzortung failed to often in the last hour!");
+			return false;
+		}
+		else
+		{
+			$fail = array();
+			bo_set_conf('login_string_fail', serialize($fail));
+		}
 	}
 	
-	bo_update_error('archivelogin', true);
+	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&username='.BO_USER.'&password='.BO_PASS, $code, 'login');
 
 	if (preg_match('/login_string=([A-Z0-9]+)/', $file, $r))
 	{
+		bo_update_error('archivelogin', true);
 		$bo_login_id = $r[1];
 		bo_set_conf('bo_login_id', $bo_login_id);
+		return $bo_login_id;
+	}
+	else
+	{
+		//sth. got wrong
+		$fail['count'] = $fail['count'] + 1;
+		$fail['last']  = time();
+		bo_set_conf('login_string_fail', serialize($fail));
+	
+		if ($file === false)
+		{
+			bo_echod("ERROR: Couldn't get file to login! Code: $code");
+			bo_update_error('archivelogin', "Login to archive failed. Couldn't get file. $code");
+		}
+		else
+		{
+			bo_echod("ERROR: Couldn't find login-id! Code: $code");
+			bo_update_error('archivelogin', "Login to archive failed. Couldn't find login-id. $code");
+		}
+		
+		return false;
 	}
 
-	return $bo_login_id;
+	
+
+
+	
 }
 
 

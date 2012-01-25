@@ -512,6 +512,13 @@ border: 1px solid #bbb;
 border-bottom: 0;
 }
 
+#myblitzortung .bo_arch_map_links a {
+padding: 0 10px;
+text-decoration: none;
+color: #77f;
+font-weight: bold;
+}
+
 #myblitzortung #bo_arch_maps #bo_arch_strikes_select_map {
 margin-right: 20px;
 }
