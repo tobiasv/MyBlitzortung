@@ -33,7 +33,7 @@ function bo_show_archive()
 	$enabled['maps']       = ($perm || (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS));
 	$enabled['density']    = ($perm || (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES)) && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES;
 	$enabled['search']     = ($perm || (defined('BO_ENABLE_ARCHIVE_SEARCH') && BO_ENABLE_ARCHIVE_SEARCH));
-	$enabled['signals']    = ($perm || (defined('BO_ENABLE_ARCHIVE_SIGNALS') && BO_ENABLE_ARCHIVE_SIGNALS));
+	$enabled['signals']    = ($perm || (defined('BO_ENABLE_ARCHIVE_SIGNALS') && BO_ENABLE_ARCHIVE_SIGNALS)) && BO_UP_INTVL_RAW > 0;
 	$enabled['strikes']    = ($perm || (bo_user_get_level() & BO_PERM_NOLIMIT));
 	
 	if (($show && !$enabled[$show]) || !$show )
@@ -597,7 +597,7 @@ function bo_show_archive_search()
 
 			$description .= '</ul>';
 
-			if ($row['raw_id'])
+			if ($row['raw_id'] && BO_UP_INTVL_RAW > 0)
 			{
 				$alt = _BL('Signals');
 				$description .= '<img src=\''.bo_bofile_url().'?graph='.$row['raw_id'].'&bo_lang='._BL().'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\' alt=\''.htmlspecialchars($alt).'\'>';
@@ -1012,7 +1012,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	{
 		$time_end = $datetime_to;
 	}
-	else if ($show_empty_sig && ($lat || $strike_id))
+	else if ($show_empty_sig)
 	{
 		$time_end = time();
 	}
@@ -1201,7 +1201,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		echo '</td>';
 
-		if ($raw_bpv == 8 && $raw_values > 10)
+		if ($raw_bpv == 8 && $raw_values > 10 && BO_UP_INTVL_RAW > 0)
 		{
 			$alt = _BL('rawgraph');
 			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';

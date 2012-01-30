@@ -188,7 +188,7 @@ function bo_get_login_str()
 		}
 	}
 	
-	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&username='.BO_USER.'&password='.BO_PASS, $code, 'login');
+	$file = bo_get_file('http://www.blitzortung.org/Webpages/index.php?page=3&username='.BO_USER.'&password='.BO_PASS.'&region='.BO_REGION, $code, 'login');
 
 	if (preg_match('/login_string=([A-Z0-9]+)/', $file, $r))
 	{
@@ -232,7 +232,7 @@ function bo_get_archive($args='', $bo_login_id=false, $as_array=false)
 	
 	if (!$bo_login_id)
 	{
-		$bo_login_id = bo_get_conf('bo_login_id');
+		//$bo_login_id = bo_get_conf('bo_login_id');
 		$auto_id = true;
 	}
 
@@ -265,15 +265,17 @@ function bo_get_archive($args='', $bo_login_id=false, $as_array=false)
 		{
 			$bo_login_id = bo_get_login_str();
 			
-			bo_echod("Old Login-Id outdated. Got new Login-Id: ".substr($bo_login_id,0,8)."...");
-			
 			if ($bo_login_id)
 			{
+				bo_echod("Old Login-Id outdated. Got new Login-Id: ".substr($bo_login_id,0,8)."...");
 				$file = bo_get_archive($args,$bo_login_id, $as_array);
 				return $file;
 			}
 			else
+			{
+				bo_echod("ERROR: Tried to get new Login-Id but it didn't work! Wrong Username/Password? ".substr($bo_login_id,0,8)."...");
 				return false;
+			}
 		}
 		else
 		{
@@ -305,6 +307,8 @@ function bo_update_raw_signals($force = false)
 
 	if (time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last)
 	{
+		bo_set_conf('uptime_raw', time());
+		
 		$file = bo_get_archive('page=3&subpage_3=1&mode=4', false, true);
 
 		$start_time = time();
@@ -448,7 +452,6 @@ function bo_update_raw_signals($force = false)
 		
 		if (!$timeout)
 		{
-			bo_set_conf('uptime_raw', time());
 			bo_match_strike2raw();
 			bo_update_status_files('signals');
 			$updated = true;

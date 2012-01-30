@@ -330,7 +330,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	
 	if ($type == 'strikes_now')
 	{
-		$last_uptime = bo_get_conf('uptime_strikes') - 60;
+		$last_uptime = bo_get_conf('uptime_strikes');
+		$time_max = time();
 		
 		$group_minutes = intval($_GET['group_minutes']);
 		if ($group_minutes < BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES)
@@ -339,7 +340,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
 		
-		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+		$time_max = floor($time_max / 60 / $group_minutes) * 60 * $group_minutes; //round
 		
 		if ($station_id)
 		{
@@ -356,21 +357,21 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$sql = "SELECT s.time time, COUNT(s.id) cnt $sql_select
 			FROM ".BO_DB_PREF."strikes s
 			$sql_join
-			WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+			WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 			".bo_region2sql($region)."
 			GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated";
 		$res = bo_db($sql);
 		while ($row = $res->fetch_assoc())
 		{
 			$time = strtotime($row['time'].' UTC');
-			$index = floor( ($time - $last_uptime + $hours_back * 3600) / 60 / $group_minutes);
+			$index = floor( ($time - $time_max + $hours_back * 3600) / 60 / $group_minutes);
 			
 			$tmp[$index][$row['participated']] = $row['cnt'] / $group_minutes;
 		}
 		
 		for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)
 		{
-			$X[$i] = $last_uptime + ($i * $group_minutes - $hours_back * 60) * 60;
+			$X[$i] = $time_max + ($i * $group_minutes - $hours_back * 60) * 60;
 			$Y[$i] = (double)($tmp[$i][0] + $tmp[$i][1]);
 			$Y2[$i] = (double)$tmp[$i][1];
 		}
@@ -911,12 +912,12 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				
 		}
 			
-		$last_uptime = bo_get_conf('uptime_strikes') - 60;
-
+		$last_uptime = bo_get_conf('uptime_strikes');
+		$time_max = time();
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
 		
-		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+		$time_max = floor($time_max / 60 / $group_minutes) * 60 * $group_minutes; //round
 		
 		if ($station_id)
 		{
@@ -979,14 +980,14 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$sql = "SELECT s.time time, COUNT(s.id) cnt $sql_select
 				FROM ".BO_DB_PREF."strikes s
 				$sql_join
-				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 				".bo_region2sql($region)."
 				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated, extra";
 		$res = bo_db($sql);
 		while ($row = $res->fetch_assoc())
 		{
 			$time = strtotime($row['time'].' UTC');
-			$index = floor( ($time - $last_uptime + $hours_back * 3600) / 60 / $group_minutes);
+			$index = floor( ($time - $time_max + $hours_back * 3600) / 60 / $group_minutes);
 			$tmp[$index][$row['participated']][$row['extra']] = $row['cnt'];
 			
 			if ($average)
@@ -998,7 +999,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		
 		for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)
 		{
-			$X[$i] = $last_uptime + ($i * $group_minutes - $hours_back * 60) * 60;
+			$X[$i] = $time_max + ($i * $group_minutes - $hours_back * 60) * 60;
 			
 			$all_all   = (double)(@array_sum($tmp[$i][0]) + @array_sum($tmp[$i][1]));
 			$all_users = (double)($tmp[$i][0][1] + $tmp[$i][1][1]);
@@ -1040,31 +1041,30 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	else if ($type == 'evaluated_signals')
 	{
 		$station_id = 0;
-		
-		$last_uptime = bo_get_conf('uptime_raw') - 60; //RAW-update time!!!!
-
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
-		
-		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+
+		$last_uptime = bo_get_conf('uptime_raw'); //RAW-update time!!!!			
+		$time_max = time();
+		$time_max = floor($time_max / 60 / $group_minutes) * 60 * $group_minutes; //round
 		
 		
 		$sql = "SELECT s.time time, COUNT(s.id) cnt, SIGN(".($channel ? ' ((s.part&'.(1<<$channel).')>0)*s.part' : 's.part').") participated
 				FROM ".BO_DB_PREF."strikes s
-				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 				".bo_region2sql($region)."
 				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated";
 		$res = bo_db($sql);
 		while ($row = $res->fetch_assoc())
 		{
 			$time = strtotime($row['time'].' UTC');
-			$index = floor( ($time - $last_uptime + $hours_back * 3600) / 60 / $group_minutes);
+			$index = floor( ($time - $time_max + $hours_back * 3600) / 60 / $group_minutes);
 			$tmp[$index][$row['participated']] = $row['cnt'];
 		}
 
 		for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)
 		{
-			$X[$i] = $last_uptime + ($i * $group_minutes - $hours_back * 60) * 60;
+			$X[$i] = $time_max + ($i * $group_minutes - $hours_back * 60) * 60;
 			
 			$all_strikes   = (double)@array_sum($tmp[$i]);
 			$participated  = (double)$tmp[$i][1];
@@ -1085,13 +1085,14 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$station_id = 0;
 		
 		$channels = BO_ANTENNAS;
-		$last_uptime = bo_get_conf('uptime_raw') - 60; //RAW-update time!!!!
+		$last_uptime = bo_get_conf('uptime_raw'); //RAW-update time!!!!
+		$time_max = $time;
 		$participated = intval($_GET['participated']);
 		
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
 		
-		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+		$time_max = floor($time_max / 60 / $group_minutes) * 60 * $group_minutes; //round
 		
 		$amp_divisor = 10;
 		
@@ -1154,7 +1155,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 						FROM ".BO_DB_PREF."raw r
 						$sql_join
 						WHERE 
-							r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+							r.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 							AND (r.amp".$channel."_max != 128)
 						$sql_where
 						GROUP BY freq";
@@ -1198,7 +1199,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$sql = "SELECT ROUND(ABS(CONVERT(amp".$channel."$ampmax, SIGNED) - 128)*2 / $amp_divisor) amp, COUNT(r.id) cnt
 						FROM ".BO_DB_PREF."raw r
 						$sql_join
-						WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+						WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 						$sql_where
 						AND (r.amp".$channel."_max != 128)
 						GROUP BY amp";
@@ -1240,12 +1241,13 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$participated = intval($_GET['participated']);
 				
 		$channels = BO_ANTENNAS;
-		$last_uptime = bo_get_conf('uptime_raw') - 60;
-
+		$last_uptime = bo_get_conf('uptime_raw');
+		$time_max = time();
+		
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
 		
-		$last_uptime = floor($last_uptime / 60 / $group_minutes) * 60 * $group_minutes; //round
+		$time_max = floor($time_max / 60 / $group_minutes) * 60 * $group_minutes; //round
 		
 		if ($participated > 0)
 		{
@@ -1336,7 +1338,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$sql = "SELECT r.time time, COUNT(r.id) cnt $sql_select
 					FROM ".BO_DB_PREF."raw r
 					$sql_join
-					WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $last_uptime - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $last_uptime)."'
+					WHERE r.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 					$sql_where
 					AND (r.amp".$channel."_max != 128)
 					GROUP BY FLOOR(UNIX_TIMESTAMP(r.time) / 60 / $group_minutes), extra";
@@ -1347,7 +1349,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			while ($row = $res->fetch_assoc())
 			{
 				$time = strtotime($row['time'].' UTC');
-				$index = floor( ($time - $last_uptime + $hours_back * 3600) / 60 / $group_minutes);
+				$index = floor( ($time - $time_max + $hours_back * 3600) / 60 / $group_minutes);
 				$tmp[$index][$row['extra']] = $row['cnt'];
 				
 				if ($average)
@@ -1358,7 +1360,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 			for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)
 			{
-				$X[$i] = $last_uptime + ($i * $group_minutes - $hours_back * 60) * 60;
+				$X[$i] = $time_max + ($i * $group_minutes - $hours_back * 60) * 60;
 				
 				$cnt_all      = (double)@array_sum($tmp[$i]);
 				$cnt_selected = (double)$tmp[$i][1];

@@ -33,6 +33,17 @@
 	
 
 /*******************************************************************/
+/*** Your Region                                                 ***/
+/*     1 = Europe                                                  */
+/*     2 = Oceania                                                 */
+/*     3 = North America                                           */
+/*     4 = Japan                                                   */                             
+
+@define('BO_REGION', 1);
+
+
+
+
 /*** Main file for creating graphs and images (URL!).            ***/
 /*   You can use relative or absolute (with leading "/") paths:    */
 /*   Only "blitzortung.php" should be ok in most cases.            */
@@ -198,7 +209,7 @@
 @define('BO_UP_ERR_MIN_MINUTES', 30);    
 
 // if error persits, send mail max. every defined minutes
-@define('BO_UP_ERR_SEND_INTERVAL', 60);  
+@define('BO_UP_ERR_SEND_INTERVAL', 720);  
 
 // if new station count is too low -> don't read new data
 @define('BO_UP_STATION_DIFFER',   0.9);     

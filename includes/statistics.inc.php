@@ -1251,12 +1251,16 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 					.date(_BL('_datetime'), $last_net)
 					.' ('._BL('update every').' '.intval(BO_UP_INTVL_STATIONS).' '._BL('unit_minutes').')'
 				.'</span>';
-	echo '<li><span class="bo_descr">'
-				._BL('Last update signals').': </span><span class="bo_value">'
-					.date(_BL('_datetime'), $last_sig)
-					.' ('._BL('update every').' '.intval(BO_UP_INTVL_RAW).' '._BL('unit_minutes').')'
-					.'</span>';
-
+	
+	if (BO_UP_INTVL_RAW > 0)
+	{
+		echo '<li><span class="bo_descr">'
+					._BL('Last update signals').': </span><span class="bo_value">'
+						.date(_BL('_datetime'), $last_sig)
+						.' ('._BL('update every').' '.intval(BO_UP_INTVL_RAW).' '._BL('unit_minutes').')'
+						.'</span>';
+	}
+	
 	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'.number_format($kb_today, 0, _BL('.'), _BL(',')).' kB ('._BL('Today').')</span>';
 					
 	echo '</ul>';
@@ -1340,7 +1344,7 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 		
 		$data = unserialize(bo_get_conf('station_data24h'.$add));
 		
-		if ($own_station)
+		if (0 && $own_station) // GPS data out of raw signal table isn't needed any more
 		{
 			$res = bo_db("SELECT lat, lon, height
 							FROM ".BO_DB_PREF."raw
@@ -1356,7 +1360,8 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 		}
 		else
 		{
-			$data = unserialize(bo_get_conf('station_data24h'.'#'.$station_id.'#'));
+			$add = $own_station ? '' : '#'.$station_id.'#';
+			$data = unserialize(bo_get_conf('station_data24h'.$add));
 			if (isset($data) && is_array($data))
 			{
 				$tmp = array();
@@ -1506,7 +1511,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 {
 	global $_BO;
 	
-	$show_options = array('strikes', 'strike_ratios', 'signals');
+	$show_options = array('strikes');
 	
 	$show = $_GET['bo_show2'];
 	$region = $_GET['bo_region'];
@@ -1524,6 +1529,10 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 	}
 	else
 	{
+		$show_options[] = 'strike_ratios';
+		if (BO_UP_INTVL_RAW > 0)
+			$show_options[] = 'signals';
+
 		if ($channel)
 			$add_graph .= '&channel='.$channel;
 	}
@@ -1729,12 +1738,15 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 				bo_show_graph('ratio_bearing', $add_graph);
 			
 			/*** EVALUATED RATIO ***/
-			echo '<a name="graph_evaluated_signals"></a>';
-			echo '<h4>'._BL('h4_graph_evaluated_signals').' ('._BL('experimental').')</h4>';
-			echo '<p class="bo_graph_description" id="bo_graph_evaluated_signals">';
-			echo _BL('bo_graph_evaluated_signals');
-			echo '</p>';
-			bo_show_graph('evaluated_signals', $add_graph);
+			if (BO_UP_INTVL_RAW)
+			{
+				echo '<a name="graph_evaluated_signals"></a>';
+				echo '<h4>'._BL('h4_graph_evaluated_signals').' ('._BL('experimental').')</h4>';
+				echo '<p class="bo_graph_description" id="bo_graph_evaluated_signals">';
+				echo _BL('bo_graph_evaluated_signals');
+				echo '</p>';
+				bo_show_graph('evaluated_signals', $add_graph);
+			}
 			
 			break;
 			
