@@ -299,7 +299,7 @@ function bo_update_raw_signals($force = false)
 		return true;
 	}
 	
-	$last = bo_get_conf('uptime_raw');
+	$last = bo_get_conf('uptime_raw_try');
 
 	$i = 0;
 	$a = 0;
@@ -307,7 +307,7 @@ function bo_update_raw_signals($force = false)
 
 	if (time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last)
 	{
-		bo_set_conf('uptime_raw', time());
+		bo_set_conf('uptime_raw_try', time());
 		
 		$file = bo_get_archive('page=3&subpage_3=1&mode=4', false, true);
 
@@ -452,6 +452,7 @@ function bo_update_raw_signals($force = false)
 		
 		if (!$timeout)
 		{
+			bo_set_conf('uptime_raw', time());
 			bo_match_strike2raw();
 			bo_update_status_files('signals');
 			$updated = true;
@@ -475,13 +476,15 @@ function bo_update_strikes($force = false)
 {
 	global $_BO;
 	
-	$last = bo_get_conf('uptime_strikes');
+	$last = bo_get_conf('uptime_strikes_try');
 
 	bo_echod(" ");
 	bo_echod("=== Strikes ===");
 
 	if (time() - $last > BO_UP_INTVL_STRIKES * 60 - 30 || $force || time() < $last)
 	{
+		bo_set_conf('uptime_strikes_try', time());
+		
 		$start_time = time();
 		$stations = bo_stations('user');
 		$own_id = bo_station_id();
@@ -1313,7 +1316,7 @@ function bo_match_strike2raw()
 // Get stations-data and statistics from blitzortung.org
 function bo_update_stations($force = false)
 {
-	$last = bo_get_conf('uptime_stations');
+	$last = bo_get_conf('uptime_stations_try');
 
 	bo_echod(" ");
 	bo_echod("=== Stations ===");
@@ -1328,6 +1331,8 @@ function bo_update_stations($force = false)
 
 	if (time() - $last > BO_UP_INTVL_STATIONS * 60 - 30 || $force)
 	{
+		bo_set_conf('uptime_stations_try', time());
+		
 		$u = 0;
 		$i = 0;
 		$Count = array();
