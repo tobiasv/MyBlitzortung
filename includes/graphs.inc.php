@@ -1086,7 +1086,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		
 		$channels = BO_ANTENNAS;
 		$last_uptime = bo_get_conf('uptime_raw'); //RAW-update time!!!!
-		$time_max = $time;
+		$time_max = time();
 		$participated = intval($_GET['participated']);
 		
 		if ($hours_back > 24)

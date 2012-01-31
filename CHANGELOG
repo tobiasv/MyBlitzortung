@@ -3,8 +3,10 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.4-dev6 (2012-01-18)
-------------------------------
+Version 0.7.4-dev7 (2012-01-31)
+-------------------------------
+- IMPORTANT: preliminary changes for accessing Blitzortung.org-archiv.cgi (for signals) 
+   --> there will be more changes in the next days/weeks (no more archiv.cgi needed)
 - new: option to resize maps
 - new: more descriptions
 - new: header-text for maps
