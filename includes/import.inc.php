@@ -334,7 +334,7 @@ function bo_update_raw_signals($force = false)
 	if ($do_update)
 	{
 		bo_set_conf('uptime_raw_try', serialize(array(time(),0)));
-		$max_signal_back_hours = 23;
+		$max_signal_back_hours = 22;
 		
 		// Search last signal
 		$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
@@ -366,7 +366,7 @@ function bo_update_raw_signals($force = false)
 		}
 		
 		
-		//what files to download
+		//which files to download
 		$range = 0; //ToDo
 		$hours = array();
 		for ($i=$update_time_start; $i<$update_time_end;$i+=3600)
@@ -385,7 +385,7 @@ function bo_update_raw_signals($force = false)
 		$files = 0;
 		foreach($hours as $hour)
 		{
-			$url = bo_access_url().'/raw_data/'.trim(BO_USER).'/'.$hour.'.log';
+			$url  = bo_access_url().'Raw_Data/'.trim(BO_USER).'/'.$hour.'.log';
 			$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
 			$files++;
 			
@@ -415,17 +415,26 @@ function bo_update_raw_signals($force = false)
 				
 				$date = $r[1];
 				$time = $r[2];
+				$time_ns = intval($r[3]);
 				$utime = strtotime("$date $time UTC");
 
-				// update strike-data only some seconds *before* the *last download*
-				if ($utime < $update_time)
+				// update strike-data only some seconds *before* the *last signal*
+				if ($utime < $last_signal)
+				{
+					$count_exists++;
+					continue;
+				}
+				
+				//don't look at existsing signals
+				$id = array_search("$date $time.$time_ns", $old_times);
+				if ($id)
 				{
 					$count_exists++;
 					continue;
 				}
 				
 				$lines++;
-				$time_ns = intval($r[3]);
+				
 				$lat = $r[4];
 				$lon = $r[5];
 				$height = (double)$r[6];
@@ -460,7 +469,7 @@ function bo_update_raw_signals($force = false)
 				
 				$sql .= ",".bo_examine_signal($bdata);
 
-				$id = array_search("$date $time.$time_ns", $old_times);
+				
 
 				if ($id)
 				{
@@ -478,15 +487,13 @@ function bo_update_raw_signals($force = false)
 				//Timeout
 				if (bo_exit_on_timeout())
 				{
-					$text = '';
 					if (count($hours) - $files > 1)
 					{
 						$auto_force++;
 						bo_set_conf('uptime_raw_try', serialize(array(time(),$auto_force)));
-						$text .= 'Auto update will occur during the next import to get the remaining files!';
+						bo_echod('Auto update will occur during the next import to get the remaining files!');
 					}
 
-					bo_echod('TIMEOUT! We will continue the next time. '.$text);
 					$timeout = true;
 					break 2;
 				}
@@ -639,8 +646,7 @@ function bo_update_strikes($force = false)
 		$modified = $last_modified; //!!
 		
 		//get the file
-		$file = bo_get_file(bo_access_url().'/participants.txt', $code, 'strikes', $range, $modified, true);
-		
+		$file = bo_get_file(bo_access_url().'participants.txt', $code, 'strikes', $range, $modified, true);
 		
 		//check the date of the 2nd line (1st may be truncated!)
 		if ($file === false)
@@ -1399,7 +1405,7 @@ function bo_update_stations($force = false)
 		//send a last modified header
 		$modified = bo_get_conf('uptime_stations_modified');
 		$range = 0;
-		$file = bo_get_file(bo_access_url().'/stations.txt', $code, 'stations', $range, $modified);
+		$file = bo_get_file(bo_access_url().'stations.txt', $code, 'stations', $range, $modified);
 
 		
 		//wasn't modified
@@ -2156,11 +2162,11 @@ function bo_my_station_update($url, $force_bo_login = false)
 		
 		$request = 'id='.bo_station_id().'&login='.$login_id.'&username='.BO_USER.'&authid='.$authid.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
 		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
-		
+
 		$content = bo_get_file($data_url, $error, 'mybo_stations');
 		
 		$R = unserialize($content);
-		
+
 		if (!$R || !is_array($R))
 		{
 			bo_echod(_BL('Error talking to the server. Please try again later.').($error ? ' Code: *'.$error.'*' : ''));
