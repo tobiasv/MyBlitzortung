@@ -26,7 +26,8 @@ if (!defined('BO_VER'))
 
 function bo_access_url()
 {
-	return 'http://'.trim(BO_USER).':'.trim(BO_PASS).'@blitzortung.tmt.de/Data_'.trim(BO_REGION).'/Protected/';
+	$path = sprintf(BO_IMPORT_PATH, trim(BO_REGION));
+	return sprintf('http://%s:%s@%s/%s', trim(BO_USER), trim(BO_PASS), trim(BO_IMPORT_SERVER), $path);
 }
 	
 function bo_update_all($force = false, $only = '')
@@ -365,12 +366,11 @@ function bo_update_raw_signals($force = false)
 			$old_times[$row['id']] = $row['time'].'.'.$row['time_ns'];
 		}
 		
-		
 		//which files to download
 		$range = 0; //ToDo
 		$hours = array();
-		for ($i=$update_time_start; $i<$update_time_end;$i+=3600)
-			$hours[] = gmdate('H', $i);
+		for ($i=floor($update_time_start/3600); $i<=floor($update_time_end/3600);$i++)
+			$hours[] = gmdate('H', $i*3600);
 		
 		
 		//Debug output
@@ -380,12 +380,11 @@ function bo_update_raw_signals($force = false)
 				' *** Importing only signals newer than: '.date('Y-m-d H:i:s', $update_time_start).
 				' *** Loading '.count($hours).' files'.
 				' *** This is update #'.$loadcount);
-
 		
 		$files = 0;
 		foreach($hours as $hour)
 		{
-			$url  = bo_access_url().'Raw_Data/'.trim(BO_USER).'/'.$hour.'.log';
+			$url  = bo_access_url().BO_IMPORT_PATH_RAW.trim(BO_USER).'/'.$hour.'.log';
 			$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
 			$files++;
 			
@@ -646,7 +645,7 @@ function bo_update_strikes($force = false)
 		$modified = $last_modified; //!!
 		
 		//get the file
-		$file = bo_get_file(bo_access_url().'participants.txt', $code, 'strikes', $range, $modified, true);
+		$file = bo_get_file(bo_access_url().BO_IMPORT_PATH_PARTICIPANTS, $code, 'strikes', $range, $modified, true);
 		
 		//check the date of the 2nd line (1st may be truncated!)
 		if ($file === false)
@@ -678,8 +677,14 @@ function bo_update_strikes($force = false)
 			/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
 			$modified = $last_modified; //!!
 			$drange = 0;
-			$file = bo_get_file(bo_access_url().'participants.txt', $code, 'strikes', $drange, $modified, true);
-
+			$file = bo_get_file(bo_access_url().BO_IMPORT_PATH_PARTICIPANTS, $code, 'strikes', $drange, $modified, true);
+			
+			if ($file === false)
+			{
+				bo_echod("Partial download AND fallback to normal download didn't work!");
+				return false;
+			}
+			
 			bo_echod("Using partial download FAILED (Range $sent_range)! Fallback to normal download (".strlen(implode($file))." bytes).");
 			
 			if ($code == 304) //wasn't modified
@@ -1405,7 +1410,7 @@ function bo_update_stations($force = false)
 		//send a last modified header
 		$modified = bo_get_conf('uptime_stations_modified');
 		$range = 0;
-		$file = bo_get_file(bo_access_url().'stations.txt', $code, 'stations', $range, $modified);
+		$file = bo_get_file(bo_access_url().BO_IMPORT_PATH_STATIONS, $code, 'stations', $range, $modified);
 
 		
 		//wasn't modified

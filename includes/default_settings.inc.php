@@ -949,6 +949,15 @@
 /*******************************************************************/
 /*** Some special settings which shouldn't be changed            ***/
 
+//Import server settings
+//Todo: more flexible
+@define("BO_IMPORT_SERVER", 'blitzortung.tmt.de');
+@define("BO_IMPORT_PATH", 'Data_%d/Protected/');
+@define("BO_IMPORT_PATH_PARTICIPANTS", 'participants.txt');
+@define("BO_IMPORT_PATH_STRIKES", 'strikes.txt');
+@define("BO_IMPORT_PATH_STATIONS", 'stations.txt');
+@define("BO_IMPORT_PATH_RAW", 'Raw_Data/');
+
 //Tile dimensions (pixels)
 @define("BO_TILE_SIZE", 512);
 
