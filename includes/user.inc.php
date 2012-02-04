@@ -1006,7 +1006,10 @@ function bo_my_station_update_form()
 	if ($_POST['ok'])	
 	{
 		$url = trim($_POST['bo_url']);
+		
+		echo '<pre>';
 		$ret = bo_my_station_update($url);
+		echo '</pre>';
 		
 		if ($ret && $url)
 			bo_set_conf('mybo_stations_autoupdate', $_POST['bo_auto'] ? 1 : 0);

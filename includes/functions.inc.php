@@ -897,6 +897,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 			$response = array();
 			$accepted_range = false;
 			$content_length = 0;
+			$location = '';
 			
 			if (fwrite($fp, $out) !== false)
 			{
@@ -914,7 +915,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 							$err = 3;
 							break;
 						}
-						else if ($response[1] != '200' && $response[1] != '206')
+						else if ($response[1] != '200' && $response[1] != '206' && $response[1] != '302')
 						{
 							$err = 2;
 							break;
@@ -923,17 +924,32 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 					
 					if (preg_match('/Content\-Range: ?bytes ([0-9]+)\-([0-9]+)\/([0-9]+)/', $header, $r))
 						$accepted_range = array($r[1], $r[2], $r[3]);
-
-					if (preg_match('/Content\-Length: ?([0-9]+)/', $header, $r))
+					elseif (preg_match('/Content\-Length: ?([0-9]+)/', $header, $r))
 						$content_length = $r[1];
-
-					if (preg_match('/Last\-Modified:(.+)/', $header, $r))
+					elseif (preg_match('/Last\-Modified:(.+)/', $header, $r))
 						$modified = strtotime($r[1]);
-			
+					elseif (preg_match('/Location:(.+)/', $header, $r))
+						$location = trim($r[1]);
+						
 					$first = false;
 				} 
 				while (!empty($header) and !feof($fp)); 
-					
+
+				
+				//It was a redirection!
+				if ($response[1] == '302')
+				{
+					if ($location)
+					{
+						$url  = 'http://';
+						$url .= $user && $pass ? $user.':'.$pass.'@' : '';
+						$url .= $host.$path.$location;
+						return bo_get_file($url, $error, $type, $range, $modified, $as_array);
+					}
+					else
+						$err = 2;
+				}
+
 				//Get the Content
 				while (!feof($fp)) 
 				{
@@ -967,6 +983,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 		}
 	}
 	
+
 	if ($type)
 	{
 		$data = unserialize(bo_get_conf('download_statistics'));

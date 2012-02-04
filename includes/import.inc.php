@@ -23,6 +23,11 @@
 if (!defined('BO_VER'))
 	exit('No BO_VER');
 
+
+function bo_access_url()
+{
+	return 'http://'.trim(BO_USER).':'.trim(BO_PASS).'@blitzortung.tmt.de/Data_'.trim(BO_REGION).'/Protected/';
+}
 	
 function bo_update_all($force = false, $only = '')
 {
@@ -217,15 +222,26 @@ function bo_get_login_str()
 		
 		return false;
 	}
+}
 
-	
+// Check login-string (currently only internal usage for MyBlitzortung station linking)
+function bo_check_login_str($string)
+{
+	$url = 'http://www.blitzortung.org/Webpages/index.php?lang=en&page=3&login_string='.$string;
+	$file = bo_get_file($url, $code, 'login_check');
 
-
-	
+	if (preg_match('/You are logged in as.*;([A-Za-z0-9]+)&/', $file, $r))
+	{
+		return trim($r[1]);
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
-// Get archive data from blitzortung cgi
+// Get archive data from blitzortung cgi (OUTDATED!)
 function bo_get_archive($args='', $bo_login_id=false, $as_array=false)
 {
 	$file = false;
@@ -238,7 +254,8 @@ function bo_get_archive($args='', $bo_login_id=false, $as_array=false)
 
 	if ($bo_login_id)
 	{
-		$file = bo_get_file('http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&lang=en&'.$args, $code, 'archive', $d1, $d2, $as_array);
+		$url = 'http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&lang=en&'.$args;
+		$file = bo_get_file($url, $code, 'archive', $d1, $d2, $as_array);
 
 		if ($file === false)
 		{
@@ -299,40 +316,44 @@ function bo_update_raw_signals($force = false)
 		return true;
 	}
 	
-	$last = bo_get_conf('uptime_raw_try');
+	list($last, $auto_force) = @unserialize(bo_get_conf('uptime_raw_try'));
 
-	$i = 0;
-	$a = 0;
-	$u = 0;
+	$count_inserted = 0;
+	$count_exists = 0;
+	$count_updated = 0;
 
-	if (time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last)
+	$do_update = time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last;
+	
+	//Auto force = if there are more files to load (e.g. after installation)
+	if (!$do_update && 0 < $auto_force && $auto_force < 30)
 	{
-		bo_set_conf('uptime_raw_try', time());
+		bo_echod("Auto forced update out of order to get the remaining data");
+		$do_update = true;
+	}
+	
+	if ($do_update)
+	{
+		bo_set_conf('uptime_raw_try', serialize(array(time(),0)));
+		$max_signal_back_hours = 23;
 		
-		$file = bo_get_archive('page=3&subpage_3=1&mode=4', false, true);
-
-		$start_time = time();
-		
-		if ($file === false)
-			return false;
-
 		// Search last signal
 		$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$last_signal = strtotime($row['mtime'].' UTC');
-		if (!$last_signal || $last_signal > time())
+		if (!$last_signal || $last_signal > time() || $last_signal < time() - $max_signal_back_hours)
 		{
-			bo_echod("No last signal found! Last time: ".$row['mtime'].". Setting to now -2 hours.");
-			$last_signal = time() - 3600 * 2;
+			bo_echod("No last signal found or last recieved signal too old! Last time: ".$row['mtime'].". Setting to now -$max_signal_back_hours hours.");
+			$last_signal = time() - 3600 * $max_signal_back_hours;
 		}
 		
-		$update_time = $last_signal - 120;
-			
+		$update_time_start = $last_signal - 120;
+		$update_time_end   = time();
+		
 		// anti-duplicate without using unique-db keys
 		//Searching for old Signals (to avoid duplicates)
 		$old_times = array();
-		$date_start = gmdate('Y-m-d H:i:s', $update_time - 10); //some secs. back to be sure
+		$date_start = gmdate('Y-m-d H:i:s', $update_time_start);
 		$date_end = gmdate('Y-m-d H:i:s', $last_signal + 3600 * 6); //6h to the future to be sure 
 		$sql = "SELECT id, time, time_ns
 				FROM ".BO_DB_PREF."raw
@@ -345,98 +366,136 @@ function bo_update_raw_signals($force = false)
 		}
 		
 		
+		//what files to download
+		$range = 0; //ToDo
+		$hours = array();
+		for ($i=$update_time_start; $i<$update_time_end;$i+=3600)
+			$hours[] = gmdate('H', $i);
+		
+		
 		//Debug output
 		$loadcount = bo_get_conf('upcount_raw');
 		bo_set_conf('upcount_raw', $loadcount+1);
 		bo_echod('Last signal: '.date('Y-m-d H:i:s', $last_signal). 
-				' *** Importing only signals newer than: '.date('Y-m-d H:i:s', $update_time).
+				' *** Importing only signals newer than: '.date('Y-m-d H:i:s', $update_time_start).
+				' *** Loading '.count($hours).' files'.
 				' *** This is update #'.$loadcount);
 
 		
-		//Read the signals
-		foreach($file as $line)
+		$files = 0;
+		foreach($hours as $hour)
 		{
-			if (!$line)
-				continue;
-				
-			if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $line, $r))
-			{
-				bo_echod("Wrong line format: \"$line\"");
-				continue;
-			}
+			$url = bo_access_url().'/raw_data/'.trim(BO_USER).'/'.$hour.'.log';
+			$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
+			$files++;
 			
-			$date = $r[1];
-			$time = $r[2];
-			$utime = strtotime("$date $time UTC");
-
-			// update strike-data only some seconds *before* the *last download*
-			if ($utime < $update_time)
+			$text = " - Reading file $hour.log";
+			
+			if ($file === false)
 			{
-				$a++;
+				bo_echod($text." *** couldn't get file $url *** Code: $code");
 				continue;
-			}
-
-			$time_ns = intval($r[3]);
-			$lat = $r[4];
-			$lon = $r[5];
-			$height = (double)$r[6];
-			$channels = $r[7];
-			$values = $r[8];
-			$bpv = $r[9];
-			$ntime = $r[10];
-			$data = trim($r[11]);
-
-
-			/*** signal examinations ***/
-			//from hex to binary
-			$bdata = '';
-			for ($j=0;$j < strlen($data);$j+=2)
-			{
-				$bdata .= chr(hexdec(substr($data,$j,2)));
-			}
-			
-			//check wether data string fits hex-code
-			if (trim($data, "1234567890abcdefABCDEF"))
-				$data = '';
-			elseif (strlen($data) % 2)
-				$data .= '0';
-	
-			$sql = "	time='$date $time',
-						time_ns='$time_ns',
-						lat='$lat',lon='$lon',
-						height='$height',
-						strike_id='0',
-						data=x'$data'
-						";
-			
-			$sql .= ",".bo_examine_signal($bdata);
-
-			$id = array_search("$date $time.$time_ns", $old_times);
-
-			if ($id)
-			{
-				$sql = "UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'";
-				bo_db($sql, 1);
-				$u++;
 			}
 			else
 			{
-				$sql = "INSERT INTO ".BO_DB_PREF."raw SET $sql";
-				bo_db($sql, 1);
-				$i++;
+				bo_echod($text." *** ".count($file)." Lines ... ");
 			}
 			
-			//Timeout
-			if (bo_exit_on_timeout())
+			//Read the signals
+			foreach($file as $line)
 			{
-				bo_echod('TIMEOUT! We will continue the next time.');
-				$timeout = true;
-				break;
+				if (!$line)
+					continue;
+					
+				if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $line, $r))
+				{
+					bo_echod("Wrong line format: \"$line\"");
+					continue;
+				}
+				
+				$date = $r[1];
+				$time = $r[2];
+				$utime = strtotime("$date $time UTC");
+
+				// update strike-data only some seconds *before* the *last download*
+				if ($utime < $update_time)
+				{
+					$count_exists++;
+					continue;
+				}
+				
+				$lines++;
+				$time_ns = intval($r[3]);
+				$lat = $r[4];
+				$lon = $r[5];
+				$height = (double)$r[6];
+				$channels = $r[7];
+				$values = $r[8];
+				$bpv = $r[9];
+				$ntime = $r[10];
+				$data = trim($r[11]);
+
+
+				/*** signal examinations ***/
+				//from hex to binary
+				$bdata = '';
+				for ($j=0;$j < strlen($data);$j+=2)
+				{
+					$bdata .= chr(hexdec(substr($data,$j,2)));
+				}
+				
+				//check wether data string fits hex-code
+				if (trim($data, "1234567890abcdefABCDEF"))
+					$data = '';
+				elseif (strlen($data) % 2)
+					$data .= '0';
+		
+				$sql = "	time='$date $time',
+							time_ns='$time_ns',
+							lat='$lat',lon='$lon',
+							height='$height',
+							strike_id='0',
+							data=x'$data'
+							";
+				
+				$sql .= ",".bo_examine_signal($bdata);
+
+				$id = array_search("$date $time.$time_ns", $old_times);
+
+				if ($id)
+				{
+					$sql = "UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'";
+					bo_db($sql, 1);
+					$count_updated++;
+				}
+				else
+				{
+					$sql = "INSERT INTO ".BO_DB_PREF."raw SET $sql";
+					bo_db($sql, 1);
+					$count_inserted++;
+				}
+				
+				//Timeout
+				if (bo_exit_on_timeout())
+				{
+					$text = '';
+					if (count($hours) - $files > 1)
+					{
+						$auto_force++;
+						bo_set_conf('uptime_raw_try', serialize(array(time(),$auto_force)));
+						$text .= 'Auto update will occur during the next import to get the remaining files!';
+					}
+
+					bo_echod('TIMEOUT! We will continue the next time. '.$text);
+					$timeout = true;
+					break 2;
+				}
+
 			}
-
+			
 		}
-
-		bo_echod("Lines: ".count($file)." *** New Raw Data: $i *** Updated: $u *** Already read: $a");
+		
+		bo_echod("Lines: $lines *** Files: $files *** New Raw Data: $count_inserted *** Updated: $count_updated *** Already read: $count_exists");
 
 		if ($channels && $values && $bpv)
 		{
@@ -448,7 +507,7 @@ function bo_update_raw_signals($force = false)
 		
 		//Longtime
 		$count = bo_get_conf('count_raw_signals');
-		bo_set_conf('count_raw_signals', $count + $i);
+		bo_set_conf('count_raw_signals', $count + $count_inserted);
 		
 		if (!$timeout)
 		{
@@ -489,9 +548,9 @@ function bo_update_strikes($force = false)
 		$stations = bo_stations('user');
 		$own_id = bo_station_id();
 
-		$u = 0;
-		$i = 0;
-		$a = 0;
+		$count_updated = 0;
+		$count_inserted = 0;
+		$count_exists = 0;
 		$old_data = null;
 		$dist_data = array();
 		$bear_data = array();
@@ -580,7 +639,7 @@ function bo_update_strikes($force = false)
 		$modified = $last_modified; //!!
 		
 		//get the file
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $range, $modified, true);
+		$file = bo_get_file(bo_access_url().'/participants.txt', $code, 'strikes', $range, $modified, true);
 		
 		
 		//check the date of the 2nd line (1st may be truncated!)
@@ -613,7 +672,7 @@ function bo_update_strikes($force = false)
 			/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
 			$modified = $last_modified; //!!
 			$drange = 0;
-			$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/participants.txt', $code, 'strikes', $drange, $modified, true);
+			$file = bo_get_file(bo_access_url().'participants.txt', $code, 'strikes', $drange, $modified, true);
 
 			bo_echod("Using partial download FAILED (Range $sent_range)! Fallback to normal download (".strlen(implode($file))." bytes).");
 			
@@ -677,7 +736,7 @@ function bo_update_strikes($force = false)
 			// update strike-data only some seconds *before* the *last strike in Database*
 			if ($utime < $time_update)
 			{
-				$a++;
+				$count_exists++;
 				continue;
 			}
 			
@@ -831,7 +890,7 @@ function bo_update_strikes($force = false)
 					$sql .= " , status=0 ";
 				
 				$id = bo_db("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
-				$i++;
+				$count_inserted++;
 
 				$new_strike = true;
 			}
@@ -843,7 +902,7 @@ function bo_update_strikes($force = false)
 					$sql .= " , status=1 ";
 				
 				bo_db("UPDATE ".BO_DB_PREF."strikes SET $sql WHERE id='$id'");
-				$u++;
+				$count_updated++;
 				$new_strike = false;
 			}
 
@@ -947,7 +1006,7 @@ function bo_update_strikes($force = false)
 			}
 		}
 		
-		bo_echod("Lines: ".count($file)." *** New Strikes: $i *** Updated: $u *** Already read: $a");
+		bo_echod("Lines: ".count($file)." *** New Strikes: $count_inserted *** Updated: $count_updated *** Already read: $count_exists");
 
 		//General
 		bo_set_conf('last_strikes_stations', serialize($last_strikes));
@@ -1023,7 +1082,7 @@ function bo_update_strikes($force = false)
 			$add = $stId == $own_id ? '' : '#'.$stId.'#';
 			
 			$count = bo_get_conf('count_strikes'.$add);
-			bo_set_conf('count_strikes'.$add, $count + $i);
+			bo_set_conf('count_strikes'.$add, $count + $count_inserted);
 			
 			if (isset($dist_data[$stId]))
 			{
@@ -1326,15 +1385,13 @@ function bo_update_stations($force = false)
 		bo_echod("Disabled!");
 	}
 	
-	$i = 0;
-	$u = 0;
+	$count_inserted = 0;
+	$count_updated = 0;
 
 	if (time() - $last > BO_UP_INTVL_STATIONS * 60 - 30 || $force)
 	{
 		bo_set_conf('uptime_stations_try', time());
 		
-		$u = 0;
-		$i = 0;
 		$Count = array();
 		$signal_count = 0;
 		$time = time();
@@ -1342,7 +1399,7 @@ function bo_update_stations($force = false)
 		//send a last modified header
 		$modified = bo_get_conf('uptime_stations_modified');
 		$range = 0;
-		$file = bo_get_file('http://'.BO_USER.':'.BO_PASS.'@blitzortung.tmt.de/Data/Protected/stations.txt', $code, 'stations', $range, $modified);
+		$file = bo_get_file(bo_access_url().'/stations.txt', $code, 'stations', $range, $modified);
 
 		
 		//wasn't modified
@@ -1467,20 +1524,20 @@ function bo_update_stations($force = false)
 			if (isset($all_stations[$stId]))
 			{
 				bo_db("UPDATE ".BO_DB_PREF."stations SET $sql WHERE id='$stId'");
-				$u++;
+				$count_updated++;
 			}
 			else 
 			{
 				$sql .= " , first_seen='".gmdate('Y-m-d H:i:s')."'";
 				bo_db("INSERT INTO ".BO_DB_PREF."stations SET $sql", false);
-				$i++;
+				$count_inserted++;
 			}
 			
 			$signal_count += $Count[$stId]['sig'];
 
 		}
 
-		bo_echod("Stations: ".(count($lines)-2)." *** New Stations: $i *** Updated: $u");
+		bo_echod("Stations: ".(count($lines)-2)." *** New Stations: $count_inserted *** Updated: $count_updated");
 
 		//Check wether stations still exists
 		foreach($all_stations as $id => $d)
@@ -2069,7 +2126,6 @@ function bo_my_station_update($url, $force_bo_login = false)
 {
 	bo_echod('=== '._BL('Linking with other MyBlitzortung stations').' ===');
 	
-	
 	if (!$force_bo_login)
 	{
 		$authid = bo_get_conf('mybo_authid');
@@ -2098,7 +2154,7 @@ function bo_my_station_update($url, $force_bo_login = false)
 		bo_echod("== "._BL('Requesting data')." ==");
 		bo_echod(_BL('Connecting to ').' *'.BO_LINK_HOST.'*');
 		
-		$request = 'id='.bo_station_id().'&login='.$login_id.'&authid='.$authid.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
+		$request = 'id='.bo_station_id().'&login='.$login_id.'&username='.BO_USER.'&authid='.$authid.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
 		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
 		
 		$content = bo_get_file($data_url, $error, 'mybo_stations');
