@@ -341,7 +341,7 @@ function bo_update_raw_signals($force = false)
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$last_signal = strtotime($row['mtime'].' UTC');
-		if (!$last_signal || $last_signal > time() || $last_signal < time() - $max_signal_back_hours)
+		if (!$last_signal || $last_signal > time() || $last_signal < time() - $max_signal_back_hours * 3600)
 		{
 			bo_echod("No last signal found or last recieved signal too old! Last time: ".$row['mtime'].". Setting to now -$max_signal_back_hours hours.");
 			$last_signal = time() - 3600 * $max_signal_back_hours;
