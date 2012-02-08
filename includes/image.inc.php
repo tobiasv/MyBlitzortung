@@ -1194,55 +1194,51 @@ function bo_image_reduce_colors(&$I, $density_map=false, $transparent=false)
 		if ($total && $total <= 256)
 			return;
 
-		
-		if ($colors)
+
+		$width = imagesx($I);
+		$height = imagesy($I);
+
+		if (BO_IMAGE_PALETTE_AUTO)
 		{
-			$auto = true;
-			$width = imagesx($I);
-			$height = imagesy($I);
-
-			if (BO_IMAGE_PALETTE_AUTO)
-			{
-				$Itmp = ImageCreateTrueColor($width, $height);
-				
-				if ($transparent)
-				{
-					$back = imagecolorallocate($Itmp, 140, 142, 144);
-					imagefilledrectangle($Itmp, 0, 0, $width, $height, $back);
-					imagecolortransparent($Itmp, $back);
-				}
-
-				ImageCopy($Itmp, $I, 0, 0, 0, 0, $width, $height);
-			}
+			$Itmp = ImageCreateTrueColor($width, $height);
 			
-			//reduce colors: imagecolormatch doesn't exist in some PHP-GD modules (i.e. Ubuntu)
-			if (!$transparent && function_exists('imagecolormatch'))
+			if ($transparent)
 			{
-				$colors_handle = ImageCreateTrueColor($width, $height);
-				ImageCopyMerge($colors_handle, $I, 0, 0, 0, 0, $width, $height, 100 );
-				ImageTrueColorToPalette($I, false, $colors);
-				ImageColorMatch($colors_handle, $I);
-				ImageDestroy($colors_handle);
+				$back = imagecolorallocate($Itmp, 140, 142, 144);
+				imagefilledrectangle($Itmp, 0, 0, $width, $height, $back);
+				imagecolortransparent($Itmp, $back);
+			}
+
+			ImageCopy($Itmp, $I, 0, 0, 0, 0, $width, $height);
+		}
+		
+		//reduce colors: imagecolormatch doesn't exist in some PHP-GD modules (i.e. Ubuntu)
+		if (!$transparent && function_exists('imagecolormatch'))
+		{
+			$colors_handle = ImageCreateTrueColor($width, $height);
+			ImageCopyMerge($colors_handle, $I, 0, 0, 0, 0, $width, $height, 100 );
+			ImageTrueColorToPalette($I, false, $colors);
+			ImageColorMatch($colors_handle, $I);
+			ImageDestroy($colors_handle);
+		}
+		else
+		{
+			imagetruecolortopalette($I, false, $colors);
+		}
+
+		if (BO_IMAGE_PALETTE_AUTO)
+		{
+			if (imagecolorstotal($I) == 256) //too much colors ==> back to truecolor
+			{
+				imagedestroy($I);
+				$I = $Itmp;
 			}
 			else
 			{
-				imagetruecolortopalette($I, false, $colors);
+				imagedestroy($Itmp);
 			}
-
-			if (BO_IMAGE_PALETTE_AUTO)
-			{
-				if (imagecolorstotal($I) == 256) //too much colors ==> back to truecolor
-				{
-					imagedestroy($I);
-					$I = $Itmp;
-				}
-				else
-				{
-					imagedestroy($Itmp);
-				}
-			}
-
 		}
+		
 	}
 }
 

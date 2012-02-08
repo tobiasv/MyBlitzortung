@@ -311,7 +311,7 @@
 
 
 // Mark stations offline after specified time with no signals  
-@define('BO_STATION_OFFLINE_HOURS', 24);
+@define('BO_STATION_OFFLINE_HOURS', 0.5);
 
 
 // Show new stations                                           
@@ -956,7 +956,7 @@
 @define("BO_IMPORT_PATH_PARTICIPANTS", 'participants.txt');
 @define("BO_IMPORT_PATH_STRIKES", 'strikes.txt');
 @define("BO_IMPORT_PATH_STATIONS", 'stations.txt');
-@define("BO_IMPORT_PATH_RAW", 'Raw_Data/');
+@define("BO_IMPORT_PATH_RAW", 'daw_data/');
 
 //Tile dimensions (pixels)
 @define("BO_TILE_SIZE", 512);
