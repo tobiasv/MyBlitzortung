@@ -956,7 +956,7 @@
 @define("BO_IMPORT_PATH_PARTICIPANTS", 'participants.txt');
 @define("BO_IMPORT_PATH_STRIKES", 'strikes.txt');
 @define("BO_IMPORT_PATH_STATIONS", 'stations.txt');
-@define("BO_IMPORT_PATH_RAW", 'daw_data/');
+@define("BO_IMPORT_PATH_RAW", 'raw_data/');
 
 //Tile dimensions (pixels)
 @define("BO_TILE_SIZE", 512);
