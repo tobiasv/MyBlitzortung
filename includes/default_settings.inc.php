@@ -129,7 +129,7 @@
 @define('BO_UP_INTVL_STATIONS', 15);
 
 //signal update interval
-@define('BO_UP_INTVL_RAW', 15);
+@define('BO_UP_INTVL_RAW', 10);
 
 
 

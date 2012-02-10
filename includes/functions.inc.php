@@ -842,8 +842,12 @@ function bo_load_locale($locale = '')
 
 }
 
-function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0, $as_array = false)
+function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0, $as_array = false, $depth=0)
 {
+	//avoid infinite loop on redirections (recursion)
+	if ($depth > 5)
+		return false;
+		
 	if (BO_USE_PHPURLWRAPPER === true)
 	{
 		$content = file_get_contents($url);
@@ -948,7 +952,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 						$url  = 'http://';
 						$url .= $user && $pass ? $user.':'.$pass.'@' : '';
 						$url .= $host.$path.$location;
-						return bo_get_file($url, $error, $type, $range, $modified, $as_array);
+						return bo_get_file($url, $error, $type, $range, $modified, $as_array, $depth+1);
 					}
 					else
 						$err = 2;

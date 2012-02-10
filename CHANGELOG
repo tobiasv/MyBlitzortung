@@ -3,6 +3,10 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.4b-dev (2012-??-??)
+-------------------------------
+- improved: partial file download for raw data, default interval is 10 minutes now
+
 Version 0.7.4a (2012-02-10)
 ---------------------------
 - new: italian translation (thx to Stefano Cirilli - www.meteo.units.it)

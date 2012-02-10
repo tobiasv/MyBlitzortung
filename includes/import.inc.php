@@ -89,7 +89,7 @@ function bo_update_all2($force = false, $only = '')
 
 		
 	//check if we should do an async update
-	if ( !(BO_UP_INTVL_STRIKES <= BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS <= BO_UP_INTVL_RAW) )
+	if ( !(BO_UP_INTVL_STRIKES <= BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS <= BO_UP_INTVL_RAW) && BO_UP_INTVL_RAW)
 	{
 		if (!$force)
 			bo_echod("Info: Asynchronous update. No problem, but untestet. To avoid set strike timer < station timer < signal timer (or equal).");
@@ -317,13 +317,13 @@ function bo_update_raw_signals($force = false)
 		return true;
 	}
 	
-	list($last, $auto_force) = @unserialize(bo_get_conf('uptime_raw_try'));
+	list($last_update, $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified) = @unserialize(bo_get_conf('uptime_raw_data'));
 
 	$count_inserted = 0;
 	$count_exists = 0;
 	$count_updated = 0;
 
-	$do_update = time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last;
+	$do_update = time() - $last_update > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last_update;
 	
 	//Auto force = if there are more files to load (e.g. after installation)
 	if (!$do_update && 0 < $auto_force && $auto_force < 30)
@@ -334,28 +334,55 @@ function bo_update_raw_signals($force = false)
 	
 	if ($do_update)
 	{
-		bo_set_conf('uptime_raw_try', serialize(array(time(),0)));
+		//set only the important entries to avoid problems if import crashes
+		bo_set_conf('uptime_raw_data', serialize(array(time(), 0, $update_errs+1))); 
+		
 		$max_signal_back_hours = 22;
+		$read_back_seconds = 180;
+		$update_err = false;
 		
 		// Search last signal
 		$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$last_signal = strtotime($row['mtime'].' UTC');
-		if (!$last_signal || $last_signal > time() || $last_signal < time() - $max_signal_back_hours * 3600)
-		{
-			bo_echod("No last signal found or last recieved signal too old! Last time: ".$row['mtime'].". Setting to now -$max_signal_back_hours hours.");
-			$last_signal = time() - 3600 * $max_signal_back_hours;
-		}
-		
-		$update_time_start = $last_signal - 120;
+		$update_time_start = $last_signal - $read_back_seconds;
 		$update_time_end   = time();
 		
-		// anti-duplicate without using unique-db keys
+		if ($update_errs > 10 || (!$last_signal && $last_update) )
+		{
+			//avoid downloading the same (missing) files again and again -> only (try to) get the latest data
+			bo_echod("There were errors during the last import or couldn't find any signal in the database ($update_errs)! Getting only the latest raw-data file.");
+			$update_time_start = time() - 3600;
+			$last_file_pos = 0;
+			$last_hour = false;
+		}
+		elseif (!$last_signal && !$last_update)
+		{
+			//First update ever
+			bo_echod("No last signal found (maybe first update)! Update begins at 'now -$max_signal_back_hours hours'");
+			$update_time_start = time() - 3600 * $max_signal_back_hours;
+			$last_file_pos = 0;
+			$last_hour = false;
+		}
+		elseif (	$last_signal > time() 
+				|| time() - $last_update > $max_signal_back_hours * 3600
+				|| time() - $last_signal > $max_signal_back_hours * 3600
+				)
+		{
+			//Last update or last signal was too long ago
+			bo_echod("No last signal found or last recieved signal too old! Last time: ".$row['mtime'].". Setting to now -$max_signal_back_hours hours.");
+			$update_time_start = time() - 3600 * $max_signal_back_hours;
+			$last_file_pos = 0;
+			$last_hour = false;
+		}
+		
+		
+		//anti-duplicate without using unique-db keys
 		//Searching for old Signals (to avoid duplicates)
 		$old_times = array();
 		$date_start = gmdate('Y-m-d H:i:s', $update_time_start);
-		$date_end = gmdate('Y-m-d H:i:s', $last_signal + 3600 * 6); //6h to the future to be sure 
+		$date_end = gmdate('Y-m-d H:i:s', time() + 3600 * 6); //6h to the future to be sure 
 		$sql = "SELECT id, time, time_ns
 				FROM ".BO_DB_PREF."raw
 				WHERE time BETWEEN '$date_start' AND '$date_end'";
@@ -366,8 +393,8 @@ function bo_update_raw_signals($force = false)
 			$old_times[$row['id']] = $row['time'].'.'.$row['time_ns'];
 		}
 		
+
 		//which files to download
-		$range = 0; //ToDo
 		$hours = array();
 		for ($i=floor($update_time_start/3600); $i<=floor($update_time_end/3600);$i++)
 			$hours[] = gmdate('H', $i*3600);
@@ -381,29 +408,84 @@ function bo_update_raw_signals($force = false)
 				' *** Loading '.count($hours).' files'.
 				' *** This is update #'.$loadcount);
 		
+		//bo_echod("Last hour: $last_hour  Last pos: $last_file_pos");
+		
 		$files = 0;
+		$lines = 0;
 		foreach($hours as $hour)
 		{
-			$url  = bo_access_url().BO_IMPORT_PATH_RAW.trim(BO_USER).'/'.$hour.'.log';
-			$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
+			$range = 0;
+			$bytes = 0;
 			$files++;
+			$text = " - Reading file $hour.log ";
+			$url  = bo_access_url().BO_IMPORT_PATH_RAW.trim(BO_USER).'/'.$hour.'.log';
+			$modified = $last_modified ? $last_modified : $last_signal;
 			
-			$text = " - Reading file $hour.log";
+			//using range-method if parameters known
+			if ($files == 0 && $last_hour !== false && $last_hour == $hour && $last_file_pos)
+			{
+				$range = $last_file_pos;
+				$text .= " using range method (starting at $last_file_pos bytes)";
+				$last_hour = false; //reset
+			}
 			
+			// GET THE FILE
+			$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
+			
+			//sth. went wrong -> retry without range
+			if ($file === false && $code != 304)
+			{
+				$text .= 'sth went rong -> getting the file the 2nd time';
+				$modified = $last_modified ? $last_modified : $last_signal;
+				
+				// GET THE FILE (again)
+				$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
+			}
+			elseif ($file !== false && empty($range) && $last_file_pos)
+			{
+				$text .= " - got whole file ";
+			}
+
+			//Check the file
 			if ($file === false)
 			{
-				bo_echod($text." *** couldn't get file $url *** Code: $code");
+				if ($code == 304)
+				{
+					bo_echod($text." *** file not modified");
+				}
+				else
+				{
+					bo_echod($text." *** couldn't get file $url *** Code: $code");
+					$update_err = true;
+					$last_file_pos = 0;
+				}
+				
 				continue;
 			}
 			else
 			{
+				//use the range method for the previous hour-file if
+				if (!$modified || gmdate('H', $modified-$read_back_seconds) == $hour)
+				{
+					//save range and modified-time for the next try
+					if (isset($range[1]))
+						$last_file_pos = $range[1];
+					else
+						$last_file_pos = strlen(implode('', $file));
+				
+					$last_modified = $modified;
+					$last_hour = $hour;			
+				}
+			
 				bo_echod($text." *** ".count($file)." Lines ... ");
 			}
 			
 			//Read the signals
 			foreach($file as $line)
 			{
-				if (!$line)
+				$bytes += strlen($line)+1;
+				
+				if (!trim($line))
 					continue;
 					
 				if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $line, $r))
@@ -418,7 +500,7 @@ function bo_update_raw_signals($force = false)
 				$utime = strtotime("$date $time UTC");
 
 				// update strike-data only some seconds *before* the *last signal*
-				if ($utime < $last_signal)
+				if ($utime < $update_time_start)
 				{
 					$count_exists++;
 					continue;
@@ -489,9 +571,12 @@ function bo_update_raw_signals($force = false)
 					if (count($hours) - $files > 1)
 					{
 						$auto_force++;
-						bo_set_conf('uptime_raw_try', serialize(array(time(),$auto_force)));
 						bo_echod('Auto update will occur during the next import to get the remaining files!');
 					}
+					
+					//change byte range for partial download
+					if ($last_file_pos)
+						$last_file_pos -= $bytes;
 
 					$timeout = true;
 					break 2;
@@ -500,6 +585,16 @@ function bo_update_raw_signals($force = false)
 			}
 			
 		}
+
+		if ($update_err)
+			$update_errs++;
+			
+		if (!$timeout)
+			$auto_force = false;
+		
+		//bo_echod("Pos: $last_file_pos");
+		
+		bo_set_conf('uptime_raw_data', serialize(array(time(), $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified)));		
 		
 		bo_echod("Lines: $lines *** Files: $files *** New Raw Data: $count_inserted *** Updated: $count_updated *** Already read: $count_exists");
 
@@ -525,11 +620,13 @@ function bo_update_raw_signals($force = false)
 		else
 			$updated = false;
 		
+		if ($update_err)
+			bo_update_error('rawdata', 'Download of raw data failed. '.$code);
 		
 	}
 	else
 	{
-		bo_echod("No update. Last update ".(time() - $last)." seconds ago. This is normal and no error message!");
+		bo_echod("No update. Last update ".(time() - $last_update)." seconds ago. This is normal and no error message!");
 		$updated = false;
 	}
 
