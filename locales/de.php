@@ -20,7 +20,7 @@ $_BL['de']['MyBlitzortung_notags'] = 'MyBlitzortung';
 //For displaying things like "translated by..." in footer
 $_BL['de']['copyright_extra'] = false;
 
-// *** PLEASE DON'T TRANSLATE THE FOLLOWING ENTRIES *** THANKS!
+// *** PLEASE DON'T CHANGE OR TRANSLATE THE NAMES IN THE FOLLOWING ENTRIES *** THANKS!
 $_BL['de']['MyBlitzortung_original'] = 'MyBlitzortung';
 $_BL['de']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['de']['Blitzortung.org'] = 'Blitzortung.org';
@@ -1057,7 +1057,7 @@ $_BL['de']['ani_next'] = 'Weiter';
 $_BL['de']['ani_prev'] = 'Zurück';
 $_BL['de']['no GPS signal'] = 'kein GPS-Signal';
 $_BL['de']['no reception'] = 'kein Empfang';
-
+$_BL['de']['Loading...'] = 'Laden...';
 
 
 

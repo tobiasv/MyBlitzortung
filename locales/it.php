@@ -25,9 +25,9 @@ $_BL['it']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo
 $_BL['it']['MyBlitzortung_notags'] = 'MyBlitzortung';
 
 //For displaying things like "translated by..." in footer
-$_BL['it']['copyright_extra'] = 'Traduzione italiana a cura di Stefano Cirilli (www.meteo.units.it)';
+$_BL['it']['copyright_extra'] = 'Traduzione italiana a cura di Stefano Cirilli - Universtà di Trieste (www.meteo.units.it)';
 
-// *** PLEASE DON'T TRANSLATE THE FOLLOWING ENTRIES *** THANKS!
+// *** PLEASE DON'T CHANGE OR TRANSLATE THE NAMES IN THE FOLLOWING ENTRIES *** THANKS!
 $_BL['it']['MyBlitzortung_original'] = 'MyBlitzortung';
 $_BL['it']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['it']['Blitzortung.org'] = 'Blitzortung.org';

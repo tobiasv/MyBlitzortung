@@ -1,5 +1,11 @@
 <?php
 
+/* 
+ * Hungary translation for MyBlitzortung
+ * by Gabor Flaisz
+ */
+ 
+ 
 $_BL['locale'] = 'hu';
 
 
@@ -20,7 +26,7 @@ $_BL['hu']['MyBlitzortung_notags'] = 'Saját Villám Radar';
 //For displaying things like "translated by..." in footer
 $_BL['hu']['copyright_extra'] = 'Hungarian translation by Gábor Flaisz (www.flaiszg.hu)';
 
-// *** PLEASE DON'T TRANSLATE THE FOLLOWING ENTRIES *** THANKS!
+// *** PLEASE DON'T CHANGE OR TRANSLATE THE NAMES IN THE FOLLOWING ENTRIES *** THANKS!
 $_BL['hu']['MyBlitzortung_original'] = 'MyBlitzortung';
 $_BL['hu']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['hu']['Blitzortung.org'] = 'Blitzortung.org';

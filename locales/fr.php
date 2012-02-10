@@ -1,5 +1,11 @@
 <?php
 
+/* 
+ * Hungary translation for MyBlitzortung
+ * by Florent Baron
+ */
+
+ 
 $_BL['locale'] = 'fr';
 
 
@@ -20,7 +26,7 @@ $_BL['fr']['MyBlitzortung_notags'] = 'Mon détecteur de foudre';
 //For displaying things like "translated by..." in footer
 $_BL['fr']['copyright_extra'] = 'Frensh translation by Florent Baron (www.meteofontenay.fr)';
 
-// *** PLEASE DON'T TRANSLATE THE FOLLOWING ENTRIES *** THANKS!
+// *** PLEASE DON'T CHANGE OR TRANSLATE THE NAMES IN THE FOLLOWING ENTRIES *** THANKS!
 $_BL['fr']['MyBlitzortung_original'] = 'MyBlitzortung';
 $_BL['fr']['copyright_footer'] = 'Généré par {MYBO_ORIG}';
 $_BL['fr']['Blitzortung.org'] = 'Blitzortung.org';

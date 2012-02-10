@@ -20,8 +20,7 @@ $_BL['en']['MyBlitzortung_notags'] = 'MyLightningDetection';
 //For displaying things like "translated by..." in footer
 $_BL['en']['copyright_extra'] = false;
 
-
-// *** PLEASE DON'T TRANSLATE THE FOLLOWING ENTRIES *** THANKS!
+// *** PLEASE DON'T CHANGE OR TRANSLATE THE NAMES IN THE FOLLOWING ENTRIES *** THANKS!
 $_BL['en']['MyBlitzortung_original'] = 'MyBlitzortung';
 $_BL['en']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['en']['Blitzortung.org'] = 'Blitzortung.org';
@@ -1008,5 +1007,5 @@ $_BL['en']['ani_next'] = 'Next';
 $_BL['en']['ani_prev'] = 'Prev';
 $_BL['en']['no GPS signal'] = 'no GPS signal';
 $_BL['en']['no reception'] = 'no reception';
-
+$_BL['en']['Loading...'] = 'Loading...';
 

@@ -1545,7 +1545,13 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		exit;
 	}
 
-	
+	if (empty($Y) && empty($Y2) && empty($X))
+	{
+		$Y[] = 0;
+		$Y2[] = 0;
+		$X[] = 0;
+	}
+		
 	require_once 'jpgraph/jpgraph.php';
 	require_once 'jpgraph/jpgraph_line.php';
 	require_once 'jpgraph/jpgraph_bar.php';
