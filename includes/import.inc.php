@@ -418,12 +418,12 @@ function bo_update_raw_signals($force = false)
 			$range = 0;
 			$bytes = 0;
 			$files++;
-			$text = " - Reading file $hour.log ";
+			$text = " $files. Reading file $hour.log ";
 			$url  = bo_access_url().BO_IMPORT_PATH_RAW.trim(BO_USER).'/'.$hour.'.log';
 			$modified = $last_modified ? $last_modified : $last_signal;
 			
 			//using range-method if parameters known
-			if ($files == 0 && $last_hour !== false && $last_hour == $hour && $last_file_pos)
+			if ($files == 1 && $last_hour !== false && $last_hour == $hour && $last_file_pos)
 			{
 				$range = $last_file_pos;
 				$text .= " using range method (starting at $last_file_pos bytes)";
@@ -432,6 +432,7 @@ function bo_update_raw_signals($force = false)
 			
 			// GET THE FILE
 			$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
+			
 			
 			//sth. went wrong -> retry without range
 			if ($file === false && $code != 304)
@@ -593,7 +594,7 @@ function bo_update_raw_signals($force = false)
 		if (!$timeout)
 			$auto_force = false;
 		
-		//bo_echod("Pos: $last_file_pos");
+		//bo_echod("Pos: $last_file_pos Hour: $last_hour");
 		
 		bo_set_conf('uptime_raw_data', serialize(array(time(), $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified)));		
 		
