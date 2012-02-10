@@ -81,7 +81,7 @@ function bo_show_statistics()
 		echo '</div>';
 	}
 	
-	if (bo_station_id() >= 0 || $station_id)
+	if (bo_station_id() >= 0 || $station_id || !$show || $show == 'strikes')
 	{
 	
 		if ($add_stid && bo_station_id() >= 0)
