@@ -89,7 +89,8 @@ function bo_update_all2($force = false, $only = '')
 
 		
 	//check if we should do an async update
-	if ( !(BO_UP_INTVL_STRIKES <= BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS <= BO_UP_INTVL_RAW) && BO_UP_INTVL_RAW)
+	if (    (BO_UP_INTVL_STRIKES > BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS) 
+	     || (BO_UP_INTVL_STRIKES > BO_UP_INTVL_RAW)     && BO_UP_INTVL_RAW)
 	{
 		if (!$force)
 			bo_echod("Info: Asynchronous update. No problem, but untestet. To avoid set strike timer < station timer < signal timer (or equal).");

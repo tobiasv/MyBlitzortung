@@ -215,12 +215,12 @@ function bo_user_show_admin()
 			
 			echo '<h5>'._BL('Links').'</h5>';
 			echo '<ul>';
-			
+
+/*			
 			$bo_login_id = bo_get_conf('bo_login_id');
-			
 			if ($bo_login_id)
 				echo '<li><a href="http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$bo_login_id.'" target="_blank">Blitzortung.org</a> (with your Login-String)</li>';
-			
+*/			
 				
 			echo '</ul>';
 			
