@@ -269,6 +269,9 @@ function bo_station_name2id($name)
 //returns your station_id
 function bo_station_id()
 {
+	if (BO_NO_DEFAULT_STATION === true)
+		return -1; // -1 ==> does not interfer with station statistic table (0 = all stations)
+	
 	static $id = 0;
 	
 	if (!$id)
@@ -309,6 +312,9 @@ function bo_station_info($id = 0)
 	}
 	else //own station info
 	{
+		if (BO_NO_DEFAULT_STATION === true)
+			return false;
+			
 		$tmp = bo_stations('user', BO_USER);
 		
 		if (defined('BO_STATION_NAME') && BO_STATION_NAME)
@@ -321,6 +327,42 @@ function bo_station_info($id = 0)
 	
 	return $info[$id];
 }
+
+
+function get_station_list()
+{
+	$stations = bo_stations();
+	$opts = array();
+	foreach($stations as $id => $d)
+	{
+		if (!$d['country'] || !$d['city'] || $d['status'] == '-')
+			continue;
+		
+		$opts[$id] = _BL($d['country']).': '._BC($d['city']);
+	}
+	
+	asort($opts);
+	
+	return $opts;
+}
+
+function get_stations_html_select($station_id)
+{
+	$opts = get_station_list();
+	
+	$text = '<select name="bo_station_id" onchange="submit()">';
+	$text .= '<option></option>';
+	foreach($opts as $id => $name)
+	{
+		$text .= '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>';
+		$text .= $name;
+		$text .= '</option>';
+	}
+	$text .= '</select>';
+	
+	return $text;
+}
+
 
 //insert HTML-hidden tags of actual GET-Request
 function bo_insert_html_hidden($exclude = array())

@@ -282,8 +282,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	
 	$hours_back = intval($hours_back) ? intval($hours_back) : 24;
 	$hours_back = !bo_user_get_level() && $hours_back > 96 ? 96 : $hours_back;
-	$stId = bo_station_id();
-
+	
 	$group_minutes = intval($_GET['group_minutes']);
 	if ($group_minutes < BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES)
 		$group_minutes = BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES;
@@ -293,6 +292,13 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$date_start = gmdate('Y-m-d H:i:s', time() - 3600 * $hours_back);
 	$time_start = strtotime($date_start." UTC");
 
+	//Station ($station_id == 0 --> Own station)
+	$stId = bo_station_id();
+	if ($station_id && $station_id == $stId)
+		$station_id = 0;
+	$show_station = bo_station_id() > 0;
+	
+	//Vars...
 	$X = $Y = $Y2 = $Y3 = array(); //data array
 	$tickLabels = array();
 	$tickMajPositions = array();
@@ -332,6 +338,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	{
 		$last_uptime = bo_get_conf('uptime_strikes');
 		$time_max = time();
+		
 		
 		$group_minutes = intval($_GET['group_minutes']);
 		if ($group_minutes < BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES)
@@ -379,16 +386,18 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$graph_type = 'datlin';
 		
 		$caption  = (array_sum($Y) * $group_minutes).' '._BL('total strikes');
-		$caption .= "\n";
-		$caption .= (array_sum($Y2) * $group_minutes).' '._BL('total strikes station2');
+		if ($show_station)
+		{
+			$caption .= "\n";
+			$caption .= (array_sum($Y2) * $group_minutes).' '._BL('total strikes station2');
+		}
 	}
 	else if ($type == 'strikes_time')
 	{
-		$station_id = 0;
-		
 		$year = intval($_GET['year']);
 		$month = intval($_GET['month']);
 		$radius = intval($_GET['radius']);
+		$show_station = $show_station && !$station_id;
 		
 		if ($radius)
 		{
@@ -454,14 +463,20 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			if ($region)
 			{
 				$Y[$i] =  $d[7][$region]['own']; //participanted
-				$Y2[$i] = $d[7][$region]['all'] - $d[7][$region]['own']; //other
+				$Y2[$i] = $d[7][$region]['all'];
 				$Y3[$i] = $d[7][$region]['all']; //Sum
+				
+				if ($show_station)
+					$Y2[$i] -= $d[7][$region]['own']; //other
 			}
 			else
 			{
 				$Y[$i] = $d[1 + $rad]; //participanted
-				$Y2[$i] = $d[0 + $rad] - $d[1 + $rad]; //other
+				$Y2[$i] = $d[0 + $rad]; //other
 				$Y3[$i] = $d[0 + $rad]; //Sum
+				
+				if ($show_station)
+					$Y2[$i] -= $d[1 + $rad];
 			}
 		}
 
@@ -474,24 +489,30 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 						FROM ".BO_DB_PREF."strikes s
 						WHERE time BETWEEN '".gmdate('Y-m-d 00:00:00')."' AND '".gmdate('Y-m-d 23:59:59')."'
 						".($radius ? " AND distance < '".(BO_RADIUS_STAT * 1000)."'" : "")."
+						".bo_region2sql($region)."
 						GROUP BY participated";
 			$res = bo_db($sql);
 			while($row = $res->fetch_assoc())
 			{
-				if ($row['participated'])
-					$Y[$i] = $row['cnt'];
+				if ($row['participated'] && $show_station)
+					$Y[$i] += $row['cnt'];
 				else
-					$Y2[$i] = $row['cnt'];
+					$Y2[$i] += $row['cnt'];
 				
 				$Y3[$i] += $row['cnt'];
 			}
 		}
 		
 		$caption  = (array_sum($Y) + array_sum($Y2)).' '._BL('total strikes');
-		$caption .= "\n";
-		$caption .= array_sum($Y).' '._BL('total strikes station');
+		
+		if (bo_station_id() > 0 && !$station_id)
+		{
+			$caption .= "\n";
+			$caption .= array_sum($Y).' '._BL('total strikes station');
+		}
 		
 		$title_no_hours = true;
+		$no_title_station = true;
 		
 		$ymin = 0;
 		$ymax = max(10, max($Y3) * 1.2);
@@ -1513,7 +1534,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 	$stInfo = bo_station_info($station_id);
 	$city = $stInfo['city'];
-	if ($station_id)
+	if (!$no_title_station && $station_id)
 	{
 		$add_title .= ' '._BL('for_station', true).': '.$city;
 		bo_station_city(0, $stInfo['city']);
@@ -1575,14 +1596,17 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$plot->SetLegend(_BL('graph_legend_strikes_now_all'));
 			$graph->Add($plot);
 
-			$plot=new LinePlot($Y2, $X);
-			$plot->SetColor(BO_GRAPH_STAT_STRIKES_NOW_COLOR_L2);
-			if (BO_GRAPH_STAT_STRIKES_NOW_COLOR_F2)
-				$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_NOW_COLOR_F2);
-			$plot->SetWeight(BO_GRAPH_STAT_STRIKES_NOW_WIDTH_2);
-			$plot->SetLegend(_BL('graph_legend_strikes_now_own'));
-			$graph->Add($plot);
-
+			if ($show_station)
+			{
+				$plot=new LinePlot($Y2, $X);
+				$plot->SetColor(BO_GRAPH_STAT_STRIKES_NOW_COLOR_L2);
+				if (BO_GRAPH_STAT_STRIKES_NOW_COLOR_F2)
+					$plot->SetFillColor(BO_GRAPH_STAT_STRIKES_NOW_COLOR_F2);
+				$plot->SetWeight(BO_GRAPH_STAT_STRIKES_NOW_WIDTH_2);
+				$plot->SetLegend(_BL('graph_legend_strikes_now_own'));
+				$graph->Add($plot);
+			}
+			
 			$graph->yaxis->title->Set(_BL('Strike count per minute'));
 			$graph->title->Set(_BL('graph_stat_title_strikes_now').$add_title);
 			
@@ -1723,19 +1747,28 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 		case 'strikes_time':
 
-			$plot1=new BarPlot($Y);
-			$plot1->SetColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_L1);
-			if (BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1)
-				$plot1->SetFillColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1);
-			$plot1->SetLegend(_BL('graph_legend_strikes_time_own'));
-
 			$plot2=new BarPlot($Y2);
 			$plot2->SetColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_L2);
 			if (BO_GRAPH_STAT_STRIKES_TIME_COLOR_F2)
 				$plot2->SetFillColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_F2);
 			$plot2->SetLegend(_BL('graph_legend_strikes_time_all'));
 
-			$plot = new AccBarPlot(array($plot1,$plot2), $X);
+			if ($show_station)
+			{
+
+				$plot1=new BarPlot($Y);
+				$plot1->SetColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_L1);
+				if (BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1)
+					$plot1->SetFillColor(BO_GRAPH_STAT_STRIKES_TIME_COLOR_F1);
+				$plot1->SetLegend(_BL('graph_legend_strikes_time_own'));
+
+				$plot = new AccBarPlot(array($plot1,$plot2), $X);
+			}
+			else
+			{
+				$plot = $plot2;
+			}
+			
 			if (BO_GRAPH_STAT_STRIKES_TIME_WIDTH)
 				$plot->SetWidth(BO_GRAPH_STAT_STRIKES_TIME_WIDTH);
 

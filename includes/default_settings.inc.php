@@ -405,7 +405,6 @@
 /*** Dynamic Map: General settings                               ***/
 /*   Appearance of the dynamic map, colors, icons etc.             */
 
-
 /*** WARNING ***/
 /*** Do not raise the following two values,                      ***/
 /*** otherwise autolinking will not work!                        ***/
@@ -428,7 +427,7 @@
 // default zoom level for archive
 @define('BO_DEFAULT_ZOOM_ARCHIVE', 10);        
 
-// max. zoom level, even in the area of you station
+// max. zoom level, even in the area of your station
 @define('BO_MAX_ZOOM_IN', 15);        
 
 // minimal zoom level
@@ -942,7 +941,15 @@
 //causes a LOT OF more load during importing
 @define('BO_ENABLE_LONGTIME_ALL', false);
 
-
+//don't use a default (your) station
+//makes sense when you use another region than yours
+//you may set the following settings
+//  BO_LAT/BO_LON to a custom location
+//  BO_UP_INTVL_RAW -> 0
+//  BO_ENABLE_LONGTIME_ALL -> true
+//  BO_MAX_ZOOM_IN -> 8
+//  BO_RADIUS -> 0
+@define('BO_NO_DEFAULT_STATION', false);
 
 
 

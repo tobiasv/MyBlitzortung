@@ -636,29 +636,32 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		{
 			$stinfo = bo_station_info();
 			
-			list($px, $py) = bo_latlon2projection($cfg['proj'], $stinfo['lat'], $stinfo['lon']);
-			$x =      ($px - $x1) * $w_x;
-			$y = $h - ($py - $y1) * $h_y;
-			
-			$size = $cfg['show_station'][0];
-			
-			if (isset($cfg['show_station'][1]))
-				$stat_color = imagecolorallocate($I, $cfg['show_station'][1],$cfg['show_station'][2],$cfg['show_station'][3]);
-			else
-				$stat_color = $text_col;
-				
-			imageline($I, $x-$size, $y, $x+$size, $y, $stat_color);
-			imageline($I, $x, $y-$size, $x, $y+$size, $stat_color);
-			
-			if ($cfg['show_station'][4])
+			if ($stinfo)
 			{
-				$tsize = (int)$cfg['show_station'][4];
-				$tsize = $tsize > 4 ? $tsize : 9;
+				list($px, $py) = bo_latlon2projection($cfg['proj'], $stinfo['lat'], $stinfo['lon']);
+				$x =      ($px - $x1) * $w_x;
+				$y = $h - ($py - $y1) * $h_y;
 				
-				$dx = isset($cfg['show_station'][6]) ? (int)$cfg['show_station'][6] : 2;
-				$dy = isset($cfg['show_station'][7]) ? (int)$cfg['show_station'][7] : -12;
+				$size = $cfg['show_station'][0];
 				
-				bo_imagestring($I, $tsize, $x+$dx, $y+$dy, $stinfo['city'], $stat_color, $cfg['show_station'][5]);
+				if (isset($cfg['show_station'][1]))
+					$stat_color = imagecolorallocate($I, $cfg['show_station'][1],$cfg['show_station'][2],$cfg['show_station'][3]);
+				else
+					$stat_color = $text_col;
+					
+				imageline($I, $x-$size, $y, $x+$size, $y, $stat_color);
+				imageline($I, $x, $y-$size, $x, $y+$size, $stat_color);
+				
+				if ($cfg['show_station'][4])
+				{
+					$tsize = (int)$cfg['show_station'][4];
+					$tsize = $tsize > 4 ? $tsize : 9;
+					
+					$dx = isset($cfg['show_station'][6]) ? (int)$cfg['show_station'][6] : 2;
+					$dy = isset($cfg['show_station'][7]) ? (int)$cfg['show_station'][7] : -12;
+					
+					bo_imagestring($I, $tsize, $x+$dx, $y+$dy, $stinfo['city'], $stat_color, $cfg['show_station'][5]);
+				}
 			}
 		}
 	}
