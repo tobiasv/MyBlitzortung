@@ -4,8 +4,12 @@ $_BL['locale'] = 'fr';
 
 
 /*************************************************************/
-/* General                                                   */
+/* Names / Copyrights                                        */
+/*                                                           */
+/* Use BO_OWN_COPYRIGHT in config.php for                    */
+/* additional own copyright                                  */
 /*************************************************************/
+
 
 //Translated name of MyBlitzortung with html tags
 $_BL['fr']['MyBlitzortung'] = '<span class="bo_my">Mon</span><span class="bo_mybo">Détecteur de foudre</span>';
@@ -13,10 +17,21 @@ $_BL['fr']['MyBlitzortung'] = '<span class="bo_my">Mon</span><span class="bo_myb
 //Translated name of MyBlitzortung without html tags
 $_BL['fr']['MyBlitzortung_notags'] = 'Mon détecteur de foudre';
 
-//Should stay original name (MyBlitzortung)
+//For displaying things like "translated by..." in footer
+$_BL['fr']['copyright_extra'] = 'Frensh translation by Florent Baron (www.meteofontenay.fr)';
+
+// *** PLEASE DON'T TRANSLATE THE FOLLOWING ENTRIES *** THANKS!
 $_BL['fr']['MyBlitzortung_original'] = 'MyBlitzortung';
+$_BL['fr']['copyright_footer'] = 'Généré par {MYBO_ORIG}';
+$_BL['fr']['Blitzortung.org'] = 'Blitzortung.org';
+$_BL['fr']['Lightning data from Blitzortung.org'] = 'Données issues de Blitzortung.org';
 
 
+
+
+/*************************************************************/
+/* General                                                   */
+/*************************************************************/
 
 
 
@@ -96,7 +111,6 @@ $_BL['fr']['yes'] = 'oui';
 $_BL['fr']['distance'] = 'Distance';
 $_BL['fr']['Bearing'] = 'Direction';
 $_BL['fr']['Deviation'] = 'Déviation';
-$_BL['fr']['copyright_footer'] = 'Généré par {MYBO_ORIG}';
 $_BL['fr']['for_station'] = 'pour la station';
 $_BL['fr']['Entries'] = 'Entrées';
 
@@ -138,7 +152,6 @@ $_BL['fr']['Year'] = 'Année';
 $_BL['fr']['Month'] = 'Mois';
 $_BL['fr']['more'] = 'Plus';
 $_BL['fr']['stations'] = 'stations';
-$_BL['fr']['Blitzortung.org'] = 'Blitzortung.org';
 $_BL['fr']['Result'] = 'Résultat';
 $_BL['fr']['Time'] = 'Heure';
 $_BL['fr']['Current'] = 'Courant';
@@ -917,7 +930,6 @@ $_BL['fr']['Update failed!'] = 'Erreur de mise à jour!';
 /* Images                                                    */
 /*************************************************************/
 $_BL['fr']['Not enough data available!'] = 'Pas suffisament de données valides!';
-$_BL['fr']['Lightning data from Blitzortung.org'] = 'Données issues de Blitzortung.org';
 $_BL['fr']['No data available!'] = 'Pas de données!';
 
 
@@ -981,8 +993,6 @@ $_BL['fr']['since'] = 'depuis';
 
 
 
-
-
 /********************/
 /*  NOT TRANSLATED  */
 /********************/
@@ -990,5 +1000,23 @@ $_BL['fr']['since'] = 'depuis';
 
 //en: 'Avg. participants per strike locating'
 $_BL['fr']['Avg. participants per strike locating'] = '';
+
+//en: 'Period'
+$_BL['fr']['Period'] = '';
+
+//en: ''
+$_BL['fr']['bo_stat_network_descr'] = '';
+
+//en: 'Play'
+$_BL['fr']['ani_play'] = '';
+
+//en: 'Pause'
+$_BL['fr']['ani_pause'] = '';
+
+//en: 'Next'
+$_BL['fr']['ani_next'] = '';
+
+//en: 'Prev'
+$_BL['fr']['ani_prev'] = '';
 
 

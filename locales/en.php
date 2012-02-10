@@ -4,8 +4,12 @@ $_BL['locale'] = 'en';
 
 
 /*************************************************************/
-/* General                                                   */
+/* Names / Copyrights                                        */
+/*                                                           */
+/* Use BO_OWN_COPYRIGHT in config.php for                    */
+/* additional own copyright                                  */
 /*************************************************************/
+
 
 //Translated name of MyBlitzortung with html tags
 $_BL['en']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">LightningDetection</span>';
@@ -13,10 +17,22 @@ $_BL['en']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo
 //Translated name of MyBlitzortung without html tags
 $_BL['en']['MyBlitzortung_notags'] = 'MyLightningDetection';
 
-//Should stay original name (MyBlitzortung)
+//For displaying things like "translated by..." in footer
+$_BL['en']['copyright_extra'] = false;
+
+
+// *** PLEASE DON'T TRANSLATE THE FOLLOWING ENTRIES *** THANKS!
 $_BL['en']['MyBlitzortung_original'] = 'MyBlitzortung';
+$_BL['en']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
+$_BL['en']['Blitzortung.org'] = 'Blitzortung.org';
+$_BL['en']['Lightning data from Blitzortung.org'] = 'Lightning data from Blitzortung.org';
 
 
+
+
+/*************************************************************/
+/* General                                                   */
+/*************************************************************/
 
 
 
@@ -96,7 +112,6 @@ $_BL['en']['yes'] = 'yes';
 $_BL['en']['distance'] = 'Distance';
 $_BL['en']['Bearing'] = 'Bearing';
 $_BL['en']['Deviation'] = 'Deviation';
-$_BL['en']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['en']['for_station'] = 'for station';
 $_BL['en']['Entries'] = 'Entries';
 
@@ -138,7 +153,6 @@ $_BL['en']['Year'] = 'Year';
 $_BL['en']['Month'] = 'Month';
 $_BL['en']['more'] = 'More';
 $_BL['en']['stations'] = 'stations';
-$_BL['en']['Blitzortung.org'] = 'Blitzortung.org';
 $_BL['en']['Result'] = 'Result';
 $_BL['en']['Time'] = 'Time';
 $_BL['en']['Current'] = 'Current';
@@ -927,7 +941,6 @@ $_BL['en']['Update failed!'] = 'Update failed!';
 /* Images                                                    */
 /*************************************************************/
 $_BL['en']['Not enough data available!'] = 'Not enough data available!';
-$_BL['en']['Lightning data from Blitzortung.org'] = 'Lightning data from Blitzortung.org';
 $_BL['en']['No data available!'] = 'No data available!';
 
 
@@ -993,4 +1006,7 @@ $_BL['en']['ani_play'] = 'Play';
 $_BL['en']['ani_pause'] = 'Pause';
 $_BL['en']['ani_next'] = 'Next';
 $_BL['en']['ani_prev'] = 'Prev';
+$_BL['en']['no GPS signal'] = 'no GPS signal';
+$_BL['en']['no reception'] = 'no reception';
+
 

@@ -827,3 +827,7 @@ margin-left: 9px;
 color: red;
 text-decoration:none;
 }
+
+#myblitzortung .bo_err_text {
+color:red;
+}

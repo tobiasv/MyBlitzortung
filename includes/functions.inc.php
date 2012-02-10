@@ -436,6 +436,10 @@ function bo_copyright_footer()
 
 	echo '<div id="bo_copyright_extra">';
 	echo _BL('timezone_is').' <strong>'.date('H:i:s').' '._BL(date('T')).'</strong>';
+	
+	if (_BL('copyright_extra'))
+		echo ' &bull; '._BL('copyright_extra');
+	
 	echo '</div>';
 
 	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))

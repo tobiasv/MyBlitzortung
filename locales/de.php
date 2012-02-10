@@ -4,8 +4,12 @@ $_BL['locale'] = 'de';
 
 
 /*************************************************************/
-/* General                                                   */
+/* Names / Copyrights                                        */
+/*                                                           */
+/* Use BO_OWN_COPYRIGHT in config.php for                    */
+/* additional own copyright                                  */
 /*************************************************************/
+
 
 //Translated name of MyBlitzortung with html tags
 $_BL['de']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
@@ -13,10 +17,21 @@ $_BL['de']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo
 //Translated name of MyBlitzortung without html tags
 $_BL['de']['MyBlitzortung_notags'] = 'MyBlitzortung';
 
-//Should stay original name (MyBlitzortung)
+//For displaying things like "translated by..." in footer
+$_BL['de']['copyright_extra'] = false;
+
+// *** PLEASE DON'T TRANSLATE THE FOLLOWING ENTRIES *** THANKS!
 $_BL['de']['MyBlitzortung_original'] = 'MyBlitzortung';
+$_BL['de']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
+$_BL['de']['Blitzortung.org'] = 'Blitzortung.org';
+$_BL['de']['Lightning data from Blitzortung.org'] = 'Blitzdaten von Blitzortung.org';
 
 
+
+
+/*************************************************************/
+/* General                                                   */
+/*************************************************************/
 
 
 
@@ -96,7 +111,6 @@ $_BL['de']['yes'] = 'ja';
 $_BL['de']['distance'] = 'Entfernung';
 $_BL['de']['Bearing'] = 'Richtung';
 $_BL['de']['Deviation'] = 'Abweichung';
-$_BL['de']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['de']['for_station'] = 'für die Station';
 $_BL['de']['Entries'] = 'Einträge';
 
@@ -138,7 +152,6 @@ $_BL['de']['Year'] = 'Jahr';
 $_BL['de']['Month'] = 'Monat';
 $_BL['de']['more'] = 'Mehr';
 $_BL['de']['stations'] = 'Stationen';
-$_BL['de']['Blitzortung.org'] = 'Blitzortung.org';
 $_BL['de']['Result'] = 'Ergebnis';
 $_BL['de']['Time'] = 'Zeit';
 $_BL['de']['Current'] = 'Blitzstrom';
@@ -282,7 +295,9 @@ $_BL['de']['main_menu_login'] = 'Intern';
 /*************************************************************/
 $_BL['de']['map_options'] = 'Anzeige';
 $_BL['de']['only own strikes'] = 'nur Blitze der Station {STATION}';
-$_BL['de']['tile not available'] = "In dieser Zoomstufe\nhier keine Blitzdaten\nverfügbar!";
+$_BL['de']['tile not available'] = 'In dieser Zoomstufe
+hier keine Blitzdaten
+verfügbar!';
 $_BL['de']['update map'] = 'Aktualisieren';
 $_BL['de']['Click to set the map to Home'] = 'Klicken um wieder zur Anfangsposition zu gelangen.';
 $_BL['de']['Dynamic map'] = 'Dynamische Karte';
@@ -654,64 +669,66 @@ $_BL['de']['h3_info_usage'] = 'Verwendung der Daten';
 $_BL['de']['h3_info_hint'] = 'Wichtige Hinweise';
 
 $_BL['de']['info_general_warning'] = '
-		Für die hier dargebotenen Blitzinformation besteht kein Anspruch auf Vollständigkeit, 
-		Aktualität und Richtigkeit. Es wird keine Verantwortung für Schäden übernommen, 
-		die durch das Vertrauen auf die angebotenen Informationen oder deren Gebrauch entstehen.';
+Für die hier dargebotenen Blitzinformation besteht kein Anspruch auf Vollständigkeit,
+Aktualität und Richtigkeit. Es wird keine Verantwortung für Schäden übernommen,
+die durch das Vertrauen auf die angebotenen Informationen oder deren Gebrauch entstehen.';
 $_BL['de']['info_general_text'] = '
-		Blitzortung.org ist ein privates Netzwerk mehrerer Blitzortungsstationen, betrieben von Freiwilligen.
-		Die Stationen sind über ganz Europa verteilt und können im Verbund den Ort und Zeitpunkt eines
-		Blitzes registrieren. 
-									';
+Blitzortung.org ist ein privates Netzwerk mehrerer Blitzortungsstationen, betrieben von Freiwilligen.
+Die Stationen sind über ganz Europa verteilt und können im Verbund den Ort und Zeitpunkt eines
+Blitzes registrieren.
+';
+
+
 $_BL['de']['info_accuracy_text'] = '
-		Durch die hohe Stationsdichte innerhalb Deutschlands ist die Genauigkeit der Ortungen
-		in diesem Bereich bereits sehr gut, was anhand von Vergleichen mit kommerziellen Diensten
-		beobachtet werden konnte.
-		Physikalisch bedingt kann die Stelle eines Blitzeinschlags jedoch nie exakt
-		bestimmt werden, da jeder Blitz eine gewisse Ausdehnung im Bereich von mindestens mehreren 100 Metern hat.
-		In bestimmten Konstellationen können auch Fehl-Blitze angezeigt werden, also Blitze die so nie aufgetreten sind.
-		Geortete Blitze werden spätestens eine Minute später auf Blitzortung.org angezeigt und sind dann
-		kurz darauf auch auf dieser Internetseite verfügbar.
+Durch die hohe Stationsdichte innerhalb Deutschlands ist die Genauigkeit der Ortungen
+in diesem Bereich bereits sehr gut, was anhand von Vergleichen mit kommerziellen Diensten
+beobachtet werden konnte.
+Physikalisch bedingt kann die Stelle eines Blitzeinschlags jedoch nie exakt
+bestimmt werden, da jeder Blitz eine gewisse Ausdehnung im Bereich von mindestens mehreren 100 Metern hat.
+In bestimmten Konstellationen können auch Fehl-Blitze angezeigt werden, also Blitze die so nie aufgetreten sind.
+Geortete Blitze werden spätestens eine Minute später auf Blitzortung.org angezeigt und sind dann
+kurz darauf auch auf dieser Internetseite verfügbar.
 ';
 $_BL['de']['info_participate_text'] = '
-		Als Teilnehmer des Netzwerks erhält man Zugriff auf das komplette Archiv und detaillierte Karten.
-		Für die Teilnahme am Blitzortungsnetzwerk braucht man zunächst etwas Übung beim Umgang
-		mit dem Lötkolben. Für das Zusammenbauen der Platinen, anschließen der Antennen und des GPS-Empfängers
-		und die anschließende Inbetriebnahme sollte man ein paar Abende einplanen. Bei Problemen
-		bekommt man im 
-		<a href="http://www.wetter-board.de/index.php?page=Board&boardID=381" target="_blank">Wetter-Board</a> 
-		recht schnell Hilfestellungen von den andern Teilnehmern.
-		Die Gesamtkosten betragen um die 150 Euro. Weitere Infos dazu unter 
-		<a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=2" target="_blank">Blitzortung &gt; Mitmachen</a>.';
+Als Teilnehmer des Netzwerks erhält man Zugriff auf das komplette Archiv und detaillierte Karten.
+Für die Teilnahme am Blitzortungsnetzwerk braucht man zunächst etwas Übung beim Umgang
+mit dem Lötkolben. Für das Zusammenbauen der Platinen, anschließen der Antennen und des GPS-Empfängers
+und die anschließende Inbetriebnahme sollte man ein paar Abende einplanen. Bei Problemen
+bekommt man im
+<a href="http://www.wetter-board.de/index.php?page=Board&boardID=381" target="_blank">Wetter-Board</a>
+recht schnell Hilfestellungen von den andern Teilnehmern.
+Die Gesamtkosten betragen um die 150 Euro. Weitere Infos dazu unter
+<a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=2" target="_blank">Blitzortung &gt; Mitmachen</a>.';
 
 $_BL['de']['info_usage_text'] = '
-		Die hier und auf Blitzortung.org angebotenen Daten sind ausschließlich für den privaten 
-		Gebrauch der teilnehmenden Benutzer bestimmt.
-		Blitzortung.org ist kein offizieller Informationsdienst für Blitzdaten.
-		Eine gewerbliche Nutzung der hier angebotenen Informationen ist strengstens verboten!
-		Beachten Sie auch die Nutzungsbedingungen auf 
-		<a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=5" target="_blank">Blitzortung.org</a>
-		';
+Die hier und auf Blitzortung.org angebotenen Daten sind ausschließlich für den privaten
+Gebrauch der teilnehmenden Benutzer bestimmt.
+Blitzortung.org ist kein offizieller Informationsdienst für Blitzdaten.
+Eine gewerbliche Nutzung der hier angebotenen Informationen ist strengstens verboten!
+Beachten Sie auch die Nutzungsbedingungen auf
+<a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=5" target="_blank">Blitzortung.org</a>
+';
 $_BL['de']['info_myblitzortung_text'] = '
-		Die Aufbereitung und Visualisierung der Daten auf dieser Internetseite
-		erfolgt durch das Programm {MYBO}. Die Verwendung von {MYBO} erfolgt auf eigene
-		Verantwortung! Weder der Betreiber der Internetseite noch der/die Ersteller des Programms 
-		können für fehlerfreihe Funktion Garantieren. {MYBO} ist freie Software. Mehr
-		Informationen dazu unter 
-		<a href="http://www.myblitzortung.de" target="_blank">myblitzortung.de</a>.
-		';
+Die Aufbereitung und Visualisierung der Daten auf dieser Internetseite
+erfolgt durch das Programm {MYBO}. Die Verwendung von {MYBO} erfolgt auf eigene
+Verantwortung! Weder der Betreiber der Internetseite noch der/die Ersteller des Programms
+können für fehlerfreihe Funktion Garantieren. {MYBO} ist freie Software. Mehr
+Informationen dazu unter
+<a href="http://www.myblitzortung.de" target="_blank">myblitzortung.de</a>.
+';
 
-		
+
 /*************************************************************/
 /* Statistics: Descriptions                                  */
 /*************************************************************/
-		
+
 $_BL['de']['bo_graph_descr_ratio'] = '
-	Sowohl Blitz- als auch Ortungsqute sind wichtige Kenngrößen für die korrekte Justage
-	der Station und damit auch für die Qualität. Die Ortungsquote wird berechnet aus der 
-	der Anzahl detektierter Blitze einer Station durch die 
-	Anzahl der Signale einer Station.
-	Die Blitzquote ist der Quotient aus der Anzahl
-	detektierter Blitze durch die Gesamtanzahl aller Blitze des Stationsnetzwerks.';
+Sowohl Blitz- als auch Ortungsqute sind wichtige Kenngrößen für die korrekte Justage
+der Station und damit auch für die Qualität. Die Ortungsquote wird berechnet aus der
+der Anzahl detektierter Blitze einer Station durch die
+Anzahl der Signale einer Station.
+Die Blitzquote ist der Quotient aus der Anzahl
+detektierter Blitze durch die Gesamtanzahl aller Blitze des Stationsnetzwerks.';
 
 $_BL['de']['bo_stat_network_descr_lasth'] = 'Alle Angaben beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung. ';
 $_BL['de']['bo_stat_network_descr_table'] = 'Hier sind alle aktiven Stationen des Ortungsnetzwerks aufgelistet. Durch Anklicken der Spaltenüberschriften kann die Tabelle entsprechend sortiert werden.';
@@ -721,15 +738,15 @@ $_BL['de']['bo_stat_other_database_descr'] = 'Alle Blitze, Signal- und Stationsd
 $_BL['de']['bo_stat_other_updates_descr'] = 'In bestimmten Zeitintervallen werden alle notwendigen Daten von blitzortung.org geholt und auf dieser Seite gespeichert. Hier sind die Zeitpunkte der letzten Aktualisierung zu sehen:';
 $_BL['de']['bo_stat_other_gps_descr'] = 'Informationen zum GPS-Empfänger, welcher zur exakten Ermittlung der aktuellen Uhrzeit benötigt wird. Die Positionsdaten der letzten 24 Stunden sind in der Karte eingezeichnet. Falls die Antennenausrichtungen bekannt sind, so sind diese ebenfalls sichtbar.';
 $_BL['de']['bo_stat_station_descr_lasth'] = '
-	Die Blitzortungsstation {STATION_CITY} empfängt elektromagnetische Signale wie sie von Blitzen ausgesendet werden. 
-	Diese werden an Blitzortung.org gesendet, wo mit Hilfe der anderen Stationen Position und Zeitpunkt der Blitze 
-	ermittelt werden. Allerdings rührt nicht jedes Signal aus einem Blitz, auch wird nicht jeder Blitz registriert. 
-	Ortungs- und Blitzquoten geben darüber Auskunft (siehe unten). Zudem müssen mindestens {MIN_PARTICIPANTS} 
-	Stationen das Signal eines Blitzes empfangen, damit daraus die Position berechnet wird. 
-	Hat die Station {STATION_CITY} bei einer Ortung mit nur {MIN_PARTICIPANTS} Stationen teilgenommen, so wird dies 
-	als "eigener" Blitz gewertet. 
-	Alle Angaben folgenden 
-	beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung und beziehen sich nur auf die Station {STATION_CITY}:';
+Die Blitzortungsstation {STATION_CITY} empfängt elektromagnetische Signale wie sie von Blitzen ausgesendet werden.
+Diese werden an Blitzortung.org gesendet, wo mit Hilfe der anderen Stationen Position und Zeitpunkt der Blitze
+ermittelt werden. Allerdings rührt nicht jedes Signal aus einem Blitz, auch wird nicht jeder Blitz registriert.
+Ortungs- und Blitzquoten geben darüber Auskunft (siehe unten). Zudem müssen mindestens {MIN_PARTICIPANTS}
+Stationen das Signal eines Blitzes empfangen, damit daraus die Position berechnet wird.
+Hat die Station {STATION_CITY} bei einer Ortung mit nur {MIN_PARTICIPANTS} Stationen teilgenommen, so wird dies
+als "eigener" Blitz gewertet.
+Alle Angaben folgenden
+beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung und beziehen sich nur auf die Station {STATION_CITY}:';
 $_BL['de']['bo_graph_descr_radi'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Entfernung zur Station {STATION_CITY}. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
 $_BL['de']['bo_graph_descr_strikes'] = 'Zu sehen ist die Gesamtanzahl an Blitzen pro Stunde aus dem Ortungsnetzwerk, die Anzahl der detektierten Blitze der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
 $_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der empfangenen Signale pro Stunde der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
@@ -739,8 +756,8 @@ $_BL['de']['bo_graph_descr_bear_longtime'] = 'Dieses Diagramm wird seit Beginn d
 $_BL['de']['bo_graph_descr_strikes_time'] = 'Verlauf der Anzahl aller Blitze des Ortungsnetzwerkes bzw. der Station {STATION}';
 $_BL['de']['bo_graph_descr_strikes_time_radius'] = 'Hier werden nur die Blitze gezählt, welche eine maximale Distanz von {RADIUS}km um die Station {STATION} aufweisen.';
 $_BL['de']['bo_graph_stations'] = 'Aktive Stationen senden Signale und nehmen somit an Blitzortungen teil. Verfügbare Stationen sind dagegen offline, z. B. wegen Wartungsarbeiten, Defekten.';
-$_BL['de']['bo_graph_participants'] = 'Je mehr Stationen einen Blitz empfangen, desto sicherer ist dessen Existent bzw. desto genauer ist dessen Position. 
-										Für eine Ortung müssen mindestens {MIN_PARTICIPANTS} Stationen ein entsprechendes Signal empfangen haben.';
+$_BL['de']['bo_graph_participants'] = 'Je mehr Stationen einen Blitz empfangen, desto sicherer ist dessen Existent bzw. desto genauer ist dessen Position.
+Für eine Ortung müssen mindestens {MIN_PARTICIPANTS} Stationen ein entsprechendes Signal empfangen haben.';
 $_BL['de']['bo_graph_log_warn'] = 'Achtung: Die Anzahl der Blitze ist logarithmisch aufgetragen!';
 $_BL['de']['bo_graph_participants_time'] = 'Es kann der Verlauf des Mittelwerts oder der Verlauf des prozentualen Anteil einzelner Teilnehmerzahlen angezeigt werden.';
 $_BL['de']['bo_graph_descr_radi_adv'] = 'Wie Blitzquote unter unter der Stations-Statistik, hier kann jedoch der entsprechende Kanal mit berücksichtigt werden.';
@@ -763,54 +780,54 @@ $_BL['de']['bo_stat_other_station_info_back'] = 'Zurück zur Station {STATION}';
 /* Archives descriptions                                     */
 /*************************************************************/
 
-$_BL['de']['archive_search_info'] = 'Hier können die letzten {COUNT} Blitze für einen bestimmten Bereich 
-auf der Karte abgefragt werden. Dazu den Marker an die gewünschte Stelle ziehen um die Koordinaten zu setzen, 
-einen Radius angeben und auf Suchen klicken. Die Blitze werden anschließend in der Karte als farbige Punkte 
-angezeigt. Durch Klick auf einen Punkt lassen sich weitere Informationen abrufen. Die Suche ist nur innerhalb 
+$_BL['de']['archive_search_info'] = 'Hier können die letzten {COUNT} Blitze für einen bestimmten Bereich
+auf der Karte abgefragt werden. Dazu den Marker an die gewünschte Stelle ziehen um die Koordinaten zu setzen,
+einen Radius angeben und auf Suchen klicken. Die Blitze werden anschließend in der Karte als farbige Punkte
+angezeigt. Durch Klick auf einen Punkt lassen sich weitere Informationen abrufen. Die Suche ist nur innerhalb
 des rot markierten Kreises um die Station möglich!';
 
-$_BL['de']['archive_map_info'] = 'Hier können Blitze tagweise auf verschiedenen Karten dargestellt werden. 
-Alternativ stehen auch Animationen zur Verfügung. Beachten Sie hierbei entsprechend längere Ladezeiten. 
+$_BL['de']['archive_map_info'] = 'Hier können Blitze tagweise auf verschiedenen Karten dargestellt werden.
+Alternativ stehen auch Animationen zur Verfügung. Beachten Sie hierbei entsprechend längere Ladezeiten.
 Die Blitzdaten sind von {DATE_START} bis {DATE_END} verfügbar. Vollständigkeit kann nicht garantiert werden.';
 
-$_BL['de']['archive_density_info'] = 'Für verschiedene Regionen können hier die Blitzdichten angezeigt werden. 
+$_BL['de']['archive_density_info'] = 'Für verschiedene Regionen können hier die Blitzdichten angezeigt werden.
 Dies ist unabhängig von den im Archiv vorhanden Einzelblitzen möglich, da die Dichten separat gespeichert werden.
 Die Blitzdichten sind nicht normiert, d. h. durch regional unterschiedliche Stationsdichten weichen die angegebenen
 Daten mehr oder weniger stark von der Realität ab.
-Auch im zeitlichen Verlauf ist dies der Fall, da die Ortungen des Stationsnetzwerkes immer weiter optimiert werden und somit 
-immer mehr Blitze registriert werden. 
-Ein Vergleich der absoluten Zahlen über einen größeren Zeitraum ist von daher nicht immer sinnvoll. 
+Auch im zeitlichen Verlauf ist dies der Fall, da die Ortungen des Stationsnetzwerkes immer weiter optimiert werden und somit
+immer mehr Blitze registriert werden.
+Ein Vergleich der absoluten Zahlen über einen größeren Zeitraum ist von daher nicht immer sinnvoll.
 Innerhalb einer Region mit entsprechender Anzahl an Stationen sowie innerhalb eines kurzen Zeitraums ist dies dagegen sehr gut möglich.
 <br><br>
-Bei der Auswahl einer Ortungsstation werden nur von dieser registrierte Blitze einbezogen. 
-Somit lässt sich deren Blitzquote anzeigen, d.h. die Regionen in denen die Station Blitze mehr oder weniger gut empfängt. 
+Bei der Auswahl einer Ortungsstation werden nur von dieser registrierte Blitze einbezogen.
+Somit lässt sich deren Blitzquote anzeigen, d.h. die Regionen in denen die Station Blitze mehr oder weniger gut empfängt.
 Dies kann Aufschluss über Empfangseigenschaften der Station sowie auf atmosphärische Einflüsse geben.
 ';
 
 $_BL['de']['archive_signaltable_info'] = '
-Jede Ortungsstation von blitzortung.org empfängt die Signale von Blitzen sowie auch Störsignale 
-aus der Umgebung - so auch die Station {STATION}. 
-Auf dieser Seite sind die zuletzt empfangenen Signale der Station {STATION} zu sehen. 
-Nur ein gewisser Prozentsatz dieser Signale werden letztendlich als Blitz registriert, nämlich dann, 
+Jede Ortungsstation von blitzortung.org empfängt die Signale von Blitzen sowie auch Störsignale
+aus der Umgebung - so auch die Station {STATION}.
+Auf dieser Seite sind die zuletzt empfangenen Signale der Station {STATION} zu sehen.
+Nur ein gewisser Prozentsatz dieser Signale werden letztendlich als Blitz registriert, nämlich dann,
 wenn diese auch andere Stationen zum richtigen Zeitpunkt empfangen (TOA-Methode - Time of arrival).
 Informationen zum Blitz werden dann entsprechend mit angegeben. Erläuterungen zu den Angaben
 sind am Ende der Seite zu finden.
 ';
 
 $_BL['de']['archive_striketable_info'] = '
-Die hier gezeigten Informationen entsprechen denen auf der Seite "Signale", es werden jedoch alle Blitze angezeigt. 
+Die hier gezeigten Informationen entsprechen denen auf der Seite "Signale", es werden jedoch alle Blitze angezeigt.
 Um im Einklang mit den Blitzortung.org-Teilnehmer-Nutzungsbedingungen zu bleiben, wird diese Seite nur für
 User eingeblendet.
 <br><br>
 Bei der Anzeige der "Details" werden die teilgenommen Stationen in der Reihenfolge der Entfernung zum berechneten Blitzort angezeigt.
 Die Stationen werden zudem markiert, entsprechend der Reihenfolge "Mindestteilnehmerzahl", "Zusätzliche Teilnehmer" und
-"Teilgenommen, aber nicht in Berechnung eingeflossen". 
-Die Hyperbeln in der Karte werden aus den vorhandenen Entfernung 
-zwischen station Station und Blitz berechnet und NICHT aus den Signaldaten der Stationen, 
-da diese {MYBO_ORIG} unbekannt sind. 
-Sie dienen allein der Veranschaulichung, 
-stellen aber nicht die eigentliche Berechnung über Hyperbelschnittpunkte (mit Fehlern) dar. 
-Die Hyperbeln werden jeweils zwischen allen markierten Stationen berechnet, 
+"Teilgenommen, aber nicht in Berechnung eingeflossen".
+Die Hyperbeln in der Karte werden aus den vorhandenen Entfernung
+zwischen station Station und Blitz berechnet und NICHT aus den Signaldaten der Stationen,
+da diese {MYBO_ORIG} unbekannt sind.
+Sie dienen allein der Veranschaulichung,
+stellen aber nicht die eigentliche Berechnung über Hyperbelschnittpunkte (mit Fehlern) dar.
+Die Hyperbeln werden jeweils zwischen allen markierten Stationen berechnet,
 dies müssen aber nicht die selben sein wie vom Blitzortung.org-Rechenserver.
 ';
 
@@ -869,14 +886,14 @@ $_BL['de']['Create new alert'] = 'Neuen Alarm erstellen';
 $_BL['de']['Change settings'] = 'Einstellungen ändern';
 $_BL['de']['SMS'] = 'SMS';
 $_BL['de']['alert_mail_description'] = 'Die folgenden Angaben wurden von {MYBO_NOTAGS} der Station {STATION} automatisch ermittelt und versendet. Ohne Gewähr!';
-$_BL['de']['alert_mail_time range']   = 'Untersuchter Zeitraum ';
-$_BL['de']['alert_mail_strikes']      = 'Anzahl an Blitzen     ';
-$_BL['de']['alert_mail_distance']     = 'Entfernung            ';
-$_BL['de']['alert_mail_last_strike']  = 'Letzter Blitz         ';
-$_BL['de']['alert_mail_first_strike'] = 'Erster Blitz          ';
-$_BL['de']['alert_sms_last_strike']   = 'Letzter Blitz';
-$_BL['de']['alert_sms_distance']      = 'Entfernung';
-$_BL['de']['alert_sms_description']   = '{MYBO_NOTAGS} Station {STATION}';
+$_BL['de']['alert_mail_time range'] = 'Untersuchter Zeitraum ';
+$_BL['de']['alert_mail_strikes'] = 'Anzahl an Blitzen ';
+$_BL['de']['alert_mail_distance'] = 'Entfernung ';
+$_BL['de']['alert_mail_last_strike'] = 'Letzter Blitz ';
+$_BL['de']['alert_mail_first_strike'] = 'Erster Blitz ';
+$_BL['de']['alert_sms_last_strike'] = 'Letzter Blitz';
+$_BL['de']['alert_sms_distance'] = 'Entfernung';
+$_BL['de']['alert_sms_description'] = '{MYBO_NOTAGS} Station {STATION}';
 $_BL['de']['No alerts available. Create one yourself!'] = 'Noch keine Alarme vorhanden.';
 $_BL['de']['You must fill all fields!'] = 'Es müssen alle Felder ausgefüllt werden!';
 $_BL['de']['Wrong format of E-Mail address'] = 'Falsches Format der E-Mail-Adresse';
@@ -918,37 +935,44 @@ $_BL['de']['Really continue?'] = 'Wirklich fortfahren?';
 $_BL['de']['Couldnt get login id'] = 'Konnte Login Kennung nicht holen';
 
 $_BL['de']['mybo_station_update_info'] = '
-		<p>
-		Hier hast Du die Möglichkeit Deine {MYBO_NOTAGS}-Webseite mit anderen Stationen 
-		zu verknüpfen, die ebenfalls {MYBO_NOTAGS} einsetzen.
-		</p>
-		
-		<p>
-		Die folgenden Dinge werden passieren wenn Du fortfährst:
-		</p>
-		
-		<ul>
-		<li>1. Deine Stations-ID, Deine Website-Adresse sowie die von Dir hinterlegten Koordinaten werden zu <em>{LINK_HOST}</em> gesendet.
-		</li>
-		<li>2. Gleichzeitig bekommst Du eine Liste von Stationen, die dies ebenfalls getan haben zurück.
-		</li>
-		</ul>
-		
-		<p>
-		Du solltest diese Daten von Zeit zu Zeit erneuern bzw. die automatische Aktualisierung aktivieren.
-		</p>
-		
-		<p>
-		Wichtiger HINWEIS:
-		Um Dich als Teilnehmer zu authentifizieren, wird mit Deinen Zugangsdaten erst einmal 
-		eine Login-Kennung bei blitzortung.org abgefragt, so wie es auch automatisch beim Hohlen
-		neuer Blitzdaten geschieht.
-		Diese wird (ohne das Passwort!) an <em>{LINK_HOST}</em> gesendet und dort wiederrum bei blitzortung.org überprüft.
-		Somit ist sichergestellt, dass nur Teilnehmer diesen Mechanismus benutzen können.
-		Die Login-Kennung wird nicht gespeichert. Sie wird sofort wieder unbrauchbar gemacht.
-		Dein Passwort selbst wird <strong>niemals an andere Webseiten</strong> außer blitzortung.org gesendet!
-		Um dieses Feature nutzen zu können, muss Deine Station in den letzten zwei Stunden Signale gesendet haben.
-		</p>';
+<p>
+Hier hast Du die Möglichkeit Deine {MYBO_NOTAGS}-Webseite mit anderen Stationen
+zu verknüpfen, die ebenfalls {MYBO_NOTAGS} einsetzen.
+</p>
+
+<p>
+Die folgenden Dinge werden passieren wenn Du fortfährst:
+</p>
+
+<ul>
+<li>1. Deine Stations-ID, Deine Website-Adresse sowie die von Dir hinterlegten Koordinaten werden zu <em>{LINK_HOST}</em> gesendet.
+</li>
+<li>2. Gleichzeitig bekommst Du eine Liste von Stationen, die dies ebenfalls getan haben zurück.
+</li>
+</ul>
+
+<p>
+Du solltest diese Daten von Zeit zu Zeit erneuern bzw. die automatische Aktualisierung aktivieren.
+</p>
+
+<p>
+Wichtiger HINWEIS:
+Um Dich als Teilnehmer zu authentifizieren, wird mit Deinen Zugangsdaten erst einmal
+eine Login-Kennung bei blitzortung.org abgefragt, so wie es auch automatisch beim Hohlen
+neuer Blitzdaten geschieht.
+Diese wird (ohne das Passwort!) an <em>{LINK_HOST}</em> gesendet und dort wiederrum bei blitzortung.org überprüft.
+Somit ist sichergestellt, dass nur Teilnehmer diesen Mechanismus benutzen können.
+Die Login-Kennung wird nicht gespeichert. Sie wird sofort wieder unbrauchbar gemacht.
+Dein Passwort selbst wird <strong>niemals an andere Webseiten</strong> außer blitzortung.org gesendet!
+Um dieses Feature nutzen zu können, muss Deine Station in den letzten zwei Stunden Signale gesendet haben.
+</p>';
+
+
+
+
+
+
+
 
 /*************************************************************/
 /* Update                                                    */
@@ -966,7 +990,6 @@ $_BL['de']['Update failed!'] = 'Update fehlgeschlagen!';
 /* Images                                                    */
 /*************************************************************/
 $_BL['de']['Not enough data available!'] = 'Nicht genügend Daten vorhanden!';
-$_BL['de']['Lightning data from Blitzortung.org'] = 'Blitzdaten von Blitzortung.org';
 $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 
 
@@ -1028,10 +1051,21 @@ $_BL['de']['since'] = 'seit';
 $_BL['de']['Period'] = 'Zeitraum';
 $_BL['de']['bo_stat_network_descr'] = false;
 
-
 $_BL['de']['ani_play'] = 'Play';
 $_BL['de']['ani_pause'] = 'Pause';
 $_BL['de']['ani_next'] = 'Weiter';
 $_BL['de']['ani_prev'] = 'Zurück';
+$_BL['de']['no GPS signal'] = 'kein GPS-Signal';
+$_BL['de']['no reception'] = 'kein Empfang';
+
+
+
+
+/********************/
+/*  NOT TRANSLATED  */
+/********************/
+
+
+
 
 

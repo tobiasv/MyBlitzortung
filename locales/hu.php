@@ -1,11 +1,15 @@
-<?php 
+<?php
 
 $_BL['locale'] = 'hu';
 
 
 /*************************************************************/
-/* General                                                   */
+/* Names / Copyrights                                        */
+/*                                                           */
+/* Use BO_OWN_COPYRIGHT in config.php for                    */
+/* additional own copyright                                  */
 /*************************************************************/
+
 
 //Translated name of MyBlitzortung with html tags
 $_BL['hu']['MyBlitzortung'] = '<span class="bo_my">Saját</span><span class="bo_mybo"> Villám Radar</span>';
@@ -13,10 +17,21 @@ $_BL['hu']['MyBlitzortung'] = '<span class="bo_my">Saját</span><span class="bo_m
 //Translated name of MyBlitzortung without html tags
 $_BL['hu']['MyBlitzortung_notags'] = 'Saját Villám Radar';
 
-//Should stay original name (MyBlitzortung)
+//For displaying things like "translated by..." in footer
+$_BL['hu']['copyright_extra'] = 'Hungarian translation by Gábor Flaisz (www.flaiszg.hu)';
+
+// *** PLEASE DON'T TRANSLATE THE FOLLOWING ENTRIES *** THANKS!
 $_BL['hu']['MyBlitzortung_original'] = 'MyBlitzortung';
+$_BL['hu']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
+$_BL['hu']['Blitzortung.org'] = 'Blitzortung.org';
+$_BL['hu']['Lightning data from Blitzortung.org'] = 'Villám adatok Blitzortung.org';
 
 
+
+
+/*************************************************************/
+/* General                                                   */
+/*************************************************************/
 
 
 
@@ -95,7 +110,6 @@ $_BL['hu']['yes'] = 'igen';
 $_BL['hu']['distance'] = 'távolság';
 $_BL['hu']['Bearing'] = 'Figyelembe';
 $_BL['hu']['Deviation'] = 'Eltérés';
-$_BL['hu']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['hu']['for_station'] = 'Az állomás';
 $_BL['hu']['Entries'] = 'Bejegyzés';
 
@@ -137,7 +151,6 @@ $_BL['hu']['Year'] = 'Év';
 $_BL['hu']['Month'] = 'Hónap';
 $_BL['hu']['more'] = 'több';
 $_BL['hu']['stations'] = 'állomások';
-$_BL['hu']['Blitzortung.org'] = 'Blitzortung.org';
 $_BL['hu']['Result'] = 'Eredmény';
 $_BL['hu']['Time'] = 'Idö';
 $_BL['hu']['Current'] = 'Jelenlegi';
@@ -270,7 +283,7 @@ $_BL['hu']['main_menu_login'] = 'Felhasználói Felület';
 $_BL['hu']['map_options'] = 'Térkép beállítás';
 $_BL['hu']['only own strikes'] = 'Csak {STATION} észlelései';
 $_BL['hu']['tile not available'] = 'Ezen a nagyítási szinten
-nincs villám 
+nincs villám
 adat!';
 $_BL['hu']['update map'] = 'Térkép frissítés';
 $_BL['hu']['Click to set the map to Home'] = 'Kattincson, hogy menjen vissza a kiinduló helyre.';
@@ -630,8 +643,8 @@ $_BL['hu']['info_participate_text'] = '
 A hállózat minden résztvevöje hozzáférést kap a blitzortung.org teljes archivumához és részletes térképeihez.
 Ha hállózati tag szeretnél lenni, nem kell más, csak egy pár gyakorlott kéz, a forrasztópáka kezeléshez, és kb.150 €.
 (Áramköri lapoknak, antennának, és GPS vevö).
-Probléma esetén kapsz segítséget a többi résztvevötöl 
-<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank"> FÓRUM</a> oldalon.	
+Probléma esetén kapsz segítséget a többi résztvevötöl
+<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank"> FÓRUM</a> oldalon.
 További információ:
 <a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=2" target="_blank"> Blitzortung Csatlakozás </a>. ';
 
@@ -642,7 +655,7 @@ A felhasználási feltételek bövebben:
 <a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=5" target="_blank">Blitzortung.org</a>
 ';
 $_BL['hu']['info_myblitzortung_text'] = '
-A vizualizációs adatok ezen az oldalon készülnek el, {MYBO} ({MYBO_ORIG}) programmal. 
+A vizualizációs adatok ezen az oldalon készülnek el, {MYBO} ({MYBO_ORIG}) programmal.
 A {MYBO} csak saját felelöségre használható!
 Sem a szoláltató, sem a honlap üzemeltetö nem vállal felelöséget!
 {MYBO_ORIG} szabad softver. További, bövebb információ:
@@ -790,7 +803,7 @@ $_BL['hu']['Couldnt get login id'] = 'Nem kapott azonosítót ';
 
 $_BL['hu']['mybo_station_update_info'] = '
 <p>
-Ezzel a funkcióval lehet kapcsolni a {MYBO_ORIG} telepítést 
+Ezzel a funkcióval lehet kapcsolni a {MYBO_ORIG} telepítést
 A következö fog történni, ha rákattint a linkre:
 </p>
 
@@ -836,7 +849,6 @@ $_BL['hu']['Update failed!'] = 'Frissítés nem sikerült!';
 /* Images                                                    */
 /*************************************************************/
 $_BL['hu']['Not enough data available!'] = 'Nem áll rendelkezésre elegendö adat!';
-$_BL['hu']['Lightning data from Blitzortung.org'] = 'Villám adatok Blitzortung.org';
 $_BL['hu']['No data available!'] = 'Nincs adat!';
 
 
@@ -864,7 +876,7 @@ $_BL['hu']['Poland'] = 'Lengyelország';
 $_BL['hu']['Spain'] = 'Spanyolország';
 $_BL['hu']['Sweden'] = 'Svédország';
 $_BL['hu']['The Netherlands'] = 'Hollandia';
-$_BL['hu']['United Kingdom'] = 'Egyesült Királyság	';
+$_BL['hu']['United Kingdom'] = 'Egyesült Királyság ';
 $_BL['hu']['Bulgaria'] = 'Bulgária';
 $_BL['hu']['Albania'] = 'Albánia';
 $_BL['hu']['Russia'] = 'Oroszország';
@@ -894,15 +906,13 @@ $_BL['hu']['Meteox rain radar'] = 'Eso radar (meteox.com)';
 
 
 
-
-
-
-
-
 /********************/
 /*  NOT TRANSLATED  */
 /********************/
 
+
+//en: 'hours'
+$_BL['hu']['hours'] = '';
 
 //en: 'Using auth ID'
 $_BL['hu']['Using auth ID'] = '';
@@ -1028,29 +1038,29 @@ $_BL['hu']['Force data purge only'] = '';
 $_BL['hu']['Check alerts only'] = '';
 
 //en: 'Here you can display the lightning strikes for each day on different maps.
-// It is also possible to view animated maps, but consider that it will take some time to load them. 
+// It is also possible to view animated maps, but consider that it will take some time to load them.
 // Lightning data is available from {DATE_START} to {DATE_END}. There\'s no guarantee for completeness.
 // '
 $_BL['hu']['archive_map_info'] = '';
 
 //en: '
 // Here you can display lightning densities for different regions. This data is saved independently from
-// the other strike data. 
+// the other strike data.
 // <br>
 // <br>
-// Some hints: The data displayed here is not standardized, 
+// Some hints: The data displayed here is not standardized,
 // so the results can not be compared over longer time ranges or bigger regions!
-// This is due to different station coverage and improved lightning detection. 
+// This is due to different station coverage and improved lightning detection.
 // You can switch to a detection station and select between different views.
 // '
 $_BL['hu']['archive_density_info'] = '';
 
 //en: '
-// Ever lightning detection stations of the Blitzortung.org network receives signal from strikes and also 
-// more or less noise. Here you can see some of the signals, that where received from the station {STATION} 
-// during the last minutes. 
-// If other stations receives the same signal during a very short time range then maybe a lightning can be 
-// located out of the correspondending times (time of arrival method - TOA). 
+// Ever lightning detection stations of the Blitzortung.org network receives signal from strikes and also
+// more or less noise. Here you can see some of the signals, that where received from the station {STATION}
+// during the last minutes.
+// If other stations receives the same signal during a very short time range then maybe a lightning can be
+// located out of the correspondending times (time of arrival method - TOA).
 // In this case additional information about the lightning strike will be displayed here.
 // '
 $_BL['hu']['archive_signaltable_info'] = '';
@@ -1066,7 +1076,7 @@ $_BL['hu']['archive_striketable_info'] = '';
 
 //en: '
 // <p>
-// If a lightning strike was detected, some additional information correspondending to the station {STATION} will be displayed. 
+// If a lightning strike was detected, some additional information correspondending to the station {STATION} will be displayed.
 // </p>
 // <ul>
 // <li><span class="bo_descr">Runtime:</span> Difference between time of strike and reception</li>
@@ -1091,4 +1101,32 @@ $_BL['hu']['Rome'] = '';
 
 //en: 'Lithuania'
 $_BL['hu']['Lithuania'] = '';
+
+//en: 'Specials'
+$_BL['hu']['Specials'] = '';
+
+//en: 'Importing data...'
+$_BL['hu']['Importing data...'] = '';
+
+//en: 'since'
+$_BL['hu']['since'] = '';
+
+//en: 'Period'
+$_BL['hu']['Period'] = '';
+
+//en: ''
+$_BL['hu']['bo_stat_network_descr'] = '';
+
+//en: 'Play'
+$_BL['hu']['ani_play'] = '';
+
+//en: 'Pause'
+$_BL['hu']['ani_pause'] = '';
+
+//en: 'Next'
+$_BL['hu']['ani_next'] = '';
+
+//en: 'Prev'
+$_BL['hu']['ani_prev'] = '';
+
 

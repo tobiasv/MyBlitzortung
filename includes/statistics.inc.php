@@ -305,6 +305,8 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 //show station-statistics
 function bo_show_statistics_station($station_id = 0, $own_station = true, $add_graph = '')
 {
+	$strikesh_own = 0;
+	$signalsh_own = 0;
 	$own_station_info = bo_station_info();
 	$stInfo = bo_station_info($station_id);
 	$city = _BC($stInfo['city']);
@@ -312,50 +314,66 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	if ($stInfo['country'] != $own_station_info['country'])
 		$city .= ' ('._BL($stInfo['country']).')';
 	
-	$sql = "SELECT signalsh, strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id')";
-	$row = bo_db($sql)->fetch_assoc();
-	$strikesh_own = $row['strikesh'];
-	$signalsh_own = $row['signalsh'];
-	$time_own = $row['time'] ? strtotime($row['time'].' UTC') : false;
-
+	//Last overall stroke count and time
 	$row = bo_db("SELECT strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='0' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
 	$strikesh = $row['strikesh'];
-	$time = strtotime($row['time'].' UTC');
-
+	$stations_time = strtotime($row['time'].' UTC');
+	$last_update = (time()-$stations_time)/60;
+	
+	//Whole active station count
 	$row = bo_db("SELECT COUNT(station_id) cnt FROM ".BO_DB_PREF."stations_stat a WHERE time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
 	$stations = $row['cnt'] - 1;
-	
+
+	//Own strokes
 	if ($own_station)
 	{
+		$add = '';
+		
 		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."strikes 
-				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $time)."'
+				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $stations_time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $stations_time)."'
 						AND part>0 AND users='".bo_participants_locating_min()."'";
 		$row = bo_db($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
-		
-		$act_time = bo_get_conf('station_last_active');
-		$inact_time = bo_get_conf('station_last_inactive');
-		$active = $act_time > $inact_time;
 	}
 	else
 	{
+		$add = '#'.$station_id.'#';
+		
 		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."strikes s
 				JOIN ".BO_DB_PREF."stations_strikes ss
 				ON s.id=ss.strike_id AND ss.station_id='$station_id'
-				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $time)."'
+				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $stations_time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $stations_time)."'
 						AND users='".bo_participants_locating_min()."'";
 		$row = bo_db($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
-		
-		$active = $time_own + 3600 >= $time;
 	}
+
+	if ($own_station || (defined('BO_STATISTICS_ALL_STATIONS') && BO_STATISTICS_ALL_STATIONS))
+	{
+		$act_time = bo_get_conf('station_last_active'.$add);
+		$inact_time = bo_get_conf('station_last_inactive'.$add);
+	}
+	
+	//Get the last non-zero signals or strikes for the station
+	$sql = "SELECT signalsh, strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id')";
+	$row = bo_db($sql)->fetch_assoc();
+	$time_last_good_signals = $row['time'] ? strtotime($row['time'].' UTC') : false;
+	$last_active = $time_last_good_signals ? (time()-$time_last_good_signals)/60 : false;
+	
+	if ($stations_time == $time_last_good_signals)
+	{
+		$strikesh_own = $row['strikesh'];
+		$signalsh_own = $row['signalsh'];
+	}
+
+	
+
 	
 	$tmp = @unserialize(bo_get_conf('last_strikes_stations'));
 	$last_strike = $tmp[$station_id][0];
 	$last_signal = strtotime($stInfo['last_time'].' UTC');
+	$active = $stInfo['status'] == 'A' || $stInfo['status'] == 'V';
 	
-	$last_update = (time()-$time)/60;
-	$last_active = $time_own ? (time()-$time_own)/60 : false;
 
 	if (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES)
 		$dens_stations = bo_get_density_stations();
@@ -369,7 +387,35 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	echo '</p>';
 	
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('Station active').': </span><span class="bo_value">'.($active ? _BL('yes') : _BL('no')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Station active').': </span>';
+	echo '<span class="bo_value">';
+	
+	echo '<strong>';
+	echo $active ? _BL('yes') : _BL('no');
+	echo '</strong>';
+	
+	
+	if ($active)
+	{
+		if ($stInfo['status'] == 'V')
+		{
+			echo ' / ';
+			echo '<span class="bo_err_text">';
+			echo _BL('no GPS signal');
+			echo '</span>';
+		}
+
+		if (!$signalsh_own)
+		{
+			echo ' / ';
+			echo '<span class="bo_err_text">';
+			echo _BL('no reception');
+			echo '</span>';
+		}
+
+	}
+	
+	echo '</span>';
 
 	if (!$active)
 	{
@@ -604,10 +650,12 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	
 	foreach($user_stations as $d)
 	{
-		if ($d['status'] != 'A')
-			continue;
-			
 		$id = $d['id'];
+		
+		
+		if ($d['status'] != 'A' && $d['status'] != 'V' && $station_id != $id)
+			continue;
+				
 		
 		$D[$id]['country'] = _BL($d['country']);
 		$D[$id]['city'] = $d['city'];
