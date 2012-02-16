@@ -537,6 +537,32 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	else
 		bo_show_graph('ratio_bearing', $add_graph);
 
+
+
+    echo '<h3>'._BL('h4_graph_residual_time').'</h3>';
+    echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_station_residual_time">';
+    echo _BL('bo_graph_descr_strikes_station_residual_time');
+    echo '</p>';
+    bo_show_graph('strikes_station_residual_time', $add_graph);
+
+    $time_max = time();
+    $time_max = floor($time_max / 60) * 60 - 5 * 60; //round
+
+    $strikes_sql = "SELECT time, time_ns, distance FROM strikes
+            WHERE time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * 2) .
+        "' AND '" . gmdate('Y-m-d H:i:s', $time_max) . "';";
+    $strikes_res = bo_db($strikes_sql);
+
+    $strikes_row = $strikes_res->fetch_assoc();
+    $timestamp1 = new Timestamp($strikes_row['time'], $strikes_row['time_ns']);
+    $strikes_row = $strikes_res->fetch_assoc();
+    $timestamp2 = new Timestamp($strikes_row['time'], $strikes_row['time_ns']);
+
+    print $timestamp1 . '<br/>';
+    print $timestamp2 . '<br/>';
+    print ($timestamp1->isBefore($timestamp2) ? "Yes" : "No") . '<br/>';
+    print ($timestamp2->isBefore($timestamp1) ? "Yes" : "No") . '<br/>';
+    print ($timestamp1->isBefore($timestamp1) ? "Yes" : "No") . '<br/>';
 	echo '</div>';
 }
 
