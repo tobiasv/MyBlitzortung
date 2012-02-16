@@ -258,7 +258,7 @@ function bo_show_archive_map()
 
 	echo '<a name="bo_arch_strikes_maps_form"></a>';
 	echo '<form action="?#bo_arch_strikes_maps_form" method="GET" class="bo_arch_strikes_form" id="bo_arch_strikes_maps_form">';
-	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_ok', 'bo_oldmap'));
+	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_get', 'bo_oldmap'));
 	echo '<input type="hidden" name="bo_oldmap" value="'.$map.'">';
 	echo '<input type="hidden" name="bo_oldani" value="'.($ani ? 1 : 0).'">';
 	
@@ -478,6 +478,7 @@ function bo_show_archive_search()
 	$select_count = $max_count;
 	$perm = (bo_user_get_level() & BO_PERM_NOLIMIT);
 	
+	
 	echo '<div id="bo_archive">';
 	echo '<p class="bo_general_description" id="bo_archive_search_info">';
 	echo strtr(_BL('archive_search_info'), array('{COUNT}' => $perm ? '' : $max_count));
@@ -494,7 +495,7 @@ function bo_show_archive_search()
 		$map_lon = (double)$_GET['bo_map_lon'];
 		$zoom = (int)$_GET['bo_map_zoom'];
 		$delta_dist = (int)$_GET['bo_dist'];
-		$getit = isset($_GET['bo_ok']);
+		$getit = isset($_GET['bo_get']);
 		
 		if ( $perm && (int)$_GET['bo_count'])
 		{
@@ -515,21 +516,32 @@ function bo_show_archive_search()
 				$time_to = '';
 				
 		}
+		elseif (!$perm && bo_latlon2dist($lat, $lon, BO_LAT, BO_LON) > $radius)
+		{
+			//marker is too far away from home
+			$getit = false;
+			
+			echo '<p>'._BL('search_outside_radius').'</p>';
+		}
+	}
+	elseif ($perm && $_GET['bo_strike_id'])
+	{
+		$getit = true;
+		$get_by_id = intval($_GET['bo_strike_id']);
+		$zoom = 4;
+		$lat = $lon = false;
+		$map_lat = BO_LAT;
+		$map_lon = BO_LON;
 	}
 	else
 	{
 		$map_lat = $lat = BO_LAT;
 		$map_lon = $lon = BO_LON;
 		$zoom = BO_DEFAULT_ZOOM_ARCHIVE;
-		$delta_dist = 10000;
+		$delta_dist = BO_ARCHIVE_SEARCH_RADIUS_DEFAULT * 1000;
 	}
 
-	if ($perm && $_GET['bo_strike_id'])
-	{
-		$getit = true;
-		$get_by_id = intval($_GET['bo_strike_id']);
-		$zoom = 4;
-	}
+
 
 	
 	if ($radius && $delta_dist > $radius)
@@ -664,53 +676,57 @@ function bo_show_archive_search()
 		echo '</ul>';
 	}
 
-
-	echo '<h4>'._BL('Search Options').'</h4>';
-
-	echo '<form action="?" method="GET" class="bo_archive_form">';
-	echo bo_insert_html_hidden(array('bo_lat', 'bo_lon', 'bo_map_zoom', 'bo_map_lat', 'bo_map_lon'));
-
-	echo '<fieldset class="bo_archive_fieldset">';
-	echo '<legend>'._BL('archive_legend').'</legend>';
-
-	echo '<span class="bo_form_descr">'._BL('Coordinates').':</span>';
-	echo '<input type="text" name="bo_lat" value="'._BC($lat).'" id="bo_archive_lat" class="bo_form_text bo_archive_latlon">';
-	echo '<input type="text" name="bo_lon" value="'._BC($lon).'" id="bo_archive_lon" class="bo_form_text bo_archive_latlon">';
-
-	echo '<span class="bo_form_descr">'._BL('Distance').' '.'('._BL('unit_meters').'):</span>';
-	echo '<input type="text" name="bo_dist" value="'._BC($delta_dist).'" id="bo_archive_dist" class="bo_form_text bo_archive_dist">';
-		
-	if (bo_user_get_level() & BO_PERM_NOLIMIT)
+	if (!$get_by_id)
 	{
-		echo '<span class="bo_form_descr">'._BL('Count').':';
-		echo '<input type="text" name="bo_count" value="'._BC($select_count).'" id="bo_archive_count" class="bo_form_text bo_archive_count">';
-		echo '</span>';
+		echo '<h4>'._BL('Search Options').'</h4>';
+
+		echo '<form action="?" method="GET" class="bo_archive_form">';
+		echo bo_insert_html_hidden(array('bo_lat', 'bo_lon', 'bo_map_zoom', 'bo_map_lat', 'bo_map_lon'));
+
+		echo '<fieldset class="bo_archive_fieldset">';
+		echo '<legend>'._BL('archive_legend').'</legend>';
+
+		echo '<span class="bo_form_descr">'._BL('Coordinates').':</span>';
+		echo '<input type="text" name="bo_lat" value="'._BC($lat).'" id="bo_archive_lat" class="bo_form_text bo_archive_latlon">';
+		echo '<input type="text" name="bo_lon" value="'._BC($lon).'" id="bo_archive_lon" class="bo_form_text bo_archive_latlon">';
+
+		echo '<span class="bo_form_descr">'._BL('Distance').' '.'('._BL('unit_meters').'):</span>';
+		echo '<input type="text" name="bo_dist" value="'._BC($delta_dist).'" id="bo_archive_dist" class="bo_form_text bo_archive_dist">';
+			
+		if (bo_user_get_level() & BO_PERM_NOLIMIT)
+		{
+			echo '<span class="bo_form_descr">'._BL('Count').':';
+			echo '<input type="text" name="bo_count" value="'._BC($select_count).'" id="bo_archive_count" class="bo_form_text bo_archive_count">';
+			echo '</span>';
+			
+			echo '<span class="bo_form_descr">'._BL('Min time').':';
+			echo '<input type="text" name="bo_time_from" value="'._BC($time_from).'" id="bo_archive_time_from" class="bo_form_text bo_archive_time_from">';
+			echo '</span>';
+			
+			echo '<span class="bo_form_descr">'._BL('Max time').':';
+			echo '<input type="text" name="bo_time_to" value="'._BC($time_to).'" id="bo_archive_time_to" class="bo_form_text bo_archive_time_to">';
+			echo '</span>';
+			
+		}
 		
-		echo '<span class="bo_form_descr">'._BL('Min time').':';
-		echo '<input type="text" name="bo_time_from" value="'._BC($time_from).'" id="bo_archive_time_from" class="bo_form_text bo_archive_time_from">';
-		echo '</span>';
+		echo '<input type="hidden" name="bo_map_zoom" id="bo_map_zoom">';
+		echo '<input type="hidden" name="bo_map_lat" id="bo_map_lat">';
+		echo '<input type="hidden" name="bo_map_lon" id="bo_map_lon">';
+		echo '<input type="hidden" name="bo_get">';
 		
-		echo '<span class="bo_form_descr">'._BL('Max time').':';
-		echo '<input type="text" name="bo_time_to" value="'._BC($time_to).'" id="bo_archive_time_to" class="bo_form_text bo_archive_time_to">';
-		echo '</span>';
+		echo '<input type="submit" value="'._BL('button_search').'" id="bo_archive_submit" class="bo_form_submit">';
+
+		echo '</fieldset>';
+
+		if (bo_user_get_level() & BO_PERM_NOLIMIT)
+		{
+			echo '<p class="bo_enter_time_hint">'._BL('enter_time_hint').'</p>';
+		}
 		
+		echo '</form>';
+	
 	}
 	
-	echo '<input type="hidden" name="bo_map_zoom" id="bo_map_zoom">';
-	echo '<input type="hidden" name="bo_map_lat" id="bo_map_lat">';
-	echo '<input type="hidden" name="bo_map_lon" id="bo_map_lon">';
-
-	echo '<input type="submit" name="bo_ok" value="'._BL('button_search').'" id="bo_archive_submit" class="bo_form_submit">';
-
-	echo '</fieldset>';
-
-	if (bo_user_get_level() & BO_PERM_NOLIMIT)
-	{
-		echo '<p class="bo_enter_time_hint">'._BL('enter_time_hint').'</p>';
-	}
-	
-	echo '</form>';
-
 	echo '</div>';
 
 ?>
@@ -721,7 +737,9 @@ function bo_show_archive_search()
 		{
 			var markerOptions;
 			var infowindow;
-
+			var bounds = new google.maps.LatLngBounds();
+			
+			<?php if ($lat !== false && $lon !== false) { ?>
 			var myLatlng = new google.maps.LatLng(<?php echo  "$lat,$lon" ?>);
 
 			centerMarker = new google.maps.Marker({
@@ -735,17 +753,18 @@ function bo_show_archive_search()
 				document.getElementById('bo_archive_lat').value=this.getPosition().lat();
 				document.getElementById('bo_archive_lon').value=this.getPosition().lng();
 			});
-
+/*
 			google.maps.event.addListener(bo_map, 'click', function(event) {
 				centerMarker.setPosition(event.latLng);
 				document.getElementById('bo_archive_lat').value=event.latLng.lat();
 				document.getElementById('bo_archive_lon').value=event.latLng.lng();
 			});
-
+*/
 			google.maps.event.addListener(bo_map, 'dragend', function() {bo_gmap_map2form();});
 			google.maps.event.addListener(bo_map, 'zoom_changed', function() {bo_gmap_map2form();});
-
-			<?php if ($getit) { ?>
+			<?php } ?>
+			
+			<?php if ($getit && $lat !== false && $lon !== false) { ?>
 
 			var boDistCircle = {
 				clickable: false,
@@ -763,7 +782,7 @@ function bo_show_archive_search()
 
 			<?php } ?>
 
-			var lightnings = {};
+			var lightnings = [ ];
 			<?php echo  $text ?>
 
 			var images = new Array();
@@ -792,7 +811,8 @@ function bo_show_archive_search()
 			var infowindow = new google.maps.InfoWindow({
 				content: '...'
 			});
-
+			var lcount=0;
+			
 			for (var lightning in lightnings)
 			{
 				if (time_int)
@@ -818,10 +838,20 @@ function bo_show_archive_search()
 					infowindow.setContent(this.content);
 					infowindow.open(bo_map, this);
 				});
-
+				
+				bounds.extend(lightnings[lightning].center);
+				lcount++;
 			}
 
+			if (lcount == 1 || (lcount > 0 && lcount <= <?php echo intval($select_count); ?>))
+			{
+				bounds.extend(new google.maps.LatLng(<?php echo  "$map_lat,$map_lon" ?>));
+				bo_map.fitBounds(bounds);
+			}
+			
+			<?php if ($lat !== false && $lon !== false) { ?>
 			bo_gmap_map2form();
+			<?php } ?>
 		}
 
 
@@ -1196,7 +1226,14 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		}
 		else
 			echo $ttime;
-			
+		
+		if ($perm && $row['strike_id'] && BO_ENABLE_ARCHIVE_SEARCH === true)
+		{
+			echo ' (<a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'search').'&bo_strike_id='.$row['strike_id'].'" target="_blank" ';
+			echo '>'._BL('Map').'</a>)';
+
+		}
+		
 		echo '</span>';
 		
 		echo '</td>';

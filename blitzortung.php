@@ -25,7 +25,7 @@ if (!defined("BO_VER"))
 	@session_start();
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.7.4b-dev');
+	define("BO_VER", '0.7.5-dev2');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -71,6 +71,7 @@ if (!defined("BO_VER"))
 	
 	//includes #1
 	require_once 'includes/functions.inc.php';
+	require_once 'includes/data.inc.php';
 	require_once 'includes/user.inc.php';
 	require_once 'includes/tiles.inc.php';
 

@@ -1058,7 +1058,7 @@ $_BL['de']['ani_prev'] = 'Zurück';
 $_BL['de']['no GPS signal'] = 'kein GPS-Signal';
 $_BL['de']['no reception'] = 'kein Empfang';
 $_BL['de']['Loading...'] = 'Laden...';
-
+$_BL['de']['search_outside_radius'] = 'Suche außerhalb des Kreises nicht möglich!';
 
 
 /********************/

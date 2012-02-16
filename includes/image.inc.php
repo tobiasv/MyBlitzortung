@@ -1629,6 +1629,9 @@ function bo_imagecreatefromfile($file)
 {
 	$extension = strtolower(substr($file, strrpos($file, '.')+1));
 	
+	if (!file_exists($file) || is_dir($file))
+		bo_image_error("Couldn't find image file:\n$file");
+	
 	if ($extension == 'jpg' || $extension == 'jpeg')
 		$I = imagecreatefromjpeg($file);
 	elseif ($extension == 'gif')
@@ -1637,7 +1640,7 @@ function bo_imagecreatefromfile($file)
 		$I = imagecreatefrompng($file);
 	
 	if ($I === false)
-		bo_image_error("Couldn't open image file!");
+		bo_image_error("Couldn't read image file:\n$file\nUnknown file format/Wrong image data");
 	
 	return $I;
 }

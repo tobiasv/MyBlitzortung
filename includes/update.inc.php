@@ -40,7 +40,8 @@ function bo_check_for_update()
 						'0.6.2' => 602,
 						'0.7.2' => 702,
 						'0.7.3' => 703,
-						'0.7.4' => 704,);
+						'0.7.4' => 704,
+						'0.7.5' => 705,);
 
 	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
 	{
@@ -89,6 +90,7 @@ function bo_check_for_update()
 		
 		echo '<h4>'._BL('Updating version').' '.$cur_version.' -&gt; '.$new_version.'</h4>';
 		echo '<ul>';
+		flush();
 		
 		$ok = false;
 		switch ($new_version)
@@ -405,6 +407,14 @@ function bo_check_for_update()
 					$ok = true;
 				}
 				
+				break;
+			
+			
+			case '0.7.5':
+				$sql = 'ALTER TABLE '.BO_DB_PREF.'strikes DROP INDEX `timelatlon`';
+				$ok = bo_db($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'Already done.').'</b></li>';
+				$ok = true; //doesn't matter too much if this fails ;-)
 				break;
 			
 			default:

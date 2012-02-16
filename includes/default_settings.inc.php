@@ -538,6 +538,9 @@
 //maximum no. of strikes displayed when searching for them
 @define('BO_ARCHIVE_SEARCH_STRIKECOUNT', 10);
 
+//default radius for strike search in kilometers
+@define('BO_ARCHIVE_SEARCH_RADIUS_DEFAULT', 10);
+
 //show the spectrum for each signal in table
 @define('BO_ARCHIVE_SHOW_SPECTRUM', true);
 
@@ -591,6 +594,41 @@
 @define('BO_PURGE_STA_OTHER',  96); //station statistics: other (not yours)
 @define('BO_PURGE_STA_ALL', 0);     //station statistics: all
 @define('BO_PURGE_STR_DIST_KM', 2000); //distance for BO_PURGE_STR_DIST in kilometers
+
+
+
+
+/*******************************************************************/
+/*** Database Keys for strike table                              ***/
+/*                                                                 */
+/*   You should enable them if you want to make an archive         */
+/*     -> faster search and drawing, but more disk-usage           */
+
+//completely enable/disable
+@define('BO_DB_EXTRA_KEYS', false);
+
+//bytes for time-key (0 = disable)
+@define('BO_DB_EXTRA_KEYS_TIME_BYTES', 2);
+
+//time key starts at given date
+@define('BO_DB_EXTRA_KEYS_TIME_START', '2011-01-01');
+
+//divisor for time -> count value every x minutes
+// -> 2bytes and 30min lasts for 3.7years
+@define('BO_DB_EXTRA_KEYS_TIME_DIV_MINUTES', 30);
+
+//bytes for each lat and lon key (0 = disable)
+@define('BO_DB_EXTRA_KEYS_LATLON_BYTES', 1);
+
+//key repeats every x degrees
+// finer values -> higher resolution
+// set to ~ "height" of your region
+@define('BO_DB_EXTRA_KEYS_LAT_DIV', 30);
+
+//divisor for longitude
+// finer values -> higher resolution
+// set to ~ "width" of your region
+@define('BO_DB_EXTRA_KEYS_LON_DIV', 30);
 
 
 

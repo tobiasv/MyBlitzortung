@@ -650,7 +650,7 @@ function bo_update_strikes($force = false)
 		bo_set_conf('uptime_strikes_try', time());
 		
 		$start_time = time();
-		$stations = bo_stations('user');
+		$stations = bo_stations();
 		$own_id = bo_station_id();
 
 		$count_updated = 0;
@@ -670,12 +670,14 @@ function bo_update_strikes($force = false)
 		$min_dist_all[$own_id] = 9E12;
 		$max_dist_own[$own_id] = 0;
 		$min_dist_own[$own_id] = 9E12;
-
-		if (BO_ENABLE_LONGTIME_ALL === true)
+		$user2id = array();
+		
+		foreach($stations as $stId => $sdata)
 		{
-			foreach($stations as $sdata)
+			$user2id[$sdata['user']] = $stId;
+			
+			if (BO_ENABLE_LONGTIME_ALL === true)
 			{
-				$stId = $sdata['id'];
 				$longtime_stations[$stId] = $stId;
 				$max_dist_all[$stId] = 0;
 				$min_dist_all[$stId] = 9E12;
@@ -683,6 +685,28 @@ function bo_update_strikes($force = false)
 				$min_dist_own[$stId] = 9E12;
 			}
 		}
+		
+		//Extra keys for database
+		$keys_enabled = (BO_DB_EXTRA_KEYS === true);
+		$key_bytes_time   = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_TIME_BYTES)   : 0;
+		$key_bytes_latlon = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_LATLON_BYTES) : 0;
+		$key_bytes_time   = 0 < $key_bytes_time   && $key_bytes_time   <= 4 ? $key_bytes_time   : 0;
+		$key_bytes_latlon = 0 < $key_bytes_latlon && $key_bytes_latlon <= 4 ? $key_bytes_latlon : 0;
+			
+		if ($key_bytes_time)
+		{
+			$key_time_vals   = pow(2, 8 * $key_bytes_time);
+			$key_time_start  = strtotime(BO_DB_EXTRA_KEYS_TIME_START);
+			$key_time_div    = (double)BO_DB_EXTRA_KEYS_TIME_DIV_MINUTES;
+		}
+
+		if ($key_bytes_latlon)
+		{
+			$key_latlon_vals = pow(2, 8 * $key_bytes_latlon);
+			$key_lat_div     = (double)BO_DB_EXTRA_KEYS_LAT_DIV;
+			$key_lon_div     = (double)BO_DB_EXTRA_KEYS_LON_DIV;
+		}
+
 		
 		/***** PREPARATIONS BEFORE READING *****/
 		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
@@ -890,19 +914,7 @@ function bo_update_strikes($force = false)
 			$dist = bo_latlon2dist($lat, $lon);
 			$bear = bo_latlon2bearing($lat, $lon);
 			
-			$sql = "
-						time='$date $time',
-						time_ns='$time_ns',
-						lat='$lat',lon='$lon',
-						distance='$dist',
-						bearing='$bear',
-						deviation='$deviation',
-						current='$cur',
-						users='$users',
-						part='$part'
-						";
-
-			
+		
 			//sometimes two strikes with same time one after another --> ignore 2nd one
 			if ("$time.$time_ns" === $time_last_strike)
 				continue;
@@ -990,7 +1002,29 @@ function bo_update_strikes($force = false)
 					$id = $ids_found[0];
 				}
 			}
-	
+
+			
+			$sql = "
+				time='$date $time',
+				time_ns='$time_ns',
+				lat='$lat',lon='$lon',
+				distance='$dist',
+				bearing='$bear',
+				deviation='$deviation',
+				current='$cur',
+				users='$users',
+				part='$part'
+				";
+
+				
+			if ($key_bytes_time)
+				$sql .= ', time_x=(FLOOR(('.($utime-$key_time_start).')/60/'.$key_time_div.')%'.$key_time_vals.')';
+			
+			
+			if ($key_bytes_latlon)
+				$sql .= ', lat_x=FLOOR((('.(90+$lat).')%'.$key_lat_div.')/'.$key_lat_div.'*'.$key_latlon_vals.') 
+						 , lon_x=FLOOR((('.(180+$lon).')%'.$key_lon_div.')/'.$key_lon_div.'*'.$key_latlon_vals.')';
+
 			
 			if (!$id) //new strike
 			{
@@ -1023,7 +1057,7 @@ function bo_update_strikes($force = false)
 				$sql = '';
 				foreach($participants as $user)
 				{
-					$stId = $stations[$user]['id'];
+					$stId = $user2id[$user];
 					$last_strikes[$stId] = array($utime, $time_ns, $id);
 					$sql .= ($sql ? ',' : '')." ('$id', '$stId') ";
 				}
@@ -1074,9 +1108,8 @@ function bo_update_strikes($force = false)
 				// *** other stations *** //
 				if (BO_ENABLE_LONGTIME_ALL === true)
 				{
-					foreach($stations as $sdata)
+					foreach($stations as $stId => $sdata)
 					{
-						$stId = $sdata['id'];
 						$stLat = $sdata['lat'];
 						$stLon = $sdata['lon'];
 
@@ -1156,7 +1189,7 @@ function bo_update_strikes($force = false)
 			
 			$oldcount = bo_get_conf('count_strikes_own'.$add);
 			bo_set_conf('count_strikes_own'.$add, $oldcount + $count);		
-		
+			
 			$bear_data_tmp = unserialize(bo_get_conf('longtime_bear_own'.$add));
 			if (!$bear_data_tmp['time']) $bear_data_tmp['time'] = time();
 			foreach($bear_data_own[$stId] as $bear_id => $bear_count)
@@ -1189,41 +1222,46 @@ function bo_update_strikes($force = false)
 		//Update Longtime statistics per station for all strikes
 		foreach($longtime_stations as $stId)
 		{
-			$add = $stId == $own_id ? '' : '#'.$stId.'#';
-			
-			$count = bo_get_conf('count_strikes'.$add);
-			bo_set_conf('count_strikes'.$add, $count + $count_inserted);
-			
-			if (isset($dist_data[$stId]))
+			//update only if station is active or got some strikes during the update
+			if ($stations[$stId]['status'] == 'A' || $strikesperstation[$stId])
 			{
-				$dist_data_tmp = unserialize(bo_get_conf('longtime_dist'.$add));
-				if (!$dist_data_tmp) $dist_data_tmp['time'] = time();
-				foreach($dist_data[$stId] as $dist_id => $dist_count)
-					$dist_data_tmp[$dist_id] += $dist_count;
-				bo_set_conf('longtime_dist'.$add, serialize($dist_data_tmp));
-			}
-			
-			if (isset($bear_data[$stId]))
-			{
-				$bear_data_tmp = unserialize(bo_get_conf('longtime_bear'.$add));
-				if (!$bear_data_tmp) $bear_data_tmp['time'] = time();
-				foreach($bear_data[$stId] as $bear_id => $bear_count)
-					$bear_data_tmp[$bear_id] += $bear_count;
-				bo_set_conf('longtime_bear'.$add, serialize($bear_data_tmp));
-			}
-			
-			$max = bo_get_conf('longtime_max_dist_all'.$add);
-			if ($max < $max_dist_all[$stId])
-			{
-				bo_set_conf('longtime_max_dist_all'.$add, $max_dist_all[$stId]);
-				bo_set_conf('longtime_max_dist_all_time'.$add, time());
-			}
 
-			$min = bo_get_conf('longtime_min_dist_all'.$add);
-			if (!$min || $min > $min_dist_all[$stId])
-			{
-				bo_set_conf('longtime_min_dist_all'.$add, $min_dist_all[$stId]);
-				bo_set_conf('longtime_min_dist_all_time'.$add, time());
+				$add = $stId == $own_id ? '' : '#'.$stId.'#';
+				
+				$count = bo_get_conf('count_strikes'.$add);
+				bo_set_conf('count_strikes'.$add, $count + $count_inserted);
+				
+				if (isset($dist_data[$stId]))
+				{
+					$dist_data_tmp = unserialize(bo_get_conf('longtime_dist'.$add));
+					if (!$dist_data_tmp) $dist_data_tmp['time'] = time();
+					foreach($dist_data[$stId] as $dist_id => $dist_count)
+						$dist_data_tmp[$dist_id] += $dist_count;
+					bo_set_conf('longtime_dist'.$add, serialize($dist_data_tmp));
+				}
+				
+				if (isset($bear_data[$stId]))
+				{
+					$bear_data_tmp = unserialize(bo_get_conf('longtime_bear'.$add));
+					if (!$bear_data_tmp) $bear_data_tmp['time'] = time();
+					foreach($bear_data[$stId] as $bear_id => $bear_count)
+						$bear_data_tmp[$bear_id] += $bear_count;
+					bo_set_conf('longtime_bear'.$add, serialize($bear_data_tmp));
+				}
+				
+				$max = bo_get_conf('longtime_max_dist_all'.$add);
+				if ($max < $max_dist_all[$stId])
+				{
+					bo_set_conf('longtime_max_dist_all'.$add, $max_dist_all[$stId]);
+					bo_set_conf('longtime_max_dist_all_time'.$add, time());
+				}
+
+				$min = bo_get_conf('longtime_min_dist_all'.$add);
+				if (!$min || $min > $min_dist_all[$stId])
+				{
+					bo_set_conf('longtime_min_dist_all'.$add, $min_dist_all[$stId]);
+					bo_set_conf('longtime_min_dist_all_time'.$add, time());
+				}
 			}
 
 		}
@@ -1697,7 +1735,12 @@ function bo_update_stations($force = false)
 				
 				//extra data
 				$cdata = unserialize(bo_get_conf('stations_new_data'));
-				bo_set_conf('stations_new_data', serialize(array_merge($cdata, $cdata_tmp)));
+				if (!is_array($cdata))
+					$cdata = $cdata_tmp;
+				else
+					$cdata = array_merge($cdata, $cdata_tmp);
+					
+				bo_set_conf('stations_new_data', serialize($cdata));
 			}
 		}
 		
@@ -1841,7 +1884,7 @@ function bo_update_stations($force = false)
 				bo_set_conf('longtime_max_strikesh_own_time'.$add, $time);
 			}
 
-			//Activity/inactivity counter for own station
+			//Activity/inactivity counter
 			$time_interval = $last ? $time - $last : 0;
 			if ($StData[$stId]['sig'])
 			{
@@ -1859,7 +1902,7 @@ function bo_update_stations($force = false)
 			}
 
 
-			//Activity/inactivity counter for own station (GPS V-state)
+			//Activity/inactivity counter (GPS V-state)
 			$time_interval = $last ? $time - $last : 0;
 			if ($StData[$stId]['status'] == 'V')
 			{

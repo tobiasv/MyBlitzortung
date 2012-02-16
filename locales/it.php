@@ -2,7 +2,7 @@
 
 /* ATTENZIONE !!!
  * Traduzione italiana a cura di Stefano Cirilli (www.meteo.units.it)
- * Versione traduzione: Rc1
+ * Versione traduzione: Rc2
  * Nel caso di utilizzo di questa traduzione è fatto obbligo di inserire il copyright di Universtà di Trieste - www.meteo.units.it
  */
 
@@ -639,7 +639,7 @@ $_BL['it']['Update only daily statistics'] = 'Aggiorna solo le statistiche giorn
 $_BL['it']['Update only densities'] = 'Aggiorna solo le densità';
 $_BL['it']['Update only tracks'] = 'Aggiorna solo il tracciamento';
 $_BL['it']['Force data purge only'] = 'Forza la pulizia del database';
-$_BL['it']['Check alerts only'] = 'Controlla solo gli allarmo';
+$_BL['it']['Check alerts only'] = 'Controlla solo gli allarmi';
 
 $_BL['it']['user_perm0'] = 'Amministrazione';
 $_BL['it']['user_perm1'] = 'Altri settaggi';
@@ -680,8 +680,6 @@ Blitzortung è una rete di stazioni di rilevamento delle fulminazioni.
 Ogni singola stazione capta e campiona il segnale eletromagnetico creato dal fulmine. Al segnale viene unito il timestamp e la posizione ricavati da un gps.
 Attraverso il metodo denominato TOA (time of arrival method) viene calcolata la posizione.
 ';
-
-
 $_BL['it']['info_accuracy_text'] = '
 Grazie alla alta densità spaziale
 delle stazioni di rilevamento, la precisone nella localizzazione è molto buona ed è confrontabile con quella dei servizi commerciali.
@@ -1005,7 +1003,18 @@ $_BL['it']['Meteox rain radar'] = 'meteox.com radar';
 /*************************************************************/
 
 
+$_BL['it']['Specials'] = 'Extra';
+$_BL['it']['Importing data...'] = 'Sto importando i dati.....';
+$_BL['it']['since'] = 'dal';
+$_BL['it']['Period'] = 'Periodo';
 
+$_BL['it']['ani_play'] = 'Azione';
+$_BL['it']['ani_pause'] = 'Pausa';
+$_BL['it']['ani_next'] = 'Avanti';
+$_BL['it']['ani_prev'] = 'Indietro';
+$_BL['it']['no GPS signal'] = 'Nessun segnale GPS';
+$_BL['it']['no reception'] = 'ricezione nulla';
+$_BL['it']['Loading...'] = 'Sto caricando...';
 
 
 
@@ -1015,31 +1024,7 @@ $_BL['it']['Meteox rain radar'] = 'meteox.com radar';
 /********************/
 
 
-//en: 'Specials'
-$_BL['it']['Specials'] = '';
-
-//en: 'Importing data...'
-$_BL['it']['Importing data...'] = '';
-
-//en: 'since'
-$_BL['it']['since'] = '';
-
-//en: 'Period'
-$_BL['it']['Period'] = '';
-
 //en: ''
 $_BL['it']['bo_stat_network_descr'] = '';
-
-//en: 'Play'
-$_BL['it']['ani_play'] = '';
-
-//en: 'Pause'
-$_BL['it']['ani_pause'] = '';
-
-//en: 'Next'
-$_BL['it']['ani_next'] = '';
-
-//en: 'Prev'
-$_BL['it']['ani_prev'] = '';
 
 
