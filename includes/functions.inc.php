@@ -1043,7 +1043,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 
 function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 {
-	if ($lat === false)
+	if ($lat1 === false)
 		return " 1 ";
 	
 	$sql = " (s.lat BETWEEN '$lat1' AND '$lat2' AND s.lon BETWEEN '$lon1' AND '$lon2') ";

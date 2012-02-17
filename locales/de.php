@@ -268,6 +268,7 @@ $_BL['de']['Unknown'] = 'Unbekannt';
 $_BL['de']['Unknown or longer'] = 'Unbekannt oder länger';
 $_BL['de']['Up to'] = 'Bis zu';
 $_BL['de']['Locating angle'] = 'Ortungswinkel';
+$_BL['de']['Residual time'] = 'Restzeit';
 
 
 $_BL['de']['timezone_is'] = 'Aktuelle Uhrzeit sowie verwendete Zeitzone bei allen Zeitangaben: ';
