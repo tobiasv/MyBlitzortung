@@ -244,7 +244,7 @@ function bo_check_for_update()
 				echo '<li><em>'.$sql.'</em>: <b>';
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql);
+					$ok = bo_db($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 				}
 				else
@@ -267,7 +267,7 @@ function bo_check_for_update()
 				echo '<li><em>'.$sql.'</em>: <b>';
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql);
+					$ok = bo_db($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 				}
 				else
@@ -288,7 +288,7 @@ function bo_check_for_update()
 				flush();
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql);
+					$ok = bo_db($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 					echo '</b></li>';
 					flush();
@@ -331,7 +331,7 @@ function bo_check_for_update()
 				echo '<li><em>'.$sql.'</em>: <b>';
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql);
+					$ok = bo_db($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 				}
 				else
@@ -384,7 +384,7 @@ function bo_check_for_update()
 				flush();
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql);
+					$ok = bo_db($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 					echo '</b></li>';
 					flush();

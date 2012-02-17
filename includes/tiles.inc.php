@@ -56,7 +56,7 @@ function bo_tile()
 	{
 		if (!$only_info && BO_MAP_MANUAL_TIME_ENABLE !== true && !(bo_user_get_level() & BO_PERM_NOLIMIT))
 		{
-			bo_tile_message('tile_time_range_na_err', 'range_na', $caching);
+			bo_tile_message('tile_time_range_na_err', 'range_na', $caching, array(), $tile_size);
 			exit;
 		}
 		
@@ -73,12 +73,12 @@ function bo_tile()
 
 		if (!$only_info && $time_manual_to < $time_manual_from)
 		{
-			bo_tile_message('tile_wrong_time_range_err', 'range_wrong', $caching);
+			bo_tile_message('tile_wrong_time_range_err', 'range_wrong', $caching, array(), $tile_size);
 			exit;
 		}
 		else if (!$only_info && intval(BO_MAP_MANUAL_TIME_MAX_HOURS) < $cfg['trange']/60 && bo_user_get_id() != 1)
 		{
-			bo_tile_message('tile_maximum_time_range_err', 'range_max', $caching, array('{HOURS}' => intval(BO_MAP_MANUAL_TIME_MAX_HOURS)));
+			bo_tile_message('tile_maximum_time_range_err', 'range_max', $caching, array('{HOURS}' => intval(BO_MAP_MANUAL_TIME_MAX_HOURS)), $tile_size);
 			exit;
 		}
 		
@@ -261,7 +261,7 @@ function bo_tile()
 			{
 
 				$text = _BL('tile not available', true);
-				bo_tile_message($text, 'na', $caching);
+				bo_tile_message($text, 'na', $caching, array(), $tile_size);
 				exit;
 			}
 
@@ -864,12 +864,22 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 		$fwidth  = imagefontwidth(BO_MAP_NA_FONTSIZE);
 		$fheight = imagefontheight(BO_MAP_NA_FONTSIZE);
 
-		imagefilledrectangle( $I, 25, 115, 35+$width*$fwidth, 127+$height*$fheight, $box_bg);
-		imagerectangle( $I, 25, 115, 35+$width*$fwidth, 127+$height*$fheight, $box_line);
+		//rows/columns if tile > 256
+		for ($x=0; $x < $tile_size; $x+=256)
+		{
+			for ($y=0; $y < $tile_size; $y+=256)
+			{
 
-		foreach($lines as $i=>$line)
-			imagestring($I, BO_MAP_NA_FONTSIZE, 30, 120+$i*$fheight, $line, $textcol);
+				//draw text
+				imagefilledrectangle( $I, 25+$x, 115+$y, 35+$width*$fwidth+$x, 127+$height*$fheight+$y, $box_bg  );
+				imagerectangle(       $I, 25+$x, 115+$y, 35+$width*$fwidth+$x, 127+$height*$fheight+$y, $box_line);
 
+				foreach($lines as $i=>$line)
+					imagestring($I, BO_MAP_NA_FONTSIZE, 30+$x, 120+$i*$fheight+$y, $line, $textcol);
+			
+			}
+		}
+		
 		imagecolortransparent($I, $blank);
 		
 		if (!$caching)
