@@ -442,7 +442,6 @@ function bo_tile()
 	//Calculate tile coordinates in SQL and group them 
 	else
 	{
-		
 		$sql_select = " MAX(s.time) mtime, 
 						".bo_sql_lat2tiley('s.lat', $zoom)." y, 
 						".bo_sql_lon2tilex('s.lon', $zoom)." x  ";

@@ -570,6 +570,7 @@ function bo_show_archive_search()
 
 			$sql_where .= " AND ".bo_strikes_sqlkey($index_sql, $utime_from, $utime_to, $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
 			$sql_where .= ($radius ? "AND distance < $radius" : "");
+			$sql_where .= " AND ". bo_sql_latlon2dist($lat, $lon, 's.lat', 's.lon').' <= '.$delta_dist.' ';
 		}
 		
 		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
@@ -578,15 +579,11 @@ function bo_show_archive_search()
 				WHERE 1
 					$sql_where
 				ORDER BY s.time DESC
-				LIMIT ".intval($select_count * 5);
+				LIMIT ".intval($select_count + 1);
 
 		$res = bo_db($sql);
 		while($row = $res->fetch_assoc())
 		{
-			//ToDo: We search by lat/lon (square) but we need circle
-			if (!$get_by_id && bo_latlon2dist($lat, $lon, $row['lat'], $row['lon']) > $delta_dist)
-				continue;
-
 			if ($count >= $select_count)
 			{
 				$more_found = true;

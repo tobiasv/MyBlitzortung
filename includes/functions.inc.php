@@ -553,6 +553,16 @@ function bo_latlon2projection($proj, $lat, $lon)
 	}
 }
 
+function bo_sql_latlon2dist($lat1, $lon1, $lat_name='lat', $lon_name)
+{
+	if ($lat1 == $lat2 && $lon1 == $lon2)
+		return 0;
+
+	$sql = "ACOS(SIN(RADIANS($lat1)) * SIN(RADIANS($lat_name)) + COS(RADIANS($lat1)) * COS(RADIANS($lat_name)) * COS(RADIANS($lon1 - $lon_name))) * 6371000";
+
+	return " ($sql) ";
+}
+
 function bo_sql_lat2tiley($name, $zoom)
 {
 	$scale = (1 << $zoom) * 256;
@@ -1024,25 +1034,25 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 		//only use key when it makes sense
 		if (abs($lat1-$lat2) < $key_lat_div)
 		{
-			$lat1_x = floor(((90+$lat1)%$key_lat_div)/$key_lat_div*$key_latlon_vals);
-			$lat2_x = ceil (((90+$lat2)%$key_lat_div)/$key_lat_div*$key_latlon_vals);
+			$lat1_x = floor(fmod(90+$lat1,$key_lat_div)/$key_lat_div*$key_latlon_vals);
+			$lat2_x = ceil (fmod(90+$lat2,$key_lat_div)/$key_lat_div*$key_latlon_vals);
 			
 			if ($lat1_x <= $lat2_x)
 				$sql .= " AND (s.lat_x BETWEEN '$lat1_x' AND '$lat2_x')";
 			else
-				$sql .= " AND (s.lat_x <= '$lat1_x' AND '$lat2_x' >= s.lat_x)";
+				$sql .= " AND (s.lat_x <= '$lat2_x' OR '$lat1_x' <= s.lat_x)";
 		}
 
 		//only use key when it makes sense
 		if (abs($lon1-$lon2) < $key_lon_div)
 		{
-			$lon1_x = floor(((90+$lon1)%$key_lon_div)/$key_lon_div*$key_latlon_vals);
-			$lon2_x = ceil (((90+$lon2)%$key_lon_div)/$key_lon_div*$key_latlon_vals);
+			$lon1_x = floor(fmod(180+$lon1,$key_lon_div)/$key_lon_div*$key_latlon_vals);
+			$lon2_x = ceil (fmod(180+$lon2,$key_lon_div)/$key_lon_div*$key_latlon_vals);
 			
 			if ($lon1_x <= $lon2_x)
 				$sql .= " AND (s.lon_x BETWEEN '$lon1_x' AND '$lon2_x')";
 			else
-				$sql .= " AND (s.lon_x <= '$lon1_x' OR '$lon2_x' >= s.lon_x)";
+				$sql .= " AND (s.lon_x <= '$lon2_x' OR '$lon1_x' <= s.lon_x)";
 
 		}
 		

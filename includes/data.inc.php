@@ -112,7 +112,8 @@ function bo_set_conf($name, $data)
 
 function bo_db_recreate_strike_keys()
 {
-	echo "Updating database keys. WARNING: This may take several minutes!\n";
+	echo "Updating database keys.\n";
+	echo "WARNING: This may take several minutes or longer!\n";
 	echo "Please wait until the page as fully loaded!\n";
 	echo "Executing Database commands:\n";
 	
@@ -155,73 +156,88 @@ function bo_db_recreate_strike_keys()
 	$bytes_latlon = 0 < $bytes_latlon && $bytes_latlon <= $maxbytes ? $bytes_latlon : 0;
 	
 	
+	$sql_alter = array();
+	
 	//1. Remove keys if needed
 	if ($keys['timelatlon'] && (!$bytes_time || !$bytes_latlon))
-		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes DROP INDEX `timelatlon_index`');
+		$sql_alter[] = 'DROP INDEX `timelatlon_index`';
 
 	if ($keys['time'] && !$bytes_time)
-		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes DROP INDEX `time_index`');
+		$sql_alter[] = 'DROP INDEX `time_index`';
 
 	if ($keys['latlon'] && !$bytes_latlon)
-		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes DROP INDEX `latlon_index`');
+		$sql_alter[] = 'DROP INDEX `latlon_index`';
 
-	
 	//2. Remove columns if needed
 	if (isset($cols['time_x']) && !$bytes_time)
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` DROP `time_x`');
+		$sql_alter[] = 'DROP `time_x`';
 	
 	if (isset($cols['lat_x']) && !$bytes_latlon)
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` DROP `lat_x`');
+		$sql_alter[] = 'DROP `lat_x`';
 	
 	if (isset($cols['lon_x']) && !$bytes_latlon)
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` DROP `lon_x`');
-	
+		$sql_alter[] = 'DROP `lon_x`';
+
+
+	if (!empty($sql_alter))
+		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter));
+
+		
+	$sql_alter = array();
 	
 	//3. Add/change columns if needed
 	if (!isset($cols['time_x']) && $bytes_time)
 	{
 		bo_set_conf('db_keys_update', 1);
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `time_x` '.$byte2mysql[$bytes_time].' UNSIGNED NOT NULL');
+		$sql_alter[] = 'ADD `time_x` '.$byte2mysql[$bytes_time].' UNSIGNED NOT NULL';
 	}
 	else if (isset($cols['time_x']) && $bytes_time && $cols['time_x'] != $bytes_time)
 	{
 		bo_set_conf('db_keys_update', 1);
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` CHANGE `time_x` `time_x` '.$byte2mysql[$bytes_time].' UNSIGNED NOT NULL');
+		$sql_alter[] = 'CHANGE `time_x` `time_x` '.$byte2mysql[$bytes_time].' UNSIGNED NOT NULL';
 	}
 		
 	if (!isset($cols['lat_x']) && $bytes_latlon)
 	{
 		bo_set_conf('db_keys_update', 1);
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `lat_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL');
+		$sql_alter[] = 'ADD `lat_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL';
 	}
 	else if (isset($cols['lat_x']) && $bytes_latlon && $cols['lat_x'] != $bytes_latlon)
 	{
 		bo_set_conf('db_keys_update', 1);
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` CHANGE `lat_x` `lat_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL');
+		$sql_alter[] = 'CHANGE `lat_x` `lat_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL';
 	}
 
 	if (!isset($cols['lon_x']) && $bytes_latlon)
 	{
 		bo_set_conf('db_keys_update', 1);
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `lon_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL');
+		$sql_alter[] = 'ADD `lon_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL';
 	}
 	else if (isset($cols['lon_x']) && $bytes_latlon && $cols['lon_x'] != $bytes_latlon)
 	{
 		bo_set_conf('db_keys_update', 1);
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` CHANGE `lon_x` `lon_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL');
+		$sql_alter[] = 'CHANGE `lon_x` `lon_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL';
 	}
 
-		
+	if (!empty($sql_alter))
+		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter));
+
+	
+	
 	//4. Add keys if needed
+	$sql_alter = array();
 	if (!$keys['timelatlon'] && $bytes_time && $bytes_latlon)
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` ADD INDEX `timelatlon_index` (`time_x`,`lat_x`,`lon_x`)');
+		$sql_alter[] = 'ADD INDEX `timelatlon_index` (`time_x`,`lat_x`,`lon_x`)';
 
 	if (!$keys['time'] && $bytes_time)
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` ADD INDEX `time_index` (`time_x`)');
+		$sql_alter[] = 'ADD INDEX `time_index` (`time_x`)';
 
 	if (!$keys['latlon'] && $bytes_latlon)
-		bo_db_recreate_strike_keys_db('ALTER TABLE `'.BO_DB_PREF.'strikes` ADD INDEX `latlon_index` (`lat_x`,`lon_x`)');
+		$sql_alter[] = 'ADD INDEX `latlon_index` (`lat_x`,`lon_x`)';
 		
+	if (!empty($sql_alter))
+		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter));
+
 		
 	//5. update values
 	list($t1, $t2, $p1, $p2) = unserialize(bo_get_conf('db_keys_settings'));
