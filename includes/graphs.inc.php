@@ -1401,11 +1401,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
             private $seconds;
             private $nanoseconds;
 
-            public function __construct($time_string, $nanoseconds, $fix_event_time = false) {
-                $this->seconds = strtotime($time_string);
+            public function __construct($seconds, $nanoseconds) {
+                $this->seconds = $seconds;
                 $this->nanoseconds = $nanoseconds;
-                if ($fix_event_time)
-                    $this->seconds++;
             }
 
             public function isBefore($other) {
@@ -1425,56 +1423,43 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
             }
         }
 
-        $time_max = time();
-        $time_max = floor($time_max / 60) * 60 - 5 * 60; //round
-
-        $strikes_sql = "SELECT time, time_ns, distance FROM strikes
-            WHERE time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * 24) .
-            "' AND '" . gmdate('Y-m-d H:i:s', $time_max) . "';";
-        $strikes_res = bo_db($strikes_sql);
-
-        $raw_sql = "SELECT time, time_ns FROM raw
-            WHERE time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * 24) .
-            "' AND '" . gmdate('Y-m-d H:i:s', $time_max) . "';";
-        $raw_res = bo_db($raw_sql);
-
         $cVacuum = 0.299792458; # m / ns
         $cReduced = (1 - 0.0025) * $cVacuum;
 
-        $raw_row = $raw_res->fetch_assoc();
-        $raw_time = new Timestamp($raw_row['time'], $raw_row['time_ns'], true);
+        $time_max = time();
+        $time_max = floor($time_max / 60) * 60 - 5 * 60; //round
 
         $binsize = 2.5;
         $range = 20;
-
-        $Y = array_pad(array(), 2 * $range + 1, 0);
 
         $X = array();
         for ($index = -$range; $index <= $range; $index++) {
             $X[] = $index * $binsize;
         }
 
-        while ($strike_row = $strikes_res->fetch_assoc()) {
-            $strike_time = new Timestamp($strike_row['time'], $strike_row['time_ns']);
+        $Y = array_pad(array(), 2 * $range + 1, 0);
 
-            while ($raw_time->isBefore($strike_time)) {
-                if ($raw_row = $raw_res->fetch_assoc()) {
-                    $raw_time = new Timestamp($raw_row['time'], $raw_row['time_ns'], true);
-                } else {
-                    break;
-                }
-            }
+
+        $strikes_raw_sql = "SELECT s.time, s.time_ns, s.distance, r.time raw_time, r.time_ns raw_time_ns FROM strikes s
+            INNER JOIN raw r ON s.raw_id = r.id
+            WHERE s.time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * 12) .
+            "' AND '" . gmdate('Y-m-d H:i:s', $time_max) . "';";
+        $strikes_raw_res = bo_db($strikes_raw_sql);
+
+        while ($strike_raw_row = $strikes_raw_res->fetch_assoc()) {
+
+            $strike_time = new Timestamp(strtotime($strike_raw_row['time']), $strike_raw_row['time_ns']);
+            $raw_time = new Timestamp(strtotime($strike_raw_row['raw_time']) + 1, $strike_raw_row['raw_time_ns']);
 
             $dt = $raw_time->usDifference($strike_time);
 
-            $distance = $strike_row['distance'];
+            $distance = $strike_raw_row['distance'];
             $runtime = $distance / $cReduced / 1000.0;
 
             $difference = $dt - $runtime;
 
             $index = intval($difference / $binsize) + $range;
 
-            error_log(sprintf("%s %.1f, %.1f, %.1f, %d", $strike_time, $distance / 1000.0, $runtime, $dt, $index));
             if ($index >= 0 && $index <= 2 * $range) {
                 $Y[$index]++;
             }
@@ -1485,7 +1470,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
         $xmax = max($X);
         $ymin = 0;
         $ymax = max($Y);
-        error_log(sprintf("x #%d [%.1f,%.1f], y #%d [%.1f, %.1f]", sizeof($X), $xmin, $xmax, sizeof($Y), $ymin, $ymax));
     }
     else
 	{
