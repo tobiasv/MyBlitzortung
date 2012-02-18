@@ -3,7 +3,7 @@
     MyBlitzortung - a tool for participants of blitzortung.org
 	to display lightning data on their web sites.
 
-    Copyright (C) 2011  Tobias Volgnandt
+    Copyright (C) 2012  Tobias Volgnandt
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
