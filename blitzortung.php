@@ -194,11 +194,17 @@ if (!defined("BO_VER"))
 		bo_icon($_GET['icon']);
 		exit;
 	}
-	else if (isset($_GET['graph']))
-	{
-		bo_graph_raw($_GET['graph'], isset($_GET['spectrum']));
-		exit;
-	}
+	else if (isset($_GET['graph'])) {
+        if (isset($_GET['spectrum'])) {
+            $type = 'spectrum';
+        } elseif (isset($_GET['xy'])) {
+            $type = 'xy';
+        } else {
+            $type = False;
+        }
+        bo_graph_raw($_GET['graph'], $type);
+        exit;
+    }
 	else if (isset($_GET['image']))
 	{
 		bo_get_image($_GET['image']);

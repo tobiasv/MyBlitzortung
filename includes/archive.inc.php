@@ -1236,6 +1236,24 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				
 				echo '</td>';
 			}
+
+            if (BO_ARCHIVE_SHOW_XY)
+            {
+                echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_H.'px;">';
+                if ($row['raw_id'])
+                {
+                    $url = bo_bofile_url().'?graph='.$row['raw_id'].'&xy&bo_lang='._BL();
+                    echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_H.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_xy_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
+                }
+                elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
+                {
+                    echo _BL('signal not found');
+                }
+                else
+                    echo _BL('No signal received');
+
+                echo '</td>';
+            }
 		}
 		
 		echo '</tr><tr>';

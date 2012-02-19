@@ -24,7 +24,7 @@ if (!defined('BO_VER'))
 	exit('No BO_VER');
 
 // Graph from raw dataset
-function bo_graph_raw($id, $spec = false)
+function bo_graph_raw($id, $type = false)
 {
 	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
 		bo_graph_error(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
@@ -61,8 +61,13 @@ function bo_graph_raw($id, $spec = false)
 	$tickPositions = array();
 
 	$channels = BO_ANTENNAS;
-	
-	$graph = new Graph(BO_GRAPH_RAW_W,BO_GRAPH_RAW_H,"auto");
+
+    if ($type == 'xy') {
+        $width = BO_GRAPH_RAW_H;
+    } else {
+        $width = BO_GRAPH_RAW_W;
+    }
+	$graph = new Graph($width, BO_GRAPH_RAW_H, "auto");
 	$graph->ClearTheme();
 
 	if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
@@ -88,7 +93,7 @@ function bo_graph_raw($id, $spec = false)
 
 	$fullscale = isset($_GET['full']);
 	
-	if ($spec)
+	if ($type == 'spectrum')
 	{
 		$data = raw2array($row['data'], true);
 		$step = 5;
@@ -102,7 +107,6 @@ function bo_graph_raw($id, $spec = false)
 		$values   = bo_get_conf('raw_values');
 		
 		$graph->SetScale("textlin", 0, $fullscale ? null : BO_GRAPH_RAW_SPEC_MAX_Y, 0, BO_GRAPH_RAW_SPEC_MAX_X * $values * $utime / 1000);
-
 		
 		$plot1=new BarPlot($data['spec'][0]);
 		$plot1->SetFillColor(BO_GRAPH_RAW_COLOR1);
@@ -145,6 +149,35 @@ function bo_graph_raw($id, $spec = false)
 		$graph->xaxis->SetTextTickInterval(2);
 		
 	}
+    elseif ($type == 'xy')
+    {
+        $xmin = -BO_MAX_VOLTAGE;
+        $xmax = BO_MAX_VOLTAGE;
+        $ymin = -BO_MAX_VOLTAGE;
+        $ymax = BO_MAX_VOLTAGE;
+
+        $graph->SetScale("linlin",$ymin,$ymax,$xmin,$xmax);
+
+        $data = raw2array($row['data']);
+        $plot=new LinePlot($data['signal'][0], $data['signal'][1]);
+        $plot->SetColor(BO_GRAPH_RAW_COLOR_XY);
+        $graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+        $graph->yaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+        $graph->Add($plot);
+
+        $graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
+        $graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
+        $graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
+        $graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
+        $graph->yaxis->SetTextTickInterval(0.5);
+        $graph->xaxis->SetTickPositions(array(-2,-1,0,1,2), array(-1.5,-0.5,0.5,1.5));
+        $graph->yaxis->SetTickPositions(array(-2,-1,0,1,2), array(-1.5,-0.5,0.5,1.5));
+        $graph->xaxis->HideLabels();
+        $graph->yaxis->HideLabels();
+        $graph->xgrid->Show(true,false);
+        $graph->ygrid->Show(true,false);
+        $graph->SetMargin(1,1,1,1);
+    }
 	else
 	{
 		$data = raw2array($row['data']);
@@ -169,7 +202,7 @@ function bo_graph_raw($id, $spec = false)
 			}
 		}
 
-		
+
 		$n = count($datax);
 		$xmin = $datax[0];
 		$xmax = $datax[$n-1];
