@@ -1271,7 +1271,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '</td>';
 			}
 
-            if (BO_ARCHIVE_SHOW_XY)
+            if ($channels > 1 && BO_ARCHIVE_SHOW_XY)
             {
                 echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_H.'px;">';
                 if ($row['raw_id'])
