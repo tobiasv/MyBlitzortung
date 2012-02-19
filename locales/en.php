@@ -804,7 +804,7 @@ If a lightning strike was detected, some additional information correspondending
 <li><span class="bo_descr">Polarity:</span> Positive/negative lightning. Is determined out of signal. Very experimental, only suitable for near lightning!</li>
 <li><span class="bo_descr">Participants:</span> Number of stations that received the lightning strike. The more, the better.</li>
 <li><span class="bo_descr">Participanted:</span> Did the station {STATION} participate? If "no" is colored, then a signal has been received but it wasn\'t used for the calculation</li>
-<li><span class="bo_descr">Locating angle:</span> Max. angle of participated station around lightning position (in parenthesis: stations that weren\'t used for calculation). A value of 270° would be ideal, but a good locating is also possibe on much smaller values.
+<li><span class="bo_descr">Locating angle:</span> Max. angle of participated station around lightning position (in parenthesis: stations that weren\'t used for calculation). A value of 270° would be ideal, but a good locating is also possible on much smaller values.
 <li><span class="bo_descr">Channel:</span> Recorded channel in the graph (if station operates in "Best Channel Mode")
 </ul>
 ';
@@ -1008,4 +1008,4 @@ $_BL['en']['ani_prev'] = 'Prev';
 $_BL['en']['no GPS signal'] = 'no GPS signal';
 $_BL['en']['no reception'] = 'no reception';
 $_BL['en']['Loading...'] = 'Loading...';
-
+$_BL['en']['search_outside_radius'] = 'Searching outside of the circle is not possible!';

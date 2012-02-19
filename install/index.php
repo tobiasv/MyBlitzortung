@@ -62,7 +62,7 @@ define("BO_DB_PREF", "mybo_"); // you can change this individually
 
 define("BO_USER", "###Your Blitzortung.org Login###");
 define("BO_PASS", "###Your Blitzortung.org Password###");
-
+define("BO_REGION", 1);
 
 /*** Station info ***/
 
@@ -80,7 +80,7 @@ define("BO_UPDATE_SECRET", "'.uniqid().'");
 
 /*** Default language ***/
 
-define("BO_LOCALE", "de");
+define("BO_LOCALE", "en");
 
 
 /*** Time Zone setting ***/
@@ -109,7 +109,7 @@ else
 		$step = 0;
 		$msg = 2;
 	}
-	else if (headers_sent())
+	else if (headers_sent() || substr($contents,0,5) != '<?php' || substr($contents,-2) != '?>' )
 	{
 		$step = 0;
 		$msg = 3;
@@ -213,7 +213,7 @@ switch($step)
 
 		if ($msg)
 		{
-			echo '<p style="color:red; font-weight: bold">';
+			echo '<p style="color:red; font-weight: bold">Error: ';
 
 			switch($msg)
 			{
@@ -235,12 +235,14 @@ switch($step)
 		}
 
 		echo '<p><a href="?step=1">Continue to next step &gt;</a></p>';
-
-
+		echo '<br>';
+		echo '<p><em>Example for config.php :</em></p>';
 		echo '<div style="width: 900px; font-family: Courier; border: 1px solid #999; padding: 1px 10px; font-size: 10pt; background: #fff;">';
 		echo nl2br($code);
 		echo '</div>';
 
+		echo '<p><a href="?step=1">Continue to next step &gt;</a></p>';
+		
 		break;
 
 
@@ -394,23 +396,17 @@ switch($step)
 					
 					Use "'.$update_url.'&force" if you want to manually force an update (only for testing!).
 					With the force-option, there is no internal timer! Do not use it periodically.
-					It will cause high load on the Blitzortung-server!
 					</li>
 					</ul>
 			';
 		echo '<h3>Change your individual configuration</h3>
 				<p>Perhaps you want to add some settings to config.php. See README or <em>includes/default_settings.inc.php</em> for details.
-				German users should try these links:</p>
-				<ul>
-				<li><a target="_blank" href="http://www.myblitzortung.de/myblitzortung_config">Konfiguration (Allgemein)</a></li>
-				<li><a target="_blank" href="http://www.myblitzortung.de/myblitzortung_config_maps">Konfiguration (Karten)</a></li>
-				<li><a target="_blank" href="http://www.myblitzortung.de/myblitzortung_config_example">Konfiguration (Beispiel)</a></li>
-				</ul>
+				<br>See also <a target="_blank" href="http://www.myblitzortung.de/">myblitzortung.de</a>.
 				';
 				
 		echo '<h3>Copy JpGraph files.</h3>
 			<p>JpGraph is used for creating the graphs.
-			You can get it at <a href="http://jpgraph.net/download/">http://jpgraph.net/download/</a>. 
+			You can get it at <a href="http://jpgraph.net/download/" target="_blank">http://jpgraph.net/download/</a>. 
 			Copy the files from the JpGraph-<em>src</em> direcory to includes/jpgraph. 
 			You can omit the directories <em>src/barcode</em>, <em>src/Examples</em>
 			and all files beginnig width <em>flag</em>.

@@ -37,9 +37,12 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 	$info = bo_station_info();
 	
+	if ($info)
+		$station_text = $info['city'];
+		
 	$station_lat = BO_LAT;
 	$station_lon = BO_LON;
-	$station_text = $info['city'];
+	
 	
 ?>
 
@@ -85,7 +88,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 		bo_map = new google.maps.Map(document.getElementById("bo_gmap"), mapOptions);
 <?php
-	if ($show_station & 1)
+	if (($show_station & 1) && bo_station_id() > 0)
 	{
 ?>
 		var myLatlng = new google.maps.LatLng(<?php echo  "$station_lat,$station_lon" ?>);
@@ -99,7 +102,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 <?php
 	}
 	
-	if (($show_station & 2) && $radius)
+	if (($show_station & 2) && $radius && bo_station_id() > 0)
 	{
 ?>
 		var boDistCircle = {
@@ -712,19 +715,44 @@ function bo_map_reload_static(manual)
 		
 		echo '</div>';
 	}
-	
-	echo '<div class="bo_input_container" id="bo_map_advanced_options">';
-	echo '<span class="bo_form_descr">'._BL('Advanced').':</span> ';
-	
-	echo '<span class="bo_form_checkbox_text">';
-	echo '<input type="checkbox" onclick="bo_map_toggle_own(this.checked);" id="bo_map_opt_own"> ';
-	echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label> &nbsp; ';
-	echo '</span>';
 
-	if ((bo_user_get_level() & BO_PERM_NOLIMIT))
+	$show_adv_counter = (bo_user_get_level() & BO_PERM_NOLIMIT);
+
+	if (!$show_adv_counter || intval(BO_TRACKS_SCANTIME) || bo_station_id() > 0)
 	{
-		echo '</div>';
+		echo '<div class="bo_input_container" id="bo_map_advanced_options">';
+		echo '<span class="bo_form_descr">'._BL('Advanced').':</span> ';
 		
+		if (intval(BO_TRACKS_SCANTIME))
+		{
+			echo '<span class="bo_form_checkbox_text">';
+			echo '<input type="checkbox" onclick="bo_map_toggle_tracks(this.checked);" id="bo_map_opt_tracks"> ';
+			echo '<label for="bo_map_opt_tracks">'._BL("show tracks").'</label> &nbsp; ';
+			echo '</span>';
+		}
+		
+		if (bo_station_id() > 0)
+		{
+			echo '<span class="bo_form_checkbox_text">';
+			echo '<input type="checkbox" onclick="bo_map_toggle_own(this.checked);" id="bo_map_opt_own"> ';
+			echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label> &nbsp; ';
+			echo '</span>';
+		}
+		
+		if (!$show_adv_counter)
+		{
+			echo '<span class="bo_form_checkbox_text">';
+			echo '<input type="checkbox" onclick="bo_map_toggle_count(this.checked);" id="bo_map_opt_count"> ';
+			echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
+			echo '</span>';
+		}
+
+		echo '</div>';
+	}
+	
+	if ($show_adv_counter)
+	{
+
 		echo '<div class="bo_input_container" id="bo_map_statistic_options">';
 		echo '<span class="bo_form_descr">'._BL('Statistics').':</span> ';
 		
@@ -742,25 +770,11 @@ function bo_map_reload_static(manual)
 		echo '<input type="radio" name="bo_map_counter" value="2" onclick="bo_map_toggle_count(this.value);" id="bo_map_opt_count2"> ';
 		echo '<label for="bo_map_opt_count2">'._BL("show strike counter").' ('._BL('stations').')</label> &nbsp; ';
 		echo '</span>';
+		
+		echo '</div>';
 	}
-	else
-	{
-		echo '<span class="bo_form_checkbox_text">';
-		echo '<input type="checkbox" onclick="bo_map_toggle_count(this.checked);" id="bo_map_opt_count"> ';
-		echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
-		echo '</span>';
-	}
-	
-	if (intval(BO_TRACKS_SCANTIME))
-	{
-		echo '<span class="bo_form_checkbox_text">';
-		echo '<input type="checkbox" onclick="bo_map_toggle_tracks(this.checked);" id="bo_map_opt_tracks"> ';
-		echo '<label for="bo_map_opt_tracks">'._BL("show tracks").'</label> &nbsp; ';
-		echo '</span>';
-	}
-	
-	echo '</div>';
 
+	
 	echo '<div class="bo_input_container" id="bo_map_stations_options">';
 	echo '<span class="bo_form_descr">'._BL('Show Stations').':</span> ';
 	echo '<span class="bo_form_checkbox_text">';

@@ -41,7 +41,7 @@ function bo_show_statistics()
 		}
 	}
 	
-	if (!$station_id || !$city)
+	if ( (!$station_id || !$city) && bo_station_id() > 0)
 	{
 		$station_id = bo_station_id();
 		$own_station = true;
@@ -68,46 +68,62 @@ function bo_show_statistics()
 
 	echo '</ul>';
 
-	if ($add_stid)
+	if (bo_station_id() < 0)
 	{
-		echo '<div id="bo_stat_other_station_info">';
-		echo strtr(_BL('bo_stat_other_station_info'), array('{STATION_CITY}' => _BC($city)));
-		echo ' <a href="'.bo_insert_url('bo_station_id').'">'._BL('bo_stat_other_station_info_back').'</a>';
+		echo '<div id="bo_stat_station_select">';
+		echo '<fieldset>';
+		echo '<form>';
+		echo _BL('Select station').': ';
+		echo bo_insert_html_hidden(array('bo_station_id'));
+		echo get_stations_html_select($station_id);
+		echo '</form>';
+		echo '</fieldset>';
 		echo '</div>';
 	}
-
-	switch($show)
+	
+	if (bo_station_id() >= 0 || $station_id || !$show || $show == 'strikes')
 	{
-		default:
-		case 'strikes':
-			bo_show_statistics_strikes($station_id, $own_station, $add_graph);
-			break;
+	
+		if ($add_stid && bo_station_id() >= 0)
+		{
+			echo '<div id="bo_stat_other_station_info">';
+			echo strtr(_BL('bo_stat_other_station_info'), array('{STATION_CITY}' => _BC($city)));
+			echo ' <a href="'.bo_insert_url('bo_station_id').'">'._BL('bo_stat_other_station_info_back').'</a>';
+			echo '</div>';
+		}
+	
+		switch($show)
+		{
+			default:
+			case 'strikes':
+				bo_show_statistics_strikes($station_id, $own_station, $add_graph);
+				break;
 
-		case 'station':
-			bo_show_statistics_station($station_id, $own_station, $add_graph);
-			break;
+			case 'station':
+				bo_show_statistics_station($station_id, $own_station, $add_graph);
+				break;
 
-		case 'longtime':
-			echo '<h3>'._BL('h3_stat_longtime').'</h3>';
-			bo_show_statistics_longtime($station_id, $own_station, $add_graph);
-			break;
+			case 'longtime':
+				echo '<h3>'._BL('h3_stat_longtime').'</h3>';
+				bo_show_statistics_longtime($station_id, $own_station, $add_graph);
+				break;
 
-		case 'network':
-			echo '<h3>'._BL('h3_stat_network').'</h3>';
-			bo_show_statistics_network($station_id, $own_station, $add_graph);
-			break;
+			case 'network':
+				echo '<h3>'._BL('h3_stat_network').'</h3>';
+				bo_show_statistics_network($station_id, $own_station, $add_graph);
+				break;
 
-		case 'other':
-			echo '<h3>'._BL('h3_stat_other').'</h3>';
-			bo_show_statistics_other($station_id, $own_station, $add_graph);
-			break;
-		
-		case 'advanced':
-			echo '<h3>'._BL('h3_stat_advanced').'</h3>';
-			bo_show_statistics_advanced($station_id, $own_station, $add_graph);
-			break;
+			case 'other':
+				echo '<h3>'._BL('h3_stat_other').'</h3>';
+				bo_show_statistics_other($station_id, $own_station, $add_graph);
+				break;
+			
+			case 'advanced':
+				echo '<h3>'._BL('h3_stat_advanced').'</h3>';
+				bo_show_statistics_advanced($station_id, $own_station, $add_graph);
+				break;
+		}
 	}
-
 	echo '</div>';
 
 	bo_copyright_footer();
@@ -287,16 +303,16 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time">';
 	echo _BL('bo_graph_descr_strikes_time');
 	echo '</p>';
-	bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&region='.$region);
+	bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&region='.$region.$add_graph);
 
-	if (!$region)
+	if (!$region && $own_station)
 	{
 		echo '<a name="graph_strikes"></a>';
 		echo '<h4>'._BL('h4_graph_strikes_time_radius').'</h4>';
 		echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time_radius">';
 		echo strtr(_BL('bo_graph_descr_strikes_time_radius'), array('{RADIUS}' => BO_RADIUS_STAT));
 		echo '</p>';
-		bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&radius=1');
+		bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&radius=1'.$add_graph);
 	}
 	
 	echo '</div>';

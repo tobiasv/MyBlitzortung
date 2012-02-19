@@ -89,7 +89,8 @@ function bo_update_all2($force = false, $only = '')
 
 		
 	//check if we should do an async update
-	if ( !(BO_UP_INTVL_STRIKES <= BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS <= BO_UP_INTVL_RAW) )
+	if (    (BO_UP_INTVL_STRIKES > BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS) 
+	     || (BO_UP_INTVL_STRIKES > BO_UP_INTVL_RAW)     && BO_UP_INTVL_RAW)
 	{
 		if (!$force)
 			bo_echod("Info: Asynchronous update. No problem, but untestet. To avoid set strike timer < station timer < signal timer (or equal).");
@@ -317,13 +318,13 @@ function bo_update_raw_signals($force = false)
 		return true;
 	}
 	
-	list($last, $auto_force) = @unserialize(bo_get_conf('uptime_raw_try'));
+	list($last_update, $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified) = @unserialize(bo_get_conf('uptime_raw_data'));
 
 	$count_inserted = 0;
 	$count_exists = 0;
 	$count_updated = 0;
 
-	$do_update = time() - $last > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last;
+	$do_update = time() - $last_update > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last_update;
 	
 	//Auto force = if there are more files to load (e.g. after installation)
 	if (!$do_update && 0 < $auto_force && $auto_force < 30)
@@ -334,28 +335,55 @@ function bo_update_raw_signals($force = false)
 	
 	if ($do_update)
 	{
-		bo_set_conf('uptime_raw_try', serialize(array(time(),0)));
+		//set only the important entries to avoid problems if import crashes
+		bo_set_conf('uptime_raw_data', serialize(array(time(), 0, $update_errs+1))); 
+		
 		$max_signal_back_hours = 22;
+		$read_back_seconds = 180;
+		$update_err = false;
 		
 		// Search last signal
 		$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 		$res = bo_db($sql);
 		$row = $res->fetch_assoc();
 		$last_signal = strtotime($row['mtime'].' UTC');
-		if (!$last_signal || $last_signal > time() || $last_signal < time() - $max_signal_back_hours * 3600)
-		{
-			bo_echod("No last signal found or last recieved signal too old! Last time: ".$row['mtime'].". Setting to now -$max_signal_back_hours hours.");
-			$last_signal = time() - 3600 * $max_signal_back_hours;
-		}
-		
-		$update_time_start = $last_signal - 120;
+		$update_time_start = $last_signal - $read_back_seconds;
 		$update_time_end   = time();
 		
-		// anti-duplicate without using unique-db keys
+		if ($update_errs > 10 || (!$last_signal && $last_update) )
+		{
+			//avoid downloading the same (missing) files again and again -> only (try to) get the latest data
+			bo_echod("There were errors during the last import or couldn't find any signal in the database ($update_errs)! Getting only the latest raw-data file.");
+			$update_time_start = time() - 3600;
+			$last_file_pos = 0;
+			$last_hour = false;
+		}
+		elseif (!$last_signal && !$last_update)
+		{
+			//First update ever
+			bo_echod("No last signal found (maybe first update)! Update begins at 'now -$max_signal_back_hours hours'");
+			$update_time_start = time() - 3600 * $max_signal_back_hours;
+			$last_file_pos = 0;
+			$last_hour = false;
+		}
+		elseif (	$last_signal > time() 
+				|| time() - $last_update > $max_signal_back_hours * 3600
+				|| time() - $last_signal > $max_signal_back_hours * 3600
+				)
+		{
+			//Last update or last signal was too long ago
+			bo_echod("No last signal found or last recieved signal too old! Last time: ".$row['mtime'].". Setting to now -$max_signal_back_hours hours.");
+			$update_time_start = time() - 3600 * $max_signal_back_hours;
+			$last_file_pos = 0;
+			$last_hour = false;
+		}
+		
+		
+		//anti-duplicate without using unique-db keys
 		//Searching for old Signals (to avoid duplicates)
 		$old_times = array();
 		$date_start = gmdate('Y-m-d H:i:s', $update_time_start);
-		$date_end = gmdate('Y-m-d H:i:s', $last_signal + 3600 * 6); //6h to the future to be sure 
+		$date_end = gmdate('Y-m-d H:i:s', time() + 3600 * 6); //6h to the future to be sure 
 		$sql = "SELECT id, time, time_ns
 				FROM ".BO_DB_PREF."raw
 				WHERE time BETWEEN '$date_start' AND '$date_end'";
@@ -366,8 +394,8 @@ function bo_update_raw_signals($force = false)
 			$old_times[$row['id']] = $row['time'].'.'.$row['time_ns'];
 		}
 		
+
 		//which files to download
-		$range = 0; //ToDo
 		$hours = array();
 		for ($i=floor($update_time_start/3600); $i<=floor($update_time_end/3600);$i++)
 			$hours[] = gmdate('H', $i*3600);
@@ -381,29 +409,85 @@ function bo_update_raw_signals($force = false)
 				' *** Loading '.count($hours).' files'.
 				' *** This is update #'.$loadcount);
 		
+		//bo_echod("Last hour: $last_hour  Last pos: $last_file_pos");
+		
 		$files = 0;
+		$lines = 0;
 		foreach($hours as $hour)
 		{
-			$url  = bo_access_url().BO_IMPORT_PATH_RAW.trim(BO_USER).'/'.$hour.'.log';
-			$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
+			$range = 0;
+			$bytes = 0;
 			$files++;
+			$text = " $files. Reading file $hour.log ";
+			$url  = bo_access_url().BO_IMPORT_PATH_RAW.trim(BO_USER).'/'.$hour.'.log';
+			$modified = $last_modified ? $last_modified : $last_signal;
 			
-			$text = " - Reading file $hour.log";
+			//using range-method if parameters known
+			if ($files == 1 && $last_hour !== false && $last_hour == $hour && $last_file_pos)
+			{
+				$range = $last_file_pos;
+				$text .= " using range method (starting at $last_file_pos bytes)";
+				$last_hour = false; //reset
+			}
 			
+			// GET THE FILE
+			$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
+			
+			
+			//sth. went wrong -> retry without range
+			if ($file === false && $code != 304)
+			{
+				$text .= 'sth went rong -> getting the file the 2nd time';
+				$modified = $last_modified ? $last_modified : $last_signal;
+				
+				// GET THE FILE (again)
+				$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
+			}
+			elseif ($file !== false && empty($range) && $last_file_pos)
+			{
+				$text .= " - got whole file ";
+			}
+
+			//Check the file
 			if ($file === false)
 			{
-				bo_echod($text." *** couldn't get file $url *** Code: $code");
+				if ($code == 304)
+				{
+					bo_echod($text." *** file not modified");
+				}
+				else
+				{
+					bo_echod($text." *** couldn't get file $url *** Code: $code");
+					$update_err = true;
+					$last_file_pos = 0;
+				}
+				
 				continue;
 			}
 			else
 			{
+				//use the range method for the previous hour-file if
+				if (!$modified || gmdate('H', $modified-$read_back_seconds) == $hour)
+				{
+					//save range and modified-time for the next try
+					if (isset($range[1]))
+						$last_file_pos = $range[1];
+					else
+						$last_file_pos = strlen(implode('', $file));
+				
+					$last_modified = $modified;
+					$last_hour = $hour;			
+				}
+			
 				bo_echod($text." *** ".count($file)." Lines ... ");
 			}
 			
 			//Read the signals
 			foreach($file as $line)
 			{
-				if (!$line)
+				$bytes += strlen($line)+1;
+				
+				if (!trim($line))
 					continue;
 					
 				if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $line, $r))
@@ -418,7 +502,7 @@ function bo_update_raw_signals($force = false)
 				$utime = strtotime("$date $time UTC");
 
 				// update strike-data only some seconds *before* the *last signal*
-				if ($utime < $last_signal)
+				if ($utime < $update_time_start)
 				{
 					$count_exists++;
 					continue;
@@ -489,9 +573,12 @@ function bo_update_raw_signals($force = false)
 					if (count($hours) - $files > 1)
 					{
 						$auto_force++;
-						bo_set_conf('uptime_raw_try', serialize(array(time(),$auto_force)));
 						bo_echod('Auto update will occur during the next import to get the remaining files!');
 					}
+					
+					//change byte range for partial download
+					if ($last_file_pos)
+						$last_file_pos -= $bytes;
 
 					$timeout = true;
 					break 2;
@@ -500,6 +587,16 @@ function bo_update_raw_signals($force = false)
 			}
 			
 		}
+
+		if ($update_err)
+			$update_errs++;
+			
+		if (!$timeout)
+			$auto_force = false;
+		
+		//bo_echod("Pos: $last_file_pos Hour: $last_hour");
+		
+		bo_set_conf('uptime_raw_data', serialize(array(time(), $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified)));		
 		
 		bo_echod("Lines: $lines *** Files: $files *** New Raw Data: $count_inserted *** Updated: $count_updated *** Already read: $count_exists");
 
@@ -525,11 +622,13 @@ function bo_update_raw_signals($force = false)
 		else
 			$updated = false;
 		
+		if ($update_err)
+			bo_update_error('rawdata', 'Download of raw data failed. '.$code);
 		
 	}
 	else
 	{
-		bo_echod("No update. Last update ".(time() - $last)." seconds ago. This is normal and no error message!");
+		bo_echod("No update. Last update ".(time() - $last_update)." seconds ago. This is normal and no error message!");
 		$updated = false;
 	}
 
@@ -551,7 +650,7 @@ function bo_update_strikes($force = false)
 		bo_set_conf('uptime_strikes_try', time());
 		
 		$start_time = time();
-		$stations = bo_stations('user');
+		$stations = bo_stations();
 		$own_id = bo_station_id();
 
 		$count_updated = 0;
@@ -571,12 +670,14 @@ function bo_update_strikes($force = false)
 		$min_dist_all[$own_id] = 9E12;
 		$max_dist_own[$own_id] = 0;
 		$min_dist_own[$own_id] = 9E12;
-
-		if (BO_ENABLE_LONGTIME_ALL === true)
+		$user2id = array();
+		
+		foreach($stations as $stId => $sdata)
 		{
-			foreach($stations as $sdata)
+			$user2id[$sdata['user']] = $stId;
+			
+			if (BO_ENABLE_LONGTIME_ALL === true)
 			{
-				$stId = $sdata['id'];
 				$longtime_stations[$stId] = $stId;
 				$max_dist_all[$stId] = 0;
 				$min_dist_all[$stId] = 9E12;
@@ -584,6 +685,28 @@ function bo_update_strikes($force = false)
 				$min_dist_own[$stId] = 9E12;
 			}
 		}
+		
+		//Extra keys for database
+		$keys_enabled = (BO_DB_EXTRA_KEYS === true);
+		$key_bytes_time   = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_TIME_BYTES)   : 0;
+		$key_bytes_latlon = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_LATLON_BYTES) : 0;
+		$key_bytes_time   = 0 < $key_bytes_time   && $key_bytes_time   <= 4 ? $key_bytes_time   : 0;
+		$key_bytes_latlon = 0 < $key_bytes_latlon && $key_bytes_latlon <= 4 ? $key_bytes_latlon : 0;
+			
+		if ($key_bytes_time)
+		{
+			$key_time_vals   = pow(2, 8 * $key_bytes_time);
+			$key_time_start  = strtotime(BO_DB_EXTRA_KEYS_TIME_START);
+			$key_time_div    = (double)BO_DB_EXTRA_KEYS_TIME_DIV_MINUTES;
+		}
+
+		if ($key_bytes_latlon)
+		{
+			$key_latlon_vals = pow(2, 8 * $key_bytes_latlon);
+			$key_lat_div     = (double)BO_DB_EXTRA_KEYS_LAT_DIV;
+			$key_lon_div     = (double)BO_DB_EXTRA_KEYS_LON_DIV;
+		}
+
 		
 		/***** PREPARATIONS BEFORE READING *****/
 		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
@@ -791,19 +914,7 @@ function bo_update_strikes($force = false)
 			$dist = bo_latlon2dist($lat, $lon);
 			$bear = bo_latlon2bearing($lat, $lon);
 			
-			$sql = "
-						time='$date $time',
-						time_ns='$time_ns',
-						lat='$lat',lon='$lon',
-						distance='$dist',
-						bearing='$bear',
-						deviation='$deviation',
-						current='$cur',
-						users='$users',
-						part='$part'
-						";
-
-			
+		
 			//sometimes two strikes with same time one after another --> ignore 2nd one
 			if ("$time.$time_ns" === $time_last_strike)
 				continue;
@@ -891,7 +1002,29 @@ function bo_update_strikes($force = false)
 					$id = $ids_found[0];
 				}
 			}
-	
+
+			
+			$sql = "
+				time='$date $time',
+				time_ns='$time_ns',
+				lat='$lat',lon='$lon',
+				distance='$dist',
+				bearing='$bear',
+				deviation='$deviation',
+				current='$cur',
+				users='$users',
+				part='$part'
+				";
+
+				
+			if ($key_bytes_time)
+				$sql .= ', time_x=(FLOOR(('.($utime-$key_time_start).')/60/'.$key_time_div.')%'.$key_time_vals.')';
+			
+			
+			if ($key_bytes_latlon)
+				$sql .= ', lat_x=FLOOR((('.(90+$lat).')%'.$key_lat_div.')/'.$key_lat_div.'*'.$key_latlon_vals.') 
+						 , lon_x=FLOOR((('.(180+$lon).')%'.$key_lon_div.')/'.$key_lon_div.'*'.$key_latlon_vals.')';
+
 			
 			if (!$id) //new strike
 			{
@@ -924,7 +1057,7 @@ function bo_update_strikes($force = false)
 				$sql = '';
 				foreach($participants as $user)
 				{
-					$stId = $stations[$user]['id'];
+					$stId = $user2id[$user];
 					$last_strikes[$stId] = array($utime, $time_ns, $id);
 					$sql .= ($sql ? ',' : '')." ('$id', '$stId') ";
 				}
@@ -975,9 +1108,8 @@ function bo_update_strikes($force = false)
 				// *** other stations *** //
 				if (BO_ENABLE_LONGTIME_ALL === true)
 				{
-					foreach($stations as $sdata)
+					foreach($stations as $stId => $sdata)
 					{
-						$stId = $sdata['id'];
 						$stLat = $sdata['lat'];
 						$stLon = $sdata['lon'];
 
@@ -1057,7 +1189,7 @@ function bo_update_strikes($force = false)
 			
 			$oldcount = bo_get_conf('count_strikes_own'.$add);
 			bo_set_conf('count_strikes_own'.$add, $oldcount + $count);		
-		
+			
 			$bear_data_tmp = unserialize(bo_get_conf('longtime_bear_own'.$add));
 			if (!$bear_data_tmp['time']) $bear_data_tmp['time'] = time();
 			foreach($bear_data_own[$stId] as $bear_id => $bear_count)
@@ -1090,41 +1222,46 @@ function bo_update_strikes($force = false)
 		//Update Longtime statistics per station for all strikes
 		foreach($longtime_stations as $stId)
 		{
-			$add = $stId == $own_id ? '' : '#'.$stId.'#';
-			
-			$count = bo_get_conf('count_strikes'.$add);
-			bo_set_conf('count_strikes'.$add, $count + $count_inserted);
-			
-			if (isset($dist_data[$stId]))
+			//update only if station is active or got some strikes during the update
+			if ($stations[$stId]['status'] == 'A' || $strikesperstation[$stId])
 			{
-				$dist_data_tmp = unserialize(bo_get_conf('longtime_dist'.$add));
-				if (!$dist_data_tmp) $dist_data_tmp['time'] = time();
-				foreach($dist_data[$stId] as $dist_id => $dist_count)
-					$dist_data_tmp[$dist_id] += $dist_count;
-				bo_set_conf('longtime_dist'.$add, serialize($dist_data_tmp));
-			}
-			
-			if (isset($bear_data[$stId]))
-			{
-				$bear_data_tmp = unserialize(bo_get_conf('longtime_bear'.$add));
-				if (!$bear_data_tmp) $bear_data_tmp['time'] = time();
-				foreach($bear_data[$stId] as $bear_id => $bear_count)
-					$bear_data_tmp[$bear_id] += $bear_count;
-				bo_set_conf('longtime_bear'.$add, serialize($bear_data_tmp));
-			}
-			
-			$max = bo_get_conf('longtime_max_dist_all'.$add);
-			if ($max < $max_dist_all[$stId])
-			{
-				bo_set_conf('longtime_max_dist_all'.$add, $max_dist_all[$stId]);
-				bo_set_conf('longtime_max_dist_all_time'.$add, time());
-			}
 
-			$min = bo_get_conf('longtime_min_dist_all'.$add);
-			if (!$min || $min > $min_dist_all[$stId])
-			{
-				bo_set_conf('longtime_min_dist_all'.$add, $min_dist_all[$stId]);
-				bo_set_conf('longtime_min_dist_all_time'.$add, time());
+				$add = $stId == $own_id ? '' : '#'.$stId.'#';
+				
+				$count = bo_get_conf('count_strikes'.$add);
+				bo_set_conf('count_strikes'.$add, $count + $count_inserted);
+				
+				if (isset($dist_data[$stId]))
+				{
+					$dist_data_tmp = unserialize(bo_get_conf('longtime_dist'.$add));
+					if (!$dist_data_tmp) $dist_data_tmp['time'] = time();
+					foreach($dist_data[$stId] as $dist_id => $dist_count)
+						$dist_data_tmp[$dist_id] += $dist_count;
+					bo_set_conf('longtime_dist'.$add, serialize($dist_data_tmp));
+				}
+				
+				if (isset($bear_data[$stId]))
+				{
+					$bear_data_tmp = unserialize(bo_get_conf('longtime_bear'.$add));
+					if (!$bear_data_tmp) $bear_data_tmp['time'] = time();
+					foreach($bear_data[$stId] as $bear_id => $bear_count)
+						$bear_data_tmp[$bear_id] += $bear_count;
+					bo_set_conf('longtime_bear'.$add, serialize($bear_data_tmp));
+				}
+				
+				$max = bo_get_conf('longtime_max_dist_all'.$add);
+				if ($max < $max_dist_all[$stId])
+				{
+					bo_set_conf('longtime_max_dist_all'.$add, $max_dist_all[$stId]);
+					bo_set_conf('longtime_max_dist_all_time'.$add, time());
+				}
+
+				$min = bo_get_conf('longtime_min_dist_all'.$add);
+				if (!$min || $min > $min_dist_all[$stId])
+				{
+					bo_set_conf('longtime_min_dist_all'.$add, $min_dist_all[$stId]);
+					bo_set_conf('longtime_min_dist_all_time'.$add, time());
+				}
 			}
 
 		}
@@ -1596,7 +1733,12 @@ function bo_update_stations($force = false)
 				
 				//extra data
 				$cdata = unserialize(bo_get_conf('stations_new_data'));
-				bo_set_conf('stations_new_data', serialize(array_merge($cdata, $cdata_tmp)));
+				if (!is_array($cdata))
+					$cdata = $cdata_tmp;
+				else
+					$cdata = array_merge($cdata, $cdata_tmp);
+					
+				bo_set_conf('stations_new_data', serialize($cdata));
 			}
 		}
 		
@@ -1740,7 +1882,7 @@ function bo_update_stations($force = false)
 				bo_set_conf('longtime_max_strikesh_own_time'.$add, $time);
 			}
 
-			//Activity/inactivity counter for own station
+			//Activity/inactivity counter
 			$time_interval = $last ? $time - $last : 0;
 			if ($StData[$stId]['sig'])
 			{
@@ -1758,7 +1900,7 @@ function bo_update_stations($force = false)
 			}
 
 
-			//Activity/inactivity counter for own station (GPS V-state)
+			//Activity/inactivity counter (GPS V-state)
 			$time_interval = $last ? $time - $last : 0;
 			if ($StData[$stId]['status'] == 'V')
 			{

@@ -172,6 +172,13 @@ function bo_user_show_admin()
 			bo_cache_info();
 			break;
 
+		case 'strike_keys':
+			echo '<h4>'._BL('Updating database keys...').'</h4>';
+			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
+			bo_db_recreate_strike_keys();
+			echo '</div></pre>';
+			break;
+			
 		case 'cities':
 			bo_import_cities();
 			break;
@@ -198,6 +205,7 @@ function bo_user_show_admin()
 			echo '<li><a href="'.$url.'update&bo_only=tracks">'._BL('Update only tracks').'</a></li>';
 			echo '<li><a href="'.$url.'update&bo_only=purge">'._BL('Force data purge only').'</a></li>';
 			echo '<li><a href="'.$url.'update&bo_only=alerts">'._BL('Check alerts only').'</a></li>';
+			echo '<li><a href="'.$url.'strike_keys">'._BL('Update database keys').'</a></li>';
 			echo '</ul>';
 
 			echo '<h5>'._BL('Specials').'</h5>';
@@ -215,12 +223,12 @@ function bo_user_show_admin()
 			
 			echo '<h5>'._BL('Links').'</h5>';
 			echo '<ul>';
-			
+
+/*			
 			$bo_login_id = bo_get_conf('bo_login_id');
-			
 			if ($bo_login_id)
 				echo '<li><a href="http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$bo_login_id.'" target="_blank">Blitzortung.org</a> (with your Login-String)</li>';
-			
+*/			
 				
 			echo '</ul>';
 			

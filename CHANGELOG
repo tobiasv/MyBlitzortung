@@ -3,6 +3,17 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.5 (2012-??-??)
+-------------------------------
+- new: option enable database keys for faster lightning search/drawing
+    --> uses some disk space
+	--> you should enable if you have archived lightning-data
+- improved: partial file download for raw data, default interval is 10 minutes now
+- improved: (a bit) behaviour with lightning search
+- cleaned and fixed install
+- added a clean config.php.example
+- fix: update longtime-statistics only when station is active
+
 Version 0.7.4a (2012-02-10)
 ---------------------------
 - new: italian translation (thx to Stefano Cirilli - www.meteo.units.it)

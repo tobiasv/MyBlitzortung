@@ -20,96 +20,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 if (!defined('BO_VER'))
 	exit('No BO_VER');
 	
 	
-// Database helper
-function bo_db($query = '', $die_on_errors = true)
-{
-	$connid = BoDb::connect();
-
-	if (!$query)
-		return $connid;
-
-	$qtype = strtolower(substr(trim($query), 0, 6));
-	
-	/*
-	switch ($qtype)
-	{
-		case 'insert': 
-		case 'delete':
-		case 'update':
-		case 'replace':
-			echo "<p>$query</p>";
-			return;
-	}
-	*/
-		
-	$erg = BoDb::query($query);
-
-	if ($erg === false)
-	{
-		if ($die_on_errors !== false)
-			echo("<p>Database Query Error:</p><pre>" . htmlspecialchars(BoDb::error()) .
-				"</pre> <p>for query</p> <pre>" . htmlspecialchars($query) . "</pre>");
-	
-		if ($die_on_errors === true)
-			die();
-	}
-
-	switch ($qtype)
-	{
-		case 'insert':
-			return BoDb::insert_id();
-
-		case 'replace':
-		case 'delete':
-		case 'update':
-			return BoDb::affected_rows();
-
-		default:
-			return $erg;
-	}
-
-}
-
-
-
-// Load config from database
-function bo_get_conf($name, &$changed=0)
-{
-	$row = bo_db("SELECT data, UNIX_TIMESTAMP(changed) changed FROM ".BO_DB_PREF."conf WHERE name='".BoDb::esc($name)."'")->fetch_object();
-	$changed = $row->changed;
-
-	return $row->data;
-}
-
-// Save config in database
-function bo_set_conf($name, $data)
-{
-	$name_esc = BoDb::esc($name);
-	$data_esc = BoDb::esc($data);
-
-	if ($data === null)
-	{
-		$sql = "DELETE FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
-		return bo_db($sql);
-	}
-	
-	$sql = "SELECT data, name FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
-	$row = bo_db($sql)->fetch_object();
-
-	if (!$row->name)
-		$sql = "INSERT ".BO_DB_PREF."conf SET data='$data_esc', name='$name_esc'";
-	elseif ($row->data != $data)
-		$sql = "UPDATE ".BO_DB_PREF."conf SET data='$data_esc' WHERE name='$name_esc'";
-	else
-		$sql = NULL; // no update necessary
-
-	return $sql ? bo_db($sql) : true;
-}
-
 // latitude, longitude to distance in meters
 function bo_latlon2dist($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
 {
@@ -269,6 +184,9 @@ function bo_station_name2id($name)
 //returns your station_id
 function bo_station_id()
 {
+	if (BO_NO_DEFAULT_STATION === true)
+		return -1; // -1 ==> does not interfer with station statistic table (0 = all stations)
+	
 	static $id = 0;
 	
 	if (!$id)
@@ -309,6 +227,9 @@ function bo_station_info($id = 0)
 	}
 	else //own station info
 	{
+		if (BO_NO_DEFAULT_STATION === true)
+			return false;
+			
 		$tmp = bo_stations('user', BO_USER);
 		
 		if (defined('BO_STATION_NAME') && BO_STATION_NAME)
@@ -321,6 +242,42 @@ function bo_station_info($id = 0)
 	
 	return $info[$id];
 }
+
+
+function get_station_list()
+{
+	$stations = bo_stations();
+	$opts = array();
+	foreach($stations as $id => $d)
+	{
+		if (!$d['country'] || !$d['city'] || $d['status'] == '-')
+			continue;
+		
+		$opts[$id] = _BL($d['country']).': '._BC($d['city']);
+	}
+	
+	asort($opts);
+	
+	return $opts;
+}
+
+function get_stations_html_select($station_id)
+{
+	$opts = get_station_list();
+	
+	$text = '<select name="bo_station_id" onchange="submit()">';
+	$text .= '<option></option>';
+	foreach($opts as $id => $name)
+	{
+		$text .= '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>';
+		$text .= $name;
+		$text .= '</option>';
+	}
+	$text .= '</select>';
+	
+	return $text;
+}
+
 
 //insert HTML-hidden tags of actual GET-Request
 function bo_insert_html_hidden($exclude = array())
@@ -596,6 +553,16 @@ function bo_latlon2projection($proj, $lat, $lon)
 	}
 }
 
+function bo_sql_latlon2dist($lat1, $lon1, $lat_name='lat', $lon_name)
+{
+	if ($lat1 == $lat2 && $lon1 == $lon2)
+		return 0;
+
+	$sql = "ACOS(SIN(RADIANS($lat1)) * SIN(RADIANS($lat_name)) + COS(RADIANS($lat1)) * COS(RADIANS($lat_name)) * COS(RADIANS($lon1 - $lon_name))) * 6371000";
+
+	return " ($sql) ";
+}
+
 function bo_sql_lat2tiley($name, $zoom)
 {
 	$scale = (1 << $zoom) * 256;
@@ -842,8 +809,12 @@ function bo_load_locale($locale = '')
 
 }
 
-function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0, $as_array = false)
+function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0, $as_array = false, $depth=0)
 {
+	//avoid infinite loop on redirections (recursion)
+	if ($depth > 5)
+		return false;
+		
 	if (BO_USE_PHPURLWRAPPER === true)
 	{
 		$content = file_get_contents($url);
@@ -948,7 +919,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 						$url  = 'http://';
 						$url .= $user && $pass ? $user.':'.$pass.'@' : '';
 						$url .= $host.$path.$location;
-						return bo_get_file($url, $error, $type, $range, $modified, $as_array);
+						return bo_get_file($url, $error, $type, $range, $modified, $as_array, $depth+1);
 					}
 					else
 						$err = 2;
@@ -1043,17 +1014,57 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 
 function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 {
-	if ($lat1 === false)
+	if ($lat1 === false || $lat2 === false || $lon1 === false || $lon2 === false)
 		return " 1 ";
 	
 	$sql = " (s.lat BETWEEN '$lat1' AND '$lat2' AND s.lon BETWEEN '$lon1' AND '$lon2') ";
+	
+
+	//Extra keys for faster search (esp. tiles ans strike search)
+	$keys_enabled = (BO_DB_EXTRA_KEYS === true);
+	$key_bytes_latlon = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_LATLON_BYTES) : 0;
+	$key_bytes_latlon = 0 < $key_bytes_latlon && $key_bytes_latlon <= 4 ? $key_bytes_latlon : 0;
+
+	if ($key_bytes_latlon)
+	{
+		$key_latlon_vals = pow(2, 8 * $key_bytes_latlon);
+		$key_lat_div     = (double)BO_DB_EXTRA_KEYS_LAT_DIV;
+		$key_lon_div     = (double)BO_DB_EXTRA_KEYS_LON_DIV;
+		
+		//only use key when it makes sense
+		if (abs($lat1-$lat2) < $key_lat_div)
+		{
+			$lat1_x = floor(fmod(90+$lat1,$key_lat_div)/$key_lat_div*$key_latlon_vals);
+			$lat2_x = ceil (fmod(90+$lat2,$key_lat_div)/$key_lat_div*$key_latlon_vals);
+			
+			if ($lat1_x <= $lat2_x)
+				$sql .= " AND (s.lat_x BETWEEN '$lat1_x' AND '$lat2_x')";
+			else
+				$sql .= " AND (s.lat_x <= '$lat2_x' OR '$lat1_x' <= s.lat_x)";
+		}
+
+		//only use key when it makes sense
+		if (abs($lon1-$lon2) < $key_lon_div)
+		{
+			$lon1_x = floor(fmod(180+$lon1,$key_lon_div)/$key_lon_div*$key_latlon_vals);
+			$lon2_x = ceil (fmod(180+$lon2,$key_lon_div)/$key_lon_div*$key_latlon_vals);
+			
+			if ($lon1_x <= $lon2_x)
+				$sql .= " AND (s.lon_x BETWEEN '$lon1_x' AND '$lon2_x')";
+			else
+				$sql .= " AND (s.lon_x <= '$lon2_x' OR '$lon1_x' <= s.lon_x)";
+
+		}
+		
+	}
+
 	
 	return $sql;
 }
 
 function bo_times2sql($time_min = 0, $time_max = 0)
 {
-	
+
 	$time_min = intval($time_min);
 	$time_max = intval($time_max);
 
@@ -1062,13 +1073,41 @@ function bo_times2sql($time_min = 0, $time_max = 0)
 		return " 1 ";
 	}
 	elseif (!$time_max)
-		$time_max = pow(2, 31) - 1;
+	{
+		$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+		$time_max = strtotime($row['time'].' UTC');
+	}
 	
 	//date range
 	$date_min = gmdate('Y-m-d H:i:s', $time_min);
 	$date_max = gmdate('Y-m-d H:i:s', $time_max);
+	$sql = " ( s.time BETWEEN '$date_min' AND '$date_max' ) ";
 
-	$sql .= " ( s.time BETWEEN '$date_min' AND '$date_max' ) ";
+	
+	//Extra keys for faster search
+	$keys_enabled   = (BO_DB_EXTRA_KEYS === true);
+	$key_bytes_time = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_TIME_BYTES)   : 0;
+	$key_bytes_time = 0 < $key_bytes_time   && $key_bytes_time   <= 4 ? $key_bytes_time   : 0;
+
+	if ($key_bytes_time)
+	{
+		$key_time_vals   = pow(2, 8 * $key_bytes_time);
+		$key_time_start  = strtotime(BO_DB_EXTRA_KEYS_TIME_START);
+		$key_time_div    = (double)BO_DB_EXTRA_KEYS_TIME_DIV_MINUTES;
+		
+		if ( ($time_max-$time_min)/60/$key_time_div)
+		{
+			$time_min_x = fmod(floor(($time_min-$key_time_start)/60/$key_time_div),$key_time_vals);
+			$time_max_x = fmod(ceil (($time_max-$key_time_start)/60/$key_time_div),$key_time_vals);
+		
+			if ($time_min_x<=$time_max_x)
+				$sql .= " AND ( s.time_x BETWEEN '$time_min_x' AND '$time_max_x' ) ";
+			else
+				$sql .= " AND ( s.time_x <= '$time_min_x' OR s.time_x >= '$time_max_x' ) ";
+		}
+		
+	}
+
 	
 	return $sql;
 }
