@@ -3,7 +3,9 @@
     MyBlitzortung - a tool for participants of blitzortung.org
 	to display lightning data on their web sites.
 
-    Copyright (C) 2012  Tobias Volgnandt
+	Copyright 2011-2012 by Tobias Volgnandt & Blitzortung.org Participants
+
+
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,10 +77,7 @@ if (!defined("BO_VER"))
 	require_once 'includes/user.inc.php';
 	require_once 'includes/tiles.inc.php';
 
-	if (!class_exists('mysqli'))
-		require_once 'includes/db_mysql.inc.php';
-	else
-		require_once 'includes/db_mysqli.inc.php';
+	require_once 'includes/classes/Db.class.php';
 
 	//Set user_id
 	if (!isset($_SESSION['bo_user']))

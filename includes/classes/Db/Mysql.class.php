@@ -1,60 +1,7 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
 
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-//breaks install!!!
-//if (!defined('BO_VER'))
-//	exit('No BO_VER');
-
-class BoDbQuery
-{
-	public $query;
-	public $num_rows;
-	
-	function __construct() 
-	{}
-
-	public function DoQuery($sql, $dbh)
-	{
-		$this->query = mysql_query($sql, $dbh);
-		
-		if (strtolower(substr(trim($sql), 0, 6)) == 'select')
-			$this->num_rows = mysql_num_rows($this->query);
-		
-		return $this->query;
-	}
-	
-	public function fetch_assoc()
-	{
-		return mysql_fetch_assoc($this->query);
-	}
-
-	public function fetch_object()
-	{
-		return mysql_fetch_object($this->query);
-	}
-	
-}
-
-class BoDb
+class BoDbMain
 {
 	static $dbh = NULL;
 
@@ -82,7 +29,7 @@ class BoDb
 			self::set_charset();
 			
 			//hope this works for everyone :-/
-			self::query("SET time_zone = '+00:00'");
+			self::do_query("SET time_zone = '+00:00'");
 		}
 		
 		return self::$dbh;
@@ -133,7 +80,7 @@ class BoDb
 		return mysql_insert_id(self::$dbh);
 	}
 
-	public function query($sql)
+	public function do_query($sql)
 	{
 		self::connect();
 		$query = new BoDbQuery();
@@ -146,6 +93,38 @@ class BoDb
 		self::connect();
 		return mysql_real_escape_string($val, self::$dbh);
 	}
+}
+
+
+
+
+class BoDbMainQuery
+{
+	public $query;
+	public $num_rows;
+
+	function __construct() { }
+
+	public function DoQuery($sql, $dbh)
+	{
+		$this->query = mysql_query($sql, $dbh);
+
+		if (strtolower(substr(trim($sql), 0, 6)) == 'select')
+		$this->num_rows = mysql_num_rows($this->query);
+
+		return $this->query;
+	}
+
+	public function fetch_assoc()
+	{
+		return mysql_fetch_assoc($this->query);
+	}
+
+	public function fetch_object()
+	{
+		return mysql_fetch_object($this->query);
+	}
+
 }
 
 ?>

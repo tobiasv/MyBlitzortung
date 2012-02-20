@@ -1,27 +1,5 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
-
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
 
 
 function bo_access_url()
@@ -344,7 +322,7 @@ function bo_update_raw_signals($force = false)
 		
 		// Search last signal
 		$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		$row = $res->fetch_assoc();
 		$last_signal = strtotime($row['mtime'].' UTC');
 		$update_time_start = $last_signal - $read_back_seconds;
@@ -387,7 +365,7 @@ function bo_update_raw_signals($force = false)
 		$sql = "SELECT id, time, time_ns
 				FROM ".BO_DB_PREF."raw
 				WHERE time BETWEEN '$date_start' AND '$date_end'";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
 		{
 			$id = $row['id'];
@@ -557,13 +535,13 @@ function bo_update_raw_signals($force = false)
 				if ($id)
 				{
 					$sql = "UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'";
-					bo_db($sql, 1);
+					BoDb::query($sql, 1);
 					$count_updated++;
 				}
 				else
 				{
 					$sql = "INSERT INTO ".BO_DB_PREF."raw SET $sql";
-					bo_db($sql, 1);
+					BoDb::query($sql, 1);
 					$count_inserted++;
 				}
 				
@@ -709,7 +687,7 @@ function bo_update_strikes($force = false)
 
 		
 		/***** PREPARATIONS BEFORE READING *****/
-		$res = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
+		$res = BoDb::query("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
 		$row = $res->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
 
@@ -736,7 +714,7 @@ function bo_update_strikes($force = false)
 					AND time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins)."' AND '".gmdate('Y-m-d H:i:s', $time_update)."'
 					AND status>0	
 				";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		$row = $res->fetch_assoc();
 		$calc_range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
 		//$calc_range = $calc_range * 0.98; //some margin to be sure
@@ -889,7 +867,7 @@ function bo_update_strikes($force = false)
 						FROM ".BO_DB_PREF."strikes
 						WHERE time BETWEEN '$date_start' AND '$date_end'
 						ORDER BY time";
-				$res = bo_db($sql);
+				$res = BoDb::query($sql);
 				while ($row = $res->fetch_assoc())
 				{
 					$id = $row['id'];
@@ -1033,7 +1011,7 @@ function bo_update_strikes($force = false)
 				else
 					$sql .= " , status=0 ";
 				
-				$id = bo_db("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
+				$id = BoDb::query("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
 				$count_inserted++;
 
 				$new_strike = true;
@@ -1045,7 +1023,7 @@ function bo_update_strikes($force = false)
 				else
 					$sql .= " , status=1 ";
 				
-				bo_db("UPDATE ".BO_DB_PREF."strikes SET $sql WHERE id='$id'");
+				BoDb::query("UPDATE ".BO_DB_PREF."strikes SET $sql WHERE id='$id'");
 				$count_updated++;
 				$new_strike = false;
 			}
@@ -1065,7 +1043,7 @@ function bo_update_strikes($force = false)
 				if ($sql)
 				{
 					$sql = "REPLACE INTO ".BO_DB_PREF."stations_strikes (strike_id, station_id) VALUES $sql";
-					bo_db($sql);
+					BoDb::query($sql);
 				}
 			}
 
@@ -1172,7 +1150,7 @@ function bo_update_strikes($force = false)
 		foreach ($_BO['region'] as $reg_id => $d)
 		{
 			$sql = strtr($sql_template,array('{where}' => bo_region2sql($reg_id)));
-			$row = bo_db($sql)->fetch_assoc();
+			$row = BoDb::query($sql)->fetch_assoc();
 			$rate_strikes_region[$reg_id] = $row['cnt'] / BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES;
 			
 			if ($row['mtime'])
@@ -1288,7 +1266,7 @@ function bo_update_strikes($force = false)
 
 			if (time() - $tmp['time'] > 3600 * BO_FIND_MIN_PARTICIPANTS_HOURS)
 			{
-				$row = bo_db("SELECT MIN(users) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*$min_hours)."'")->fetch_assoc();
+				$row = BoDb::query("SELECT MIN(users) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*$min_hours)."'")->fetch_assoc();
 				
 				if ($row['minusers'] >= 4)
 				{
@@ -1350,7 +1328,7 @@ function bo_match_strike2raw()
 	$amp_trigger = (BO_TRIGGER_VOLTAGE * BO_STR2SIG_TRIGGER_FACTOR / BO_MAX_VOLTAGE) * 256 / 2;
 
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
-	$row = bo_db($sql)->fetch_assoc();
+	$row = BoDb::query($sql)->fetch_assoc();
 	$maxtime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC'));
 	$mintime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC') - 3600 * 74);
 	
@@ -1371,7 +1349,7 @@ function bo_match_strike2raw()
 			ORDER BY part DESC
 			LIMIT 10000
 			";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 	{
 		if ($row['part'] > 0)
@@ -1418,7 +1396,7 @@ function bo_match_strike2raw()
 						AND strike_id=0
 						AND $nsql
 				LIMIT 2";
-		$res2 = bo_db($sql);
+		$res2 = BoDb::query($sql);
 		$num = $res2->num_rows;
 		$row2 = $res2->fetch_assoc();
 
@@ -1504,9 +1482,9 @@ function bo_match_strike2raw()
 					polarity='".intval($polarity[$strike_id])."',
 					part='".intval($part[$strike_id])."'
 				WHERE id='$strike_id'";
-		bo_db($sql);
+		BoDb::query($sql);
 
-		bo_db("UPDATE ".BO_DB_PREF."raw SET strike_id='$strike_id' WHERE id='$raw_id'");
+		BoDb::query("UPDATE ".BO_DB_PREF."raw SET strike_id='$strike_id' WHERE id='$raw_id'");
 	}
 
 	//Update unmatched
@@ -1515,7 +1493,7 @@ function bo_match_strike2raw()
 	foreach($d as $strike_id)
 		$sql .= " OR id='$strike_id' ";
 	$sql = "UPDATE ".BO_DB_PREF."strikes SET raw_id='0' WHERE 1=0 $sql";
-	bo_db($sql);
+	BoDb::query($sql);
 
 	return true;
 }
@@ -1670,13 +1648,13 @@ function bo_update_stations($force = false)
 			
 			if (isset($all_stations[$stId]))
 			{
-				bo_db("UPDATE ".BO_DB_PREF."stations SET $sql WHERE id='$stId'");
+				BoDb::query("UPDATE ".BO_DB_PREF."stations SET $sql WHERE id='$stId'");
 				$count_updated++;
 			}
 			else 
 			{
 				$sql .= " , first_seen='".gmdate('Y-m-d H:i:s')."'";
-				bo_db("INSERT INTO ".BO_DB_PREF."stations SET $sql", false);
+				BoDb::query("INSERT INTO ".BO_DB_PREF."stations SET $sql", false);
 				$count_inserted++;
 			}
 			
@@ -1759,7 +1737,7 @@ function bo_update_stations($force = false)
 				WHERE a.strike_id=b.id AND b.time > '$datetime_back'
 					".($only_own ? " AND a.station_id='".$only_own."'" : "")."
 				GROUP BY a.station_id";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
 			$StData[intval($row['sid'])]['strikes'] = $row['cnt'];
 		
@@ -1774,7 +1752,7 @@ function bo_update_stations($force = false)
 			
 			if ($id && ($data['sig'] || $data['strikes']))
 			{
-				bo_db("INSERT INTO ".BO_DB_PREF."stations_stat
+				BoDb::query("INSERT INTO ".BO_DB_PREF."stations_stat
 					SET station_id='$id', time='$datetime', 
 					signalsh='".intval($data['sig'])."', 
 					strikesh='".intval($data['strikes'])."'");
@@ -1799,9 +1777,9 @@ function bo_update_stations($force = false)
 		$sql = "SELECT COUNT(id) cnt
 				FROM ".BO_DB_PREF."strikes
 				WHERE time > '$datetime_back'";
-		$row = bo_db($sql)->fetch_assoc();
+		$row = BoDb::query($sql)->fetch_assoc();
 		$strike_count = $row['cnt'];
-		bo_db("INSERT INTO ".BO_DB_PREF."stations_stat
+		BoDb::query("INSERT INTO ".BO_DB_PREF."stations_stat
 				SET station_id='0', time='$datetime', 
 					signalsh='".intval($signal_count)."', strikesh='".intval($strike_count)."'");
 
@@ -2005,13 +1983,13 @@ function bo_update_daily_stat()
 		{
 			/*** Strikes ***/
 			//whole strike count
-			$row_all = bo_db(strtr($sql_template,array('{where}' => '')))->fetch_assoc();
+			$row_all = BoDb::query(strtr($sql_template,array('{where}' => '')))->fetch_assoc();
 			//own strike count
-			$row_own = bo_db(strtr($sql_template,array('{where}' => 'part > 0 AND ')))->fetch_assoc();
+			$row_own = BoDb::query(strtr($sql_template,array('{where}' => 'part > 0 AND ')))->fetch_assoc();
 			//whole strike count (in radius)
-			$row_all_rad = bo_db(strtr($sql_template,array('{where}' => 'distance < "'.$radius.'" AND ')))->fetch_assoc();
+			$row_all_rad = BoDb::query(strtr($sql_template,array('{where}' => 'distance < "'.$radius.'" AND ')))->fetch_assoc();
 			//own strike count (in radius)
-			$row_own_rad = bo_db(strtr($sql_template,array('{where}' => 'part > 0 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
+			$row_own_rad = BoDb::query(strtr($sql_template,array('{where}' => 'part > 0 AND distance < "'.$radius.'" AND ')))->fetch_assoc();
 
 			/*** Save the data ***/
 			$data = array(	0 => $row_all['cnt'], 
@@ -2031,11 +2009,11 @@ function bo_update_daily_stat()
 				foreach ($_BO['region'] as $reg_id => $d)
 				{
 					//all strikes in a region
-					$row = bo_db(strtr($sql_template,array('{where}' => '1 '.bo_region2sql($reg_id).' AND ')))->fetch_assoc();
+					$row = BoDb::query(strtr($sql_template,array('{where}' => '1 '.bo_region2sql($reg_id).' AND ')))->fetch_assoc();
 					$strikes_region[$reg_id]['all'] = $row['cnt'];
 					
 					//own strikes in a region
-					$row = bo_db(strtr($sql_template,array('{where}' => 'part>0 '.bo_region2sql($reg_id).' AND ')))->fetch_assoc();
+					$row = BoDb::query(strtr($sql_template,array('{where}' => 'part>0 '.bo_region2sql($reg_id).' AND ')))->fetch_assoc();
 					$strikes_region[$reg_id]['own'] = $row['cnt'];
 				}
 			}
@@ -2049,11 +2027,11 @@ function bo_update_daily_stat()
 			/*** Stations ***/
 			$stations = array();
 			// available stations
-			$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status != '-'")->fetch_assoc();
+			$row = BoDb::query("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status != '-'")->fetch_assoc();
 			$stations['available'] = $row->cnt;
 			
 			// active stations
-			$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status = 'A'")->fetch_assoc();
+			$row = BoDb::query("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status = 'A'")->fetch_assoc();
 			$stations['active'] = $row->cnt;
 
 			$data[10] = $stations;
@@ -2066,14 +2044,14 @@ function bo_update_daily_stat()
 
 			/*** Signals ***/
 			//own exact value
-			$signals_exact = bo_db("SELECT COUNT(id) cnt FROM ".BO_DB_PREF."raw WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end'")->fetch_assoc();
+			$signals_exact = BoDb::query("SELECT COUNT(id) cnt FROM ".BO_DB_PREF."raw WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end'")->fetch_assoc();
 			
 			//all from station statistics
 			$sql = "SELECT SUM(signalsh) cnt, COUNT(DISTINCT time) entries, station_id=".bo_station_id()." own
 							FROM ".BO_DB_PREF."stations_stat 
 							WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end' AND station_id != 0
 							GROUP BY own, HOUR(time)";
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			while ($row = $res->fetch_assoc())
 			{
 				if (intval($row['entries']))
@@ -2112,7 +2090,7 @@ function bo_update_daily_stat()
 					FROM ".BO_DB_PREF."raw 
 					WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end'
 					LIMIT $limit,$max_lines";
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			while ($row = $res->fetch_assoc())
 			{
 				if (bo_exit_on_timeout()) break;
@@ -2228,7 +2206,7 @@ function bo_update_daily_stat()
 		$sql = "SELECT data
 				FROM ".BO_DB_PREF."conf
 				WHERE name LIKE 'strikes_".$month_id."%'";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while($row = $res->fetch_assoc())
 		{
 			$d = unserialize($row['data']);
@@ -2453,7 +2431,7 @@ function bo_update_tracks($force = false)
 					FROM ".BO_DB_PREF."strikes
 					WHERE time BETWEEN '$date_start' AND '$date_end'
 					";
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
 			{
 				//End this ugly calculation to prevent running in php-timeout
@@ -2690,7 +2668,7 @@ function bo_update_status_files($type)
 		return false;
 		
 	
-	$row = bo_db("SELECT signalsh, strikesh FROM ".BO_DB_PREF."stations_stat WHERE station_id='".bo_station_id()."' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
+	$row = BoDb::query("SELECT signalsh, strikesh FROM ".BO_DB_PREF."stations_stat WHERE station_id='".bo_station_id()."' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
 	$STATION_CURRENT_STRIKES = $row['strikesh'];
 	$STATION_CURRENT_SIGNALS = $row['signalsh'];
 
@@ -2817,7 +2795,7 @@ function bo_purge_olddata($force = false)
 			if (defined('BO_PURGE_SIG_NS') && BO_PURGE_SIG_NS)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_SIG_NS * 3600);
-				$num = bo_db("DELETE FROM ".BO_DB_PREF."raw WHERE time < '$dtime' AND strike_id=0");
+				$num = BoDb::query("DELETE FROM ".BO_DB_PREF."raw WHERE time < '$dtime' AND strike_id=0");
 				$num_signals += $num;
 				bo_echod("Raw signals (with no strikes assigned): $num");
 			}
@@ -2827,7 +2805,7 @@ function bo_purge_olddata($force = false)
 			if (defined('BO_PURGE_SIG_ALL') && BO_PURGE_SIG_ALL)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_SIG_ALL * 3600);
-				$num = bo_db("DELETE FROM ".BO_DB_PREF."raw WHERE time < '$dtime'");
+				$num = BoDb::query("DELETE FROM ".BO_DB_PREF."raw WHERE time < '$dtime'");
 				$num_signals += $num;
 				bo_echod("Raw signals: $num");
 			}
@@ -2836,9 +2814,9 @@ function bo_purge_olddata($force = false)
 			if (defined('BO_PURGE_STR_NP') && BO_PURGE_STR_NP)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STR_NP * 3600);
-				$num1  = bo_db("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
+				$num1  = BoDb::query("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
 						WHERE time < '$dtime' AND a.id=b.strike_id AND part=0");
-				$num2  = bo_db("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime' AND part=0"); //to be sure
+				$num2  = BoDb::query("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime' AND part=0"); //to be sure
 
 				$num_stastr += $num1;
 				$num_strikes += $num2;
@@ -2850,9 +2828,9 @@ function bo_purge_olddata($force = false)
 			if (defined('BO_PURGE_STR_DIST') && BO_PURGE_STR_DIST && defined('BO_PURGE_STR_DIST_KM') && BO_PURGE_STR_DIST_KM)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STR_DIST * 3600);
-				$num1  = bo_db("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
+				$num1  = BoDb::query("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
 						WHERE time < '$dtime' AND a.id=b.strike_id AND distance > '".(BO_PURGE_STR_DIST_KM * 1000)."'");
-				$num2  = bo_db("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime' AND distance > '".(BO_PURGE_STR_DIST_KM * 1000)."'"); //to be sure
+				$num2  = BoDb::query("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime' AND distance > '".(BO_PURGE_STR_DIST_KM * 1000)."'"); //to be sure
 
 				$num_stastr += $num1;
 				$num_strikes += $num2;
@@ -2864,9 +2842,9 @@ function bo_purge_olddata($force = false)
 			if (defined('BO_PURGE_STR_ALL') && BO_PURGE_STR_ALL)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STR_ALL * 3600);
-				$num1  = bo_db("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
+				$num1  = BoDb::query("DELETE a,b FROM ".BO_DB_PREF."strikes a, ".BO_DB_PREF."stations_strikes b
 						WHERE time < '$dtime' AND a.id=b.strike_id");
-				$num2 = bo_db("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime'"); //to be sure
+				$num2 = BoDb::query("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '$dtime'"); //to be sure
 				
 				$num_stastr += $num1;
 				$num_strikes += $num2;
@@ -2878,9 +2856,9 @@ function bo_purge_olddata($force = false)
 			if (defined('BO_PURGE_STRSTA_ALL') && BO_PURGE_STRSTA_ALL)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STRSTA_ALL * 3600);
-				$row = bo_db("SELECT MAX(id) id FROM ".BO_DB_PREF."strikes WHERE time < '$dtime'")->fetch_assoc();
+				$row = BoDb::query("SELECT MAX(id) id FROM ".BO_DB_PREF."strikes WHERE time < '$dtime'")->fetch_assoc();
 				$strId = $row['id'];
-				$num = bo_db("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE strike_id < '$strId'");
+				$num = BoDb::query("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE strike_id < '$strId'");
 				$num_stastr += $num;
 				bo_echod("Strike <-> Station table: $num");
 			}
@@ -2890,7 +2868,7 @@ function bo_purge_olddata($force = false)
 			{
 				$stId = bo_station_id();
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STA_OTHER * 3600);
-				$num = bo_db("DELETE FROM ".BO_DB_PREF."stations_stat WHERE time < '$dtime' AND station_id != '$stId' AND station_id != 0");
+				$num = BoDb::query("DELETE FROM ".BO_DB_PREF."stations_stat WHERE time < '$dtime' AND station_id != '$stId' AND station_id != 0");
 				$num_stations += $num;
 				bo_echod("Station statistics (not yours): $num");
 			}
@@ -2899,7 +2877,7 @@ function bo_purge_olddata($force = false)
 			if (defined('BO_PURGE_STA_ALL') && BO_PURGE_STA_ALL)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STA_ALL * 3600);
-				$num = bo_db("DELETE FROM ".BO_DB_PREF."stations_stat WHERE time < '$dtime'");
+				$num = BoDb::query("DELETE FROM ".BO_DB_PREF."stations_stat WHERE time < '$dtime'");
 				$num_stations += $num;
 				bo_echod("Station statistics: $num");
 			}
@@ -2909,25 +2887,25 @@ function bo_purge_olddata($force = false)
 				if ($num_strikes > BO_PURGE_OPTIMIZE_TABLES)
 				{
 					bo_echod("Optimizing strikes table");
-					bo_db("OPTIMIZE TABLE ".BO_DB_PREF."strikes");
+					BoDb::query("OPTIMIZE TABLE ".BO_DB_PREF."strikes");
 				}
 
 				if ($num_stations > BO_PURGE_OPTIMIZE_TABLES)
 				{
 					bo_echod("Optimizing stations table");
-					bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_stat");
+					BoDb::query("OPTIMIZE TABLE ".BO_DB_PREF."stations_stat");
 				}
 				
 				if ($num_signals > BO_PURGE_OPTIMIZE_TABLES)
 				{
 					bo_echod("Optimizing signals table");
-					bo_db("OPTIMIZE TABLE ".BO_DB_PREF."raw");
+					BoDb::query("OPTIMIZE TABLE ".BO_DB_PREF."raw");
 				}
 				
 				if ($num_stastr > BO_PURGE_OPTIMIZE_TABLES)
 				{
 					bo_echod("Optimizing strikes-stations table");
-					bo_db("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes");
+					BoDb::query("OPTIMIZE TABLE ".BO_DB_PREF."stations_strikes");
 				}
 			}
 			
@@ -3032,7 +3010,7 @@ function bo_delete_station($id = 0)
 			return false;
 		
 		//find new ID
-		$row = bo_db("SELECT MAX(id) id FROM ".BO_DB_PREF."stations WHERE id >= ".intval(BO_DELETED_STATION_MIN_ID))->fetch_assoc();
+		$row = BoDb::query("SELECT MAX(id) id FROM ".BO_DB_PREF."stations WHERE id >= ".intval(BO_DELETED_STATION_MIN_ID))->fetch_assoc();
 		$new_id = $row['id']+1;
 		if ($new_id < intval(BO_DELETED_STATION_MIN_ID))
 			$new_id = intval(BO_DELETED_STATION_MIN_ID);
@@ -3043,10 +3021,10 @@ function bo_delete_station($id = 0)
 		bo_set_conf('stations_deleted', serialize($deleted_stations));
 
 		//reassign IDs
-		bo_db("UPDATE ".BO_DB_PREF."conf SET name=REPLACE(name, '#".$id."#', '#".$new_id."#') WHERE name LIKE '%#".$id."#%'");
-		bo_db("UPDATE ".BO_DB_PREF."stations_stat    SET station_id='$new_id' WHERE station_id='$id'");
-		bo_db("UPDATE ".BO_DB_PREF."stations_strikes SET station_id='$new_id' WHERE station_id='$id'");
-		bo_db("UPDATE ".BO_DB_PREF."densities        SET station_id='$new_id' WHERE station_id='$id'");
+		BoDb::query("UPDATE ".BO_DB_PREF."conf SET name=REPLACE(name, '#".$id."#', '#".$new_id."#') WHERE name LIKE '%#".$id."#%'");
+		BoDb::query("UPDATE ".BO_DB_PREF."stations_stat    SET station_id='$new_id' WHERE station_id='$id'");
+		BoDb::query("UPDATE ".BO_DB_PREF."stations_strikes SET station_id='$new_id' WHERE station_id='$id'");
+		BoDb::query("UPDATE ".BO_DB_PREF."densities        SET station_id='$new_id' WHERE station_id='$id'");
 		
 		$last_strikes = unserialize(bo_get_conf('last_strikes_stations'));
 		$last_strikes[$new_id] = $last_strikes[$id];
@@ -3054,7 +3032,7 @@ function bo_delete_station($id = 0)
 		bo_set_conf('last_strikes_stations', serialize($last_strikes));
 		
 		//last not least the station itself (last update, if former queries fail)
-		bo_db("UPDATE ".BO_DB_PREF."stations         SET id='$new_id', status='-' WHERE id='$id'");
+		BoDb::query("UPDATE ".BO_DB_PREF."stations         SET id='$new_id', status='-' WHERE id='$id'");
 	
 		bo_echod("Deleted old station $id, reassigned new ID $new_id");
 		

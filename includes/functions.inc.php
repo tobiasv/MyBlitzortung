@@ -1,29 +1,6 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
 
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
-	
 	
 // latitude, longitude to distance in meters
 function bo_latlon2dist($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
@@ -167,7 +144,7 @@ function bo_stations($index = 'id', $only = '', $under_constr = true)
 		$sql .= " AND last_time != '1970-01-01 00:00:00' ";
 		
 	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND id < ".intval(BO_DELETED_STATION_MIN_ID);
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 		$S[$row[$index]] = $row;
 
@@ -1074,7 +1051,7 @@ function bo_times2sql($time_min = 0, $time_max = 0)
 	}
 	elseif (!$time_max)
 	{
-		$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+		$row = BoDb::query("SELECT MAX(time) time FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 		$time_max = strtotime($row['time'].' UTC');
 	}
 	

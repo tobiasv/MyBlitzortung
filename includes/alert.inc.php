@@ -1,27 +1,6 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
 
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
 
 function bo_alert_settings()
 {
@@ -50,7 +29,7 @@ function bo_alert_settings()
 			FROM ".BO_DB_PREF."conf
 			WHERE name LIKE '$like'
 			";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	while ($row = $res->fetch_assoc())
 	{
 		$data = unserialize($row['data']);
@@ -264,7 +243,7 @@ function bo_alert_settings_form()
 			else
 			{
 				$sql = "SELECT name FROM ".BO_DB_PREF."conf WHERE name LIKE 'alert\_".$user_id."\_%' ORDER BY name DESC LIMIT 1";
-				$res = bo_db($sql);
+				$res = BoDb::query($sql);
 				$row = $res->fetch_assoc();
 
 				preg_match('/alert_([0-9]+)_([0-9]+)/', $row['name'], $r);
@@ -485,7 +464,7 @@ function bo_alert_send()
 		$sql = "SELECT name, data, changed
 				FROM ".BO_DB_PREF."conf
 				WHERE name LIKE 'alert\_%'";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
 		{
 			$d = unserialize($row['data']);
@@ -530,7 +509,7 @@ function bo_alert_send()
 						FROM ".BO_DB_PREF."strikes
 						WHERE 1	
 							$sql_where";
-				$res2 = bo_db($sql);
+				$res2 = BoDb::query($sql);
 				$row2 = $res2->fetch_assoc();
 				
 				if ($row2['cnt'] >= $d['count'] && !$d['no_checking'])
@@ -544,7 +523,7 @@ function bo_alert_send()
 									$sql_where 
 								ORDER BY time DESC
 								LIMIT 1";
-						$res3 = bo_db($sql);
+						$res3 = BoDb::query($sql);
 						$row3 = $res3->fetch_assoc();
 
 						$dist = round(bo_latlon2dist($d['lat'], $d['lon'], $row3['lat'], $row3['lon']) / 1000);

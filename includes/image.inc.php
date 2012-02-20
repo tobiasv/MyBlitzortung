@@ -1,28 +1,5 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
-
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
 
 
 // returns png-image for map-marker
@@ -182,7 +159,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$cfg['legend'] = array();
 		
 		$sql = "SELECT time, time_ns FROM ".BO_DB_PREF."strikes s WHERE id='$strike_id' ";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		$row = $res->fetch_assoc();
 		$time_min = $time_max = strtotime($row['time'].' UTC');
 		$time_string = date(_BL('_date').' H:i:s', $time_min).'.'.substr($row['time_ns'], 0, 6);
@@ -577,7 +554,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 					$sql_where_id
 					".bo_region2sql($region)."
 				ORDER BY time ASC";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		
 		
 		while ($row = $res->fetch_assoc())
@@ -1278,7 +1255,7 @@ function bo_add_cities2image($I, $cfg, $w, $h)
 				AND (0 $sql_types)
 			GROUP BY lat, lon
 			ORDER BY type ASC";
-	$erg = bo_db($sql);
+	$erg = BoDb::query($sql);
 	while ($row = $erg->fetch_assoc())
 	{
 		list($px, $py) = bo_latlon2projection($cfg['proj'], $row['lat'], $row['lon']);
@@ -1333,7 +1310,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 		$sql = "SELECT lat, lon
 				FROM ".BO_DB_PREF."strikes
 				WHERE id='$strike_id'";
-		$erg = bo_db($sql);
+		$erg = BoDb::query($sql);
 		$row = $erg->fetch_assoc();
 		$strike_lat = $row['lat'];
 		$strike_lon = $row['lon'];
@@ -1346,7 +1323,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 				FROM ".BO_DB_PREF."stations_strikes ss
 				WHERE ss.strike_id='$strike_id'
 				";
-		$erg = bo_db($sql);
+		$erg = BoDb::query($sql);
 		while ($row = $erg->fetch_assoc())
 		{
 			$stations[$row['id']]['part'] = 1;

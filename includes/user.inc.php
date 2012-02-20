@@ -1,28 +1,5 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
-
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
-
 
 function bo_show_login()
 {
@@ -122,7 +99,7 @@ function bo_show_login()
 				echo '<li>'._BL('MyBlitzortung version').': <strong>'.bo_get_conf('version').'</strong></li>';
 				if (BO_PERM_ADMIN & $level)
 				{
-					$res = bo_db("SHOW VARIABLES LIKE 'version'");
+					$res = BoDb::query("SHOW VARIABLES LIKE 'version'");
 					$row = $res->fetch_assoc();
 					$mysql_ver = $row['Value'];
 					
@@ -302,7 +279,7 @@ function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 		if ($md5pass == false)
 			$pass = md5($pass);
 			
-		$res = bo_db("SELECT id, login, level FROM ".BO_DB_PREF."user WHERE login='$user' AND password='$pass'");
+		$res = BoDb::query("SELECT id, login, level FROM ".BO_DB_PREF."user WHERE login='$user' AND password='$pass'");
 
 		if ($res->num_rows == 1)
 		{
@@ -329,7 +306,7 @@ function bo_user_do_login_byid($id, $pass)
 	}
 	else
 	{
-		$row = bo_db("SELECT login FROM ".BO_DB_PREF."user WHERE id='$id'")->fetch_assoc();
+		$row = BoDb::query("SELECT login FROM ".BO_DB_PREF."user WHERE id='$id'")->fetch_assoc();
 		$user = $row['login'];
 	}
 
@@ -387,7 +364,7 @@ function bo_user_get_level($user_id = 0)
 	if ($user_id == 1)
 		return pow(2, BO_PERM_COUNT) - 1;
 
-	$res = bo_db("SELECT level FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+	$res = BoDb::query("SELECT level FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
 	$row = $res->fetch_assoc();
 
 	return $row['level'];
@@ -405,7 +382,7 @@ function bo_user_get_name($user_id = 0)
 
 	if (!isset($names[$user_id]))
 	{
-		$res = bo_db("SELECT login FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+		$res = BoDb::query("SELECT login FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
 		$row = $res->fetch_assoc();
 		$names[$user_id] = $row['login'];
 	}
@@ -422,7 +399,7 @@ function bo_user_get_mail($user_id = 0)
 
 	if (!isset($mails[$user_id]))
 	{
-		$res = bo_db("SELECT mail FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+		$res = BoDb::query("SELECT mail FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
 		$row = $res->fetch_assoc();
 		$mails[$user_id] = $row['mail'];
 	}
@@ -440,7 +417,7 @@ function bo_user_show_passw_change()
 		if ($pass1 && $pass2 && $pass1 == $pass2)
 		{
 			$pass = md5($pass1);
-			bo_db("UPDATE ".BO_DB_PREF."user SET password='$pass' WHERE id='".bo_user_get_id()."'");
+			BoDb::query("UPDATE ".BO_DB_PREF."user SET password='$pass' WHERE id='".bo_user_get_id()."'");
 			echo '<div class="bo_info_ok">';
 			echo _BL('Password changed!');
 			echo '</div>';
@@ -511,12 +488,12 @@ function bo_user_show_useradmin()
 			}
 			
 			//To be sure, if creation of main user during install failed
-			bo_db("INSERT IGNORE INTO ".BO_DB_PREF."user SET id=1", false);
+			BoDb::query("INSERT IGNORE INTO ".BO_DB_PREF."user SET id=1", false);
 			
 			if ($user_id)
-				$ok = bo_db("UPDATE $sql WHERE id='$user_id'", false);
+				$ok = BoDb::query("UPDATE $sql WHERE id='$user_id'", false);
 			else
-				$ok = bo_db("INSERT INTO $sql", false);
+				$ok = BoDb::query("INSERT INTO $sql", false);
 
 			if (!$ok)
 				$failure = true;
@@ -533,8 +510,8 @@ function bo_user_show_useradmin()
 
 	if ($_GET['bo_action2'] == 'delete' && $user_id > 1 && (bo_user_get_level() & BO_PERM_ADMIN) )
 	{
-		bo_db("DELETE FROM ".BO_DB_PREF."user WHERE id='$user_id'");
-		bo_db("DELETE FROM ".BO_DB_PREF."conf WHERE name LIKE 'alert_$user_id%'");
+		BoDb::query("DELETE FROM ".BO_DB_PREF."user WHERE id='$user_id'");
+		BoDb::query("DELETE FROM ".BO_DB_PREF."conf WHERE name LIKE 'alert_$user_id%'");
 		$user_id = 0;
 	}
 
@@ -561,7 +538,7 @@ function bo_user_show_useradmin()
 			FROM ".BO_DB_PREF."user
 			ORDER BY id
 			";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	while ($row = $res->fetch_assoc())
 	{
 		if ($row['id'] == 1)
@@ -751,7 +728,7 @@ function bo_show_calibrate_antennas()
 						".($age ? " AND s.time > '".gmdate('Y-m-d H:i:s', time() - 3600 * 24 * $age)."' " : '')."
 					ORDER BY RAND()
 					LIMIT $limit";
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			while ($row = $res->fetch_assoc())
 			{
 				$bearing = bo_latlon2bearing($row['lat'], $row['lon']);
@@ -1077,7 +1054,7 @@ function bo_import_cities()
 		{
 			echo '<p>'._BL('Deleting existing cities from DB').'</p>';
 			flush();
-			bo_db("DELETE FROM ".BO_DB_PREF."cities");
+			BoDb::query("DELETE FROM ".BO_DB_PREF."cities");
 			
 			echo '<p>'._BL('Cities imported').': ';
 			flush();
@@ -1088,7 +1065,7 @@ function bo_import_cities()
 				if (count($city) > 4) //cities with borders --> big cities
 					$city[3] += 4;
 					
-				$ok = bo_db("INSERT INTO ".BO_DB_PREF."cities 
+				$ok = BoDb::query("INSERT INTO ".BO_DB_PREF."cities 
 						SET name='".BoDb::esc($city[0])."',
 							lat ='".BoDb::esc($city[1])."',
 							lon ='".BoDb::esc($city[2])."',

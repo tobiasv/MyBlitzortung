@@ -1,30 +1,5 @@
 <?php
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
 
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
-
-
-	
 
 function bo_update_densities($force = false)
 {
@@ -57,7 +32,7 @@ function bo_update_densities($force = false)
 
 	//check which densities are pending
 	$pending = array();
-	$res = bo_db("SELECT id, type, date_start, date_end, station_id, info, status
+	$res = BoDb::query("SELECT id, type, date_start, date_end, station_id, info, status
 					FROM ".BO_DB_PREF."densities 
 					WHERE status<=0 
 					ORDER BY status DESC, date_start, date_end");
@@ -69,7 +44,7 @@ function bo_update_densities($force = false)
 	
 	if (!empty($pending))
 	{
-		$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+		$row = BoDb::query("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 		$strike_min = strtotime($row['mintime'].' UTC');
 	
 		//create densities by type
@@ -126,7 +101,7 @@ function bo_update_densities($force = false)
 						$text .= ' *** Starting at '.$b['date_start'];
 						
 						$sql = "SELECT data FROM ".BO_DB_PREF."densities WHERE id='$id'";
-						$row = bo_db($sql)->fetch_assoc();
+						$row = BoDb::query($sql)->fetch_assoc();
 						$DATA = $row['data'] ? gzinflate($row['data']) : '';
 
 					}
@@ -159,7 +134,7 @@ function bo_update_densities($force = false)
 								AND date_end   <= '".$b['date_end']."'
 								AND station_id = '".$b['station_id']."'
 							ORDER BY status, date_start, date_end DESC";
-					$res = bo_db($sql);
+					$res = BoDb::query($sql);
 					while ($row = $res->fetch_assoc())
 					{
 						//Check for timeout
@@ -285,7 +260,7 @@ function bo_update_densities($force = false)
 								
 							GROUP BY lon_id, lat_id
 							";
-					$res = bo_db($sql);
+					$res = BoDb::query($sql);
 					while ($row = $res->fetch_assoc())
 					{
 						$max_count = max($max_count, $row['cnt']);
@@ -376,7 +351,7 @@ function bo_update_densities($force = false)
 				$sql = "UPDATE ".BO_DB_PREF."densities 
 								SET data='$DATA', info='".serialize($info)."', status='$status'
 								WHERE id='$id'";
-				$res = bo_db($sql);
+				$res = BoDb::query($sql);
 				
 				$text .= ' Max strike count: '.$info['max'].' *** Whole data compressed: '.(strlen($DATA)).'bytes *** BPS: '.$cbps;
 				bo_echod($text);
@@ -432,7 +407,7 @@ function bo_show_archive_density()
 			WHERE (status=1 OR status=3) AND data != '0'
 			".($station_id ? " AND station_id='$station_id' " : '')."
 			";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	$row = $res->fetch_assoc();
 	$start_time = strtotime($row['mindate']);
 	$end_time = strtotime($row['maxdate_end']);
@@ -442,7 +417,7 @@ function bo_show_archive_density()
 	elseif ($month && $month > date('m', $end_time) && $year == date('Y', $end_time))
 		$month = date('m', $end_time);
 	
-	$row = bo_db("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities WHERE status=5")->fetch_assoc();
+	$row = BoDb::query("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities WHERE status=5")->fetch_assoc();
 	$show_whole_timerange = $row['cnt'] ? true : false;
 	
 	$station_infos = bo_stations('id', '', false);
@@ -845,7 +820,7 @@ function bo_get_density_image()
 					ORDER BY length ASC, date_end DESC, ABS(station_id) ASC
 					LIMIT 2
 						";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	$row = $res->fetch_assoc();
 
 	$exit_msg = '';
@@ -1347,7 +1322,7 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 	 
 	 
 	//Min/Max strike times
-	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+	$row = BoDb::query("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$min_strike_time = strtotime($row['mintime'].' UTC');
 	$max_strike_time = strtotime($row['maxtime'].' UTC');
 	
@@ -1426,7 +1401,7 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 		//whole range (check only for years!)
 		$sql = "SELECT MIN(date_start) mindate, MAX(date_end) maxdate
 				FROM ".BO_DB_PREF."densities WHERE status=2";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		$row = $res->fetch_assoc();
 		$ymin = substr($row['mindate'],0,4);
 		$ymax = substr($row['maxdate'],0,4);
@@ -1454,7 +1429,7 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 			$delete_time = gmmktime(0,0,0,gmdate('m'),gmdate('d')-3,gmdate('Y'));
 			if (gmdate('t', $delete_time) != gmdate('d', $delete_time))
 			{
-				$cnt = bo_db("DELETE FROM ".BO_DB_PREF."densities WHERE date_end='".date('Y-m-d', $delete_time)."'");
+				$cnt = BoDb::query("DELETE FROM ".BO_DB_PREF."densities WHERE date_end='".date('Y-m-d', $delete_time)."'");
 				if ($cnt)
 					bo_echod("Deleted $cnt density entries from database!");
 			}
@@ -1496,7 +1471,7 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 		//check if rows already exists
 		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities 
 					WHERE date_start='$date_start' AND date_end='$date_end'";
-		$row = bo_db($sql)->fetch_assoc();
+		$row = BoDb::query($sql)->fetch_assoc();
 
 		// if rows missing --> insert to prepare for getting the data
 		if ($force || count($stations) * count($_BO['density']) > $row['cnt'])
@@ -1521,7 +1496,7 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 							lat_max='$lat_max',lon_max='$lon_max',
 							length='$length', info='', data=''
 							";
-					if (bo_db($sql))
+					if (BoDb::query($sql))
 					{
 						$count++;
 						$new = true;

@@ -1,27 +1,5 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
-
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
 
 // Graph from raw dataset
 function bo_graph_raw($id, $spec = false)
@@ -36,7 +14,7 @@ function bo_graph_raw($id, $spec = false)
 	$sql = "SELECT id, time, time_ns, lat, lon, height, data
 			FROM ".BO_DB_PREF."raw
 			WHERE id='$id'";
-	$erg = bo_db($sql);
+	$erg = BoDb::query($sql);
 	
 	if (!$erg->num_rows)
 	{
@@ -367,7 +345,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 			".bo_region2sql($region)."
 			GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
 		{
 			$time = strtotime($row['time'].' UTC');
@@ -450,7 +428,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				FROM ".BO_DB_PREF."conf
 				WHERE name LIKE '$like'
 				ORDER BY time";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while($row = $res->fetch_assoc())
 		{
 			$y = substr($row['time'], 0, 4);
@@ -491,7 +469,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 						".($radius ? " AND distance < '".(BO_RADIUS_STAT * 1000)."'" : "")."
 						".bo_region2sql($region)."
 						GROUP BY participated";
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
 			{
 				if ($row['participated'] && $show_station)
@@ -680,7 +658,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					WHERE s.time BETWEEN '$date_start' AND '$date_end'
 					".bo_region2sql($region)."
 					";
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
 			{
 				if ($type == 'ratio_bearing')
@@ -707,7 +685,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					WHERE time BETWEEN '$date_start' AND '$date_end'
 					".bo_region2sql($region)."
 					GROUP BY participated, val";
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
 			{
 				$tmp[$row['participated']][$row['val']] = $row['cnt'];
@@ -773,7 +751,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				WHERE time BETWEEN '$date_start' AND '$date_end'
 				".bo_region2sql($region)."
 				GROUP BY participated, DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while($row = $res->fetch_assoc())
 		{
 			$time = strtotime($row['time'].' UTC');
@@ -849,7 +827,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		}
 		
 		$tmp = array();
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while($row = $res->fetch_assoc())
 		{
 			$index = $row['groupby'];
@@ -1004,7 +982,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 				".bo_region2sql($region)."
 				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated, extra";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
 		{
 			$time = strtotime($row['time'].' UTC');
@@ -1075,7 +1053,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 				".bo_region2sql($region)."
 				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
 		{
 			$time = strtotime($row['time'].' UTC');
@@ -1180,7 +1158,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 							AND (r.amp".$channel."_max != 128)
 						$sql_where
 						GROUP BY freq";
-				$res = bo_db($sql);
+				$res = BoDb::query($sql);
 				while ($row = $res->fetch_assoc())
 				{
 					$freq_id = (int)$f2id[$row['freq']];
@@ -1224,7 +1202,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 						$sql_where
 						AND (r.amp".$channel."_max != 128)
 						GROUP BY amp";
-				$res = bo_db($sql);
+				$res = BoDb::query($sql);
 				while ($row = $res->fetch_assoc())
 				{
 					$Y[$channel][$row['amp']] = $row['cnt'];
@@ -1366,7 +1344,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 			$sql = strtr($sql, array('{CHANNEL}' => $channel));
 			
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			while ($row = $res->fetch_assoc())
 			{
 				$time = strtotime($row['time'].' UTC');
@@ -1447,7 +1425,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			if ($hours_back < 7 * 24)
 					$sql .= ", HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
 
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
 			{
 				$time = strtotime($row['time'].' UTC');
@@ -1965,7 +1943,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$sql = "SELECT COUNT(*) cnt
 					FROM ".BO_DB_PREF."stations
 					WHERE status != '-'";
-			$res = bo_db($sql);
+			$res = BoDb::query($sql);
 			$row = $res->fetch_assoc();
 			$available = $row['cnt'];
 

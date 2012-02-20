@@ -1,29 +1,5 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
-
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
-
 
 function bo_check_for_update()
 {
@@ -96,17 +72,17 @@ function bo_check_for_update()
 		switch ($new_version)
 		{
 			case '0.2.2':
-				bo_db('ALTER TABLE '.BO_DB_PREF.'raw DROP INDEX `time`', false); // to be sure the key is not added twice
+				BoDb::query('ALTER TABLE '.BO_DB_PREF.'raw DROP INDEX `time`', false); // to be sure the key is not added twice
 				$sql = 'ALTER TABLE '.BO_DB_PREF.'raw ADD INDEX (`time`)';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				$ok = true; //doesn't matter too much if this fails ;-)
 				break;
 			
 			case '0.3':
-				bo_db('ALTER TABLE '.BO_DB_PREF.'stations_stat DROP INDEX `stations_time`', false); // to be sure the key is not added twice
+				BoDb::query('ALTER TABLE '.BO_DB_PREF.'stations_stat DROP INDEX `stations_time`', false); // to be sure the key is not added twice
 				$sql = 'CREATE INDEX stations_time ON '.BO_DB_PREF.'stations_stat (station_id, time)';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				$ok = true; //doesn't matter too much if this fails ;-)
 				break;
@@ -135,7 +111,7 @@ function bo_check_for_update()
 						  KEY `type` (`type`)
 						) ENGINE=MyISAM  DEFAULT CHARSET=utf8';
 				
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				break;
 			
@@ -153,7 +129,7 @@ function bo_check_for_update()
 					
 					case 'clear_dens_yes':
 						$sql = 'TRUNCATE TABLE `'.BO_DB_PREF.'densities`';
-						$ok = bo_db($sql, false);
+						$ok = BoDb::query($sql, false);
 						echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 						break;
 						
@@ -167,27 +143,27 @@ function bo_check_for_update()
 			case '0.5.2':
 
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP INDEX `time_dist`';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD INDEX `time` (`time`)';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 				
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `lat2` TINYINT NOT NULL AFTER `lon`, ADD `lon2` TINYINT NOT NULL AFTER `lat2`';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 
 				$sql = 'UPDATE `'.BO_DB_PREF.'strikes` SET lat2=FLOOR(lat), lon2=FLOOR(lon/180 * 128)';
-				$ok = bo_db($sql);
+				$ok = BoDb::query($sql);
 				echo '<li><em>'.$sql.'</em>: <b>'.$ok.' rows affected</b></li>';
 				flush();
 				
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD INDEX `latlon2` (`lat2`,`lon2`)';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 				
@@ -205,13 +181,13 @@ function bo_check_for_update()
 							ADD `freq2` SMALLINT UNSIGNED NOT NULL AFTER `freq1_amp`,
 							ADD `freq2_amp` TINYINT UNSIGNED NOT NULL AFTER `freq2`
 							';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 
 				// to assign new signals
-				bo_db('UPDATE `'.BO_DB_PREF.'raw` SET strike_id=0 WHERE time > NOW() - INTERVAL 72 HOUR', false);
-				bo_db('UPDATE `'.BO_DB_PREF.'strikes` SET raw_id=NULL WHERE time > NOW() - INTERVAL 72 HOUR', false);
+				BoDb::query('UPDATE `'.BO_DB_PREF.'raw` SET strike_id=0 WHERE time > NOW() - INTERVAL 72 HOUR', false);
+				BoDb::query('UPDATE `'.BO_DB_PREF.'strikes` SET raw_id=NULL WHERE time > NOW() - INTERVAL 72 HOUR', false);
 
 				
 				echo '<li><strong>You can update some signals by clicking <a href="'.bo_insert_url('bo_action', 'do_update').'&bo_update_signals">here</a>';
@@ -230,7 +206,7 @@ function bo_check_for_update()
 						  KEY `latlon` (`lat`,`lon`)
 						) ENGINE=MyISAM  DEFAULT CHARSET=utf8
 						';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();			
 				
@@ -239,12 +215,12 @@ function bo_check_for_update()
 			
 			case '0.6.2':
 			
-				$res = bo_db("SHOW COLUMNS FROM `".BO_DB_PREF."strikes` WHERE Field='time_key'");
+				$res = BoDb::query("SHOW COLUMNS FROM `".BO_DB_PREF."strikes` WHERE Field='time_key'");
 				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD `time_key` SMALLINT UNSIGNED NOT NULL AFTER `time_ns`";
 				echo '<li><em>'.$sql.'</em>: <b>';
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql, false);
+					$ok = BoDb::query($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 				}
 				else
@@ -257,17 +233,17 @@ function bo_check_for_update()
 
 				
 				$sql = "UPDATE `".BO_DB_PREF."strikes` SET time_key=FLOOR(UNIX_TIMESTAMP(time) / (3600*12) )";
-				$no = bo_db($sql, false);
+				$no = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'.$no.' rows affected</b></li>';
 				flush();
 
 				
-				$res = bo_db("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='time_latlon'");
+				$res = BoDb::query("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='time_latlon'");
 				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD INDEX `time_latlon` (`time_key`,`lat2`,`lon2`)";
 				echo '<li><em>'.$sql.'</em>: <b>';
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql, false);
+					$ok = BoDb::query($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 				}
 				else
@@ -282,13 +258,13 @@ function bo_check_for_update()
 			case '0.7.2':
 			
 			
-				$res = bo_db("SHOW COLUMNS FROM `".BO_DB_PREF."strikes` WHERE Field='status'");
+				$res = BoDb::query("SHOW COLUMNS FROM `".BO_DB_PREF."strikes` WHERE Field='status'");
 				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD `status` tinyint(4) NOT NULL";
 				echo '<li><em>'.$sql.'</em>: <b>';
 				flush();
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql, false);
+					$ok = BoDb::query($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 					echo '</b></li>';
 					flush();
@@ -298,7 +274,7 @@ function bo_check_for_update()
 						$sql = "UPDATE `".BO_DB_PREF."strikes` SET status=3 WHERE status=0";
 						echo '<li><em>'.$sql.'</em>: <b>';
 						flush();
-						$ok = bo_db($sql, false);
+						$ok = BoDb::query($sql, false);
 						echo _BL($ok ? 'OK' : 'FAIL');
 						echo '</b></li>';
 					}
@@ -317,21 +293,21 @@ function bo_check_for_update()
 			case '0.7.3':
 				
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP INDEX `latlon2`';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP INDEX `time_latlon`';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 				
-				$res = bo_db("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='timelatlon'");
+				$res = BoDb::query("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='timelatlon'");
 				$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD INDEX `timelatlon` (`time`,`lat`,`lon`)";
 				echo '<li><em>'.$sql.'</em>: <b>';
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql, false);
+					$ok = BoDb::query($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 				}
 				else
@@ -343,7 +319,7 @@ function bo_check_for_update()
 				flush();
 				
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` DROP `time_key`, DROP `lat2`, DROP `lon2`';
-				$ok2 = bo_db($sql, false);
+				$ok2 = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok2 ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 				
@@ -364,7 +340,7 @@ function bo_check_for_update()
 					
 					case 'clear_dens_yes':
 						$sql = 'TRUNCATE TABLE `'.BO_DB_PREF.'densities`';
-						$ok = bo_db($sql, false);
+						$ok = BoDb::query($sql, false);
 						echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 						break;
 						
@@ -374,17 +350,17 @@ function bo_check_for_update()
 				}
 				
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'densities` CHANGE  `station_id`  `station_id` SMALLINT( 5 ) NOT NULL';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 				
-				$res = bo_db("SHOW COLUMNS FROM `".BO_DB_PREF."stations` WHERE Field='first_seen'");
+				$res = BoDb::query("SHOW COLUMNS FROM `".BO_DB_PREF."stations` WHERE Field='first_seen'");
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` ADD `first_seen` datetime NOT NULL ';
 				echo '<li><em>'.$sql.'</em>: <b>';
 				flush();
 				if (!$res->num_rows)
 				{
-					$ok = bo_db($sql, false);
+					$ok = BoDb::query($sql, false);
 					echo _BL($ok ? 'OK' : 'FAIL');
 					echo '</b></li>';
 					flush();
@@ -394,7 +370,7 @@ function bo_check_for_update()
 						$sql = "UPDATE `".BO_DB_PREF."stations` SET first_seen=changed";
 						echo '<li><em>'.$sql.'</em>: <b>';
 						flush();
-						$ok = bo_db($sql, false);
+						$ok = BoDb::query($sql, false);
 						echo _BL($ok ? 'OK' : 'FAIL');
 						echo '</b></li>';
 					}
@@ -412,7 +388,7 @@ function bo_check_for_update()
 			
 			case '0.7.5':
 				$sql = 'ALTER TABLE '.BO_DB_PREF.'strikes DROP INDEX `timelatlon`';
-				$ok = bo_db($sql, false);
+				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'Already done.').'</b></li>';
 				$ok = true; //doesn't matter too much if this fails ;-)
 				break;
@@ -469,12 +445,12 @@ function bo_check_for_update()
 		echo '<p>Updating '.$limit.' signals!</p>';
 		flush();
 		
-		$res = bo_db("SELECT id, data FROM ".BO_DB_PREF."raw WHERE amp1=0 AND freq1=0 ORDER BY id DESC LIMIT $limit");
+		$res = BoDb::query("SELECT id, data FROM ".BO_DB_PREF."raw WHERE amp1=0 AND freq1=0 ORDER BY id DESC LIMIT $limit");
 		$i = 0;
 		while ($row = $res->fetch_assoc())
 		{
 			$sql = bo_examine_signal($row['data']);
-			bo_db("UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='".$row['id']."'");
+			BoDb::query("UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='".$row['id']."'");
 			$i++;
 			$last_id = $row['id'];
 		}

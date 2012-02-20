@@ -1,27 +1,5 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
-
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
 
 //show all available statistics and menu
 function bo_show_statistics()
@@ -160,12 +138,12 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 		$sql = "SELECT COUNT(*) cnt
 				FROM ".BO_DB_PREF."strikes 
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $last_update - 60*$group_minutes*2 )."' AND '".gmdate('Y-m-d H:i:s', $last_update-60*$group_minutes*1)."'"; 
-		$row = bo_db($sql)->fetch_assoc();
+		$row = BoDb::query($sql)->fetch_assoc();
 		$strike_rate = $row['cnt'] / $group_minutes;
 		
 		$sql = "SELECT MAX(time) mtime
 				FROM ".BO_DB_PREF."strikes ";
-		$row = bo_db($sql)->fetch_assoc();
+		$row = BoDb::query($sql)->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
 	}
 
@@ -195,7 +173,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	$months = array();
 	$months[-1] = _BL('All');
 
-	$res = bo_db("SELECT DISTINCT SUBSTRING(name, 9, 6) time
+	$res = BoDb::query("SELECT DISTINCT SUBSTRING(name, 9, 6) time
 					FROM ".BO_DB_PREF."conf
 					WHERE name LIKE 'strikes_%'
 					ORDER BY time");
@@ -331,13 +309,13 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		$city .= ' ('._BL($stInfo['country']).')';
 	
 	//Last overall stroke count and time
-	$row = bo_db("SELECT strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='0' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
+	$row = BoDb::query("SELECT strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='0' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
 	$strikesh = $row['strikesh'];
 	$stations_time = strtotime($row['time'].' UTC');
 	$last_update = (time()-$stations_time)/60;
 	
 	//Whole active station count
-	$row = bo_db("SELECT COUNT(station_id) cnt FROM ".BO_DB_PREF."stations_stat a WHERE time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
+	$row = BoDb::query("SELECT COUNT(station_id) cnt FROM ".BO_DB_PREF."stations_stat a WHERE time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
 	$stations = $row['cnt'] - 1;
 
 	//Own strokes
@@ -348,7 +326,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."strikes 
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $stations_time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $stations_time)."'
 						AND part>0 AND users='".bo_participants_locating_min()."'";
-		$row = bo_db($sql)->fetch_assoc();
+		$row = BoDb::query($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
 	}
 	else
@@ -360,7 +338,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 				ON s.id=ss.strike_id AND ss.station_id='$station_id'
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $stations_time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $stations_time)."'
 						AND users='".bo_participants_locating_min()."'";
-		$row = bo_db($sql)->fetch_assoc();
+		$row = BoDb::query($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
 	}
 
@@ -372,7 +350,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	
 	//Get the last non-zero signals or strikes for the station
 	$sql = "SELECT signalsh, strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat WHERE station_id='$station_id')";
-	$row = bo_db($sql)->fetch_assoc();
+	$row = BoDb::query($sql)->fetch_assoc();
 	$time_last_good_signals = $row['time'] ? strtotime($row['time'].' UTC') : false;
 	$last_active = $time_last_good_signals ? (time()-$time_last_good_signals)/60 : false;
 	
@@ -581,7 +559,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$date_range	= gmdate('Y-m-d H:i:s', time() - $range*3600);
 	
 	//Last update, time range
-	$row = bo_db("SELECT MAX(time) mtime FROM ".BO_DB_PREF."stations_stat WHERE time < '".gmdate("Y-m-d H:i:s", time() - 10)."'")->fetch_assoc();
+	$row = BoDb::query("SELECT MAX(time) mtime FROM ".BO_DB_PREF."stations_stat WHERE time < '".gmdate("Y-m-d H:i:s", time() - 10)."'")->fetch_assoc();
 	$time = strtotime($row['mtime'].' UTC');
 	$strikes_time_start = gmdate('Y-m-d H:i:s', $time - $range * 3600);
 	$table_time_start   = gmdate('Y-m-d H:i:s', $time - ($range>1 ? ($range-1)*3600 : 0) );
@@ -590,7 +568,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	
 	//participants
-	$row = bo_db("SELECT MAX(users) max_users, AVG(users) avg_users 
+	$row = BoDb::query("SELECT MAX(users) max_users, AVG(users) avg_users 
 					FROM ".BO_DB_PREF."strikes 
 					WHERE time BETWEEN '$strikes_time_start' AND '$table_time_end'")->fetch_assoc();
 	$max_part = $row['max_users'];
@@ -603,7 +581,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			WHERE station_id='0' 
 			AND time BETWEEN '$table_time_start' AND '$table_time_end' 
 			GROUP BY h";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 	{
 		$strikes_range += $row['strikesh'];
@@ -619,7 +597,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 					FROM ".BO_DB_PREF."stations_stat
 					WHERE time BETWEEN '$table_time_start' AND '$table_time_end'
 					GROUP BY station_id, h";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 	{
 		$D[$row['station_id']]['strikesh'] += $row['strikesh'];
@@ -631,7 +609,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$sql = "SELECT COUNT(*) cnt
 			FROM ".BO_DB_PREF."stations
 			WHERE status != '-' AND id < ".intval(BO_DELETED_STATION_MIN_ID)."";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	$row = $res->fetch_assoc();
 	$available = $row['cnt'];
 
@@ -650,7 +628,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			FROM ".BO_DB_PREF."stations
 			WHERE last_time = '1970-01-01 00:00:00' AND id < ".intval(BO_DELETED_STATION_MIN_ID)."
 			GROUP BY type";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 	{
 		$under_construction[$row['type']] = $row['cnt'];
@@ -1039,7 +1017,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				FROM ".BO_DB_PREF."stations
 				WHERE last_time = '1970-01-01 00:00:00' AND id < ".intval(BO_DELETED_STATION_MIN_ID)."
 				ORDER BY first_seen DESC";
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while($row = $res->fetch_assoc())
 			$station_under_constr[$row['id']] = $user_stations[$row['user']];
 		
@@ -1273,7 +1251,7 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	$D = array();
 	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'user', 'densities', 'cities');
 
-	$res = bo_db("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
+	$res = BoDb::query("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
 	while($row = $res->fetch_assoc())
 	{
 		$name = substr($row['Name'], strlen(BO_DB_PREF));
@@ -1410,7 +1388,7 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 		
 		if (0 && $own_station) // GPS data out of raw signal table isn't needed any more
 		{
-			$res = bo_db("SELECT lat, lon, height
+			$res = BoDb::query("SELECT lat, lon, height
 							FROM ".BO_DB_PREF."raw
 							WHERE time > '".gmdate('Y-m-d H:i:s', time() - 24 * 3600)."'
 							GROUP BY DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / 5)

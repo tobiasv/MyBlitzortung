@@ -1,27 +1,6 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
 
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-if (!defined('BO_VER'))
-	exit('No BO_VER');
 
 function bo_show_archive()
 {
@@ -244,7 +223,7 @@ function bo_show_archive_map()
 
 	
 	//min/max strike-time
-	$row = bo_db("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+	$row = BoDb::query("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$start_time = strtotime($row['mintime'].' UTC');
 	$end_time = strtotime($row['maxtime'].' UTC');
 	
@@ -581,7 +560,7 @@ function bo_show_archive_search()
 				ORDER BY s.time DESC
 				LIMIT ".intval($select_count + 1);
 
-		$res = bo_db($sql);
+		$res = BoDb::query($sql);
 		while($row = $res->fetch_assoc())
 		{
 			if ($count >= $select_count)
@@ -1045,7 +1024,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	}
 	else
 	{
-		$row = bo_db("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
+		$row = BoDb::query("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
 		$time_end  = strtotime($row['time'].' UTC') - $date_end_max_sec;
 	}
 	
@@ -1093,7 +1072,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					".bo_region2sql($region)."
 			ORDER BY $table.time DESC, $table.time_ns DESC
 			LIMIT ".($page * $per_page).", ".($per_page+1)."";
-	$res = bo_db($sql);
+	$res = BoDb::query($sql);
 
 	echo '<div class="bo_sig_navi">';
 
@@ -1139,7 +1118,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			$sql2 = "SELECT ss.station_id id
 				FROM ".BO_DB_PREF."stations_strikes ss
 				WHERE ss.strike_id='".$row['strike_id']."'";
-			$res2 = bo_db($sql2);
+			$res2 = BoDb::query($sql2);
 			while ($row2 = $res2->fetch_assoc())
 			{
 				$sid = $row2['id'];
