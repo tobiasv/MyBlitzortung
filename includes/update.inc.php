@@ -42,14 +42,14 @@ function bo_check_for_update()
 			$cur_version_num--;
 
 		//Warning when updating from dev-Version
-		if ($do_update && strpos($cur_version, 'dev'))
+		if ($do_update && (strpos($cur_version, 'dev') || strpos($cur_version, '-')))
 		{
 			echo '<div id="bo_update_info">Hint: ';
 			echo 'You are updating from a developer Version. Database updates may fail, because they could already have been occured before!';
 			echo '</div>';
 		}
 
-		if ($cur_version_num < max($updates) && $do_update)
+		if ($cur_version_num < max($updates) && !$do_update)
 		{
 			echo '<div id="bo_update_info">';
 			echo '<h4>'._BL('Database version changed!').'</h4>';
