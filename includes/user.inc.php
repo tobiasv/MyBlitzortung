@@ -4,7 +4,7 @@
 function bo_show_login()
 {
 	global $_BO;
-	
+
 	if (!defined('BO_LOGIN_ALLOW') || (BO_LOGIN_ALLOW != 1 && BO_LOGIN_ALLOW != 2))
 	{
 		echo _BL('Login not allowed');
@@ -14,40 +14,40 @@ function bo_show_login()
 	$login_fail = false;
 
 	$remove_vars = array('bo_*','login','id');
-	
+
 	if (bo_user_get_id())
 	{
 		$level = bo_user_get_level();
 		$show = $_GET['bo_action'];
-		
+
 		echo '<ul id="bo_menu">';
 
 		echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=" class="bo_navi'.($show == '' ? '_active' : '').'">'._BL('Start').'</a>';
 		if (bo_user_get_id() > 1)
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=password" class="bo_navi'.($show == 'password' ? '_active' : '').'">'._BL('Password').'</a>';
-		
+
 		if (BO_PERM_ADMIN & $level)
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=user_settings" class="bo_navi'.($show == 'user_settings' ? '_active' : '').'">'._BL('Add/Remove User').'</a>';
 
 		if (BO_PERM_ADMIN & $level)
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=admin" class="bo_navi'.($show == 'admin' ? '_active' : '').'">'._BL('Administration').'</a>';
-			
+
 		if (defined('BO_ALERTS') && BO_ALERTS && ($level & BO_PERM_ALERT))
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=alert" class="bo_navi'.($show == 'alert' ? '_active' : '').'" class="bo_navi'.($show == 'alert' ? '_active' : '').'">'._BL('Strike alert').'</a></li>';
-		
+
 		echo '</ul>';
 
 		if (bo_user_get_id() == 1)
 		{
 			include 'update.inc.php';
-			
+
 			if (bo_check_for_update() == true)
 			{
 				bo_copyright_footer();
 				return;
 			}
 		}
-		
+
 		switch($show)
 		{
 
@@ -65,35 +65,35 @@ function bo_show_login()
 				if (bo_user_get_id() > 1)
 					bo_user_show_passw_change();
 				break;
-				
+
 			case 'alert':
 				if (BO_PERM_ALERT & $level)
 					bo_alert_settings();
 				break;
 
 
-			
+
 			default:
-				
-				$lastlogin = bo_get_conf('user_lastlogin');
-				$sessiontime = time() - bo_get_conf('user_lastlogin_next');
-				
+
+				$lastlogin = bo_get_conf_user('lastlogin');
+				$sessiontime = time() - $_SESSION['bo_login_time'];
+
 				echo '<h3>'._BL('Welcome to MyBlitzortung user area').'!</h3>';
 				echo '<ul class="bo_login_info">';
 				echo '<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>';
-				
+
 				if ($lastlogin)
 					echo '<li>'._BL('user_lastlogin_text').': <strong>'.date(_BL('_datetime'), $lastlogin).'</strong></li>';
-				
+
 				echo '<li>'._BL('user_sessiontime_text').': <strong>'.number_format($sessiontime / 60, 1, _BL('.'), _BL(',')).' '._BL('unit_minutes').'</strong></li>';
 				echo '</ul>';
-				
+
 				if (BO_PERM_ADMIN & $level)
 				{
 					if (file_exists(BO_DIR.'settings.php'))
 						echo '<p style="color:red"><strong>Warning: File <u>settings.php</u> found!</strong><br>Since version 0.3.1 standard values and settings are saved internally. For individual setting edit config.php and enter your individual settings there. Delete settings.php to hide this message.</p>';
 				}
-				
+
 				echo '<h4>'._BL('Version information').'</h4>';
 				echo '<ul>';
 				echo '<li>'._BL('MyBlitzortung version').': <strong>'.bo_get_conf('version').'</strong></li>';
@@ -102,15 +102,15 @@ function bo_show_login()
 					$res = BoDb::query("SHOW VARIABLES LIKE 'version'");
 					$row = $res->fetch_assoc();
 					$mysql_ver = $row['Value'];
-					
+
 					echo '<li>'._BL('PHP version').': '.phpversion().' (<a href="'.bo_insert_url($remove_vars).'&bo_action=phpinfo" target="_blank">'._BL('Show PHP info').'</a>)</li>';
 					echo '<li>'._BL('MySQL version').': '.$mysql_ver.'</li>';
 				}
 				echo '</ul>';
-				
+
 				break;
 		}
-		
+
 
 
 	}
@@ -127,24 +127,24 @@ function bo_user_show_admin()
 {
 	$show = $_GET['bo_action_admin'];
 	$url = bo_insert_url(array('bo_*','login','id')).'&bo_action=admin&bo_action_admin=';
-	
+
 	switch($show)
 	{
 		case 'calibrate':
 			bo_show_calibrate_antennas();
 			break;
-			
+
 		case 'mybo_station_update':
 			bo_my_station_update_form();
 			break;
-		
+
 		case 'update':
 			echo '<h4>'._BL('Importing data...').'</h4>';
 			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
 			bo_update_all(true, $_GET['bo_only']);
 			echo '</div></pre>';
 			break;
-		
+
 		case 'cache_info':
 			bo_cache_info();
 			break;
@@ -155,15 +155,15 @@ function bo_user_show_admin()
 			bo_db_recreate_strike_keys();
 			echo '</div></pre>';
 			break;
-			
+
 		case 'cities':
 			bo_import_cities();
 			break;
-		
+
 		default:
 
 			echo '<h4>'._BL('Admin tools').'</h4>';
-			
+
 			echo '<ul>';
 			echo '<li><a href="'.$url.'mybo_station_update">'._BL('Update MyBlitzortung Stations').'</a></li>';
 			echo '<li><a href="'.$url.'cache_info">'._BL('File cache info').'</a></li>';
@@ -197,28 +197,28 @@ function bo_user_show_admin()
 			echo '<li><a href="http://www.wetter-board.de/index.php?page=Board&boardID=381" target="_blank">Board</a></li>';
 			echo '<li><a href="http://www.faq-blitzortung.org/index.php?sid=267611&lang=de&action=show&cat=18" target="_blank">FAQ</a></li>';
 			echo '</ul>';
-			
+
 			echo '<h5>'._BL('Links').'</h5>';
 			echo '<ul>';
 
-/*			
+/*
 			$bo_login_id = bo_get_conf('bo_login_id');
 			if ($bo_login_id)
 				echo '<li><a href="http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$bo_login_id.'" target="_blank">Blitzortung.org</a> (with your Login-String)</li>';
-*/			
-				
+*/
+
 			echo '</ul>';
-			
+
 			break;
 	}
 
-	
+
 }
 
 function bo_show_login_form($fail = false)
 {
 	global $_BO;
-	
+
 	echo '<div id="bo_login">';
 
 	if ($fail)
@@ -242,7 +242,7 @@ function bo_show_login_form($fail = false)
 		echo '<label for="bo_login_cookie_check" class="bo_form_descr_checkbox">'._BL('stay logged in').'</label>';
 		echo '</span>';
 	}
-	
+
 	echo '<input type="submit" name="ok" value="'._BL('Login').'" id="bo_login_submit" class="bo_form_submit">';
 
 	echo '<input type="hidden" name="bo_do_login" value="1">';
@@ -258,17 +258,17 @@ function bo_show_login_form($fail = false)
 function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 {
 	$pass = trim($pass);
-	
+
 	if (!$user || !$pass)
 		return false;
-		
+
 	if (BO_LOGIN_ALLOW > 0 && $user == BO_USER && defined('BO_USER') && strlen(BO_USER))
 	{
 		if ( ($pass == BO_PASS || ($md5pass && $pass == md5(BO_PASS))) && defined('BO_PASS') && strlen(BO_PASS))
 		{
 			if (!$md5pass)
 				$pass = md5($pass);
-			
+
 			bo_user_set_session(1, pow(2, BO_PERM_COUNT) - 1, $cookie, $pass);
 			return true;
 		}
@@ -278,7 +278,7 @@ function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 	{
 		if ($md5pass == false)
 			$pass = md5($pass);
-			
+
 		$res = BoDb::query("SELECT id, login, level FROM ".BO_DB_PREF."user WHERE login='$user' AND password='$pass'");
 
 		if ($res->num_rows == 1)
@@ -299,7 +299,7 @@ function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 function bo_user_do_login_byid($id, $pass)
 {
 	$id = intval($id);
-	
+
 	if ($id == 1)
 	{
 		$user = BO_USER;
@@ -317,12 +317,13 @@ function bo_user_do_logout()
 {
 	if ($_COOKIE['bo_login'] && !$_BO['headers_sent'])
 		setcookie("bo_login", '', time()+3600*24*9999,'/');
-	
-	bo_set_conf('user_cookie'.$_SESSION['bo_user'], '');
+
+	bo_set_conf_user('cookie', '');
 
 	$_SESSION['bo_user'] = 0;
 	$_SESSION['bo_user_level'] = 0;
 	$_SESSION['bo_logged_out'] = true;
+	$_SESSION['bo_login_time'] = 0;
 }
 
 function bo_user_set_session($id, $level, $cookie, $pass='')
@@ -330,25 +331,26 @@ function bo_user_set_session($id, $level, $cookie, $pass='')
 	$_SESSION['bo_user'] = $id;
 	$_SESSION['bo_user_level'] = $level;
 	$_SESSION['bo_logged_out'] = false;
-	
+	$_SESSION['bo_login_time'] = time();
+
 	$cookie_days = intval(BO_LOGIN_COOKIE_TIME);
-	
+
 	if ($cookie && !$_BO['headers_sent'] && $cookie_days)
 	{
-		$data = unserialize(bo_get_conf('user_cookie'.$cookie_user));
-		
+		$data = unserialize(bo_get_conf_user('cookie', $id));
+
 		if (!$data['uid'])
 			$data['uid'] = md5(uniqid('', true));
 
 		$data['pass'] = $pass;
-		bo_set_conf('user_cookie'.$id, serialize($data));
-		
+		bo_set_conf_user('user_cookie', serialize($data), $id);
+
 		setcookie("bo_login", $id.'_'.$data['uid'], time()+3600*24*$cookie_days,'/');
 	}
-	
-	$lastlogin = bo_get_conf('user_lastlogin_next');
-	bo_set_conf('user_lastlogin', $lastlogin);
-	bo_set_conf('user_lastlogin_next', time());
+
+	$lastlogin = bo_get_conf_user('lastlogin_next', $id);
+	bo_set_conf_user('lastlogin', $lastlogin, $id);
+	bo_set_conf_user('lastlogin_next', time(), $id);
 }
 
 function bo_user_get_id()
@@ -373,7 +375,7 @@ function bo_user_get_level($user_id = 0)
 function bo_user_get_name($user_id = 0)
 {
 	static $names;
-	
+
 	if (!$user_id)
 		$user_id = $_SESSION['bo_user'];
 
@@ -386,14 +388,14 @@ function bo_user_get_name($user_id = 0)
 		$row = $res->fetch_assoc();
 		$names[$user_id] = $row['login'];
 	}
-	
+
 	return $names[$user_id];
 }
 
 function bo_user_get_mail($user_id = 0)
 {
 	static $mails;
-	
+
 	if (!$user_id)
 		$user_id = $_SESSION['bo_user'];
 
@@ -403,7 +405,7 @@ function bo_user_get_mail($user_id = 0)
 		$row = $res->fetch_assoc();
 		$mails[$user_id] = $row['mail'];
 	}
-	
+
 	return $mails[$user_id];
 }
 
@@ -413,7 +415,7 @@ function bo_user_show_passw_change()
 	{
 		$pass1 = bo_gpc_prepare($_POST['pass1']);
 		$pass2 = bo_gpc_prepare($_POST['pass2']);
-		
+
 		if ($pass1 && $pass2 && $pass1 == $pass2)
 		{
 			$pass = md5($pass1);
@@ -429,9 +431,9 @@ function bo_user_show_passw_change()
 			echo '</div>';
 		}
 	}
-	
+
 	echo '<h3>'._BL('Change password').'</h3>';
-	
+
 	echo '<form action="'.bo_insert_url().'" method="POST" class="bo_admin_user_form">';
 
 	echo '<fieldset class="bo_admin_user_fieldset">';
@@ -445,7 +447,7 @@ function bo_user_show_passw_change()
 
 	echo '<input type="submit" name="ok" value="'._BL('Change').'" id="bo_user_admin_submit" class="bo_form_submit">';
 	echo '</fieldset>';
-	
+
 	echo '</form>';
 }
 
@@ -470,26 +472,26 @@ function bo_user_show_useradmin()
 				foreach($_POST['bo_user_perm'] as $perm => $checked)
 				{
 					if ($checked)
-						$new_user_level += $perm; 
+						$new_user_level += $perm;
 				}
 			}
-			
+
 			$sql = " ".BO_DB_PREF."user SET mail='$new_user_mail' ";
 
 			if ($user_id != 1)
 			{
 				$sql .= ", login='$new_user_login', level='$new_user_level' ";
-			
+
 				if (strlen(trim($new_user_pass)))
 				{
 					$new_user_pass = md5($new_user_pass);
 					$sql .= ", password='$new_user_pass'";
 				}
 			}
-			
+
 			//To be sure, if creation of main user during install failed
 			BoDb::query("INSERT IGNORE INTO ".BO_DB_PREF."user SET id=1", false);
-			
+
 			if ($user_id)
 				$ok = BoDb::query("UPDATE $sql WHERE id='$user_id'", false);
 			else
@@ -497,7 +499,7 @@ function bo_user_show_useradmin()
 
 			if (!$ok)
 				$failure = true;
-				
+
 			$user_id = 0;
 		}
 		else
@@ -533,7 +535,7 @@ function bo_user_show_useradmin()
 	{
 		echo '<th>'.($i+1).'</th>';
 	}
-			
+
 	$sql = "SELECT id, login, password, level, mail
 			FROM ".BO_DB_PREF."user
 			ORDER BY id
@@ -558,16 +560,16 @@ function bo_user_show_useradmin()
 			$l = pow(2, $i);
 			echo '<td>'.(($row['level'] & $l) ? 'X' : '-').'</td>';
 		}
-		
+
 		echo '<td>';
-			
+
 		if ($row['id'] > 1)
 			echo '<a href="'.bo_insert_url(array('bo_action2')).'&bo_action2=delete&id='.$row['id'].'" style="color:red" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
 
 		echo '</td>';
-		
+
 		echo '<td><a href="'.bo_insert_url(array('bo_action', 'bo_action2')).'&bo_action=alert&bo_action2=alert_form%2C'.$row['id'].'">'._BL('new').'</a></td>';
-		
+
 		echo '</tr>';
 
 		if ($user_id == $row['id'])
@@ -589,7 +591,7 @@ function bo_user_show_useradmin()
 	if ($failure)
 		echo '<div class="bo_info_fail">'._BL('Failure!').'</div>';
 
-	
+
 	echo '<form action="'.bo_insert_url(array('bo_logout', 'id', 'bo_action2')).'" method="POST" class="bo_admin_user_form">';
 
 	echo '<fieldset class="bo_admin_user_fieldset">';
@@ -612,7 +614,7 @@ function bo_user_show_useradmin()
 	for ($i=0; $i<BO_PERM_COUNT;$i++)
 	{
 		$l = pow(2, $i);
-		
+
 		echo '<span class="bo_form_checkbox_text">';
 		echo '<input type="checkbox" value="1" name="bo_user_perm['.$l.']" id="bo_user_perm'.$i.'" class="bo_form_checkbox" '.$disabled.(($user_level & $l) ? ' checked="checked"' : '').'>';
 		echo '<label for="bo_user_perm'.$i.'" class="bo_form_descr_checkbox">'._BL('user_perm'.$i).'&nbsp;('.($i+1).')</label>';
@@ -637,26 +639,26 @@ function bo_user_show_useradmin()
 function bo_show_calibrate_antennas()
 {
 	$channels = bo_get_conf('raw_channels');
-	
+
 	if (!$_POST['bo_calibrate'])
 	{
 		if ($_POST['bo_calibrate_manual'] && (bo_user_get_level() & BO_PERM_ADMIN))
 		{
 			if (strlen(trim($_POST['bo_antenna1_bearing'])))
-				bo_set_conf('antenna1_bearing', (double)$_POST['bo_antenna1_bearing']);	
-			
+				bo_set_conf('antenna1_bearing', (double)$_POST['bo_antenna1_bearing']);
+
 			if (strlen(trim($_POST['bo_antenna2_bearing'])))
-				bo_set_conf('antenna2_bearing', (double)$_POST['bo_antenna2_bearing']);	
-			
+				bo_set_conf('antenna2_bearing', (double)$_POST['bo_antenna2_bearing']);
+
 			if (strlen(trim($_POST['bo_antenna1_bearing_elec'])))
 				bo_set_conf('antenna1_bearing_elec', (double)$_POST['bo_antenna1_bearing_elec']);
-				
+
 			if (strlen(trim($_POST['bo_antenna2_bearing_elec'])))
 				bo_set_conf('antenna2_bearing_elec', (double)$_POST['bo_antenna2_bearing_elec']);
 		}
-		
+
 		echo '<h3>'._BL('Manual antenna calibration').'</h3>';
-		
+
 		echo '<form action="'.bo_insert_url().'" method="POST" class="bo_admin_user_form">';
 
 		echo '<fieldset class="bo_admin_user_fieldset">';
@@ -690,9 +692,9 @@ function bo_show_calibrate_antennas()
 
 		if (!$dist && intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST))
 			$dist = intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST) * 1000;
-		
+
 		echo '<h3>'._BL('Automatic antenna calibration').'</h3>';
-		
+
 		echo '<form action="'.bo_insert_url().'" method="POST" class="bo_admin_user_form">';
 
 		echo '<fieldset class="bo_admin_user_fieldset">';
@@ -792,9 +794,9 @@ function bo_show_calibrate_antennas()
 			$alpha[1] = null;
 			if (count($ant_alpha[1]))
 				$alpha[1] = round(array_sum($ant_alpha[1]) / count($ant_alpha[1]),1);
-			
+
 			echo '<form action="'.bo_insert_url().'" method="POST" class="bo_admin_user_form">';
-			
+
 			echo '<h3>'._BL('Results').'</h3>';
 
 			echo '<ul>';
@@ -807,20 +809,20 @@ function bo_show_calibrate_antennas()
 
 			if ((bo_user_get_level() & BO_PERM_ADMIN))
 				echo '<input type="text" name="bo_antenna1_bearing" value="'.$alpha[0].'" id="bo_antenna1_bearing_id" class="bo_form_text bo_form_input">';
-			
+
 			echo '</li>';
 			echo '<li>'._BL('Antenna').' 2: '.$alpha[1].'&deg; ('._BL(bo_bearing2direction($alpha[1])).' <-> '._BL(bo_bearing2direction($alpha[1] + 180)).')';
 
 			if ((bo_user_get_level() & BO_PERM_ADMIN))
 				echo '<input type="text" name="bo_antenna2_bearing" value="'.$alpha[1].'" id="bo_antenna2_bearing_id" class="bo_form_text bo_form_input">';
-				
+
 			echo '</li>';
 			echo '<li>'._BL('Difference').': '.abs($alpha[1]-$alpha[0]).'&deg;</li>';
 
 			echo '</ul>';
 
-			
-				
+
+
 
 			//find polarity (+/-) from statistics (suppose: more negative lightning than positve)
 			echo '<h4>'._BL('Polarity').' ('._BL('Very experimental').')</h4>';
@@ -894,7 +896,7 @@ function bo_show_calibrate_antennas()
 				else
 				{
 					echo $pos_dir[$i].'&deg';
-					
+
 					if ((bo_user_get_level() & BO_PERM_ADMIN))
 						echo '<input type="text" name="bo_antenna'.($i+1).'_bearing_elec" value="'.$pos_dir[$i].'" id="bo_antenna'.($i+1).'_elec_bearing_id" class="bo_form_text bo_form_input">';
 				}
@@ -904,9 +906,9 @@ function bo_show_calibrate_antennas()
 				echo '</ul>';
 
 			}
-			
+
 			echo '<input type="submit" name="bo_calibrate_manual" value="'._BL('Ok').'" id="bo_admin_submit" class="bo_form_submit">';
-			
+
 			echo '</form>';
 		}
 	}
@@ -917,49 +919,49 @@ function bo_cache_info()
 	$dirs['Tiles'] = array('cache/tiles/', 5);
 	$dirs['Icons'] = array('cache/icons/', 5);
 	$dirs['Maps']  = array('cache/maps/', 5, 1);
-	
+
 	if (BO_CACHE_SUBDIRS === true)
 		$dirs['Density maps'] = array('cache/densitymap/', 2);
-		
+
 	$dirs['Other'] = array('cache/', 0);
-	
+
 	echo '<h3>'._BL('File cache info').'</h3>';
-	
+
 	foreach($dirs as $name => $d)
 	{
 		$dir = $d[0];
 		$depth = $d[1];
 		$delete_dir_depth = $d[2] ? $d[2] : false;
-		
+
 		echo '<h4>'.$name.' <em>'.$dir.'</em></h4>';
-		
+
 		$dir = BO_DIR.$dir;
-		
+
 		if ($_GET['bo_action2'] == 'unlink')
 		{
 			bo_delete_files($dir, 0, $depth, $delete_dir_depth);
 			flush();
 			clearstatcache();
 		}
-		
-		
-		
+
+
+
 		$files = glob($dir.'*');
-		
+
 		if ($depth && is_array($files))
 		{
-			for ($i = 0; $i < count($files); $i++) 
+			for ($i = 0; $i < count($files); $i++)
 			{
-				if (is_dir($files[$i])) 
+				if (is_dir($files[$i]))
 				{
 					$add = glob($files[$i].'/*');
-					
+
 					if ($add && is_array($add))
 						$files = array_merge($files, $add);
 				}
 			}
 		}
-		
+
 		if (is_array($files))
 		{
 			$size = 0;
@@ -974,28 +976,28 @@ function bo_cache_info()
 				}
 			}
 		}
-		
+
 		echo '<p>'._BL('Files').': <strong>'.$count.'</strong> ('.number_format($size / 1024, 1, _BL('.'), _BL(',')).' kB)</p>';
-		
+
 		flush();
 	}
 
-	
+
 	echo '<h3>'._BL('Clear all files').'</h3>';
-	
+
 	echo '<p><a href="'.bo_insert_url().'&bo_action2=unlink">'._BL('Click here to delete all files').'</a></p>';
 }
 
 function bo_my_station_update_form()
 {
-	if ($_POST['ok'])	
+	if ($_POST['ok'])
 	{
 		$url = trim($_POST['bo_url']);
-		
+
 		echo '<pre>';
 		$ret = bo_my_station_update($url);
 		echo '</pre>';
-		
+
 		if ($ret && $url)
 			bo_set_conf('mybo_stations_autoupdate', $_POST['bo_auto'] ? 1 : 0);
 		else
@@ -1003,15 +1005,15 @@ function bo_my_station_update_form()
 	}
 	else
 	{
-	
+
 		$st_urls = unserialize(bo_get_conf('mybo_stations'));
-		
+
 		if (is_array($st_urls) && $st_urls[bo_station_id()])
 			$url = $st_urls[bo_station_id()];
 		else
 			$url = 'http://'.$_SERVER["HTTP_HOST"].dirname($_SERVER["REQUEST_URI"]);
 
-			
+
 		echo '<h3>'._BL('Link with the MyBlitzortung network').'</h3>';
 		echo strtr(_BL('mybo_station_update_info'), array('{LINK_HOST}' => BO_LINK_HOST));
 		echo '<form action="'.bo_insert_url().'" method="POST" class="bo_login_form">';
@@ -1025,7 +1027,7 @@ function bo_my_station_update_form()
 		echo '<input type="submit" name="ok" value="'._BL('Agree and Send').'" id="bo_login_submit" class="bo_form_submit" onclick="return confirm(\''._BL('Really continue?').'\');">';
 		echo '</fieldset>';
 		echo '</form>';
-	
+
 	}
 
 }
@@ -1033,46 +1035,46 @@ function bo_my_station_update_form()
 function bo_import_cities()
 {
 	$fp = @fopen(BO_DIR."cities.txt", "r");
-	
+
 	echo '<h3>'._BL('Importing cities').'</h3>';
-	
-	if ($fp) 
+
+	if ($fp)
 	{
 		$cities = array();
-		while (($line = fgets($fp, 4096)) !== false) 
+		while (($line = fgets($fp, 4096)) !== false)
 		{
 			$p = explode(',', $line);
 			$cities[] = $p;
 		}
-	
+
 		fclose($fp);
-	
+
 		echo '<p>'._BL('Cities read').': '.count($cities).'</p>';
 		flush();
-		
+
 		if (count($cities))
 		{
 			echo '<p>'._BL('Deleting existing cities from DB').'</p>';
 			flush();
 			BoDb::query("DELETE FROM ".BO_DB_PREF."cities");
-			
+
 			echo '<p>'._BL('Cities imported').': ';
 			flush();
-			
+
 			$i = 0;
 			foreach($cities as $city)
 			{
 				if (count($city) > 4) //cities with borders --> big cities
 					$city[3] += 4;
-					
-				$ok = BoDb::query("INSERT INTO ".BO_DB_PREF."cities 
+
+				$ok = BoDb::query("INSERT INTO ".BO_DB_PREF."cities
 						SET name='".BoDb::esc($city[0])."',
 							lat ='".BoDb::esc($city[1])."',
 							lon ='".BoDb::esc($city[2])."',
 							type='".BoDb::esc($city[3])."'");
 				if ($ok) $i++;
 			}
-			
+
 			echo $i.'</p>';
 		}
 	}
@@ -1082,5 +1084,64 @@ function bo_import_cities()
 	}
 
 }
-		
+
+function bo_set_conf_user($name, $data, $id=0)
+{
+	$id = $id > 0 ? $id : bo_user_get_id();
+
+	if ($id > 0)
+		return bo_set_conf('user_'.$name.'_'.$id, $data);
+	else
+		return false;
+}
+
+
+function bo_get_conf_user($name, $id=0)
+{
+	$id = $id > 0 ? $id : bo_user_get_id();
+
+	if ($id > 0)
+		return bo_get_conf('user_'.$name.'_'.$id);
+	else
+		return false;
+}
+
+
+
+function bo_user_init()
+{
+	//Session handling
+	@session_start();
+
+	//Set user_id
+	if (!isset($_SESSION['bo_user']))
+	$_SESSION['bo_user'] = 0;
+
+	//Cookie login
+	bo_user_cookie_login();
+
+
+	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
+}
+
+
+
+function bo_user_cookie_login()
+{
+	//Check for stored login in cookie
+	if (!bo_user_get_id() && intval(BO_LOGIN_COOKIE_TIME) && isset($_COOKIE['bo_login']) && preg_match('/^([0-9]+)_([0-9a-z]+)$/i', trim($_COOKIE['bo_login']), $r) )
+	{
+		$cookie_user_id = $r[1];
+		$cookie_uid = $r[2];
+
+		$data = unserialize(bo_get_conf_user('user_cookie', $cookie_user_id));
+
+		if ($cookie_uid == $data['uid'] && trim($data['uid']))
+		{
+			bo_user_do_login_byid($cookie_user_id, $data['pass']);
+		}
+
+	}
+}
+
 ?>

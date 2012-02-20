@@ -1,7 +1,6 @@
 <?php
 
 
-	
 // latitude, longitude to distance in meters
 function bo_latlon2dist($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
 {
@@ -15,20 +14,20 @@ function bo_latlon2dist($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
 function bo_latlon2dist_rhumb($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
 {
 	$R = 6371000;
-	
+
 	$lat1     = deg2rad($lat1);
 	$lat2     = deg2rad($lat2);
 
 	$dlat     = deg2rad($lat2 - $lat1);
 	$dlon     = abs(deg2rad($lon2 - $lon1));
-	
+
 	$dPhi = log(tan($lat2/2 + M_PI/4) / tan($lat1/2 + M_PI/4));
 	$q    = $dPhi != 0 ? $dlat / $dPhi : cos($lat1);  // E-W line gives dPhi=0
-	
+
 	// if dLon over 180° take shorter rhumb across 180° meridian:
 	if ($dlon > M_PI) $dlon = 2*M_PI - $dlon;
-	
-	$dist = sqrt($dlat*$dlat + $q*$q*$dlon*$dlon) * $R; 
+
+	$dist = sqrt($dlat*$dlat + $q*$q*$dlon*$dlon) * $R;
 
 	return $dist;
 }
@@ -108,24 +107,24 @@ function bo_distbearing2latlong_rhumb($dist, $bearing, $lat = BO_LAT, $lon = BO_
 {
 	$lat     = deg2rad($lat);
 	$lon     = deg2rad($lon);
-	
+
 	$d    = $dist / 6371000;
 	$lat2 = $lat + $d * cos($bearing);
 	$dLat = $lat2-$lat;
 	$dPhi = log(tan($lat2/2 + M_PI/4) / tan($lat/2 + M_PI/4));
 	$q    = $dPhi != 0 ? $dLat/$dPhi : cos($lat);  // E-W line gives dPhi=0
 	$dLon = $dist * sin($bearing) / $q;
-	
+
 	// check for some daft bugger going past the pole, normalise latitude if so
-	if (abs($lat2) > M_PI/2) 
+	if (abs($lat2) > M_PI/2)
 		$lat2 = $lat2 > 0 ? M_PI-$lat2 : -(M_PI-$lat2);
-	
+
 	$lon2 = ($lon + $dLon + M_PI) % (2 * M_PI) - M_PI;
 
-	
+
 	$lat2 = rad2deg($lat2);
 	$lon2 = rad2deg($lon2);
-	
+
 	return array($lat2, $lon2);
 }
 
@@ -136,13 +135,13 @@ function bo_stations($index = 'id', $only = '', $under_constr = true)
 	$S = array();
 
 	$sql .= '';
-	
+
 	if ($only)
 		$sql .= " AND $index='".BoDb::esc($only)."' ";
 
 	if (!$under_constr)
 		$sql .= " AND last_time != '1970-01-01 00:00:00' ";
-		
+
 	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND id < ".intval(BO_DELETED_STATION_MIN_ID);
 	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
@@ -163,12 +162,12 @@ function bo_station_id()
 {
 	if (BO_NO_DEFAULT_STATION === true)
 		return -1; // -1 ==> does not interfer with station statistic table (0 = all stations)
-	
+
 	static $id = 0;
-	
+
 	if (!$id)
 		$id = bo_station_name2id(BO_USER);
-	
+
 	return $id ? $id : -1;
 }
 
@@ -193,10 +192,10 @@ function bo_station_city($id=0, $force_name = '')
 function bo_station_info($id = 0)
 {
 	static $info = array();
-	
+
 	if (isset($info[$id]))
 		return $info[$id];
-	
+
 	if ($id)
 	{
 		$tmp = bo_stations('id', $id);
@@ -206,17 +205,17 @@ function bo_station_info($id = 0)
 	{
 		if (BO_NO_DEFAULT_STATION === true)
 			return false;
-			
+
 		$tmp = bo_stations('user', BO_USER);
-		
+
 		if (defined('BO_STATION_NAME') && BO_STATION_NAME)
 			$tmp[BO_USER]['city'] = BO_STATION_NAME;
-			
+
 		$ret = $tmp[BO_USER];
 	}
 
 	$info[$id] = $ret;
-	
+
 	return $info[$id];
 }
 
@@ -229,19 +228,19 @@ function get_station_list()
 	{
 		if (!$d['country'] || !$d['city'] || $d['status'] == '-')
 			continue;
-		
+
 		$opts[$id] = _BL($d['country']).': '._BC($d['city']);
 	}
-	
+
 	asort($opts);
-	
+
 	return $opts;
 }
 
 function get_stations_html_select($station_id)
 {
 	$opts = get_station_list();
-	
+
 	$text = '<select name="bo_station_id" onchange="submit()">';
 	$text .= '<option></option>';
 	foreach($opts as $id => $name)
@@ -251,7 +250,7 @@ function get_stations_html_select($station_id)
 		$text .= '</option>';
 	}
 	$text .= '</select>';
-	
+
 	return $text;
 }
 
@@ -275,13 +274,13 @@ function bo_insert_url($exclude = array(), $add = null)
 
 	if (bo_user_get_id())
 		$exclude[] = 'bo_login';
-	
+
 	$exclude_bo = array_search('bo_*', $exclude) !== false;
-	
+
 	$query = '';
 	foreach($_GET as $name => $val)
 	{
-		
+
 		if (array_search($name, $exclude) !== false || ($exclude_bo && substr($name,0,3) == 'bo_' && $name != 'bo_page') )
 			continue;
 
@@ -296,7 +295,7 @@ function bo_insert_url($exclude = array(), $add = null)
 	preg_match('@/([^/\?]+)\?|$@', $url, $r);
 
 	$query = strtr($query, array('&&' => '&'));
-	
+
 	return $r[1].'?'.$query;
 }
 
@@ -306,7 +305,7 @@ function bo_copyright_footer()
 {
 
 	echo '<div id="bo_footer">';
-	
+
 	echo '<a href="http://www.blitzortung.org/" target="_blank">';
 	echo '<img src="'.bo_bofile_url().'?image=logo" id="bo_copyright_logo">';
 	echo '</a>';
@@ -330,11 +329,11 @@ function bo_copyright_footer()
 
 
 	}
-	
+
 	if (BO_SHOW_LANGUAGES === true)
 	{
 		$languages = explode(',', BO_LANGUAGES);
-		
+
 		echo '<div id="bo_lang_links">';
 
 		echo _BL('Languages').': ';
@@ -344,18 +343,18 @@ function bo_copyright_footer()
 				$a_lang = '<img src="'.bo_bofile_url().'?image=flag_'.$lang.'" class="bo_flag">';
 			else
 				$a_lang = $lang;
-				
+
 			if (trim($lang) == _BL())
 				echo ' <strong>'.trim($a_lang).'</strong> ';
 			else
 				echo ' <a href="'.bo_insert_url('bo_lang', trim($lang)).'">'.trim($a_lang).'</a> ';
-				
+
 		}
-		
+
 		echo '</div>';
 	}
-	
-	
+
+
 	echo '<div id="bo_copyright">';
 	echo _BL('Lightning data');
 	echo ' &copy; 2003-'.date('Y ');
@@ -370,10 +369,10 @@ function bo_copyright_footer()
 
 	echo '<div id="bo_copyright_extra">';
 	echo _BL('timezone_is').' <strong>'.date('H:i:s').' '._BL(date('T')).'</strong>';
-	
+
 	if (_BL('copyright_extra'))
 		echo ' &bull; '._BL('copyright_extra');
-	
+
 	echo '</div>';
 
 	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
@@ -383,7 +382,7 @@ function bo_copyright_footer()
 		echo '</div>';
 	}
 
-	
+
 
 	echo '</div>';
 
@@ -395,18 +394,18 @@ function _BL($msgid='', $noutf = false)
 	global $_BL;
 
 	$locale = $_BL['locale'];
-	
+
 	if ($msgid === '')
 		return $locale;
-	
+
 	$msg = $_BL[$locale][$msgid];
 
 	$utf = defined('BO_UTF8') && BO_UTF8 && !$noutf;
-	
+
 	if ($msg === false)
 	{
 		return '';
-	}	
+	}
 	else if (!$msg)
 	{
 		if (defined('BO_LANG_AUTO_ADD') && BO_LANG_AUTO_ADD)
@@ -433,7 +432,7 @@ function _BL($msgid='', $noutf = false)
 					'{MYBO_NOTAGS}' => $_BL[$locale]['MyBlitzortung_notags'],
 					'{MYBO_ORIG}' => $_BL[$locale]['MyBlitzortung_original']
 				);
-			
+
 		$msg = strtr($msg, $replace);
 	}
 
@@ -520,13 +519,13 @@ function bo_latlon2projection($proj, $lat, $lon)
 {
 	switch ($proj)
 	{
-	
+
 		default:
 			return bo_latlon2mercator($lat, $lon);
-		
+
 		case 'plate':
 			return array($lon, $lat);
-	
+
 	}
 }
 
@@ -545,7 +544,7 @@ function bo_sql_lat2tiley($name, $zoom)
 	$scale = (1 << $zoom) * 256;
 	$lat_mercator = " (  LOG(TAN( PI()/4 + RADIANS($name)/2 )) / PI() / 2 ) ";
 	$y = " ROUND( ABS( $lat_mercator - 0.5 ) * $scale ) ";
-	
+
 	return $y;
 }
 
@@ -554,7 +553,7 @@ function bo_sql_lon2tilex($name, $zoom)
 	$scale = (1 << $zoom) * 256;
 	$lon_mercator = " ( $name / 360 ) ";
 	$x = " ROUND( ($lon_mercator+0.5) * $scale ) ";
-	
+
 	return $x;
 }
 
@@ -573,13 +572,13 @@ function bo_strike2polarity($data, $bearing)
 	}
 
 	$channels = bo_get_conf('raw_channels');
-	
+
 	$ant_arc = 80;
 
 	for ($i=0;$i<2;$i++)
 	{
 		$signal[$i] = (ord(substr($data,$i,1)) - 128) / 128;
-		
+
 		//workaround for "best channel setting"
 		if ($signal[$i] == 0)
 		{
@@ -587,7 +586,7 @@ function bo_strike2polarity($data, $bearing)
 			continue;
 		}
 
-		
+
 		if (abs($signal[$i]) > 0.03)
 			$sig_pol[$i] = $signal[$i] > 0 ? 1 : -1;
 		else
@@ -611,7 +610,7 @@ function bo_strike2polarity($data, $bearing)
 
 	if ($channels == 1)
 		$strike_pol[1] = $strike_pol[0];
-	
+
 	if (!$strike_pol[0] && !$strike_pol[1])
 		$polarity = null;
 	else if ($strike_pol[0] && $strike_pol[1] && $strike_pol[0] != $strike_pol[1])
@@ -648,16 +647,16 @@ function bo_show_menu()
 
 	echo '<ul id="bo_mainmenu">';
 	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'map').'"        id="bo_mainmenu_map"  class="bo_mainmenu'.($page == 'map' ? '_active' : '').'">'._BL('main_menu_map').'</a></li>';
-	
+
 	if (BO_DISABLE_ARCHIVE !== true)
 		echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'archive').'"    id="bo_mainmenu_arch" class="bo_mainmenu'.($page == 'archive' ? '_active' : '').'">'._BL('main_menu_archive').'</a></li>';
-	
+
 	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'statistics').'" id="bo_mainmenu_stat" class="bo_mainmenu'.($page == 'statistics' ? '_active' : '').'">'._BL('main_menu_statistics').'</a></li>';
 	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'info').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'info' ? '_active' : '').'">'._BL('main_menu_info').'</a></li>';
 
 	if (bo_user_get_id())
 		echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'login').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'login' ? '_active' : '').'">'._BL('main_menu_login').'</a></li>';
-	
+
 	echo '</ul>';
 
 }
@@ -683,7 +682,7 @@ function bo_gpc_prepare($text)
 {
 	$text = trim($text);
 	$text = stripslashes($text);
-	
+
 	if (defined('BO_UTF8') && BO_UTF8)
 		return utf8_decode($text);
 	else
@@ -696,12 +695,12 @@ function bo_gpc_prepare($text)
 function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 {
 	flush();
-	
+
 	$dir .= '/';
-	
+
 	if ($delete_dir_depth === false)
 		$delete_dir_depth = 10;
-		
+
 	$files = @scandir($dir);
 
 	if (is_array($files))
@@ -710,7 +709,7 @@ function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 		{
 			if (!is_dir($dir.$file) && substr($file,0,1) != '.' && ($min_age == 0 || @fileatime($dir.$file) < time() - 3600 * $min_age) )
 			{
-				
+
 				@unlink($dir.$file);
 			}
 			else if (is_dir($dir.$file) && substr($file,0,1) != '.' && $depth > 0)
@@ -729,12 +728,12 @@ function bo_load_locale($locale = '')
 {
 	global $_BL;
 	$locdir = BO_DIR.'locales/';
-	
+
 	if (BO_LOCALE2 && file_exists($locdir.BO_LOCALE2.'.php')) // 2nd locale -> include first
 	{
 		include $locdir.BO_LOCALE2.'.php';
 	}
-	
+
 	if (file_exists($locdir.BO_LOCALE.'.php')) //main locale -> overwrites 2nd
 	{
 		include $locdir.BO_LOCALE.'.php';
@@ -746,8 +745,8 @@ function bo_load_locale($locale = '')
 
 	if (file_exists($locdir.'own.php')) //own translation (language independent)
 		include $locdir.'own.php';
-	
-	
+
+
 	//individual locale for user (link, session, cookie)
 	if ($locale == '')
 	{
@@ -779,7 +778,7 @@ function bo_load_locale($locale = '')
 		if (file_exists($locdir.$locale.'.php'))
 			include $locdir.$locale.'.php';
 	}
-	
+
 	//Send the language
 	if (!headers_sent())
 		header("Content-Language: $locale");
@@ -791,32 +790,32 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 	//avoid infinite loop on redirections (recursion)
 	if ($depth > 5)
 		return false;
-		
+
 	if (BO_USE_PHPURLWRAPPER === true)
 	{
 		$content = file_get_contents($url);
 		$content_size = strlen($content);
-		
+
 		if ($as_array)
 			$content = explode("\n", $content);
 	}
 	else
 	{
 		ini_set("auto_detect_line_endings", "1");
-		
+
 		$err = 0;
 		$content_size = 0;
 		$content = $as_array ? array() : '';
 
-		$parsedurl = @parse_url($url); 
+		$parsedurl = @parse_url($url);
 		$host = $parsedurl['host'];
 		$user = $parsedurl['user'];
 		$pass = $parsedurl['pass'];
 		$path = $parsedurl['path'];
 		$query = $parsedurl['query'];
-		
+
 		$fp = fsockopen($host, 80, $errno, $errstr);
-		
+
 		if (!$fp)
 		{
 			$error = "Connect ERROR: $errstr ($errno)<br />\n";
@@ -829,20 +828,20 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 			// only HTTP1.1 if range request
 			// otherwise we could get a chunked response!
 			$http_ver = $range > 0 ? "1.1" : "1.0";
-			
+
 			$out =  "GET ".$path."?".$query." HTTP/".$http_ver."\r\n";
 			$out .= "Host: ".$host."\r\n";
 			$out .= "User-Agent: MyBlitzortung ".BO_VER."\r\n";
-			
+
 			if ($user && $pass)
 				$out .= "Authorization: Basic ".base64_encode($user.':'.$pass)."\r\n";
-			
+
 			if ($range > 0)
 				$out .= "Range: bytes=".intval($range)."-\r\n";
-			
+
 			if ($modified)
 				$out .= "If-Modified-Since: ".gmdate("r", $modified)."\r\n";
-				
+
 			$out .= "Connection: Close\r\n\r\n";
 
 			$first = true;
@@ -850,18 +849,18 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 			$accepted_range = false;
 			$content_length = 0;
 			$location = '';
-			
+
 			if (fwrite($fp, $out) !== false)
 			{
 				//Header
-				do 
-				{ 
-					$header = chop(fgets($fp)); 
+				do
+				{
+					$header = chop(fgets($fp));
 
 					if ($first) //Check the first line (=Response)
 					{
 						preg_match('/[^ ]+ ([^ ]+) (.+)/', $header, $response);
-						
+
 						if ($response[1] == '304')
 						{
 							$err = 3;
@@ -873,7 +872,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 							break;
 						}
 					}
-					
+
 					if (preg_match('/Content\-Range: ?bytes ([0-9]+)\-([0-9]+)\/([0-9]+)/', $header, $r))
 						$accepted_range = array($r[1], $r[2], $r[3]);
 					elseif (preg_match('/Content\-Length: ?([0-9]+)/', $header, $r))
@@ -882,12 +881,12 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 						$modified = strtotime($r[1]);
 					elseif (preg_match('/Location:(.+)/', $header, $r))
 						$location = trim($r[1]);
-						
-					$first = false;
-				} 
-				while (!empty($header) and !feof($fp)); 
 
-				
+					$first = false;
+				}
+				while (!empty($header) and !feof($fp));
+
+
 				//It was a redirection!
 				if ($response[1] == '302')
 				{
@@ -903,23 +902,23 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 				}
 
 				//Get the Content
-				while (!feof($fp)) 
+				while (!feof($fp))
 				{
 					$line = fgets($fp);
 					$content_size += strlen($line);
-					
+
 					if ($as_array)
-						$content[] = $line; 
+						$content[] = $line;
 					else
 						$content  .= $line;
-				} 
+				}
 			}
 			else
 			{
 				$error = "Send ERROR: $errstr ($errno)<br />\n";
 				echo $error;
 			}
-			
+
 			fclose($fp);
 		}
 
@@ -934,36 +933,36 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 			$content = false;
 		}
 	}
-	
+
 
 	if ($type)
 	{
 		$data = unserialize(bo_get_conf('download_statistics'));
 		$data[$type]['count'][$err]++;
-		
+
 		if ($content_size)
 		{
 			$data[$type]['traffic'] += $content_size;
-			
+
 			$today = date('Ymd');
-			
+
 			if ($today != $data[$type]['traffic_today_date'])
 			{
 				$data[$type]['traffic_today'] = 0;
 				$data[$type]['count_today'] = 0;
 			}
-			
+
 			$data[$type]['traffic_today_date'] = $today;
 			$data[$type]['traffic_today'] += $content_size;
 			$data[$type]['count_today']++;
 		}
-		
+
 		if (!$data[$type]['time_first'])
 			$data[$type]['time_first'] = time();
-		
+
 		bo_set_conf('download_statistics', serialize($data));
 	}
-	
+
 	if ($range > 0)
 	{
 		if ($accepted_range === false)
@@ -984,18 +983,18 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 			$range = $accepted_range;
 		}
 	}
-	
 
-	return $content; 	 
+
+	return $content;
 }
 
 function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 {
 	if ($lat1 === false || $lat2 === false || $lon1 === false || $lon2 === false)
 		return " 1 ";
-	
+
 	$sql = " (s.lat BETWEEN '$lat1' AND '$lat2' AND s.lon BETWEEN '$lon1' AND '$lon2') ";
-	
+
 
 	//Extra keys for faster search (esp. tiles ans strike search)
 	$keys_enabled = (BO_DB_EXTRA_KEYS === true);
@@ -1007,13 +1006,13 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 		$key_latlon_vals = pow(2, 8 * $key_bytes_latlon);
 		$key_lat_div     = (double)BO_DB_EXTRA_KEYS_LAT_DIV;
 		$key_lon_div     = (double)BO_DB_EXTRA_KEYS_LON_DIV;
-		
+
 		//only use key when it makes sense
 		if (abs($lat1-$lat2) < $key_lat_div)
 		{
 			$lat1_x = floor(fmod(90+$lat1,$key_lat_div)/$key_lat_div*$key_latlon_vals);
 			$lat2_x = ceil (fmod(90+$lat2,$key_lat_div)/$key_lat_div*$key_latlon_vals);
-			
+
 			if ($lat1_x <= $lat2_x)
 				$sql .= " AND (s.lat_x BETWEEN '$lat1_x' AND '$lat2_x')";
 			else
@@ -1025,17 +1024,17 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 		{
 			$lon1_x = floor(fmod(180+$lon1,$key_lon_div)/$key_lon_div*$key_latlon_vals);
 			$lon2_x = ceil (fmod(180+$lon2,$key_lon_div)/$key_lon_div*$key_latlon_vals);
-			
+
 			if ($lon1_x <= $lon2_x)
 				$sql .= " AND (s.lon_x BETWEEN '$lon1_x' AND '$lon2_x')";
 			else
 				$sql .= " AND (s.lon_x <= '$lon2_x' OR '$lon1_x' <= s.lon_x)";
 
 		}
-		
+
 	}
 
-	
+
 	return $sql;
 }
 
@@ -1054,13 +1053,13 @@ function bo_times2sql($time_min = 0, $time_max = 0)
 		$row = BoDb::query("SELECT MAX(time) time FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 		$time_max = strtotime($row['time'].' UTC');
 	}
-	
+
 	//date range
 	$date_min = gmdate('Y-m-d H:i:s', $time_min);
 	$date_max = gmdate('Y-m-d H:i:s', $time_max);
 	$sql = " ( s.time BETWEEN '$date_min' AND '$date_max' ) ";
 
-	
+
 	//Extra keys for faster search
 	$keys_enabled   = (BO_DB_EXTRA_KEYS === true);
 	$key_bytes_time = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_TIME_BYTES)   : 0;
@@ -1071,21 +1070,21 @@ function bo_times2sql($time_min = 0, $time_max = 0)
 		$key_time_vals   = pow(2, 8 * $key_bytes_time);
 		$key_time_start  = strtotime(BO_DB_EXTRA_KEYS_TIME_START);
 		$key_time_div    = (double)BO_DB_EXTRA_KEYS_TIME_DIV_MINUTES;
-		
+
 		if ( ($time_max-$time_min)/60/$key_time_div)
 		{
 			$time_min_x = fmod(floor(($time_min-$key_time_start)/60/$key_time_div),$key_time_vals);
 			$time_max_x = fmod(ceil (($time_max-$key_time_start)/60/$key_time_div),$key_time_vals);
-		
+
 			if ($time_min_x<=$time_max_x)
 				$sql .= " AND ( s.time_x BETWEEN '$time_min_x' AND '$time_max_x' ) ";
 			else
 				$sql .= " AND ( s.time_x <= '$time_min_x' OR s.time_x >= '$time_max_x' ) ";
 		}
-		
+
 	}
 
-	
+
 	return $sql;
 }
 
@@ -1103,70 +1102,70 @@ function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2
 function bo_region2sql($region)
 {
 	global $_BO;
-	
+
 	if (!isset($_BO['region'][$region]['rect_add']))
 		return '';
-	
+
 	$reg = $_BO['region'][$region]['rect_add'];
 	$sql .= ' AND ( 0 ';
-	
+
 	while ($r = @each($reg))
 	{
 		$lat1 = $r[1];
 		list(,$lon1) = @each($reg);
 		list(,$lat2) = @each($reg);
 		list(,$lon2) = @each($reg);
-		
+
 		$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1, true);
 	}
-	
+
 	$sql .= ' ) ';
 
 	if (isset($_BO['region'][$region]['rect_rem']))
 	{
 		$reg = $_BO['region'][$region]['rect_rem'];
 		$sql .= ' AND NOT ( 0 ';
-		
+
 		while ($r = @each($reg))
 		{
 			$lat1 = $r[1];
 			list(,$lon1) = @each($reg);
 			list(,$lat2) = @each($reg);
 			list(,$lon2) = @each($reg);
-			
+
 			$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1, true);
 
 		}
-		
+
 		$sql .= ' ) ';
 	}
-	
+
 	return $sql;
 }
 
 
-	
+
 // FFT
 // Fast Fourier Trasforn according "Numerical Recipies"
 // bo_fft($sign, $ar, $ai)
-// $sign = -1 for inverse FFT, 1 otherwise 
+// $sign = -1 for inverse FFT, 1 otherwise
 // $ar = array of real parts
 // $ar = array of imaginary parts
 // count($ar) must be power of 2
 function bo_fft($sign, &$ar, &$ai)
 {
 	$n = count($ar);
-	
+
 	// n must be positive and power of 2: 2^n & (2^n-1) == 0
 	if (($n<2) or ($n & ($n-1)))
 	  return false;
-	
+
 	$scale = sqrt(1.0/$n);
-	
+
 	for ($i=$j=0; $i<$n; ++$i) {
 		if ($j>=$i) {
-			$tempr = $ar[$j]*$scale;           
-			$tempi = $ai[$j]*$scale;           
+			$tempr = $ar[$j]*$scale;
+			$tempi = $ai[$j]*$scale;
 			$ar[$j] = $ar[$i]*$scale;
 			$ai[$j] = $ai[$i]*$scale;
 			$ar[$i] = $tempr;
@@ -1179,16 +1178,16 @@ function bo_fft($sign, &$ar, &$ai)
 		}
 		$j += $m;
 	}
-	
-	for ($mmax=1,$istep=2*$mmax; $mmax<$n; $mmax=$istep,$istep=2*$mmax) 
+
+	for ($mmax=1,$istep=2*$mmax; $mmax<$n; $mmax=$istep,$istep=2*$mmax)
 	{
 		$delta = $sign*pi()/$mmax;
-		for ($m=0; $m<$mmax; ++$m) 
+		for ($m=0; $m<$mmax; ++$m)
 		{
-			$w = $m*$delta;             
+			$w = $m*$delta;
 			$wr = cos($w);
 			$wi = sin($w);
-			for ($i=$m; $i<$n; $i+=$istep) 
+			for ($i=$m; $i<$n; $i+=$istep)
 			{
 				$j = $i+$mmax;
 				$tr = $wr*$ar[$j]-$wi*$ai[$j];
@@ -1201,13 +1200,13 @@ function bo_fft($sign, &$ar, &$ai)
 		}
 		$mmax = $istep;
 	}
-	
+
 	return true;
 }
 
-if (!function_exists('hypot')) 
+if (!function_exists('hypot'))
 {
-	function hypot($x, $y) 
+	function hypot($x, $y)
 	{
 	  return sqrt($x*$x + $y*$y);
 	}
@@ -1219,76 +1218,90 @@ function bo_time2freq($d, &$phase=array())
 	$n = count($d);
 
 	// check if n is a power of 2: 2^n & (2^n-1) == 0
-	if ($n & ($n-1)) 
+	if ($n & ($n-1))
 	{
 	  // eval the minimum power of 2 >= $n
 	  $p = pow(2, ceil(log($n, 2)));
 	  $d += array_fill($n, $p-$n, 0);
 	  $n = $p;
-	}  
+	}
 
 	$im = array_fill(0, $n, 0);
 
 	bo_fft(1, $d, $im);
-	
+
 	$amp = array();
-	for ($i=0; $i<=$n/2; $i++) 
+	for ($i=0; $i<=$n/2; $i++)
 	{
 		// Calculate the modulus (as length of the hypotenuse)
 		$amp[$i] = hypot($d[$i], $im[$i]);
-		
+
 		if (!$d[$i])
 			$phase[$i] = ($im[$i] < 0 ? -1 : 1) * M_PI / 2;
 		else
 			$phase[$i] = atan($im[$i] / $d[$i]);
-	} 
-	
-	return $amp; 
+	}
+
+	return $amp;
 }
 
 //Raw hexadecimal signal to array
-function raw2array($raw = false, $calc_spec = false)
+function raw2array($raw = false, $calc_spec = false, $channels = -1, $ntime = -1)
 {
-	static $channels = -1, $bpv = -1, $values = -1, $utime = -1;
-	
-	if ($channels == -1 && $bpv == -1 && $utime == -1 && $values == -1)
+	static $std_channels = -1, $std_bpv = -1, $std_values = -1, $std_ntime = -1;
+
+	//load default values
+	if ($std_channels == -1 && $std_bpv == -1 && $std_ntime == -1 && $std_values == -1)
 	{
-		$channels = bo_get_conf('raw_channels');
-		$bpv      = bo_get_conf('raw_bitspervalue');
-		$utime    = bo_get_conf('raw_ntime') / 1000;
-		$values   = bo_get_conf('raw_values');
+		$std_channels = bo_get_conf('raw_channels');
+		$std_bpv      = bo_get_conf('raw_bitspervalue');
+		$std_ntime    = bo_get_conf('raw_ntime');
+		$std_values   = bo_get_conf('raw_values');
 	}
 
-	if (!$channels || !$bpv || !$utime || !$values)
+	$channels =  $channels > 0 ? $channels : $std_channels;
+	$bpv      =  $bpv > 0      ? $bpv      : $std_bpv;
+	$utime    = ($ntime > 0	  ? $ntime    : $std_ntime) / 1000;
+
+
+	if ($channels <= 0 || $bpv <= 0 || $utime <= 0)
 		return false;
-	
-	//dummy signal when returning an empty array
+
+
 	if ($raw === false)
 	{
+		//dummy signal when returning an empty array out of standard value count
 		$calc_spec = true;
 		$raw = str_repeat(chr(0), $values * $channels);
 	}
-	
+	else
+	{
+		//calculate count of values out of current raw-data
+		// -> no need to save this variable
+		$values = strlen($raw) / $channels;
+	}
+
+
 	$data = array();
 	$data['signal_raw'] = array();
 	$data['signal'] = array();
 	$data['spec'] = array();
 	$data['spec_freq'] = array();
-	
-	
+
+
 	//fill array with zeros
 	for ($i=0;$i<$values;$i++)
 	{
 		$data['signal_time'][$i] = $i * $utime;
-		
+
 		$data['signal'][0][$i] = 0;
 		$data['signal'][1][$i] = 0;
-		
+
 		$data['signal_raw'][0][$i] = 128;
 		$data['signal_raw'][1][$i] = 128;
 	}
 
-	
+
 	//channel select
 	if ($channels == 1)
 	{
@@ -1296,20 +1309,20 @@ function raw2array($raw = false, $calc_spec = false)
 		//last byte odd  ==> channel 2 (B)
 		$ch = ord(substr($raw,-1)) % 2;
 	}
-	
-	
+
+
 	//signal string to array
 	$ymax = pow(2,$bpv-1);
 	for ($i=0;$i<strlen($raw);$i++)
 	{
 		$byte = ord(substr($raw,$i,1));
 		$pos  = floor($i / $channels);
-		
+
 		if ($channels == 2)
 			$ch = $i%$channels;
-		
+
 		$data['signal_raw'][$ch][$pos] = $byte;
-		$data['signal'][$ch][$pos] = ($byte - $ymax) / $ymax * BO_MAX_VOLTAGE;	
+		$data['signal'][$ch][$pos] = ($byte - $ymax) / $ymax * BO_MAX_VOLTAGE;
 	}
 
 
@@ -1320,46 +1333,46 @@ function raw2array($raw = false, $calc_spec = false)
 		{
 			$data['spec'][$channel] = bo_time2freq($d);
 		}
-		
+
 		foreach ($data['spec'][0] as $i => $dummy)
 		{
 			$data['spec_freq'][$i] = round($i / ($values * $utime) * 1000);
 		}
 	}
-	
+
 	return $data;
 }
 
-		
-function bo_examine_signal($data, &$amp = array(), &$amp_max = array(), &$freq = array(), &$freq_amp = array())
+
+function bo_examine_signal($data, $channels=0, $ntime=0, &$amp = array(), &$amp_max = array(), &$freq = array(), &$freq_amp = array())
 {
-	$sig_data = raw2array($data, true);
-	
+	$sig_data = raw2array($data, true, $channels, $ntime);
+
 	$amp = array(0,0);
 	$amp_max = array(0,0);
 	$freq = array(0,0);
 	$freq_amp = array(0,0);
-	
+
 	if ($sig_data)
 	{
 		foreach($sig_data['signal_raw'] as $channel => $dummy)
 		{
 			//amplitude of first value
 			$amp[$channel] = $sig_data['signal_raw'][$channel][0];
-			
+
 			//max. amplitude
 			$max = 0;
 			foreach($sig_data['signal_raw'][$channel] as $signal)
 			{
 				$sig = abs($signal - 128);
-				
+
 				if ($sig >= $max)
 				{
 					$max = $sig;
 					$amp_max[$channel] = $signal;
 				}
 			}
-			
+
 			//main frequency
 			$max = 0;
 			$freq_id_max = 0;
@@ -1371,25 +1384,25 @@ function bo_examine_signal($data, &$amp = array(), &$amp_max = array(), &$freq =
 					$freq[$channel] = $sig_data['spec_freq'][$freq_id];
 				}
 			}
-			
+
 			$freq_amp[$channel] = $max * 100;
 		}
 	}
-	
-	$sql = "amp1='$amp[0]', amp2='$amp[1]', 
-			amp1_max='$amp_max[0]', amp2_max='$amp_max[1]', 
-			freq1='$freq[0]', freq2='$freq[1]', 
+
+	$sql = "amp1='$amp[0]', amp2='$amp[1]',
+			amp1_max='$amp_max[0]', amp2_max='$amp_max[1]',
+			freq1='$freq[0]', freq2='$freq[1]',
 			freq1_amp='$freq_amp[0]', freq2_amp='$freq_amp[1]' ";
 
 	return $sql;
-}	
+}
 
 
 
 function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = false, $angle = 0, $bordercolor = false, $px = 0)
 {
 	$font = bo_imagestring_font($size, $bold);
-	
+
 	if (is_string($tcolor))
 	{
 		$color = bo_hex2color($I, $tcolor);
@@ -1414,9 +1427,9 @@ function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = fals
 	{
 		$h = $angle ? 0 : $size;
 		$w = $angle ? $size : 0;
-		
+
 		$text = utf8_encode($text);
-		
+
 		return bo_imagettftextborder($I, $size, $angle, $x+$w, $y+$h, $color, $font, $text, $bordercolor, $px);
 	}
 }
@@ -1441,28 +1454,28 @@ function bo_imagestring_max(&$I, $size, $x, $y, $text, $color, $maxwidth, $bold 
 	$line_height = bo_imagetextheight($size, $bold) * 1.2;
 	$breaks = explode("\n", $text);
 	$blankwidth = bo_imagetextwidth($size, $bold, " ");
-	
+
 	foreach($breaks as $text2)
 	{
 		$width = 0;
 		$lines = explode(" ", $text2);
 		$x2 = $x;
-		
+
 		foreach($lines as $i=>$line)
 		{
 			$width = bo_imagetextwidth($size, $bold, $line) + $blankwidth;
-			
+
 			if ($x2+$width+9 > $x+$maxwidth)
 			{
 				$y += $line_height;
 				$x2 = $x;
 			}
-			
+
 			bo_imagestring($I, $size, $x2, $y, $line, $color, $bold);
-			
+
 			$x2 += $width;
 		}
-		
+
 		$y += $line_height;
 	}
 	return $y;
@@ -1474,18 +1487,18 @@ function bo_imagetextheight($size, $bold = false, $string = false)
 	{
 		return imagefontheight($size);
 	}
-	
+
 	$font = bo_imagestring_font($size, $bold);
 
 	$string = $string === false ? 'Ag' : $string;
-	
+
 	if (BO_FONT_USE_FREETYPE2)
 		$tmp = imageftbbox($size, 0, $font, $string);
 	else
 		$tmp = imagettfbbox($size, 0, $font, $string);
-		
+
 	$height = $tmp[1] - $tmp[5];
-	
+
 	return $height;
 }
 
@@ -1495,9 +1508,9 @@ function bo_imagetextwidth($size, $bold = false, $string = false)
 	{
 		return imagefontwidth($size) * strlen($string);
 	}
-	
+
 	$font = bo_imagestring_font($size, $bold);
-	
+
 	$string = $string === false ? 'A' : $string;
 
 	if (BO_FONT_USE_FREETYPE2)
@@ -1506,7 +1519,7 @@ function bo_imagetextwidth($size, $bold = false, $string = false)
 		$tmp = imagettfbbox($size, 0, $font, $string);
 
 	$width = $tmp[2] - $tmp[0];
-	
+
 	return $width;
 }
 
@@ -1520,7 +1533,7 @@ function bo_imagestring_font(&$size, &$type)
 	else
 		$font = BO_DIR.BO_FONT_TTF_NORMAL;
 
-	
+
 	return $font;
 
 }
@@ -1534,7 +1547,7 @@ function bo_imagettftextborder(&$I, $size, $angle, $x, $y, &$textcolor, $font, $
 			for($c2 = ($y-abs($px)); $c2 <= ($y+abs($px)); $c2++)
 				$bg = bo_imagefttext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
 	}
- 
+
    return bo_imagefttext($I, $size, $angle, $x, $y, $textcolor, $font, $text);
 }
 
@@ -1555,7 +1568,7 @@ function bo_hex2color(&$I, $str, $use_alpha = true)
 	else
 	{
 		$col = imagecolorexact($I, $rgb[0], $rgb[1], $rgb[2]);
-		
+
 		if ($col === -1)
 			return imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
 		else
@@ -1563,34 +1576,34 @@ function bo_hex2color(&$I, $str, $use_alpha = true)
 	}
 }
 
-function bo_hex2rgb($str) 
+function bo_hex2rgb($str)
 {
     $hexStr = preg_replace("/[^0-9A-Fa-f]/", '', $str);
     $rgb = array();
-	
-	if (strlen($hexStr) == 3 || strlen($hexStr) == 4) 
+
+	if (strlen($hexStr) == 3 || strlen($hexStr) == 4)
 	{
         $rgb[0] = hexdec(str_repeat(substr($hexStr, 0, 1), 2));
         $rgb[1] = hexdec(str_repeat(substr($hexStr, 1, 1), 2));
         $rgb[2] = hexdec(str_repeat(substr($hexStr, 2, 1), 2));
-		
+
 		if (strlen($hexStr) == 4)
 			$rgb[3] = hexdec(str_repeat(substr($hexStr, 3, 1), 2)) / 2;
 		else
 			$rgb[3] = 0;
-    } 
-	elseif (strlen($hexStr) == 6 || strlen($hexStr) == 8) 
+    }
+	elseif (strlen($hexStr) == 6 || strlen($hexStr) == 8)
 	{
         $rgb[0] = hexdec(substr($hexStr, 0, 2));
         $rgb[1] = hexdec(substr($hexStr, 2, 2));
         $rgb[2] = hexdec(substr($hexStr, 4, 2));
-		
+
 		if (strlen($hexStr) == 8)
 			$rgb[3] = hexdec(substr($hexStr, 6, 2)) / 2;
 		else
 			$rgb[3] = 0;
     }
-	
+
     return $rgb;
 }
 
@@ -1599,53 +1612,53 @@ function bo_owner_mail($subject, $text)
 {
 	$mail = bo_user_get_mail(1);
 	$ret = false;
-	
+
 	if ($mail)
 	{
 		$ret = mail($mail, $subject, $text, "From: MyBlitzortung");
 		echo '<p>Sent E-Mail to '.$mail.':</p><p>'.$subject.'</p><pre>'.$text.'</pre>';
 	}
-	
+
 	return $ret;
 }
 
 function bo_output_kml()
 {
 	global $_BO;
-	
+
 	$type = intval($_GET['kml']);
-	
+
 	$host = $_SERVER["SERVER_NAME"] ? $_SERVER["SERVER_NAME"] : $_SERVER["HTTP_HOST"];
 	$p = parse_url($_SERVER["REQUEST_URI"]);
 	$url = 'http://'.$host.$p['path'];
 
-	header("Content-type: application/vnd.google-earth.kml+xml"); 
+	header("Content-type: application/vnd.google-earth.kml+xml");
 	header("Content-Disposition: attachment; filename=\"MyBlitzortung.kml\"");
-	
+
 	echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 	echo '<kml xmlns="http://www.opengis.net/kml/2.2">'."\n";
-	
+
 	switch($type)
 	{
-	
+
 		case 1:
-		
+
 			echo "<Folder>\n";
 			echo "<name>"._BL($d['name'])."</name>\n";
 			echo "<description></description>\n";
 			echo "<visibility>0</visibility>\n";
 			echo "<refreshVisibility>0</refreshVisibility>\n";
-			
+
 			foreach($_BO['mapimg'] as $id => $d)
 			{
 				if (!$d['kml'])
 					continue;
-				
+
 				$imgurl = $url."?map=".$id."&amp;bo_lang="._BL();
-				
+
 				if (!$d['file'])
 					$imgurl .= "&amp;transparent";
-				
+
 				echo "<GroundOverlay>\n";
 				echo "<name>"._BL($d['name'])."</name>\n";
 				echo "<description></description>\n";
@@ -1662,17 +1675,17 @@ function bo_output_kml()
 				echo "<refreshVisibility>0</refreshVisibility>\n";
 				echo "</LatLonBox>\n";
 				echo "</GroundOverlay>\n";
-				
+
 
 			}
-			
+
 			echo "</Folder>\n";
-		
+
 			break;
-			
+
 		default:
-		
-			
+
+
 			echo "<NetworkLink>\n";
 			echo "<name>"._BL('MyBlitzortung_notags')."</name>\n";
 			echo "<visibility>0</visibility>\n";
@@ -1686,22 +1699,22 @@ function bo_output_kml()
 			echo "</NetworkLink>\n";
 
 	}
-	
+
 	echo '</kml>';
-	
+
 	exit;
 }
 
 function bo_session_close($force = false)
 {
 	$c = intval(BO_SESSION_CLOSE);
-	
+
 	if (!$c)
 		return;
-	
+
 	if ($c == 2 || ($c == 1 && $force))
 		@session_write_close();
-	
+
 }
 
 function bo_bofile_url()
@@ -1715,7 +1728,7 @@ function bo_bofile_url()
 function bo_participants_locating_min()
 {
 	static $value=false;
-	
+
 	if ($value === false && intval(BO_FIND_MIN_PARTICIPANTS_HOURS))
 	{
 		$tmp = unserialize(bo_get_conf('bo_participants_locating_min'));
@@ -1724,23 +1737,23 @@ function bo_participants_locating_min()
 
 	if (!$value)
 		$value = BO_MIN_PARTICIPANTS;
-	
+
 	return intval($value);
 }
 
 function bo_participants_locating_max()
 {
 	static $value=false;
-	
+
 	if ($value === false && intval(BO_FIND_MAX_PARTICIPANTS_HOURS))
 	{
 		$tmp = unserialize(bo_get_conf('bo_participants_locating_max'));
 		$value = intval($tmp['value']);
 	}
-	
+
 	if (!$value)
 		$value = BO_MAX_PARTICIPANTS;
-	
+
 	return intval($value);
 }
 
@@ -1754,6 +1767,13 @@ function bo_echod($text = '')
 	flush();
 }
 
+function bo_dprint($text = '')
+{
+	if (defined('BO_DEBUG') && BO_DEBUG)
+	{
+		echo $text;
+	}
+}
 
 
 ?>
