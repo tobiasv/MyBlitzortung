@@ -2,7 +2,7 @@
 
 
 // Graph from raw dataset
-function bo_graph_raw($id, $spec = false)
+function bo_graph_raw($id, $type = false)
 {
 	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
 		bo_graph_error(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
@@ -39,8 +39,13 @@ function bo_graph_raw($id, $spec = false)
 	$tickPositions = array();
 
 	$channels = BO_ANTENNAS;
-	
-	$graph = new Graph(BO_GRAPH_RAW_W,BO_GRAPH_RAW_H,"auto");
+
+    if ($type == 'xy') {
+        $width = BO_GRAPH_RAW_H;
+    } else {
+        $width = BO_GRAPH_RAW_W;
+    }
+	$graph = new Graph($width, BO_GRAPH_RAW_H, "auto");
 	$graph->ClearTheme();
 
 	if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
@@ -66,7 +71,7 @@ function bo_graph_raw($id, $spec = false)
 
 	$fullscale = isset($_GET['full']);
 	
-	if ($spec)
+	if ($type == 'spectrum')
 	{
 		$data = raw2array($row['data'], true);
 		$step = 5;
@@ -80,7 +85,6 @@ function bo_graph_raw($id, $spec = false)
 		$values   = bo_get_conf('raw_values');
 		
 		$graph->SetScale("textlin", 0, $fullscale ? null : BO_GRAPH_RAW_SPEC_MAX_Y, 0, BO_GRAPH_RAW_SPEC_MAX_X * $values * $utime / 1000);
-
 		
 		$plot1=new BarPlot($data['spec'][0]);
 		$plot1->SetFillColor(BO_GRAPH_RAW_COLOR1);
@@ -123,6 +127,35 @@ function bo_graph_raw($id, $spec = false)
 		$graph->xaxis->SetTextTickInterval(2);
 		
 	}
+    elseif ($type == 'xy')
+    {
+        $xmin = -BO_MAX_VOLTAGE;
+        $xmax = BO_MAX_VOLTAGE;
+        $ymin = -BO_MAX_VOLTAGE;
+        $ymax = BO_MAX_VOLTAGE;
+
+        $graph->SetScale("linlin",$ymin,$ymax,$xmin,$xmax);
+
+        $data = raw2array($row['data']);
+        $plot=new LinePlot($data['signal'][0], $data['signal'][1]);
+        $plot->SetColor(BO_GRAPH_RAW_COLOR_XY);
+        $graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+        $graph->yaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+        $graph->Add($plot);
+
+        $graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
+        $graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
+        $graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
+        $graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
+        $graph->yaxis->SetTextTickInterval(0.5);
+        $graph->xaxis->SetTickPositions(array(-2,-1,0,1,2), array(-1.5,-0.5,0.5,1.5));
+        $graph->yaxis->SetTickPositions(array(-2,-1,0,1,2), array(-1.5,-0.5,0.5,1.5));
+        $graph->xaxis->HideLabels();
+        $graph->yaxis->HideLabels();
+        $graph->xgrid->Show(true,false);
+        $graph->ygrid->Show(true,false);
+        $graph->SetMargin(1,1,1,1);
+    }
 	else
 	{
 		$data = raw2array($row['data']);
@@ -147,7 +180,7 @@ function bo_graph_raw($id, $spec = false)
 			}
 		}
 
-		
+
 		$n = count($datax);
 		$xmin = $datax[0];
 		$xmax = $datax[$n-1];
@@ -1391,7 +1424,86 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$type .= '_average';
 		
 	}
-	else
+	else if ($type == 'strikes_station_residual_time')
+    {
+        date_default_timezone_set('UTC');
+
+        class Timestamp {
+
+            private $seconds;
+            private $nanoseconds;
+
+            public function __construct($seconds, $nanoseconds) {
+                $this->seconds = $seconds;
+                $this->nanoseconds = $nanoseconds;
+            }
+
+            public function isBefore($other) {
+                if ($this->seconds == $other->seconds) {
+                    return $this->nanoseconds < $other->nanoseconds;
+                } else {
+                    return $this->seconds < $other->seconds;
+                }
+            }
+
+            public function usDifference($other) {
+                return ($this->seconds - $other->seconds) * 1e6 + ($this->nanoseconds - $other->nanoseconds) * 1e-3;
+            }
+
+            public function __toString() {
+                return gmdate('Y-m-d H:i:s', $this->seconds) . '.' . sprintf("%09d", $this->nanoseconds);
+            }
+        }
+
+        $cVacuum = 0.299792458; # m / ns
+        $cReduced = (1 - 0.0025) * $cVacuum;
+
+        $time_max = time();
+        $time_max = floor($time_max / 60) * 60 - 5 * 60; //round
+
+        $binsize = 2.5;
+        $range = 20;
+
+        $X = array();
+        for ($index = -$range; $index <= $range; $index++) {
+            $X[] = $index * $binsize;
+        }
+
+        $Y = array_pad(array(), 2 * $range + 1, 0);
+
+
+        $strikes_raw_sql = "SELECT s.time, s.time_ns, s.distance, r.time raw_time, r.time_ns raw_time_ns FROM strikes s
+            INNER JOIN raw r ON s.raw_id = r.id
+            WHERE s.time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * 12) .
+            "' AND '" . gmdate('Y-m-d H:i:s', $time_max) . "';";
+        $strikes_raw_res = bo_db($strikes_raw_sql);
+
+        while ($strike_raw_row = $strikes_raw_res->fetch_assoc()) {
+
+            $strike_time = new Timestamp(strtotime($strike_raw_row['time']), $strike_raw_row['time_ns']);
+            $raw_time = new Timestamp(strtotime($strike_raw_row['raw_time']) + 1, $strike_raw_row['raw_time_ns']);
+
+            $dt = $raw_time->usDifference($strike_time);
+
+            $distance = $strike_raw_row['distance'];
+            $runtime = $distance / $cReduced / 1000.0;
+
+            $difference = $dt - $runtime;
+
+            $index = intval($difference / $binsize) + $range;
+
+            if ($index >= 0 && $index <= 2 * $range) {
+                $Y[$index]++;
+            }
+        }
+
+        $graph_type = 'linlin';
+        $xmin = min($X);
+        $xmax = max($X);
+        $ymin = 0;
+        $ymax = max($Y);
+    }
+    else
 	{
 		$interval = BO_UP_INTVL_STATIONS;
 		if ($interval < 10)
@@ -2378,6 +2490,16 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			
 			break;
 
+        case 'strikes_station_residual_time':
+            $plot=new BarPlot($Y, $X);
+            $plot->SetColor('#fff@1');
+            $plot->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR1);
+            $graph->xaxis->title->Set(_BL('Residual time').'  [µs]');
+            $plot->SetLegend('Restzeiten');
+            $plot->SetWidth(10);
+            $graph->Add($plot);
+
+            break;
 	}
 
 	

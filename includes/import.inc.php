@@ -1437,9 +1437,7 @@ function bo_match_strike2raw()
 					$part[$row['id']] = abs($part[$row['id']]) * -1;
 				else
 					$own_found++;
-					
-					
-					
+
 				//experimental polarity checking
 				if (BO_EXPERIMENTAL_POLARITY_CHECK === true
 					&& ( !intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST)

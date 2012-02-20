@@ -544,6 +544,9 @@
 //show the spectrum for each signal in table
 @define('BO_ARCHIVE_SHOW_SPECTRUM', true);
 
+//show the xy plot for each signal in table
+@define('BO_ARCHIVE_SHOW_XY', true);
+
 //entries in strike table per page
 @define('BO_ARCHIVE_TABLE_PER_PAGE', 10);
 
@@ -681,6 +684,7 @@
 @define('BO_GRAPH_RAW_COLOR1', '#f00@0.5');
 @define('BO_GRAPH_RAW_COLOR2', '#0f0@0.5');
 @define('BO_GRAPH_RAW_COLOR3', '#800@0.6');
+@define('BO_GRAPH_RAW_COLOR_XY', '#00f@0.6');
 @define('BO_GRAPH_RAW_COLOR_BOX', '#d0d0d0');
 @define('BO_GRAPH_RAW_COLOR_BACK', '#fff');
 @define('BO_GRAPH_RAW_COLOR_MARGIN','#fff');
