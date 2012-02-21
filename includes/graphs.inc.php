@@ -1483,7 +1483,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
         $time_max = time();
         $time_max = floor($time_max / 60) * 60 - 5 * 60; //round
 
-        $binsize = 2.5;
+        $binsize = 5;
         $range = 20;
 
         $X = array();
@@ -1515,7 +1515,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
             $index = intval($difference / $binsize) + $range;
 
             if ($index >= 0 && $index <= 2 * $range) {
-                error_log('***' . $strike_raw_row['part']);
                 if ($strike_raw_row['part'] > 0)
                     $Y[$index]++;
                 else
@@ -1527,7 +1526,10 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
         $xmin = 0;
         $xmax = (2 * $range + 1);
         $ymin = 0;
-        $ymax = max($Y);
+        $ymax = 0;
+        for ($i=0; $i < sizeof($X); $i++) {
+            $ymax = max($ymax, $Y[$i] + $Y2[$i]);
+        }
     }
     else
 	{
@@ -2531,8 +2533,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
             foreach ($X as $xvalue) {
                 $tickLabels[] = sprintf('%.1f', $xvalue);
             }
-
             $graph->xaxis->SetTickLabels($tickLabels);
+            $graph->yaxis->HideTicks(false, true);
             $graph->Add($plot);
 
             break;
