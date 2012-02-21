@@ -45,7 +45,7 @@ function bo_check_for_update()
 		if ($do_update && (strpos($cur_version, 'dev') || strpos($cur_version, '-')))
 		{
 			echo '<div id="bo_update_info">Hint: ';
-			echo 'You are updating from a developer Version. Database updates may fail, because they could already have been occured before!';
+			echo 'You are updating from a developer Version. Database updates may fail, because they could already have been occured before! In most cases this should be no problem.';
 			echo '</div>';
 		}
 

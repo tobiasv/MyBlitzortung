@@ -1,5 +1,10 @@
 <?php
 
+/*
+* English translation by tobiasv
+* -> feel free to correct the entries!
+*/
+
 $_BL['locale'] = 'en';
 
 
@@ -636,8 +641,8 @@ $_BL['en']['Update only tracks'] = 'Update only tracks';
 $_BL['en']['Force data purge only'] = 'Force data purge only';
 $_BL['en']['Check alerts only'] = 'Check alerts only';
 
-$_BL['en']['user_perm0'] = 'Administration';
-$_BL['en']['user_perm1'] = 'Other settings';
+$_BL['en']['user_perm0'] = 'Administration (Users...)';
+$_BL['en']['user_perm1'] = 'More station data (GPS, Usernames...)';
 $_BL['en']['user_perm2'] = 'No limits';
 $_BL['en']['user_perm3'] = 'Manage alerts';
 $_BL['en']['user_perm4'] = 'Alerts: everywhere';
@@ -945,9 +950,11 @@ $_BL['en']['No data available!'] = 'No data available!';
 
 /*************************************************************/
 /* Translations for templates                                */
-/*************************************************************/
+/************************************************************/
 
-//Countries
+/*** EUROPE ***/
+
+//Europe: Countries
 $_BL['en']['Germany'] = 'Germany';
 $_BL['en']['France'] = 'France';
 $_BL['en']['Austria'] = 'Austria';
@@ -975,15 +982,27 @@ $_BL['en']['Romania'] = 'Romania';
 $_BL['en']['Rome'] = 'Rome';
 $_BL['en']['Lithuania'] = 'Lithuania';
 
-//Europe
+//Europe: Regions
 $_BL['en']['Europe'] = 'Europe';
 $_BL['en']['Western Europe'] = 'Western Europe';
 
-//German states
+//Europe: German states
 $_BL['en']['Bavaria'] = 'Bavaria';
 $_BL['en']['NRW'] = 'NRW';
 
-//Others
+//Europe: Italy
+$_BL['en']['Sardinia'] = 'Sardinia';
+
+
+
+/*** OCEANIA ***/
+$_BL['en']['New Zealand'] = 'New Zealand';
+
+
+
+
+/*** OTHER TEMPLATE NAMES***/
+
 $_BL['en']['Meteox rain radar'] = 'Rain radar (meteox.com)';
 
 
@@ -1009,3 +1028,13 @@ $_BL['en']['no GPS signal'] = 'no GPS signal';
 $_BL['en']['no reception'] = 'no reception';
 $_BL['en']['Loading...'] = 'Loading...';
 $_BL['en']['search_outside_radius'] = 'Searching outside of the circle is not possible!';
+
+$_BL['en']['Links'] = 'Links';
+$_BL['en']['Login string is'] = 'Login string is';
+$_BL['en']['Auth ID is'] = 'Auth ID is';
+$_BL['en']['Logging out from Blitzortung.org'] = 'Logging out from Blitzortung.org';
+$_BL['en']['Already DONE BEFORE'] = 'Already DONE BEFORE';
+$_BL['en']['Update database keys'] = 'Update database keys';
+
+
+
