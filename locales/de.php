@@ -1084,8 +1084,8 @@ $_BL['de']['Auth ID is'] = 'Authentifizierungs-Id ist';
 $_BL['de']['Logging out from Blitzortung.org'] = 'Melde von Blitzortung.org ab';
 $_BL['de']['Already DONE BEFORE'] = 'Wurde schon vorher ERLEDIGT';
 $_BL['de']['Update database keys'] = 'Datenbank-Index erneuern';
-
-
+$_BL['de']['without GPS'] = 'ohne GPS';
+$_BL['de']['Record longtime data since'] = 'Langzeitdaten seit';
 
 
 

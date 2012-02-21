@@ -346,6 +346,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	{
 		$act_time = bo_get_conf('station_last_active'.$add);
 		$inact_time = bo_get_conf('station_last_inactive'.$add);
+		$nogps_last_time = bo_get_conf('station_last_nogps'.$add);
 	}
 
 	//Get the last non-zero signals or strikes for the station
@@ -470,6 +471,11 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	elseif ($last_signal)
 	{
 		echo '<li><span class="bo_descr">'._BL('Last signal').': </span><span class="bo_value">'.date(_BL('_datetime'), $last_signal).'</span>';
+	}
+
+	if ($nogps_last_time)
+	{
+		echo '<li><span class="bo_descr">'._BL('Last time without GPS').': </span><span class="bo_value">'.date(_BL('_datetime'), $nogps_last_time).'</span>';
 	}
 
 	echo '</ul>';
@@ -1116,13 +1122,15 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	}
 
 	//Own
-	$str_own	 		= bo_get_conf('count_strikes_own'.$add);
-	$active_days 		= bo_get_conf('longtime_station_active_time'.$add) / 3600 / 24;
-	$inactive_days 		= bo_get_conf('longtime_station_inactive_time'.$add) / 3600 / 24;
-	$min_dist_own 		= bo_get_conf('longtime_min_dist_own'.$add) / 1000;
-	$max_dist_own 		= bo_get_conf('longtime_max_dist_own'.$add) / 1000;
-	$max_str_own 		= (double)bo_get_conf('longtime_max_strikesh_own'.$add);
-	$max_sig_own 		= (double)bo_get_conf('longtime_max_signalsh_own'.$add);
+	$str_own	 		  = bo_get_conf('count_strikes_own'.$add);
+	$active_days 		  = bo_get_conf('longtime_station_active_time'.$add) / 3600 / 24;
+	$inactive_days 		  = bo_get_conf('longtime_station_inactive_time'.$add) / 3600 / 24;
+	$min_dist_own 		  = bo_get_conf('longtime_min_dist_own'.$add) / 1000;
+	$max_dist_own 		  = bo_get_conf('longtime_max_dist_own'.$add) / 1000;
+	$max_str_own 		  = (double)bo_get_conf('longtime_max_strikesh_own'.$add);
+	$max_sig_own 		  = (double)bo_get_conf('longtime_max_signalsh_own'.$add);
+	$first_update_station = bo_get_conf('longtime_station_first_time'.$add);
+	$nogps_whole_time     = bo_get_conf('longtime_station_nogps_time'.$add);
 
 
 	//Global
@@ -1183,15 +1191,22 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	echo '<h4>'.strtr(_BL('h4_stat_longtime_station'), array('{STATION_CITY}' => $city)).'</h4>';
 
 	echo '<ul class="bo_stat_overview">';
+
+	if (!$own_station && $first_update_station)
+		echo '<li><span class="bo_descr">'._BL('Record longtime data since').': </span><span class="bo_value">'.date(_BL('_datetime'), $first_update_station).'</span>';
+
 	echo '<li><span class="bo_descr">'._BL('Strikes detected').': </span><span class="bo_value">'.number_format($str_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Active').': </span><span class="bo_value">'.number_format($active_days, 1, _BL('.'), _BL(',')).' '._BL('days').'</span>';
-	echo '<li><span class="bo_descr">'._BL('Inactive').': </span><span class="bo_value">'.number_format($inactive_days, 1, _BL('.'), _BL(',')).' '._BL('days').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Inactive').': </span><span class="bo_value">';
+	echo number_format($inactive_days, 1, _BL('.'), _BL(',')).' '._BL('days');
+	echo $nogps_whole_time > 360 ? ' ('.number_format($nogps_whole_time / 3600, 1, _BL('.'), _BL(',')).' '._BL('hours').' '._BL('without GPS').')' : '';
+	echo '</span>';
 	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'.number_format($max_str_own, 0, _BL('.'), _BL(',')).'</span>';
 
 	if ($own_station)
 	{
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_own[0], 0, _BL('.'), _BL(',')).($max_str_day_own[1] ? ' ('.date(_BL('_date'), strtotime($max_str_day_own[1])).')' : '' ).'</span>';
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS_STAT.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_own[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_own[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_own[1])).')' : '').'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_own[0], 0, _BL('.'), _BL(',')).($max_str_day_own[1] > 0 ? ' ('.date(_BL('_date'), $max_str_day_own[1]).')' : '' ).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS_STAT.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_own[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_own[1] ? ' ('.date(_BL('_date'), $max_str_dayrad_own[1]).')' : '').'</span>';
 	}
 
 	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'.number_format($min_dist_own, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
@@ -1210,8 +1225,8 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 
 	if ($own_station)
 	{
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_all[0], 0, _BL('.'), _BL(',')).($max_str_day_all[1] ? ' ('.date(_BL('_date'), strtotime($max_str_day_all[1])).')' : '').'</span>';
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS_STAT.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_all[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_all[1] ? ' ('.date(_BL('_date'), strtotime($max_str_dayrad_all[1])).')' : '').'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_all[0], 0, _BL('.'), _BL(',')).($max_str_day_all[1] ? ' ('.date(_BL('_date'), $max_str_day_all[1]).')' : '').'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS_STAT.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_all[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_all[1] ? ' ('.date(_BL('_date'), $max_str_dayrad_all[1]).')' : '').'</span>';
 	}
 
 	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'.number_format($min_dist_all, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';

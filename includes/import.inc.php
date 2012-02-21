@@ -1840,7 +1840,7 @@ function bo_update_stations($force = false)
 			$add = $stId == $own_id ? '' : '#'.$stId.'#';
 
 			//whole signals count (not exact)
-			if ($last > 0)
+			if ($last > 0 && $StData[$stId]['sig'])
 			{
 				$count = bo_get_conf('count_raw_signals2'.$add);
 				bo_set_conf('count_raw_signals2'.$add, $count + ($StData[$stId]['sig']*($time-$last)/3600));
@@ -1864,8 +1864,18 @@ function bo_update_stations($force = false)
 
 			//Activity/inactivity counter
 			$time_interval = $last ? $time - $last : 0;
-			if ($StData[$stId]['sig'])
+			if ($StData[$stId]['status'] == 'A')
 			{
+
+				//save first data-time
+				if ($stId != $own_id)
+				{
+					$longtime_time = bo_get_conf('longtime_first_time'.$add);
+
+					if (!$longtime_time)
+						bo_set_conf('longtime_station_first_time'.$add, time());
+				}
+
 				bo_set_conf('station_last_active'.$add, $time);
 				$time_interval += bo_get_conf('longtime_station_active_time'.$add);
 				bo_set_conf('longtime_station_active_time'.$add, $time_interval);

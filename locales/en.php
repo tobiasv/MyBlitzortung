@@ -1035,6 +1035,7 @@ $_BL['en']['Auth ID is'] = 'Auth ID is';
 $_BL['en']['Logging out from Blitzortung.org'] = 'Logging out from Blitzortung.org';
 $_BL['en']['Already DONE BEFORE'] = 'Already DONE BEFORE';
 $_BL['en']['Update database keys'] = 'Update database keys';
-
+$_BL['en']['without GPS'] = 'without GPS';
+$_BL['en']['Record longtime data since'] = 'Record longtime data since';
 
 
