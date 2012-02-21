@@ -7,16 +7,25 @@ Version 0.7.5 (2012-??-??)
 -------------------------------
 - new: option enable database keys for faster lightning search/drawing
     --> uses some disk space
-	--> you should enable if you have archived lightning-data
+    --> disabled by default
+	--> you should enable if you have archived lightning-data and enough disk space
+- new: residual time graphs (by andreas)
+- new: xy-graphs for signals (by andreas)
+- new: added a clean config.php.example
 - improved: partial file download for raw data, default interval is 10 minutes now
 - improved: (a bit) behaviour with lightning search
-- cleaned and fixed install
-- added a clean config.php.example
+- fix: cleaned and fixed install
 - fix: update longtime-statistics only when station is active
+- fix: user cookie behaviour, session time display
+- dev: added folder for classes
+- dev: added Database and Timestamp class
+- dev: added channels/ntime column to database-table "raw"
+
 
 Version 0.7.4a (2012-02-10)
 ---------------------------
 - new: italian translation (thx to Stefano Cirilli - www.meteo.units.it)
+- new: copyright for translators
 - fix: station statistics
 - fix: changed signal import folder name to "raw_data"
 
