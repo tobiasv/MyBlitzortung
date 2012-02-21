@@ -24,6 +24,8 @@ $_BL['fr']['MyBlitzortung_notags'] = 'Mon détecteur de foudre';
 
 //For displaying things like "translated by..." in footer
 
+$_BL['fr']['copyright_extra'] = 'Traduction française par Florent.B (FLC85) <a href="http://www.meteofontenay.fr" target="_blank">Météo Fontenay le Comte</a>';
+
 // *** PLEASE DON'T CHANGE OR TRANSLATE THE NAMES IN THE FOLLOWING ENTRIES *** THANKS!
 $_BL['fr']['MyBlitzortung_original'] = 'MyBlitzortung';
 $_BL['fr']['copyright_footer'] = 'Généré par {MYBO_ORIG}';
@@ -1032,20 +1034,19 @@ $_BL['fr']['Update database keys'] = 'Maj. des clefs de la base de donnée';
 /********************/
 
 
-//en: ''
-$_BL['fr']['copyright_extra'] = '';
+
 
 //en: 'Period'
-$_BL['fr']['Period'] = '';
+$_BL['fr']['Period'] = 'Période';
 
 //en: ''
 $_BL['fr']['bo_stat_network_descr'] = '';
 
 //en: 'no GPS signal'
-$_BL['fr']['no GPS signal'] = '';
+$_BL['fr']['no GPS signal'] = 'Pas de signaux GPS';
 
 //en: 'Searching outside of the circle is not possible!'
-$_BL['fr']['search_outside_radius'] = '';
+$_BL['fr']['search_outside_radius'] = 'Recherche impossible en dehors du cercle';
 
 
 /*******************************/
