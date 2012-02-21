@@ -1492,11 +1492,11 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
         }
 
         $Y = array_pad(array(), 2 * $range + 1, 0);
+        $Y2 = array_pad(array(), 2 * $range + 1, 0);
 
-
-        $strikes_raw_sql = "SELECT s.time, s.time_ns, s.distance, r.time raw_time, r.time_ns raw_time_ns FROM strikes s
+        $strikes_raw_sql = "SELECT s.time, s.time_ns, s.distance, s.part, r.time raw_time, r.time_ns raw_time_ns FROM strikes s
             INNER JOIN raw r ON s.raw_id = r.id
-            WHERE s.time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * 12) .
+            WHERE s.time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * 24) .
             "' AND '" . gmdate('Y-m-d H:i:s', $time_max) . "';";
         $strikes_raw_res = bo_db($strikes_raw_sql);
 
@@ -1515,13 +1515,17 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
             $index = intval($difference / $binsize) + $range;
 
             if ($index >= 0 && $index <= 2 * $range) {
-                $Y[$index]++;
+                error_log('***' . $strike_raw_row['part']);
+                if ($strike_raw_row['part'] > 0)
+                    $Y[$index]++;
+                else
+                    $Y2[$index]++;
             }
         }
 
-        $graph_type = 'linlin';
-        $xmin = min($X);
-        $xmax = max($X);
+        $graph_type = 'textlin';
+        $xmin = 0;
+        $xmax = (2 * $range + 1);
         $ymin = 0;
         $ymax = max($Y);
     }
@@ -2513,12 +2517,22 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			break;
 
         case 'strikes_station_residual_time':
-            $plot=new BarPlot($Y, $X);
-            $plot->SetColor('#fff@1');
-            $plot->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR1);
+            $plot1=new BarPlot($Y);
+            $plot1->SetColor('#fff@1');
+            $plot1->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR2);
+            $plot2=new BarPlot($Y2);
+            $plot2->SetColor('#fff@1');
+            $plot2->SetFillColor(BO_GRAPH_STAT_SPECTRUM_COLOR1);
+            $plot = new AccBarPlot(array($plot1, $plot2));
             $graph->xaxis->title->Set(_BL('Residual time').'  [µs]');
-            $plot->SetLegend('Restzeiten');
             $plot->SetWidth(10);
+
+            $tickLabels = array();
+            foreach ($X as $xvalue) {
+                $tickLabels[] = sprintf('%.1f', $xvalue);
+            }
+
+            $graph->xaxis->SetTickLabels($tickLabels);
             $graph->Add($plot);
 
             break;
