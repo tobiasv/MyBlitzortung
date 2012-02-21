@@ -1162,14 +1162,28 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 		}
 	}
 
+	//set date to 0 if count is zero
+	//compatibility for older entries
 	if (!$max_str_day_all[0])
 		$max_str_day_all[1] = 0;
+	else if (strpos($max_str_day_all[1], '-'))
+		$max_str_day_all[1] = strtotime($max_str_day_all[1]);
+
 	if (!$max_str_dayrad_all[0])
 		$max_str_dayrad_all[1] = 0;
+	else if (strpos($max_str_dayrad_all[1], '-'))
+		$max_str_dayrad_all[1] = strtotime($max_str_dayrad_all[1]);
+
 	if (!$max_str_day_own[0])
 		$max_str_day_own[1] = 0;
+	else if (strpos($max_str_day_own[1], '-'))
+		$max_str_day_own[1] = strtotime($max_str_day_own[1]);
+
 	if (!$max_str_dayrad_own[0])
 		$max_str_dayrad_own[1] = 0;
+	else if (strpos($max_str_dayrad_own[1], '-'))
+		$max_str_dayrad_own[1] = strtotime($max_str_dayrad_own[1]);
+
 
 	if (intval($strikes))
 		$strike_ratio = number_format($str_own / $strikes * 100, 1, _BL('.'), _BL(',')).'%';
