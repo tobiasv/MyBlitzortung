@@ -1,2 +1,5 @@
 .idea
 config.php
+.htaccess
+own.css
+cities.txt

@@ -1485,9 +1485,10 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 			}
 		}
 
-
+		$show_map = false;
 		if (count($lat))
 		{
+			$show_map = true;
 			$st_lat = array_sum($lat) / count($lat);
 			$st_lon = array_sum($lon) / count($lon);
 
@@ -1519,8 +1520,9 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 			$st_lon = BO_LON;
 		}
 
-		if ($show_ant)
+		if ($show_ant && $own_station)
 		{
+			$show_map = true;
 			$dist = 50;
 			list($lat1a, $lon1a) = bo_distbearing2latlong($dist, $ant1, $st_lat, $st_lon);
 			list($lat1b, $lon1b) = bo_distbearing2latlong($dist, $ant1+180, $st_lat, $st_lon);
@@ -1566,44 +1568,47 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 
 		echo '</ul>';
 
-		echo '<div id="bo_gmap" class="bo_map_gps" style="width:250px;height:200px"></div>';
 
 
-
-		?>
-		<script type="text/javascript">
-
-		function bo_gmap_init2()
+		//Show the map
+		if ($show_map)
 		{
-			var coordinates;
-			coordinates = [ <?php echo $js_data ?> ];
+			echo '<div id="bo_gmap" class="bo_map_gps" style="width:250px;height:200px"></div>';
+?>
+			<script type="text/javascript">
 
-			if (coordinates.length > 0)
+			function bo_gmap_init2()
 			{
-				var gpsPath = new google.maps.Polyline({
-					path: coordinates,
-					strokeColor: "#0000FF",
-					strokeOpacity: 0.5,
-					strokeWeight: 2,
-					clickable: false
-					});
-				gpsPath.setMap(bo_map);
+				var coordinates;
+				coordinates = [ <?php echo $js_data ?> ];
 
-				var bounds = new google.maps.LatLngBounds();
-				for (var i = 0; i < coordinates.length; i++) {
-					bounds.extend(coordinates[i]);
+				if (coordinates.length > 0)
+				{
+					var gpsPath = new google.maps.Polyline({
+						path: coordinates,
+						strokeColor: "#0000FF",
+						strokeOpacity: 0.5,
+						strokeWeight: 2,
+						clickable: false
+						});
+					gpsPath.setMap(bo_map);
+
+					var bounds = new google.maps.LatLngBounds();
+					for (var i = 0; i < coordinates.length; i++) {
+						bounds.extend(coordinates[i]);
+					}
+					bo_map.fitBounds(bounds);
 				}
-				bo_map.fitBounds(bounds);
+
+				<?php echo $js_data_ant ?>
 			}
 
-			<?php echo $js_data_ant ?>
+			</script>
+
+<?php
+
+			bo_insert_map(0, $st_lat, $st_lon, 19, BO_STATISTICS_GPS_MAPTYPE);
 		}
-
-		</script>
-
-		<?php
-
-		bo_insert_map(0, $st_lat, $st_lon, 19, BO_STATISTICS_GPS_MAPTYPE);
 	}
 
 }

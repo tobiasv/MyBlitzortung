@@ -413,7 +413,7 @@ function bo_update_raw_signals($force = false)
 
 
 			//sth. went wrong -> retry without range
-			if ($file === false && $code != 304)
+			if ($file === false && intval($code) != 304)
 			{
 				$text .= 'sth went rong -> getting the file the 2nd time';
 				$modified = $last_modified ? $last_modified : $last_signal;
@@ -429,7 +429,7 @@ function bo_update_raw_signals($force = false)
 			//Check the file
 			if ($file === false)
 			{
-				if ($code == 304)
+				if (intval($code) == 304)
 				{
 					bo_echod($text." *** file not modified");
 				}
