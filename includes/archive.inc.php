@@ -1104,8 +1104,17 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		if ($row['raw_id'])
 		{
 			$rtime = strtotime($row['rtime'].' UTC') + 1;
-			$time_diff = $rtime - $stime + ($row['rtimens'] - $row['stimens']) * 1E-9;
-			$dist_sig  = BO_C * $time_diff / 1000;
+		
+			if ($row['strike_id'])
+			{
+				$time_diff = $rtime - $stime + ($row['rtimens'] - $row['stimens']) * 1E-9;
+				$residual_time = $row['distance'] / BO_C - $time_diff;
+
+				$cdev = $row['distance'] / $time_diff / BO_C;
+				$cdev_text =  number_format($residual_time*1E6, 1, _BL('.'), _BL(','))._BC('µs');
+				$cdev_text .= ' / '.number_format($cdev, 5, _BL('.'), _BL(',')).'c';
+				$cdev_text .= ' / '.round(($cdev-1)*$row['distance']).'m';
+			}
 		}
 
 		$bearing = bo_latlon2bearing($row['lat'], $row['lon']);
@@ -1279,8 +1288,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '</tr><tr>';
 
 		echo '<td class="bo_sig_table_strikeinfo">';
-
-
 		echo '<ul>';
 		
 		if ($row['strike_id'])
@@ -1289,13 +1296,12 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '<span class="bo_descr">';
 			echo _BL('Runtime').': ';
 			echo '</span>';
+			
 			echo '<span class="bo_value" title="';
 			
 			if ($row['raw_id'])
 			{
-				$cdev = $row['distance'] / $time_diff / BO_C;
-				echo number_format($cdev, 5, _BL('.'), _BL(',')).'c';
-				echo ' / '.round(($cdev-1)*$row['distance']).'m';
+				echo $cdev_text;
 				echo '">';
 				echo number_format($time_diff * 1000, 4, _BL('.'), _BL(','))._BL('unit_millisec');
 			}
@@ -1380,6 +1386,19 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</li>';
 
 			
+		}
+		
+		if ($row['raw_id'])
+		{			
+			echo '<li>';
+			echo '<span class="bo_descr">';
+			echo _BL('Residual time').': ';
+			echo '</span>';
+			echo '<span class="bo_value">';
+			echo $cdev_text;
+			echo '</span>';
+			echo '</li>';
+		
 		}
 		
 		if ($loc_angle[0])
