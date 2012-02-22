@@ -1,11 +1,10 @@
 <?php
 
-/* 
- * Hungary translation for MyBlitzortung
+/*
+ * French translation for MyBlitzortung
  * by Florent Baron
  */
 
- 
 $_BL['locale'] = 'fr';
 
 
@@ -24,7 +23,8 @@ $_BL['fr']['MyBlitzortung'] = '<span class="bo_my">Mon</span><span class="bo_myb
 $_BL['fr']['MyBlitzortung_notags'] = 'Mon détecteur de foudre';
 
 //For displaying things like "translated by..." in footer
-$_BL['fr']['copyright_extra'] = 'Frensh translation by Florent Baron (www.meteofontenay.fr)';
+
+$_BL['fr']['copyright_extra'] = 'Traduction française par Florent.B (FLC85) <a href="http://www.meteofontenay.fr" target="_blank">Météo Fontenay le Comte</a>';
 
 // *** PLEASE DON'T CHANGE OR TRANSLATE THE NAMES IN THE FOLLOWING ENTRIES *** THANKS!
 $_BL['fr']['MyBlitzortung_original'] = 'MyBlitzortung';
@@ -62,7 +62,7 @@ $_BL['fr']['days'] = 'jours';
 $_BL['fr']['hours'] = 'heures';
 $_BL['fr']['number_every_minutes'] = 'toutes les {NUMBER} minutes';
 $_BL['fr']['number_1every_minute'] = 'toutes les minutes';
-$_BL['fr']['number_minutes'] = 'minutes';
+$_BL['fr']['number_minutes'] = '{NUMBER} minutes';
 $_BL['fr']['number_1minute'] = 'une minute';
 
 
@@ -174,7 +174,7 @@ $_BL['fr']['Position'] = 'Position';
 $_BL['fr']['City'] = 'Ville';
 $_BL['fr']['Country'] = 'Pays';
 $_BL['fr']['Strikes/h'] = 'Eclairs/h';
-$_BL['fr']['Signals/h'] = 'Signals/h';
+$_BL['fr']['Signals/h'] = 'Signaux/h';
 $_BL['fr']['Efficiency'] = 'Efficience';
 $_BL['fr']['Ratio'] = 'Taux';
 $_BL['fr']['Pos.'] = 'Pos.';
@@ -301,7 +301,7 @@ $_BL['fr']['main_menu_login'] = 'Espace utilisateur';
 /*************************************************************/
 $_BL['fr']['map_options'] = 'Options';
 $_BL['fr']['only own strikes'] = 'Foudres seulement détectées par la station {STATION}';
-$_BL['fr']['tile not available'] = 'Dans ce niveau de zoom,cette position,pas de données disponibles!';
+$_BL['fr']['tile not available'] = 'Membres enregistrés seulement';
 $_BL['fr']['update map'] = 'Mise à jour';
 $_BL['fr']['Click to set the map to Home'] = 'Cliquez pour centrer la carte sur Fontenay le Comte.';
 $_BL['fr']['Dynamic map'] = 'Carte dynamique';
@@ -411,7 +411,7 @@ $_BL['fr']['h4_graph_amplitudes_time'] = 'Historique de l\'amplitude';
 $_BL['fr']['h4_graph_distance'] = 'Distance';
 $_BL['fr']['h4_graph_deviations_time'] = 'Historique des déviations';
 $_BL['fr']['h4_graph_evaluated_signals'] = 'Taux de foudre / signaux évalués';
-$_BL['fr']['h4_graph_signals_all'] = 'Signals de toutes les stations';
+$_BL['fr']['h4_graph_signals_all'] = 'Signaux de toutes les stations';
 $_BL['fr']['h4_graph_amplitudes'] = 'Amplitudes';
 $_BL['fr']['h4_graph_spectrum'] = 'Spectre des fréquences';
 
@@ -463,6 +463,7 @@ $_BL['fr']['Total density'] = 'Densité totale';
 $_BL['fr']['Station density'] = 'Densité station';
 $_BL['fr']['Station ratio'] = 'Ratio la station';
 $_BL['fr']['View'] = 'Vue';
+$_BL['fr']['Avg. participants per strike locating'] = 'Moyenne des participants par foudre localisée';
 $_BL['fr']['Maximum mean participants'] = 'Moyenne max participants';
 $_BL['fr']['Additional information'] = 'Informations additionnelles';
 
@@ -470,15 +471,15 @@ $_BL['fr']['Additional information'] = 'Informations additionnelles';
 /*************************************************************/
 /* Statistics                                                */
 /*************************************************************/
-$_BL['fr']['h3_stat_last_signals'] = 'Dernier signal reçu ';
+$_BL['fr']['h3_stat_last_signals'] = 'Derniers signaux reçus ';
 $_BL['fr']['h3_stat_station'] = 'Statistiques de la station {STATION_CITY}';
 $_BL['fr']['h3_stat_graphs'] = 'Statistique: Graphiques';
 $_BL['fr']['h3_stat_other'] = 'Plus de statistiques';
-$_BL['fr']['h4_stat_longtime_network'] = 'Réseau de détection de la foudre';
+$_BL['fr']['h4_stat_longtime_network'] = 'Réseau Blitzortung';
 $_BL['fr']['h4_stat_other_database'] = 'Statistique de la base de données';
 $_BL['fr']['h4_stat_other_gps'] = 'GPS';
 $_BL['fr']['h4_stat_other_updates'] = 'Mises à jour';
-$_BL['fr']['h4_stat_longtime_station'] = 'Station {STATION_CITY}';
+$_BL['fr']['h4_stat_longtime_station'] = 'Station {STATION}';
 $_BL['fr']['h4_table_network'] = 'Tableau des stations';
 $_BL['fr']['h3_stat_network'] = 'Statistiques du réseau de détection';
 $_BL['fr']['h3_stat_longtime'] = 'Statistiques à long terme';
@@ -495,7 +496,7 @@ $_BL['fr']['stat_advanced_show_strikes'] = 'Stat.foudre';
 $_BL['fr']['stat_advanced_show_signals'] = 'Stat.signal';
 
 $_BL['fr']['since begin of data logging'] = 'depuis début de l\'enregistrement de données';
-$_BL['fr']['update every'] = 'Mise à jour tous les';
+$_BL['fr']['update every'] = 'Maj toutes les';
 $_BL['fr']['Direction antenna 1'] = 'Direction antenne 1';
 $_BL['fr']['Direction antenna 2'] = 'Direction antenne 2';
 $_BL['fr']['Max participants per strike'] = 'Maximum de participants / coup de foudre';
@@ -504,8 +505,8 @@ $_BL['fr']['Mean locating ratio'] = 'Moyenne du taux de positionnement';
 $_BL['fr']['Mean strike ratio'] = 'Moyenne du taux de foudre';
 $_BL['fr']['Active'] = 'Station active';
 $_BL['fr']['Inactive'] = 'Station inactive';
-$_BL['fr']['Min dist'] = 'Minimum distance';
-$_BL['fr']['Max dist'] = 'Maximum distance';
+$_BL['fr']['Min dist'] = ' Distance minimum';
+$_BL['fr']['Max dist'] = ' Distance maximum';
 $_BL['fr']['Max strikes per hour'] = 'Coups maximum par heure';
 $_BL['fr']['Max strikes per day'] = 'Coups maximum par jour';
 $_BL['fr']['Max signals per hour'] = 'Signaux maximum par heure';
@@ -516,9 +517,9 @@ $_BL['fr']['Memory usage'] = 'Utilisation de la mémoire';
 $_BL['fr']['for keys'] = 'pour les clefs';
 $_BL['fr']['Entries (all data)'] = 'Entrées (toutes les données)';
 $_BL['fr']['Station active'] = 'Station active';
-$_BL['fr']['Last update strikes'] = 'Dernière mise à jour des données de la foudre ';
-$_BL['fr']['Last update stations'] = 'Dernière mise à jour des données de la station ';
-$_BL['fr']['Last update signals'] = 'Dernière mise à jour des données de signal ';
+$_BL['fr']['Last update strikes'] = 'Dernière Maj. de la foudre ';
+$_BL['fr']['Last update stations'] = 'Dernière Maj. de la station ';
+$_BL['fr']['Last update signals'] = 'Dernière Maj. des signaux ';
 $_BL['fr']['Active Stations'] = 'Stations actives';
 $_BL['fr']['Sum of Signals'] = 'Nombre de signaux';
 $_BL['fr']['Sum of Strikes'] = 'Nombre de foudres';
@@ -535,7 +536,7 @@ $_BL['fr']['available_stations'] = 'stations disponibles';
 $_BL['fr']['time_from'] = 'depuis';
 $_BL['fr']['time_to'] = 'à';
 $_BL['fr']['Max available stations'] = 'Max stations disponibles';
-$_BL['fr']['Last active'] = 'Dernière active';
+$_BL['fr']['Last active'] = 'Dernière activité';
 $_BL['fr']['Signals detected'] = 'Signaux détectés';
 $_BL['fr']['Signal ratio'] = 'Taux de localisation';
 $_BL['fr']['Strikes station min participants'] = 'Min. de stations pour la foudre';
@@ -591,7 +592,7 @@ $_BL['fr']['Not definite'] = 'Non définie';
 $_BL['fr']['No signal received'] = 'Pas de signaux reçus';
 $_BL['fr']['stat_navi_alarm'] = 'Alertes foudre';
 $_BL['fr']['user_welcome_text'] = 'Vous êtes connecté sous ';
-$_BL['fr']['MyBlitzortung version'] = 'Version de {MYBO_ORIG}';
+$_BL['fr']['MyBlitzortung version'] = '{MYBO_ORIG} version: ';
 $_BL['fr']['No permisson for saving to DB!'] = 'Pas d autorisation pour sauvegarder la DB!';
 $_BL['fr']['User list'] = 'Liste des utilisateurs';
 $_BL['fr']['Alert'] = 'Alerte';
@@ -617,10 +618,10 @@ $_BL['fr']['Password was not changed!'] = 'Le mot de passe n\'a pas été changé!'
 $_BL['fr']['Welcome to MyBlitzortung user area'] = 'Bienvenu à {MYBO} espace utilisateur';
 $_BL['fr']['Admin tools'] = 'Outils d\'administration';
 $_BL['fr']['File cache info'] = 'Info sur le fichier cache';
-$_BL['fr']['Version information'] = 'Version information';
-$_BL['fr']['PHP version'] = 'PHP Version';
+$_BL['fr']['Version information'] = 'Informations sur les versions';
+$_BL['fr']['PHP version'] = 'PHP version';
 $_BL['fr']['Show PHP info'] = 'Montrer les infos PHP';
-$_BL['fr']['MySQL version'] = 'Version de MySQL';
+$_BL['fr']['MySQL version'] = ' MySQL version:';
 $_BL['fr']['Files'] = 'Fichiers';
 $_BL['fr']['Click here to delete all files'] = 'Cliquez ici pour effacer tous les fichiers';
 $_BL['fr']['Clear all files'] = 'Nettoyer tous les fichiers.';
@@ -628,7 +629,7 @@ $_BL['fr']['stay logged in'] = 'Restez connecté';
 $_BL['fr']['Administration'] = 'Administration';
 $_BL['fr']['Documentation'] = 'Documentation';
 $_BL['fr']['Import/update data'] = 'Importation et mise à jour des données';
-$_BL['fr']['user_lastlogin_text'] = 'Dernier identifiant';
+$_BL['fr']['user_lastlogin_text'] = 'Dernière connexion';
 $_BL['fr']['user_sessiontime_text'] = 'Connecté depuis';
 $_BL['fr']['Update only strikes'] = 'Maj. des éclaires seulement';
 $_BL['fr']['Update only stations'] = 'Maj. des stations seulement';
@@ -688,7 +689,7 @@ $_BL['fr']['info_participate_text'] = '
 Vous devez construire votre propre récepteur,et ainsi participer au réseau et obtenir l\'intégralité des données.
 
 Plus d\'information ici:
-<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>.
+<a href="http://www.blitzortung.org/Webpages/index.php?lang=fr&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>.
 et ici:
 <a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a>
 ';
@@ -696,7 +697,7 @@ et ici:
 $_BL['fr']['info_usage_text'] = '
 Les données fournies sur cette page et par Blitzortung.org sont uniquement utilisables à des fins privées et de divertissement.
 Nous ne sommes pas un service d\'information commerciale pour les données de la foudre! Voir plus d\'informations sur
-<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=5" target="_blank">Blitzortung.org</a>
+<a href="http://www.blitzortung.org/Webpages/index.php?lang=fr&page=5" target="_blank">Blitzortung.org</a>
 ';
 $_BL['fr']['info_myblitzortung_text'] = '
 La visualisation de ces pages est faite par un logiciel appelé
@@ -705,7 +706,7 @@ Personne ne peut garantir que ce logiciel affiche toujours des informations corr
 Vous êtes responsable de vous même!!!
 {MYBO} ({MYBO_ORIG}) est un logiciel libre. Vous pouvez trouver
 plus d\'informations ici:
-<a href="http://www.myblitzortung.de?lang=en" target="_blank">www.myblitzortung.de</a>.
+<a href="http://www.myblitzortung.de?lang=fr" target="_blank">www.myblitzortung.de</a>.
 ';
 
 
@@ -722,7 +723,7 @@ de la station. Calcul:
 $_BL['fr']['bo_stat_network_descr_lasth'] = 'Tous les chiffres se rapportent à une période de 60 minutes avant la dernière mise à jour.';
 $_BL['fr']['bo_stat_network_descr_table'] = 'Ici vous pouvez voir toutes les stations actives du réseau de détection de la foudre. Vous pouvez faire des tris dans le tableau en cliquant sur les liens dans la première rangée.';
 $_BL['fr']['bo_graph_descr_bear'] = 'Taux de localisation géographique. Pour une meilleure comparaison, il y a aussi le nombre de coups de foudre détecté.';
-$_BL['fr']['bo_stat_longtime_descr'] = 'Toutes les informations disponibles ici datent depuis la mise en service de {MYBO}. Les distances sont données par rapport à {STATION_CITY}.';
+$_BL['fr']['bo_stat_longtime_descr'] = 'Toutes les informations disponibles ici datent depuis la mise en service de {MYBO}. Les distances sont données par rapport à {STATION}.';
 $_BL['fr']['bo_stat_other_database_descr'] = 'Tous les coups de foudres, signaux et données de la station sont sauvegardés dans une base de données ';
 $_BL['fr']['bo_stat_other_updates_descr'] = 'Les nouvelles données sont collectées depuis blitzortung.org à intervalle régulier:';
 $_BL['fr']['bo_stat_other_gps_descr'] = 'Quelques informations du récepteur GPS , qui est utilisé pour connaitre le temps exact et la position. Si elles sont connues, les orientations des antennes sont aussi affichées (rouge, vert).';
@@ -749,7 +750,7 @@ $_BL['fr']['bo_graph_deviations'] = 'Pour chaque coup de foudre la déviation est
 $_BL['fr']['bo_graph_evaluated_signals'] = 'Les signaux de la station {STATION} qui ne peuvent être attribués à un coup de foudre par Blitzortung.org sont de nouveau analysés par MyLightningDetection. Dans certains cas, la foudre peut être réaffecté à un signal. Plus cela arrive, plus la probabilité qu\'il y ait un problème avec la station existe.';
 $_BL['fr']['bo_graph_deviations_time'] = 'Évolution dans le temps de la déviation moyenne de la foudre.';
 $_BL['fr']['bo_graph_distance'] = 'Historique de la distance moyenne avec la station {STATION}. Vous pouvez estimer la sensibilité des stations en comparant les deux lignes.';
-$_BL['fr']['bo_descr_strikes_now'] = 'Les données sur la foudre sont récupérées toutes les {UPDATE_INTERVAL} minutes de Blitzortung.org. L\'intervalle de rafraichissement est de {RATE_INTERVAL} minutes . ';
+$_BL['fr']['bo_descr_strikes_now'] = 'Les données sur la foudre sont récupérées toutes les {UPDATE_INTERVAL} de Blitzortung.org. L\'intervalle de rafraichissement est de {RATE_INTERVAL}. ';
 $_BL['fr']['bo_stat_advanced_info'] = 'Statistiques avancées, principalement pour l\'exploitant de la station.';
 $_BL['fr']['bo_stat_other_station_info'] = 'Information! Les statistiques de la station de {STATION_CITY} sont affichées. Pour des raisons techniques seul une partie des informations peuvent être affichée. Quelques données peuvent être demandé à la station de {STATION}! ';
 $_BL['fr']['bo_stat_other_station_info_back'] = 'Retourner à la station {STATION}';
@@ -941,9 +942,11 @@ $_BL['fr']['No data available!'] = 'Pas de données!';
 
 /*************************************************************/
 /* Translations for templates                                */
-/*************************************************************/
+/************************************************************/
 
-//Countries
+/*** EUROPE ***/
+
+//Europe: Countries
 $_BL['fr']['Germany'] = 'Allemagne';
 $_BL['fr']['France'] = 'France';
 $_BL['fr']['Austria'] = 'Autriche';
@@ -971,15 +974,27 @@ $_BL['fr']['Romania'] = 'Roumanie';
 $_BL['fr']['Rome'] = 'Rome';
 $_BL['fr']['Lithuania'] = 'Lithuanie';
 
-//Europe
+//Europe: Regions
 $_BL['fr']['Europe'] = 'Europe';
 $_BL['fr']['Western Europe'] = 'Europe de l\'Ouest';
 
-//German states
+//Europe: German states
 $_BL['fr']['Bavaria'] = 'Bavière';
 $_BL['fr']['NRW'] = 'Rhénanie-du-Nord-Westphalie';
 
-//Others
+//Europe: Italy
+$_BL['fr']['Sardinia'] = 'Sardaigne';
+
+
+
+/*** OCEANIA ***/
+$_BL['fr']['New Zealand'] = 'Nouvelle-Zélande';
+
+
+
+
+/*** OTHER TEMPLATE NAMES***/
+
 $_BL['fr']['Meteox rain radar'] = 'Radar pluies (meteox.com)';
 
 
@@ -995,6 +1010,21 @@ $_BL['fr']['Specials'] = 'Spécials';
 $_BL['fr']['Importing data...'] = 'Importation des données';
 $_BL['fr']['since'] = 'depuis';
 
+$_BL['fr']['ani_play'] = 'lecture';
+$_BL['fr']['ani_pause'] = 'Pause';
+$_BL['fr']['ani_next'] = 'Suivant';
+$_BL['fr']['ani_prev'] = 'Précédent';
+$_BL['fr']['no reception'] = 'pas de réception';
+$_BL['fr']['Loading...'] = 'Chargement en cours';
+
+$_BL['fr']['Links'] = 'Liens';
+$_BL['fr']['Login string is'] = 'La chaîne d\'identification est';
+$_BL['fr']['Auth ID is'] = 'Auth ID=';
+$_BL['fr']['Logging out from Blitzortung.org'] = 'Déconnexion de Blitzortung.org';
+$_BL['fr']['Already DONE BEFORE'] = 'Déjà fait avant';
+$_BL['fr']['Update database keys'] = 'Maj. des clefs de la base de donnée';
+
+
 
 
 
@@ -1004,25 +1034,47 @@ $_BL['fr']['since'] = 'depuis';
 /********************/
 
 
-//en: 'Avg. participants per strike locating'
-$_BL['fr']['Avg. participants per strike locating'] = '';
+
 
 //en: 'Period'
-$_BL['fr']['Period'] = '';
+$_BL['fr']['Period'] = 'Période';
 
 //en: ''
 $_BL['fr']['bo_stat_network_descr'] = '';
 
-//en: 'Play'
-$_BL['fr']['ani_play'] = '';
+//en: 'no GPS signal'
+$_BL['fr']['no GPS signal'] = 'Pas de signaux GPS';
 
-//en: 'Pause'
-$_BL['fr']['ani_pause'] = '';
+//en: 'Searching outside of the circle is not possible!'
+$_BL['fr']['search_outside_radius'] = 'Recherche impossible en dehors du cercle';
 
-//en: 'Next'
-$_BL['fr']['ani_next'] = '';
 
-//en: 'Prev'
-$_BL['fr']['ani_prev'] = '';
+/*******************************/
+/*  NOT AVAILABLE IN ORIGINAL  */
+/*******************************/
+
+$_BL['fr']['Recieved'] = 'Reçu';
+$_BL['fr']['No signal recieved'] = 'Pas de signal reçu par la station de {STATION}';
+$_BL['fr']['Moy. des participants par coup de foudre'] = '';
+$_BL['fr']['España / Spain'] = 'Espagne';
+$_BL['fr']['Deutschland'] = 'Allemagne';
+$_BL['fr']['Danmark'] = 'Danemark';
+$_BL['fr']['Slowenien'] = 'Slovénie';
+$_BL['fr']['Czech Repubic'] = 'République Tchéque';
+$_BL['fr']['Europe (Ouest/Central)'] = '';
+$_BL['fr']['Vendée'] = '';
+$_BL['fr']['Région de Fontenay'] = '';
+$_BL['fr']['Stations (mini)'] = '';
+$_BL['fr']['2h'] = '2h';
+$_BL['fr']['24h'] = '24h';
+$_BL['fr']['No signal recieved.'] = 'Pas de signaux reçus';
+$_BL['fr']['graph_stat_title_signals_all'] = '';
+$_BL['fr']['graph_stat_title_participants_time'] = '';
+$_BL['fr']['graph_stat_title_deviations_time'] = '';
+$_BL['fr']['graph_stat_title_ratio_distance_longtime'] = '';
+$_BL['fr']['graph_stat_title_ratio_bearing_longtime'] = '';
+$_BL['fr'][''] = '';
+$_BL['fr']['graph_stat_title_amplitudes'] = 'Amplitudes';
+$_BL['fr']['Germany,Brandenburg'] = 'Allemagne,Brandenburg';
 
 

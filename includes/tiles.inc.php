@@ -1,24 +1,5 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
-
-    Copyright (C) 2011  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 
 function bo_tile()
 {
@@ -317,7 +298,7 @@ function bo_tile()
 					".($only_own ? " AND part>0 " : "")."
 				GROUP BY sid
 				";
-			$erg = bo_db($sql);
+			$erg = BoDb::query($sql);
 			while ($row = $erg->fetch_assoc())
 			{
 				$stations_count[$row['sid']] = $row['cnt'];
@@ -332,7 +313,7 @@ function bo_tile()
 				AND $sql_where
 				".($only_own ? " GROUP BY participated " : "")."
 			";
-		$erg = bo_db($sql);
+		$erg = BoDb::query($sql);
 		while ($row = $erg->fetch_assoc())
 		{
 			if ($only_own)
@@ -461,7 +442,7 @@ function bo_tile()
 				AND $sql_where
 			".($grouping ? " GROUP BY x, y" : "")."
 			ORDER BY mtime ASC";
-	$erg = bo_db($sql);
+	$erg = BoDb::query($sql);
 	
 	//Max. strikes per tile
 	$num = $erg->num_rows;

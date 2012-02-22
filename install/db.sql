@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}raw` (
   `lon` decimal(9,6) NOT NULL,
   `height` smallint(6) NOT NULL,
   `strike_id` int(10) unsigned NOT NULL,
+  `channels` TINYINT UNSIGNED NOT NULL,
   `amp1` TINYINT UNSIGNED NOT NULL, 
   `amp2` TINYINT UNSIGNED NOT NULL,
   `amp1_max` TINYINT UNSIGNED NOT NULL,

@@ -3,7 +3,9 @@
     MyBlitzortung - a tool for participants of blitzortung.org
 	to display lightning data on their web sites.
 
-    Copyright (C) 2012  Tobias Volgnandt
+	Copyright 2011-2012 by Tobias Volgnandt & Blitzortung.org Participants
+
+
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,11 +23,8 @@
 
 if (!defined("BO_VER"))
 {
-	//Session handling
-	@session_start();
-
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.7.5-dev2');
+	define("BO_VER", '0.7.5-dev3');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -36,9 +35,9 @@ if (!defined("BO_VER"))
 	define("BO_PERM_ALERT_URL",		64);
 	define("BO_PERM_ARCHIVE", 		128);
 	define("BO_PERM_COUNT",	        8);
-	
-	
-	
+
+
+
 	//Some default PHP-Options
 	ini_set('magic_quotes_runtime', 0);
 
@@ -56,7 +55,7 @@ if (!defined("BO_VER"))
 	require_once 'config.php';
 	require_once 'includes/default_settings.inc.php'; //after config.php!
 	require_once 'includes/default_templates.inc.php'; //after config.php!
-	
+
 	if (defined('BO_DEBUG') && BO_DEBUG)
 	{
 		error_reporting(E_ALL & ~E_NOTICE);
@@ -68,39 +67,20 @@ if (!defined("BO_VER"))
 	}
 
 	date_default_timezone_set(BO_TIMEZONE);
-	
+
+
 	//includes #1
 	require_once 'includes/functions.inc.php';
 	require_once 'includes/data.inc.php';
 	require_once 'includes/user.inc.php';
 	require_once 'includes/tiles.inc.php';
 
-	if (!class_exists('mysqli'))
-		require_once 'includes/db_mysql.inc.php';
-	else
-		require_once 'includes/db_mysqli.inc.php';
+	require_once 'includes/classes/Db.class.php';
+	require_once 'includes/classes/DateTime.class.php';
 
-	//Set user_id
-	if (!isset($_SESSION['bo_user']))
-		$_SESSION['bo_user'] = 0;
-		
-	//Check for stored login in cookie
-	if (!bo_user_get_id() && intval(BO_LOGIN_COOKIE_TIME) && isset($_COOKIE['bo_login']) && preg_match('/^([0-9]+)_([0-9a-z]+)$/i', trim($_COOKIE['bo_login']), $r) )
-	{
-		$cookie_user = $r[1];
-		$cookie_uid = $r[2];
-		
-		$data = unserialize(bo_get_conf('user_cookie'.$cookie_user));
-		
-		if ($cookie_uid == $data['uid'] && trim($data['uid']))
-		{
-			bo_user_do_login_byid($cookie_user, $data['pass']);
-		}
+	//User init (session, cookie, etc...)
+	bo_user_init();
 
-	}
-	
-
-	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
 
 	//creating tiles should be very fast, other include files not needed
 	if (isset($_GET['tile']))
@@ -112,7 +92,7 @@ if (!defined("BO_VER"))
 			bo_tile_tracks();
 		else
 			bo_tile();
-		
+
 		exit;
 	}
 	//phpinfo for admin
@@ -146,7 +126,7 @@ if (!defined("BO_VER"))
 
 		$do_update = true;
 		$force_update = isset($_GET['force']);
-		
+
 		header("Content-Type: text/plain");
 	}
 	else if (isset($argv))
@@ -162,7 +142,7 @@ if (!defined("BO_VER"))
 
 	//load locale after tiles
 	bo_load_locale();
-	
+
 	//decisions what to do begins...
 	if ($do_update)
 	{
@@ -232,25 +212,25 @@ if (!defined("BO_VER"))
 		exit;
 	}
 
-	
+
 	//Order maps
 	if (defined('BO_MAPS_ORDER') && strlen(BO_MAPS_ORDER))
 	{
 		$order = explode(',',BO_MAPS_ORDER);
 		$tmp = array();
 		ksort($_BO['mapimg']);
-		
+
 		foreach($order as $id)
 		{
 			$tmp[$id] = $_BO['mapimg'][$id];
 		}
-		
+
 		foreach($_BO['mapimg'] as $id => $data)
 		{
 			if (!isset($tmp[$id]))
 				$tmp[$id] = $_BO['mapimg'][$id];
 		}
-		
+
 		$_BO['mapimg'] = $tmp;
 	}
 
@@ -259,8 +239,8 @@ if (!defined("BO_VER"))
 		bo_output_kml();
 		exit;
 	}
-	
-	
+
+
 }
 
 ?>

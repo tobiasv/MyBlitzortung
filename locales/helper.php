@@ -11,9 +11,9 @@ $out = 'hu';
 /*
 	HELPER FILE FOR TRANSLATING MyBlitzortung
 	-----------------------------------------
-	
+
 	Howto:
-	
+
 	1. Above, change the $in and $out values according to your translation.
 	2. Create a new file for your language code like 'xx.php' in the locales directory.
 	   --> Read the warning below if the file already exists.
@@ -26,45 +26,45 @@ $out = 'hu';
 	       at beginning or end of file!
 	6. Again, call the helper.php URL, as described in step 3.
 	   --> Your new translations will be ordered as in the input file.
-	7. You can now repeat steps 4-6 and add more and more translations. 
-	
-	
+	7. You can now repeat steps 4-6 and add more and more translations.
+
+
 	WARNING!
 	--------
 	BE CAREFUL IF YOU UPDATE MYBLITZORTUNG! YOUR OWN LANGUAGE FILE COULD BE OVERWITTEN!
-	
-	The above description is for creating new translations. If you want to change or add existing 
-	translations, you should use the "own.php" file. You can put all your changes/additions in there. 
+
+	The above description is for creating new translations. If you want to change or add existing
+	translations, you should use the "own.php" file. You can put all your changes/additions in there.
 	Leave the $out value (don't insert "own"). The output of helper.php will be the same,
 	as if you would edit the original language file. Everything in "own.php" will overwrite the
 	original files.
-	
-	
+
+
 
 	NOTES
 	-----
-	
+
 	Be careful: Currently you can not use UTF-8 in language files!
 
-	
-	Even if you didn't have finished translating, you can send the new translation file
-	to the maintainer at <mail@myblitzortung.de> 
 
-	
+	Even if you didn't have finished translating, you can send the new translation file
+	to the maintainer at <mail@myblitzortung.de>
+
+
 	You may change one or more of the following settings in config.php:
-	
+
 	define('BO_LOCALE', 'en'); // <-- enter your new language-code here
 	define('BO_LOCALE2', '');  // <-- second lang. if no translation of 1st locale is present (default: en)
-	define('BO_LANGUAGES', 'de,en,fr'); 
-	define('BO_SHOW_LANGUAGES', true); 
+	define('BO_LANGUAGES', 'de,en,fr');
+	define('BO_SHOW_LANGUAGES', true);
 	define('BO_SHOW_LANG_FLAGS', true);
 	define('BO_FORCE_MAP_LANG', true); // <-- set to false if languages in images can be changed too
-	
-	//For changing texts in images/graphs (change back to false after you've finished!)
-	define('BO_CACHE_DISABLE', true); 
-	
 
-	
+	//For changing texts in images/graphs (change back to false after you've finished!)
+	define('BO_CACHE_DISABLE', true);
+
+
+
 */
 
 
@@ -82,26 +82,43 @@ if (file_exists('own.php'))
 	include('own.php');
 
 $O = ''; $U = '';
+
+//find first "$_BL"
+$tmp = file_get_contents($out.'.php');
+$lines = explode("\n", $tmp);
+foreach($lines as $line)
+{
+	if (preg_match('/\$_BL\[/', trim($line)))
+		break;
+
+	$O .= strtr(htmlentities($line), array(' ' => '&nbsp;')).'<br>';
+}
+
+
+//get input file
 $I = file_get_contents($in.'.php');
 $lines = explode("\n", $I);
+$first_lines = true;
+
 
 foreach($lines as $line)
 {
 	$line = trim($line);
 	$line1 = substr($line,0,1);
 	$line2 = substr($line,0,2);
-	
+
 	if (preg_match('/\$_BL\[\'[a-z]+\'\]\[\'([^\]]+)\'\]/', $line, $r))
 	{
+		$first_lines = false;
+
 		$text = $_BL[$out][$r[1]];
-		
 		$translated = $text === false || strlen($text) > 0;
-		
+
 		if (!strlen($text) && $out == 'en' && strpos($r[1], '_') === false)
 			$text = strtr($r[1], array("\\'" => "'"));
 
 		$text = strtr(htmlentities($text), array("'" => "\\'"));
-		
+
 		if (0 && !$translated)
 		{
 			$text = '<input type="text" value="'.$text.'">';
@@ -110,18 +127,18 @@ foreach($lines as $line)
 		{
 			$text = nl2br($text);
 		}
-		
+
 		$T  = '<span style="'.($translated ? '' : 'color: red').'">';
 		$T .= '$_BL[\''.$out.'\'][\'<strong>'.$r[1].'</strong>\'] = ';
-		
+
 		if ($_BL[$out][$r[1]] === false)
 			$T .= 'false';
 		else
 			$T .= '\''.$text.'\'';
-		
+
 		$T .= ';<br>';
 		$T .= '</span>';
-		
+
 		if ($translated)
 		{
 			$O .= $T;
@@ -130,21 +147,22 @@ foreach($lines as $line)
 		{
 			$comment = htmlentities(strtr($_BL[$in][$r[1]], array("'" => "\\'")));
 			$comment = strtr($comment, array("\n" => "<br>//      "));
-			
+
 			$U .= '<span style="color:#080">';
 			$U .= '<br>//'.$in.': \''.$comment.'\'<br>';
 			$U .= '</span>';
 			$U .= $T;
 		}
-		
+
 		if (isset($_BL[$out][$r[1]]))
 			unset($_BL[$out][$r[1]]);
 	}
 	elseif (preg_match('/\$_BL\[\'locale\'\]/', $line))
 	{
+		$first_lines = false;
 		$O .= '$_BL[\'locale\'] = \''.$out.'\';<br>';
 	}
-	elseif ((!$line || $line1 == '$' || $line2 == '* ' || $line2 == '**' || $line2 == '/*' || $line2 == '*/' || $line2 == '//') && substr($line,0,5) != '//'.$in.':')
+	elseif ($first_lines == false && (!$line || $line1 == '$' || $line2 == '* ' || $line2 == '**' || $line2 == '/*' || $line2 == '*/' || $line2 == '//') && substr($line,0,5) != '//'.$in.':')
 	{
 		$O .= strtr(htmlentities($line), array(' ' => '&nbsp;')).'<br>';
 	}
@@ -156,12 +174,12 @@ if (!empty($_BL[$out]))
 	foreach($_BL[$out] as $id => $text)
 	{
 		$X .= '$_BL[\''.$out.'\'][\''.$id.'\'] = ';
-		
+
 		if ($text === false)
 			$X .= 'false';
 		else
 			$X .= '\''.strtr(htmlentities($text), array("'" => "\\'")).'\'';
-		
+
 		$X .= ';<br>';
 	}
 }
@@ -180,7 +198,7 @@ font-size: 11px;
 
 <body>
 <?php
-echo htmlentities("<?php\n").'<br>';
+//echo htmlentities("<?php\n").'<br>';
 echo $O;
 
 if ($U)

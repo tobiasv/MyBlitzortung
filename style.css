@@ -170,7 +170,8 @@ margin: 20px 0 0 0;
 padding-top: 3px;
 }
 
-#myblitzortung #bo_copyright a {
+#myblitzortung #bo_copyright a,
+#myblitzortung #bo_copyright_extra a {
 color: #99c;
 } 
 
@@ -189,6 +190,7 @@ font-weight: bold;
 
 #myblitzortung #bo_copyright_extra a {
 text-decoration: none;
+font-weight: bold;
 }
 
 #myblitzortung #bo_copyright_logo {

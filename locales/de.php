@@ -1,5 +1,9 @@
 <?php
 
+
+//Testtest
+//Testtest
+
 $_BL['locale'] = 'de';
 
 
@@ -268,7 +272,6 @@ $_BL['de']['Unknown'] = 'Unbekannt';
 $_BL['de']['Unknown or longer'] = 'Unbekannt oder länger';
 $_BL['de']['Up to'] = 'Bis zu';
 $_BL['de']['Locating angle'] = 'Ortungswinkel';
-$_BL['de']['Residual time'] = 'Restzeit';
 
 
 $_BL['de']['timezone_is'] = 'Aktuelle Uhrzeit sowie verwendete Zeitzone bei allen Zeitangaben: ';
@@ -325,7 +328,6 @@ $_BL['de']['graph_stat_title_ratio'] = 'Ortungs- und Blitzquoten';
 $_BL['de']['graph_stat_title_stations'] = 'Anzahl Stationen';
 $_BL['de']['graph_stat_title_ratio_distance'] = 'Blitzquote nach Entfernung';
 $_BL['de']['graph_stat_title_ratio_bearing'] = 'Blitzquote nach Himmelsrichtung';
-$_BL['de']['graph_stat_title_residual_time'] = 'Verteilung der Restzeit';
 $_BL['de']['graph_stat_title_distance'] = 'Mittlere Entfernung der Blitze';
 $_BL['de']['graph_stat_title_strikes_time'] = 'Blitze pro Tag';
 $_BL['de']['graph_stat_title_participants'] = 'Ortungen pro Teilnehmerzahl';
@@ -396,7 +398,6 @@ $_BL['de']['h4_graph_signals'] = 'Anzahl an Signalen';
 $_BL['de']['h4_graph_ratio'] = 'Quoten';
 $_BL['de']['h4_graph_ratio_distance'] = 'Blitzquote nach Entfernung';
 $_BL['de']['h4_graph_ratio_bearing'] = 'Blitzquote nach Himmelsrichtung';
-$_BL['de']['h4_graph_residual_time'] = 'Verteilung der Restzeit';
 $_BL['de']['h4_graph_stations'] = 'Anzahl aktiver Stationen';
 $_BL['de']['h4_graph_ratio_distance_longtime'] = 'Blitzquoten nach Entfernung';
 $_BL['de']['h4_graph_ratio_bearing_longtime'] = 'Blitzquoten nach Himmelsrichtung';
@@ -758,7 +759,6 @@ $_BL['de']['bo_graph_descr_radi_longtime'] = 'Dieses Diagramm wird seit Beginn d
 $_BL['de']['bo_graph_descr_bear_longtime'] = 'Dieses Diagramm wird seit Beginn der Aufzeichnungen nachgeführt.';
 $_BL['de']['bo_graph_descr_strikes_time'] = 'Verlauf der Anzahl aller Blitze des Ortungsnetzwerkes bzw. der Station {STATION}';
 $_BL['de']['bo_graph_descr_strikes_time_radius'] = 'Hier werden nur die Blitze gezählt, welche eine maximale Distanz von {RADIUS}km um die Station {STATION} aufweisen.';
-$_BL['de']['bo_graph_descr_strikes_station_residual_time'] = 'Hier wird die Restzeit zu jedem von der Station gemessenen Signal bestimmt und als Histogramm dargestellt. Grüne Flächen repräsentieren Blitze bei der die Station {STATION} am Blitz beteiligt war. Rote Flächen hingegen zeigen eine passende Zeit, aber  keine Berücksichtigung der Signale der Station';
 $_BL['de']['bo_graph_stations'] = 'Aktive Stationen senden Signale und nehmen somit an Blitzortungen teil. Verfügbare Stationen sind dagegen offline, z. B. wegen Wartungsarbeiten, Defekten.';
 $_BL['de']['bo_graph_participants'] = 'Je mehr Stationen einen Blitz empfangen, desto sicherer ist dessen Existent bzw. desto genauer ist dessen Position.
 Für eine Ortung müssen mindestens {MIN_PARTICIPANTS} Stationen ein entsprechendes Signal empfangen haben.';
@@ -999,9 +999,11 @@ $_BL['de']['No data available!'] = 'Keine Daten vorhanden!';
 
 /*************************************************************/
 /* Translations for templates                                */
-/*************************************************************/
+/************************************************************/
 
-//Countries
+/*** EUROPE ***/
+
+//Europe: Countries
 $_BL['de']['Germany'] = 'Deutschland';
 $_BL['de']['France'] = 'Frankreich';
 $_BL['de']['Austria'] = 'Österreich';
@@ -1029,15 +1031,27 @@ $_BL['de']['Romania'] = 'Rumänien';
 $_BL['de']['Rome'] = 'Rom';
 $_BL['de']['Lithuania'] = 'Litauen';
 
-//Europe
+//Europe: Regions
 $_BL['de']['Europe'] = 'Europa';
 $_BL['de']['Western Europe'] = 'Westeuropa';
 
-//German states
+//Europe: German states
 $_BL['de']['Bavaria'] = 'Bayern';
 $_BL['de']['NRW'] = 'NRW';
 
-//Others
+//Europe: Italy
+$_BL['de']['Sardinia'] = 'Sardinien';
+
+
+
+/*** OCEANIA ***/
+$_BL['de']['New Zealand'] = 'Neuseeland';
+
+
+
+
+/*** OTHER TEMPLATE NAMES***/
+
 $_BL['de']['Meteox rain radar'] = 'Niederschlagsradar (meteox.com)';
 
 
@@ -1064,12 +1078,25 @@ $_BL['de']['no reception'] = 'kein Empfang';
 $_BL['de']['Loading...'] = 'Laden...';
 $_BL['de']['search_outside_radius'] = 'Suche außerhalb des Kreises nicht möglich!';
 
+$_BL['de']['Links'] = 'Verweise';
+$_BL['de']['Login string is'] = 'Login String ist';
+$_BL['de']['Auth ID is'] = 'Authentifizierungs-Id ist';
+$_BL['de']['Logging out from Blitzortung.org'] = 'Melde von Blitzortung.org ab';
+$_BL['de']['Already DONE BEFORE'] = 'Wurde schon vorher ERLEDIGT';
+$_BL['de']['Update database keys'] = 'Datenbank-Index erneuern';
+$_BL['de']['without GPS'] = 'ohne GPS';
+$_BL['de']['Record longtime data since'] = 'Langzeitdaten seit';
 
-/********************/
-/*  NOT TRANSLATED  */
-/********************/
 
 
 
+/*******************************/
+/*  NOT AVAILABLE IN ORIGINAL  */
+/*******************************/
+
+$_BL['de']['Residual time'] = 'Restzeit';
+$_BL['de']['graph_stat_title_residual_time'] = 'Verteilung der Restzeit';
+$_BL['de']['h4_graph_residual_time'] = 'Verteilung der Restzeit';
+$_BL['de']['bo_graph_descr_strikes_station_residual_time'] = 'Hier wird die Restzeit zu jedem von der Station gemessenen Signal bestimmt und als Histogramm dargestellt. Grüne Flächen repräsentieren Blitze bei der die Station {STATION} am Blitz beteiligt war. Rote Flächen hingegen zeigen eine passende Zeit, aber keine Berücksichtigung der Signale der Station';
 
 

@@ -1,84 +1,17 @@
 <?php
 
-/*
-    MyBlitzortung - a tool for participants of blitzortung.org
-	to display lightning data on their web sites.
 
-    Copyright (C) 2012  Tobias Volgnandt
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-
-
-// Database helper
-function bo_db($query = '', $die_on_errors = true)
+/* For compatibility. */
+function bo_db($query = '', $die = true)
 {
-	$connid = BoDb::connect();
-
-	if (!$query)
-		return $connid;
-
-	$qtype = strtolower(substr(trim($query), 0, 6));
-	
-	/*
-	switch ($qtype)
-	{
-		case 'insert': 
-		case 'delete':
-		case 'update':
-		case 'replace':
-			echo "<p>$query</p>";
-			return;
-	}
-	*/
-		
-	$erg = BoDb::query($query);
-
-	if ($erg === false)
-	{
-		if ($die_on_errors !== false)
-			echo("<p>Database Query Error:</p><pre>" . htmlspecialchars(BoDb::error()) .
-				"</pre> <p>for query</p> <pre>" . htmlspecialchars($query) . "</pre>");
-	
-		if ($die_on_errors === true)
-			die();
-	}
-
-	switch ($qtype)
-	{
-		case 'insert':
-			return BoDb::insert_id();
-
-		case 'replace':
-		case 'delete':
-		case 'update':
-			$rows = BoDb::affected_rows();
-			return $rows == -1 ? false : $rows;
-
-		default:
-			return $erg;
-	}
-
+	return BoDb::query($query, $die);
 }
-
 
 
 // Load config from database
 function bo_get_conf($name, &$changed=0)
 {
-	$row = bo_db("SELECT data, UNIX_TIMESTAMP(changed) changed FROM ".BO_DB_PREF."conf WHERE name='".BoDb::esc($name)."'")->fetch_object();
+	$row = BoDb::query("SELECT data, UNIX_TIMESTAMP(changed) changed FROM ".BO_DB_PREF."conf WHERE name='".BoDb::esc($name)."'")->fetch_object();
 	$changed = $row->changed;
 
 	return $row->data;
@@ -93,11 +26,11 @@ function bo_set_conf($name, $data)
 	if ($data === null)
 	{
 		$sql = "DELETE FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
-		return bo_db($sql);
+		return BoDb::query($sql);
 	}
 	
 	$sql = "SELECT data, name FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
-	$row = bo_db($sql)->fetch_object();
+	$row = BoDb::query($sql)->fetch_object();
 
 	if (!$row->name)
 		$sql = "INSERT ".BO_DB_PREF."conf SET data='$data_esc', name='$name_esc'";
@@ -106,7 +39,7 @@ function bo_set_conf($name, $data)
 	else
 		$sql = NULL; // no update necessary
 
-	return $sql ? bo_db($sql) : true;
+	return $sql ? BoDb::query($sql) : true;
 }
 
 
@@ -125,7 +58,7 @@ function bo_db_recreate_strike_keys()
 	
 	//Get the columns an data types
 	$cols = array();
-	$res = bo_db("SHOW COLUMNS FROM ".BO_DB_PREF."strikes");
+	$res = BoDb::query("SHOW COLUMNS FROM ".BO_DB_PREF."strikes");
 	while($row = $res->fetch_assoc())
 	{
 		$bytes = 0;
@@ -143,9 +76,9 @@ function bo_db_recreate_strike_keys()
 	}
 	
 	//Get existing keys
-	$keys['timelatlon'] = bo_db("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='timelatlon_index'")->num_rows;
-	$keys['time']       = bo_db("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='time_index'")->num_rows;
-	$keys['latlon']     = bo_db("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='latlon_index'")->num_rows;
+	$keys['timelatlon'] = BoDb::query("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='timelatlon_index'")->num_rows;
+	$keys['time']       = BoDb::query("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='time_index'")->num_rows;
+	$keys['latlon']     = BoDb::query("SHOW INDEX FROM `".BO_DB_PREF."strikes` WHERE Key_name='latlon_index'")->num_rows;
 
 
 	//Set the new config
@@ -290,7 +223,7 @@ function bo_db_recreate_strike_keys_db($sql)
 {
 	echo "\n * $sql: ";
 	flush();
-	$ok = bo_db($sql, false);
+	$ok = BoDb::query($sql, false);
 
 	echo _BL($ok !== false ? 'OK' : 'FAIL');
 	flush();
