@@ -1761,10 +1761,13 @@ function bo_participants_locating_max()
 
 function bo_echod($text = '')
 {
-	echo date('Y-m-d H:i:s | ');
-	echo $text;
-	echo "\n";
-	flush();
+	if (!isset($_GET['quiet']))
+	{
+		echo date('Y-m-d H:i:s | ');
+		echo $text;
+		echo "\n";
+		flush();
+	}
 }
 
 function bo_dprint($text = '')
