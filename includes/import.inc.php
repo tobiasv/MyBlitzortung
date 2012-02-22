@@ -877,6 +877,7 @@ function bo_update_strikes($force = false)
 					$old_data[$id]['n'] = $row['time_ns'];
 					$old_data[$id]['loc'] = array($row['lat'], $row['lon']);
 					$old_data[$id]['users'] = $row['users'];
+					$old_data[$id]['part'] = $row['part'];
 				}
 			}
 
@@ -993,7 +994,8 @@ function bo_update_strikes($force = false)
 				deviation='$deviation',
 				current='$cur',
 				users='$users',
-				part='$part'
+				part='$part',
+				raw_id=NULL
 				";
 
 
@@ -1329,11 +1331,20 @@ function bo_match_strike2raw()
 
 	$amp_trigger = (BO_TRIGGER_VOLTAGE * BO_STR2SIG_TRIGGER_FACTOR / BO_MAX_VOLTAGE) * 256 / 2;
 
+	//Get last recorded strike
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 	$row = BoDb::query($sql)->fetch_assoc();
 	$maxtime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC'));
-	$mintime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC') - 3600 * 74);
+	$mintime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC') - 3600 * 24 * 30);
 
+	//time of last update
+	$last_modified = bo_get_conf('uptime_strikes_modified');
+	
+	//update only strikes that are "old enough"
+	//because younger ones could be updated during the next strike-import
+	//and this will overwrite "part" and "raw_id"!
+	$maxtime = $last_modified - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60 - 60;
+	
 	$u = array();
 	$n = array();
 	$m = array();
@@ -1395,7 +1406,7 @@ function bo_match_strike2raw()
 		$sql = "SELECT id, time, time_ns, data, amp1, amp2, amp1_max, amp2_max
 				FROM ".BO_DB_PREF."raw
 				WHERE 	time BETWEEN '$search_date_from' AND '$search_date_to'
-						AND strike_id=0
+						AND (strike_id=0 OR strike_id='".$row['id']."')
 						AND $nsql
 				LIMIT 2";
 		$res2 = BoDb::query($sql);
@@ -1462,11 +1473,9 @@ function bo_match_strike2raw()
 
 	bo_echod(" ");
 	bo_echod("== Assign raw data to strikes ==");
-	bo_echod("Strikes: ".(count($u) + count($n) + count($m)).
-			" | Own: ".$own_strikes.
-			" || Found:".
-			" | Unique: ".count($u).
-			" | Own unique: ".$own_found." (Rate ".round($own_strikes ? $own_found / $own_strikes * 100 : 0,1)."%)".
+	bo_echod("Begin at: ".date('Y-m-d H:i:s', $maxtime)." | Strikes: ".(count($u) + count($n) + count($m))." | Own: ".$own_strikes);
+	bo_echod("Found unique: ".count($u).
+			" | Found own unique: ".$own_found." (Rate ".round($own_strikes ? $own_found / $own_strikes * 100 : 0,1)."%)".
 			" | Not found: ".count($n).
 			" | Multiple Sig->Str: ".count($m).
 			" | Multiple Str->Sig: ".count($d2));
