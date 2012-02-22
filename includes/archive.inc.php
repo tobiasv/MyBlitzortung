@@ -1018,14 +1018,21 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	{
 		$time_end = $datetime_to;
 	}
-	else if ($show_empty_sig)
+	else if ($show_empty_sig) // display strikes
 	{
 		$time_end = time();
 	}
-	else
+	else //display signals
 	{
+		//time of last strike update
+		$last_modified_strikes = bo_get_conf('uptime_strikes_modified');
+		$last_modified_strikes -= BO_MIN_MINUTES_STRIKE_CONFIRMED * 60 - 60;
+
+		//time of last signal
 		$row = BoDb::query("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
-		$time_end  = strtotime($row['time'].' UTC') - $date_end_max_sec;
+		$last_signal = strtotime($row['time'].' UTC') - $date_end_max_sec;
+		$time_end = min($last_signal, $last_modified_strikes);
+
 	}
 	
 	$date_end  = gmdate('Y-m-d H:i:s', $time_end);

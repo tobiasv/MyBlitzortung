@@ -1334,8 +1334,8 @@ function bo_match_strike2raw()
 	//Get last recorded strike
 	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
 	$row = BoDb::query($sql)->fetch_assoc();
-	$maxtime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC'));
-	$mintime = gmdate('Y-m-d H:i:s', strtotime($row['mtime'].' UTC') - 3600 * 24 * 30);
+	$maxtime = strtotime($row['mtime'].' UTC');
+	$mintime = strtotime($row['mtime'].' UTC') - 3600 * 24 * 30;
 
 	//time of last update
 	$last_modified = bo_get_conf('uptime_strikes_modified');
@@ -1358,7 +1358,7 @@ function bo_match_strike2raw()
 			FROM ".BO_DB_PREF."strikes
 			WHERE 1
 					AND raw_id IS NULL
-					AND time BETWEEN '$mintime' AND '$maxtime'
+					AND time BETWEEN '".gmdate('Y-m-d H:i:s', $mintime)."' AND '".gmdate('Y-m-d H:i:s', $maxtime)."'
 			ORDER BY part DESC
 			LIMIT 10000
 			";
@@ -1469,11 +1469,19 @@ function bo_match_strike2raw()
 		}
 
 		//bo_echod("Strike: ".$row['time'].".".$row['time_ns']." <-> Your Station: ".$row2['time'].".".$row2['time_ns']." Num Rows: ".$num);
+		
+		
+		//Timeout
+		if (bo_exit_on_timeout())
+		{
+			$timeout = true;
+			break;
+		}
 	}
 
 	bo_echod(" ");
 	bo_echod("== Assign raw data to strikes ==");
-	bo_echod("Begin at: ".date('Y-m-d H:i:s', $maxtime)." | Strikes: ".(count($u) + count($n) + count($m))." | Own: ".$own_strikes);
+	bo_echod("Max strike time: ".date('Y-m-d H:i:s', $maxtime)." | Strikes: ".(count($u) + count($n) + count($m))." | Own: ".$own_strikes);
 	bo_echod("Found unique: ".count($u).
 			" | Found own unique: ".$own_found." (Rate ".round($own_strikes ? $own_found / $own_strikes * 100 : 0,1)."%)".
 			" | Not found: ".count($n).
