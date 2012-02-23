@@ -700,6 +700,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		if ($D[$id]['signalsh'])
 		{
 			$D[$id]['signalsh_ratio'] = $D[$id]['strikesh'] / $D[$id]['signalsh'];
+			$D[$id]['signalsh_ratio'] = $D[$id]['signalsh_ratio'] > 1 ? 1 : $D[$id]['signalsh_ratio'];
 			$whole_sig_ratio += $D[$id]['strikesh'] / $D[$id]['signalsh'];
 			$whole_sig_ratio_cnt++;
 		}
@@ -711,6 +712,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		if ($strikes_range)
 		{
 			$D[$id]['strikesh_ratio'] = $D[$id]['strikesh'] / $strikes_range;
+			$D[$id]['strikesh_ratio'] = $D[$id]['strikesh_ratio'] > 1 ? 1 : $D[$id]['strikesh_ratio'];
 			$whole_strike_ratio += $D[$id]['strikesh'] / $strikes_range;
 			$whole_strike_ratio_cnt++;
 		}
