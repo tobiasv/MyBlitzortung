@@ -1780,4 +1780,18 @@ function bo_dprint($text = '')
 }
 
 
+//from hex to binary
+function bo_hex2bin($data)
+{
+	
+	$bdata = '';
+	for ($j=0;$j < strlen($data);$j+=2)
+	{
+		$bdata .= chr(hexdec(substr($data,$j,2)));
+	}
+	
+	return $bdata;
+}
+
+
 ?>

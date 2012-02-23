@@ -176,14 +176,7 @@ if (!defined("BO_VER"))
 		exit;
 	}
 	else if (isset($_GET['graph'])) {
-        if (isset($_GET['spectrum'])) {
-            $type = 'spectrum';
-        } elseif (isset($_GET['xy'])) {
-            $type = 'xy';
-        } else {
-            $type = False;
-        }
-        bo_graph_raw($_GET['graph'], $type);
+        bo_graph_raw();
         exit;
     }
 	else if (isset($_GET['image']))

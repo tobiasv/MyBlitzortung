@@ -869,6 +869,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$region = $_GET['bo_region'];
 	$show_details = $_GET['bo_show_details'];
 	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
+	$other_graphs = isset($_GET['bo_other_graphs']) && bo_user_get_id() == 1;
 	
 	$channels   = bo_get_conf('raw_channels');
 	$raw_bpv    = bo_get_conf('raw_bitspervalue');
@@ -1479,10 +1480,13 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			$i = 0;
 			echo '<tr><td class="bo_sig_table_strikeinfo bo_sig_table_stations" colspan="4">';
 			
-			echo '<h5>'._BL('Stations').':</h5> ';
+			echo '<h5>'._BL('Stations').'</h5> ';
+			
+					
 			foreach ($s_dists[0] as $sid => $dist)
 			{
-				echo $i ? ', ' : '';
+				echo $i && !$other_graphs ? ', ' : '';
+				
 				echo '<a ';
 				echo ' href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$sid.'" ';
 				echo ' title="';
@@ -1513,8 +1517,30 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					echo _BC($s_data[$sid]['city']);
 					
 				echo '</a>';
+				
+				if ($other_graphs)
+				{
+					//station time to signal
+					$station_time  = $stime;
+					$station_ntime = $dist / BO_C + $row['stimens'] * 1E-9;
+					$station_time  = $station_ntime > 1 ? $stime+1 : $stime;
+					$station_ntime = $station_ntime > 1 ? $station_ntime-1 : $station_ntime;
+					
+					echo ' +'.round($dist/1000).'km';
+					$url = bo_bofile_url().'?graph&bo_station_id='.$sid.'&bo_time='.urlencode(gmdate('Y-m-d H:i:s',$station_time).'.'.round($station_ntime * 1E9)).'&bo_lang='._BL();
+					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" class="bo_graph_sig_other">';
+
+					echo '';
+				
+				}
+				
 				$i++;
 			}
+			
+			
+			if (bo_user_get_id() == 1 && !$other_graphs && time() - $stime < 3600 * 23)
+				echo ' (<a href="'.bo_insert_url('bo_action').'bo_other_graphs">'._BL('Show their signals').'</a>)';
+
 			echo '</p>';
 			
 			

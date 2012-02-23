@@ -370,6 +370,11 @@ text-align:left;
 font-size:11px;
 }
 
+#myblitzortung img.bo_graph_sig_other {
+display: block;
+margin: 5px 5px;
+}
+
 #myblitzortung .bo_archive_station_dist {
 border-collapse: collapse;
 margin-bottom: 15px;

@@ -505,15 +505,6 @@ function bo_update_raw_signals($force = false)
 				$ntime = $r[10]; //nanosec per sample
 				$data = trim($r[11]);
 
-
-				/*** signal examinations ***/
-				//from hex to binary
-				$bdata = '';
-				for ($j=0;$j < strlen($data);$j+=2)
-				{
-					$bdata .= chr(hexdec(substr($data,$j,2)));
-				}
-
 				//check wether data string fits hex-code
 				if (trim($data, "1234567890abcdefABCDEF"))
 					$data = '';
@@ -530,9 +521,9 @@ function bo_update_raw_signals($force = false)
 							data=x'$data'
 							";
 
+				// signal examinations
+				$bdata = bo_hex2bin($data);
 				$sql .= ",".bo_examine_signal($bdata, $channels, $ntime);
-
-
 
 				if ($id)
 				{

@@ -3,32 +3,104 @@
 
 
 // Graph from raw dataset
-function bo_graph_raw($id, $type = false)
+function bo_graph_raw()
 {
 	require_once 'classes/SignalGraphs.class.php';
 	$graph = new BoSignalGraph();
 
 	bo_session_close();
-	$id = intval($id);
 
-	$sql = "SELECT id, time, time_ns, lat, lon, height, data, channels, ntime
-			FROM ".BO_DB_PREF."raw
-			WHERE id='$id'";
-	$erg = BoDb::query($sql);
+	$type = null;
+	if (isset($_GET['spectrum']))
+		$type = 'spectrum';
+	elseif (isset($_GET['xy']))
+		$type = 'xy';
+
+	$id = intval($_GET['graph']);
+	$station_id = intval($_GET['bo_station_id']);
+	$time = $_GET['bo_time'];
 	
-	if (!$erg->num_rows)
-	{
-		$graph->DisplayEmpty();
-		exit;
-	}
-
-	$row = $erg->fetch_assoc();
-	BoDb::close();
-	bo_session_close(true);
-
-	$channels = BO_ANTENNAS;
 	$graph->fullscale = isset($_GET['full']);
-	$graph->SetData($type, $row['data'], $row['channels'], $row['ntime']);
+	
+	if ($id) //get graph from own station
+	{
+	
+		$sql = "SELECT id, time, time_ns, lat, lon, height, data, channels, ntime
+				FROM ".BO_DB_PREF."raw
+				WHERE id='$id'";
+		$erg = BoDb::query($sql);
+		
+		if (!$erg->num_rows)
+		{
+			$graph->DisplayEmpty();
+			exit;
+		}
+
+		$row = $erg->fetch_assoc();
+		BoDb::close();
+		
+
+		$channels = BO_ANTENNAS;
+		
+		$graph->SetData($type, $row['data'], $row['channels'], $row['ntime']);
+	}
+	elseif ($station_id && $time) //try to get graph from other station
+	{
+		$info = bo_station_info($station_id);
+		$user = $info['user'];
+		list($date, $nsec) = explode('.', $time);
+		
+		if (!$user || !$date || !$nsec)
+			$graph->DisplayEmpty(true);
+		
+		$tstamp = strtotime($date.' UTC');
+		$url = bo_access_url().BO_IMPORT_PATH_RAW.$user.'/'.gmdate('H', $tstamp).'.log';
+		$file = bo_get_file($url, $code, 'raw_data_other'.$station_id, $dummy1, $dummy2, true);
+		
+		if ($file == false || (is_array($file) && empty($file)))
+			$graph->DisplayEmpty(true);
+		
+		$search_time = new Timestamp($tstamp, $nsec);
+		$raw_time    = new Timestamp();
+		$last_dt = 1E12;
+		
+		//search for signal
+		foreach($file as $line)
+		{
+			$data = explode(' ', $line);
+			list($data_time, $data_time_ns) = explode('.', $data[1]);
+			$data_time    = strtotime($data[0].' '.$data_time.' UTC');
+
+            $raw_time->Set($data_time + 1, $data_time_ns);
+            $dt = $raw_time->usDifference($search_time);
+			
+
+			if ( (abs($last_dt) < abs($dt) && abs($dt) < 100) || $dt > 100)
+				break;
+			
+			$channels = $data[5];
+			$values = $data[6];
+			$ntime = $data[8];
+			$raw_data = trim($data[9]);
+			$last_time = $data_time;
+			$last_nsec = $data_time_ns;
+			
+			$last_dt = $dt;
+		}
+
+		if (strlen($raw_data) > 10 && $last_dt < 100)
+		{
+			$bdata = bo_hex2bin($raw_data);
+			$graph->SetData($type, $bdata, $channels, $ntime);
+			$graph->AddText(date('H:i:s', $last_time).'.'.$nsec.'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs');
+		}
+		else
+			$graph->DisplayEmpty(true);
+		
+		bo_session_close(true);
+		
+	}
+	
 	$graph->Display();
 
 	exit;

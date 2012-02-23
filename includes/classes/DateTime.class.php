@@ -6,7 +6,11 @@ class Timestamp {
 	private $seconds;
 	private $nanoseconds;
 
-	public function __construct($seconds, $nanoseconds) {
+	public function __construct($seconds=0, $nanoseconds=0) {
+		$this->Set($seconds, $nanoseconds);
+	}
+
+	public function Set($seconds, $nanoseconds) {
 		$this->seconds = $seconds;
 		$this->nanoseconds = $nanoseconds;
 	}

@@ -254,21 +254,36 @@ class BoSignalGraph
 	
 	}
 	
-	public function Display()
+	public function AddText($text)
 	{
-		$time = strtotime($row['time'].' UTC');
-
-		header("Content-Type: image/png");
-		header("Pragma: ");
-		header("Cache-Control: public, max-age=".(3600 * 24));
-		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $time)." GMT");
-		header("Expires: ".gmdate("D, d M Y H:i:s", $time + 3600 * 24)." GMT");
-
-		$I = $this->graph->Stroke(_IMG_HANDLER);
-		imagepng($I);
+			$caption = new Text($text,35,3);
+			$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
+			$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
+			$this->graph->AddText($caption);
 	}
 	
-	public function DisplayEmpty()
+	public function Display()
+	{
+		if (!is_object($this->graph))
+		{
+			bo_graph_error(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
+		}
+		else
+		{
+			$time = strtotime($row['time'].' UTC');
+
+			header("Content-Type: image/png");
+			header("Pragma: ");
+			header("Cache-Control: public, max-age=".(3600 * 24));
+			header("Last-Modified: ".gmdate("D, d M Y H:i:s", $time)." GMT");
+			header("Expires: ".gmdate("D, d M Y H:i:s", $time + 3600 * 24)." GMT");
+
+			$I = $this->graph->Stroke(_IMG_HANDLER);
+			imagepng($I);
+		}
+	}
+	
+	public function DisplayEmpty($do_exit = false)
 	{
 		$I = imagecreate(BO_GRAPH_RAW_W,BO_GRAPH_RAW_H);
 		$color = imagecolorallocate($I, 255, 150, 150);
@@ -276,6 +291,9 @@ class BoSignalGraph
 		imagecolortransparent($I, $color);
 		Header("Content-type: image/png");
 		Imagepng($I);
+		
+		if ($do_exit)
+			exit;
 	}
 	
 }
