@@ -1,276 +1,35 @@
 <?php
 
 
+
 // Graph from raw dataset
 function bo_graph_raw($id, $type = false)
 {
-	if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
-		bo_graph_error(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
+	require_once 'classes/SignalGraphs.class.php';
+	$graph = new BoSignalGraph();
 
 	bo_session_close();
-
 	$id = intval($id);
 
 	$sql = "SELECT id, time, time_ns, lat, lon, height, data, channels, ntime
 			FROM ".BO_DB_PREF."raw
 			WHERE id='$id'";
 	$erg = BoDb::query($sql);
-
+	
 	if (!$erg->num_rows)
 	{
-		$I = imagecreate(BO_GRAPH_RAW_W,BO_GRAPH_RAW_H);
-		$color = imagecolorallocate($I, 255, 150, 150);
-		imagefill($I, 0, 0, $color);
-		imagecolortransparent($I, $color);
-		Header("Content-type: image/png");
-		Imagepng($I);
+		$graph->DisplayEmpty();
 		exit;
 	}
 
 	$row = $erg->fetch_assoc();
-
-	require_once 'jpgraph/jpgraph.php';
-	require_once 'jpgraph/jpgraph_line.php';
-	require_once 'jpgraph/jpgraph_bar.php';
-	require_once 'jpgraph/jpgraph_plotline.php';
-
-	$tickLabels = array();
-	$tickMajPositions = array();
-	$tickPositions = array();
-
-	$channels = BO_ANTENNAS;
-
-    if ($type == 'xy') {
-        $width = BO_GRAPH_RAW_H;
-    } else {
-        $width = BO_GRAPH_RAW_W;
-    }
-
-	$graph = new Graph($width, BO_GRAPH_RAW_H, "auto");
-	$graph->ClearTheme();
-
-	if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
-		$graph->img->SetAntiAliasing();
-
-	if (BO_GRAPH_RAW_COLOR_BACK)
-		$graph->SetColor(BO_GRAPH_RAW_COLOR_BACK);
-
-	if (BO_GRAPH_RAW_COLOR_BACK)
-		$graph->SetMarginColor(BO_GRAPH_RAW_COLOR_MARGIN);
-
-	if (BO_GRAPH_RAW_COLOR_FRAME)
-		$graph->SetFrame(true, BO_GRAPH_RAW_COLOR_FRAME);
-	else
-		$graph->SetFrame(false);
-
-	if (BO_GRAPH_RAW_COLOR_BOX)
-		$graph->SetBox(true, BO_GRAPH_RAW_COLOR_BOX);
-	else
-		$graph->SetBox(false);
-
-	$graph->SetMargin(24,1,1,1);
-
-	$fullscale = isset($_GET['full']);
-
-	if ($type == 'spectrum')
-	{
-		$data = raw2array($row['data'], true, $row['channels'], $row['ntime']);
-		$step = 5;
-
-		foreach ($data['spec_freq'] as $i => $khz)
-		{
-			$tickLabels[$i] = (round($khz / 5) * 5).'kHz';
-		}
-
-		$utime    = bo_get_conf('raw_ntime') / 1000;
-		$values   = bo_get_conf('raw_values');
-
-		$graph->SetScale("textlin", 0, $fullscale ? null : BO_GRAPH_RAW_SPEC_MAX_Y, 0, BO_GRAPH_RAW_SPEC_MAX_X * $values * $utime / 1000);
-
-		$plot1=new BarPlot($data['spec'][0]);
-		$plot1->SetFillColor(BO_GRAPH_RAW_COLOR1);
-		$plot1->SetColor('#fff@1');
-		$plot1->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
-
-		$plot2=new BarPlot($data['spec'][1]);
-		$plot2->SetFillColor(BO_GRAPH_RAW_COLOR2);
-		$plot2->SetColor('#fff@1');
-		$plot2->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
-
-		$plot = new GroupBarPlot(array($plot1, $plot2));
-		$graph->Add($plot);
-
-
-		if (BO_GRAPH_RAW_COLOR_XGRID)
-		{
-			$graph->xgrid->SetColor(BO_GRAPH_RAW_COLOR_XGRID);
-			$graph->xgrid->Show(true,true);
-		}
-		else
-			$graph->xgrid->Show(false);
-
-		if (BO_GRAPH_RAW_COLOR_YGRID)
-		{
-			$graph->ygrid->SetColor(BO_GRAPH_RAW_COLOR_YGRID);
-			$graph->ygrid->Show(true,true);
-		}
-		else
-			$graph->ygrid->Show(false,false);
-
-		$graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
-		$graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
-		$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-		$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-		$graph->yaxis->HideLabels();
-
-		$graph->xaxis->SetTickLabels($tickLabels);
-		$graph->xaxis->SetTextLabelInterval(2);
-		$graph->xaxis->SetTextTickInterval(2);
-
-	}
-    elseif ($type == 'xy')
-    {
-        $xmin = -BO_MAX_VOLTAGE;
-        $xmax = BO_MAX_VOLTAGE;
-        $ymin = -BO_MAX_VOLTAGE;
-        $ymax = BO_MAX_VOLTAGE;
-
-        $graph->SetScale("linlin",$ymin,$ymax,$xmin,$xmax);
-
-        $data = raw2array($row['data'], false, $row['channels'], $row['ntime']);
-        $plot=new LinePlot($data['signal'][0], $data['signal'][1]);
-        $plot->SetColor(BO_GRAPH_RAW_COLOR_XY);
-        $graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
-        $graph->yaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
-        $graph->Add($plot);
-
-        $graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
-        $graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
-        $graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
-        $graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
-        $graph->yaxis->SetTextTickInterval(0.5);
-        $graph->xaxis->SetTickPositions(array(-2,-1,0,1,2), array(-1.5,-0.5,0.5,1.5));
-        $graph->yaxis->SetTickPositions(array(-2,-1,0,1,2), array(-1.5,-0.5,0.5,1.5));
-        $graph->xaxis->HideLabels();
-        $graph->yaxis->HideLabels();
-        $graph->xgrid->Show(true,false);
-        $graph->ygrid->Show(true,false);
-        $graph->SetMargin(1,1,1,1);
-    }
-	else
-	{
-		$data = raw2array($row['data'], false, $row['channels'], $row['ntime']);
-
-		$ustep = 50;
-		foreach ($data['signal_time'] as $i => $time_us)
-		{
-			$datax[] = $i;
-			$time_us = round($time_us / $ustep, 1) * $ustep;
-
-			if (!($i%12))
-			{
-				if (!($i%18))
-				{
-					$tickMajPositions[] = $i;
-					$tickLabels[] = $time_us.'µs';
-				}
-				elseif (!($i%6))
-				{
-					$tickPositions[] = $i;
-				}
-			}
-		}
-
-
-		$n = count($datax);
-		$xmin = $datax[0];
-		$xmax = $datax[$n-1];
-
-		if ($fullscale)
-		{
-			$ymax = $ymin = null;
-		}
-		else
-		{
-			$ymin = -BO_MAX_VOLTAGE;
-			$ymax = BO_MAX_VOLTAGE;
-		}
-
-		$graph->SetScale("linlin",$ymin,$ymax,$xmin,$xmax);
-
-		if (max($data['signal'][0]) || min($data['signal'][0]))
-		{
-			$plot=new LinePlot($data['signal'][0], $datax);
-			$plot->SetColor(BO_GRAPH_RAW_COLOR1);
-			$graph->Add($plot);
-		}
-
-		if (max($data['signal'][1]) || min($data['signal'][1]))
-		{
-			$plot=new LinePlot($data['signal'][1], $datax);
-			$plot->SetColor(BO_GRAPH_RAW_COLOR2);
-			$graph->Add($plot);
-		}
-
-		$graph->xaxis->SetPos('min');
-		$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
-
-		$graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
-		$graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
-
-		if (BO_GRAPH_RAW_COLOR_XGRID)
-		{
-			$graph->xgrid->SetColor(BO_GRAPH_RAW_COLOR_XGRID);
-			$graph->xgrid->Show(true,true);
-		}
-		else
-			$graph->xgrid->Show(false);
-
-		if (BO_GRAPH_RAW_COLOR_YGRID)
-		{
-			$graph->ygrid->SetColor(BO_GRAPH_RAW_COLOR_YGRID);
-			$graph->ygrid->Show(true,true);
-		}
-		else
-			$graph->ygrid->Show(false,false);
-
-		if (!$fullscale)
-		{
-			$graph->yaxis->SetTextTickInterval(0.5);
-
-			for($i=-BO_MAX_VOLTAGE;$i<=BO_MAX_VOLTAGE;$i+=0.5)
-			{
-				if (abs($i) != 0.5)
-					$yt[] = $i;
-			}
-
-			$graph->yaxis->SetTickPositions(array(-2,-1,0,1,2),$yt,array('-2V','-1V','0V','1V','2V'));
-		}
-
-		$sline  = new PlotLine(HORIZONTAL,  BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR3, 1);
-		$graph->AddLine($sline);
-
-		$sline  = new PlotLine(HORIZONTAL, -BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR3, 1);
-		$graph->AddLine($sline);
-
-		$graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-		$graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
-	}
-
-
 	BoDb::close();
 	bo_session_close(true);
 
-	$time = strtotime($row['time'].' UTC');
-
-	header("Content-Type: image/png");
-	header("Pragma: ");
-	header("Cache-Control: public, max-age=".(3600 * 24));
-	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $time)." GMT");
-	header("Expires: ".gmdate("D, d M Y H:i:s", $time + 3600 * 24)." GMT");
-
-	$I = $graph->Stroke(_IMG_HANDLER);
-	imagepng($I);
+	$channels = BO_ANTENNAS;
+	$graph->fullscale = isset($_GET['full']);
+	$graph->SetData($type, $row['data'], $row['channels'], $row['ntime']);
+	$graph->Display();
 
 	exit;
 }

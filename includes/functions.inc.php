@@ -1286,6 +1286,7 @@ function raw2array($raw = false, $calc_spec = false, $channels = -1, $ntime = -1
 	$data['signal_raw'] = array();
 	$data['signal'] = array();
 	$data['spec'] = array();
+	$data['spec'][0] = array();
 	$data['spec_freq'] = array();
 
 

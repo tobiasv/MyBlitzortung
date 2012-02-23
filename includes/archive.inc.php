@@ -1065,6 +1065,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$stations = bo_stations();
 	}
 	
+	$show_xy_graph = $channels > 1 && BO_ARCHIVE_SHOW_XY;
+	$show_spectrum = BO_ARCHIVE_SHOW_SPECTRUM;
+	
+	
 	$count = 0;
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
 					s.deviation deviation, s.current current, s.polarity polarity,
@@ -1089,7 +1093,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
 	echo '</div>';
 
-	echo '<table class="bo_sig_table'.(BO_ARCHIVE_SHOW_SPECTRUM ? ' bo_sig_table_spectrum' : '').'">';
+	echo '<table class="bo_sig_table';
+	echo $show_spectrum ? ' bo_sig_table_spectrum' : '';
+	echo $show_xy_graph ? ' bo_sig_table_xy_graph' : '';
+	echo '">';
 
 	
 	while($row = $res->fetch_assoc())
@@ -1108,7 +1115,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			if ($row['strike_id'])
 			{
 				$time_diff = $rtime - $stime + ($row['rtimens'] - $row['stimens']) * 1E-9;
-				$residual_time = $row['distance'] / BO_C - $time_diff;
+				$residual_time = $time_diff - $row['distance'] / BO_C;
 
 				$cdev = $row['distance'] / $time_diff / BO_C;
 				$cdev_text =  number_format($residual_time*1E6, 1, _BL('.'), _BL(','))._BC('µs');
@@ -1248,7 +1255,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				
 			echo '</td>';
 
-			if (BO_ARCHIVE_SHOW_SPECTRUM)
+			if ($show_spectrum)
 			{
 				echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 				if ($row['raw_id'])
@@ -1266,7 +1273,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '</td>';
 			}
 
-            if ($channels > 1 && BO_ARCHIVE_SHOW_XY)
+            if ($show_xy_graph)
             {
                 echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_H.'px;">';
                 if ($row['raw_id'])
@@ -1470,7 +1477,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		{
 				
 			$i = 0;
-			echo '<tr><td class="bo_sig_table_strikeinfo bo_sig_table_stations" colspan="3">';
+			echo '<tr><td class="bo_sig_table_strikeinfo bo_sig_table_stations" colspan="4">';
 			
 			echo '<h5>'._BL('Stations').':</h5> ';
 			foreach ($s_dists[0] as $sid => $dist)

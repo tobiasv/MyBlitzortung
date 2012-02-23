@@ -286,6 +286,11 @@ width: 560px;
 width: 800px;
 }
 
+#myblitzortung .bo_sig_table_xy_graph {
+width: 900px;
+}
+
+
 #myblitzortung .bo_sig_table td {
 background: #fff;
 vertical-align: top;
