@@ -1028,3 +1028,4 @@ $_BL['it']['Loading...'] = 'Sto caricando...';
 $_BL['it']['bo_stat_network_descr'] = '';
 
 
+?>

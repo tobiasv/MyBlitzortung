@@ -1039,3 +1039,4 @@ $_BL['en']['without GPS'] = 'without GPS';
 $_BL['en']['Record longtime data since'] = 'Record longtime data since';
 
 
+?>

@@ -1,9 +1,6 @@
 <?php
 
 
-//Testtest
-//Testtest
-
 $_BL['locale'] = 'de';
 
 
@@ -1100,3 +1097,4 @@ $_BL['de']['h4_graph_residual_time'] = 'Verteilung der Restzeit';
 $_BL['de']['bo_graph_descr_strikes_station_residual_time'] = 'Hier wird die Restzeit zu jedem von der Station gemessenen Signal bestimmt und als Histogramm dargestellt. Grüne Flächen repräsentieren Blitze bei der die Station {STATION} am Blitz beteiligt war. Rote Flächen hingegen zeigen eine passende Zeit, aber keine Berücksichtigung der Signale der Station';
 
 
+?>

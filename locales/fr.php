@@ -1078,3 +1078,4 @@ $_BL['fr']['graph_stat_title_amplitudes'] = 'Amplitudes';
 $_BL['fr']['Germany,Brandenburg'] = 'Allemagne,Brandenburg';
 
 
+?>

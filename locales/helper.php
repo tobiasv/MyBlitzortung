@@ -214,6 +214,7 @@ if ($X)
 }
 
 echo '<br><br>';
+echo htmlentities("?>").'<br>';
 
 ?>
 </body>

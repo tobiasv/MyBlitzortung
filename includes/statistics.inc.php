@@ -2053,7 +2053,7 @@ function bo_signal_info_list()
 	$channels = BO_ANTENNAS;
 	$bpv      = bo_get_conf('raw_bitspervalue');
 	$values   = bo_get_conf('raw_values');
-	$utime    = bo_get_conf('raw_ntime') / 1000;
+ 	$utime    = bo_get_conf('raw_ntime') / 1000;
 	$last_update = bo_get_conf('uptime_raw');
 	$last_update_minutes = round((time()-$last_update)/60,1);
 
