@@ -869,7 +869,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$region = $_GET['bo_region'];
 	$show_details = $_GET['bo_show_details'];
 	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
-	$other_graphs = isset($_GET['bo_other_graphs']) && bo_user_get_id() == 1;
+	$other_graphs = isset($_GET['bo_other_graphs']) && (bo_user_get_level() & BO_PERM_NOLIMIT);
 	
 	$channels   = bo_get_conf('raw_channels');
 	$raw_bpv    = bo_get_conf('raw_bitspervalue');
