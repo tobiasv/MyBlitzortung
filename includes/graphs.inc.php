@@ -1317,8 +1317,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		if ($interval < 10)
 			$interval = 10;
 
-		$ticks = ($time_end - $time_start) / 60 / $interval;
-
 		$stId = $station_id ? $station_id : $stId;
 
 		if ($type == 'stations')
@@ -1340,11 +1338,15 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$sql = "SELECT time, AVG(signalsh) sig, AVG(strikesh) astr, MAX(strikesh) mstr, COUNT(time) / COUNT(DISTINCT time) cnt
 					FROM ".BO_DB_PREF."stations_stat
 					WHERE time BETWEEN '$date_start' AND '$date_end' AND $sqlw
-					GROUP BY DAYOFMONTH(time)";
+					GROUP BY TO_DAYS(time)";
 
 			if ($hours_back < 7 * 24)
-					$sql .= ", HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
-
+				$sql .= ", HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
+			else
+				$interval = 24 * 60;
+			
+			$ticks = ($time_end - $time_start) / 60 / $interval;
+			
 			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
 			{
@@ -1383,7 +1385,6 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			for($i=0;$i<$ticks;$i++)
 			{
 				$X[$i] = $time_start + $i * $interval * 60;
-
 
 				//special treatment for the following vars
 				if (!isset($Y[$data_id]['sig_ratio'][$i]) && !isset($Y[$data_id]['str_ratio'][$i]) && $data_id > 0)
