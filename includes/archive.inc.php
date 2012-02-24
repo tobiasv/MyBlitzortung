@@ -1108,7 +1108,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 		$count++;
 		$stime = strtotime($row['stime'].' UTC');
-
+		$cdev_text = '';
+		
 		if ($row['raw_id'])
 		{
 			$rtime = strtotime($row['rtime'].' UTC') + 1;
