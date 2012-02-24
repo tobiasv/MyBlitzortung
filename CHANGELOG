@@ -12,13 +12,14 @@ Version 0.7.5 (2012-??-??)
 - new: residual time graphs (by andreas)
 - new: xy-graphs for signals (by andreas)
 - new: added a clean config.php.example
+- new: possibility to view signals of other station to a strike
 - improved: partial file download for raw data, default interval is 10 minutes now
 - improved: (a bit) behaviour with lightning search
 - fix: cleaned and fixed install
 - fix: update longtime-statistics only when station is active
 - fix: user cookie behaviour, session time display
 - dev: added folder for classes
-- dev: added Database and Timestamp class
+- dev: added Database, Timestamp and SignalGraph classes
 - dev: added channels/ntime column to database-table "raw"
 
 

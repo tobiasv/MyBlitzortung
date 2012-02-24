@@ -1487,6 +1487,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			{
 				echo $i && !$other_graphs ? ', ' : '';
 				
+				echo '<span class="bo_arch_other_participants">';
+				
 				echo '<a ';
 				echo ' href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$sid.'" ';
 				echo ' title="';
@@ -1533,6 +1535,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					echo '';
 				
 				}
+				
+				echo '</span>';
 				
 				$i++;
 			}
