@@ -1110,12 +1110,21 @@ function bo_get_conf_user($name, $id=0)
 
 function bo_user_init()
 {
+	global $_BO;
+	
+	//don't create a session if request comes through non-cookie-domain
+	if (strpos(BO_FILE_NOCOOKIE, 'http://'.$_SERVER['HTTP_HOST'].'/') !== false)
+	{
+		$_BO['radius'] = BO_RADIUS;
+		return;
+	}
+	
 	//Session handling
 	@session_start();
 
 	//Set user_id
 	if (!isset($_SESSION['bo_user']))
-	$_SESSION['bo_user'] = 0;
+		$_SESSION['bo_user'] = 0;
 
 	//Cookie login
 	bo_user_cookie_login();
