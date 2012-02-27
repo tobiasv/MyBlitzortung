@@ -1878,7 +1878,7 @@ function bo_update_stations($force = false)
 				//save first data-time
 				if ($stId != $own_id)
 				{
-					$longtime_time = bo_get_conf('longtime_first_time'.$add);
+					$longtime_time = bo_get_conf('longtime_station_first_time'.$add);
 
 					if (!$longtime_time)
 						bo_set_conf('longtime_station_first_time'.$add, time());
