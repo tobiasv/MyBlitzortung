@@ -1473,6 +1473,18 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</li>';
 		}
 		
+		if ($row['strike_id'])
+		{
+			echo '<li>';
+			echo '<span class="bo_descr">';
+			echo _BL('Lat').'/'._BL('Lon').': ';
+			echo '</span>';
+			echo '<span class="bo_value">';
+			echo $row['lat'].' / '.$row['lon'];
+			echo '</span>';
+			echo '</li>';
+		}
+		
 		echo '</ul>';
 		
 		echo '<div style="clear:both"></div>';
@@ -1557,7 +1569,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			
 			
 			if (bo_user_get_id() == 1 && !$other_graphs && time() - $stime < 3600 * 23)
-				echo ' (<a href="'.bo_insert_url('bo_action').'bo_other_graphs">'._BL('Show their signals').'</a>)';
+				echo ' (<a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs">'._BL('Show their signals').'</a>)';
 
 			echo '</p>';
 			

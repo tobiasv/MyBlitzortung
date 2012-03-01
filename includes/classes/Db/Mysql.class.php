@@ -83,7 +83,7 @@ class BoDbMain
 	public function do_query($sql)
 	{
 		self::connect();
-		$query = new BoDbQuery();
+		$query = new BoDbMainQuery();
 		$query->DoQuery($sql, self::$dbh);
 		return $query;
 	}

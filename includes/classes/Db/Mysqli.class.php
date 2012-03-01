@@ -99,3 +99,5 @@ class BoDbMain
 		return self::$dbh->real_escape_string($val);
 	}
 }
+
+?>
