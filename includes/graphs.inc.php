@@ -305,7 +305,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 			if ($region)
 			{
-				$Y[$i] =  $d[7][$region]['own']; //participanted
+				$Y[$i] =  $d[7][$region]['own']; //participated
 				$Y2[$i] = $d[7][$region]['all'];
 				$Y3[$i] = $d[7][$region]['all']; //Sum
 
@@ -314,7 +314,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			}
 			else
 			{
-				$Y[$i] = $d[1 + $rad]; //participanted
+				$Y[$i] = $d[1 + $rad]; //participated
 				$Y2[$i] = $d[0 + $rad]; //other
 				$Y3[$i] = $d[0 + $rad]; //Sum
 
@@ -912,18 +912,30 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$time_max = time();
 		$time_max = floor($time_max / 60 / $group_minutes) * 60 * $group_minutes; //round
 
+		
+		//if channel is selected, use the "part" column with bit-and
+		if ($channel)
+		{
+			$part_sql = " SIGN(((s.part&'.(1<<$channel).')>0)*s.part) ";
+		
+		}
+		else
+		{
+			$part_sql = " CASE WHEN s.part>0 THEN 1 WHEN s.part<=0 AND s.raw_id>0 THEN -1 ELSE 0 END ";
+		}
 
-		$sql = "SELECT s.time time, COUNT(s.id) cnt, SIGN(".($channel ? ' ((s.part&'.(1<<$channel).')>0)*s.part' : 's.part').") participated
+		//participated_type: 0=not, 1=yes, -1=signal found but not participated
+		$sql = "SELECT s.time time, COUNT(s.id) cnt, $part_sql participated_type
 				FROM ".BO_DB_PREF."strikes s
 				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
 				".bo_region2sql($region)."
-				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated";
+				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated_type";
 		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
 		{
 			$time = strtotime($row['time'].' UTC');
 			$index = floor( ($time - $time_max + $hours_back * 3600) / 60 / $group_minutes);
-			$tmp[$index][$row['participated']] = $row['cnt'];
+			$tmp[$index][$row['participated_type']] = $row['cnt'];
 		}
 
 		for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)

@@ -1039,7 +1039,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$date_end  = gmdate('Y-m-d H:i:s', $time_end);
 	$date_start    = gmdate('Y-m-d H:i:s', $time_end - 3600 * $hours_back);
 	
-	if ($show_empty_sig)
+	if ($show_empty_sig) // all strikes, maybe with own sigs
 	{
 		$sql_join = BO_DB_PREF."strikes s 
 					LEFT OUTER JOIN ".BO_DB_PREF."raw r 
@@ -1049,13 +1049,13 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		if ($only_participated)
 			$sql_where .= " AND s.part>0 ";
 	}
-	elseif ($only_strikes)
+	elseif ($only_strikes) // own raw signals, only with strikes
 	{
 		$sql_join = BO_DB_PREF."raw r JOIN ".BO_DB_PREF."strikes s ON s.raw_id=r.id ";
 		$table = 'r';
-		$sql_where .= " AND s.part != 0 ";
+		$sql_where .= " AND s.raw_id > 0 ";
 	}
-	else
+	else // all own raw signals
 	{
 		$sql_join = BO_DB_PREF."raw r LEFT OUTER JOIN ".BO_DB_PREF."strikes s ON s.raw_id=r.id ";
 		$table = 'r';
@@ -1247,7 +1247,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		}
 		
 		echo '</span>';
-		
+
 		echo '</td>';
 
 		if ($raw_bpv == 8 && $raw_values > 10 && BO_UP_INTVL_RAW > 0)
