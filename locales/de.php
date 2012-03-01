@@ -773,7 +773,7 @@ $_BL['de']['bo_graph_deviations_time'] = 'Zeitlicher Verlauf der mittleren Abwei
 $_BL['de']['bo_graph_distance'] = 'Zeitlicher Verlauf der durschnittlichen Entfernung zur Station {STATION}. Durch Vergleich der beiden Kurven kann die Empfindlichkeit der Station im Verhältnis zur Entfernung abgeschätzt werden.';
 $_BL['de']['bo_descr_strikes_now'] = 'Die Blitzdaten werden {UPDATE_INTERVAL} von Blitzortung.org übernommen und direkt hier angezeigt. Das Intervall in welchem die Blitzrate bestimmt wird, beträgt {RATE_INTERVAL}.';
 $_BL['de']['bo_stat_advanced_info'] = 'Erweiterte Statistiken, welche für den Stationsbetreiber hilfreich sein könnten um die Auswertungen zu optimieren. Im Gegensatz zur den Statistiken unter "Station" werden genauere Daten zur Berechnung verwendet.';
-$_BL['de']['bo_stat_other_station_info'] = 'Hinweis: Es werden Statistiken der <strong>Station {STATION_CITY}</strong> angezeigt. Aus technischen Gründen kann nur eine Auswahl der sonst vorhandenen Informationen angezeigt werden. Einzelne Informationen können sich auch weiterhin noch auf die Station {STATION} beziehen!';
+$_BL['de']['bo_stat_other_station_info'] = 'Hinweis: Es werden Statistiken der <strong>Station {STATION_CITY}</strong> angezeigt. Aus technischen Gründen kann nur eine Auswahl der sonst vorhandenen Informationen angezeigt werden.';
 $_BL['de']['bo_stat_other_station_info_back'] = 'Zurück zur Station {STATION}';
 
 

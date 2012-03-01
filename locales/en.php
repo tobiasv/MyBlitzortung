@@ -753,7 +753,7 @@ $_BL['en']['bo_graph_deviations_time'] = 'Development by time of mean deviation 
 $_BL['en']['bo_graph_distance'] = 'Development of the mean distance to the station {STATION}. You can estimate the stations sensitivity by comparing the two lines.';
 $_BL['en']['bo_descr_strikes_now'] = 'Lightning data is downloaded {UPDATE_INTERVAL} from Blitzortung.org servers. The interval for the calculation of the strike rate is {RATE_INTERVAL}. ';
 $_BL['en']['bo_stat_advanced_info'] = 'Advanced statistics, mainly for the station operator.';
-$_BL['en']['bo_stat_other_station_info'] = 'Hint: Statistics of station {STATION_CITY} are displayed. Due to technical reasons only parts of the information can be displayed. Some information could still refer to the station {STATION}! ';
+$_BL['en']['bo_stat_other_station_info'] = 'Hint: Statistics of station {STATION_CITY} are displayed.';
 $_BL['en']['bo_stat_other_station_info_back'] = 'Back to station {STATION}';
 
 

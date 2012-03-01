@@ -676,7 +676,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		{
 			$sql = "SELECT COUNT(s.id) cnt, ss.station_id spart, $groupby groupby
 					FROM ".BO_DB_PREF."strikes s
-					LEFT JOIN ".BO_DB_PREF."stations_strikes ss
+					LEFT OUTER JOIN ".BO_DB_PREF."stations_strikes ss
 					ON s.id=ss.strike_id AND ss.station_id='$station_id'
 					WHERE time BETWEEN '$date_start' AND '$date_end'
 					".bo_region2sql($region)."
@@ -696,10 +696,10 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		while($row = $res->fetch_assoc())
 		{
 			$index = $row['groupby'];
-			$xmax = max($row['groupby'], $max);
+			$xmax = max($row['groupby'], $xmax);
 			$xmin = min($row['groupby'], $xmin);
 
-			if ($row['spart'])
+			if ($row['spart'] !== null)
 				$tmp['own'][$index] = $row['cnt'];
 			else
 				$tmp['all'][$index] = $row['cnt'];
