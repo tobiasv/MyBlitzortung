@@ -1137,24 +1137,36 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			$s_dists = array(array(),array());
 			$s_sdists = array(array(),array());
 			$s_bears = array(array(),array());
-			$s_data  = array();
+			$participated_stations  = array();
 			
 			//Participated stations
+			$participated_stations = array();
 			$sql2 = "SELECT ss.station_id id
 				FROM ".BO_DB_PREF."stations_strikes ss
 				WHERE ss.strike_id='".$row['strike_id']."'";
 			$res2 = BoDb::query($sql2);
 			while ($row2 = $res2->fetch_assoc())
 			{
-				$sid = $row2['id'];
-				
-				$s_data[$sid] = $stations[$row2['id']];
-				$s_dists[0][$sid] = bo_latlon2dist($row['lat'], $row['lon'], $s_data[$sid]['lat'], $s_data[$sid]['lon']);
-				$s_bears[0][$sid] = bo_latlon2bearing($s_data[$sid]['lat'], $s_data[$sid]['lon'], $row['lat'], $row['lon']);
+				$participated_stations[ $row2['id'] ] = $stations[$row2['id']];
+				$participated_stations[ $row2['id'] ]['part'] = true;
 			}
 			
-			if (count($s_data))
+			//own station only evaluated, but not participated
+			if (!isset($participated_stations[bo_station_id()]) && $row['raw_id'])
 			{
+				$participated_stations[ bo_station_id() ] = $stations[bo_station_id()];
+				$participated_stations[ bo_station_id() ]['part'] = false;
+			}
+			
+			if (count($participated_stations))
+			{
+
+				foreach ($participated_stations as $sid => $dummy)
+				{
+					$s_dists[0][$sid] = bo_latlon2dist($row['lat'], $row['lon'], $participated_stations[$sid]['lat'], $participated_stations[$sid]['lon']);
+					$s_bears[0][$sid] = bo_latlon2bearing($participated_stations[$sid]['lat'], $participated_stations[$sid]['lon'], $row['lat'], $row['lon']);
+				}
+
 				//Get stations that participated in calculation
 				asort($s_dists[0]);
 				$i=0;
@@ -1176,17 +1188,16 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				{
 					
 					//Distances between stations
-					$s_data_tmp = $s_data;
-					foreach($s_data as $sid1 => $d1)
+					$participated_stations_tmp = $participated_stations;
+					foreach($participated_stations as $sid1 => $d1)
 					{
-						foreach($s_data_tmp as $sid2 => $d2)
+						foreach($participated_stations_tmp as $sid2 => $d2)
 						{
 							$s_sdists[$i][$sid1.'.'.$sid2] = bo_latlon2dist($d1['lat'], $d1['lon'], $d2['lat'], $d2['lon']);
 						}
 					}
 					asort($s_sdists[$i]);
 
-					
 					//Locating angles
 					asort($s_bears[$i]);
 					end($s_bears[$i]);
@@ -1475,7 +1486,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '</tr>';
 
 		
-		if ( (bo_user_get_level() & BO_PERM_ARCHIVE) && count($s_data) && ($strike_id || ($row['strike_id'] && $show_details)) )
+		if ( (bo_user_get_level() & BO_PERM_ARCHIVE) && count($participated_stations) && ($strike_id || ($row['strike_id'] && $show_details)) )
 		{
 				
 			$i = 0;
@@ -1493,7 +1504,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '<a ';
 				echo ' href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$sid.'" ';
 				echo ' title="';
-				echo htmlentities($s_data[$sid]['city']).': ';
+				echo htmlentities($participated_stations[$sid]['city']).': ';
 				echo round($dist/1000).'km / ';
 				echo round($s_bears[0][$sid]).'&deg; '.bo_bearing2direction($s_bears[0][$sid]);
 				
@@ -1502,7 +1513,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				if ($i < bo_participants_locating_min())
 					echo 'font-weight: bold;';
 
-				if ($i < bo_participants_locating_max())
+				if ($participated_stations[$sid]['part'] === false)
+					echo 'text-decoration:line-through;';
+				elseif ($i < bo_participants_locating_max())
 					echo 'text-decoration:underline;';
 				else
 					echo 'text-decoration:none;';
@@ -1515,9 +1528,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '">';
 				
 				if ((bo_user_get_level() & BO_PERM_SETTINGS))
-					echo $s_data[$sid]['user'];
+					echo $participated_stations[$sid]['user'];
 				else
-					echo _BC($s_data[$sid]['city']);
+					echo _BC($participated_stations[$sid]['city']);
 					
 				echo '</a>';
 				
@@ -1593,7 +1606,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					$nd = false;
 					
 					echo '<tr>';
-					echo '<th>'._BC($s_data[$sid1]['city']).'</th>';
+					echo '<th>'._BC($participated_stations[$sid1]['city']).'</th>';
 					
 					
 					echo '<th>'.$sid1.'</th>';
