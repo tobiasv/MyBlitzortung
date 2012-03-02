@@ -204,21 +204,6 @@ function bo_get_login_str()
 	}
 }
 
-// Check login-string (currently only internal usage for MyBlitzortung station linking)
-function bo_check_login_str($string)
-{
-	$url = 'http://www.blitzortung.org/Webpages/index.php?lang=en&page=3&login_string='.$string;
-	$file = bo_get_file($url, $code, 'login_check');
-
-	if (preg_match('/You are logged in as.*;([A-Za-z0-9]+)&/', $file, $r))
-	{
-		return trim($r[1]);
-	}
-	else
-	{
-		return false;
-	}
-}
 
 
 // Get archive data from blitzortung cgi (OUTDATED!)
@@ -2304,7 +2289,7 @@ function bo_my_station_update($url, $force_bo_login = false)
 		bo_echod("== "._BL('Requesting data')." ==");
 		bo_echod(_BL('Connecting to ').' *'.BO_LINK_HOST.'*');
 
-		$request = 'id='.bo_station_id().'&login='.$login_id.'&username='.BO_USER.'&authid='.$authid.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
+		$request = 'id='.bo_station_id().'&login='.$login_id.'&username='.BO_USER.'&region='.BO_REGION.'&authid='.$authid.'&url='.urlencode($url).'&lat='.((double)BO_LAT).'&lon='.((double)BO_LON.'&rad='.(double)BO_RADIUS.'&zoom='.(double)BO_MAX_ZOOM_LIMIT);
 		$data_url = 'http://'.BO_LINK_HOST.BO_LINK_URL.'?mybo_link&'.$request;
 
 		$content = bo_get_file($data_url, $error, 'mybo_stations');
