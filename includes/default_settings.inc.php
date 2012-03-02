@@ -83,7 +83,7 @@
 /*******************************************************************/
 /*** Default timezone                                            ***/
 
-@define('BO_TIMEZONE', 'Europe/Berlin');
+@define('BO_TIMEZONE', 'UTC');
 
 
 

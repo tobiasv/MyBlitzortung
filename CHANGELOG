@@ -5,6 +5,7 @@
 
 Version 0.7.5 (2012-??-??)
 -------------------------------
+- Default timezone now UTC!
 - new: option enable database keys for faster lightning search/drawing
     --> uses some disk space
     --> disabled by default

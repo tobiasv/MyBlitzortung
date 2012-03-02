@@ -92,7 +92,7 @@ function bo_graph_raw()
 		{
 			$bdata = bo_hex2bin($raw_data);
 			$graph->SetData($type, $bdata, $channels, $ntime);
-			$graph->AddText(date('H:i:s', $last_time).'.'.$last_nsec.'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs');
+			$graph->AddText(date('H:i:s', $last_time).'.'.$nsec.'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs');
 		}
 		else
 			$graph->DisplayEmpty(true);
@@ -699,7 +699,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$xmax = max($row['groupby'], $xmax);
 			$xmin = min($row['groupby'], $xmin);
 
-			if ($row['spart'])
+			if ($row['spart'] !== null)
 				$tmp['own'][$index] = $row['cnt'];
 			else
 				$tmp['all'][$index] = $row['cnt'];
@@ -736,6 +736,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$max = max($ymax, $Y[$i] + $Y2[$i]);
 		}
 
+		if (empty($Y3))
+			$Y3[0] = 0;
+		
 		if ($is_logarithmic)
 		{
 			$graph_type = 'linlog';
@@ -1331,6 +1334,11 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 		$stId = $station_id ? $station_id : $stId;
 
+		if ($type == 'signals_all' || $type == 'stations')
+		{
+			$no_title_station = true;
+		}
+		
 		if ($type == 'stations')
 		{
 			//$sql_where[0] = " station_id != 0 ";
@@ -1491,10 +1499,20 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	require_once 'jpgraph/jpgraph_date.php';
 	require_once 'jpgraph/jpgraph_log.php';
 
+	
+	
 	$graph = new Graph(BO_GRAPH_STAT_W,BO_GRAPH_STAT_H,"auto");
 	$graph->ClearTheme();
+	
+	if ($xmin > $xmax)
+		$xmin = $xmax = 0;
+
+	if ($ymin > $ymax)
+		$ymin = $ymax = 0;
+		
 	$graph->SetScale($graph_type, $ymin, $ymax, $xmin, $xmax);
 
+	
 	switch($type)
 	{
 
@@ -1935,7 +1953,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->SetYScale(0,'lin');
 			$graph->AddY(0,$plot);
 
-			$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+			if (!empty($tickMajPositions) && !empty($tickPositions) && !empty($tickLabels))
+				$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+				
 			$graph->xaxis->title->Set(_BL('Distance').'   [km]');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
 
