@@ -388,7 +388,7 @@ function bo_show_archive_density()
 	global $_BO;
 
 	$level = bo_user_get_level();
-	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
+	$map = isset($_GET['bo_map']) ? $_GET['bo_map'] : -1;
 	$year = intval($_GET['bo_year']) ? intval($_GET['bo_year']) : date('Y');
 	$month = intval($_GET['bo_month']);
 	$station_id = intval($_GET['bo_station']);
@@ -444,7 +444,7 @@ function bo_show_archive_density()
 			
 		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
 		
-		if ($map < 0)
+		if ($map == -1)
 			$map = $id;
 	}
 	echo '</select>';
@@ -643,7 +643,7 @@ function bo_get_density_image()
 	
 	$year = intval($_GET['bo_year']);
 	$month = intval($_GET['bo_month']);
-	$map_id = intval($_GET['map']);
+	$map_id = $_GET['map'];
 	$station_id = intval($_GET['id']);
 	$ratio = isset($_GET['ratio']) && $station_id > 0;
 	$participants = $station_id == -1;

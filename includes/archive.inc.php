@@ -97,7 +97,7 @@ function bo_show_archive_map()
 	$ani_delay = BO_ANIMATIONS_WAITTIME;
 	$ani_delay_end = BO_ANIMATIONS_WAITTIME_END;
 	
-	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : -1;
+	$map = isset($_GET['bo_map']) ? $_GET['bo_map'] : -1;
 	$year = intval($_GET['bo_year']);
 	$month = intval($_GET['bo_month']);
 	$day = intval($_GET['bo_day']);

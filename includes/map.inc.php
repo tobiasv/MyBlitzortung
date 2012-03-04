@@ -297,10 +297,10 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 	
 	$disabled = ((defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !bo_user_get_level())) || $show_gmap === 0;
 	$no_google = isset($_GET['bo_showmap']) || $disabled;
-	$static_map_id = intval($show_static_maps) > 0 ? intval($show_static_maps) : intval($_GET['bo_showmap']);
 	$period = (float)$_GET['bo_period'];
-	$show_menu = intval($show_static_maps) == 0;
-	$show_static_maps = ($show_static_maps === null) || $show_static_maps > 0;
+	$static_map_id = $show_static_maps ? $show_static_maps : $_GET['bo_showmap'];
+	$show_static_maps = $show_static_maps === null || $show_static_maps;
+	$show_menu = $show_static_maps;
 	$last_update = bo_get_conf('uptime_strikes_modified');
 	
 	if ($show_static_maps)
