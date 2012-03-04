@@ -465,6 +465,7 @@ function bo_show_archive_density()
 
 	echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
 	echo '<select name="bo_station" id="bo_arch_dens_select_station" onchange="submit();">';
+	echo '<option></option>';
 	foreach ($stations as $id )
 	{
 		if ($id >= 0 && $station_infos[$id]['city'] && $station_infos[$id]['country'])
