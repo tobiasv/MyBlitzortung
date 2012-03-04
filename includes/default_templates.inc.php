@@ -36,7 +36,12 @@ if (!isset($_BO['mapimg'][3]))
 	$_BO['mapimg'][3] = $_BO['tpl_imgmap']['europe_mini'];
 
 if (!isset($_BO['mapimg']['stations_mini']))
-	$_BO['mapimg']['stations_mini'] = $_BO['tpl_imgmap']['europe_mini_stations'];
+{
+	if (BO_REGION == 2)
+		$_BO['mapimg']['stations_mini'] = $_BO['tpl_imgmap']['oceania_mini_stations'];
+	else
+		$_BO['mapimg']['stations_mini'] = $_BO['tpl_imgmap']['europe_mini_stations'];
+}
 
 if (!isset($_BO['mapimg']['kml_eu2']))
 	$_BO['mapimg']['kml_eu2'] = $_BO['tpl_imgmap']['europe_kml_2h'];

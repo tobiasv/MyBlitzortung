@@ -492,25 +492,28 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	//main strike colors
 	$color_tmp = array();
-	foreach($c as $i => $rgb)
+	if (isset($c) && is_array($c))
 	{
-		if (!is_array($rgb))
+		foreach($c as $i => $rgb)
 		{
-			 $rgb = bo_hex2rgb($rgb);
-			 $color_tmp[$i] = $rgb;
+			if (!is_array($rgb))
+			{
+				 $rgb = bo_hex2rgb($rgb);
+				 $color_tmp[$i] = $rgb;
+			}
+			
+			//alpha doens't work with alpha-channel and transparent background
+			if ($transparent)
+				$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
+			else
+				$color[$i] = imagecolorallocatealpha($I, $rgb[0], $rgb[1], $rgb[2], $rgb[3]);
+				
+			$count[$i] = 0;
 		}
 		
-		//alpha doens't work with alpha-channel and transparent background
-		if ($transparent)
-			$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
-		else
-			$color[$i] = imagecolorallocatealpha($I, $rgb[0], $rgb[1], $rgb[2], $rgb[3]);
-			
-		$count[$i] = 0;
+		if (!empty($color_tmp))
+			$c = $color_tmp;
 	}
-	
-	if (!empty($color_tmp))
-		$c = $color_tmp;
 	
 	//smooth the colors
 	if ($cfg['col_smooth'])
@@ -535,7 +538,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 	//time calculations
 	$time_range  = $time_max - $time_min + 59;
-	$color_intvl = $time_range / count($c);
+	$color_intvl = count($c) > 0 ? $time_range / count($c) : 1;
 	
 	
 	//get the strikes
@@ -1286,7 +1289,7 @@ function bo_add_cities2image($I, $cfg, $w, $h)
 function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 {
 	global $_BO;
-	
+
 	if (!$strike_id && (!isset($cfg['stations']) || empty($cfg['stations'])))
 		return;
 	
@@ -1294,7 +1297,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 	$lonE = $cfg['coord'][1];
 	$latS = $cfg['coord'][2];
 	$lonW = $cfg['coord'][3];
-	
+			
 	$pic_dim = bo_latlon2dist($latN, $lonE, $latS, $lonW);
 	
 	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $latS, $lonW);
