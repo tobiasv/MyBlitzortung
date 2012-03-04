@@ -6,6 +6,8 @@
 Version 0.7.5 (2012-??-??)
 -------------------------------
 - Default timezone now UTC!
+- moved europe maps to images/maps_europe
+- added map for Oceania and New Zealand to images/maps_oceania/
 - new: option enable database keys for faster lightning search/drawing
     --> uses some disk space
     --> disabled by default

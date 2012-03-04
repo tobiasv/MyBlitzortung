@@ -1953,7 +1953,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->SetYScale(0,'lin');
 			$graph->AddY(0,$plot);
 
-			if (!empty($tickMajPositions) && !empty($tickPositions) && !empty($tickLabels))
+			if (!empty($tickMajPositions) && !empty($tickLabels))
 				$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
 				
 			$graph->xaxis->title->Set(_BL('Distance').'   [km]');
