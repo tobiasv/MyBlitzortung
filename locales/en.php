@@ -1040,5 +1040,10 @@ $_BL['en']['Record longtime data since'] = 'Record longtime data since';
 $_BL['en']['Show their signals'] = 'Show their signals';
 $_BL['en']['no_lightning_data'] = 'No lightning data!';
 
+$_BL['en']['Residual time'] = 'Residual time';
+$_BL['en']['graph_stat_title_residual_time'] = 'Distribution of residual time';
+$_BL['en']['h4_graph_residual_time'] = 'Distribution of residual time';
+$_BL['en']['bo_graph_descr_strikes_station_residual_time'] = false; // ToDo
+
 
 ?>

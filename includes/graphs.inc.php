@@ -1325,6 +1325,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
         for ($i=0; $i < sizeof($X); $i++) {
             $ymax = max($ymax, $Y[$i] + $Y2[$i]);
         }
+		
+		$no_title_station = true;
     }
     else
 	{
@@ -2348,6 +2350,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
             }
             $graph->xaxis->SetTickLabels($tickLabels);
             $graph->yaxis->HideTicks(false, true);
+			$graph->yaxis->title->Set(_BL('Strike count'));
+			$graph->title->Set(_BL('graph_stat_title_residual_time').$add_title);
             $graph->Add($plot);
 
             break;
