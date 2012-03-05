@@ -1037,6 +1037,7 @@ $_BL['en']['Already DONE BEFORE'] = 'Already DONE BEFORE';
 $_BL['en']['Update database keys'] = 'Update database keys';
 $_BL['en']['without GPS'] = 'without GPS';
 $_BL['en']['Record longtime data since'] = 'Record longtime data since';
+$_BL['en']['Show their signals'] = 'Show their signals';
 
 
 ?>

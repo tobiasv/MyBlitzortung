@@ -13,7 +13,7 @@ function bo_show_archive()
 	$enabled['density']    = ($perm || (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES)) && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES;
 	$enabled['search']     = ($perm || (defined('BO_ENABLE_ARCHIVE_SEARCH') && BO_ENABLE_ARCHIVE_SEARCH));
 	$enabled['signals']    = ($perm || (defined('BO_ENABLE_ARCHIVE_SIGNALS') && BO_ENABLE_ARCHIVE_SIGNALS)) && BO_UP_INTVL_RAW > 0 && bo_station_id() > 0;
-	$enabled['strikes']    = ($perm || (bo_user_get_level() & BO_PERM_NOLIMIT));
+	$enabled['strikes']    = (bo_user_get_level() & BO_PERM_ARCHIVE); // to see strike table => only logged in users with archive permission!
 	
 	if (($show && !$enabled[$show]) || !$show )
 	{
@@ -869,7 +869,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$region = $_GET['bo_region'];
 	$show_details = $_GET['bo_show_details'];
 	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
-	$other_graphs = isset($_GET['bo_other_graphs']) && (bo_user_get_level() & BO_PERM_NOLIMIT);
+	$other_graphs = isset($_GET['bo_other_graphs']) && $perm;
 	
 	$channels   = bo_get_conf('raw_channels');
 	$raw_bpv    = bo_get_conf('raw_bitspervalue');
@@ -1554,7 +1554,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					$station_time  = $station_ntime > 1 ? $stime+1 : $stime;
 					$station_ntime = $station_ntime > 1 ? $station_ntime-1 : $station_ntime;
 					
-					echo ' +'.round($dist/1000).'km';
+					echo ' +'.round($dist/1000).'km / ';
+					echo round($s_bears[0][$sid]).'&deg;';
 					$url = bo_bofile_url().'?graph&bo_station_id='.$sid.'&bo_time='.urlencode(gmdate('Y-m-d H:i:s',$station_time).'.'.round($station_ntime * 1E9)).'&bo_lang='._BL();
 					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" class="bo_graph_sig_other">';
 
@@ -1568,7 +1569,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			}
 			
 			
-			if (bo_user_get_id() == 1 && !$other_graphs && time() - $stime < 3600 * 23)
+			if ($perm && !$other_graphs && time() - $stime < 3600 * 23)
 				echo ' (<a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs">'._BL('Show their signals').'</a>)';
 
 			echo '</p>';
