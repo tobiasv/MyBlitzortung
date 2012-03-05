@@ -1415,7 +1415,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			
 		}
 		
-		if ($row['raw_id'])
+		if ($row['raw_id'] && $cdev_text)
 		{			
 			echo '<li>';
 			echo '<span class="bo_descr">';
