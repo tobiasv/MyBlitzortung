@@ -135,8 +135,9 @@ function bo_tile()
 	$cur_minute = intval(intval(date('i')) / $update_interval);
 	$mod_time   = mktime(date('H'), $cur_minute * $update_interval , 0);
 	$exp_time   = $mod_time + 60 * $update_interval + 59;
-	$age        = $exp_time - time();
-
+	
+	if (time() - $exp_time < 10)
+		$exp_time = time() + 60;
 	
 	//Headers
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");
@@ -146,7 +147,7 @@ function bo_tile()
 	if ($caching)
 	{
 		header("Pragma: ");
-		header("Cache-Control: public, max-age=".$age);
+		header("Cache-Control: public, max-age=".($exp_time - time()));
 	}
 	else
 	{
