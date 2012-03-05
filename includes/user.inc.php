@@ -23,7 +23,7 @@ function bo_show_login()
 		echo '<ul id="bo_menu">';
 
 		echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=" class="bo_navi'.($show == '' ? '_active' : '').'">'._BL('Start').'</a>';
-		if (bo_user_get_id() > 1)
+		if (bo_user_get_id() > 1 && $_SESSION['bo_external_login'] !== true)
 			echo '<li><a href="'.bo_insert_url($remove_vars).'&bo_action=password" class="bo_navi'.($show == 'password' ? '_active' : '').'">'._BL('Password').'</a>';
 
 		if (BO_PERM_ADMIN & $level)
@@ -81,8 +81,8 @@ function bo_show_login()
 				echo '<h3>'._BL('Welcome to MyBlitzortung user area').'!</h3>';
 				echo '<ul class="bo_login_info">';
 				echo '<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>';
-
-				if ($lastlogin)
+ 
+				if ($lastlogin && $_SESSION['bo_external_login'] !== true)
 					echo '<li>'._BL('user_lastlogin_text').': <strong>'.date(_BL('_datetime'), $lastlogin).'</strong></li>';
 
 				echo '<li>'._BL('user_sessiontime_text').': <strong>'.number_format($sessiontime / 60, 1, _BL('.'), _BL(',')).' '._BL('unit_minutes').'</strong></li>';
@@ -324,6 +324,10 @@ function bo_user_do_logout()
 	$_SESSION['bo_user_level'] = 0;
 	$_SESSION['bo_logged_out'] = true;
 	$_SESSION['bo_login_time'] = 0;
+	
+	unset($_SESSION['bo_external_login']);
+	unset($_SESSION['bo_external_name']);
+	
 }
 
 function bo_user_set_session($id, $level, $cookie, $pass='')
@@ -387,6 +391,11 @@ function bo_user_get_name($user_id = 0)
 		$res = BoDb::query("SELECT login FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
 		$row = $res->fetch_assoc();
 		$names[$user_id] = $row['login'];
+		
+		if ($_SESSION['bo_external_login'] === true && trim($_SESSION['bo_external_name']))
+		{
+			$names[$user_id] .= ' ('.$_SESSION['bo_external_name'].')';
+		}
 	}
 
 	return $names[$user_id];

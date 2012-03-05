@@ -1083,7 +1083,7 @@ $_BL['de']['Already DONE BEFORE'] = 'Wurde schon vorher ERLEDIGT';
 $_BL['de']['Update database keys'] = 'Datenbank-Index erneuern';
 $_BL['de']['without GPS'] = 'ohne GPS';
 $_BL['de']['Record longtime data since'] = 'Langzeitdaten seit';
-$_BL['de']['Show their signals'] = 'Zeige Signale der anderen';
+$_BL['de']['Show their signals'] = 'Zeige Signale der Anderen';
 
 
 
