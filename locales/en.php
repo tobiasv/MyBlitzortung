@@ -440,7 +440,7 @@ $_BL['en']['Strike density'] = 'Strike density';
 $_BL['en']['arch_navi_density'] = 'Strike densities';
 $_BL['en']['h3_arch_density'] = 'Strike densities';
 $_BL['en']['legend_arch_densities'] = 'Options';
-$_BL['en']['arch_select_dates_beween'] = 'Only data from {START} to {END} available!';
+$_BL['en']['arch_select_dates_between'] = 'Only data from {START} to {END} available!';
 $_BL['en']['Max strikes density'] = 'Max strike density';
 $_BL['en']['check_all_strikes_network'] = 'All strikes of the network';
 $_BL['en']['Calculation basis are elements with area'] = 'Calculation basis are elements with area';
@@ -1038,6 +1038,7 @@ $_BL['en']['Update database keys'] = 'Update database keys';
 $_BL['en']['without GPS'] = 'without GPS';
 $_BL['en']['Record longtime data since'] = 'Record longtime data since';
 $_BL['en']['Show their signals'] = 'Show their signals';
+$_BL['en']['no_lightning_data'] = 'No lightning data!';
 
 
 ?>

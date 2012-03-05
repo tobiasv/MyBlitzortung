@@ -222,111 +222,116 @@ function bo_show_archive_map()
 	$hour_from = date('H', $time);
 
 	
+	
+	
+	
 	//min/max strike-time
 	$row = BoDb::query("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
+	$strikes_available = $row['mintime'] > 0;
 	$start_time = strtotime($row['mintime'].' UTC');
 	$end_time = strtotime($row['maxtime'].' UTC');
-	
-	
+
 	//Output
 	echo '<div id="bo_arch_maps">';
-
-	echo '<p class="bo_general_description" id="bo_archive_density_info">';
-	echo strtr(_BL('archive_map_info'), array('{DATE_START}' => date(_BL('_date'), $start_time),'{DATE_END}' => date(_BL('_date'), $end_time)));
-	echo '</p>';
-
-	echo '<a name="bo_arch_strikes_maps_form"></a>';
-	echo '<form action="?#bo_arch_strikes_maps_form" method="GET" class="bo_arch_strikes_form" id="bo_arch_strikes_maps_form">';
-	echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_get', 'bo_oldmap'));
-	echo '<input type="hidden" name="bo_oldmap" value="'.$map.'">';
-	echo '<input type="hidden" name="bo_oldani" value="'.($ani ? 1 : 0).'">';
 	
-	echo '<fieldset>';
-	echo '<legend>'._BL('legend_arch_strikes').'</legend>';
-	echo $select_map;
-
-	echo '<span class="bo_form_descr">'._BL('Date').':</span> ';
-	echo '<select name="bo_year" id="bo_arch_strikes_select_year">';
-	for($i=date('Y', $start_time); $i<=date('Y');$i++)
-		echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$i.'</option>';
-	echo '</select>';
-
-	echo '<select name="bo_month" id="bo_arch_strikes_select_month">';
-	for($i=1;$i<=12;$i++)
-		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').'>'._BL(date('M', strtotime("2000-$i-01"))).'</option>';
-	echo '</select>';
-
-	echo '<select name="bo_day" id="bo_arch_strikes_select_day" onchange="submit()">';
-	for($i=1;$i<=31;$i++)
-		echo '<option value="'.$i.'" '.($i == $day ? 'selected' : '').'>'.$i.'</option>';
-	echo '</select>';
-
-	echo '&nbsp;<input type="submit" name="bo_prev" value=" &lt; " id="bo_archive_maps_prevday" class="bo_form_submit">';
-	echo '&nbsp;<input type="submit" name="bo_next" value=" &gt; " id="bo_archive_maps_nextday" class="bo_form_submit">';
-	echo '<input type="submit" value="'._BL('update map').'" id="bo_archive_maps_submit" class="bo_form_submit">';
-
-	echo '<div class="bo_input_container">';
-	echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
-	echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from">';
-	for($i=0;$i<=23;$i+=$hours_interval)
-		echo '<option value="'.$i.'" '.($i == $hour_from ? 'selected' : '').'>'.$i.' '._BL('oclock').'</option>';
-	echo '</select>';
-
-	echo '&nbsp;<input type="submit" name="bo_prev_hour" value=" &lt; " id="bo_archive_maps_prevhour" class="bo_form_submit">';
-	echo '&nbsp;<input type="submit" name="bo_next_hour" value=" &gt; " id="bo_archive_maps_nexthour" class="bo_form_submit">';
-
-	echo ' <select name="bo_hour_range" id="bo_arch_strikes_select_hour_to" '.($ani ? '' : ' onchange="submit()"').'>';
-	for($i=$hours_interval;$i<=$max_range;$i+=$hours_interval)
-		echo '<option value="'.$i.'" '.($i == $hour_range ? 'selected' : '').'>+'.$i.' '._BL('hours').'</option>';
-	echo '</select> ';
-
-	
-	if ($ani_div)
+	if ($strikes_available)
 	{
-		echo ' &nbsp;&nbsp;&nbsp; ';
-		echo '<span class="bo_form_descr">'._BL('Animation').':</span> ';
-		echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false, true);" '.($ani_forced ? ' disabled' : '').'>';
-		echo '<label for="bo_archive_maps_animation_off">'._BL('Off').'</label>';
-		echo '<input type="radio" name="bo_animation" value="1" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true, true);">';
-		echo '<label for="bo_archive_maps_animation_on">'._BL('On').'</label>';
-	}
-	
-	echo '</div>';	
-	
-	
-	echo '<div class="bo_input_container">';
+		echo '<p class="bo_general_description" id="bo_archive_density_info">';
+		echo strtr(_BL('archive_map_info'), array('{DATE_START}' => date(_BL('_date'), $start_time),'{DATE_END}' => date(_BL('_date'), $end_time)));
+		echo '</p>';
 
-	echo '<div class="bo_arch_map_form_links">';
-	echo '<span class="bo_form_descr">';
-	echo _BL('Yesterday').': &nbsp; ';
-	echo '</span>';
-	
-	if (!$ani_cfg['force'])
-		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
-	
-	if ($ani_div)
-		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
-	
-	echo '  &nbsp;  &nbsp; &nbsp; ';
-	
-	echo '<span class="bo_form_descr">';
-	echo _BL('Today').': &nbsp; ';
-	echo '</span>';
-	
-	if (!$ani_cfg['force'])
-		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
-	
-	if ($ani_div)
-		echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
+		echo '<a name="bo_arch_strikes_maps_form"></a>';
+		echo '<form action="?#bo_arch_strikes_maps_form" method="GET" class="bo_arch_strikes_form" id="bo_arch_strikes_maps_form">';
+		echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_get', 'bo_oldmap'));
+		echo '<input type="hidden" name="bo_oldmap" value="'.$map.'">';
+		echo '<input type="hidden" name="bo_oldani" value="'.($ani ? 1 : 0).'">';
 		
-	echo '</div>';
-	
-	
-	echo '</div>';	
-	
-	echo '</fieldset>';
-	echo '</form>';
+		echo '<fieldset>';
+		echo '<legend>'._BL('legend_arch_strikes').'</legend>';
+		echo $select_map;
 
+		echo '<span class="bo_form_descr">'._BL('Date').':</span> ';
+		echo '<select name="bo_year" id="bo_arch_strikes_select_year">';
+		for($i=date('Y', $start_time); $i<=date('Y');$i++)
+			echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$i.'</option>';
+		echo '</select>';
+
+		echo '<select name="bo_month" id="bo_arch_strikes_select_month">';
+		for($i=1;$i<=12;$i++)
+			echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').'>'._BL(date('M', strtotime("2000-$i-01"))).'</option>';
+		echo '</select>';
+
+		echo '<select name="bo_day" id="bo_arch_strikes_select_day" onchange="submit()">';
+		for($i=1;$i<=31;$i++)
+			echo '<option value="'.$i.'" '.($i == $day ? 'selected' : '').'>'.$i.'</option>';
+		echo '</select>';
+
+		echo '&nbsp;<input type="submit" name="bo_prev" value=" &lt; " id="bo_archive_maps_prevday" class="bo_form_submit">';
+		echo '&nbsp;<input type="submit" name="bo_next" value=" &gt; " id="bo_archive_maps_nextday" class="bo_form_submit">';
+		echo '<input type="submit" value="'._BL('update map').'" id="bo_archive_maps_submit" class="bo_form_submit">';
+
+		echo '<div class="bo_input_container">';
+		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
+		echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from">';
+		for($i=0;$i<=23;$i+=$hours_interval)
+			echo '<option value="'.$i.'" '.($i == $hour_from ? 'selected' : '').'>'.$i.' '._BL('oclock').'</option>';
+		echo '</select>';
+
+		echo '&nbsp;<input type="submit" name="bo_prev_hour" value=" &lt; " id="bo_archive_maps_prevhour" class="bo_form_submit">';
+		echo '&nbsp;<input type="submit" name="bo_next_hour" value=" &gt; " id="bo_archive_maps_nexthour" class="bo_form_submit">';
+
+		echo ' <select name="bo_hour_range" id="bo_arch_strikes_select_hour_to" '.($ani ? '' : ' onchange="submit()"').'>';
+		for($i=$hours_interval;$i<=$max_range;$i+=$hours_interval)
+			echo '<option value="'.$i.'" '.($i == $hour_range ? 'selected' : '').'>+'.$i.' '._BL('hours').'</option>';
+		echo '</select> ';
+
+		
+		if ($ani_div)
+		{
+			echo ' &nbsp;&nbsp;&nbsp; ';
+			echo '<span class="bo_form_descr">'._BL('Animation').':</span> ';
+			echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false, true);" '.($ani_forced ? ' disabled' : '').'>';
+			echo '<label for="bo_archive_maps_animation_off">'._BL('Off').'</label>';
+			echo '<input type="radio" name="bo_animation" value="1" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true, true);">';
+			echo '<label for="bo_archive_maps_animation_on">'._BL('On').'</label>';
+		}
+		
+		echo '</div>';	
+		
+		
+		echo '<div class="bo_input_container">';
+
+		echo '<div class="bo_arch_map_form_links">';
+		echo '<span class="bo_form_descr">';
+		echo _BL('Yesterday').': &nbsp; ';
+		echo '</span>';
+		
+		if (!$ani_cfg['force'])
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
+		
+		if ($ani_div)
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
+		
+		echo '  &nbsp;  &nbsp; &nbsp; ';
+		
+		echo '<span class="bo_form_descr">';
+		echo _BL('Today').': &nbsp; ';
+		echo '</span>';
+		
+		if (!$ani_cfg['force'])
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
+		
+		if ($ani_div)
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
+			
+		echo '</div>';
+		
+		
+		echo '</div>';	
+		
+		echo '</fieldset>';
+		echo '</form>';
+	}
 	
 	if ($cfg['date_min'] && ($min = strtotime($cfg['date_min'])))
 		$start_time = $min + 3600*24;
@@ -351,13 +356,16 @@ function bo_show_archive_map()
 		
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 		
-		if ($time < $start_time - 3600 * 24 || $time > $end_time)
+		if (!$strikes_available || $time < $start_time - 3600 * 24 || $time > $end_time)
 		{
-			$text = _BL('arch_select_dates_beween');
+			if ($strikes_available)
+				$text = _BL('arch_select_dates_between');
+			else
+				$text = _BL('no_lightning_data');
+				
 			$img_file = bo_bofile_url().'?map='.$map.'&blank&bo_lang='._BL().'';
 			
 			echo '<div style="position:relative;'.bo_archive_get_dim($map, 0, true).'" id="bo_arch_map_nodata">';
-			
 			echo '<img style="position:absolute;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_noimg" src="'.$img_file.'">';
 			echo '<div style="position:absolute;top:0px;left:0px" id="bo_arch_map_nodata_white"></div>';
 			echo '<div style="position:absolute;top:0px;left:0px" id="bo_arch_map_nodata_text">';
@@ -365,7 +373,6 @@ function bo_show_archive_map()
 			echo strtr($text, array('{START}' => date(_BL('_date'), $start_time), '{END}' => date(_BL('_date'), $end_time) ));
 			echo '</p>';
 			echo '</div>';
-			
 			echo '</div>';
 		}
 		else if ($ani)

@@ -436,7 +436,7 @@ $_BL['de']['Strike density'] = 'Blitzdichte';
 $_BL['de']['arch_navi_density'] = 'Blitzdichte';
 $_BL['de']['h3_arch_density'] = 'Blitzdichten';
 $_BL['de']['legend_arch_densities'] = 'Optionen';
-$_BL['de']['arch_select_dates_beween'] = 'Daten sind nur von {START} bis {END} vorhanden!';
+$_BL['de']['arch_select_dates_between'] = 'Daten sind nur von {START} bis {END} vorhanden!';
 $_BL['de']['Max strikes density'] = 'Max. Blitzdichte';
 $_BL['de']['check_all_strikes_network'] = 'Alle Blitze des Ortungsnetzwerks';
 $_BL['de']['Calculation basis are elements with area'] = 'Berechnungsgrundlage sind Elemente mit einer Fläche von';
@@ -1095,6 +1095,7 @@ $_BL['de']['Residual time'] = 'Restzeit';
 $_BL['de']['graph_stat_title_residual_time'] = 'Verteilung der Restzeit';
 $_BL['de']['h4_graph_residual_time'] = 'Verteilung der Restzeit';
 $_BL['de']['bo_graph_descr_strikes_station_residual_time'] = 'Hier wird die Restzeit zu jedem von der Station gemessenen Signal bestimmt und als Histogramm dargestellt. Grüne Flächen repräsentieren Blitze bei der die Station {STATION} am Blitz beteiligt war. Rote Flächen hingegen zeigen eine passende Zeit, aber keine Berücksichtigung der Signale der Station';
+$_BL['de']['no_lightning_data'] = 'Keine Blitzdaten verfügbar!';
 
 
 ?>
