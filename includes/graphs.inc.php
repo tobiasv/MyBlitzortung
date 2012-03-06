@@ -699,7 +699,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$xmax = max($row['groupby'], $xmax);
 			$xmin = min($row['groupby'], $xmin);
 
-			if ($row['spart'] !== null)
+			if ($row['spart'] > 0)
 				$tmp['own'][$index] = $row['cnt'];
 			else
 				$tmp['all'][$index] = $row['cnt'];
