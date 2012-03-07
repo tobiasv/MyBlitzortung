@@ -347,7 +347,7 @@ $_BL['en']['graph_stat_title_amplitude'] = 'Amplitudes';
 $_BL['en']['graph_stat_title_all_signals'] = 'Signals of all stations';
 $_BL['en']['graph_stat_title_evaluated_signals'] = 'Strike ratios';
 
-$_BL['en']['graph_legend_strikes_sum'] = 'Whole strike cound';
+$_BL['en']['graph_legend_strikes_sum'] = 'Whole strike count';
 $_BL['en']['graph_legend_strikes_avg_all'] = 'Mean of all stations';
 $_BL['en']['graph_legend_strikes_own'] = 'Detected strikes station {STATION}';
 $_BL['en']['graph_legend_signals_avg_all'] = 'Mean signals per station';

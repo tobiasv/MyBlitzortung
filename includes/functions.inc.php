@@ -1074,7 +1074,7 @@ function bo_times2sql($time_min = 0, $time_max = 0)
 		if ( ($time_max-$time_min)/60/$key_time_div)
 		{
 			$time_min_x = fmod(floor(($time_min-$key_time_start)/60/$key_time_div),$key_time_vals);
-			$time_max_x = fmod(ceil (($time_max-$key_time_start)/60/$key_time_div),$key_time_vals);
+			$time_max_x = fmod(ceil (($time_max-$key_time_start)/60/$key_time_div),$key_time_vals)+1;
 
 			if ($time_min_x<=$time_max_x)
 				$sql .= " AND ( s.time_x BETWEEN '$time_min_x' AND '$time_max_x' ) ";
