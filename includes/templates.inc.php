@@ -426,7 +426,7 @@ $_BO['tpl_imgmap']['oceania'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['oceania']['name'] = 'Oceania';
 $_BO['tpl_imgmap']['oceania']['file'] = 'maps_oceania/map_oceania.png';
 $_BO['tpl_imgmap']['oceania']['borders'] = array('maps_oceania/map_oceania_borders.png', 60);
-$_BO['tpl_imgmap']['oceania']['coord'] = array(-33, 180, -48.15, 160); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['oceania']['coord'] = array(10, 180, -51.6, 110); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['oceania']['point_style'] = array(2, 2, 'f008', 0);
 
 
@@ -436,7 +436,7 @@ $_BO['tpl_imgmap']['new_zealand'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['new_zealand']['name'] = 'New Zealand';
 $_BO['tpl_imgmap']['new_zealand']['file'] = 'maps_oceania/map_new_zealand.png';
 $_BO['tpl_imgmap']['new_zealand']['borders'] = array('maps_oceania/map_new_zealand_borders.png', 60);
-$_BO['tpl_imgmap']['new_zealand']['coord'] = array(10, 180, -51.6, 110); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['new_zealand']['coord'] = array(-33, 180, -48.15, 160); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['new_zealand']['point_style'] = array(2, 2, 'f008', 0);
 
 
@@ -444,7 +444,7 @@ $_BO['tpl_imgmap']['new_zealand']['point_style'] = array(2, 2, 'f008', 0);
 $_BO['tpl_imgmap']['oceania_mini_stations'] = $_BO['tpl_imgmap_stations_mini'];
 $_BO['tpl_imgmap']['oceania_mini_stations']['name'] = 'Oceania stations (mini)';
 $_BO['tpl_imgmap']['oceania_mini_stations']['file'] = 'maps_oceania/map_oceania_mini_dark.png';
-$_BO['tpl_imgmap']['oceania_mini_stations']['coord'] = array(-33, 180, -48.15, 160); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['oceania_mini_stations']['coord'] = array(10, 180, -51.6, 110); //North, East, South, West (Degrees)
 
 
 
