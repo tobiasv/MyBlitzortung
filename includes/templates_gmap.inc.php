@@ -225,14 +225,36 @@ $_BO['tpl_overlay']['wwlln']['sel_name'] = 'WWLLN';
 $_BO['tpl_overlay']['wwlln']['only_loggedin'] = false;
 
 //Image with clouds
-$_BO['tpl_overlay']['wwlln_clouds']['img'] = 'http://webflash.ess.washington.edu/EurAfricaL_plot_weather_map.jpg';
-$_BO['tpl_overlay']['wwlln_clouds']['coord'] = array(77.5, 71, -45, -36.7);  //North, East, South, West (Degrees)
-$_BO['tpl_overlay']['wwlln_clouds']['default_show'] = false;
-$_BO['tpl_overlay']['wwlln_clouds']['sel_name'] = 'WWLLN with clouds';
-$_BO['tpl_overlay']['wwlln_clouds']['only_loggedin'] = false;
-$_BO['tpl_overlay']['wwlln_clouds']['to_mercator'] = false;
-$_BO['tpl_overlay']['wwlln_clouds']['opacity'] = 50;
-$_BO['tpl_overlay']['wwlln_clouds']['layer'] = 1;
+$_BO['tpl_overlay']['wwlln_eu_africa']['img'] = 'http://webflash.ess.washington.edu/EurAfricaL_plot_weather_map.jpg';
+$_BO['tpl_overlay']['wwlln_eu_africa']['coord'] = array(77.5, 71, -45, -36.7);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['wwlln_eu_africa']['default_show'] = false;
+$_BO['tpl_overlay']['wwlln_eu_africa']['sel_name'] = '</label><a href="http://wwlln.net" target="blank">WWLLN.net EU/Africa</a> (&copy; by University of Washington, Seattle, WA, USA)<label>';
+$_BO['tpl_overlay']['wwlln_eu_africa']['only_loggedin'] = false;
+$_BO['tpl_overlay']['wwlln_eu_africa']['to_mercator'] = false;
+$_BO['tpl_overlay']['wwlln_eu_africa']['opacity'] = 50;
+$_BO['tpl_overlay']['wwlln_eu_africa']['layer'] = 1;
+
+//WWLLN America
+$_BO['tpl_overlay']['wwlln_america']['img'] = 'http://webflash.ess.washington.edu/AmericaL_plot_weather_map.jpg';
+$_BO['tpl_overlay']['wwlln_america']['coord'] = array(70.7, -9.5, -54.9, -138);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['wwlln_america']['default_show'] = false;
+$_BO['tpl_overlay']['wwlln_america']['sel_name'] = '</label><a href="http://wwlln.net" target="blank">WWLLN.net America</a> (&copy; by University of Washington, Seattle, WA, USA)<label>';
+$_BO['tpl_overlay']['wwlln_america']['only_loggedin'] = false;
+$_BO['tpl_overlay']['wwlln_america']['to_mercator'] = false;
+$_BO['tpl_overlay']['wwlln_america']['opacity'] = 50;
+$_BO['tpl_overlay']['wwlln_america']['layer'] = 1;
+
+//WWLLN Pacific
+$_BO['tpl_overlay']['wwlln_oceania_asia']['img'] = 'http://webflash.ess.washington.edu/L_plot_weather_map.jpg';
+$_BO['tpl_overlay']['wwlln_oceania_asia']['coord'] = array(45.7, 183.2, -54.2, 24.6);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['wwlln_oceania_asia']['default_show'] = false;
+$_BO['tpl_overlay']['wwlln_oceania_asia']['sel_name'] = '</label><a href="http://wwlln.net" target="blank">WWLLN.net Asia/Oceania</a> (&copy; by University of Washington, Seattle, WA, USA)<label>';
+$_BO['tpl_overlay']['wwlln_oceania_asia']['only_loggedin'] = false;
+$_BO['tpl_overlay']['wwlln_oceania_asia']['to_mercator'] = false;
+$_BO['tpl_overlay']['wwlln_oceania_asia']['opacity'] = 50;
+$_BO['tpl_overlay']['wwlln_oceania_asia']['layer'] = 1;
+
+
 
 /*** Overlays that don't fit ***/
 
