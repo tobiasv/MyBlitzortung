@@ -16,6 +16,7 @@ Version 0.7.5 (2012-??-??)
 - new: xy-graphs for signals (by andreas)
 - new: added a clean config.php.example
 - new: possibility to view signals of other station to a strike
+- new: you can now set the google maps API parameters (i.e. for api-key or sensor-state)
 - improved: partial file download for raw data, default interval is 10 minutes now
 - improved: (a bit) behaviour with lightning search
 - fix: cleaned and fixed install

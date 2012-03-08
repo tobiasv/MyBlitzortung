@@ -279,8 +279,8 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 	</script>
 
-        <script type="text/javascript" id="bo_script_google" src="http://maps.googleapis.com/maps/api/js?sensor=false&callback=bo_gmap_init&<?php echo BO_GMAP_API_VERSION ?>">
-        </script>
+    <script type="text/javascript" id="bo_script_google" src="http://maps.googleapis.com/maps/api/js?callback=bo_gmap_init&v=<?php echo BO_GMAP_API_VERSION.'&'.BO_GMAP_PARAM ?>">
+    </script>
 
 
 
