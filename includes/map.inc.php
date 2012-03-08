@@ -159,16 +159,19 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 		// Redraw based on the current projection and zoom level...
 		bo_ProjectedOverlay.prototype.draw = function(firstTime)
 		{
-			 if (!this.div_)
-			 {
-			  return ;
-			 }
+			if (!this.div_)
+			{
+				return ;
+			}
 
-			 var c1 = this.get('projection').fromLatLngToDivPixel(this.bounds_.getSouthWest());
-			 var c2 = this.get('projection').fromLatLngToDivPixel(this.bounds_.getNorthEast());
+			var c1 = this.getProjection().fromLatLngToDivPixel(this.bounds_.getSouthWest());
+			var c2 = this.getProjection().fromLatLngToDivPixel(this.bounds_.getNorthEast());
 
-			 if (!c1 || !c2) return;
+			if (!c1 || !c2) return;
 
+			if (c1.x > c2.x)
+				c2.x += this.getProjection().getWorldWidth();
+				
 			 // Now position our DIV based on the DIV coordinates of our bounds
 			 this.div_.style.width = Math.abs(c2.x - c1.x) + "px";
 			 this.div_.style.height = Math.abs(c2.y - c1.y) + "px";
