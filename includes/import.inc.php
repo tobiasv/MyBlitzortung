@@ -1900,6 +1900,18 @@ function bo_update_stations($force = false)
 				$data = unserialize(bo_get_conf('station_data24h'.$add));
 				if ($data['time'] != $StData[$stId]['time'])
 				{
+					//add height to own station
+					if ($stId == $own_id)
+					{
+						$sql = "SELECT height
+								FROM ".BO_DB_PREF."raw
+								WHERE time=(SELECT MAX(time) FROM ".BO_DB_PREF."raw)
+								LIMIT 1";
+						$row = BoDb::query($sql)->fetch_assoc();
+						if (isset($row['height']))
+							$StData[$stId]['height'] = $row['height'];
+					}
+					
 					$time_floor = floor(date('Hi', $StData[$stId]['time']) / BO_UP_INTVL_STATIONS);
 					$data[$time_floor] = $StData[$stId];
 					bo_set_conf('station_data24h'.$add, serialize($data));

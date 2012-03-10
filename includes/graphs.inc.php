@@ -1289,14 +1289,22 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
         $Y = array_pad(array(), 2 * $range + 1, 0);
         $Y2 = array_pad(array(), 2 * $range + 1, 0);
 
-        $strikes_raw_sql = "SELECT UNIX_TIMESTAMP(s.time) time, s.time_ns,
-        					UNIX_TIMESTAMP(r.time) raw_time, r.time_ns raw_time_ns,
-        					s.distance, s.part
-        	FROM ".BO_DB_PREF."strikes s
-            INNER JOIN ".BO_DB_PREF."raw r ON s.raw_id = r.id
-            WHERE s.time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back) .
-            "' AND '" . gmdate('Y-m-d H:i:s', $time_max) . "';";
-        $strikes_raw_res = BoDb::query($strikes_raw_sql);
+		if ($channel)
+			$sql_part = " (s.part&".(1<<$channel).") != 0 ";
+		else
+			$sql_part = " 1 ";
+			
+        $sql = "SELECT UNIX_TIMESTAMP(s.time) time, s.time_ns,
+        				UNIX_TIMESTAMP(r.time) raw_time, r.time_ns raw_time_ns,
+        				s.distance, s.part
+				FROM ".BO_DB_PREF."strikes s
+				INNER JOIN ".BO_DB_PREF."raw r ON s.raw_id = r.id
+				WHERE 1
+					".bo_region2sql($region)."
+					AND s.time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."'
+					AND '" . gmdate('Y-m-d H:i:s', $time_max) . "'
+					AND $sql_part";
+        $strikes_raw_res = BoDb::query($sql);
 
         while ($strike_raw_row = $strikes_raw_res->fetch_assoc()) {
 

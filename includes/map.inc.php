@@ -54,7 +54,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	{ 
 		bo_home = new google.maps.LatLng(<?php echo  $lat ?>, <?php echo  $lon ?>);
 		bo_home_zoom = <?php echo  $zoom ?>;
-		
+
 		var mapOptions = {
 		  zoom: bo_home_zoom,
 		  center: bo_home,

@@ -659,7 +659,7 @@ $_BL['en']['stat_navi_other'] = 'Other';
 $_BL['en']['stat_navi_network'] = 'Network';
 $_BL['en']['arch_navi_search'] = 'Strike search';
 $_BL['en']['arch_navi_signals'] = 'Signals';
-$_BL['en']['stat_navi_longtime'] = 'Long time statistics';
+$_BL['en']['stat_navi_longtime'] = 'Long-time';
 $_BL['en']['stat_navi_advanced'] = 'Advanced';
 
 
@@ -1044,6 +1044,7 @@ $_BL['en']['Residual time'] = 'Residual time';
 $_BL['en']['graph_stat_title_residual_time'] = 'Distribution of residual time';
 $_BL['en']['h4_graph_residual_time'] = 'Distribution of residual time';
 $_BL['en']['bo_graph_descr_strikes_station_residual_time'] = false; // ToDo
-
+$_BL['en']['Mean coordinates'] = 'Mean coordinates';
+$_BL['en']['h4_stat_station_area'] = 'Surrounding area';
 
 ?>

@@ -285,6 +285,11 @@
 @define('BO_STATISTICS_GPS_MAPTYPE', 'HYBRID');
 
 
+// Map type for GPS info
+// 0 => fit into window
+@define('BO_STATISTICS_GPS_MAP_ZOOM', 17);
+
+
 // Disable station statistics (for slow servers)
 @define('BO_STATION_STAT_DISABLE', false);
 
