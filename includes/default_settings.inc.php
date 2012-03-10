@@ -432,7 +432,7 @@
 @define('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM', 12);
 @define('BO_MAP_STRIKE_SIZE', 3);
 @define('BO_MAP_STRIKE_CIRCLE_SIZE', 4);
-@define('BO_MAP_STRIKE_CIRCLE_GROW', 0.3);
+@define('BO_MAP_STRIKE_CIRCLE_GROW', 0.6);
 @define('BO_MAP_MAX_STRIKES_PER_TILE', 50000);
 
 //some other values, sizes etc...

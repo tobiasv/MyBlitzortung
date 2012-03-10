@@ -472,7 +472,7 @@ function bo_tile()
 
 	if ($zoom >= BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM) //circle (grows with zoom)
 	{
-		$s = floor((BO_MAP_STRIKE_CIRCLE_SIZE+BO_MAP_STRIKE_CIRCLE_GROW*$zoom)/2)*2-1;
+		$s = BO_MAP_STRIKE_CIRCLE_SIZE + round(pow(2,($zoom-BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM)*BO_MAP_STRIKE_CIRCLE_GROW));
 		$style = 0;
 	}
 	else if ($zoom >= BO_EXPERIMENTAL_POLARITY_ZOOM && BO_EXPERIMENTAL_POLARITY_CHECK === true)
