@@ -555,25 +555,15 @@ function bo_map_reload_static(manual)
 	else
 		$cookie_load_defaults = true;
 	
+	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
 	$zoom = $zoom ? $zoom : BO_DEFAULT_ZOOM;
 	$lat = $lat ? $lat : BO_LAT;
 	$lon = $lon ? $lon : BO_LON;
 
+	if ($zoom < $min_zoom || $zoom > $max_zoom)
+		$zoom = $min_zoom;
 	
-	if ((bo_user_get_level() & BO_PERM_NOLIMIT)) //allow all zoom levels on logged in users with access rights
-	{
-		$max_zoom = 999;
-		$min_zoom = 0;
-	}
-	else
-	{
-		$max_zoom = defined('BO_MAX_ZOOM_IN') ? intval(BO_MAX_ZOOM_IN) : 999;
-		$min_zoom = defined('BO_MIN_ZOOM_OUT') ? intval(BO_MIN_ZOOM_OUT) : 0;
-	}
 	
-	$min_zoom = max($min_zoom, round(BO_TILE_SIZE/256)-1);
-	
-
 	echo '<fieldset class="bo_map_options">';
 	echo '<legend>'._BL("map_options").'</legend>';
 	ksort($_BO['mapcfg']);

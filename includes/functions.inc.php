@@ -1793,5 +1793,25 @@ function bo_hex2bin($data)
 	return $bdata;
 }
 
+// min/max zoom limits for dynamic map
+function bo_get_zoom_limits()
+{
+
+	//allow all zoom levels on logged in users with access rights	
+	if ((bo_user_get_level() & BO_PERM_NOLIMIT)) 
+	{
+		$max_zoom = defined('BO_MAX_ZOOM_IN_USER') ? intval(BO_MAX_ZOOM_IN) : 999;
+		$min_zoom = defined('BO_MIN_ZOOM_OUT_USER') ? intval(BO_MIN_ZOOM_OUT) : 0;
+	}
+	else
+	{
+		$max_zoom = defined('BO_MAX_ZOOM_IN') ? intval(BO_MAX_ZOOM_IN) : 999;
+		$min_zoom = defined('BO_MIN_ZOOM_OUT') ? intval(BO_MIN_ZOOM_OUT) : 0;
+	}
+	
+	$min_zoom = max($min_zoom, round(BO_TILE_SIZE/256)-1);
+	
+	return array($min_zoom, $max_zoom);
+}
 
 ?>

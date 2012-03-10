@@ -3,7 +3,7 @@
 
 function bo_tile()
 {
-	@set_time_limit(5);
+	@set_time_limit(BO_TILE_CREATION_TIMEOUT);
 
 	global $_BO;
 
@@ -31,6 +31,13 @@ function bo_tile()
 	else
 		$tile_size = BO_TILE_SIZE;
 
+	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
+	
+	if (!$only_info && ($zoom < $min_zoom || $zoom > $max_zoom))
+	{
+		bo_tile_message('tile_zoom_not_allowed', 'zoom_na', $caching, array(), $tile_size);
+		exit;
+	}
 	
 	//manual time select
 	if (isset($_GET['from']) && isset($_GET['to']))
@@ -250,7 +257,7 @@ function bo_tile()
 		}
 	}
 
-	if (BO_WAIT_SIM_TILE_CREATION)
+	if (BO_TILE_CREATION_SIM_WAIT)
 	{
 		//to avoid too much parallel sql queries
 		usleep(rand(0,100) * 1000);
@@ -384,9 +391,6 @@ function bo_tile()
 			}
 		}
 		
-		if (BO_WAIT_SIM_TILE_CREATION)
-			bo_set_conf('is_creating_tile', 0);
-			
 		bo_tile_output($file, $caching, $I);
 		
 		exit;
@@ -469,10 +473,12 @@ function bo_tile()
 	if ($zoom >= BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM) //circle (grows with zoom)
 	{
 		$s = floor((BO_MAP_STRIKE_CIRCLE_SIZE+BO_MAP_STRIKE_CIRCLE_GROW*$zoom)/2)*2-1;
+		$style = 0;
 	}
 	else if ($zoom >= BO_EXPERIMENTAL_POLARITY_ZOOM && BO_EXPERIMENTAL_POLARITY_CHECK === true)
 	{
-		$s = BO_MAP_STRIKE_POLARITY_SIZE;
+		$s1 = BO_MAP_STRIKE_POLARITY_SIZE;
+		$s  = BO_MAP_STRIKE_POLARITY_SIZE_UNKNOWN;
 		$style = 2; //with polarity
 	}
 	else
@@ -481,6 +487,7 @@ function bo_tile()
 		$style = 1;
 	}
 
+	
 	// get the data and paint tile
 	while ($row = $erg->fetch_assoc())
 	{
@@ -517,6 +524,16 @@ function bo_tile()
 		$strike_time = strtotime($row['mtime'].' UTC');
 		$col = $color[floor(($time_max - $strike_time) / $color_intvl)];
 		
+		
+		//imagefilledarc draws much nicer circles, but has a bug in older php versions
+		//https://bugs.php.net/bug.php?id=43547
+		//imagefilledarc: not nice when size is even
+		if (!($s%2) || $s >= 8 || BO_NICE_CIRCLES == 0 || (BO_NICE_CIRCLES == 2 && $py >= $tile_size-$s+3))
+			$nice_circles = false;
+		else
+			$nice_circles = true;
+		
+		
 		//paint!
 		switch($style)
 		{
@@ -531,11 +548,17 @@ function bo_tile()
 				if (!$row['polarity']) //plot circle (no polarity known)
 				{
 					imagesetthickness($I, 1);
-					imagefilledellipse($I, $px, $py, $s, $s, $col);
+					
+					if ($nice_circles)
+						imagefilledarc($I, $px, $py, $s, $s, 0, 360, $col, IMG_ARC_PIE);
+					else
+						imagefilledellipse($I, $px, $py, $s, $s, $col);
+		
+						
 				}
 				else //plot "+" or "-"
 				{
-					$t = $s - 2;
+					$t = $s1 - 2;
 					imagesetthickness($I, 2);
 					imageline($I, $px-$t, $py, $px+$t-1, $py, $col);
 					if ($row['polarity'] > 0)
@@ -546,7 +569,11 @@ function bo_tile()
 
 			default: // plot circle
 				imagesetthickness($I, 1);
-				imagefilledellipse($I, $px, $py, $s, $s, $col);
+				
+				if ($nice_circles)
+					imagefilledarc($I, $px, $py, $s, $s, 0, 360, $col, IMG_ARC_PIE);
+				else
+					imagefilledellipse($I, $px, $py, $s, $s, $col);
 
 				if ($row['polarity'] && BO_EXPERIMENTAL_POLARITY_CHECK == true)
 				{
@@ -567,10 +594,6 @@ function bo_tile()
 		
 	}
 	
-	if (BO_WAIT_SIM_TILE_CREATION)
-		bo_set_conf('is_creating_tile', 0);
-	
-
 	imagecolortransparent($I, $blank);
 	bo_tile_output($file, $caching, $I);
 }
@@ -579,7 +602,8 @@ function bo_tile_tracks()
 {
 	global $_BO;
 	bo_session_close();
-
+	@set_time_limit(BO_TILE_CREATION_TIMEOUT);
+	
 	if (!intval(BO_TRACKS_SCANTIME)) //disabled
 		exit;
 	
@@ -772,6 +796,9 @@ function bo_tile_tracks()
 
 function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE_SIZE)
 {
+	if (BO_TILE_CREATION_SIM_WAIT)
+		bo_set_conf('is_creating_tile', 0);
+
 	BoDb::close();
 	bo_session_close(true);
 	
@@ -819,7 +846,9 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 {
 	$dir = BO_DIR.'cache/tiles/';
 	
-	$file = $dir.$type.'_'._BL().'.png';
+	$file  = $dir.$type.'_';
+	$file .= bo_user_get_level().'_';
+	$file .= _BL().'.png';
 	
 	if (!file_exists($file) || !$caching)
 	{

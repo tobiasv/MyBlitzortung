@@ -240,27 +240,6 @@
 
 
 
-/*******************************************************************/
-/*** Experimental Polarity                                       ***/
-
-//enable the experiment ;-)
-//be sure to "calibrate" your antennas in the user area
-//the electrical orientation is important!
-@define('BO_EXPERIMENTAL_POLARITY_CHECK', true);
-
-//maximum distance in kilometers from your station where polarities
-//should be not too far, as polarity of the wave changes 
-//after some hundrets of kilometers
-@define('BO_EXPERIMENTAL_POLARITY_MAX_DIST', 300);
-
-//polarity is displayed beginning from given zoom-level
-@define('BO_EXPERIMENTAL_POLARITY_ZOOM', 8);
-
-//size of the +/- symbol in strike on map
-@define('BO_MAP_STRIKE_POLARITY_SIZE', 5);
-
-
-
 
 /*******************************************************************/
 /*** The file cache                                              ***/
@@ -427,11 +406,17 @@
 // default zoom level for archive
 @define('BO_DEFAULT_ZOOM_ARCHIVE', 10);        
 
-// max. zoom level, even in the area of your station
-@define('BO_MAX_ZOOM_IN', 15);        
+// max. zoom level for guest, even in the area of your station
+@define('BO_MAX_ZOOM_IN', 12);        
 
-// minimal zoom level
+// minimal zoom level for guests
 @define('BO_MIN_ZOOM_OUT', 4);
+
+// max. zoom level for users
+@define('BO_MAX_ZOOM_IN_USER', 14);        
+
+// minimal zoom level for users
+@define('BO_MIN_ZOOM_OUT_USER', 3);
 
 // the default map style (you can also use satellite, hybrid, street)
 @define('BO_DEFAULT_MAP', 'TERRAIN'); 
@@ -443,11 +428,11 @@
 @define('BO_MAP_CIRCLE_OPAC_FILL', '0.05');
 
 //displaying of strikes
-@define('BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM', 9);
+@define('BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM', 7);
 @define('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM', 12);
 @define('BO_MAP_STRIKE_SIZE', 3);
 @define('BO_MAP_STRIKE_CIRCLE_SIZE', 4);
-@define('BO_MAP_STRIKE_CIRCLE_GROW', 0.5);
+@define('BO_MAP_STRIKE_CIRCLE_GROW', 0.3);
 @define('BO_MAP_MAX_STRIKES_PER_TILE', 50000);
 
 //some other values, sizes etc...
@@ -666,6 +651,31 @@
 /*    - http://gateway.sms77.de/?u=USER&p=PASS&to={tel}&text={text}&type=quality&from=MyBO                                       */
 /*    - http://www.innosend.de/gateway/sms.php?id=USER&pw=PASS&absender=MyBO&empfaenger={tel}&text={text}&type=4                 */
 @define('BO_SMS_GATEWAY_URL', ''); //do not edit here, put it in config.php file!!!
+
+
+
+
+/*******************************************************************/
+/*** Experimental Polarity                                       ***/
+
+//enable the experiment ;-)
+//be sure to "calibrate" your antennas in the user area
+//the electrical orientation is important!
+@define('BO_EXPERIMENTAL_POLARITY_CHECK', true);
+
+//maximum distance in kilometers from your station where polarities
+//should be not too far, as polarity of the wave changes 
+//after some hundrets of kilometers
+@define('BO_EXPERIMENTAL_POLARITY_MAX_DIST', 300);
+
+//polarity is displayed beginning from given zoom-level
+@define('BO_EXPERIMENTAL_POLARITY_ZOOM', 8);
+
+//size of the +/- symbol in strike on map
+@define('BO_MAP_STRIKE_POLARITY_SIZE', 5);
+
+//size of the circle symbol in strike on map if polarity is unknown
+@define('BO_MAP_STRIKE_POLARITY_SIZE_UNKNOWN', 5);
 
 
 
@@ -1017,8 +1027,11 @@
 //Tile dimensions for strike counter
 @define("BO_TILE_SIZE_COUNT", 256);
 
+//timeout for tile creating
+@define("BO_TILE_CREATION_TIMEOUT", 5); 
+
 //waits when another tile is created
-define("BO_WAIT_SIM_TILE_CREATION", false); 
+@define("BO_TILE_CREATION_SIM_WAIT", false); 
 
 //Min and max count of participants - values are only used if
 //automatic getting from participants.txt failed
@@ -1056,6 +1069,12 @@ define("BO_WAIT_SIM_TILE_CREATION", false);
 
 //when station deleted -> assign a new unique id from defined value and up (MySQL UNSIGNED SMALLINT!)
 @define('BO_DELETED_STATION_MIN_ID', 50000);
+
+//draws nicer circles
+//0: off
+//1: on
+//2: auto-fallback to old method (off) in some cases, due to bug in old php versions
+@define('BO_NICE_CIRCLES', 2);
 
 
 /*******************************************************************/
