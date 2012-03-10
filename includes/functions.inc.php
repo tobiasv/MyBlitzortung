@@ -32,8 +32,26 @@ function bo_latlon2dist_rhumb($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
 	return $dist;
 }
 
+// latitude, longitude to bearing
+function bo_latlon2bearing($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
+{
+	if ($lat1 == $lat2 && $lon1 == $lon2)
+		return false;
+		
+	$dlon = deg2rad($lon1-$lon2);
+	$lat1 = deg2rad($lat1);
+	$lat2 = deg2rad($lat2);
+	
+	$bear = atan2(sin($dlon)*cos($lat2), cos($lat1)*sin($lat2) - sin($lat1)*cos($lat2)*cos($dlon) );
+	$bear = -rad2deg($bear) + 180;
+	$bear = fmod($bear, 360);
+	
+	return $bear;
+}
+
+
 // latitude, longitude to bearing (Rhumb Line!)
-function bo_latlon2bearing($lat2, $lon2, $lat1 = BO_LAT, $lon1 = BO_LON)
+function bo_latlon2bearing_rhumb($lat2, $lon2, $lat1 = BO_LAT, $lon1 = BO_LON)
 {
      //difference in longitudinal coordinates
      $dLon = deg2rad($lon2) - deg2rad($lon1);
@@ -52,10 +70,10 @@ function bo_latlon2bearing($lat2, $lon2, $lat1 = BO_LAT, $lon1 = BO_LON)
      }
 
      //return the angle, normalized
-	 $beta = (rad2deg(atan2($dLon, $dPhi)) + 360);
-	 $beta = fmod($beta, 360);
+	 $bear = rad2deg(atan2($dLon, $dPhi)) + 360;
+	 $bear = fmod($bear, 360);
 
-     return $beta;
+     return $bear;
 }
 
 function bo_bearing2direction($bearing)
@@ -119,8 +137,7 @@ function bo_distbearing2latlong_rhumb($dist, $bearing, $lat = BO_LAT, $lon = BO_
 	if (abs($lat2) > M_PI/2)
 		$lat2 = $lat2 > 0 ? M_PI-$lat2 : -(M_PI-$lat2);
 
-	$lon2 = ($lon + $dLon + M_PI) % (2 * M_PI) - M_PI;
-
+	$lon2 = fmod($lon + $dLon + M_PI, 2 * M_PI) - M_PI;
 
 	$lat2 = rad2deg($lat2);
 	$lon2 = rad2deg($lon2);
