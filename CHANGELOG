@@ -12,13 +12,14 @@ Version 0.7.5 (2012-??-??)
     --> uses some disk space
     --> disabled by default
 	--> you should enable if you have archived lightning-data and enough disk space
+	--> have a look on your mysql key-cache
 - new: residual time graphs (by andreas)
 - new: xy-graphs for signals (by andreas)
 - new: added a clean config.php.example
-- new: possibility to view signals of other station to a strike
+- new: possibility to view signals of a strike from other participated stations
 - new: you can now set the google maps API parameters (i.e. for api-key or sensor-state)
 - improved: partial file download for raw data, default interval is 10 minutes now
-- improved: (a bit) behaviour with lightning search
+- improved: behaviour with lightning search
 - fix: cleaned and fixed install
 - fix: update longtime-statistics only when station is active
 - fix: user cookie behaviour, session time display
