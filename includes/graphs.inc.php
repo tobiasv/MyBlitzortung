@@ -1003,7 +1003,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 		if ($type == 'spectrum')
 		{
-			$tmp = raw2array();
+			$tmp = bo_raw2array(false, true);
 			$freqs = $tmp['spec_freq'];
 			unset($freqs[0]);
 
@@ -1712,7 +1712,10 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$plot->SetWidth(BO_GRAPH_STAT_STRIKES_TIME_WIDTH);
 
 			$graph->Add($plot);
-			$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+			
+			if (count($tickMajPositions) > 1)
+				$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+				
 			$graph->yaxis->title->Set(_BL('Count'));
 			$graph->xaxis->title->Set(_BL($xtitle));
 			$graph->title->Set(_BL('graph_stat_title_strikes_time').$add_title);
@@ -1963,7 +1966,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->SetYScale(0,'lin');
 			$graph->AddY(0,$plot);
 
-			if (!empty($tickMajPositions) && !empty($tickLabels))
+			if (count($tickMajPositions) > 1)
 				$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
 				
 			$graph->xaxis->title->Set(_BL('Distance').'   [km]');
@@ -2006,7 +2009,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$graph->SetYScale(0,'lin');
 			$graph->AddY(0,$plot);
 
-			$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+			if (count($tickMajPositions) > 1)
+				$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
+				
 			$graph->xaxis->title->Set(_BL('Bearing').'   [°]');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
 

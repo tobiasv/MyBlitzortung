@@ -2112,7 +2112,7 @@ function bo_update_daily_stat()
 			{
 				if (bo_exit_on_timeout()) break;
 
-				$d = raw2array($row['data'], true, $row['channels'], $row['ntime']);
+				$d = bo_raw2array($row['data'], true, $row['channels'], $row['ntime']);
 
 				if ($row['amp1_max'])
 				{

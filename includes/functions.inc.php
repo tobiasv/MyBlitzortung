@@ -237,7 +237,7 @@ function bo_station_info($id = 0)
 }
 
 
-function get_station_list()
+function bo_get_station_list()
 {
 	$stations = bo_stations();
 	$opts = array();
@@ -254,9 +254,9 @@ function get_station_list()
 	return $opts;
 }
 
-function get_stations_html_select($station_id)
+function bo_get_stations_html_select($station_id)
 {
-	$opts = get_station_list();
+	$opts = bo_get_station_list();
 
 	$text = '<select name="bo_station_id" onchange="submit()">';
 	$text .= '<option></option>';
@@ -1221,13 +1221,6 @@ function bo_fft($sign, &$ar, &$ai)
 	return true;
 }
 
-if (!function_exists('hypot'))
-{
-	function hypot($x, $y)
-	{
-	  return sqrt($x*$x + $y*$y);
-	}
-}
 
 // transform from time domine to frequency domine using FFT
 function bo_time2freq($d, &$phase=array())
@@ -1251,7 +1244,7 @@ function bo_time2freq($d, &$phase=array())
 	for ($i=0; $i<=$n/2; $i++)
 	{
 		// Calculate the modulus (as length of the hypotenuse)
-		$amp[$i] = hypot($d[$i], $im[$i]);
+		$amp[$i] = hypot($d[$i]*$d[$i], $im[$i]*$im[$i]);
 
 		if (!$d[$i])
 			$phase[$i] = ($im[$i] < 0 ? -1 : 1) * M_PI / 2;
@@ -1263,7 +1256,7 @@ function bo_time2freq($d, &$phase=array())
 }
 
 //Raw hexadecimal signal to array
-function raw2array($raw = false, $calc_spec = false, $channels = -1, $ntime = -1)
+function bo_raw2array($raw = false, $calc_spec = false, $channels = -1, $ntime = -1)
 {
 	static $std_channels = -1, $std_bpv = -1, $std_values = -1, $std_ntime = -1;
 
@@ -1289,7 +1282,8 @@ function raw2array($raw = false, $calc_spec = false, $channels = -1, $ntime = -1
 	{
 		//dummy signal when returning an empty array out of standard value count
 		$calc_spec = true;
-		$raw = str_repeat(chr(0), $values * $channels);
+		$values = $std_values;
+		$raw = str_repeat(chr(0), $std_values * $channels);
 	}
 	else
 	{
@@ -1364,7 +1358,7 @@ function raw2array($raw = false, $calc_spec = false, $channels = -1, $ntime = -1
 
 function bo_examine_signal($data, $channels=0, $ntime=0, &$amp = array(), &$amp_max = array(), &$freq = array(), &$freq_amp = array())
 {
-	$sig_data = raw2array($data, true, $channels, $ntime);
+	$sig_data = bo_raw2array($data, true, $channels, $ntime);
 
 	$amp = array(0,0);
 	$amp_max = array(0,0);

@@ -18,7 +18,7 @@ class BoSignalGraph
 	
 	function SetData($type, $data, $channels, $ntime)
 	{
-		$data = raw2array($data, true, $channels, $ntime);
+		$data = bo_raw2array($data, true, $channels, $ntime);
 		
 		$tickLabels = array();
 		$tickMajPositions = array();
