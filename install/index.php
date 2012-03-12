@@ -12,7 +12,7 @@ if (file_exists($path.'config.php'))
 
 require_once $path.'includes/default_settings.inc.php';
 require_once $path.'includes/classes/Db.class.php';
-
+require_once $path.'includes/data.inc.php';
 
 if ($_SERVER['HTTP_HOST'])
 {
