@@ -133,6 +133,9 @@ function bo_show_archive_map()
 	if (isset($ani_cfg['default_range']))
 		$ani_default_range = $ani_cfg['default_range'];
 
+	if (isset($ani_cfg['max_range']))
+		$ani_max_range = $ani_cfg['max_range'];
+
 	if (isset($ani_cfg['delay']))
 		$ani_delay = $ani_cfg['delay'];
 		
@@ -178,8 +181,8 @@ function bo_show_archive_map()
 		{
 			if ($ani_preset == 'now')
 			{
-				$hour_from = date('H') - ($ani_pic_range / 60) * 2;
 				$hour_range = $ani_default_range + ($hours_interval <= 6 ? $hours_interval : 0);
+				$hour_from = date('H') - $hour_range;
 			}
 			elseif ($ani_preset == 'day')
 			{
