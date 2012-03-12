@@ -92,7 +92,7 @@ else
 		$step = 0;
 		$msg = 3;
 	}
-	elseif (!strpos(BO_LAT, '.') || !strpos(BO_LON, '.'))
+	elseif (strpos(BO_LAT, ',') || strpos(BO_LON, ','))
 	{
 		$step = 0;
 		$msg = 4;
