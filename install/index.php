@@ -143,8 +143,8 @@ else
 				$step = 2;
 			else if (!count($tables) && $step == 2 && $rows < 10) //already installed --> no reinstall
 				$step = 3;
-			else if ($rows) // there's already sth in the database --> last step
-				$step = 4;
+			//else if ($rows) // there's already sth in the database --> last step
+			//	$step = 4;
 		}
 	}
 }
@@ -280,7 +280,8 @@ switch($step)
 			}
 		}
 
-		bo_db_recreate_strike_keys();
+		bo_db_recreate_strike_keys(true);
+		
 		
 		if ($err)
 		{
@@ -292,6 +293,7 @@ switch($step)
 		else
 		{
 			echo '<p>Database installation done!</p>';
+			
 			if (!$rows)
 				echo '<p><a href="?step=3">Test data collection</a> (This may take a while!)</p>';
 			else
@@ -303,7 +305,8 @@ switch($step)
 	case 3:
 
 		include $path.'blitzortung.php';
-
+		bo_set_conf('version', BO_VER);
+		
 		echo '<h2>Testing data collection</h2>';
 
 		echo '<p>You should see some output and no error messages:</p>';
@@ -319,7 +322,6 @@ switch($step)
 		echo '<p><a href="?step=4">Finish installation &gt;</a></p>';
 
 		bo_set_conf('install_show_secret', time());
-		bo_set_conf('version', BO_VER);
 		
 		break;
 

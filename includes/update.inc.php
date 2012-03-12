@@ -32,8 +32,17 @@ function bo_check_for_update()
 		if ($_GET['bo_update_from'])
 			$cur_version = $_GET['bo_update_from'];
 		else
+		{
 			$cur_version = bo_get_conf('version');
-
+			
+			if ((int)$cur_version == 0) //if no or wrong version is saved
+			{
+				bo_set_conf('version', BO_VER);
+				$cur_version = BO_VER;
+			}
+				
+		}
+		
 		$cur_version_num = bo_version2number($cur_version);
 		$bo_version = BO_VER;
 
