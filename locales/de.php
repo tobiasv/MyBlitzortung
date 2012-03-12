@@ -1098,6 +1098,6 @@ $_BL['de']['bo_graph_descr_strikes_station_residual_time'] = 'Hier wird die Rest
 $_BL['de']['no_lightning_data'] = 'Keine Blitzdaten verfügbar!';
 $_BL['de']['Mean coordinates'] = 'Gemittelte Koordinaten';
 $_BL['de']['h4_stat_station_area'] = 'Umgebung der Station';
-
+$_BL['de']['Last position'] = 'Letzte Position';
 
 ?>

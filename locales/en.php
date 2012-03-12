@@ -1046,5 +1046,6 @@ $_BL['en']['h4_graph_residual_time'] = 'Distribution of residual time';
 $_BL['en']['bo_graph_descr_strikes_station_residual_time'] = false; // ToDo
 $_BL['en']['Mean coordinates'] = 'Mean coordinates';
 $_BL['en']['h4_stat_station_area'] = 'Surrounding area';
+$_BL['en']['Last position'] = 'Last position';
 
 ?>

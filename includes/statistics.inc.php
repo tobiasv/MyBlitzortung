@@ -482,31 +482,25 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 	
 	
+	$antenna = $own_station ? bo_get_antenna_data() : false;
+	$show_overview = (double)$stInfo['lat'] != 0.0 && (double)$stInfo['lon'] != 0.0;
+	$show_gps = $show_overview && (
+	              ($own_station && ((defined("BO_SHOW_GPS_INFO") && BO_SHOW_GPS_INFO) || (bo_user_get_level() & BO_PERM_SETTINGS)))
+				  || (BO_ENABLE_LONGTIME_ALL === true && (bo_user_get_level() & BO_PERM_SETTINGS))
+				  );
 	
-	if ($own_station)
-		$antenna = bo_get_antenna_data();
-	else
-		$antenna = false;
-		
 	//Show GPS Info
-	if (
-	         ($own_station 
-					&& ((defined("BO_SHOW_GPS_INFO") && BO_SHOW_GPS_INFO) || (bo_user_get_level() & BO_PERM_SETTINGS)))
-				|| (BO_ENABLE_LONGTIME_ALL === true && (bo_user_get_level() & BO_PERM_SETTINGS))
-		)
+	if ($show_gps)
 	{
-		echo '<h4>'._BL('h4_stat_other_gps').'</h4>';
-		echo '<p class="bo_stat_description" id="bo_stat_other_descr_gps">';
-		echo _BL('bo_stat_other_gps_descr');
-		echo '</p>';
-
 		$js_data = '';
 		$height = array();
 		$lat = array();
 		$lon = array();
+		$mean_lat = 0;
+		$mean_lat = 0;
+		$show_map = false;
 
 		$data = unserialize(bo_get_conf('station_data24h'.$add));
-
 		$add = $own_station ? '' : '#'.$station_id.'#';
 		$data = unserialize(bo_get_conf('station_data24h'.$add));
 		if (isset($data) && is_array($data))
@@ -531,8 +525,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			}
 
 		}
-
-		$show_map = false;
+		
 		if (count($lat))
 		{
 			$show_map = true;
@@ -561,12 +554,24 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			}
 
 		}
-		else
+		elseif ((double)$stInfo['lat'] != 0.0 && (double)$stInfo['lon'] != 0.0)
 		{
-			$mean_lat = $stInfo['lon'];
-			$mean_lon = $stInfo['lat'];
+			$show_map = true;
+			$mean_lat = $stInfo['lat'];
+			$mean_lon = $stInfo['lon'];
 		}
 
+		if ($own_station)
+		{
+			$lat_marker = BO_LAT;
+			$lon_marker = BO_LON;
+		}
+		else
+		{
+			$lat_marker = $stInfo['lat'];
+			$lon_marker = $stInfo['lon'];
+		}
+		
 		if ($antenna !== false && $own_station)
 		{
 			$show_map = true;
@@ -601,8 +606,11 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			';
 		}
 
+		echo '<h4>'._BL('h4_stat_other_gps').'</h4>';
+		echo '<p class="bo_stat_description" id="bo_stat_other_descr_gps">';
+		echo _BL('bo_stat_other_gps_descr');
+		echo '</p>';
 		echo '<ul class="bo_stat_overview">';
-
 		if ($lat[0] && $lon[0])
 		{
 			echo '<li><span class="bo_descr">'._BL('Mean coordinates').': </span>';
@@ -611,22 +619,36 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			if (count($height) > 1)
 				echo '<li><span class="bo_descr">'._BL('Height').': </span><span class="bo_value">'.$st_height.'m (&plusmn;'.number_format($height_dev, 1, _BL('.'), _BL(',')).'m)</span>';
 		}
+		elseif ($show_map)
+		{
+			echo '<li><span class="bo_descr">'._BL('Last position').': </span>';
+			echo '<span class="bo_value">'.number_format($stInfo['lat'],6,_BL('.'), _BL(',')).'&deg; / '.number_format($stInfo['lon'],6,_BL('.'), _BL(',')).'&deg</span>';
+		}
 		else
 			echo '<li><span class="bo_descr">'._BL('Currently no GPS coordinates available!').'</span>';
-
 		echo '</ul>';
-
 
 
 		//Show the map
 		if ($show_map)
 		{
-			echo '<div id="bo_gmap" class="bo_map_gps" style="width:560px;height:200px"></div>';
+			echo '<div id="bo_gmap" class="bo_map_gps" style="width:550px;height:200px"></div>';
 ?>
 			<script type="text/javascript">
 
 			function bo_gmap_init2()
 			{
+				var bounds = new google.maps.LatLngBounds();			
+				var myLatlng = new google.maps.LatLng(<?php echo (double)$lat_marker.','.(double)$lon_marker ?>);
+				
+				var marker = new google.maps.Marker({
+				  position: myLatlng, 
+				  map: bo_map, 
+				  icon: '<?php echo BO_MAP_STATION_ICON ?>' 
+				});
+				
+				bounds.extend(myLatlng);
+			
 				var coordinates;
 				coordinates = [ <?php echo $js_data ?> ];
 
@@ -641,16 +663,19 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 						});
 					gpsPath.setMap(bo_map);
 
-					var bounds = new google.maps.LatLngBounds();
+
 					for (var i = 0; i < coordinates.length; i++) {
 						bounds.extend(coordinates[i]);
 					}
-					
-					bounds.extend(new google.maps.LatLng(<?php echo $stInfo['lat'].','.$stInfo['lon']; ?>));
-					
+
 					<?php echo BO_STATISTICS_GPS_MAP_ZOOM == 0 ? 'bo_map.fitBounds(bounds);' : ''; ?>
 				}
+				else
+				{
+					bo_map.setZoom(<?php echo BO_STATISTICS_GPS_MAP_ZOOM == 0 ? 12 : BO_STATISTICS_GPS_MAP_ZOOM; ?>);
+				}
 
+				
 				<?php echo $js_data_ant ?>
 			}
 
@@ -661,11 +686,11 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			bo_insert_map(0, $mean_lat, $mean_lon, BO_STATISTICS_GPS_MAP_ZOOM, BO_STATISTICS_GPS_MAPTYPE);
 		}
 	}
-	elseif ((double)($stInfo['lat']) && (double)($stInfo['lon']))
+	elseif ($show_overview)
 	{
 		echo '<h4>'._BL('h4_stat_station_area').'</h4>';
 		
-		echo '<div id="bo_gmap" class="bo_map_station" style="width:560px;height:200px"></div>';
+		echo '<div id="bo_gmap" class="bo_map_station" style="width:550px;height:200px"></div>';
 
 		?>
 		<script type="text/javascript">
