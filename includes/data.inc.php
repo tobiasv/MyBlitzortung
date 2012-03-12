@@ -43,12 +43,15 @@ function bo_set_conf($name, $data)
 }
 
 
-function bo_db_recreate_strike_keys()
+function bo_db_recreate_strike_keys($quiet = false)
 {
-	echo "Updating database keys.\n";
-	echo "WARNING: This may take several minutes or longer!\n";
-	echo "Please wait until the page as fully loaded!\n";
-	echo "Executing Database commands:\n";
+	if (!$quiet)
+	{
+		echo "Updating database keys.\n";
+		echo "WARNING: This may take several minutes or longer!\n";
+		echo "Please wait until the page as fully loaded!\n";
+		echo "Executing Database commands:\n";
+	}
 	
 	$byte2mysql[1] = 'TINYINT';
 	$byte2mysql[2] = 'SMALLINT';
@@ -113,7 +116,7 @@ function bo_db_recreate_strike_keys()
 
 
 	if (!empty($sql_alter))
-		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter));
+		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter), $quiet);
 
 		
 	$sql_alter = array();
@@ -153,7 +156,7 @@ function bo_db_recreate_strike_keys()
 	}
 
 	if (!empty($sql_alter))
-		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter));
+		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter), $quiet);
 
 	
 	
@@ -169,7 +172,7 @@ function bo_db_recreate_strike_keys()
 		$sql_alter[] = 'ADD INDEX `latlon_index` (`lat_x`,`lon_x`)';
 		
 	if (!empty($sql_alter))
-		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter));
+		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter), $quiet);
 
 		
 	//5. update values
@@ -190,7 +193,7 @@ function bo_db_recreate_strike_keys()
 			$time_start  = strtotime(BO_DB_EXTRA_KEYS_TIME_START);
 			$time_div    = (double)BO_DB_EXTRA_KEYS_TIME_DIV_MINUTES;
 			$sql = 'UPDATE `'.BO_DB_PREF.'strikes` SET time_x=(FLOOR((UNIX_TIMESTAMP(time)-'.$time_start.')/60/'.$time_div.')%'.$time_vals.')';
-			$ok = bo_db_recreate_strike_keys_db($sql) >= 0;
+			$ok = bo_db_recreate_strike_keys_db($sql, $quiet) >= 0;
 		}
 		
 		if ($ok && $bytes_latlon)
@@ -200,7 +203,7 @@ function bo_db_recreate_strike_keys()
 			$lon_div     = (double)BO_DB_EXTRA_KEYS_LON_DIV;
 			
 			$sql = 'UPDATE `'.BO_DB_PREF.'strikes` SET lat_x=FLOOR(((90+lat)%'.$lat_div.')/'.$lat_div.'*'.$latlon_vals.'), lon_x=FLOOR(((180+lon)%'.$lon_div.')/'.$lon_div.'*'.$latlon_vals.')';
-			$ok = bo_db_recreate_strike_keys_db($sql) >= 0;
+			$ok = bo_db_recreate_strike_keys_db($sql, $quiet) >= 0;
 		}
 		
 		if ($ok)
@@ -214,19 +217,25 @@ function bo_db_recreate_strike_keys()
 		}
 	}
 	
-	echo "\n\nFinished! ";
+	if (!$quiet)
+		echo "\n\nFinished! ";
 	
 	return;
 }
 
-function bo_db_recreate_strike_keys_db($sql)
+function bo_db_recreate_strike_keys_db($sql, $quiet = false)
 {
-	echo "\n * $sql: ";
+	if (!$quiet)
+		echo "\n * $sql: ";
+	
 	flush();
 	$ok = BoDb::query($sql, false);
 
-	echo _BL($ok !== false ? 'OK' : 'FAIL');
+	if (!$quiet)
+		echo _BL($ok !== false ? 'OK' : 'FAIL');
+	
 	flush();
+
 	return $ok;
 }
 

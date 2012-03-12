@@ -280,6 +280,8 @@ switch($step)
 			}
 		}
 
+		bo_db_recreate_strike_keys();
+		
 		if ($err)
 		{
 			echo '<p style="color:red; font-weight: bold">';
