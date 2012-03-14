@@ -421,7 +421,7 @@
 @define('BO_MAX_ZOOM_IN_USER', 14);        
 
 // minimal zoom level for users
-@define('BO_MIN_ZOOM_OUT_USER', 3);
+@define('BO_MIN_ZOOM_OUT_USER', 2);
 
 // the default map style (you can also use satellite, hybrid, street)
 @define('BO_DEFAULT_MAP', 'TERRAIN'); 

@@ -1811,8 +1811,8 @@ function bo_get_zoom_limits()
 	//allow all zoom levels on logged in users with access rights	
 	if ((bo_user_get_level() & BO_PERM_NOLIMIT)) 
 	{
-		$max_zoom = defined('BO_MAX_ZOOM_IN_USER') ? intval(BO_MAX_ZOOM_IN) : 999;
-		$min_zoom = defined('BO_MIN_ZOOM_OUT_USER') ? intval(BO_MIN_ZOOM_OUT) : 0;
+		$max_zoom = defined('BO_MAX_ZOOM_IN_USER') ? intval(BO_MAX_ZOOM_IN_USER) : 999;
+		$min_zoom = defined('BO_MIN_ZOOM_OUT_USER') ? intval(BO_MIN_ZOOM_OUT_USER) : 0;
 	}
 	else
 	{
