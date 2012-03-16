@@ -294,8 +294,8 @@
 @define('BO_STATION_STAT_DISABLE', false);
 
 
-// Mark stations offline after specified time with no signals  
-@define('BO_STATION_OFFLINE_HOURS', 0.5);
+// Mark stations offline after specified time with no activity  
+@define('BO_STATION_OFFLINE_MINUTES', 15);
 
 
 // Show new stations                                           

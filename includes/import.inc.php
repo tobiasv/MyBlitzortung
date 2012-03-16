@@ -1604,15 +1604,13 @@ function bo_update_stations($force = false)
 				$activebyuser[$stUser] = array('id' => $stId, 'sig' => $stSignals, 'lat' => $stLat, 'lon' => $stLon);
 
 			//mark Offline?
-			if ($stStatus != '-' && time() - $stTimeU > (double)BO_STATION_OFFLINE_HOURS * 3600)
+			if ($stStatus != '-' && time() - $stTimeU > (double)BO_STATION_OFFLINE_MINUTES)
 				$stStatus = 'O';  //Special offline status
 
 			//Data for statistics
 			$StData[$stId] = array('time' => $stTimeU, 'lat' => $stLat, 'lon' => $stLon);
 			$StData[$stId]['sig'] = $stSignals;
 			$StData[$stId]['status'] = $stStatus;
-			$StData[$stId]['active'] = $stStatus == 'A'; //GPS is (or was) active
-			$StData[$stId]['available'] = $stStatus != '-'; //has sent some data some time ago
 
 
 			$sql = " 	id='$stId',
@@ -1738,6 +1736,8 @@ function bo_update_stations($force = false)
 		$active_sig_stations = 0;
 		$active_avail_stations = 0;
 		$active_nogps = 0;
+		$stat_sql = '';
+		
 		foreach($StData as $id => $data)
 		{
 			if ($only_own && $only_own != $id)
@@ -1745,25 +1745,26 @@ function bo_update_stations($force = false)
 
 			if ($id && ($data['sig'] || $data['strikes']))
 			{
-				BoDb::query("INSERT INTO ".BO_DB_PREF."stations_stat
-					SET station_id='$id', time='$datetime',
-					signalsh='".intval($data['sig'])."',
-					strikesh='".intval($data['strikes'])."'");
+				$stat_sql .= ($stat_sql ? ',' : '');
+				$stat_sql .= "('$id', '$datetime', '".intval($data['sig'])."', '".intval($data['strikes'])."')";
 			}
 
-			if ($data['active']) //GPS is/was active
+			if ($data['status'] == 'A') //GPS is/was active
 				$active_stations++;
 
-			if ($data['sig']) //Station is sending (really active)
-				$active_sig_stations++;
-
-			if ($data['available']) //Station is available (no dummy entry, has sent some data some time ago)
+			if ($data['status'] != '-') //Station is available (no dummy entry, has sent some data some time ago)
 				$active_avail_stations++;
 
 			if ($data['status'] == 'V') //GPS is unavailable right now
 				$active_nogps++;
+
+			if ($data['sig']) //Station is sending (really active)
+				$active_sig_stations++;
 		}
 
+		if ($stat_sql)
+			BoDb::query("INSERT INTO ".BO_DB_PREF."stations_stat (station_id, time, signalsh, strikesh) VALUES $stat_sql");
+		
 		bo_set_conf('active_stations_nogps', $active_nogps);
 
 		//Update whole strike count for dummy station "0"
