@@ -779,6 +779,7 @@ function bo_load_locale($locale = '')
 		}
 		else if (isset($_COOKIE['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_COOKIE['bo_locale']))
 		{
+			$_SESSION['bo_locale'] = $_COOKIE['bo_locale'];
 			$locale = $_COOKIE['bo_locale'];
 		}
 
