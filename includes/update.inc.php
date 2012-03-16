@@ -7,19 +7,22 @@ function bo_check_for_update()
 	$db_update = false;
 	$do_update = $_GET['bo_action'] == 'do_update';
 
-	$updates = array(	'0.2.2' => 202,
-						'0.3' 	=> 300,
-						'0.3.1' => 301,
-						'0.4.8' => 408,
-						'0.5.2' => 502,
-						'0.5.5' => 505,
-						'0.6.1' => 601,
-						'0.6.2' => 602,
-						'0.7.2' => 702,
-						'0.7.3' => 703,
-						'0.7.4' => 704,
-						'0.7.5' => 705,);
+	$updates = array(	'0.2.2',
+						'0.3',
+						'0.3.1',
+						'0.4.8',
+						'0.5.2',
+						'0.5.5',
+						'0.6.1',
+						'0.6.2',
+						'0.7.2',
+						'0.7.3',
+						'0.7.4',
+						'0.7.5',
+						'0.7.5a');
 
+	$max_update_num = bo_version2number($updates[count($updates)-1]);
+	
 	if ($_GET['bo_update_from'] && $_GET['bo_update_to'])
 	{
 		$cur_version = $_GET['bo_update_from'];
@@ -30,12 +33,14 @@ function bo_check_for_update()
 	else
 	{
 		if ($_GET['bo_update_from'])
+		{
 			$cur_version = $_GET['bo_update_from'];
+		}
 		else
 		{
 			$cur_version = bo_get_conf('version');
 			
-			if ((int)$cur_version == 0) //if no or wrong version is saved
+			if (!$cur_version) //if no or wrong version is saved
 			{
 				bo_set_conf('version', BO_VER);
 				$cur_version = BO_VER;
@@ -58,7 +63,7 @@ function bo_check_for_update()
 			echo '</div>';
 		}
 
-		if ($cur_version_num < max($updates) && !$do_update)
+		if ($cur_version_num < $max_update_num && !$do_update)
 		{
 			echo '<div id="bo_update_info">';
 			echo '<h4>'._BL('Database version changed!').'</h4>';
@@ -72,8 +77,10 @@ function bo_check_for_update()
 
 	echo '<div id="bo_update_info">';
 
-	foreach($updates as $new_version => $number)
+	foreach($updates as $new_version)
 	{
+		$number = bo_version2number($new_version);
+				
 		if ($cur_version_num >= $number)
 			continue;
 
@@ -506,8 +513,13 @@ function bo_check_for_update()
 
 function bo_version2number($version)
 {
-	preg_match('/([0-9]+)(\.([0-9]+)(\.([0-9]+))?)?/', $version, $r);
-	return $r[1] * 10000 + $r[3] * 100 + $r[5];
+	preg_match('/([0-9]+)(\.([0-9]+)(\.([0-9]+))?)?([a-z])?/', $version, $r);
+	$num = $r[1] * 10000 + $r[3] * 100 + $r[5];
+	
+	if ($r[6])
+		$num += (abs(ord($r[6]) - ord('a')) + 1) * 0.01;
+	
+	return $num;
 }
 
 

@@ -3,6 +3,10 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.5a (2012-03-16)
+-------------------------------
+- fixed update
+
 Version 0.7.5 (2012-03-16)
 -------------------------------
 - Default timezone now UTC!
