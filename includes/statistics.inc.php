@@ -785,8 +785,6 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		$range = 1;
 
 
-	$date_range	= gmdate('Y-m-d H:i:s', time() - $range*3600);
-
 	//Last update, time range
 	$row = BoDb::query("SELECT MAX(time) mtime FROM ".BO_DB_PREF."stations_stat WHERE time < '".gmdate("Y-m-d H:i:s", time() - 10)."'")->fetch_assoc();
 	$time = strtotime($row['mtime'].' UTC');
@@ -805,7 +803,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 
 	//Strikes in timerange
-	$sql = "SELECT strikesh, DATE_FORMAT(time, '%Y%m%d%H') h
+	$sql = "SELECT AVG(strikesh) strikesh, DATE_FORMAT(time, '%Y%m%d%H') h
 			FROM ".BO_DB_PREF."stations_stat
 			WHERE station_id='0'
 			AND time BETWEEN '$table_time_start' AND '$table_time_end'
