@@ -19,7 +19,8 @@ function bo_check_for_update()
 						'0.7.3',
 						'0.7.4',
 						'0.7.5',
-						'0.7.5a');
+						'0.7.5a',
+						'0.7.5b');
 
 	$max_update_num = bo_version2number($updates[count($updates)-1]);
 	
@@ -425,18 +426,22 @@ function bo_check_for_update()
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 
+				break;
+			
+			case '0.7.5b':
 
-				//if ($ok)
-				{
-					$channels = bo_get_conf('raw_channels');
-					$ntime    = bo_get_conf('raw_ntime');
-
-					$sql = "UPDATE `".BO_DB_PREF."raw` SET channels='$channels', ntime='$ntime' WHERE channels=0 AND ntime=0";
-					echo '<li><em>'.$sql.'</em>: <b>';
-					flush();
-					$no = BoDb::query($sql, false);
-					echo $no.' rows affected</b></li>';
-				}
+				//silent update, because of wrong install in 0.7.5(a)
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'raw`	ADD `ntime` SMALLINT UNSIGNED NOT NULL AFTER `channels`';
+				BoDb::query($sql, false);
+				$ok = true;
+				
+				$channels = bo_get_conf('raw_channels');
+				$ntime    = bo_get_conf('raw_ntime');
+				$sql = "UPDATE `".BO_DB_PREF."raw` SET channels='$channels', ntime='$ntime' WHERE channels=0 AND ntime=0";
+				echo '<li><em>'.$sql.'</em>: <b>';
+				flush();
+				$no = BoDb::query($sql, false);
+				echo $no.' rows affected</b></li>';
 
 				break;
 
