@@ -666,7 +666,7 @@
 //enable the experiment ;-)
 //be sure to "calibrate" your antennas in the user area
 //the electrical orientation is important!
-@define('BO_EXPERIMENTAL_POLARITY_CHECK', true);
+@define('BO_EXPERIMENTAL_POLARITY_CHECK', false);
 
 //maximum distance in kilometers from your station where polarities
 //should be not too far, as polarity of the wave changes 
