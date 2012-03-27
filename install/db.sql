@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (
   `id` smallint(5) unsigned NOT NULL,
   `user` varchar(8) NOT NULL,
   `city` varchar(50) NOT NULL,
-  `country` varchar(20) NOT NULL,
+  `country` varchar(50) NOT NULL,
   `lat` decimal(9,6) NOT NULL,
   `lon` decimal(9,6) NOT NULL,
   `distance` mediumint(8) unsigned NOT NULL,
