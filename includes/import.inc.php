@@ -3102,7 +3102,7 @@ function bo_download_external($force = false)
 			clearstatcache();
 			
 			//Download!
-			$modified = $data['data'][$id]['modified'];
+			$modified = $force ? 0 : $data['data'][$id]['modified'];
 			$range = 0;
 			$data['data'][$id]['last'] = time();
 			$file_content = bo_get_file($d['url'], $code, 'download_'.$id, $range, $modified);
