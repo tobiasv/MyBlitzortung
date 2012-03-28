@@ -137,6 +137,10 @@ function bo_update_all2($force = false, $only = '')
 			bo_my_station_autoupdate($force);
 	}
 
+	
+	/*** Download external pictures/files ***/
+	if (!$only || $only == 'download')
+		bo_download_external($force);
 
 	/*** Purge old data ***/
 	if (bo_exit_on_timeout()) return;
@@ -3060,6 +3064,139 @@ function bo_delete_station($id = 0)
 	return false;
 }
 
+function bo_download_external($force = false)
+{
+	global $_BO;
+
+	
+	if (!isset($_BO['download']) || count($_BO['download']) == 0)
+		return;
+
+	bo_echod(" ");
+	bo_echod("=== File Downloads ===");
+
+	$data = unserialize(bo_get_conf('uptime_ext_downloads'));
+
+	if (time() - $data['last_update'] > BO_UP_INTVL_DOWNLOADS * 60 - 30 || $force || time() < $data['last_update'])
+	{
+		//pre-save time to avoid errors when downloads hang...
+		$data['last_update'] = time();
+		bo_set_conf('uptime_ext_downloads', serialize($data));
+	
+	
+		
+		foreach($_BO['download'] as $name => $d)
+		{
+			//use a short id
+			$id = substr(md5($id), 0, 10);
+			
+			bo_echod(" - $name [$id] / Last download: ".date('Y-m-d H:i:s', $data['data'][$id]['last']).' / Last modified: '.date('Y-m-d H:i:s', $data['data'][$id]['modified']));
+			
+			//Download if min minute is gone and last update was interval-time before
+			if (!$force && ((int)date('i') < $d['after_minute'] || time() - $data['data'][$id]['last'] < $d['interval'] * 60))
+			{
+				bo_echod("    -> Needs no download");
+				continue;
+			}
+
+			clearstatcache();
+			
+			//Download!
+			$modified = $data['data'][$id]['modified'];
+			$range = 0;
+			$data['data'][$id]['last'] = time();
+			$file_content = bo_get_file($d['url'], $code, 'download_'.$id, $range, $modified);
+			
+			if ($file_content === false)
+			{
+				if ($code == 304)
+					bo_echod("    -> File not modified, no download. ");
+				else
+					bo_echod("    -> Error: Download failed (Code: $code)!");
+				
+				continue;
+			}
+			else
+			{
+			
+				if ($modified)
+					$data['data'][$id]['modified'] = $modified;
+				else
+					$data['data'][$id]['modified'] = time();
+
+					
+				//File/Directory handling
+				$dir = BO_DIR.'/'.$d['dir'].'/';
+				$file = bo_insert_date_string($d['file'], $data['data'][$id]['modified']);
+				$dir = $dir.dirname($file);
+				$file = $dir.'/'.basename($file);
+				
+				if (!file_exists($file))
+					@mkdir($dir, 0777, true);
+				
+				if (file_exists($file) && is_dir($file))
+				{
+					bo_echod("    -> Error: Filename is a directory!");
+					continue;
+				}
+				elseif (file_exists($file) && !$d['overwrite'])
+				{
+					bo_echod("    -> File exists! Overwrite disabled!");
+					continue;
+				}
+				elseif(file_exists($file) && !is_writeable($file))
+				{
+					bo_echod("    -> Error: Directory/file is not writeable!");
+					continue;
+				}
+				elseif(!file_exists($file) && !is_writeable($dir))
+				{
+					bo_echod("    -> Error: Directory/file is not writeable!");
+					continue;
+				}
+				
+				//Save it
+				$put = file_put_contents($file, $file_content);
+				
+				if (!$put)
+				{
+					bo_echod("    -> Error: Writing to file!");
+					continue;
+				}
+				
+				$kbytes = round(strlen($file_content)) / 1024;
+				
+				bo_echod("    -> Success: Saved $kbytes kB");
+			}
+			
+		}
+
+		
+		
+		$data['last_update'] = time();
+		bo_set_conf('uptime_ext_downloads', serialize($data));
+
+	}
+	
+	return;
+	
+}
+
+function bo_insert_date_string($text, $time = null)
+{
+	if ($time === null)
+		$time = time();
+		
+	$allow = "yYmdHhis"; //todo: maybe more needed
+	
+	for($i=0;$i<strlen($allow);$i++)
+	{
+		$letter = substr($allow,$i,1);
+		$text = strtr($text, array('%'.$letter => gmdate($letter, $time)));
+	}
+	
+	return $text;
+}
 
 
 ?>

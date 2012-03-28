@@ -503,7 +503,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		}
 		
 		if (!empty($color_tmp))
-			$c = $color_tmp;
+			$cfg['col'] = $color_tmp;
 	}
 	
 	//smooth the colors

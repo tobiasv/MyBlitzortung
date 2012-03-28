@@ -68,7 +68,7 @@ class BoMapProjection
 		}
 	}
 	
-	//ToDo: We need calculation image-pixel -> lat/lon for that
+	//ToDo: We need calculation image-pixel -> lat/lon for that (or extra cfg-setting)
 	function GetBounds()
 	{
 		switch ($this->Method)

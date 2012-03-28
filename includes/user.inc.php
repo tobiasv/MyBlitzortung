@@ -180,6 +180,7 @@ function bo_user_show_admin()
 			//echo '<li><a href="'.$url.'update&bo_only=daily">'._BL('Update only daily statistics').'</a></li>';
 			echo '<li><a href="'.$url.'update&bo_only=density">'._BL('Update only densities').'</a></li>';
 			echo '<li><a href="'.$url.'update&bo_only=tracks">'._BL('Update only tracks').'</a></li>';
+			echo '<li><a href="'.$url.'update&bo_only=download">'._BL('Download only external files').'</a></li>';
 			echo '<li><a href="'.$url.'update&bo_only=purge">'._BL('Force data purge only').'</a></li>';
 			echo '<li><a href="'.$url.'update&bo_only=alerts">'._BL('Check alerts only').'</a></li>';
 			echo '<li><a href="'.$url.'strike_keys">'._BL('Update database keys').'</a></li>';

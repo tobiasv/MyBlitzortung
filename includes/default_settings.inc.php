@@ -131,6 +131,8 @@
 //signal update interval
 @define('BO_UP_INTVL_RAW', 10);
 
+//min interval of external downloads
+@define('BO_UP_INTVL_DOWNLOADS', 5);
 
 
 /*******************************************************************/
