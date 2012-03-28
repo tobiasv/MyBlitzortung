@@ -532,19 +532,65 @@ function bo_latlon2mercator($lat, $lon)
 	return array($lon, $lat);
 }
 
-function bo_latlon2projection($proj, $lat, $lon)
+
+function bo_latlon2geos($lat, $lon)
 {
-	switch ($proj)
-	{
 
-		default:
-			return bo_latlon2mercator($lat, $lon);
+	//  REFERENCE:                                            
+	//  [1] LRIT/HRIT Global Specification                     
+	//      (CGMS 03, Issue 2.6, 12.08.1999)                  
+	//      for the parameters used in the program.
 
-		case 'plate':
-			return array($lon, $lat);
+	if ($lon > 180)
+		$lon -= 360;
 
-	}
+	$SUB_LON     = 0.0;        /* longitude of sub-satellite point in radiant */
+	$R_POL       = 6356.5838;  /* radius from Earth centre to pol             */
+	$R_EQ        =  6378.169;  /* radius from Earth centre to equator         */
+	$SAT_HEIGHT  = 42164.0;    /* distance from Earth centre to satellite     */
+		
+	$lat = deg2rad($lat);
+	$lon = deg2rad($lon);
+	
+	/* calculate the geocentric latitude from the          */
+	/* geograhpic one using equations on page 24, Ref. [1] */
+	$c_lat = atan( 0.993243 * tan($lat) );
+	
+	/* using c_lat calculate the length form the Earth */
+	/* centre to the surface of the Earth ellipsoid    */
+	/* equations on page 23, Ref. [1]                  */
+	$re = $R_POL / sqrt( (1.0 - 0.00675701 * cos($c_lat) * cos($c_lat) ) );
+	
+	/* calculate the forward projection using equations on */
+	/* page 24, Ref. [1]                                   */
+	$rl = $re; 
+	$r1 = $SAT_HEIGHT - $rl * cos($c_lat) * cos($lon - $SUB_LON);
+	$r2 = -$rl *  cos($c_lat) * sin($lon - $SUB_LON);
+	$r3 = $rl * sin($c_lat);
+	$rn = sqrt( $r1*$r1 + $r2*$r2 +$r3*$r3 );
+	
+
+	/* check for visibility, whether the point on the Earth given by the */
+	/* latitude/longitude pair is visible from the satellte or not. This */ 
+	/* is given by the dot product between the vectors of:               */
+	/* 1) the point to the spacecraft,			               */
+	/* 2) the point to the centre of the Earth.			       */
+	/* If the dot product is positive the point is visible otherwise it  */
+	/* is invisible.						       */
+	$dotprod = $r1*($rl * cos($c_lat) * cos($lon - $SUB_LON)) - $r2*$r2 - $r3*$r3*(pow(($R_EQ/$R_POL),2));
+
+	if ($dotprod <= 0 )
+		return false;
+	
+	/* the forward projection is x and y */
+	$x = atan(-$r2/$r1);
+	$y = asin(-$r3/$rn);
+	
+	return array($x, $y);
 }
+
+
+
 
 function bo_sql_latlon2dist($lat1, $lon1, $lat_name='lat', $lon_name)
 {

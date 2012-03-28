@@ -396,11 +396,6 @@ function bo_show_archive_density()
 
 	// Map infos
 	$cfg = $_BO['mapimg'][$map];
-	$latN = $cfg['coord'][0];
-	$lonE = $cfg['coord'][1];
-	$latS = $cfg['coord'][2];
-	$lonW = $cfg['coord'][3];
-
 	
 	$sql = "SELECT MIN(date_start) mindate, MAX(date_start) maxdate, MAX(date_end) maxdate_end 
 			FROM ".BO_DB_PREF."densities 
@@ -721,11 +716,7 @@ function bo_get_density_image()
 	}
 	
 	
-	//Image: Size, colors	
-	$PicLatN = $cfg['coord'][0];
-	$PicLonE = $cfg['coord'][1];
-	$PicLatS = $cfg['coord'][2];
-	$PicLonW = $cfg['coord'][3];
+	//Image: Size, colors
 	$colors = is_array($cfg['density_colors']) ? $cfg['density_colors'] : $_BO['tpl_density_colors'];
 
 	$tmpImage = bo_imagecreatefromfile(BO_DIR.'images/'.$file);
@@ -771,12 +762,12 @@ function bo_get_density_image()
 	//Legend
 	$color = imagecolorallocatealpha($I, 100, 100, 100, 0);
 	imagefilledrectangle($I, $w, 0, $w+$LegendWidth, $h, $color);
-	
-	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $PicLatS, $PicLonW);
-	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $PicLatN, $PicLonE);
-	$w_x = $w / ($x2 - $x1);
-	$h_y = $h / ($y2 - $y1);
 
+	//Projection
+	require_once 'classes/MapProjection.class.php';
+	$Projection = new BoMapProjection($cfg['proj'], $w, $h, $cfg['coord']);
+	list($PicLatN, $PicLonE, $PicLatS, $PicLonW) = $Projection->GetBounds();
+	
 	if ($month)
 	{
 		$date_start = "$year-$month-01";
@@ -895,9 +886,7 @@ function bo_get_density_image()
 	if ($station_id)
 	{
 		$stinfo = bo_station_info($station_id);
-		list($px, $py) = bo_latlon2projection($cfg['proj'], $stinfo['lat'], $stinfo['lon']);
-		$StX =      ($px - $x1) * $w_x;
-		$StY = $h - ($py - $y1) * $h_y;
+		list($StX, $StY) = $Projection->LatLon2Image($stinfo['lat'], $stinfo['lon']);
 	}
 	
 	//Cache - Second cache try
@@ -936,8 +925,8 @@ function bo_get_density_image()
 			$lon_data = substr($DATA, $string_pos + $lon_start_pos * 2*$bps, $lon_string_len *2*$bps);
 			
 			//image coordinates (left side of image, height is current latitude)
-			list($px, $py) = bo_latlon2projection($cfg['proj'], $lat_act, $PicLonE);
-			$y  = $h - ($py - $y1) * $h_y; //image y
+			list(,$y) = $Projection->LatLon2Image($lat_act, $PicLonE);
+			
 			$ay = round(($y / $min_block_size)); //block number y
 			$dx = $dlon / ($PicLonE - $PicLonW) * $w; //delta x
 			
@@ -1064,7 +1053,7 @@ function bo_get_density_image()
 	}
 	
 	//add cities
-	bo_add_cities2image($I, $cfg, $w, $h);
+	bo_add_cities2image($I, $cfg, $w, $h, $Projection);
 
 	//Antennas
 	if ($ratio && $station_id == bo_station_id() && isset($info['antennas']) && is_array($info['antennas']['bearing']))
@@ -1079,9 +1068,10 @@ function bo_get_density_image()
 		foreach($info['antennas']['bearing'] as $bear)
 		{
 			list($lat, $lon) = bo_distbearing2latlong(100000, $bear, $stinfo['lat'], $stinfo['lon']);
-			list($px, $py) = bo_latlon2projection($cfg['proj'], $lat, $lon);
-			$ant_x =      ($px - $x1) * $w_x - $StX;
-			$ant_y = $h - ($py - $y1) * $h_y - $StY;
+			list($ant_x, $ant_y) = $Projection->LatLon2Image($lat, $lon);
+			$ant_x -= $StX;
+			$ant_y -= $StY;
+			
 			
 			$ant_xn = $ant_x / sqrt(pow($ant_x,2) + pow($ant_y,2)) * $size;
 			$ant_yn = $ant_y / sqrt(pow($ant_x,2) + pow($ant_y,2)) * $size;

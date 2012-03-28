@@ -369,15 +369,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		exit;
 	}
 
-	
-	//Preparations
-	$latN = $cfg['coord'][0];
-	$lonE = $cfg['coord'][1];
-	$latS = $cfg['coord'][2];
-	$lonW = $cfg['coord'][3];
-	$size = $cfg['point_size'];
-	$c = $cfg['col'];
-	
 	//dimensions are set
 	if (isset($cfg['dim']))
 	{
@@ -483,18 +474,18 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 
 	
-	//image dimensions
-	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $latS, $lonW);
-	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $latN, $lonE);
-	$w_x = $w / ($x2 - $x1);
-	$h_y = $h / ($y2 - $y1);
+	//Init the Projection method
+	require_once 'classes/MapProjection.class.php';
+	$Projection = new BoMapProjection($cfg['proj'], $w, $h, $cfg['coord']);
 
+	//bounds for sql-Query
+	list($latN, $lonE, $latS, $lonW) = $Projection->GetBounds();
 	
 	//main strike colors
 	$color_tmp = array();
-	if (isset($c) && is_array($c))
+	if (isset($cfg['col']) && is_array($cfg['col']))
 	{
-		foreach($c as $i => $rgb)
+		foreach($cfg['col'] as $i => $rgb)
 		{
 			if (!is_array($rgb))
 			{
@@ -520,7 +511,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	{
 		for ($i=0;$i<=$cfg['col_smooth'];$i++)
 		{
-			list($red, $green, $blue, $alpha) = bo_value2color($i/$cfg['col_smooth'], $c);
+			list($red, $green, $blue, $alpha) = bo_value2color($i/$cfg['col_smooth'], $cfg['col']);
 			
 			if ($transparent)	
 				$color_smooth[$i] = imagecolorallocate($I, $red, $green, $blue);
@@ -538,7 +529,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 	//time calculations
 	$time_range  = $time_max - $time_min + 59;
-	$color_intvl = count($c) > 0 ? $time_range / count($c) : 1;
+	$color_intvl = count($cfg['col']) > 0 ? $time_range / count($cfg['col']) : 1;
 	
 	
 	//get the strikes
@@ -571,11 +562,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 			if (isset($cfg['point_style']))
 			{
-				list($px, $py) = bo_latlon2projection($cfg['proj'], $row['lat'], $row['lon']);
-				$x =      ($px - $x1) * $w_x;
-				$y = $h - ($py - $y1) * $h_y;
-
-
+				list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon']);
+				
 				if ($cfg['col_smooth'])
 					$pcolor = $color_smooth[floor($age / $time_range * $cfg['col_smooth'])];
 				else
@@ -606,10 +594,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 		
 		//add cities
-		bo_add_cities2image($I, $cfg, $w, $h);
+		bo_add_cities2image($I, $cfg, $w, $h, $Projection);
 		
 		//add stations
-		bo_add_stations2image($I, $cfg, $w, $h, $strike_id);
+		bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id);
 		
 		//Show station pos
 		if ($cfg['show_station'][0])
@@ -618,10 +606,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			
 			if ($stinfo)
 			{
-				list($px, $py) = bo_latlon2projection($cfg['proj'], $stinfo['lat'], $stinfo['lon']);
-				$x =      ($px - $x1) * $w_x;
-				$y = $h - ($py - $y1) * $h_y;
-				
+				list($x, $y) = $Projection->LatLon2Image($stinfo['lat'], $stinfo['lon']);
+
 				$size = $cfg['show_station'][0];
 				
 				if (isset($cfg['show_station'][1]))
@@ -663,13 +649,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				list(,$lat2) = @each($reg);
 				list(,$lon2) = @each($reg);
 				
-				list($px, $py) = bo_latlon2projection($cfg['proj'], $lat1, $lon1);
-				$rx1 =      ($px - $x1) * $w_x;
-				$ry1 = $h - ($py - $y1) * $h_y;
-
-				list($px, $py) = bo_latlon2projection($cfg['proj'], $lat2, $lon2);
-				$rx2 =      ($px - $x1) * $w_x;
-				$ry2 = $h - ($py - $y1) * $h_y;
+				list($rx1, $ry1) = $Projection->LatLon2Image($lat1, $lon1);
+				list($rx2, $ry2) = $Projection->LatLon2Image($lat2, $lon2);
 				
 				imagerectangle($I, $rx1, $ry1, $rx2, $ry2, $rect_col[$rect_type]);
 			}
@@ -982,8 +963,6 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 	//default color
 	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
 
-	$tdy = 0;
-	
 	if (isset($cfg['top_font']))
 	{
 		$fontsize = $cfg['top_font'][0];
@@ -1004,7 +983,6 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 		$tcol = $cfg['bottom_font'][2];
 	}
 	
-
 	/* BOTTOM LINE */
 	if (isset($cfg['bottom_style']))
 	{
@@ -1018,9 +996,6 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 		}
 	}
 	
-
-	$tdy = bo_imagetextheight($fontsize);		
-	
 	//Copyright
 	$text = _BL('Lightning data from Blitzortung.org', true);
 	$bo_width = bo_imagetextwidth($fontsize, $tbold, $text);
@@ -1030,6 +1005,7 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 	if ($cfg['image_footer'])
 		$text .= ' '.$cfg['image_footer'];
 	
+	$tdy += bo_imagetextheight($fontsize);	
 	bo_imagestring($I, $fontsize, 4, $h - $tdy, $text, $tcol, $tbold);
 
 	//Own copyright
@@ -1226,7 +1202,7 @@ function bo_image_reduce_colors(&$I, $density_map=false, $transparent=false)
 }
 
 
-function bo_add_cities2image($I, $cfg, $w, $h)
+function bo_add_cities2image($I, $cfg, $w, $h, $Projection)
 {
 	if (!isset($cfg['cities']) || !is_array($cfg['cities']))
 		return;
@@ -1240,15 +1216,7 @@ function bo_add_cities2image($I, $cfg, $w, $h)
 		$sql_types .= " OR type='$type' ";
 	}
 	
-	$latN = $cfg['coord'][0];
-	$lonE = $cfg['coord'][1];
-	$latS = $cfg['coord'][2];
-	$lonW = $cfg['coord'][3];
-	
-	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $latS, $lonW);
-	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $latN, $lonE);
-	$w_x = $w / ($x2 - $x1);
-	$h_y = $h / ($y2 - $y1);
+	list($latN, $lonE, $latS, $lonW) = $Projection->GetBounds();
 
 	//get cities (group by -> no duplicates)
 	$sql = "SELECT id, name, lat, lon, MAX(type) type
@@ -1261,9 +1229,7 @@ function bo_add_cities2image($I, $cfg, $w, $h)
 	$erg = BoDb::query($sql);
 	while ($row = $erg->fetch_assoc())
 	{
-		list($px, $py) = bo_latlon2projection($cfg['proj'], $row['lat'], $row['lon']);
-		$x =      ($px - $x1) * $w_x;
-		$y = $h - ($py - $y1) * $h_y;
+		list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon']);
 
 		$c = $cfg['cities'][$row['type']];
 	
@@ -1286,25 +1252,15 @@ function bo_add_cities2image($I, $cfg, $w, $h)
 }
 
 
-function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
+function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 {
 	global $_BO;
 
 	if (!$strike_id && (!isset($cfg['stations']) || empty($cfg['stations'])))
 		return;
 	
-	$latN = $cfg['coord'][0];
-	$lonE = $cfg['coord'][1];
-	$latS = $cfg['coord'][2];
-	$lonW = $cfg['coord'][3];
-			
+	list($latN, $lonE, $latS, $lonW) = $Projection->GetBounds();			
 	$pic_dim = bo_latlon2dist($latN, $lonE, $latS, $lonW);
-	
-	list($x1, $y1) = bo_latlon2projection($cfg['proj'], $latS, $lonW);
-	list($x2, $y2) = bo_latlon2projection($cfg['proj'], $latN, $lonE);
-	$w_x = $w / ($x2 - $x1);
-	$h_y = $h / ($y2 - $y1);
-
 	$stations = bo_stations();
 
 	if ($strike_id)
@@ -1317,9 +1273,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 		$row = $erg->fetch_assoc();
 		$strike_lat = $row['lat'];
 		$strike_lon = $row['lon'];
-		list($px, $py) = bo_latlon2projection($cfg['proj'], $strike_lat, $strike_lon);
-		$strike_x =      ($px - $x1) * $w_x;
-		$strike_y = $h - ($py - $y1) * $h_y;
+		list($strike_x, $strike_y) = $Projection->LatLon2Image($strike_lat, $strike_lon);
 	
 		$strike_dists = array();
 		$sql = "SELECT ss.station_id id
@@ -1374,10 +1328,8 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 		else
 			$c = $cfg['stations'][0];
 		
-		list($px, $py) = bo_latlon2projection($cfg['proj'], round($d['lat'],2), round($d['lon'],2));
-		$x =      ($px - $x1) * $w_x;
-		$y = $h - ($py - $y1) * $h_y;
-
+		list($x, $y) = $Projection->LatLon2Image(round($d['lat'],2), round($d['lon'],2));
+		
 		if ($c['font'][0])
 		{
 			if ($c['font'][3] < 0)
@@ -1445,11 +1397,8 @@ function bo_add_stations2image($I, $cfg, $w, $h, $strike_id = 0)
 						
 						if ($lon < -170 || $lon > 170 || $lat < -90 || $lat > 90)
 							continue;
-						
-						list($px, $py) = bo_latlon2projection($cfg['proj'], $lat, $lon);
-						$x =      ($px - $x1) * $w_x;
-						$y = $h - ($py - $y1) * $h_y;
-						$polyline[$i][] = array($x, $y);
+		
+						$polyline[$i][] = $Projection->LatLon2Image($lat, $lon);		
 					}
 					
 					$r += $pic_dim / 1000;

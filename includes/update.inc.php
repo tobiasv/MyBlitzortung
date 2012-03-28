@@ -21,7 +21,7 @@ function bo_check_for_update()
 						'0.7.5',
 						'0.7.5a',
 						'0.7.5b',
-						'0.7.5c',
+						'0.7.6',
 						);
 
 	$max_update_num = bo_version2number($updates[count($updates)-1]);
@@ -447,7 +447,7 @@ function bo_check_for_update()
 
 				break;
 
-			case '0.7.5c':
+			case '0.7.6':
 
 				$sql = 'ALTER TABLE '.BO_DB_PREF.'stations CHANGE `country` `country` VARCHAR(50) NOT NULL';
 				$ok = BoDb::query($sql, false);

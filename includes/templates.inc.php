@@ -227,7 +227,16 @@ $_BO['tpl_imgmap']['europe_west_central']['cities'][1] = $_BO['points']['whitere
 $_BO['tpl_imgmap']['europe_west_central']['cities'][5] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitered1'];
 
-
+//Europe: Template for Eumetsat Central Europe Images with GEOS-Projection (1054x745)
+$_BO['tpl_imgmap']['meteosat_europe_central'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['meteosat_europe_central']['name'] = 'Sat Central Europe';
+$_BO['tpl_imgmap']['meteosat_europe_central']['file'] = 'test_geos.jpg';
+$_BO['tpl_imgmap']['meteosat_europe_central']['coord'] = array(55, 30, 30, -10, 159, 874, 712, 2); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8)
+$_BO['tpl_imgmap']['meteosat_europe_central']['proj'] = 'geos';
+$_BO['tpl_imgmap']['meteosat_europe_central']['legend'] = array(5, 100, 80, 4, 28, 1);
+$_BO['tpl_imgmap']['meteosat_europe_central']['bottom_style'] = array(0, 24, '9999ff66', 1, 'ccf8');
+$_BO['tpl_imgmap']['meteosat_europe_central']['density'] = false;
+$_BO['tpl_imgmap']['meteosat_europe_central']['cities'][1] = $_BO['points']['whitered1'];
 
 /* ============================= Germany ============================= */
 
