@@ -3068,7 +3068,7 @@ function bo_download_external($force = false)
 {
 	global $_BO;
 
-	
+
 	if (!isset($_BO['download']) || count($_BO['download']) == 0)
 		return;
 
@@ -3124,10 +3124,18 @@ function bo_download_external($force = false)
 				else
 					$data['data'][$id]['modified'] = time();
 
+				
+				$file_time = $data['data'][$id]['modified'];
+				
+				if (isset($d['time_floor']) && (int)$d['time_floor'])
+					$file_time = floor($file_time/$d['time_floor']/60) * $d['time_floor']*60;
+				
+				$file_time += $d['time_add'];
 					
+				
 				//File/Directory handling
 				$dir = BO_DIR.'/'.$d['dir'].'/';
-				$file = bo_insert_date_string($d['file'], $data['data'][$id]['modified']);
+				$file = bo_insert_date_string($d['file'], $file_time);
 				$dir = $dir.dirname($file);
 				$file = $dir.'/'.basename($file);
 				
