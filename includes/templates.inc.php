@@ -227,21 +227,6 @@ $_BO['tpl_imgmap']['europe_west_central']['cities'][1] = $_BO['points']['whitere
 $_BO['tpl_imgmap']['europe_west_central']['cities'][5] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitered1'];
 
-//Europe: Template for Eumetsat Central Europe Images with GEOS-Projection (1054x745)
-//You have to add a 'file' and 'name' parameter
-$_BO['tpl_imgmap']['meteosat_europe_central'] = $_BO['tpl_imgmap_default'];
-$_BO['tpl_imgmap']['meteosat_europe_central']['coord'] = array(55, 30, 30, -10, 159, 874, 712, 2); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8)
-$_BO['tpl_imgmap']['meteosat_europe_central']['proj'] = 'geos';
-$_BO['tpl_imgmap']['meteosat_europe_central']['legend'] = array(5, 100, 80, 4, 28, 1);
-$_BO['tpl_imgmap']['meteosat_europe_central']['bottom_style'] = array(0, 24, '9999ff66', 1, 'ccf8');
-$_BO['tpl_imgmap']['meteosat_europe_central']['density'] = false;
-$_BO['tpl_imgmap']['meteosat_europe_central']['file'] = 'maps_europe/map_eumetsat_central_eu_blank.jpg';
-$_BO['tpl_imgmap']['meteosat_europe_central']['image_footer'] = ' *  (c) EUMETSAT '.date('Y').' Meteosat MSG';
-$_BO['tpl_imgmap']['meteosat_europe_central']['col'] = array('ff05', 'fc05', 'f905', 'f505', 'f005', 'c005', '9065');
-$_BO['tpl_imgmap']['meteosat_europe_central']['point_style'] = array(2, 4, 'f008', 0, '00ad');
-$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay'] = 700; //msec
-$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay_end'] = 1500; //msec
-$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['transparent'] = false;
 
 /* ============================= Germany ============================= */
 
@@ -427,7 +412,30 @@ $_BO['tpl_imgmap']['europe_kml_24h']['name'] = '24h';
 
 
 
+/**************************************/
+/* METEOSAT Images                    */
+/**************************************/
 
+
+//Europe: Template for Eumetsat Central Europe Images with GEOS-Projection (1054x745)
+//You have to add a 'file' and 'name' parameter
+$_BO['tpl_imgmap']['meteosat_europe_central'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['meteosat_europe_central']['coord'] = array(55, 30, 30, -10, 159, 874, 712, 2); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8)
+$_BO['tpl_imgmap']['meteosat_europe_central']['proj'] = 'geos';
+$_BO['tpl_imgmap']['meteosat_europe_central']['legend'] = array(5, 100, 80, 4, 28, 1);
+$_BO['tpl_imgmap']['meteosat_europe_central']['bottom_style'] = array(0, 24, '9999ff66', 1, 'ccf8');
+$_BO['tpl_imgmap']['meteosat_europe_central']['density'] = false;
+$_BO['tpl_imgmap']['meteosat_europe_central']['file'] = 'maps_europe/map_eumetsat_central_eu_blank.jpg';
+$_BO['tpl_imgmap']['meteosat_europe_central']['image_footer'] = ' *  (c) EUMETSAT '.date('Y').' Meteosat MSG';
+$_BO['tpl_imgmap']['meteosat_europe_central']['col'] = array('ff05', 'fc05', 'f905', 'f505', 'f005', 'c005', '9065');
+$_BO['tpl_imgmap']['meteosat_europe_central']['point_style'] = array(2, 4, 'f008', 0, '00ad');
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay'] = 700; //msec
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay_end'] = 1500; //msec
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['transparent'] = false;
+
+$_BO['tpl_imgmap']['meteosat_segment15'] = $_BO['tpl_imgmap']['meteosat_europe_central'];
+$_BO['tpl_imgmap']['meteosat_segment15']['coord'] = array(55.29, 26.8, 46.137, 5.96, 33, 1140, 483, 66); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8)
+$_BO['tpl_imgmap']['meteosat_segment15']['file'] = 'maps_europe/map_eumetsat_segm15_blank.jpg';
 
 
 

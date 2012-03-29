@@ -32,7 +32,7 @@ class BoMapProjection
 		$this->ImageCalibrationX = ($cE - $cW) / ($x2 - $x1);
 		$this->ImageCalibrationY = ($cS - $cN) / ($y2 - $y1);
 		
-		$this->ImageOffsetX = $x1 * $this->ImageCalibrationX + $cW;
+		$this->ImageOffsetX = $x1 * $this->ImageCalibrationX - $cW;
 		$this->ImageOffsetY = $y1 * $this->ImageCalibrationY + $cS;
 		
 	}
