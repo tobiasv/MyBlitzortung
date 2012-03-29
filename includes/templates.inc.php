@@ -451,7 +451,6 @@ $_BO['tpl_imgmap']['meteosat_europe_central']['quality'] = 97;
 $_BO['tpl_imgmap']['meteosat_europe_central_15min'] = $_BO['tpl_imgmap']['meteosat_europe_central'];
 $_BO['tpl_imgmap']['meteosat_europe_central_15min']['trange'] = 0.5; //hours!
 $_BO['tpl_imgmap']['meteosat_europe_central_15min']['maxrange'] = 1; //hours!
-$_BO['tpl_imgmap']['meteosat_europe_central_15min']['hoursinterval'] = 1; //hours!
 $_BO['tpl_imgmap']['meteosat_europe_central_15min']['upd_intv'] = 5; //minutes
 $_BO['tpl_imgmap']['meteosat_europe_central_15min']['animation']['range'] = 30; //minutes
 $_BO['tpl_imgmap']['meteosat_europe_central_15min']['animation']['interval'] = 15; //minutes
