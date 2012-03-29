@@ -437,7 +437,7 @@ function bo_show_archive_density()
 		if (!$d['name'] || !$d['density'])
 			continue;
 			
-		echo '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
+		echo '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BL($d['name']).'</option>';
 		
 		if ($map == -1)
 			$map = $id;

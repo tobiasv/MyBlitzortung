@@ -337,7 +337,10 @@ function bo_show_archive_map()
 	}
 	
 	if ($cfg['date_min'] && ($min = strtotime($cfg['date_min'])))
-		$start_time = $min + 3600*24;
+	{
+		$start_time = $min;
+		$end_time   = max($start_time, $end_time);
+	}
 	
 	if ($cfg['archive'])
 	{
@@ -359,14 +362,14 @@ function bo_show_archive_map()
 		
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 		
-		if (!$strikes_available || $time < $start_time - 3600 * 24 || $time > $end_time)
+		if (!$strikes_available || $time < $start_time - 3600 * 24 || $time > $end_time + 3600 * 24)
 		{
 			if ($strikes_available)
 				$text = _BL('arch_select_dates_between');
 			else
 				$text = _BL('no_lightning_data');
 				
-			$img_file = bo_bofile_url().'?map='.$map.'&blank&bo_lang='._BL().'';
+			$img_file = bo_bofile_url().'?map='.$map.'&blank&blank_background&bo_lang='._BL().'';
 			
 			echo '<div style="position:relative;'.bo_archive_get_dim($map, 0, true).'" id="bo_arch_map_nodata">';
 			echo '<img style="position:absolute;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_noimg" src="'.$img_file.'">';
@@ -1724,7 +1727,7 @@ function bo_archive_select_map(&$map)
 		if ($map_default === false)
 			$map_default = $id;
 			
-		$ret .= '<option value="'.$id.'" '.($id == $map ? 'selected' : '').'>'._BL($d['name']).'</option>';
+		$ret .= '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BL($d['name']).'</option>';
 		
 		if ($map < 0)
 			$map = $id;

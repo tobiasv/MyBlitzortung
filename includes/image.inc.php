@@ -63,6 +63,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$date 			= $_GET['date'];
 		$transparent 	= isset($_GET['transparent']);
 		$blank 			= isset($_GET['blank']);
+		$blank_background       = isset($_GET['blank_background']);
 		$region			= $_GET['mark'];
 		$strike_id		= intval($_GET['strike_id']);
 		$period         = (float)$_GET['period'];
@@ -74,6 +75,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$date 			= $cfg['date'];
 		$transparent 	= $cfg['transparent'];
 		$blank 			= $cfg['blank'];
+		$blank_background 		= $cfg['blank_background'];
 		$region			= $cfg['mark'];
 		$strike_id		= $cfg['strike_id'];
 		$caching		= $caching && $cfg['caching'];
@@ -259,44 +261,47 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if ($cfg['date_min'] && strtotime($cfg['date_min']) && $time_min < strtotime($cfg['date_min']))
 		bo_image_error('Minimum date is '.$cfg['date_min']);
 	
-	
-	
 	//find the correct file
 	$file = '';
 	
 	//filename by endtime
 	if (($file_by_time || isset($cfg['file_time_search'])) && isset($cfg['file_time']))
 	{
-		$search_times[] = $time_max;
+		$found = false;
 		
-		if (isset($cfg['file_time_search']) && is_array($cfg['file_time_search']))
+		if (!$blank_background)
 		{
-			$sstep = $cfg['file_time_search'][0];
-			$sback = $cfg['file_time_search'][1]; 
-			$sforw = $cfg['file_time_search'][2];
-
-			$time_search = floor($time_max / 60 / $sstep) * 60 * $sstep;
+			$search_times[] = $time_max;
 			
-			$j=0;
-			for ($i=$time_search-60*$sback;$i<=$time_search+60*$sforw;$i+=60*$sstep)
+			if (isset($cfg['file_time_search']) && is_array($cfg['file_time_search']))
 			{
-				if ($i != $time_search)
-					$search_times[(abs($time_search-$i)/60).'.'.$j] = $i;
-				$j++;
+				$sstep = $cfg['file_time_search'][0];
+				$sback = $cfg['file_time_search'][1]; 
+				$sforw = $cfg['file_time_search'][2];
+
+				$time_search = floor($time_max / 60 / $sstep) * 60 * $sstep;
+				
+				$j=0;
+				for ($i=$time_search-60*$sback;$i<=$time_search+60*$sforw;$i+=60*$sstep)
+				{
+					//if ($i != $time_search)
+						$search_times[(abs($time_search-$i)/60).'.'.$j] = $i;
+					$j++;
+				}
+				
+				ksort($search_times);
 			}
 			
-			ksort($search_times);
-		}
-		
-		$found = false;
-		foreach($search_times as $stime)
-		{
-			$file = bo_insert_date_string($cfg['file_time'], $stime);
-
-			if (file_exists(BO_DIR.'images/'.$file))
+			
+			foreach($search_times as $stime)
 			{
-				$found = true;
-				break;
+				$file = bo_insert_date_string($cfg['file_time'], $stime);
+
+				if (file_exists(BO_DIR.'images/'.$file))
+				{
+					$found = true;
+					break;
+				}
 			}
 		}
 		
@@ -424,9 +429,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		if ($transparent) //transpatent image
 		{
 			$I = imagecreate($w, $h);
-			$blank = imagecolorallocate($I, 140, 142, 144);
-			imagefilledrectangle( $I, 0, 0, $w, $h, $blank);
-			imagecolortransparent($I, $blank);
+			$col_transp = imagecolorallocate($I, 140, 142, 144);
+			imagefilledrectangle( $I, 0, 0, $w, $h, $col_transp);
+			imagecolortransparent($I, $col_transp);
 		}
 		else //normal image
 		{
