@@ -3125,13 +3125,10 @@ function bo_download_external($force = false)
 					$data['data'][$id]['modified'] = time();
 
 				
-				$file_time = $data['data'][$id]['modified'];
+				$file_time = $data['data'][$id]['modified'] + $d['time_add']*60;
 				
 				if (isset($d['time_floor']) && (int)$d['time_floor'])
 					$file_time = floor($file_time/$d['time_floor']/60) * $d['time_floor']*60;
-				
-				$file_time += $d['time_add'];
-					
 				
 				//File/Directory handling
 				$dir = BO_DIR.'/'.$d['dir'].'/';
