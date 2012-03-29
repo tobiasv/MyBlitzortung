@@ -291,16 +291,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$found = false;
 		foreach($search_times as $stime)
 		{
-			$replace = array(
-				'%Y' => gmdate('Y', $stime),
-				'%y' => gmdate('y', $stime),
-				'%M' => gmdate('m', $stime),
-				'%D' => gmdate('d', $stime),
-				'%h' => gmdate('H', $stime),
-				'%m' => gmdate('i', $stime)
-				);
-
-			$file = strtr($cfg['file_time'], $replace);
+			$file = bo_insert_date_string($cfg['file_time'], $stime);
 
 			if (file_exists(BO_DIR.'images/'.$file))
 			{
@@ -1027,24 +1018,6 @@ function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = fal
 }
 
 
-//error output
-function bo_image_error($text, $w=400, $h=300, $size=2)
-{
-	$I = imagecreate($w, $h);
-	imagefill($I, 0, 0, imagecolorallocate($I, 255, 150, 150));
-	$black = imagecolorallocate($I, 0, 0, 0);
-	bo_imagestring($I, $size, 10, $h/2-25, $text, $black, $w-20);
-	imagerectangle($I, 0,0,$w-1,$h-1,$black);
-	
-	Header("Content-type: image/png");
-	Imagepng($I);
-	exit;
-}
-
-function bo_image_cache_error($w=400, $h=300)
-{
-	bo_image_error('Creating image failed! Please check if your cache-dirs are writeable!', $w, $h, 3);
-}
 
 //get an image from /images directory
 //we need this for easy integration of MyBlitzortung in other projects

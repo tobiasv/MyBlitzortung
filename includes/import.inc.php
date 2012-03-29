@@ -3190,21 +3190,5 @@ function bo_download_external($force = false)
 	
 }
 
-function bo_insert_date_string($text, $time = null)
-{
-	if ($time === null)
-		$time = time();
-		
-	$allow = "yYmdHhis"; //todo: maybe more needed
-	
-	for($i=0;$i<strlen($allow);$i++)
-	{
-		$letter = substr($allow,$i,1);
-		$text = strtr($text, array('%'.$letter => gmdate($letter, $time)));
-	}
-	
-	return $text;
-}
-
 
 ?>

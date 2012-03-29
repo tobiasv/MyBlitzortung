@@ -235,7 +235,6 @@ $_BO['tpl_imgmap']['meteosat_europe_central']['proj'] = 'geos';
 $_BO['tpl_imgmap']['meteosat_europe_central']['legend'] = array(5, 100, 80, 4, 28, 1);
 $_BO['tpl_imgmap']['meteosat_europe_central']['bottom_style'] = array(0, 24, '9999ff66', 1, 'ccf8');
 $_BO['tpl_imgmap']['meteosat_europe_central']['density'] = false;
-$_BO['tpl_imgmap']['meteosat_europe_central']['cities'][1] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['meteosat_europe_central']['image_footer'] = ' *  (c) EUMETSAT '.date('Y').' Meteosat MSG';
 
 

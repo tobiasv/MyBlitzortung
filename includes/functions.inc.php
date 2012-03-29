@@ -1872,4 +1872,45 @@ function bo_get_zoom_limits()
 	return array($min_zoom, $max_zoom);
 }
 
+function bo_insert_date_string($text, $time = null)
+{
+	if ($time === null)
+		$time = time();
+
+	$replace = array(
+		'%Y' => gmdate('Y', $time),
+		'%y' => gmdate('y', $time),
+		'%M' => gmdate('m', $time),
+		'%D' => gmdate('d', $time),
+		'%h' => gmdate('H', $time),
+		'%m' => gmdate('i', $time)
+		);
+
+	$text = strtr($text, $replace);
+		
+	return $text;
+}
+
+
+//error output
+function bo_image_error($text, $w=400, $h=300, $size=2)
+{
+	$I = imagecreate($w, $h);
+	imagefill($I, 0, 0, imagecolorallocate($I, 255, 150, 150));
+	$black = imagecolorallocate($I, 0, 0, 0);
+	bo_imagestring($I, $size, 10, $h/2-25, $text, $black, $w-20);
+	imagerectangle($I, 0,0,$w-1,$h-1,$black);
+	
+	Header("Content-type: image/png");
+	Imagepng($I);
+	exit;
+}
+
+function bo_image_cache_error($w=400, $h=300)
+{
+	bo_image_error('Creating image failed! Please check if your cache-dirs are writeable!', $w, $h, 3);
+}
+
+
+
 ?>
