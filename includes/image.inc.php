@@ -531,6 +531,13 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	//get the strikes
 	if (!$blank)
 	{
+
+		//get outer bounds where to paint strikes
+		$boundsN =      (int)$cfg['strikes_area'][0];
+		$boundsE = $w - (int)$cfg['strikes_area'][1];
+		$boundsS = $h - (int)$cfg['strikes_area'][2];
+		$boundsW =      (int)$cfg['strikes_area'][3];
+
 	
 		//the where clause
 		$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $latS, $latN, $lonW, $lonE);
@@ -558,10 +565,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon']);
 				
 				//point out of bounds?
-				if (   $x < -$cfg['point_style'][1] 
-					|| $y < -$cfg['point_style'][1] 
-					|| $x > $cfg['point_style'][1] + $w
-					|| $y > $cfg['point_style'][1] + $h)
+				if (   $x < -$cfg['point_style'][1] + $boundsW
+					|| $y < -$cfg['point_style'][1] + $boundsN
+					|| $x >  $cfg['point_style'][1] + $boundsE
+					|| $y >  $cfg['point_style'][1] + $boundsS)
 					continue;
 				
 				if ($cfg['col_smooth'])

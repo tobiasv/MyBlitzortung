@@ -416,27 +416,54 @@ $_BO['tpl_imgmap']['europe_kml_24h']['name'] = '24h';
 /* METEOSAT Images                    */
 /**************************************/
 
-
-//Europe: Template for Eumetsat Central Europe Images with GEOS-Projection (1054x745)
-//You have to add a 'file' and 'name' parameter
+//EUMETSAT
+// - Template for Eumetsat Central Europe Images with GEOS-Projection (1054x745)
+// - for images with 1h interval
+// - you have to add a 'file' and 'name' parameter
 $_BO['tpl_imgmap']['meteosat_europe_central'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['meteosat_europe_central']['coord'] = array(55, 30, 30, -10, 159, 874, 712, 2); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8)
 $_BO['tpl_imgmap']['meteosat_europe_central']['proj'] = 'geos';
+$_BO['tpl_imgmap']['meteosat_europe_central']['trange'] = 1; //hours!
+$_BO['tpl_imgmap']['meteosat_europe_central']['maxrange'] = 1; //hours!
+$_BO['tpl_imgmap']['meteosat_europe_central']['hoursinterval'] = 1; //hours!
+$_BO['tpl_imgmap']['meteosat_europe_central']['upd_intv'] = 30; //minutes
 $_BO['tpl_imgmap']['meteosat_europe_central']['legend'] = array(5, 100, 80, 4, 28, 1);
 $_BO['tpl_imgmap']['meteosat_europe_central']['bottom_style'] = array(0, 24, '9999ff66', 1, 'ccf8');
 $_BO['tpl_imgmap']['meteosat_europe_central']['density'] = false;
 $_BO['tpl_imgmap']['meteosat_europe_central']['file'] = 'maps_europe/map_eumetsat_central_eu_blank.jpg';
 $_BO['tpl_imgmap']['meteosat_europe_central']['image_footer'] = ' *  (c) EUMETSAT '.date('Y').' Meteosat MSG';
-$_BO['tpl_imgmap']['meteosat_europe_central']['col'] = array('ff05', 'fc05', 'f905', 'f505', 'f005', 'c005', '9065');
-$_BO['tpl_imgmap']['meteosat_europe_central']['point_style'] = array(2, 4, 'f008', 0, '00ad');
-$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay'] = 700; //msec
-$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay_end'] = 1500; //msec
+$_BO['tpl_imgmap']['meteosat_europe_central']['col'] = array('fc00', 'f900', 'f500', 'f000', 'c000', '9060', '509');
+$_BO['tpl_imgmap']['meteosat_europe_central']['point_style'] = array(2, 6, 'f008', 0, '00ad');
+$_BO['tpl_imgmap']['meteosat_europe_central']['strikes_area'] = array(0, 0, 31, 0);
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['force'] = false; //no static image
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['range'] = 60; //minutes
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['interval'] = 60; //minutes
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['default_range'] = 6; //hours
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['max_range'] = 24; //hours
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay'] = 200; //msec
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay_end'] = 1000; //msec
 $_BO['tpl_imgmap']['meteosat_europe_central']['animation']['transparent'] = false;
+$_BO['tpl_imgmap']['meteosat_europe_central']['file_time_search'] = array(60, 120, 0); //steps, before, after (minutes)
+$_BO['tpl_imgmap']['meteosat_europe_central']['quality'] = 97;
 
+
+//EUMETSAT: Same as above, but with 15min interval
+$_BO['tpl_imgmap']['meteosat_europe_central_15min'] = $_BO['tpl_imgmap']['meteosat_europe_central'];
+$_BO['tpl_imgmap']['meteosat_europe_central_15min']['trange'] = 0.5; //hours!
+$_BO['tpl_imgmap']['meteosat_europe_central_15min']['maxrange'] = 1; //hours!
+$_BO['tpl_imgmap']['meteosat_europe_central_15min']['hoursinterval'] = 1; //hours!
+$_BO['tpl_imgmap']['meteosat_europe_central_15min']['upd_intv'] = 5; //minutes
+$_BO['tpl_imgmap']['meteosat_europe_central_15min']['animation']['range'] = 30; //minutes
+$_BO['tpl_imgmap']['meteosat_europe_central_15min']['animation']['interval'] = 15; //minutes
+$_BO['tpl_imgmap']['meteosat_europe_central_15min']['animation']['default_range'] = 6; //hours
+$_BO['tpl_imgmap']['meteosat_europe_central_15min']['animation']['max_range'] = 24; //hours
+$_BO['tpl_imgmap']['meteosat_europe_central_15min']['file_time_search'] = array(15, 60, 30); //steps, before, after (minutes)
+
+
+//EUMETSAT: Segment 15
 $_BO['tpl_imgmap']['meteosat_segment15'] = $_BO['tpl_imgmap']['meteosat_europe_central'];
-$_BO['tpl_imgmap']['meteosat_segment15']['coord'] = array(55.29, 26.8, 46.137, 5.96, 33, 1140, 483, 66); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8)
+$_BO['tpl_imgmap']['meteosat_segment15']['coord'] = array(55.29, 26.8, 46.137, 5.96, 33, 1140, 483, 66, 57, 28, 46, 4); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8) AND rough bounds to filter strikes
 $_BO['tpl_imgmap']['meteosat_segment15']['file'] = 'maps_europe/map_eumetsat_segm15_blank.jpg';
-
 
 
 

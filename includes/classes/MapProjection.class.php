@@ -12,6 +12,7 @@ class BoMapProjection
 	var $ImageOffsetX;
 	var $ImageOffsetY;
 	var $ImageCoor;
+	var $StrikeBounds = array();
 	
 	function __construct($proj = '', $w, $h, $coord)
 	{
@@ -34,6 +35,16 @@ class BoMapProjection
 		
 		$this->ImageOffsetX = $x1 * $this->ImageCalibrationX - $cW;
 		$this->ImageOffsetY = $y1 * $this->ImageCalibrationY + $cS;
+		
+		
+		//Strike bounds
+		if (isset($coord[8]) && isset($coord[9]) && isset($coord[10]) && isset($coord[11]))
+		{
+			$this->StrikeBounds[0] = $coord[8];
+			$this->StrikeBounds[1] = $coord[9];
+			$this->StrikeBounds[2] = $coord[10];
+			$this->StrikeBounds[3] = $coord[11];
+		}
 		
 	}
 	
@@ -74,7 +85,13 @@ class BoMapProjection
 		switch ($this->Method)
 		{
 			case 'geos':
-				return array(90, 180, -90, -180);
+				
+				if (empty($this->StrikeBounds))
+					$bounds = array(90, 180, -90, -180);
+				else
+					$bounds = $this->StrikeBounds;
+			
+				return $bounds;
 				
 			default:
 				return array($this->ImageCoor[0], $this->ImageCoor[1], $this->ImageCoor[2], $this->ImageCoor[3]);
