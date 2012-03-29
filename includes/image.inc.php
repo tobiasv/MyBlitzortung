@@ -548,12 +548,16 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$age = $time_max - $strike_time;
 			$color_index = floor($age / $color_intvl);
 			
-
-			$count[$color_index]++;
-
 			if (isset($cfg['point_style']))
 			{
 				list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon']);
+				
+				//point out of bounds?
+				if (   $x < -$cfg['point_style'][1] 
+					|| $y < -$cfg['point_style'][1] 
+					|| $x > $cfg['point_style'][1] + $w
+					|| $y > $cfg['point_style'][1] + $h)
+					continue;
 				
 				if ($cfg['col_smooth'])
 					$pcolor = $color_smooth[floor($age / $time_range * $cfg['col_smooth'])];
@@ -562,6 +566,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 				bo_drawpoint($I, $x, $y, $cfg['point_style'], $pcolor, !$transparent);
 			}
+			
+			$count[$color_index]++;
 		}
 	}
 	

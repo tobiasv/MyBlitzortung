@@ -235,8 +235,13 @@ $_BO['tpl_imgmap']['meteosat_europe_central']['proj'] = 'geos';
 $_BO['tpl_imgmap']['meteosat_europe_central']['legend'] = array(5, 100, 80, 4, 28, 1);
 $_BO['tpl_imgmap']['meteosat_europe_central']['bottom_style'] = array(0, 24, '9999ff66', 1, 'ccf8');
 $_BO['tpl_imgmap']['meteosat_europe_central']['density'] = false;
+$_BO['tpl_imgmap']['meteosat_europe_central']['file'] = 'maps_europe/map_eumetsat_central_eu_blank.jpg';
 $_BO['tpl_imgmap']['meteosat_europe_central']['image_footer'] = ' *  (c) EUMETSAT '.date('Y').' Meteosat MSG';
-
+$_BO['tpl_imgmap']['meteosat_europe_central']['col'] = array('ff05', 'fc05', 'f905', 'f505', 'f005', 'c005', '9065');
+$_BO['tpl_imgmap']['meteosat_europe_central']['point_style'] = array(2, 4, 'f008', 0, '00ad');
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay'] = 700; //msec
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['delay_end'] = 1500; //msec
+$_BO['tpl_imgmap']['meteosat_europe_central']['animation']['transparent'] = false;
 
 /* ============================= Germany ============================= */
 

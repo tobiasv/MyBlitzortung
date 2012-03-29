@@ -308,24 +308,48 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 	
 	if ($show_static_maps)
 	{
-		$menu_text = '';
+		$map_groups = array();
+		
+		$menu = array();
 		
 		foreach($_BO['mapimg'] as $id => $d)
 		{
 			if (!$d['name'] || !$d['menu'])
 				continue;
 			
-			$menu_text .= '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), "$id").'&bo_period='.$period.'" class="bo_navi'.($no_google && $static_map_id == $id ? '_active' : '').'">'._BL($d['name']).'</a></li>';
+			if ($d['group'])
+			{
+				$map_groups[$d['group']][$id] = $d['name'];
+				$name = $d['group'];
+				$menu_id  = 'group_'.$d['group'];
+				$menu_active = (string)$static_map_id === (string)$id;
+				
+				if (!isset($menu[$menu_id]))
+					$menu[$menu_id] = array($menu_active, $name, $id);
+				else
+					$menu[$menu_id][0] = $menu[$menu_id][0] || $menu_active;
+			}
+			else
+			{
+				$name = $d['name'];
+				$menu_active = (string)$static_map_id === (string)$id;
+				$menu[$id] = array($menu_active, $name, $id);
+			}
 		}
 
-		if ($menu_text && $show_menu)
+		if (!empty($menu) && $show_menu)
 		{
 			echo '<ul id="bo_menu">';
 			
 			if (!$disabled)
 				echo '<li><a href="'.bo_insert_url(array('bo_*')).'" class="bo_navi'.(!$no_google ? '_active' : '').'">'._BL('Dynamic map').'</a></li>';
 			
-			echo $menu_text;
+			foreach($menu as $menu_id => $d)
+			{
+				echo '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), $d[2]).'&bo_period='.$period.'" ';
+				echo' class="bo_navi'.($d[0] ? '_active' : '').'">'._BL($d[1]).'</a></li>';
+			}
+			
 			echo '</ul>';
 		}
 
@@ -361,10 +385,31 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			$url = bo_bofile_url().'?map='.$static_map_id.($period_id ? '&period='.$period : '').'&bo_lang='._BL();
 			$img_dim = bo_archive_get_dim($static_map_id);
 
-			
+			echo '<form method="GET">';
+			echo bo_insert_html_hidden(array('bo_showmap'));
 			echo '<fieldset class="bo_map_options_static">';
 			echo '<legend>'._BL("map_options_static").'</legend>';
 			echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_static(1); return false;" id="bo_map_reload">';
+
+			if ($cfg['group'] && isset($map_groups[$cfg['group']]) && count($map_groups[$cfg['group']]) > 1)
+			{
+				
+				echo '<span class="bo_form_checkbox_text">';
+				echo _BL('Map').': ';
+				echo '<select name="bo_showmap" onchange="submit();">';
+				foreach($map_groups[$cfg['group']] as $map_id => $map_name)
+				{
+					echo '<option value="'.$map_id.'" '.($map_id == $static_map_id ? 'selected' : '').'>';
+					echo $map_name;
+					echo '</option>';
+				}
+				echo '</select> &bull; ';
+			}
+			else
+			{
+				echo '<input type="hidden" name="bo_showmap" value="'.$static_map_id.'">';
+			}
+
 			echo '<span class="bo_form_checkbox_text">';
 			echo '<input type="checkbox" onclick="bo_toggle_autoupdate_static(this.checked);" id="bo_check_autoupdate"> ';
 			echo '<label for="bo_check_autoupdate">'._BL('auto update').'</label> ';
@@ -394,6 +439,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			}
 			
 			echo '</fieldset>';
+			echo '</form>';
 			
 			echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 			
