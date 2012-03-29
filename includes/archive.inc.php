@@ -179,7 +179,11 @@ function bo_show_archive_map()
 	{
 		if ($ani_changed)
 		{
-			if ($ani_preset == 'now' || isset($cfg['file_time']))
+			//now is default for maps with chaning backgrounds
+			if (!$ani_preset && isset($cfg['file_time']))
+				$ani_preset = 'now';
+			
+			if ($ani_preset == 'now')
 			{
 				$hour_range = $ani_default_range + ($hours_interval <= 6 ? $hours_interval : 0);
 				$hour_from = date('H') - $hour_range;
