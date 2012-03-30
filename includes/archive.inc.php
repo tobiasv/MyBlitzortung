@@ -224,6 +224,10 @@ function bo_show_archive_map()
 		
 	//Set to correct time
 	$time      = mktime($hour_from,0,0,$month,$day+$day_add,$year);
+	
+	if ($time > time())
+		$time = time() - $hour_range * 3600;
+	
 	$year      = date('Y', $time);
 	$month     = date('m', $time);
 	$day       = date('d', $time);
@@ -367,7 +371,7 @@ function bo_show_archive_map()
 		
 		echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 		
-		if (!$strikes_available || $time < $start_time - 3600 * 24 || $time > $end_time + 3600 * 24)
+		if (!$strikes_available || $time < floor($start_time/3600/24)*3600*24 || $time > $end_time + 3600 * 24)
 		{
 			if ($strikes_available)
 				$text = _BL('arch_select_dates_between');
