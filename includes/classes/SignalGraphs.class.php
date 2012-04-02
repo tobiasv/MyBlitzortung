@@ -4,6 +4,7 @@ class BoSignalGraph
 {
 	var $graph;
 	var $fullscale = false;
+	var $MaxTime = null;
 	
 	function __construct()
 	{
@@ -16,7 +17,13 @@ class BoSignalGraph
 		require_once BO_DIR.'includes/jpgraph/jpgraph_plotline.php';
 	}
 	
-	function SetData($type, $data, $channels, $ntime)
+	
+	public function SetMaxTime($max_time)
+	{
+		$this->MaxTime = $max_time;
+	}
+	
+	public function SetData($type, $data, $channels, $ntime)
 	{
 		$data = bo_raw2array($data, true, $channels, $ntime);
 		
@@ -156,18 +163,36 @@ class BoSignalGraph
 		}
 		else
 		{
-			$ustep = 50;
+			$ustepdisplay = 50;
+			$data_tmp = array();
+			
 			foreach ($data['signal_time'] as $i => $time_us)
 			{
+				$data_tmp[$i] = $time_us;
+			}
+			
+			if ($time_us < $this->MaxTime && $ntime > 0.0)
+			{
+				for ($us = $time_us+$ntime/1000; $us < $this->MaxTime; $us += $ntime/1000)
+					$data_tmp[] = $us;
+			}
+			
+			foreach($data_tmp as $i => $time_us)
+			{
+				if ($this->MaxTime !== null && $time_us > $this->MaxTime)
+					break;
+				
 				$datax[] = $i;
-				$time_us = round($time_us / $ustep, 1) * $ustep;
-
+				$datay[0][] = $data['signal'][0][$i];
+				$datay[1][] = $data['signal'][1][$i];
+				$tickLabels[] = round($time_us / $ustepdisplay, 1) * $ustepdisplay.'µs';
+				
 				if (!($i%12))
 				{
 					if (!($i%18))
 					{
 						$tickMajPositions[] = $i;
-						$tickLabels[] = $time_us.'µs';
+						
 					}
 					elseif (!($i%6))
 					{
@@ -193,23 +218,23 @@ class BoSignalGraph
 
 			$this->graph->SetScale("linlin",$ymin,$ymax,$xmin,$xmax);
 
-			if (max($data['signal'][0]) || min($data['signal'][0]))
+			if (max($datay[0]) || min($datay[0]))
 			{
-				$plot=new LinePlot($data['signal'][0], $datax);
+				$plot=new LinePlot($datay[0], $datax);
 				$plot->SetColor(BO_GRAPH_RAW_COLOR1);
 				$this->graph->Add($plot);
 			}
 
-			if (max($data['signal'][1]) || min($data['signal'][1]))
+			if (max($datay[1]) || min($datay[1]))
 			{
-				$plot=new LinePlot($data['signal'][1], $datax);
+				$plot=new LinePlot($datay[1], $datax);
 				$plot->SetColor(BO_GRAPH_RAW_COLOR2);
 				$this->graph->Add($plot);
 			}
 
 			$this->graph->xaxis->SetPos('min');
-			$this->graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
-
+			$this->graph->xaxis->SetTickLabels($tickLabels);
+			$this->graph->xaxis->scale->ticks->Set(28);
 			$this->graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
 			$this->graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
 
@@ -250,6 +275,8 @@ class BoSignalGraph
 
 			$this->graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			$this->graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
+			
+			$this->graph->SetMargin(28,4,2,3);
 		}
 	
 	}

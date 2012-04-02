@@ -64,6 +64,8 @@ function bo_graph_raw()
 		$raw_time    = new Timestamp();
 		$last_dt = 1E12;
 		
+		$max_tolerance = 500;
+		
 		//search for signal
 		foreach($file as $line)
 		{
@@ -74,8 +76,7 @@ function bo_graph_raw()
             $raw_time->Set($data_time + 1, $data_time_ns);
             $dt = $raw_time->usDifference($search_time);
 			
-
-			if ( (abs($last_dt) < abs($dt) && abs($dt) < 100) || $dt > 100)
+			if ( (abs($last_dt) < abs($dt) && abs($dt) < $max_tolerance) || $dt > $max_tolerance)
 				break;
 			
 			$channels = $data[5];
@@ -88,9 +89,10 @@ function bo_graph_raw()
 			$last_dt = $dt;
 		}
 
-		if (strlen($raw_data) > 10 && $last_dt < 100)
+		if (strlen($raw_data) > 10 && $last_dt < $max_tolerance)
 		{
 			$bdata = bo_hex2bin($raw_data);
+			$graph->SetMaxTime(300);
 			$graph->SetData($type, $bdata, $channels, $ntime);
 			$graph->AddText(date('H:i:s', $last_time).'.'.$nsec.'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs');
 		}
