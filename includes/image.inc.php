@@ -589,7 +589,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	if ($transparent && $strike_id)
 	{
-		bo_add_stations2image($I, $cfg, $w, $h, $strike_id);
+		bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id);
 	}
 	elseif (!$transparent)
 	{
