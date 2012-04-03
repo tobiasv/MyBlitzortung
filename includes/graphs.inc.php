@@ -64,7 +64,7 @@ function bo_graph_raw()
 		$raw_time    = new Timestamp();
 		$last_dt = 1E12;
 		
-		$max_tolerance = 500;
+		$max_tolerance = 1000;
 		
 		//search for signal
 		foreach($file as $line)
@@ -91,7 +91,7 @@ function bo_graph_raw()
 			}
 		}
 
-		if (strlen($raw_data) > 10 && $last_dt < $max_tolerance)
+		if (strlen($raw_data) > 10 && abs($last_dt) < $max_tolerance)
 		{
 			$bdata = bo_hex2bin($raw_data);
 			$graph->SetMaxTime(300);
