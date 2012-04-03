@@ -612,11 +612,11 @@ function bo_tile_tracks()
 	$y = intval($_GET['y']);
 	$zoom = intval($_GET['zoom']);
 
-	$file = BO_DIR.'cache/tiles/tracks_'.$zoom.'_'.$x.'x'.$y.'.png';
-	
+	$file = 'tracks_'.$zoom.'_'.$x.'x'.$y.'.png';
 	if (BO_CACHE_SUBDIRS === true)
 		$file = strtr($file, array('_' => '/'));
-
+	$file = BO_DIR.'cache/tiles/'.$file;
+		
 	if (file_exists($file) && $caching)
 	{
 		if (file_exists($file) && filemtime($file) + intval(BO_UP_INTVL_TRACKS) > time())

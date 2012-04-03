@@ -208,7 +208,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		}
 
 		if (BO_CACHE_SUBDIRS === true)
-			$cache_file .= gmdate('Ymd', $time_min).'/';
+			$cache_file .= gmdate('Y/m/d/', $time_min);
 		
 		$cache_file .= $id.'_'.gmdate('YmdHi', $time_min).'_'.$duration;
 		
