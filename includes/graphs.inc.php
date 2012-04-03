@@ -76,17 +76,19 @@ function bo_graph_raw()
             $raw_time->Set($data_time + 1, $data_time_ns);
             $dt = $raw_time->usDifference($search_time);
 			
-			if ( (abs($last_dt) < abs($dt) && abs($dt) < $max_tolerance) || $dt > $max_tolerance)
+			if ($dt > 1E8)
 				break;
 			
-			$channels = $data[5];
-			$values = $data[6];
-			$ntime = $data[8];
-			$raw_data = trim($data[9]);
-			$last_time = $data_time;
-			$last_nsec = $data_time_ns;
-			
-			$last_dt = $dt;
+			if (abs($dt) < $max_tolerance && abs($last_dt) > abs($dt))
+			{
+				$channels = $data[5];
+				$values = $data[6];
+				$ntime = $data[8];
+				$raw_data = trim($data[9]);
+				$last_time = $data_time;
+				$last_nsec = $data_time_ns;
+				$last_dt = $dt;
+			}
 		}
 
 		if (strlen($raw_data) > 10 && $last_dt < $max_tolerance)
