@@ -74,6 +74,9 @@ switch(BO_REGION)
 	
 	case 2:
 
+	
+		/***************** OCEANIA *****************/
+	
 		if (!isset($_BO['mapimg']['oceania']))
 			$_BO['mapimg']['oceania'] = $_BO['tpl_imgmap']['oceania'];
 
@@ -83,6 +86,14 @@ switch(BO_REGION)
 		if (!isset($_BO['mapimg']['stations_mini']))
 			$_BO['mapimg']['stations_mini'] = $_BO['tpl_imgmap']['oceania_mini_stations'];
 		
+		break;
+	
+	
+	case 3:
+		
+		/***************** NORTH AMERICA *****************/
+	
+	
 		break;
 		
 	
