@@ -8,32 +8,32 @@ function bo_icon($icon)
 	$dir = BO_DIR."cache/icons/";
 	$file = $dir.$icon.'.png';
 
-	$s = 11;
-
-	if (!file_exists($file))
+	if (BO_CACHE_DISABLE === true || !file_exists($file) || time() - filemtime($file) > 3600 * 24 * 30)
 	{
-		$c = floor($s/2);
+		$c = 3;
 
-		$im = ImageCreate($s, $s);
-		$bg = imagecolorallocate($im, 255, 255, 255);
-		$trans = imagecolortransparent($im, $bg);
-		imagefill($im,0,0,$trans);
+		$I = imagecreate($c*2+1, $c*2+1);
+		$bg = imagecolorallocate($I, 255, 255, 255);
+		$trans = imagecolortransparent($I, $bg);
+		imagefill($I,0,0,$trans);
 
-		$col = ImageColorAllocate ($im, hexdec(substr($icon,0,2)), hexdec(substr($icon,2,2)), hexdec(substr($icon,4,2)));
-		imagefilledellipse( $im, $c, $c, $c+2, $c+2, $col );
+		$col = imagecolorallocate ($I, hexdec(substr($icon,0,2)), hexdec(substr($icon,2,2)), hexdec(substr($icon,4,2)));
+		bo_circle($I, $c, $c, $c+2, $col, true);
 
 		$tag = intval(substr($icon,6,1));
-		if ($tag >= 1)
+		if (0 && $tag >= 1)
 		{
-			$col = ImageColorAllocate ($im, 0,0,0);
-			imageellipse( $im, $c, $c, $c+$tag, $c+$tag, $col );
+			$s=$c-5;
+			$col = imagecolorallocate ($I, 255,255,255);
+			imageline($I, $c-$s-1, $c, $c+$s+1, $c, $col);
+			imageline($I, $c, $c-$s-1, $c, $c+$s+1, $col);
 		}
 		
-		Imagepng($im, $file);
-		ImageDestroy($im);
+		imagepng($I, $file);
+		imagedestroy($I);
 	}
 	
-	Header("Content-type: image/png");
+	header("Content-type: image/png");
 	readfile($file);
 
 	exit;
@@ -1581,6 +1581,31 @@ function bo_imageout($I, $extension = 'png', $file = null, $quality = BO_IMAGE_J
 		$ret = imagejpeg($I, $file, $quality);
 		
 	return $ret;
+}
+
+
+
+function bo_circle($I, $px, $py, $s, $col, $filled = false)
+{
+	//imagefilledarc draws much nicer circles, but has a bug in older php versions
+	//https://bugs.php.net/bug.php?id=43547
+	//imagefilledarc: not nice when size is even
+	$arc = !(!($s%2) || $s >= 8 || BO_NICE_CIRCLES == 0 || (BO_NICE_CIRCLES == 2 && $py >= imagesy($I)-$s+3));
+	
+	if ($filled)
+	{
+		if ($arc)
+			imagefilledarc($I, $px, $py, $s, $s, 0, 360, $col, IMG_ARC_PIE);
+		else
+			imagefilledellipse($I, $px, $py, $s, $s, $col);
+	}
+	else
+	{
+		if ($arc)
+			imagearc($I, $px, $py, $s, $s, 0, 360, $col);
+		else
+			imageellipse($I, $px, $py, $s, $s, $col);
+	}
 }
 
 ?>
