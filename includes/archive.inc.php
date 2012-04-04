@@ -892,6 +892,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$show_details = $_GET['bo_show_details'];
 	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
 	$other_graphs = isset($_GET['bo_other_graphs']) && $perm;
+	$station_id = bo_station_id() < 0 ? intval($_GET['bo_station_id']) : bo_station_id();
+	
 	
 	$channels   = bo_get_conf('raw_channels');
 	$raw_bpv    = bo_get_conf('raw_bitspervalue');
@@ -998,12 +1000,22 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		if (!$show_empty_sig)
 		{
 			echo '<input type="checkbox" name="bo_only_strikes" value="1" '.($only_strikes ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_strikes">';
-			echo '<label for="check_only_strikes"> '._BL('check_only_strikes').'</label> &nbsp; ';
+			echo '<label for="check_only_strikes"> '._BL('check_only_strikes').'</label>&nbsp;&nbsp; ';
 		}
 		else
 		{
-			echo '<input type="checkbox" name="bo_only_participated" value="1" '.($only_participated ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_participated">';
-			echo '<label for="check_only_participated"> '._BL('check_only_participated').'</label> &nbsp; ';
+			if (bo_station_id() < 0)
+			{
+				echo _BL('Station').':&nbsp;';
+				echo bo_insert_html_hidden(array('bo_station_id'));
+				echo bo_get_stations_html_select($station_id);
+				echo '&nbsp;&nbsp; ';
+			}
+			else
+			{
+				echo '<input type="checkbox" name="bo_only_participated" value="1" '.($only_participated ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_participated">';
+				echo '<label for="check_only_participated"> '._BL('check_only_participated').'</label>&nbsp;&nbsp; ';
+			}
 		}
 		
 		if ($perm)
@@ -1014,20 +1026,20 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '<label for="check_show_details"> '._BL('Details').'</label> &nbsp; ';
 			}
 			
-			echo ' &nbsp; <span class="bo_form_descr">'._BL('Time').':</span> ';
-			echo '<input type="text" name="bo_datetime_to" value="'._BC($date).'" id="bo_archive_date" class="bo_archive_date">';
+			echo ' &nbsp; <span class="bo_form_descr">'._BL('Time').':</span>&nbsp;';
+			echo '<input type="text" name="bo_datetime_to" value="'._BC($date).'" id="bo_archive_date" class="bo_archive_date">&nbsp;&nbsp; ';
 			
 			if ($show_empty_sig || $only_strikes)
 			{
-				echo ' &nbsp; <span class="bo_form_descr">'._BL('Region').': ';
+				echo ' <span class="bo_form_descr">'._BL('Region').':&nbsp;';
 				bo_show_select_region($region);
-				echo '</span>  &nbsp; ';
+				echo '</span>&nbsp;&nbsp; ';
 			}
 			
 			if ($show_details)
 				echo bo_archive_select_map($map);
 
-			echo ' &nbsp; <input type="submit" value="'._BL('Ok').'">';
+			echo '&nbsp;&nbsp; <input type="submit" value="'._BL('Ok').'">';
 		}
 		
 		echo '</fieldset>';
@@ -1063,13 +1075,28 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	if ($show_empty_sig) // all strikes, maybe with own sigs
 	{
-		$sql_join = BO_DB_PREF."strikes s 
-					LEFT OUTER JOIN ".BO_DB_PREF."raw r 
-					ON s.raw_id=r.id ";
-		$table = 's';
-		
-		if ($only_participated)
-			$sql_where .= " AND s.part>0 ";
+	
+		if (bo_station_id() == -1 && $station_id)
+		{
+			$table = 's';
+			$sql_join = BO_DB_PREF."strikes s 
+						JOIN ".BO_DB_PREF."stations_strikes ss
+						ON s.id=ss.strike_id AND ss.station_id='".$station_id."'
+						LEFT OUTER JOIN ".BO_DB_PREF."raw r 
+						ON s.raw_id=r.id ";
+		}
+		else
+		{
+
+			$sql_join = BO_DB_PREF."strikes s 
+						LEFT OUTER JOIN ".BO_DB_PREF."raw r 
+						ON s.raw_id=r.id ";
+			$table = 's';
+			
+			if ($only_participated)
+				$sql_where .= " AND s.part>0 ";
+			
+		}
 	}
 	elseif ($only_strikes) // own raw signals, only with strikes
 	{
@@ -1083,22 +1110,29 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$table = 'r';
 	}
 	
+	
 	if (bo_user_get_id())
 	{
 		$stations = bo_stations();
 	}
 	
-	$show_xy_graph = $channels > 1 && BO_ARCHIVE_SHOW_XY;
-	$show_spectrum = BO_ARCHIVE_SHOW_SPECTRUM;
 	
+	$show_signal   = bo_station_id() > 0;
+	$show_spectrum = bo_station_id() > 0 && BO_ARCHIVE_SHOW_SPECTRUM;
+	$show_xy_graph = bo_station_id() > 0 && $channels > 1 && BO_ARCHIVE_SHOW_XY;
+	
+	if (bo_station_id() > 0)
+		$sql_raw = ",	r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data,
+						r.amp1 amp1, r.amp2 amp2, r.amp1_max amp1_max, r.amp2_max amp2_max";
+
+		
 	
 	$count = 0;
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
 					s.deviation deviation, s.current current, s.polarity polarity,
 					s.time stime, s.time_ns stimens, s.users users, s.part part,
-					s.status status,
-					r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data,
-					r.amp1 amp1, r.amp2 amp2, r.amp1_max amp1_max, r.amp2_max amp2_max
+					s.status status 
+					$sql_raw
 			FROM $sql_join
 			WHERE 1
 					AND $table.time BETWEEN '$date_start' AND '$date_end'
@@ -1174,10 +1208,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			}
 			
 			//own station only evaluated, but not participated
-			if (!isset($participated_stations[bo_station_id()]) && $row['raw_id'])
+			if (!isset($participated_stations[$station_id]) && $row['raw_id'])
 			{
-				$participated_stations[ bo_station_id() ] = $stations[bo_station_id()];
-				$participated_stations[ bo_station_id() ]['part'] = false;
+				$participated_stations[ $station_id ] = $stations[$station_id];
+				$participated_stations[ $station_id ]['part'] = false;
 			}
 			
 			if (count($participated_stations))
@@ -1254,7 +1288,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 		if (!$strike_id && $perm && $row['strike_id'])
 		{
-			echo '<a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'&bo_strike_id='.$row['strike_id'].'" target="_blank" ';
+			echo '<a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'&bo_station_id='.$station_id.'&bo_strike_id='.$row['strike_id'].'" target="_blank" ';
 			echo ' title="Confirmed: '.$row['status'].'" ';
 			echo '>'.$ttime.'</a>';
 		}
@@ -1275,21 +1309,24 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		if ($raw_bpv == 8 && $raw_values > 10 && BO_UP_INTVL_RAW > 0)
 		{
 			$alt = _BL('rawgraph');
-			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
-			if ($row['raw_id'])
+			if ($show_signal)
 			{
-				$url = bo_bofile_url().'?graph='.$row['raw_id'].'&bo_lang='._BL();
-				echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
+				echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
+				if ($row['raw_id'])
+				{
+					$url = bo_bofile_url().'?graph='.$row['raw_id'].'&bo_lang='._BL();
+					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
+				}
+				else if ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
+				{
+					echo _BL('signal not found');
+				}
+				else
+					echo _BL('No signal received');
+					
+				echo '</td>';
 			}
-			else if ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
-			{
-				echo _BL('signal not found');
-			}
-			else
-				echo _BL('No signal received');
-				
-			echo '</td>';
-
+			
 			if ($show_spectrum)
 			{
 				echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
@@ -1531,7 +1568,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					
 			foreach ($s_dists[0] as $sid => $dist)
 			{
-				echo $i && !$other_graphs ? ', ' : '';
+				//echo $i && !$other_graphs ? ', ' : '';
 				
 				echo '<span class="bo_arch_other_participants">';
 				
@@ -1554,17 +1591,26 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				else
 					echo 'text-decoration:none;';
 				
-				if ($sid == bo_station_id())
+				if ($sid == $station_id)
 					echo 'color:red;';
 				else
 					echo 'color:inherit;';
 				
-				echo '">';
+				
+				
+				
 				
 				if ((bo_user_get_level() & BO_PERM_SETTINGS))
+				{
+					echo 'width:80px; display:inline-block;';
+					echo '">';
 					echo $participated_stations[$sid]['user'];
+				}
 				else
+				{
+					echo '">';
 					echo _BC($participated_stations[$sid]['city']);
+				}
 					
 				echo '</a>';
 				
@@ -1580,9 +1626,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					echo round($s_bears[0][$sid]).'&deg;';
 					$url = bo_bofile_url().'?graph&bo_station_id='.$sid.'&bo_time='.urlencode(gmdate('Y-m-d H:i:s',$station_time).'.'.round($station_ntime * 1E9)).'&bo_lang='._BL();
 					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" class="bo_graph_sig_other">';
-
-					echo '';
-				
 				}
 				
 				echo '</span>';
@@ -1592,7 +1635,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			
 			
 			if ($perm && !$other_graphs && time() - $stime < 3600 * 23)
-				echo ' (<a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs">'._BL('Show their signals').'</a>)';
+				echo '<br> -> <a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs">'._BL('Show their signals').'</a>';
 
 			echo '</p>';
 			

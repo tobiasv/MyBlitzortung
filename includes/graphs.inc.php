@@ -143,7 +143,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$stId = bo_station_id();
 	if ($station_id && $station_id == $stId)
 		$station_id = 0;
-	$show_station = $station_id > 0;
+
+	$show_station = bo_station_id() > 0 || (bo_station_id() == -1 && $station_id > 0);
 
 	//Vars...
 	$X = $Y = $Y2 = $Y3 = array(); //data array
