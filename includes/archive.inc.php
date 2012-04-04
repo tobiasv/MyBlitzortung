@@ -1371,47 +1371,51 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		if ($row['strike_id'])
 		{
-			echo '<li>';
-			echo '<span class="bo_descr">';
-			echo _BL('Runtime').': ';
-			echo '</span>';
-			
-			echo '<span class="bo_value" title="';
-			
-			if ($row['raw_id'])
+			if (bo_station_id() > 0)
 			{
-				echo $cdev_text;
-				echo '">';
-				echo number_format($time_diff * 1000, 4, _BL('.'), _BL(','))._BL('unit_millisec');
-			}
-			else
-			{
-				echo '">';
-				echo '-';
+				echo '<li>';
+				echo '<span class="bo_descr">';
+				echo _BL('Runtime').': ';
+				echo '</span>';
+				
+				echo '<span class="bo_value" title="';
+				
+				if ($row['raw_id'])
+				{
+					echo $cdev_text;
+					echo '">';
+					echo number_format($time_diff * 1000, 4, _BL('.'), _BL(','))._BL('unit_millisec');
+				}
+				else
+				{
+					echo '">';
+					echo '-';
+				}
+				
+				echo '</span>';
+				echo '</li>';
+
+
+				echo '<li>';
+				echo '<span class="bo_descr">';
+				echo _BL('Distance').': ';
+				echo '</span>';
+				echo '<span class="bo_value">';
+				echo number_format($row['distance'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
+				echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
+				echo '</span>';
+				echo '</li>';
+
+				echo '<li>';
+				echo '<span class="bo_descr">';
+				echo _BL('Deviation').': ';
+				echo '</span>';
+				echo '<span class="bo_value">';
+				echo number_format($row['deviation'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
+				echo '</span>';
+				echo '</li>';
 			}
 			
-			echo '</span>';
-			echo '</li>';
-
-			echo '<li>';
-			echo '<span class="bo_descr">';
-			echo _BL('Distance').': ';
-			echo '</span>';
-			echo '<span class="bo_value">';
-			echo number_format($row['distance'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
-			echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
-			echo '</span>';
-			echo '</li>';
-
-			echo '<li>';
-			echo '<span class="bo_descr">';
-			echo _BL('Deviation').': ';
-			echo '</span>';
-			echo '<span class="bo_value">';
-			echo number_format($row['deviation'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
-			echo '</span>';
-			echo '</li>';
-
 			echo '<li>';
 			echo '<span class="bo_descr">';
 			echo _BL('Current').': ';
@@ -1448,22 +1452,24 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</span>';
 			echo '</li>';
 
-			echo '<li>';
-			echo '<span class="bo_descr">';
-			echo _BL('Participated').': ';
-			echo '</span>';
-			echo '<span class="bo_value">';
-			
-			if ($row['part'] > 0)
-				echo _BL('yes');
-			elseif ($row['raw_id'])
-				echo '<span class="bo_archive_not_evaluated">'._BL('no').'</span>';
-			else
-				echo _BL('no');
+			if (bo_station_id() > 0)
+			{
+				echo '<li>';
+				echo '<span class="bo_descr">';
+				echo _BL('Participated').': ';
+				echo '</span>';
+				echo '<span class="bo_value">';
 				
-			echo '</span>';
-			echo '</li>';
-
+				if ($row['part'] > 0)
+					echo _BL('yes');
+				elseif ($row['raw_id'])
+					echo '<span class="bo_archive_not_evaluated">'._BL('no').'</span>';
+				else
+					echo _BL('no');
+					
+				echo '</span>';
+				echo '</li>';
+			}
 			
 		}
 		
