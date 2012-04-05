@@ -1102,7 +1102,7 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 	return $sql;
 }
 
-function bo_times2sql($time_min = 0, $time_max = 0)
+function bo_times2sql($time_min = 0, $time_max = 0, $table='s')
 {
 
 	$time_min = intval($time_min);
@@ -1121,7 +1121,7 @@ function bo_times2sql($time_min = 0, $time_max = 0)
 	//date range
 	$date_min = gmdate('Y-m-d H:i:s', $time_min);
 	$date_max = gmdate('Y-m-d H:i:s', $time_max);
-	$sql = " ( s.time BETWEEN '$date_min' AND '$date_max' ) ";
+	$sql = " ( $table.time BETWEEN '$date_min' AND '$date_max' ) ";
 
 
 	//Extra keys for faster search
@@ -1141,9 +1141,9 @@ function bo_times2sql($time_min = 0, $time_max = 0)
 			$time_max_x = fmod(ceil (($time_max-$key_time_start)/60/$key_time_div),$key_time_vals)+1;
 
 			if ($time_min_x<=$time_max_x)
-				$sql .= " AND ( s.time_x BETWEEN '$time_min_x' AND '$time_max_x' ) ";
+				$sql .= " AND ( $table.time_x BETWEEN '$time_min_x' AND '$time_max_x' ) ";
 			else
-				$sql .= " AND ( s.time_x <= '$time_min_x' OR s.time_x >= '$time_max_x' ) ";
+				$sql .= " AND ( $table.time_x <= '$time_min_x' OR $table.time_x >= '$time_max_x' ) ";
 		}
 
 	}
@@ -1163,32 +1163,49 @@ function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2
 	return $sql;
 }
 
-function bo_region2sql($region)
+function bo_region2sql($region, $station_id = 0)
 {
 	global $_BO;
 
-	if (!isset($_BO['region'][$region]['rect_add']))
-		return '';
-
-	$reg = $_BO['region'][$region]['rect_add'];
-	$sql .= ' AND ( 0 ';
-
-	while ($r = @each($reg))
+	$region = trim($region);
+	
+	//Exclude?
+	if (substr($region,0,1) == '-')
 	{
-		$lat1 = $r[1];
-		list(,$lon1) = @each($reg);
-		list(,$lat2) = @each($reg);
-		list(,$lon2) = @each($reg);
-
-		$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1, true);
+		$exclude = true;
+		$region = substr($region,1);
 	}
-
-	$sql .= ' ) ';
-
-	if (isset($_BO['region'][$region]['rect_rem']))
+	
+	//Distance
+	if (substr($region,0,4) == 'dist')
 	{
-		$reg = $_BO['region'][$region]['rect_rem'];
-		$sql .= ' AND NOT ( 0 ';
+		$dist = intval(substr($region, 4)) * 1000;
+		
+		if (!$station_id)
+			$station_id = bo_station_id();
+
+		$data = bo_station_info($station_id);
+		$lat = $data['lat'];
+		$lon = $data['lon'];
+		
+		if ($station_id == bo_station_id() && $station_id > 0)
+		{
+			$sql .= " s.distance <= '$dist' ";
+		
+		}
+		else
+		{
+			$sql .= bo_sql_latlon2dist($lat, $lon, 's.lat', 's.lon')." <= '$dist' ";
+		}
+	}
+	else
+	{
+	
+		if (!isset($_BO['region'][$region]['rect_add']))
+			return '';
+
+		$reg = $_BO['region'][$region]['rect_add'];
+		$sql .= ' ( 0 ';
 
 		while ($r = @each($reg))
 		{
@@ -1198,12 +1215,33 @@ function bo_region2sql($region)
 			list(,$lon2) = @each($reg);
 
 			$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1, true);
-
 		}
 
 		$sql .= ' ) ';
-	}
 
+		if (isset($_BO['region'][$region]['rect_rem']))
+		{
+			$reg = $_BO['region'][$region]['rect_rem'];
+			$sql .= ' AND NOT ( 0 ';
+
+			while ($r = @each($reg))
+			{
+				$lat1 = $r[1];
+				list(,$lon1) = @each($reg);
+				list(,$lat2) = @each($reg);
+				list(,$lon2) = @each($reg);
+
+				$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1, true);
+
+			}
+
+			$sql .= ' ) ';
+		}
+	}
+	
+	if ($sql)
+		$sql = ($exclude ? ' AND NOT ' : ' AND ').$sql;
+	
 	return $sql;
 }
 
@@ -1911,6 +1949,87 @@ function bo_image_cache_error($w=400, $h=300)
 	bo_image_error('Creating image failed! Please check if your cache-dirs are writeable!', $w, $h, 3);
 }
 
+function bo_get_regions($bo_station_id = false)
+{
+	global $_BO;
+
+	$regions[0] = array();
+	$regions[1] = array();
+	
+	if (isset($_BO['region']) && is_array($_BO['region']))
+	{
+		foreach ($_BO['region'] as $reg_id => $d)
+		{
+			if ($d['visible'] && isset($d['rect_add']))
+			{
+				$regions[0][$reg_id] = _BL($d['name']);
+				$regions[1]['-'.$reg_id] = _BL('outside of').' '._BL($d['name']);
+			}
+		}
+
+		ksort($regions[0]);
+		ksort($regions[1]);
+	}
+
+	//Distances
+	if ($bo_station_id !== false)
+	{
+		$dists = explode(',', BO_DISTANCES_REGION);
+		$name = bo_station_city($bo_station_id);
+		
+		if (count($dists) && $name)
+		{
+			foreach($dists as $dist)
+			{
+				$dist = intval($dist);
+				if ($dist > 0)
+				{
+					$regions[0]['dist'.$dist] = _BL('max.').' '.$dist.'km '._BL('to station').' '._BC($name);
+					$regions[1]['-dist'.$dist] = _BL('min.').' '.$dist.'km '._BL('to station').' '._BC($name);
+				}
+			}
+		}
+	}
+	
+	return $regions;
+
+}
+
+function bo_show_select_region($region, $bo_station_id = false, $show_exclude = true)
+{
+	$regions = bo_get_regions($bo_station_id);
+	
+	if (count($regions[0]) > 1)
+	{
+		echo '<select name="bo_region" onchange="submit();" id="bo_stat_strikes_select_now" class="bo_select_region">';
+		echo '<option value="">'._BL('No limit').'</option>';
+		
+		echo '<optgroup label="'._BL('Show only region').'">';
+		foreach($regions[0] as $i => $y)
+			echo '<option value="'.$i.'" '.($i === $region ? 'selected' : '').'>'.$y.'</option>';
+		echo '</optgroup>';
+
+		if ($show_exclude && count($regions[1]) > 1)
+		{
+			echo '<optgroup label="'._BL('Exclude region').'">';
+			foreach($regions[1] as $i => $y)
+				echo '<option value="'.$i.'" '.($i === $region ? 'selected' : '').'>'.$y.'</option>';
+			echo '</optgroup>';
+		}
+		
+		echo '</select>';
+	}
+
+
+}
+
+function bo_region2name($region, $bo_station_id = false)
+{
+	$regions = bo_get_regions($bo_station_id);
+	$regions = array_merge($regions[0], $regions[1]);
+	
+	return $regions[$region];
+}
 
 
 ?>

@@ -116,9 +116,6 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	$month = intval($_GET['bo_month']);
 	$region = $_GET['bo_region'];
 
-	//Regions
-	if (!preg_match('/[0-9a-z]+/i', $region) || !isset($_BO['region'][$region]['rect_add']))
-		$region = 0;
 
 	/*** Strikes NOW ***/
 	$last_update = bo_get_conf('uptime_strikes');
@@ -212,13 +209,12 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	echo strtr(_BL('bo_descr_strikes_now'), array('{UPDATE_INTERVAL}' => _BLN(BO_UP_INTVL_STRIKES, 'every_minute'), '{RATE_INTERVAL}' => _BLN($group_minutes)));
 	echo '</p>';
 
-
 	echo '<form action="?" method="GET" class="bo_stat_strikes_form">';
 	echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_region'));
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_stat_strikes_now').'</legend>';
 	echo '<span class="bo_form_descr">'._BL('Region').': </span>';
-	bo_show_select_region($region);
+	bo_show_select_region($region, $station_id);
 	echo '</fieldset>';
 	echo '</form>';
 
@@ -268,7 +264,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	echo '</select>';
 
 	echo ' &nbsp; &bull; &nbsp; <span class="bo_form_descr">'._BL('Region').': </span>';
-	bo_show_select_region($region);
+	bo_show_select_region($region, false, false);
 	echo '</fieldset>';
 
 
@@ -441,7 +437,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.number_format($strikesh_own, 0, _BL('.'), _BL(','));
 		
 		if (bo_user_get_level() & BO_PERM_ARCHIVE)
-			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=strikes&bo_station_id='.$station_id.'&bo_ratio=1">'._BL('Show strikes').'</a>)';
+			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=strikes&bo_station_id='.$station_id.'&bo_datetime_start='.urlencode(date('Y-m-d H:i', time() - 4000)).'">'._BL('List').'</a>)';
 
 		echo '</span>';
 		echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.number_format($signalsh_own, 0, _BL('.'), _BL(',')).'</span>';
@@ -1140,7 +1136,12 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'distance' ? 'bo_marked' : '').'">';
-		echo number_format($d['distance'] / 1000, 0, _BL('.'), _BL(',')).'km';
+		
+		if ($own_station || $station_id > 0)
+			echo number_format($d['distance'] / 1000, 0, _BL('.'), _BL(',')).'km';
+		else
+			echo '-';
+			
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'strikes' ? 'bo_marked' : '').'">';
@@ -1611,10 +1612,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 	$channel = intval($_GET['bo_channel']);
 
 	//Regions
-	if (!preg_match('/[0-9a-z]+/i', $region) || !isset($_BO['region'][$region]['rect_add']))
-		$region = '';
-	else
-		$add_graph .= '&region='.$region;
+	$add_graph .= '&region='.$region;
 
 	if (!$own_station)
 	{
@@ -1661,7 +1659,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 
 	echo '<span class="bo_form_group">';
 	echo '<span class="bo_form_descr">'._BL('Region').': </span>';
-	bo_show_select_region($region);
+	bo_show_select_region($region, $station_id);
 	echo '</span>&nbsp;';
 
 	if ($own_station && $channels > 1)
@@ -1998,34 +1996,6 @@ function bo_show_graph($type, $add_graph='', $width=BO_GRAPH_STAT_W, $height=BO_
 			>';
 }
 
-function bo_show_select_region($region)
-{
-	global $_BO;
-
-	$regions = array();
-	if (isset($_BO['region']) && is_array($_BO['region']))
-	{
-		foreach ($_BO['region'] as $reg_id => $d)
-		{
-			if ($d['visible'] && isset($d['rect_add']))
-				$regions[$reg_id] = _BL($d['name']);
-		}
-
-		$regions[''] = _BL('No limit');
-		ksort($regions);
-	}
-
-
-	if (count($regions) > 1)
-	{
-		echo '<select name="bo_region" onchange="submit();" id="bo_stat_strikes_select_now" class="bo_select_region">';
-		foreach($regions as $i => $y)
-			echo '<option value="'.$i.'" '.($i === $region ? 'selected' : '').'>'.$y.'</option>';
-		echo '</select>';
-	}
-
-
-}
 
 function bo_show_select_strike_connected($id)
 {

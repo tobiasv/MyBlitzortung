@@ -1048,5 +1048,12 @@ $_BL['en']['Mean coordinates'] = 'Mean coordinates';
 $_BL['en']['h4_stat_station_area'] = 'Surrounding area';
 $_BL['en']['Last position'] = 'Last position';
 $_BL['en']['Select station'] = 'Select station';
+$_BL['en']['List'] = 'List';
+$_BL['en']['outside of'] = 'outside of';
+$_BL['en']['to station'] = 'to station';
+$_BL['en']['Show only region'] = 'Show only region';
+$_BL['en']['Exclude region'] = 'Exclude region';
+
+
 
 ?>

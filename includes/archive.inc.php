@@ -887,12 +887,12 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$only_participated = $_GET['bo_only_participated'] == 1;
 	$strike_id = intval($_GET['bo_strike_id']);
 	$strikes_before = intval($_GET['bo_strikes_before']);
-	$date = $_GET['bo_datetime_to'];
+	$date = $_GET['bo_datetime_start'];
 	$region = $_GET['bo_region'];
 	$show_details = $_GET['bo_show_details'];
 	$map = isset($_GET['bo_map']) ? $_GET['bo_map'] : 0;
 	$other_graphs = isset($_GET['bo_other_graphs']) && $perm;
-	$station_id = $perm ? intval($_GET['bo_station_id']) : bo_station_id();
+	$station_id = $perm && $_GET['bo_station_id'] ? intval($_GET['bo_station_id']) : bo_station_id();
 	$own_station   = bo_station_id() > 0 && bo_station_id() == $station_id;
 	
 	$channels   = bo_get_conf('raw_channels');
@@ -906,7 +906,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	$sql_where = '';
 	$date_end_max_sec = 0;
-	$datetime_to = 0;
+	$datetime_start = 0;
 	
 	if (!$perm)
 	{
@@ -916,7 +916,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	}
 	else if ($date)
 	{
-		$datetime_to = strtotime($date);
+		$datetime_start = strtotime($date);
 	}
 	
 	echo '<form action="?#bo_arch_table_form" method="GET" class="bo_arch_table_form" id="bo_arch_tableform">';	
@@ -1030,12 +1030,12 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			}
 			
 			echo ' &nbsp; <span class="bo_form_descr">'._BL('Time').':</span>&nbsp;';
-			echo '<input type="text" name="bo_datetime_to" value="'._BC($date).'" id="bo_archive_date" class="bo_archive_date">&nbsp;&nbsp; ';
+			echo '<input type="text" name="bo_datetime_start" value="'._BC($date).'" id="bo_archive_date" class="bo_archive_date">&nbsp;&nbsp; ';
 			
 			if ($show_empty_sig || $only_strikes)
 			{
 				echo ' <span class="bo_form_descr">'._BL('Region').':&nbsp;';
-				bo_show_select_region($region);
+				bo_show_select_region($region, $station_id);
 				echo '</span>&nbsp;&nbsp; ';
 			}
 			
@@ -1052,13 +1052,18 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	}
 
 	
-	if ($datetime_to)
+	if ($datetime_start)
 	{
-		$time_end = $datetime_to;
+		$time_start = $datetime_start;
+		$time_end   = time();
+		$sort = 'ASC';
 	}
 	else if ($show_empty_sig) // display strikes
 	{
+		
 		$time_end = time();
+		$time_start = $time_end - 3600 * $hours_back;
+		$sort = 'DESC';
 	}
 	else //display signals
 	{
@@ -1070,11 +1075,12 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$row = BoDb::query("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
 		$last_signal = strtotime($row['time'].' UTC') - $date_end_max_sec;
 		$time_end = min($last_signal, $last_modified_strikes);
-
+		$time_start = $time_end - 3600 * $hours_back;
+		$sort = 'DESC';
 	}
 	
-	$date_end  = gmdate('Y-m-d H:i:s', $time_end);
-	$date_start    = gmdate('Y-m-d H:i:s', $time_end - 3600 * $hours_back);
+	$date_start = gmdate('Y-m-d H:i:s', $time_start);
+	$date_end   = gmdate('Y-m-d H:i:s', $time_end);
 	
 	if ($show_empty_sig) // all strikes, maybe with own sigs
 	{
@@ -1083,9 +1089,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			$table = 's';
 			$sql_join = BO_DB_PREF."strikes s 
 						JOIN ".BO_DB_PREF."stations_strikes ss
-						ON s.id=ss.strike_id AND ss.station_id='".$station_id."'
-						LEFT OUTER JOIN ".BO_DB_PREF."raw r 
-						ON s.raw_id=r.id ";
+						ON s.id=ss.strike_id AND ss.station_id='".$station_id."'";
 		}
 		else
 		{
@@ -1112,6 +1116,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		$table = 'r';
 	}
 	
+	if ($table == 'r')
+		$sql_where .= " AND $table.time BETWEEN '$date_start' AND '$date_end'";
+	else
+		$sql_where .= " AND ".bo_times2sql($time_start, $time_end);
 	
 	if (bo_user_get_id())
 	{
@@ -1135,19 +1143,28 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					$sql_raw
 			FROM $sql_join
 			WHERE 1
-					AND $table.time BETWEEN '$date_start' AND '$date_end'
 					$sql_where
-					".bo_region2sql($region)."
-			ORDER BY $table.time DESC, $table.time_ns DESC
+					".bo_region2sql($region, $station_id)."
+			ORDER BY $table.time $sort, $table.time_ns $sort
 			LIMIT ".($page * $per_page).", ".($per_page+1)."";
 	$res = BoDb::query($sql);
 
+	if ($sort == 'DESC')
+	{
+		$sort1_text = 'Older';
+		$sort2_text = 'Newer';
+	}
+	else
+	{
+		$sort1_text = 'Newer';
+		$sort2_text = 'Older';
+	}
+	
 	echo '<div class="bo_sig_navi">';
-
 	if ($res->num_rows > $per_page && $page < $max_pages)
-		echo '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
+		echo '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL($sort1_text).'</a>';
 	if ($page)
-		echo '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
+		echo '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL($sort2_text).' &gt;</a>';
 	echo '</div>';
 
 	echo '<table class="bo_sig_table';
@@ -1750,9 +1767,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	{
 		echo '<div class="bo_sig_navi">';
 		if ($count == $per_page && $page < $max_pages)
-			echo '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
+			echo '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL($sort1_text).'</a>';
 		if ($page)
-			echo '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
+			echo '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL($sort2_text).' &gt;</a>';
 		echo '</div>';
 	}
 

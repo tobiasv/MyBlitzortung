@@ -1100,6 +1100,11 @@ $_BL['de']['Mean coordinates'] = 'Gemittelte Koordinaten';
 $_BL['de']['h4_stat_station_area'] = 'Umgebung der Station';
 $_BL['de']['Last position'] = 'Letzte Position';
 $_BL['de']['Select station'] = 'Station wählen';
+$_BL['de']['List'] = 'Liste';
+$_BL['de']['outside of'] = 'außerhalb von';
+$_BL['de']['to station'] = 'zur Station';
+$_BL['de']['Show only region'] = 'Zeige nur Region';
+$_BL['de']['Exclude region'] = 'Schließe Region aus';
 
 
 ?>

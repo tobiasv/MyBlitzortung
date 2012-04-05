@@ -320,10 +320,13 @@
 // possible values: country,city,strikes,signals,signals_ratio,efficiency,distance
 @define('BO_STATISTICS_STATIONS_SORT', 'distance');
 
+
 //Time-ranges for network statistics (1h is always present)
 @define('BO_STATISTICS_NETWORK_RANGES', ''); //hours, comma separated
 
 
+//Pre defined distances for region select box
+@define('BO_DISTANCES_REGION', '10, 25, 50, 100, 200, 500, 1000, 2000');
 
 
 /*******************************************************************/
@@ -471,6 +474,9 @@
 // - API Key: &key={key}
 // - Sensor: &sensor={false|true}  <-- must be included!
 @define('BO_GMAP_PARAM', 'sensor=false');
+
+
+
 
 /*******************************************************************/
 /*** Calculate tracks                                            ***/

@@ -165,9 +165,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 	//Region
 	$region = $_GET['region'];
-
-	if ($_BO['region'][$region]['name'])
-		$add_title .= ' ('._BL($_BO['region'][$region]['name'], true).')';
+	$region_name = bo_region2name($region, $station_id);
+	if ($region_name)
+		$add_title .= ' ('.$region_name.')';
 
 	//Channel
 	$channel = intval($_GET['channel']);
@@ -213,7 +213,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			FROM ".BO_DB_PREF."strikes s
 			$sql_join
 			WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
-			".bo_region2sql($region)."
+			".bo_region2sql($region, $station_id)."
 			GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated";
 		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
@@ -337,7 +337,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 						FROM ".BO_DB_PREF."strikes s
 						WHERE time BETWEEN '".gmdate('Y-m-d 00:00:00')."' AND '".gmdate('Y-m-d 23:59:59')."'
 						".($radius ? " AND distance < '".(BO_RADIUS_STAT * 1000)."'" : "")."
-						".bo_region2sql($region)."
+						".bo_region2sql($region, $station_id)."
 						GROUP BY participated";
 			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
@@ -526,7 +526,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					LEFT JOIN ".BO_DB_PREF."stations_strikes ss
 						ON s.id=ss.strike_id AND ss.station_id='$station_id'
 					WHERE s.time BETWEEN '$date_start' AND '$date_end'
-					".bo_region2sql($region)."
+					".bo_region2sql($region, $station_id)."
 					";
 			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
@@ -553,7 +553,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$sql = "SELECT COUNT(id) cnt, $sql_part participated, $sql
 					FROM ".BO_DB_PREF."strikes s
 					WHERE time BETWEEN '$date_start' AND '$date_end'
-					".bo_region2sql($region)."
+					".bo_region2sql($region, $station_id)."
 					GROUP BY participated, val";
 			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
@@ -619,7 +619,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$sql = "SELECT SUM(distance) sum_dist, COUNT(distance) cnt_dist, $sql_part participated, time
 				FROM ".BO_DB_PREF."strikes s
 				WHERE time BETWEEN '$date_start' AND '$date_end'
-				".bo_region2sql($region)."
+				".bo_region2sql($region, $station_id)."
 				GROUP BY participated, DAYOFMONTH(time), HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
 		$res = BoDb::query($sql);
 		while($row = $res->fetch_assoc())
@@ -684,7 +684,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					LEFT OUTER JOIN ".BO_DB_PREF."stations_strikes ss
 					ON s.id=ss.strike_id AND ss.station_id='$station_id'
 					WHERE time BETWEEN '$date_start' AND '$date_end'
-					".bo_region2sql($region)."
+					".bo_region2sql($region, $station_id)."
 					GROUP BY spart, groupby";
 		}
 		else
@@ -692,7 +692,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$sql = "SELECT COUNT(s.id) cnt, $sql_part spart, $groupby groupby
 					FROM ".BO_DB_PREF."strikes s
 					WHERE s.time BETWEEN '$date_start' AND '$date_end'
-					".bo_region2sql($region)."
+					".bo_region2sql($region, $station_id)."
 					GROUP BY spart, groupby";
 		}
 
@@ -853,7 +853,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				FROM ".BO_DB_PREF."strikes s
 				$sql_join
 				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
-				".bo_region2sql($region)."
+				".bo_region2sql($region, $station_id)."
 				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated, extra";
 		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
@@ -936,7 +936,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$sql = "SELECT s.time time, COUNT(s.id) cnt, $part_sql participated_type
 				FROM ".BO_DB_PREF."strikes s
 				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
-				".bo_region2sql($region)."
+				".bo_region2sql($region, $station_id)."
 				GROUP BY FLOOR(UNIX_TIMESTAMP(s.time) / 60 / $group_minutes), participated_type";
 		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
@@ -994,7 +994,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$add_title .= '+'._BL('with_participation');
 			}
 
-			$sql_join .= bo_region2sql($region);
+			$sql_join .= bo_region2sql($region, $station_id);
 		}
 		else if ($participated < 0)
 		{
@@ -1147,7 +1147,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				$add_title .= '+'._BL('with_participation');
 			}
 
-			$sql_join .= bo_region2sql($region);
+			$sql_join .= bo_region2sql($region, $station_id);
 		}
 		else if ($participated < 0)
 		{
@@ -1305,7 +1305,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 				FROM ".BO_DB_PREF."strikes s
 				INNER JOIN ".BO_DB_PREF."raw r ON s.raw_id = r.id
 				WHERE 1
-					".bo_region2sql($region)."
+					".bo_region2sql($region, $station_id)."
 					AND s.time BETWEEN '" . gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."'
 					AND '" . gmdate('Y-m-d H:i:s', $time_max) . "'
 					AND $sql_part";
