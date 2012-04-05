@@ -1084,25 +1084,28 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	if ($show_empty_sig) // all strikes, maybe with own sigs
 	{
-		if ($station_id && !$own_station)
+		$table = 's';
+		
+		if ($station_id > 0 && !$own_station)
 		{
-			$table = 's';
 			$sql_join = BO_DB_PREF."strikes s 
 						JOIN ".BO_DB_PREF."stations_strikes ss
 						ON s.id=ss.strike_id AND ss.station_id='".$station_id."'";
 		}
-		else
+		elseif ($own_station)
 		{
-
 			$sql_join = BO_DB_PREF."strikes s 
 						LEFT OUTER JOIN ".BO_DB_PREF."raw r 
 						ON s.raw_id=r.id ";
-			$table = 's';
-			
+
 			if ($only_participated)
 				$sql_where .= " AND s.part>0 ";
-			
 		}
+		else
+		{
+			$sql_join = BO_DB_PREF."strikes s ";
+		}
+		
 	}
 	elseif ($only_strikes) // own raw signals, only with strikes
 	{
