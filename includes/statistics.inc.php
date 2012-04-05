@@ -438,7 +438,12 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 	if ($active) //don't display this part when inactive, there may be still some non-zero values
 	{
-		echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.number_format($strikesh_own, 0, _BL('.'), _BL(',')).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.number_format($strikesh_own, 0, _BL('.'), _BL(','));
+		
+		if (bo_user_get_level() & BO_PERM_ARCHIVE)
+			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=strikes&bo_station_id='.$station_id.'&bo_ratio=1">'._BL('Show strikes').'</a>)';
+
+		echo '</span>';
 		echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.number_format($signalsh_own, 0, _BL('.'), _BL(',')).'</span>';
 
 		echo '<li><span class="bo_descr">'._BL('Locating ratio').': </span><span class="bo_value">';
@@ -448,7 +453,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo $strikesh ? number_format($strikesh_own / $strikesh * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 
 		if ($dens_stations[$station_id])
-			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=density&bo_station='.$station_id.'&bo_ratio=1">'._BL('Map').'</a>)';
+			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=density&bo_station_id='.$station_id.'&bo_ratio=1">'._BL('Map').'</a>)';
 
 		echo '</span></li>';
 

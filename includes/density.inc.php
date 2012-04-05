@@ -391,7 +391,7 @@ function bo_show_archive_density()
 	$map = isset($_GET['bo_map']) ? $_GET['bo_map'] : -1;
 	$year = intval($_GET['bo_year']) ? intval($_GET['bo_year']) : date('Y');
 	$month = intval($_GET['bo_month']);
-	$station_id = intval($_GET['bo_station']);
+	$station_id = intval($_GET['bo_station_id']);
 	$ratio = intval($_GET['bo_ratio']);
 
 	// Map infos
@@ -426,7 +426,7 @@ function bo_show_archive_density()
 	echo '</p>';
 	echo '<a name="bo_arch_strikes_form"></a>';
 	echo '<form action="?#bo_arch_strikes_form" method="GET" class="bo_arch_strikes_form" name="bo_arch_strikes_form">';
-	echo bo_insert_html_hidden(array('bo_year', 'bo_map', 'bo_station', 'bo_ratio'));
+	echo bo_insert_html_hidden(array('bo_year', 'bo_map', 'bo_station_id', 'bo_ratio'));
 	echo '<input type="hidden" value="'.($ratio ? 1 : 0).'" name="bo_ratio">';
 	echo '<fieldset>';
 	echo '<legend>'._BL('legend_arch_densities').'</legend>';
@@ -459,7 +459,7 @@ function bo_show_archive_density()
 	echo '</select>';
 
 	echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
-	echo '<select name="bo_station" id="bo_arch_dens_select_station" onchange="submit();">';
+	echo '<select name="bo_station_id" id="bo_arch_dens_select_station" onchange="submit();">';
 	echo '<option></option>';
 	foreach ($stations as $id )
 	{

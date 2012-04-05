@@ -892,8 +892,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$show_details = $_GET['bo_show_details'];
 	$map = isset($_GET['bo_map']) ? $_GET['bo_map'] : 0;
 	$other_graphs = isset($_GET['bo_other_graphs']) && $perm;
-	$station_id = bo_station_id() < 0 ? intval($_GET['bo_station_id']) : bo_station_id();
-	
+	$station_id = $perm ? intval($_GET['bo_station_id']) : bo_station_id();
+	$own_station   = bo_station_id() > 0 && bo_station_id() == $station_id;
 	
 	$channels   = bo_get_conf('raw_channels');
 	$raw_bpv    = bo_get_conf('raw_bitspervalue');
@@ -994,28 +994,31 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	{
 		echo '<a name="bo_arch_table_form"></a>';
 		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes', 'bo_show_details', 'bo_region'));
+
+		if ($perm && $show_empty_sig)
+		{
+			echo '<fieldset>';
+			echo '<legend>'._BL('Station').'</legend>';
+			echo _BL('Select station').':&nbsp;';
+			echo bo_insert_html_hidden(array('bo_station_id'));
+			echo bo_get_stations_html_select($station_id);
+			echo '&nbsp;&nbsp; ';
+			echo '</select>';
+			echo '</fieldset>';
+		}
+		
 		echo '<fieldset>';
 		echo '<legend>'._BL('settings').'</legend>';
-
+		
 		if (!$show_empty_sig)
 		{
 			echo '<input type="checkbox" name="bo_only_strikes" value="1" '.($only_strikes ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_strikes">';
 			echo '<label for="check_only_strikes"> '._BL('check_only_strikes').'</label>&nbsp;&nbsp; ';
 		}
-		else
+		elseif ($own_station)
 		{
-			if (bo_station_id() < 0)
-			{
-				echo _BL('Station').':&nbsp;';
-				echo bo_insert_html_hidden(array('bo_station_id'));
-				echo bo_get_stations_html_select($station_id);
-				echo '&nbsp;&nbsp; ';
-			}
-			else
-			{
-				echo '<input type="checkbox" name="bo_only_participated" value="1" '.($only_participated ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_participated">';
-				echo '<label for="check_only_participated"> '._BL('check_only_participated').'</label>&nbsp;&nbsp; ';
-			}
+			echo '<input type="checkbox" name="bo_only_participated" value="1" '.($only_participated ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_participated">';
+			echo '<label for="check_only_participated"> '._BL('check_only_participated').'</label>&nbsp;&nbsp; ';
 		}
 		
 		if ($perm)
@@ -1075,8 +1078,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	if ($show_empty_sig) // all strikes, maybe with own sigs
 	{
-	
-		if (bo_station_id() == -1 && $station_id)
+		if ($station_id && !$own_station)
 		{
 			$table = 's';
 			$sql_join = BO_DB_PREF."strikes s 
@@ -1117,16 +1119,14 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	}
 	
 	
-	$show_signal   = bo_station_id() > 0;
-	$show_spectrum = bo_station_id() > 0 && BO_ARCHIVE_SHOW_SPECTRUM;
-	$show_xy_graph = bo_station_id() > 0 && $channels > 1 && BO_ARCHIVE_SHOW_XY;
+	$show_signal   = $own_station;
+	$show_spectrum = $own_station && BO_ARCHIVE_SHOW_SPECTRUM;
+	$show_xy_graph = $own_station && $channels > 1 && BO_ARCHIVE_SHOW_XY;
 	
-	if (bo_station_id() > 0)
+	if ($own_station)
 		$sql_raw = ",	r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data,
 						r.amp1 amp1, r.amp2 amp2, r.amp1_max amp1_max, r.amp2_max amp2_max";
 
-		
-	
 	$count = 0;
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
 					s.deviation deviation, s.current current, s.polarity polarity,
@@ -1371,7 +1371,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		if ($row['strike_id'])
 		{
-			if (bo_station_id() > 0)
+			if ($own_station)
 			{
 				echo '<li>';
 				echo '<span class="bo_descr">';
@@ -1452,7 +1452,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</span>';
 			echo '</li>';
 
-			if (bo_station_id() > 0)
+			if ($own_station)
 			{
 				echo '<li>';
 				echo '<span class="bo_descr">';

@@ -1099,5 +1099,7 @@ $_BL['de']['no_lightning_data'] = 'Keine Blitzdaten verfügbar!';
 $_BL['de']['Mean coordinates'] = 'Gemittelte Koordinaten';
 $_BL['de']['h4_stat_station_area'] = 'Umgebung der Station';
 $_BL['de']['Last position'] = 'Letzte Position';
+$_BL['de']['Select station'] = 'Station wählen';
+
 
 ?>
