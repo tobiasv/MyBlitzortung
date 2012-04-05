@@ -138,7 +138,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 				FROM ".BO_DB_PREF."strikes s
 				WHERE $sql_time ".bo_region2sql($region, $station_id);
 		$row = BoDb::query($sql)->fetch_assoc();
-		$last_strike = strtotime($row['mtime'].' UTC');
+		$last_strike = $row['mtime'] ? strtotime($row['mtime'].' UTC') : 0;
 	}
 	else
 	{
