@@ -890,7 +890,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$date = $_GET['bo_datetime_to'];
 	$region = $_GET['bo_region'];
 	$show_details = $_GET['bo_show_details'];
-	$map = isset($_GET['bo_map']) ? intval($_GET['bo_map']) : 0;
+	$map = isset($_GET['bo_map']) ? $_GET['bo_map'] : 0;
 	$other_graphs = isset($_GET['bo_other_graphs']) && $perm;
 	$station_id = bo_station_id() < 0 ? intval($_GET['bo_station_id']) : bo_station_id();
 	
@@ -1405,16 +1405,16 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
 				echo '</span>';
 				echo '</li>';
-
-				echo '<li>';
-				echo '<span class="bo_descr">';
-				echo _BL('Deviation').': ';
-				echo '</span>';
-				echo '<span class="bo_value">';
-				echo number_format($row['deviation'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
-				echo '</span>';
-				echo '</li>';
 			}
+			
+			echo '<li>';
+			echo '<span class="bo_descr">';
+			echo _BL('Deviation').': ';
+			echo '</span>';
+			echo '<span class="bo_value">';
+			echo number_format($row['deviation'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
+			echo '</span>';
+			echo '</li>';
 			
 			echo '<li>';
 			echo '<span class="bo_descr">';
@@ -1538,7 +1538,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</li>';
 		}
 		
-		if ($row['strike_id'])
+		if ($row['strike_id'] && $perm)
 		{
 			echo '<li>';
 			echo '<span class="bo_descr">';
