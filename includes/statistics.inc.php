@@ -114,8 +114,8 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 
 	$year = intval($_GET['bo_year']);
 	$month = intval($_GET['bo_month']);
-	$region = $_GET['bo_region'];
-
+	$region = $_GET['bo_region'] ? $_GET['bo_region'] : 0;
+	
 
 	/*** Strikes NOW ***/
 	$last_update = bo_get_conf('uptime_strikes');
@@ -123,25 +123,29 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	$group_minutes = BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES;
 
 
-	if (1 || $region)
+	if (substr($region, 0, 4) == 'dist' || substr($region, 0, 1) == '-')
+	{
+		$sql_time = " time BETWEEN '".gmdate('Y-m-d H:i:s', $last_update - 60*$group_minutes*2 )."' AND '".gmdate('Y-m-d H:i:s', $last_update-60*$group_minutes*1)."' ";
+		$sql = "SELECT COUNT(*) cnt
+				FROM ".BO_DB_PREF."strikes s
+				WHERE $sql_time ".bo_region2sql($region, $station_id);
+		$row = BoDb::query($sql)->fetch_assoc();
+		$strike_rate = $row['cnt'] / $group_minutes;
+
+		//can take a very very long time without 
+		//specifing a time range!
+		$sql = "SELECT MAX(time) mtime
+				FROM ".BO_DB_PREF."strikes s
+				WHERE $sql_time ".bo_region2sql($region, $station_id);
+		$row = BoDb::query($sql)->fetch_assoc();
+		$last_strike = strtotime($row['mtime'].' UTC');
+	}
+	else
 	{
 		$last_strikes_region = unserialize(bo_get_conf('last_strikes_region'));
 		$rate_strikes_region = unserialize(bo_get_conf('rate_strikes_region'));
 		$strike_rate = $rate_strikes_region[$region];
 		$last_strike = $last_strikes_region[$region];
-	}
-	else
-	{
-		$sql = "SELECT COUNT(*) cnt
-				FROM ".BO_DB_PREF."strikes
-				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $last_update - 60*$group_minutes*2 )."' AND '".gmdate('Y-m-d H:i:s', $last_update-60*$group_minutes*1)."'";
-		$row = BoDb::query($sql)->fetch_assoc();
-		$strike_rate = $row['cnt'] / $group_minutes;
-
-		$sql = "SELECT MAX(time) mtime
-				FROM ".BO_DB_PREF."strikes ";
-		$row = BoDb::query($sql)->fetch_assoc();
-		$last_strike = strtotime($row['mtime'].' UTC');
 	}
 
 	if (!$region && intval(BO_TRACKS_SCANTIME))
