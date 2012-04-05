@@ -783,12 +783,12 @@
 
 //Statistics-Graph: Strikes (Station)
 @define('BO_GRAPH_STAT_STR_COLOR_L1', '#99f@1');
-@define('BO_GRAPH_STAT_STR_COLOR_F1', '#ccf@0');
+@define('BO_GRAPH_STAT_STR_COLOR_F1', '#ccf@0.2');
 @define('BO_GRAPH_STAT_STR_WIDTH_1',  1);
 @define('BO_GRAPH_STAT_STR_COLOR_L2', '#00f@1');
-@define('BO_GRAPH_STAT_STR_COLOR_F2', '#99f@0');
+@define('BO_GRAPH_STAT_STR_COLOR_F2', '#99f@0.3');
 @define('BO_GRAPH_STAT_STR_WIDTH_2',  2);
-@define('BO_GRAPH_STAT_STR_COLOR_L3', '#00f@0.5');
+@define('BO_GRAPH_STAT_STR_COLOR_L3', '#00f@0.1');
 @define('BO_GRAPH_STAT_STR_COLOR_F3', false);
 @define('BO_GRAPH_STAT_STR_WIDTH_3',  1);
 
