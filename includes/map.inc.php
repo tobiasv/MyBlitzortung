@@ -592,9 +592,9 @@ function bo_map_reload_static(manual)
 	
 	$radius = $_BO['radius'] * 1000;
 
-	$lat = (double)$_GET['lat'];
-	$lon = (double)$_GET['lon'];
-	$zoom = intval($_GET['zoom']);
+	$lat = (double)$_GET['bo_lat'];
+	$lon = (double)$_GET['bo_lon'];
+	$zoom = intval($_GET['bo_zoom']);
 
 	if ($lat || $lon || $zoom)
 		$cookie_load_defaults = false;
