@@ -584,7 +584,8 @@ function bo_update_raw_signals($force = false)
 
 		if ($update_err)
 			bo_update_error('rawdata', 'Download of raw data failed. '.$code);
-
+		else
+			bo_update_error('rawdata', true);
 	}
 	else
 	{

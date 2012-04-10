@@ -1062,7 +1062,7 @@
 @define('BO_MIN_MINUTES_STRIKE_CONFIRMED', 5);
 
 //needed for auto linking stations
-@define('BO_LINK_HOST', 'www.myblitzortung.de');
+@define('BO_LINK_HOST', 'www.myblitzortung.org');
 @define('BO_LINK_URL',  '/blitzortung/bo.php');
 
 //for finding signal to strike

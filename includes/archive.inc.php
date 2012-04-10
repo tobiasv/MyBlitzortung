@@ -993,7 +993,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	if (!$strike_id)
 	{
 		echo '<a name="bo_arch_table_form"></a>';
-		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes', 'bo_show_details', 'bo_region'));
+		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes', 'bo_show_details', 'bo_region', 'bo_datetime_start'));
 
 		if ($perm && $show_empty_sig)
 		{
