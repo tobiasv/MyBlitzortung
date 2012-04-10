@@ -1673,8 +1673,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				
 				if (!$show_details)
 				{
-					echo '<form action="?" method="GET" class="bo_arch_strikes_form">';
-					echo bo_insert_html_hidden(array('bo_map'));
 					echo '<fieldset>';
 					echo bo_archive_select_map($map);
 					echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $row['strike_id']).'&bo_strikes_before=100">'._BL('Animation').'</a>';
