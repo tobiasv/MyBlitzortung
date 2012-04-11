@@ -455,6 +455,11 @@ function bo_check_for_update()
 				$ok = true; //doesn't matter too much if this fails ;-)
 				flush();
 
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` ADD `tracker` VARCHAR(50) NOT NULL';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
+
 				
 			default:
 				$ok = true;

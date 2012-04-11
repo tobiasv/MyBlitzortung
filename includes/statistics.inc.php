@@ -886,6 +886,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		$D[$id]['country'] = _BL($d['country']);
 		$D[$id]['city'] = $d['city'];
 		$D[$id]['user'] = $d['user'];
+		$D[$id]['tracker'] = $d['tracker'];
 
 		if (!$own_station)
 			$D[$id]['distance'] = bo_latlon2dist($d['lat'], $d['lon'], $sinfo['lat'], $sinfo['lon']);
@@ -965,7 +966,10 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			case 'efficiency':
 				$S[$id] = $D[$id]['efficiency'];
 				break;
-
+				
+			case 'tracker':
+				$S[$id] = $D[$id]['tracker'];
+				break;
 		}
 
 	}
@@ -1067,6 +1071,11 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'user').'#table_network" rel="nofollow">'._BL('User').'</a></th>';
 	}
 
+	if (isset($_GET['tracker']))
+	{
+		echo '<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'tracker').'#table_network" rel="nofollow">'._BL('Tracker').'</a></th>';
+	}
+	
 	echo '
 			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'country').'#table_network" rel="nofollow">'._BL('Country').'</a></th>
 			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'city').'#table_network" rel="nofollow">'._BL('City').'</a></th>
@@ -1127,6 +1136,12 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			echo '</td>';
 		}
 
+		if (isset($_GET['tracker']))
+		{
+			echo '<td class="bo_text '.($sort == 'tracker' ? 'bo_marked' : '').'">';
+			echo $d['tracker'];
+			echo '</td>';
+		}
 
 		echo '<td class="bo_text '.($sort == 'country' ? 'bo_marked' : '').'">';
 		echo $d['country'];
@@ -1199,7 +1214,9 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			if ($time && isset($user_stations[$user]))
 			{
 				$id = $user_stations[$user]['id'];
-				$new_stations[$id] = array($time, $user_stations[$user]['city'], $user_stations[$user]['country']);
+				
+				if ($user_stations[$user]['city'] && $user_stations[$user]['country'])
+					$new_stations[$id] = array($time, $user_stations[$user]['city'], $user_stations[$user]['country']);
 			}
 		}
 

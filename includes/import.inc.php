@@ -1600,6 +1600,7 @@ function bo_update_stations($force = false)
 			$stTimeMs 	= substr($cols[7], 25);
 			$stStatus 	= $cols[8];
 			$stDist 	= bo_latlon2dist($stLat, $stLon);
+			$stTracker	= strtr(html_entity_decode($cols[9]), array(chr(160) => ' '));
 			$stSignals	= (int)$cols[10];
 			$stTimeU    = strtotime($stTime.' UTC');
 
@@ -1617,7 +1618,6 @@ function bo_update_stations($force = false)
 			$StData[$stId]['sig'] = $stSignals;
 			$StData[$stId]['status'] = $stStatus;
 
-
 			$sql = " 	id='$stId',
 						user='$stUser',
 						city='$stCity',
@@ -1627,7 +1627,9 @@ function bo_update_stations($force = false)
 						distance='$stDist',
 						last_time='$stTime',
 						last_time_ns='$stTimeMs',
-						status='$stStatus' ";
+						status='$stStatus',
+						tracker='$stTracker'
+						";
 
 			$sql = strtr($sql, array('\null' => ''));
 

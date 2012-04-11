@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (
   `last_time` datetime NOT NULL,
   `last_time_ns` int(11) NOT NULL,
   `status` varchar(1) NOT NULL,
+  `tracker` varchar(50) NOT NULL,
   `first_seen` datetime NOT NULL,
   `changed` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`)
