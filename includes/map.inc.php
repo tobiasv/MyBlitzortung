@@ -745,8 +745,9 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		echo '</div>';
 	}
 
-	$show_adv_counter = (bo_user_get_level() & BO_PERM_NOLIMIT);
-
+	$show_adv_counter    = (bo_user_get_level() & BO_PERM_NOLIMIT);
+	$show_station_select = (bo_user_get_level() & BO_PERM_NOLIMIT) && BO_MAP_STATION_SELECT === true; 
+	
 	if (!$show_adv_counter || intval(BO_TRACKS_SCANTIME) || bo_station_id() > 0)
 	{
 		echo '<div class="bo_input_container" id="bo_map_advanced_options">';
@@ -760,10 +761,10 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			echo '</span>';
 		}
 		
-		if (bo_station_id() > 0)
+		if (!$show_station_select && bo_station_id() > 0)
 		{
 			echo '<span class="bo_form_checkbox_text">';
-			echo '<input type="checkbox" onclick="bo_map_toggle_own(this.checked);" id="bo_map_opt_own"> ';
+			echo '<input type="checkbox" onclick="bo_map_toggle_stationid(this.checked ? '.intval(bo_station_id()).' : 0);" id="bo_map_opt_own"> ';
 			echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label> &nbsp; ';
 			echo '</span>';
 		}
@@ -803,6 +804,29 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		echo '</div>';
 	}
 
+	if ($show_station_select)
+	{
+		$opts = bo_get_station_list();
+		
+		echo '<div class="bo_input_container" id="bo_map_statistic_options">';
+		echo '<span class="bo_form_descr">'._BL('Only station').':</span> ';
+		
+		echo '<span class="bo_form_checkbox_text">';
+		
+		echo '<select name="bo_station_id" id="bo_only_station_id" onchange="bo_map_toggle_stationid(this.value);">';
+		echo '<option></option>';
+		foreach($opts as $id => $name)
+		{
+			echo '<option value="'.$id.'">';
+			echo $name;
+			echo '</option>';
+		}
+		echo '</select>';
+		echo '</span>';
+		
+		echo '</div>';
+
+	}
 	
 	echo '<div class="bo_input_container" id="bo_map_stations_options">';
 	echo '<span class="bo_form_descr">'._BL('Show Stations').':</span> ';
@@ -881,7 +905,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	var bo_OverlayTracks;
 	var bo_ExtraOverlay = [];
 	var bo_ExtraOverlayMaps = [];
-	var bo_show_only_own = 0;
+	var bo_show_only_stationid = 0;
 	var bo_show_count = 0;
 	var bo_show_tracks = 0;
 	var bo_mybo_markers = [];
@@ -966,12 +990,16 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			bo_show:false
 		};
 		
-		var c = bo_getcookie('bo_show_only_own');
+		var c = bo_getcookie('bo_show_only_stationid');
 		if (c)
 		{
-			bo_show_only_own = c == -1 ? 0 : 1;
+			bo_show_only_stationid = c == -1 ? 0 : c;
+			<?php if (!$show_station_select) { ?>
 			document.getElementById('bo_map_opt_own').checked = c == -1 ? false : true;
-			if (c != -1) bo_show_more();
+			<?php } else { ?>
+			document.getElementById('bo_only_station_id').value = c > 0 ? c : 0;
+			<?php } ?>
+			if (c > 0) bo_show_more();
 		}
 
 		var c = bo_getcookie('bo_show_count');
@@ -979,7 +1007,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		{
 			bo_show_count = c == -1 ? 0 : 1;
 			document.getElementById('bo_map_opt_count').checked = c == -1 ? false : true;
-			if (c != -1) bo_show_more();
+			if (c > 0) bo_show_more();
 		}
 
 		
@@ -992,7 +1020,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		{
 			bo_show_tracks = c == -1 ? 0 : 1;
 			document.getElementById('bo_map_opt_tracks').checked = c == -1 ? false : true;
-			if (c != -1) bo_show_more();
+			if (c > 0) bo_show_more();
 		}
 <?php
 	}
@@ -1221,10 +1249,10 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		bo_map_reload_overlays();
 	}
 	
-	function bo_map_toggle_own(show_only_own)
+	function bo_map_toggle_stationid(id)
 	{
-		bo_setcookie('bo_show_only_own', show_only_own ? 1 : -1);
-		bo_show_only_own = show_only_own ? 1 : 0;
+		bo_setcookie('bo_show_only_stationid', id > 0 ? id : -1);
+		bo_show_only_stationid = id > 0 ? id : 0;
 		bo_map_reload_overlays();
 	}
 
@@ -1360,7 +1388,11 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		c = new bo_tile_coord(zoom, coord, tile_size);
 		if (!c.ok) return c.failimg;
 		
-		var url = "<?php echo bo_bofile_url() ?>?tile&own="+bo_show_only_own+"&zoom="+zoom+"&x="+c.x+"&y="+c.y;
+		var url = "<?php echo bo_bofile_url() ?>?tile&zoom="+zoom+"&x="+c.x+"&y="+c.y;
+		
+		if (bo_show_only_stationid > 0)
+			url=url+"&sid="+bo_show_only_stationid;
+		
 		var now = new Date();
 		var add = "";
 		
@@ -1391,11 +1423,20 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		if (bo_manual_timerange)
 		{
 			types = '-1';
-			add = "&from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2)+"&";
+			add = "&from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2);
 		}
 		else
 		{
-			add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
+			add = "&" + now.getDate() + '_' + now.getHours() + '_';
+			
+			if (interval > 0)
+				add = add + Math.floor(now.getMinutes() / interval);
+			else
+				add = add + '0';
+			
+			if (bo_loggedin)
+				add = add + '_1';
+			
 			for (i in bo_OverlayMaps)
 			{
 				if (bo_OverlayMaps[i].bo_show)
@@ -1408,8 +1449,12 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			}
 		}
 		
+		var url="<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&zoom="+zoom+"&x="+c.x+"&y="+c.y;
 		
-		return "<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&own="+bo_show_only_own+"&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&"+add;
+		if (bo_show_only_stationid > 0)
+			url=url+"&sid="+bo_show_only_stationid;
+		
+		return url+add;
 	}
 	
 	function bo_get_tile_tracks(zoom, coord, tile_size)

@@ -1006,7 +1006,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo _BL('Select station').':&nbsp;';
 			echo bo_get_stations_html_select($station_id);
 			echo '&nbsp;&nbsp; ';
-			echo '</select>';
 			echo '</fieldset>';
 		}
 		

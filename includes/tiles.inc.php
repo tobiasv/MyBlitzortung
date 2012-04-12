@@ -17,7 +17,7 @@ function bo_tile()
 	$x          = intval($_GET['x']);
 	$y          = intval($_GET['y']);
 	$zoom       = intval($_GET['zoom']);
-	$only_own   = intval($_GET['own']);
+	$station_id = intval($_GET['sid']);
 	$only_info  = isset($_GET['info']);
 	$show_count = isset($_GET['count']);
 	$type       = intval($_GET['type']);
@@ -36,6 +36,13 @@ function bo_tile()
 	if (!$only_info && ($zoom < $min_zoom || $zoom > $max_zoom))
 	{
 		bo_tile_message('tile_zoom_not_allowed', 'zoom_na', $caching, array(), $tile_size);
+		exit;
+	}
+
+	
+	if ( $station_id > 0 && $station_id != bo_station_id() && (!(bo_user_get_level() & BO_PERM_NOLIMIT) || BO_MAP_STATION_SELECT !== true) )
+	{
+		bo_tile_message('tile_station_not_allowed', 'station_na', $caching, array(), $tile_size);
 		exit;
 	}
 	
@@ -206,7 +213,7 @@ function bo_tile()
 
 	//Caching
 	$dir = BO_DIR.'cache/tiles/';
-	$filename = $type.'_'.$zoom.'_'.$x.'x'.$y.'-'.$only_own.'-'.(bo_user_get_level() ? 1 : 0).'.png';
+	$filename = $type.'_'.$zoom.'_'.$station_id.'_'.$x.'x'.$y.'-'.(bo_user_get_level() ? 1 : 0).'.png';
 	
 	if (BO_CACHE_SUBDIRS === true)
 		$filename = strtr($filename, array('_' => '/'));
@@ -274,38 +281,55 @@ function bo_tile()
 	//Display only strike count
 	if ($show_count) 
 	{
-		$sql_where = '';
+		$strike_count = 0;
+		$whole_strike_count = 0;
+		
+		//Build ugly SQL Query
+		$sql_join  = '';
+		$sql_where = ' ( 0';
 		foreach($count_types as $i)
 		{
 			$date_min = gmdate('Y-m-d H:i:s', $times_min[$i]);
 			$date_max = gmdate('Y-m-d H:i:s', $times_max[$i]);
 			
-			$sql_where_time .= " OR s.time BETWEEN '$date_min' AND '$date_max' ";
+			$sql_where .= " OR s.time BETWEEN '$date_min' AND '$date_max' ";
 		}
-		
-		$strike_count = 0;
-		$whole_strike_count = 0;
+		$sql_where .= ') ';
 		
 		//the where clause
-		$sql_where = bo_strikes_sqlkey($index_sql, min($times_min), max($times_max), $lat1, $lat2, $lon1, $lon2);
+		$sql_where .= ' AND '.bo_strikes_sqlkey($index_sql, min($times_min), max($times_max), $lat1, $lat2, $lon1, $lon2);
+		$sql_where .= $radius ? " AND s.distance < $radius " : "";
 
 		
+		if ($station_id && $station_id == bo_station_id())
+		{
+			$sql_where .= " AND s.part>0 ";
+			$sql_participated = " s.part>0 ";
+		}
+		elseif ($station_id > 0)
+		{
+			$sql_join1   = " LEFT OUTER JOIN ".BO_DB_PREF."stations_strikes ss2 ON s.id=ss2.strike_id AND ss2.station_id='".$station_id."'";
+			$sql_join2   = "            JOIN ".BO_DB_PREF."stations_strikes ss2 ON s.id=ss2.strike_id AND ss2.station_id='".$station_id."'";
+			$sql_participated = " ss2.strike_id IS NOT NULL ";
+		}
+		else
+		{
+			$sql_participated = " 0 ";
+		}
+		
+		//get count of all other stations
 		if ($_GET['stat'] == 2)
 		{
 			$stations = bo_stations();
 			$stations_count = array();
 			
 			$sql = "SELECT ss.station_id sid, COUNT(s.time) cnt 
-				FROM ".BO_DB_PREF."stations_strikes ss
-				JOIN ".BO_DB_PREF."strikes s $index_sql
-					ON s.id=ss.strike_id
-				WHERE 1
-					".($radius ? "AND s.distance < $radius" : "")."
-					AND (0 $sql_where_time)
-					AND $sql_where
-					".($only_own ? " AND part>0 " : "")."
-				GROUP BY sid
-				";
+					FROM ".BO_DB_PREF."stations_strikes ss 
+					JOIN ".BO_DB_PREF."strikes s $index_sql ON s.id=ss.strike_id
+					$sql_join2
+					WHERE $sql_where
+					GROUP BY sid
+					";
 			$erg = BoDb::query($sql);
 			while ($row = $erg->fetch_assoc())
 			{
@@ -313,18 +337,16 @@ function bo_tile()
 			}
 		}
 		
-		$sql = "SELECT COUNT(time) cnt ".($only_own ? ", part>0 participated " : "")."
-			FROM ".BO_DB_PREF."strikes s $index_sql
-			WHERE 1
-				".($radius ? "AND distance < $radius" : "")."
-				AND (0 $sql_where_time)
-				AND $sql_where
-				".($only_own ? " GROUP BY participated " : "")."
-			";
+		//all strike count and participated count
+		$sql = "SELECT COUNT(s.time) cnt, $sql_participated participated 
+				FROM ".BO_DB_PREF."strikes s $index_sql $sql_join1
+				WHERE $sql_where
+				GROUP BY participated
+				";
 		$erg = BoDb::query($sql);
 		while ($row = $erg->fetch_assoc())
 		{
-			if ($only_own)
+			if ($station_id)
 			{
 				if ($row['participated'])
 					$strike_count += $row['cnt'];
@@ -354,40 +376,46 @@ function bo_tile()
 		//number
 		$textsize = BO_MAP_COUNT_FONTSIZE;
 		$bold = BO_MAP_COUNT_FONTBOLD;
-		$twidth = bo_imagetextwidth($textsize, $bold, $strike_count);
-		$theight = bo_imagetextheight($textsize, $bold, $strike_count);
-		$white = imagecolorallocatealpha($I, 255,255,255,0);
-		imagefilledrectangle( $I, 0, 0, $twidth+3, $theight+2, $col);
-		bo_imagestring($I, $textsize, 2, 2, $strike_count, $white, $bold);
 		
-		if ($only_own && intval($whole_strike_count))
+		$text = $strike_count;
+		if ($station_id > 0 && intval($whole_strike_count))
 		{
-			$ratio = round($strike_count / $whole_strike_count * 100).'%';
-			$twidth = bo_imagetextwidth($textsize, false, $ratio);
-			imagefilledrectangle( $I, 0, $theight+3, $twidth+6, 2*$theight+4, $col);
-			bo_imagestring($I, $textsize, 2, $theight+4, $ratio, $white, $bold);
+			$ratio = $strike_count / $whole_strike_count * 100;
+			$text .= ' / '.number_format($ratio, 1, _BL('.'), _BL(',')).'%';
 		}
+		
+		$twidth = bo_imagetextwidth($textsize, $bold, $text)+3;
+		$theight = bo_imagetextheight($textsize, $bold, $text)+2;
+		$white = imagecolorallocatealpha($I, 255,255,255,0);
+		$color2   = imagecolorallocatealpha($I, 255,255,200,0);
+		imagefilledrectangle( $I, 0, 0, $twidth, $theight, $col);
+		bo_imagestring($I, $textsize, 2, 2, $text, $white, $bold);
+		
 		
 		//Stations
 		if ($_GET['stat'] == 2)
 		{
-			arsort($stations_count);
-			$theight = bo_imagetextheight($textsize-1, $bold, $strike_count);
-			$i = 0;
-			foreach($stations_count as $sid => $cnt)
+			if ($strike_count > 0)
 			{
-				$i++;
+				arsort($stations_count);
+				$theight-=1;
 				
-				$text = round($cnt / $strike_count * 100).'% ';
-				$text .= trim($stations[$sid]['city']);
+				$i = 0;
+				foreach($stations_count as $sid => $cnt)
+				{
+					$i++;
+					
+					$text = round($cnt / $strike_count * 100).'% ';
+					$text .= trim($stations[$sid]['city']);
 
-				$twidth = bo_imagetextwidth($textsize-1, $bold, $text);
-				
-				imagefilledrectangle($I, 0, ($theight+3)*$i, $twidth+10, ($theight+3)*($i+1), $col);
-				bo_imagestring($I, $textsize-1, 2, ($theight+3)*$i+3, $text, $white, false);
-				
-				if ($i >= BO_MAP_COUNT_STATIONS)
-					break;
+					$twidth = bo_imagetextwidth($textsize-1, $bold, $text);
+					
+					imagefilledrectangle($I, 0, $theight*$i, $twidth+10, $theight*($i+1), $col);
+					bo_imagestring($I, $textsize-1, 2, $theight*$i+3, $text, $sid == $station_id ? $color2 : $white, false);
+					
+					if ($i >= BO_MAP_COUNT_STATIONS)
+						break;
+				}
 			}
 		}
 		
@@ -415,9 +443,24 @@ function bo_tile()
 	//color handling
 	$color_intvl = ($time_max - $time_min) / count($c);
 
-	//the where clause
-	$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat1, $lat2, $lon1, $lon2);
-
+	/*** Build SQL Query ***/
+	$sql_join = "";
+	
+	/* WHERE */
+	$sql_where  = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat1, $lat2, $lon1, $lon2);
+	$sql_where .= $radius ? "AND distance < $radius" : "";
+	
+	/* Station Filter */
+	if ($station_id && $station_id == bo_station_id())
+	{
+		$sql_where .= " AND s.part>0 ";
+	}
+	elseif ($station_id > 0)
+	{
+		$sql_join   = " JOIN ".BO_DB_PREF."stations_strikes ss ON s.id=ss.strike_id AND ss.station_id='".$station_id."'";
+	}
+	
+	
 	//strike grouping
 	//no grouping for deviation-circle
 	if ($zoom >= $zoom_show_deviation) 
@@ -439,12 +482,8 @@ function bo_tile()
 	$deviation = array();
 	$sql = "SELECT s.id id, s.deviation deviation, s.polarity polarity,
 				$sql_select	
-			FROM ".BO_DB_PREF."strikes s
-				$index_sql
-			WHERE 1
-				".($radius ? "AND distance < $radius" : "")."
-				".($only_own ? " AND part>0 " : "")."
-				AND $sql_where
+			FROM ".BO_DB_PREF."strikes s $index_sql $sql_join
+			WHERE $sql_where
 			".($grouping ? " GROUP BY x, y" : "")."
 			ORDER BY mtime ASC";
 	$erg = BoDb::query($sql);

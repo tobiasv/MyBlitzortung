@@ -476,7 +476,8 @@
 // - Sensor: &sensor={false|true}  <-- must be included!
 @define('BO_GMAP_PARAM', 'sensor=false');
 
-
+//Allow selection of stations
+@define('BO_MAP_STATION_SELECT', false);
 
 
 /*******************************************************************/
