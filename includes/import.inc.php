@@ -743,9 +743,10 @@ function bo_update_strikes($force = false)
 
 			$first_strike_file = 0;
 		}
-		else
+		elseif (!empty($range))
 		{
-			unset($file[0]); //is always chunked
+			//range request was successful...
+			unset($file[0]); //1st line is always chunked
 			$first_strike_file = strtotime(substr($file[1],0,19).' UTC');
 		}
 
@@ -753,8 +754,9 @@ function bo_update_strikes($force = false)
 
 		if ($file !== false && empty($range))
 		{
-			bo_echod("Partial download didn't work, got whole file instead (sent range $sent_range got ".strlen($file)." bytes)");
-			bo_set_conf('import_strike_filelength', serialize(array(strlen(implode($file)), time(), 0)));
+			$filesize = strlen(implode('', $file));
+			bo_echod("Partial download didn't work, got whole file instead (sent range $sent_range got $filesize bytes)");
+			bo_set_conf('import_strike_filelength', serialize(array($filesize, time(), 0)));
 		}
 		else if ($file === false || $first_strike_file > $last_strike)
 		{
@@ -769,7 +771,8 @@ function bo_update_strikes($force = false)
 				return false;
 			}
 
-			bo_echod("Using partial download FAILED (Range $sent_range)! Fallback to normal download (".strlen(implode($file))." bytes).");
+			$filesize = strlen(implode('', $file));
+			bo_echod("Using partial download FAILED (Range $sent_range)! Fallback to normal download ($filesize bytes).");
 
 			if ($code == 304) //wasn't modified
 			{
@@ -1933,7 +1936,7 @@ function bo_update_stations($force = false)
 
 
 		//send mail to owner if no signals
-		if (BO_TRACKER_WARN_ENABLED === true)
+		if (BO_TRACKER_WARN_ENABLED === true && $own_id > 0)
 		{
 			$data = unserialize(bo_get_conf('warn_tracker_offline'));
 
