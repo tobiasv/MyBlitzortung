@@ -477,9 +477,7 @@ function bo_toggle_autoupdate_static(on)
 	bo_autoupdate_running = on;
 
 	if (on)
-	{
 		bo_map_reload_static(0);
-	}
 }
 
 function bo_map_reload_static(manual)
@@ -487,14 +485,28 @@ function bo_map_reload_static(manual)
 	if (bo_autoupdate_running || manual)
 	{
 		var now = new Date();
-		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo $update_interval; ?> / 60);
+		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&' + Math.floor(now.getTime() / <?php echo 1000 * $update_interval; ?>);
 	}
 	
-	if (bo_autoupdate_running && !manual)
+	if (!manual)
+		bo_map_reload_static_wait();
+}
+
+function bo_map_reload_static_wait()
+{
+	if (bo_autoupdate_running)
 	{
-		window.setTimeout("bo_map_reload_static(0);", <?php echo 1000 * 60 * ceil($update_interval / 2) ?>);
+		window.setTimeout("bo_map_reload_static(0);", <?php echo 1000 * ceil($update_interval / 2) ?>);
 	}
 }
+
+if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
+{
+	bo_autoupdate_running=true;
+	bo_map_reload_static_wait();
+	document.getElementById('bo_check_autoupdate').checked=true;
+}
+
 
 </script>
 

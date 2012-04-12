@@ -333,7 +333,7 @@
 /*** Image Maps: General settings                                ***/
 
 // order your maps, comma separated ids like "4,2,12,34,2,0"
-@define('BO_MAPS_ORDER', ''); 
+@define('BO_MAPS_ORDER', '');
 
 //use true color images for internal drawing
 //gives nicer transparency effects - higer CPU usage and bigger files size
@@ -369,7 +369,8 @@
 //Jpeg Quality 100 = best
 @define('BO_IMAGE_JPEG_QUALITY', 90);
 
-
+// automatic update off by default
+@define('BO_MAPS_AUTOUPDATE_DEFAULTON', true);
 
 
 
