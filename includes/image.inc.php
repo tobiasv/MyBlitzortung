@@ -1389,11 +1389,17 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 						if ($lon < -170 || $lon > 170 || $lat < -90 || $lat > 90)
 							continue;
 		
-						$polyline[$i][] = $Projection->LatLon2Image($lat, $lon);		
+						list($x, $y) = $Projection->LatLon2Image($lat, $lon);
+						
+						if ($x === false || $y === false)
+							break;
+						
+						$polyline[$i][] = array($x, $y);
 					}
 					
 					$r += $pic_dim / 1000;
 					$phi = acos(($a * ($e*$e - 1) / $r - 1) / $e);
+					
 				}
 				
 				for ($i=0;$i<2;$i++)
@@ -1401,22 +1407,30 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 					if (count($polyline[$i]) > 2)
 					{
 						list($xl, $yl) = $polyline[$i][0];
-						foreach($polyline[$i] as $d)
+						$in_pic_last = false;
+						
+						foreach($polyline[$i] as $j => $d)
 						{
 							list($x, $y) = $d;
 							imageline($I, $x, $y, $xl, $yl, $pcolor);
+							$in_pic = $x >= 0 && $y >= 0 && $x < $w && $y < $h;
+							
+							if ($in_pic_last === true && !$in_pic)
+								break;
+							
 							$xl = $x;
 							$yl = $y;
+							$in_pic_last = $in_pic;
 						}
 					}
 				}
 				
+		
 			}
 
 		}
 	
 	}
-	
 }
 
 

@@ -990,7 +990,11 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		bo_signal_info_list();
 	}
 	
-	if (!$strike_id)
+	if ($strike_id)
+	{
+		echo bo_insert_html_hidden(array('bo_map'));
+	}
+	else
 	{
 		echo '<a name="bo_arch_table_form"></a>';
 		echo bo_insert_html_hidden(array('bo_only_strikes', 'bo_action', 'bo_all_strikes', 'bo_show_details', 'bo_region', 'bo_datetime_start', 'bo_station_id'));
@@ -1588,8 +1592,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			$i = 0;
 			echo '<tr><td class="bo_sig_table_strikeinfo bo_sig_table_stations" colspan="4">';
 			
-			echo '<h5>'._BL('Stations').'</h5> ';
-			
+			echo '<h5>'._BL('Participated stations').':</h5>';		
+		
 					
 			foreach ($s_dists[0] as $sid => $dist)
 			{
@@ -1664,25 +1668,20 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 			echo '</p>';
 			
+		
 			
-			//if ($show_empty_sig && $count == 1 && $strike_id)
+				
+			if (!$show_details)
 			{
-				
-				$img_dim = bo_archive_get_dim($map);
-				echo '<h5>'._BL('Participated stations').':</h5>';
-				
-				if (!$show_details)
-				{
-					echo '<fieldset>';
-					echo bo_archive_select_map($map);
-					echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $row['strike_id']).'&bo_strikes_before=100">'._BL('Animation').'</a>';
-					echo '</fieldset>';
-				}
-				
-				$img_file = bo_bofile_url().'?map='.$map.'&strike_id='.$row['strike_id'].'&hyps&bo_lang='._BL();
-				echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
+				echo '<fieldset>';
+				echo bo_archive_select_map($map);
+				echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $row['strike_id']).'&bo_strikes_before=100">'._BL('Animation').'</a>';
+				echo '</fieldset>';
 			}
 			
+			$img_dim = bo_archive_get_dim($map);
+			$img_file = bo_bofile_url().'?map='.$map.'&strike_id='.$row['strike_id'].'&hyps&bo_lang='._BL();
+			echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
 			
 			$start = 1; //$s_dists[0] == $s_dists[1] ? 1 : 0;
 			for($i=$start;$i<=1;$i++)

@@ -51,10 +51,16 @@ class BoMapProjection
 	
 	function LatLon2Image($lat, $lon)
 	{
-		list($px, $py) = $this->Calculate($lat, $lon);
+		$result = $this->Calculate($lat, $lon);
+		
+		if ($result === false)
+		{
+			return array(false, false);
+		}
+		
+		list($px, $py) = $result;
 		$x =  $px * $this->ImageCalibrationX - $this->ImageOffsetX;
 		$y = -$py * $this->ImageCalibrationY + $this->ImageOffsetY;
-
 		return array($x, $y);
 	}
 
