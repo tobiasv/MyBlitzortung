@@ -1083,12 +1083,12 @@ $_BL['de']['Already DONE BEFORE'] = 'Wurde schon vorher ERLEDIGT';
 $_BL['de']['Update database keys'] = 'Datenbank-Index erneuern';
 $_BL['de']['without GPS'] = 'ohne GPS';
 $_BL['de']['Record longtime data since'] = 'Langzeitdaten seit';
-$_BL['de']['Show their signals'] = 'Zeige Signale der Anderen';
+$_BL['de']['Show all signals'] = 'Zeige alle Signale';
 
 
 
 /*******************************/
-/*  NOT AVAILABLE IN ORIGINAL  */
+/*  New translations           */
 /*******************************/
 
 $_BL['de']['Residual time'] = 'Restzeit';
@@ -1105,6 +1105,7 @@ $_BL['de']['outside of'] = 'außerhalb von';
 $_BL['de']['to station'] = 'zur Station';
 $_BL['de']['Show only region'] = 'Zeige nur Region';
 $_BL['de']['Exclude region'] = 'Schließe Region aus';
-
+$_BL['de']['Only station'] = 'Nur Station';
+$_BL['de']['City names'] = 'Städtenamen';
 
 ?>

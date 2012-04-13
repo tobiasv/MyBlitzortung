@@ -757,8 +757,7 @@ function bo_gpc_prepare($text)
 //recursive delete function
 function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 {
-	flush();
-
+	$count = 0;
 	$dir .= '/';
 
 	if ($delete_dir_depth === false)
@@ -772,18 +771,20 @@ function bo_delete_files($dir, $min_age=0, $depth=0, $delete_dir_depth=false)
 		{
 			if (!is_dir($dir.$file) && substr($file,0,1) != '.' && ($min_age == 0 || @fileatime($dir.$file) < time() - 3600 * $min_age) )
 			{
-
 				@unlink($dir.$file);
+				$count++;
 			}
 			else if (is_dir($dir.$file) && substr($file,0,1) != '.' && $depth > 0)
 			{
-				bo_delete_files($dir.$file, $min_age, $depth-1,$delete_dir_depth-1);
+				$count += bo_delete_files($dir.$file, $min_age, $depth-1,$delete_dir_depth-1);
 
 				//if ($delete_dir_depth <= 0)
 				@rmdir($dir.$file.'/');
 			}
 		}
 	}
+	
+	return $count;
 }
 
 //loads the needed locales
@@ -1329,7 +1330,7 @@ function bo_time2freq($d, &$phase=array())
 	for ($i=0; $i<=$n/2; $i++)
 	{
 		// Calculate the modulus (as length of the hypotenuse)
-		$amp[$i] = hypot($d[$i]*$d[$i], $im[$i]*$im[$i]);
+		$amp[$i] = hypot($d[$i], $im[$i]);
 
 		if (!$d[$i])
 			$phase[$i] = ($im[$i] < 0 ? -1 : 1) * M_PI / 2;

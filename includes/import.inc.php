@@ -142,6 +142,7 @@ function bo_update_all2($force = false, $only = '')
 	if (!$only || $only == 'download')
 		bo_download_external($force);
 
+		
 	/*** Purge old data ***/
 	if (bo_exit_on_timeout()) return;
 
@@ -155,6 +156,14 @@ function bo_update_all2($force = false, $only = '')
 	if (!$only || $only == 'density')
 		bo_update_densities($force);
 
+		
+	/*** File Cache ***/
+	if (bo_exit_on_timeout()) return;
+
+	if (!$only || $only == 'cache')
+		bo_purge_cache($force);
+
+		
 	return;
 }
 
@@ -3192,6 +3201,67 @@ function bo_download_external($force = false)
 	return;
 	
 }
+
+
+function bo_purge_cache($force = false)
+{
+	$whole_count = 0;
+	
+	//Purge Maps
+	if (intval(BO_CACHE_PURGE_MAPS_RAND) > 0 && rand(0, BO_CACHE_PURGE_MAPS_RAND) == 1)
+	{	
+		bo_echod("=== Cache Purge: Maps ===");
+		$count = bo_delete_files(BO_DIR.'cache/maps/', intval(BO_CACHE_PURGE_MAPS_HOURS), 3);
+		bo_echod(" -> Deleted $count files");
+		$whole_count += $count;
+	}
+
+	
+	//Purge Tiles
+	if (intval(BO_CACHE_PURGE_TILES_RAND) > 0 && rand(0, BO_CACHE_PURGE_TILES_RAND) == 1)
+	{
+		bo_echod("=== Cache Purge: Tiles ===");
+		$count = bo_delete_files(BO_DIR.'cache/tiles/', BO_CACHE_PURGE_TILES_HOURS, 5);
+		bo_echod(" -> Deleted $count files");
+		$whole_count += $count;
+	}
+
+	
+	//Purge Densities
+	if (intval(BO_CACHE_PURGE_DENS_RAND) > 0 && rand(0, BO_CACHE_PURGE_DENS_RAND) == 1)
+	{
+		bo_echod("=== Cache Purge: Densities ===");
+		
+		if (BO_CACHE_SUBDIRS === true)
+			$count = bo_delete_files(BO_DIR.'cache/densitymap', intval(BO_CACHE_PURGE_DENS_HOURS), 3);
+		else
+			$count = bo_delete_files(BO_DIR.'cache', intval(BO_CACHE_PURGE_DENS_HOURS), 0);
+		
+		bo_echod(" -> Deleted $count files");
+		$whole_count += $count;
+	}
+	
+	
+	//Purge other files
+	if (intval(BO_CACHE_PURGE_OTHER_RAND) > 0 && rand(0, BO_CACHE_PURGE_OTHER_RAND) == 1)
+	{
+		bo_echod("=== Cache Purge: Other Files ===");
+		
+		if (BO_CACHE_SUBDIRS === true)
+			$count = bo_delete_files(BO_DIR.'cache/signals', intval(BO_CACHE_PURGE_OTHER_HOURS), 3);
+		else
+			$count = bo_delete_files(BO_DIR.'cache', intval(BO_CACHE_PURGE_OTHER_HOURS), 0);
+		
+		$count += bo_delete_files(BO_DIR.'cache/icons', intval(BO_CACHE_PURGE_OTHER_HOURS), 3);
+		
+		bo_echod(" -> Deleted $count files");
+		$whole_count += $count;
+	}
+
+	return $whole_count;
+	
+}
+
 
 
 ?>

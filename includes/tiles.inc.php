@@ -9,11 +9,6 @@ function bo_tile()
 
 	bo_session_close();
 	
-	if (intval(BO_CACHE_PURGE_TILES_RAND) > 0 && rand(0, BO_CACHE_PURGE_TILES_RAND) == 1)
-	{
-		register_shutdown_function('bo_delete_files', BO_DIR.'cache/tiles/', BO_CACHE_PURGE_TILES_HOURS, 5);
-	}
-	
 	$x          = intval($_GET['x']);
 	$y          = intval($_GET['y']);
 	$zoom       = intval($_GET['zoom']);

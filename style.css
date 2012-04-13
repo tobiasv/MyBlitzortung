@@ -376,10 +376,6 @@ display: block;
 margin: 5px 10px 5px 0px;
 }
 
-#myblitzortung .bo_arch_other_participants {
-display: inline-block;
-}
-
 #myblitzortung .bo_archive_station_dist {
 border-collapse: collapse;
 margin-bottom: 15px;
@@ -847,4 +843,22 @@ text-decoration:none;
 
 #myblitzortung .bo_err_text {
 color:red;
+}
+
+#myblitzortung .bo_arch_other_participants {
+display: inline-block;
+padding-right: 20px;
+}
+
+#myblitzortung .bo_arch_other_participants_container {
+clear: both;
+}
+
+#myblitzortung .bo_sig_table_menu {
+float: right;
+font-size: 10px;
+position: relative;
+top: -40px;
+padding-left: 10px;
+display: inline-block;
 }

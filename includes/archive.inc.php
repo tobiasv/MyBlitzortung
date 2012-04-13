@@ -889,9 +889,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$strikes_before = intval($_GET['bo_strikes_before']);
 	$date = $_GET['bo_datetime_start'];
 	$region = $_GET['bo_region'];
-	$show_details = $_GET['bo_show_details'];
 	$map = isset($_GET['bo_map']) ? $_GET['bo_map'] : 0;
-	$other_graphs = isset($_GET['bo_other_graphs']) && $perm;
+	$show_details = $_GET['bo_show_details'];
+	$show_other_graphs = isset($_GET['bo_other_graphs']) && $perm;
+	$show_cities = isset($_GET['bo_show_cities']);
 	$station_id = $perm && $_GET['bo_station_id'] ? intval($_GET['bo_station_id']) : bo_station_id();
 	$own_station   = bo_station_id() > 0 && bo_station_id() == $station_id;
 	
@@ -1585,18 +1586,24 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '</tr>';
 
 		
-		if ( (bo_user_get_level() & BO_PERM_ARCHIVE) && count($participated_stations) && ($strike_id || ($row['strike_id'] && $show_details)) )
+		if ( $perm && count($participated_stations) && ($strike_id || ($row['strike_id'] && $show_details)) )
 		{
 				
 			$i = 0;
 			echo '<tr><td class="bo_sig_table_strikeinfo bo_sig_table_stations" colspan="4">';
 			
-			echo '<h5>'._BL('Participated stations').':</h5>';		
+			echo '<h5>'._BL('Participated stations').'</h5>';		
 		
-					
+			if (!$show_other_graphs && time() - $stime < 3600 * 23)
+				echo '<a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs" class="bo_show_all_signals bo_sig_table_menu">'._BL('Show all signals').'</a>';
+
+			if ((bo_user_get_level() & BO_PERM_SETTINGS) && !$show_cities)
+				echo '<a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_show_cities" class="bo_show_all_signals bo_sig_table_menu">'._BL('City names').'</a>';
+			
+			echo '<div class="bo_arch_other_participants_container">';
 			foreach ($s_dists[0] as $sid => $dist)
 			{
-				//echo $i && !$other_graphs ? ', ' : '';
+				//echo $i && !$show_other_graphs ? ', ' : '';
 				
 				echo '<span class="bo_arch_other_participants">';
 				
@@ -1607,7 +1614,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo round($dist/1000).'km / ';
 				echo round($s_bears[0][$sid]).'&deg; '.bo_bearing2direction($s_bears[0][$sid]);
 				
-				echo '" style="';
+				echo '" style="display:inline-block;';
 				
 				if ($i < bo_participants_locating_min())
 					echo 'font-weight: bold;';
@@ -1624,25 +1631,21 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				else
 					echo 'color:inherit;';
 				
-				
-				
-				
-				
-				if ((bo_user_get_level() & BO_PERM_SETTINGS))
+				if (!$show_cities && (bo_user_get_level() & BO_PERM_SETTINGS))
 				{
-					echo 'width:80px; display:inline-block;';
+					echo 'width:80px; ';
 					echo '">';
 					echo $participated_stations[$sid]['user'];
 				}
 				else
 				{
-					echo '">';
+					echo 'width:280px;">';
 					echo _BC($participated_stations[$sid]['city']);
 				}
 					
-				echo '</a>';
 				
-				if ($other_graphs)
+				
+				if ($show_other_graphs)
 				{
 					//station time to signal
 					$station_time  = $stime;
@@ -1652,22 +1655,19 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					
 					echo ' +'.round($dist/1000).'km / ';
 					echo round($s_bears[0][$sid]).'&deg;';
+					echo '</a>';
+					
 					$url = bo_bofile_url().'?graph&bo_station_id='.$sid.'&bo_time='.urlencode(gmdate('Y-m-d H:i:s',$station_time).'.'.round($station_ntime * 1E9)).'&bo_lang='._BL();
-					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" class="bo_graph_sig_other">';
+					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" class="bo_graph_sig_other" onmouseover="this.src+=\'&spectrum&full\'" onmouseout="this.src=\''.$url.'\'">';
 				}
+				else
+					echo '</a>';
 				
 				echo '</span>';
 				
 				$i++;
 			}
-			
-			
-			if ($perm && !$other_graphs && time() - $stime < 3600 * 23)
-				echo '<br> -> <a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs">'._BL('Show their signals').'</a>';
-
-			echo '</p>';
-			
-		
+			echo '</div>';
 			
 				
 			if (!$show_details)

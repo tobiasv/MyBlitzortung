@@ -256,7 +256,7 @@
 @define('BO_CACHE_PURGE_TILES_HOURS', 24); 
 
 //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
-@define('BO_CACHE_PURGE_TILES_RAND',  5000); 
+@define('BO_CACHE_PURGE_TILES_RAND',  1000); 
 
 //purges maps when older that specified value (hours)
 @define('BO_CACHE_PURGE_MAPS_HOURS', 24 * 4); 
@@ -268,7 +268,13 @@
 @define('BO_CACHE_PURGE_DENS_HOURS', 24 * 10); 
 
 //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
-@define('BO_CACHE_PURGE_DENS_RAND',  100); 
+@define('BO_CACHE_PURGE_DENS_RAND',  1000); 
+
+//purges other files when older that specified value (hours)
+@define('BO_CACHE_PURGE_OTHER_HOURS', 24); 
+
+//how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
+@define('BO_CACHE_PURGE_OTHER_RAND',  100); 
 
 
 

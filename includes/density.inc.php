@@ -624,13 +624,6 @@ function bo_get_density_image()
 	if (!$densities_enabled)
 		bo_image_error('Forbidden');
 
-	if (intval(BO_CACHE_PURGE_DENS_RAND) > 0 && rand(0, BO_CACHE_PURGE_DENS_RAND) == 1)
-	{
-		if (BO_CACHE_SUBDIRS === true)
-			register_shutdown_function('bo_delete_files', BO_DIR.'cache/densitymap', intval(BO_CACHE_PURGE_DENS_HOURS), 3);
-		else
-			register_shutdown_function('bo_delete_files', BO_DIR.'cache', intval(BO_CACHE_PURGE_DENS_HOURS), 0);
-	}
 	
 	if (BO_FORCE_MAP_LANG === true)
 		bo_load_locale(BO_LOCALE);

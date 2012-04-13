@@ -49,31 +49,51 @@ function bo_graph_raw()
 		$info = bo_station_info($station_id);
 		$user = $info['user'];
 		list($date, $nsec) = explode('.', $time);
+		$tstamp = strtotime($date.' UTC') - 1;
 		
 		if (!$user || !$date || !$nsec)
 			$graph->DisplayEmpty(true);
 		
-		$tstamp = strtotime($date.' UTC');
-		$url = bo_access_url().BO_IMPORT_PATH_RAW.$user.'/'.gmdate('H', $tstamp).'.log';
-		$file = bo_get_file($url, $code, 'raw_data_other'.$station_id, $dummy1, $dummy2, true);
+		$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+		$cache_file  = BO_DIR.'cache/';
+		$cache_file .= BO_CACHE_SUBDIRS === true ? 'signals/' : 'signal_';
+		$cache_file .= $user.'_'.gmdate('YmdH', $tstamp).'.log';
 		
-		if ($file == false || (is_array($file) && empty($file)))
+		if ($caching && file_exists($cache_file) && filemtime($cache_file) > $tstamp)
+		{
+			$lines = file($cache_file);
+		}
+		else
+		{
+			$url = bo_access_url().BO_IMPORT_PATH_RAW.$user.'/'.gmdate('H', $tstamp).'.log';
+			$lines = bo_get_file($url, $code, 'raw_data_other'.$station_id, $dummy1, $dummy2, true);
+			
+			if ($caching)
+			{
+				$dir = dirname($cache_file);
+				if (!file_exists($dir))
+					mkdir($dir, 0777, true);
+
+				file_put_contents($cache_file, $lines);
+			}
+		}
+		
+		if (!$lines || (is_array($lines) && empty($lines)))
 			$graph->DisplayEmpty(true);
 		
 		$search_time = new Timestamp($tstamp, $nsec);
 		$raw_time    = new Timestamp();
 		$last_dt = 1E12;
-		
 		$max_tolerance = 1000;
 		
 		//search for signal
-		foreach($file as $line)
+		foreach($lines as $line)
 		{
 			$data = explode(' ', $line);
 			list($data_time, $data_time_ns) = explode('.', $data[1]);
 			$data_time    = strtotime($data[0].' '.$data_time.' UTC');
 
-            $raw_time->Set($data_time + 1, $data_time_ns);
+            $raw_time->Set($data_time, $data_time_ns);
             $dt = $raw_time->usDifference($search_time);
 			
 			if ($dt > 1E8)

@@ -1037,7 +1037,7 @@ $_BL['en']['Already DONE BEFORE'] = 'Already DONE BEFORE';
 $_BL['en']['Update database keys'] = 'Update database keys';
 $_BL['en']['without GPS'] = 'without GPS';
 $_BL['en']['Record longtime data since'] = 'Record longtime data since';
-$_BL['en']['Show their signals'] = 'Show their signals';
+$_BL['en']['Show all signals'] = 'Show all signals';
 $_BL['en']['no_lightning_data'] = 'No lightning data!';
 
 $_BL['en']['Residual time'] = 'Residual time';
@@ -1053,7 +1053,7 @@ $_BL['en']['outside of'] = 'outside of';
 $_BL['en']['to station'] = 'to station';
 $_BL['en']['Show only region'] = 'Show only region';
 $_BL['en']['Exclude region'] = 'Exclude region';
-
-
+$_BL['en']['Only station'] = 'Only station';
+$_BL['en']['City names'] = 'City names';
 
 ?>
