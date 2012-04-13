@@ -1603,8 +1603,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '<div class="bo_arch_other_participants_container">';
 			foreach ($s_dists[0] as $sid => $dist)
 			{
-				//echo $i && !$show_other_graphs ? ', ' : '';
-				
 				echo '<span class="bo_arch_other_participants">';
 				
 				echo '<a ';
@@ -1633,7 +1631,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				
 				if (!$show_cities && (bo_user_get_level() & BO_PERM_SETTINGS))
 				{
-					echo 'width:80px; ';
+					echo $show_other_graphs ? 'width:200px; ' : 'width:80px; ';
 					echo '">';
 					echo $participated_stations[$sid]['user'];
 				}
