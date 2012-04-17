@@ -84,7 +84,7 @@ function bo_graph_raw()
 		$search_time = new Timestamp($tstamp, $nsec);
 		$raw_time    = new Timestamp();
 		$last_dt = 1E12;
-		$max_tolerance = 1000;
+		$max_tolerance = BO_STR2SIG_INTERVAL_OTHERS;
 		
 		//search for signal
 		foreach($lines as $line)
