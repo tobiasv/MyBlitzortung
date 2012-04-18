@@ -1066,7 +1066,7 @@
 @define('BO_TRIGGER_VOLTAGE', 0.45);
 
 //search interval for strike -> signal matching for foreign stations
-@define('BO_STR2SIG_INTERVAL_OTHERS', 2000); //µs
+@define('BO_STR2SIG_INTERVAL_OTHERS', 4000); //µs
 
 //data in participants.txt can change for strikes younger
 //than given minutes
