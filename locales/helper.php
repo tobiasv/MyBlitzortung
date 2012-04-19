@@ -48,7 +48,7 @@ $out = 'hu';
 
 
 	Even if you didn't have finished translating, you can send the new translation file
-	to the maintainer at <mail@myblitzortung.de>
+	to the maintainer at <mail@myblitzortung.org>
 
 
 	You may change one or more of the following settings in config.php:

@@ -6,7 +6,7 @@
 	
 	Copyright 2011-2012 by Tobias Volgnandt & Blitzortung.org Participants
 	
-	See http://www.myblitzortung.de & http://www.blitzortung.org
+	See http://www.myblitzortung.org & http://www.blitzortung.org
 	
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

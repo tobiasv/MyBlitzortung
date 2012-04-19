@@ -715,7 +715,7 @@ erfolgt durch das Programm {MYBO}. Die Verwendung von {MYBO} erfolgt auf eigene
 Verantwortung! Weder der Betreiber der Internetseite noch der/die Ersteller des Programms
 können für fehlerfreihe Funktion Garantieren. {MYBO} ist freie Software. Mehr
 Informationen dazu unter
-<a href="http://www.myblitzortung.de" target="_blank">myblitzortung.de</a>.
+<a href="http://www.myblitzortung.org" target="_blank">myblitzortung.org</a>.
 ';
 
 

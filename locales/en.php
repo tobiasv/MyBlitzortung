@@ -707,7 +707,7 @@ Nobody can guarantee, that this software shows always the correct information!
 The responsibility is on your side!
 {MYBO} is free software. You can find
 more information here:
-<a href="http://www.myblitzortung.de?lang=en" target="_blank">www.myblitzortung.de</a>.
+<a href="http://www.myblitzortung.org?lang=en" target="_blank">www.myblitzortung.org</a>.
 ';
 
 

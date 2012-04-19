@@ -665,7 +665,7 @@ A vizualizációs adatok ezen az oldalon készülnek el, {MYBO} ({MYBO_ORIG}) progra
 A {MYBO} csak saját felelöségre használható!
 Sem a szoláltató, sem a honlap üzemeltetö nem vállal felelöséget!
 {MYBO_ORIG} szabad softver. További, bövebb információ:
-<a href="http://www.myblitzortung.de?lang=en" target="_blank">www.myblitzortung.de</a>.
+<a href="http://www.myblitzortung.org?lang=en" target="_blank">www.myblitzortung.org</a>.
 ';
 
 

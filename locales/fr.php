@@ -706,7 +706,7 @@ Personne ne peut garantir que ce logiciel affiche toujours des informations corr
 Vous êtes responsable de vous même!!!
 {MYBO} ({MYBO_ORIG}) est un logiciel libre. Vous pouvez trouver
 plus d\'informations ici:
-<a href="http://www.myblitzortung.de?lang=fr" target="_blank">www.myblitzortung.de</a>.
+<a href="http://www.myblitzortung.org?lang=fr" target="_blank">www.myblitzortung.org</a>.
 ';
 
 

@@ -194,7 +194,7 @@ function bo_user_show_admin()
 			echo '<h5>'._BL('Documentation').'</h5>';
 			echo '<ul>';
 			echo '<li><a href="'.dirname(BO_FILE).'/README" target="_blank">README</a></li>';
-			echo '<li><a href="http://www.myblitzortung.de" target="_blank">www.myblitzortung.de</a></li>';
+			echo '<li><a href="http://www.myblitzortung.org" target="_blank">www.myblitzortung.org</a></li>';
 			echo '<li><a href="http://www.wetter-board.de/index.php?page=Board&boardID=381" target="_blank">Board</a></li>';
 			echo '<li><a href="http://www.faq-blitzortung.org/index.php?sid=267611&lang=de&action=show&cat=18" target="_blank">FAQ</a></li>';
 			echo '</ul>';

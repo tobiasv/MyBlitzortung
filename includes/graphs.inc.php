@@ -1224,7 +1224,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 						$value_max = $value + 10;
 
 					$amp_min = $value / 10 / BO_MAX_VOLTAGE * 255;
-					$amp_max = $value_max / 10 / BO_MAX_VOLTAGE * 255;
+					$amp_max = $value_max / 10 / BO_MAX_VOLTAGE * 255 + 1;
 
 					$values_text = number_format($value/10, 1, _BL('.'), _BL(',')).'-'.number_format($value_max/10, 1, _BL('.'), _BL(',')).'V';
 					$sql_select .= ", ABS(CONVERT(r.amp{CHANNEL}$ampmax, SIGNED) - 128)*2 BETWEEN '$amp_min' AND '$amp_max' extra ";

@@ -700,7 +700,7 @@ $_BL['it']['info_myblitzortung_text'] = '
 La visualizzazione di queste pagine è possibile anche grazie ad un software chiamato MyBlitzortung.
 Non è garantito che questo software dia sempre informazioni corrette!
 Puoi trovare maggiori informazioni su:
-<a href="http://www.myblitzortung.de" target="_blank">myblitzortung.de</a>.
+<a href="http://www.myblitzortung.org" target="_blank">myblitzortung.org</a>.
 ';
 
 
