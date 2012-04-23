@@ -3,11 +3,12 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.6-dev (2012-xx-xx)
+Version 0.7.6-dev3 (2012-xx-xx)
 -------------------------------
 - new: GEOS projection method (for satellite images)
 - new: auto download of external pictures/maps (i. e. satellite)
 - new: map grouping
+- new: select stations on main map
 - fix: allow longer contry names
 
 
