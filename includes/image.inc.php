@@ -110,7 +110,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	{
 		$blank = true;
 		$show_banners = true;
-		$extra_text = $cfg['blank'];
+		$extra_text = is_string($cfg['blank']) ? $cfg['blank'] : '';
 	}
 	else
 	{
