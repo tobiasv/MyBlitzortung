@@ -1055,5 +1055,6 @@ $_BL['en']['Show only region'] = 'Show only region';
 $_BL['en']['Exclude region'] = 'Exclude region';
 $_BL['en']['Only station'] = 'Only station';
 $_BL['en']['City names'] = 'City names';
+$_BL['en']['Only strikes of selected station'] = 'Only strikes of selected station';
 
 ?>

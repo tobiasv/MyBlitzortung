@@ -9,13 +9,14 @@ function bo_tile()
 
 	bo_session_close();
 	
-	$x          = intval($_GET['x']);
-	$y          = intval($_GET['y']);
-	$zoom       = intval($_GET['zoom']);
-	$station_id = intval($_GET['sid']);
-	$only_info  = isset($_GET['info']);
-	$show_count = isset($_GET['count']);
-	$type       = intval($_GET['type']);
+	$x            = intval($_GET['x']);
+	$y            = intval($_GET['y']);
+	$zoom         = intval($_GET['zoom']);
+	$station_info = intval($_GET['sid']);
+	$only_station = isset($_GET['os']);
+	$only_info    = isset($_GET['info']);
+	$show_count   = isset($_GET['count']);
+	$type         = intval($_GET['type']);
 	
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$time = time();
@@ -28,12 +29,16 @@ function bo_tile()
 
 	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
 	
+	if ($station_info && $only_station)
+		$station_id = $station_info;
+	else
+		$station_id = false;
+	
 	if (!$only_info && ($zoom < $min_zoom || $zoom > $max_zoom))
 	{
 		bo_tile_message('tile_zoom_not_allowed', 'zoom_na', $caching, array(), $tile_size);
 		exit;
 	}
-
 	
 	if ( $station_id > 0 && $station_id != bo_station_id() && (!(bo_user_get_level() & BO_PERM_NOLIMIT) || BO_MAP_STATION_SELECT !== true) )
 	{
@@ -123,7 +128,7 @@ function bo_tile()
 		$time_max        = count($times_max) ? max($times_max) : 0;
 		
 		if ($_GET['stat'] == 2)
-			$type = 'count_stat_'.$type;
+			$type = 'count_stat_'.$only_station.'_'.$type;
 		else
 			$type = 'count_'.$type;
 	}
@@ -396,10 +401,24 @@ function bo_tile()
 			{
 				arsort($stations_count);
 				$theight-=1;
+				$selected_station_displayed = $station_info ? false : true;
 				
 				$i = 0;
+				$j = 0;
 				foreach($stations_count as $sid => $cnt)
 				{
+					$j++;
+
+					if ($j > BO_MAP_COUNT_STATIONS)
+					{
+						if ($selected_station_displayed)
+							break;
+						elseif ($station_info == $sid)
+							$selected_station_displayed = true;
+						else
+							continue;
+					}
+					
 					$i++;
 					
 					$text = round($cnt / $strike_count * 100).'% ';
@@ -408,10 +427,10 @@ function bo_tile()
 					$twidth = bo_imagetextwidth($textsize-1, $bold, $text);
 					
 					imagefilledrectangle($I, 0, $theight*$i, $twidth+10, $theight*($i+1), $col);
-					bo_imagestring($I, $textsize-1, 2, $theight*$i+3, $text, $sid == $station_id ? $color2 : $white, false);
+					bo_imagestring($I, $textsize-1, 2, $theight*$i+3, $text, $sid == $station_info ? $color2 : $white, false);
 					
-					if ($i >= BO_MAP_COUNT_STATIONS)
-						break;
+
+					
 				}
 			}
 		}

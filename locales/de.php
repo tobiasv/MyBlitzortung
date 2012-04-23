@@ -1107,5 +1107,7 @@ $_BL['de']['Show only region'] = 'Zeige nur Region';
 $_BL['de']['Exclude region'] = 'Schließe Region aus';
 $_BL['de']['Only station'] = 'Nur Station';
 $_BL['de']['City names'] = 'Städtenamen';
+$_BL['de']['Only strikes of selected station'] = 'Nur Blitze der gewählten Station';
+
 
 ?>
