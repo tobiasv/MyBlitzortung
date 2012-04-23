@@ -298,17 +298,19 @@ function bo_tile()
 		
 		if ($station_id && $station_id == bo_station_id())
 		{
-			$sql_where .= " AND s.part>0 ";
+			$sql_where2 = " AND s.part>0 ";
 			$sql_participated = " s.part>0 ";
 		}
 		elseif ($station_id > 0)
 		{
+			$sql_where2  = "";
 			$sql_join1   = " LEFT OUTER JOIN ".BO_DB_PREF."stations_strikes ss2 ON s.id=ss2.strike_id AND ss2.station_id='".$station_id."'";
 			$sql_join2   = "            JOIN ".BO_DB_PREF."stations_strikes ss2 ON s.id=ss2.strike_id AND ss2.station_id='".$station_id."'";
 			$sql_participated = " ss2.strike_id IS NOT NULL ";
 		}
 		else
 		{
+			$sql_where2 = "";
 			$sql_participated = " 0 ";
 		}
 		
@@ -322,7 +324,7 @@ function bo_tile()
 					FROM ".BO_DB_PREF."stations_strikes ss 
 					JOIN ".BO_DB_PREF."strikes s $index_sql ON s.id=ss.strike_id
 					$sql_join2
-					WHERE $sql_where
+					WHERE $sql_where $sql_where2
 					GROUP BY sid
 					";
 			$erg = BoDb::query($sql);
@@ -333,9 +335,9 @@ function bo_tile()
 		}
 		
 		//all strike count and participated count
-		$sql = "SELECT COUNT(s.time) cnt, $sql_participated participated 
+	 	$sql = "SELECT COUNT(s.time) cnt, $sql_participated participated 
 				FROM ".BO_DB_PREF."strikes s $index_sql $sql_join1
-				WHERE $sql_where
+				WHERE $sql_where 
 				GROUP BY participated
 				";
 		$erg = BoDb::query($sql);

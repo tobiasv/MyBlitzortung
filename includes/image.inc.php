@@ -100,6 +100,23 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	$last_update = bo_get_conf('uptime_strikes_modified');
 	
+	//blank map?
+	if ($blank)
+	{
+		$show_banners = false;
+		$extra_text = '';
+	}
+	elseif (isset($cfg['blank']) && $cfg['blank'])
+	{
+		$blank = true;
+		$show_banners = true;
+		$extra_text = $cfg['blank'];
+	}
+	else
+	{
+		$show_banners = true;
+		$extra_text = '';
+	}
 	
 	//look for different time ranges for the live-view
 	if (!is_array($cfg['trange']))
@@ -712,67 +729,70 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$cy = $h - $ch - $cy;
 			$legend = true;
 		}
-		
-		//banners
-		$extra = _BL('Strikes', true).': '.array_sum($count);
-		bo_image_banner_top($I, $w, $h, $cfg, $time_string, $extra);
+	}
+	
+	//banners
+	if ($show_banners)
+	{
+		if (!$blank)
+			$extra_text = _BL('Strikes', true).': '.array_sum($count);
+
+		bo_image_banner_top($I, $w, $h, $cfg, $time_string, $extra_text);
 		bo_image_banner_bottom($I, $w, $h, $cfg, $cw);
-
-
-		if ($legend)
-		{
-			$legend_text_drawn = false;
-
-			ksort($count);
-			
-			foreach($count as $i => $cnt)
-			{
-				if (max($count))
-					$height = $ch * $cnt / max($count);
-				else
-					$height = 0;
-
-				$px1 = $cx + (count($color)-$i-1) * $coLegendWidth;
-				$px2 = $cx + (count($color)-$i) * $coLegendWidth - 1;
-				$py1 = $cy + $ch;
-				$py2 = $cy + $ch - $height;
-
-				imagefilledrectangle($I, $px1, $py1, $px2, $py2, $color[$i]);
-
-				if (!$legend_text_drawn && $cfg['legend'][0] &&
-						(    ($transparent  && $i == count($color)-1)
-						  || (!$transparent && $cnt == max($count))
-						) 
-				   )
-				{
-				
-					if (isset($cfg['legend_font']))
-					{
-						$fontsize = $cfg['legend_font'][0];
-						$tbold = $cfg['legend_font'][1];
-						$tcol = $cfg['legend_font'][2];
-						$ldx = $cfg['legend_font'][3];
-						$ldy = $cfg['legend_font'][4];
-					}
-					else
-						$ldx = -5;
-				
-					bo_imagestring($I, $fontsize, $px1+$coLegendWidth/2-$fontsize/2+$ldx, $py1 - 4+$ldy, $cnt, $tcol, $tbold, 90);
-					$legend_text_drawn = true;
-				}
-
-			}
-
-			if ($cfg['legend'][5])
-			{
-				imagesetthickness($I, 1);
-				imageline($I, $cx-1, $cy-1, $cx-1, $cy+$ch, $text_col);
-				imageline($I, $cx-1, $cy+$ch, $cx+$cw+2, $cy+$ch, $text_col);
-			}
-		}
 
 	}
 	
+	if (!$blank && $legend)
+	{
+		$legend_text_drawn = false;
+
+		ksort($count);
+		
+		foreach($count as $i => $cnt)
+		{
+			if (max($count))
+				$height = $ch * $cnt / max($count);
+			else
+				$height = 0;
+
+			$px1 = $cx + (count($color)-$i-1) * $coLegendWidth;
+			$px2 = $cx + (count($color)-$i) * $coLegendWidth - 1;
+			$py1 = $cy + $ch;
+			$py2 = $cy + $ch - $height;
+
+			imagefilledrectangle($I, $px1, $py1, $px2, $py2, $color[$i]);
+
+			if (!$legend_text_drawn && $cfg['legend'][0] &&
+					(    ($transparent  && $i == count($color)-1)
+					  || (!$transparent && $cnt == max($count))
+					) 
+			   )
+			{
+			
+				if (isset($cfg['legend_font']))
+				{
+					$fontsize = $cfg['legend_font'][0];
+					$tbold = $cfg['legend_font'][1];
+					$tcol = $cfg['legend_font'][2];
+					$ldx = $cfg['legend_font'][3];
+					$ldy = $cfg['legend_font'][4];
+				}
+				else
+					$ldx = -5;
+			
+				bo_imagestring($I, $fontsize, $px1+$coLegendWidth/2-$fontsize/2+$ldx, $py1 - 4+$ldy, $cnt, $tcol, $tbold, 90);
+				$legend_text_drawn = true;
+			}
+
+		}
+
+		if ($cfg['legend'][5])
+		{
+			imagesetthickness($I, 1);
+			imageline($I, $cx-1, $cy-1, $cx-1, $cy+$ch, $text_col);
+			imageline($I, $cx-1, $cy+$ch, $cx+$cw+2, $cy+$ch, $text_col);
+		}
+	}
 
 	if ($return_img)
 	{
