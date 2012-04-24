@@ -997,11 +997,13 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		if (c)
 		{
 			bo_select_stationid = c == -1 ? 0 : c;
-			<?php if (!$show_station_select) { ?>
-			document.getElementById('bo_map_opt_own').checked = c == -1 ? false : true;
-			<?php } elseif ($show_station_select) { ?>
-			document.getElementById('bo_only_station_id').value = c > 0 ? c : 0;
-			<?php } ?>
+			
+			if (document.getElementById('bo_map_opt_own') != null)
+				document.getElementById('bo_map_opt_own').checked = c == -1 ? false : true;
+			
+			if (document.getElementById('bo_only_station_id') != null)
+				document.getElementById('bo_only_station_id').value = c > 0 ? c : 0;
+			
 			if (c > 0) bo_show_more();
 		}
 

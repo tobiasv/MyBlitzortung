@@ -394,7 +394,7 @@ $_BL['fr']['graph_legend_all_signals'] = 'Signaux';
 
 $_BL['fr']['h3_graphs'] = 'Graphes';
 $_BL['fr']['h4_graph_strikes'] = 'Nombre de coups de foudre';
-$_BL['fr']['h4_graph_signals'] = 'Qté de signaux';
+$_BL['fr']['h4_graph_signals'] = 'Quantité de signaux';
 $_BL['fr']['h4_graph_ratio'] = 'Taux';
 $_BL['fr']['h4_graph_ratio_distance'] = 'Taux de foudre par distance';
 $_BL['fr']['h4_graph_ratio_bearing'] = 'Taux de foudre par direction';
@@ -439,7 +439,7 @@ $_BL['fr']['Strike density'] = 'Densité de fourdroiement';
 $_BL['fr']['arch_navi_density'] = 'Densité de fourdroiement';
 $_BL['fr']['h3_arch_density'] = 'Densité de fourdroiement';
 $_BL['fr']['legend_arch_densities'] = 'Options';
-$_BL['fr']['arch_select_dates_between'] = 'Seul les données du {START} au {END} sont disponibles!';
+$_BL['fr']['arch_select_dates_beween'] = 'Seul les données du {START} au {END} sont disponibles!';
 $_BL['fr']['Max strikes density'] = 'Densité max de la foudre';
 $_BL['fr']['check_all_strikes_network'] = 'Tous les coups de foudre du réseau';
 $_BL['fr']['Calculation basis are elements with area'] = 'Calculé sur la base des éléments dans une superficie de ';
@@ -448,8 +448,8 @@ $_BL['fr']['Maximum mean strike density displayed'] = 'Moyenne maximum de la den
 $_BL['fr']['densities_strikes_station'] = 'Coups de foudre de la station {STATION_CITY}';
 $_BL['fr']['Legend'] = 'Légende';
 $_BL['fr']['Strikes per square kilometer'] = 'Coups par kilomètre carré';
-$_BL['fr']['Min time'] = 'Min time';
-$_BL['fr']['Max time'] = 'Max time';
+$_BL['fr']['Min time'] = 'Date début';
+$_BL['fr']['Max time'] = 'Date fin';
 $_BL['fr']['enter_time_hint'] = 'Entrer la date sous le format "AAAA-MM-JJ HH:MM:SS". Vous pouvez omettre la dernière valeur, par exemple "AAAA-MM" est une valeur possible.';
 $_BL['fr']['Time range'] = 'Période';
 $_BL['fr']['arch_navi_strikes'] = 'Coups';
@@ -513,7 +513,7 @@ $_BL['fr']['Max signals per hour'] = 'Signaux maximum par heure';
 $_BL['fr']['Max active stations'] = 'Maximum de stations actives';
 $_BL['fr']['Max active stations (sending signals)'] = 'Maximum de stations actives (envoi de signaux)';
 $_BL['fr']['First data'] = 'Début de la collecte des données';
-$_BL['fr']['Memory usage'] = 'Utilisation de la mémoire';
+$_BL['fr']['Memory usage'] = 'Taille de la base de données';
 $_BL['fr']['for keys'] = 'pour les clefs';
 $_BL['fr']['Entries (all data)'] = 'Entrées (toutes les données)';
 $_BL['fr']['Station active'] = 'Station active';
@@ -706,7 +706,7 @@ Personne ne peut garantir que ce logiciel affiche toujours des informations corr
 Vous êtes responsable de vous même!!!
 {MYBO} ({MYBO_ORIG}) est un logiciel libre. Vous pouvez trouver
 plus d\'informations ici:
-<a href="http://www.myblitzortung.org?lang=fr" target="_blank">www.myblitzortung.org</a>.
+<a href="http://www.myblitzortung.de?lang=fr" target="_blank">www.myblitzortung.de</a>.
 ';
 
 
@@ -965,7 +965,7 @@ $_BL['fr']['Norway'] = 'Norvége';
 $_BL['fr']['Poland'] = 'Pologne';
 $_BL['fr']['Spain'] = 'Espagne';
 $_BL['fr']['Sweden'] = 'Suéde';
-$_BL['fr']['The Netherlands'] = 'Pays bas';
+$_BL['fr']['The Netherlands'] = 'Pays-bas';
 $_BL['fr']['United Kingdom'] = 'Royaume unis';
 $_BL['fr']['Bulgaria'] = 'Bulgarie';
 $_BL['fr']['Albania'] = 'Aghbanie';
@@ -1007,25 +1007,56 @@ $_BL['fr']['Meteox rain radar'] = 'Radar pluies (meteox.com)';
 
 
 $_BL['fr']['Specials'] = 'Spécials';
-$_BL['fr']['Importing data...'] = 'Importation des données';
+$_BL['fr']['Importing data...'] = 'Importation des données.....';
 $_BL['fr']['since'] = 'depuis';
-
-$_BL['fr']['ani_play'] = 'lecture';
+$_BL['fr']['ani_play'] = 'Lecture';
 $_BL['fr']['ani_pause'] = 'Pause';
 $_BL['fr']['ani_next'] = 'Suivant';
 $_BL['fr']['ani_prev'] = 'Précédent';
 $_BL['fr']['no reception'] = 'pas de réception';
 $_BL['fr']['Loading...'] = 'Chargement en cours';
-
 $_BL['fr']['Links'] = 'Liens';
 $_BL['fr']['Login string is'] = 'La chaîne d\'identification est';
 $_BL['fr']['Auth ID is'] = 'Auth ID=';
 $_BL['fr']['Logging out from Blitzortung.org'] = 'Déconnexion de Blitzortung.org';
 $_BL['fr']['Already DONE BEFORE'] = 'Déjà fait avant';
 $_BL['fr']['Update database keys'] = 'Maj. des clefs de la base de donnée';
-
-
-
+$_BL['fr']['Period'] = 'Période';
+$_BL['fr']['no GPS signal'] = 'Pas de signaux GPS';
+$_BL['fr']['search_outside_radius'] = 'Recherche impossible en dehors du cercle';
+$_BL['fr']['Download only external files'] = 'Télécharger seulement les fichiers externes';
+$_BL['fr']['Show all signals'] = 'Montrer tous les signaux';
+$_BL['fr']['City names'] = 'Noms des villes';
+$_BL['fr']['Recieved'] = 'Reçu';
+$_BL['fr']['No signal recieved'] = 'Pas de signaux reçus par la station de {STATION}';
+$_BL['fr']['Deutschland'] = 'Allemagne';
+$_BL['fr']['Danmark'] = 'Danemark';
+$_BL['fr']['Slowenien'] = 'Slovénie';
+$_BL['fr']['Czech Repubic'] = 'République Tchéque';
+$_BL['fr']['Luxembourg'] = 'Luxembourg';
+$_BL['fr']['Netherlands'] = 'Pays-Bas';
+$_BL['fr']['2h'] = '2h';
+$_BL['fr']['24h'] = '24h';
+$_BL['fr']['graph_stat_title_amplitudes'] = 'Amplitudes';
+$_BL['fr']['h4_graph_residual_time'] = 'Temps résiduel';
+$_BL['fr']['bo_graph_descr_strikes_station_residual_time'] = 'Le temps résiduel est déterminé pour station à partir du signal mesuré et affiché sous forme d\'histogramme. Les espaces verts représentent la foudre où la station de {STATION} a été impliqué . Les zones en rouge montrent cependant un moment approprié, mais pas de prise en compte des signaux de la station';
+$_BL['fr']['Residual time'] = 'Temps résiduel';
+$_BL['fr']['Europe stations (mini)'] = 'Europe stations (mini)';
+$_BL['fr']['Mean coordinates'] = 'Moyennes des coordonnées';
+$_BL['fr']['h4_stat_station_area'] = 'Région de la station';
+$_BL['fr']['Already done.'] = 'Déjà effectué';
+$_BL['fr']['graph_stat_title_residual_time'] = 'Temps résiduel ';
+$_BL['fr']['Lat'] = 'Lat.';
+$_BL['fr']['Lon'] = 'Long.';
+$_BL['fr']['Show their signals'] = 'Montrer leurs signaux';
+$_BL['fr']['List'] = 'Liste';
+$_BL['fr']['outside of'] = 'en dehors de';
+$_BL['fr']['max.'] = 'max.';
+$_BL['fr']['to station'] = 'de la station';
+$_BL['fr']['min.'] = 'min.';
+$_BL['fr']['Select station'] = 'Choisir une station';
+$_BL['fr']['Show only region'] = 'Montrer une région';
+$_BL['fr']['Exclude region'] = 'Exclure une région';
 
 
 
@@ -1033,49 +1064,17 @@ $_BL['fr']['Update database keys'] = 'Maj. des clefs de la base de donnée';
 /*  NOT TRANSLATED  */
 /********************/
 
-
-
-
-//en: 'Period'
-$_BL['fr']['Period'] = 'Période';
-
-//en: ''
-$_BL['fr']['bo_stat_network_descr'] = '';
-
-//en: 'no GPS signal'
-$_BL['fr']['no GPS signal'] = 'Pas de signaux GPS';
-
-//en: 'Searching outside of the circle is not possible!'
-$_BL['fr']['search_outside_radius'] = 'Recherche impossible en dehors du cercle';
-
-
-/*******************************/
-/*  NOT AVAILABLE IN ORIGINAL  */
-/*******************************/
-
-$_BL['fr']['Recieved'] = 'Reçu';
-$_BL['fr']['No signal recieved'] = 'Pas de signal reçu par la station de {STATION}';
-$_BL['fr']['Moy. des participants par coup de foudre'] = '';
-$_BL['fr']['España / Spain'] = 'Espagne';
-$_BL['fr']['Deutschland'] = 'Allemagne';
-$_BL['fr']['Danmark'] = 'Danemark';
-$_BL['fr']['Slowenien'] = 'Slovénie';
-$_BL['fr']['Czech Repubic'] = 'République Tchéque';
-$_BL['fr']['Europe (Ouest/Central)'] = '';
-$_BL['fr']['Vendée'] = '';
-$_BL['fr']['Région de Fontenay'] = '';
-$_BL['fr']['Stations (mini)'] = '';
-$_BL['fr']['2h'] = '2h';
-$_BL['fr']['24h'] = '24h';
-$_BL['fr']['No signal recieved.'] = 'Pas de signaux reçus';
-$_BL['fr']['graph_stat_title_signals_all'] = '';
-$_BL['fr']['graph_stat_title_participants_time'] = '';
-$_BL['fr']['graph_stat_title_deviations_time'] = '';
 $_BL['fr']['graph_stat_title_ratio_distance_longtime'] = '';
 $_BL['fr']['graph_stat_title_ratio_bearing_longtime'] = '';
-$_BL['fr'][''] = '';
-$_BL['fr']['graph_stat_title_amplitudes'] = 'Amplitudes';
-$_BL['fr']['Germany,Brandenburg'] = 'Allemagne,Brandenburg';
+$_BL['fr']['graph_stat_title_participants_time'] = '';
+$_BL['fr']['graph_stat_title_deviations_time'] = '';
+$_BL['fr']['bo_stat_network_descr'] = '';
+$_BL['fr']['graph_stat_title_strikes_station_residual_time'] = '';
+$_BL['fr']['arch_select_dates_between'] = '';
+$_BL['fr']['tile_zoom_not_allowed'] = '';
+$_BL['fr']['graph_stat_title_signals_all'] = '';
 
 
-?>
+
+
+
