@@ -881,3 +881,15 @@ top: -40px;
 padding-left: 10px;
 display: inline-block;
 }
+
+#myblitzortung .bo_select_station_active {
+color: #080;
+}
+
+#myblitzortung .bo_select_station_nogps {
+color: #e90;
+}
+
+#myblitzortung .bo_select_station_offline {
+color: red;
+}

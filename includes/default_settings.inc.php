@@ -455,6 +455,7 @@
 //some other values, sizes etc...
 @define('BO_MAP_STATION_ICON', 'http://labs.google.com/ridefinder/images/mm_20_red.png');
 @define('BO_MAP_STATIONS_ICON', 'http://maps.google.com/mapfiles/kml/pal4/icon24.png'); //Stations icon
+@define('BO_MAP_STATION_ICON2', 'http://labs.google.com/ridefinder/images/mm_20_green.png');
 @define('BO_MAP_LEGEND_WIDTH', 80);
 @define('BO_MAP_LEGEND_HEIGHT', 10); //only colorbar
 @define('BO_MAP_LEGEND_FONTSIZE', 2); //no TTF!

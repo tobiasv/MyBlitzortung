@@ -237,7 +237,7 @@ function bo_station_info($id = 0)
 }
 
 
-function bo_get_station_list()
+function bo_get_station_list(&$style_class = array())
 {
 	$stations = bo_stations();
 	$opts = array();
@@ -247,6 +247,15 @@ function bo_get_station_list()
 			continue;
 
 		$opts[$id] = _BL($d['country']).': '._BC($d['city']);
+		
+		$style_class[$id] = 'bo_select_station';
+		
+		if ($d['status'] == 'A')
+			$style_class[$id] .= '_active';
+		elseif ($d['status'] == 'O')
+			$style_class[$id] .= '_offline';
+		elseif ($d['status'] == 'V')
+			$style_class[$id] .= '_nogps';
 	}
 
 	asort($opts);
@@ -256,13 +265,13 @@ function bo_get_station_list()
 
 function bo_get_stations_html_select($station_id)
 {
-	$opts = bo_get_station_list();
+	$opts = bo_get_station_list($style_class);
 
 	$text = '<select name="bo_station_id" onchange="submit()">';
 	$text .= '<option></option>';
 	foreach($opts as $id => $name)
 	{
-		$text .= '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>';
+		$text .= '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').' class="'.$style_class[$id].'">';
 		$text .= $name;
 		$text .= '</option>';
 	}

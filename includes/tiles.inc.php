@@ -128,7 +128,7 @@ function bo_tile()
 		$time_max        = count($times_max) ? max($times_max) : 0;
 		
 		if ($_GET['stat'] == 2)
-			$type = 'count_stat_'.$only_station.'_'.$type;
+			$type = 'count_stat_'.($only_station ? 'only_' : '').$type;
 		else
 			$type = 'count_'.$type;
 	}

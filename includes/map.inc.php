@@ -802,7 +802,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 
 	if ($show_station_select)
 	{
-		$opts = bo_get_station_list();
+		$opts = bo_get_station_list($style_class);
 		
 		echo '<div class="bo_input_container" id="bo_map_statistic_options">';
 		echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
@@ -813,7 +813,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		echo '<option></option>';
 		foreach($opts as $id => $name)
 		{
-			echo '<option value="'.$id.'">';
+			echo '<option value="'.$id.'" class="'.$style_class[$id].'">';
 			echo $name;
 			echo '</option>';
 		}
@@ -913,6 +913,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	var bo_mybo_markers = [];
 	var bo_mybo_circles = [];
 	var bo_station_markers = [];
+	var bo_station2_marker;
 	var bo_stations_display = 1;
 	var bo_mybo_stations = [ <?php echo $js_mybo_stations ?> ];
 	var bo_stations      = [ <?php echo $js_stations ?> ];
@@ -1058,7 +1059,10 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		bo_map.controls[google.maps.ControlPosition.RIGHT_TOP].push(bo_infobox);
 		
 		bo_map_reload_overlays();  
-
+		
+		bo_station2_marker = new google.maps.Marker();
+		bo_map_toggle_stations(0);
+		
 		var map_lat = bo_getcookie('bo_map_lat');
 		var map_lon = bo_getcookie('bo_map_lon');
 		var map_zoom = bo_getcookie('bo_map_zoom');
@@ -1149,8 +1153,8 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	{
 		if (display)
 			bo_stations_display = display;
-		else if (bo_stations_display == 3)
-			display = 3;
+		else
+			display = bo_stations_display;
 			
 		for (i in bo_mybo_markers)
 			bo_mybo_markers[i].setMap(null);
@@ -1161,6 +1165,8 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		for (i in bo_station_markers)
 			bo_station_markers[i].setMap(null);
 
+		bo_station2_marker.setMap(null);
+			
 		if (display == 0 && bo_map.getZoom() > <?php echo (bo_user_get_level() & BO_PERM_SETTINGS) ? 20 : 10; ?>)
 		{
 			document.getElementById('bo_map_station1').disabled = true;
@@ -1253,6 +1259,24 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			}
 		}
 		
+		if (bo_select_stationid > 0)
+		{
+			for (i in bo_stations)
+			{
+				if (bo_stations[i].stid == bo_select_stationid)
+				{
+					bo_station2_marker = new google.maps.Marker({
+					  position: new google.maps.LatLng(bo_stations[i].lat,bo_stations[i].lon), 
+					  map: bo_map, 
+					  title:bo_stations[i].city,
+					  icon: '<?php echo  BO_MAP_STATION_ICON2 ?>',
+					  stid: bo_stations[i].stid
+					});  
+				}
+			}
+		}
+		
+		
 	}
 	
 	function bo_map_toggle_overlay(checked, type)
@@ -1267,6 +1291,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		bo_setcookie('bo_select_stationid', id > 0 ? id : -1);
 		bo_select_stationid = id > 0 ? id : 0;
 		bo_map_reload_overlays();
+		bo_map_toggle_stations();
 	}
 
 	function bo_map_toggle_stationid_display(checked)
@@ -1378,6 +1403,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			bo_map.overlayMapTypes.push(new google.maps.ImageMapType(bo_OverlayCount));
 			
 		bo_reload_mapinfo();
+		
 	}
 	
 	function bo_tile_coord(zoom, coord, tile_size)
