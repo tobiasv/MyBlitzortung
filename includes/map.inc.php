@@ -668,26 +668,22 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	if (BO_MAP_MANUAL_TIME_ENABLE === true || (bo_user_get_level() & BO_PERM_NOLIMIT))
 	{
 		$max_range = intval(BO_MAP_MANUAL_TIME_MAX_HOURS);
+		if ($max_range > 24)
+			$max_range = 24;
 	
 		$yesterday = strtotime('now -1 day');
-		$year1 = (int)date('Y', $yesterday);
-		$month1 = (int)date('m', $yesterday);
-		$day1 = (int)date('d', $yesterday);
-		$hour1 = $minute1 = 0;
+		$year1     = (int)date('Y', $yesterday);
+		$month1    = (int)date('m', $yesterday);
+		$day1      = (int)date('d', $yesterday);
+		$hour1     = 0;
+		$minute1   = 0;
 		
-		$today = strtotime("$year1-$month1-$day1 00:00:00");
-		if ($max_range < 24)
-			$today += $max_range * 3600;
-		else
-			$today += $max_range * 3600 * 24;
-		
-		$year2 = (int)date('Y', $today);
-		$month2 = (int)date('m', $today);
-		$day2 = (int)date('d', $today);
-		$hour2 = (int)date('H', $today);
-		$minute2 = (int)date('i', $today);
-		
-		
+		$time2   = strtotime("$year1-$month1-$day1 $hour1:$minute1:00 UTC") + $max_range * 3600;
+		$year2   = (int)date('Y', $time2);
+		$month2  = (int)date('m', $time2);
+		$day2    = (int)date('d', $time2);
+		$hour2   = (int)date('H', $time2);
+		$minute2 = (int)date('i', $time2);
 		
 		
 		echo '<div class="bo_input_container" id="bo_map_timerange">';
