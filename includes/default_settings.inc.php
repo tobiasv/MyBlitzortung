@@ -741,8 +741,17 @@
 /*** (main settings for all graphs) ***/
 
 //time settings
-@define('BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES',  30); // interval between each data point
+
+// interval between each data point
+@define('BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES',  30); 
+
+//default time review
 @define('BO_GRAPH_STAT_HOURS_BACK', 24);
+
+//max. review time for non-loggedin
+@define('BO_GRAPH_STAT_HOURS_BACK_MAX', 96);
+
+//default review time for station graph
 @define('BO_GRAPH_STAT_HOURS_BACK_STATIONS', 72);
 
 //main appearance

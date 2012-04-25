@@ -246,53 +246,57 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 
 	bo_show_graph('strikes_now', $add_graph.'&region='.$region);
 
-	echo '<h3>'._BL('h3_stat_strikes_time').'</h3>';
-	echo '<a name="graph_strikes_time_select"></a>';
-
-	echo '<form action="?#graph_strikes_time_select" method="GET" class="bo_stat_strikes_form">';
-	echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_region'));
-
-	echo '<fieldset>';
-	echo '<legend>'._BL('legend_stat_strikes').'</legend>';
-
-	echo '<span class="bo_form_descr">'._BL('time_year_month').': </span>';
-
-	echo '<select name="bo_year" onchange="submit();" id="bo_stat_strikes_select_year">';
-	foreach($years as $i => $y)
-		echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$y.'</option>';
-	echo '</select> ';
-
-	echo '<select name="bo_month" onchange="submit();" id="bo_stat_strikes_select_month">';
-	foreach($months as $i => $m)
-		echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').' style="'.($i <= 0 ? 'font-weight:bold;' : '').'">'.$m.'</option>';
-	echo '</select>';
-
-	echo ' &nbsp; &bull; &nbsp; <span class="bo_form_descr">'._BL('Region').': </span>';
-	bo_show_select_region($region, false, false);
-	echo '</fieldset>';
-
-
-	echo '</fieldset>';
-
-	echo '</form>';
-
-	echo '<a name="graph_strikes"></a>';
-	echo '<h4>'._BL('h4_graph_strikes_time').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time">';
-	echo _BL('bo_graph_descr_strikes_time');
-	echo '</p>';
-	bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&region='.$region.$add_graph);
-
-	if (!$region && $own_station)
+	if (substr($region, 0, 4) != 'dist' && substr($region, 0, 5) != '-dist')
 	{
-		echo '<a name="graph_strikes"></a>';
-		echo '<h4>'._BL('h4_graph_strikes_time_radius').'</h4>';
-		echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time_radius">';
-		echo strtr(_BL('bo_graph_descr_strikes_time_radius'), array('{RADIUS}' => BO_RADIUS_STAT));
-		echo '</p>';
-		bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&radius=1'.$add_graph);
-	}
+	
+		echo '<h3>'._BL('h3_stat_strikes_time').'</h3>';
+		echo '<a name="graph_strikes_time_select"></a>';
 
+		echo '<form action="?#graph_strikes_time_select" method="GET" class="bo_stat_strikes_form">';
+		echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_region'));
+
+		echo '<fieldset>';
+		echo '<legend>'._BL('legend_stat_strikes').'</legend>';
+
+		echo '<span class="bo_form_descr">'._BL('time_year_month').': </span>';
+
+		echo '<select name="bo_year" onchange="submit();" id="bo_stat_strikes_select_year">';
+		foreach($years as $i => $y)
+			echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$y.'</option>';
+		echo '</select> ';
+
+		echo '<select name="bo_month" onchange="submit();" id="bo_stat_strikes_select_month">';
+		foreach($months as $i => $m)
+			echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').' style="'.($i <= 0 ? 'font-weight:bold;' : '').'">'.$m.'</option>';
+		echo '</select>';
+
+		echo ' &nbsp; &bull; &nbsp; <span class="bo_form_descr">'._BL('Region').': </span>';
+		bo_show_select_region($region, false, false);
+		echo '</fieldset>';
+
+
+		echo '</fieldset>';
+
+		echo '</form>';
+
+		echo '<a name="graph_strikes"></a>';
+		echo '<h4>'._BL('h4_graph_strikes_time').'</h4>';
+		echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time">';
+		echo _BL('bo_graph_descr_strikes_time');
+		echo '</p>';
+		bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&region='.$region.$add_graph);
+
+		if (!$region && $own_station)
+		{
+			echo '<a name="graph_strikes"></a>';
+			echo '<h4>'._BL('h4_graph_strikes_time_radius').'</h4>';
+			echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_time_radius">';
+			echo strtr(_BL('bo_graph_descr_strikes_time_radius'), array('{RADIUS}' => BO_RADIUS_STAT));
+			echo '</p>';
+			bo_show_graph('strikes_time', '&year='.$year.'&month='.$month.'&radius=1'.$add_graph);
+		}
+	}
+	
 	echo '</div>';
 }
 

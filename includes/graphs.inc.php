@@ -191,6 +191,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 	//Channel
 	$channel = intval($_GET['channel']);
+	
+	//Country
+	$country = trim(strtolower($_GET['bo_country']));
 
 	if ($channel)
 	{
@@ -206,7 +209,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	{
 		$last_uptime = bo_get_conf('uptime_strikes');
 		$time_max = time();
-
+		$no_title_station = true;
 
 		$group_minutes = intval($_GET['group_minutes']);
 		if ($group_minutes < BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES)
@@ -1373,6 +1376,24 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		{
 			$no_title_station = true;
 		}
+
+		$sqlw_country = '';
+		if ($country)
+		{
+			$stations = bo_stations();
+			
+			$ids = array();
+			foreach($stations as $id => $d)
+			{
+				if (strtolower($d['country']) == $country)
+				{	
+					$ids[] = $id;
+				}
+			}
+			
+			$sqlw_country = " AND station_id IN (".implode(',', $ids).")";
+		}
+
 		
 		if ($type == 'stations')
 		{
@@ -1392,7 +1413,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			//one SQL-Query for all graphs -> Query Cache should improve performance (if enabled)
 			$sql = "SELECT time, AVG(signalsh) sig, AVG(strikesh) astr, MAX(strikesh) mstr, COUNT(time) / COUNT(DISTINCT time) cnt
 					FROM ".BO_DB_PREF."stations_stat
-					WHERE time BETWEEN '$date_start' AND '$date_end' AND $sqlw
+					WHERE time BETWEEN '$date_start' AND '$date_end' AND $sqlw $sqlw_country
 					GROUP BY TO_DAYS(time)";
 
 			if ($hours_back < 7 * 24)
@@ -1484,7 +1505,14 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$info_station_id = $station_id ? $station_id : $stId;
 
 	if (!$title_no_hours)
-		$add_title .= ' '._BL('of the last', true).' '.$hours_back.'h';
+	{
+		$add_title .= ' '._BL('of the last', true).' ';
+		
+		if ($hours_back > 96)
+			$add_title .= round($hours_back / 24).' '._BL('days');
+		else
+			$add_title .= $hours_back.'h';
+	}
 
 	$stInfo = bo_station_info($station_id);
 	$city = $stInfo['city'];
@@ -1919,37 +1947,40 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			}
 			*/
 
-			$max_stations = bo_get_conf('longtime_count_max_active_stations_sig');
-			if ($max_stations)
+			if (!$country)
 			{
-				$sline  = new PlotLine(HORIZONTAL, $max_stations, BO_GRAPH_STAT_STA_COLOR_L4, 1);
-				$sline->SetWeight(BO_GRAPH_STAT_STA_WIDTH_4);
-				$sline->SetLegend(_BL('graph_legend_stations_max_active_signal'));
-				$graph->AddLine($sline);
+				$max_stations = bo_get_conf('longtime_count_max_active_stations_sig');
+				if ($max_stations)
+				{
+					$sline  = new PlotLine(HORIZONTAL, $max_stations, BO_GRAPH_STAT_STA_COLOR_L4, 1);
+					$sline->SetWeight(BO_GRAPH_STAT_STA_WIDTH_4);
+					$sline->SetLegend(_BL('graph_legend_stations_max_active_signal'));
+					$graph->AddLine($sline);
+				}
+
+				// currently available stations
+				$sql = "SELECT COUNT(*) cnt
+						FROM ".BO_DB_PREF."stations
+						WHERE status != '-'";
+				$res = BoDb::query($sql);
+				$row = $res->fetch_assoc();
+				$available = $row['cnt'];
+
+				if ($available)
+				{
+					$sline  = new PlotLine(HORIZONTAL, $available, BO_GRAPH_STAT_STA_COLOR_L2, 1);
+					$sline->SetWeight(BO_GRAPH_STAT_STA_WIDTH_4);
+					$sline->SetLegend(_BL('graph_legend_stations_available'));
+					$graph->AddLine($sline);
+				}
+				
+				$max = max($max_stations, $available);
+				$graph->yscale->SetAutoMax($max+1);
+
+				if ($max/2 < min($Y[0]['cnt']))
+					$graph->yscale->SetAutoMin($max/2);
+				
 			}
-
-			// currently available stations
-			$sql = "SELECT COUNT(*) cnt
-					FROM ".BO_DB_PREF."stations
-					WHERE status != '-'";
-			$res = BoDb::query($sql);
-			$row = $res->fetch_assoc();
-			$available = $row['cnt'];
-
-			if ($available)
-			{
-				$sline  = new PlotLine(HORIZONTAL, $available, BO_GRAPH_STAT_STA_COLOR_L2, 1);
-				$sline->SetWeight(BO_GRAPH_STAT_STA_WIDTH_4);
-				$sline->SetLegend(_BL('graph_legend_stations_available'));
-				$graph->AddLine($sline);
-			}
-
-
-			$max = max($max_stations, $available);
-			$graph->yscale->SetAutoMax($max+1);
-
-			if ($max/2 < min($Y[0]['cnt']))
-				$graph->yscale->SetAutoMin($max/2);
 
 			$graph->xaxis->title->Set(_BL('Time'));
 			$graph->yaxis->title->Set(_BL('Count'));
