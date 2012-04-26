@@ -554,6 +554,7 @@ $_BL['en']['legend_stat_amplitudes'] = 'Options';
 $_BL['en']['legend_stat_advanced_options'] = 'Options';
 $_BL['en']['legend_stat_participants_time'] = 'Options';
 $_BL['en']['legend_stat_deviations_time'] = 'Options';
+$_BL['en']['legend_stat_active_stations'] = 'Options';
 
 
 /*************************************************************/
@@ -973,7 +974,8 @@ $_BL['en']['Norway'] = 'Norway';
 $_BL['en']['Poland'] = 'Poland';
 $_BL['en']['Spain'] = 'Spain';
 $_BL['en']['Sweden'] = 'Sweden';
-$_BL['en']['The Netherlands'] = 'The Netherlands';
+$_BL['en']['The Netherlands'] = 'Netherlands';
+$_BL['en']['The Netherlands'] = 'Netherlands';
 $_BL['en']['United Kingdom'] = 'United Kingdom ';
 $_BL['en']['Bulgaria'] = 'Bulgaria';
 $_BL['en']['Albania'] = 'Albania';

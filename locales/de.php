@@ -550,7 +550,7 @@ $_BL['de']['legend_stat_amplitudes'] = 'Optionen';
 $_BL['de']['legend_stat_advanced_options'] = 'Optionen';
 $_BL['de']['legend_stat_participants_time'] = 'Optionen';
 $_BL['de']['legend_stat_deviations_time'] = 'Optionen';
-
+$_BL['de']['legend_stat_active_stations'] = 'Optionen';
 
 /*************************************************************/
 /* User                                                     */
@@ -1020,6 +1020,7 @@ $_BL['de']['Poland'] = 'Polen';
 $_BL['de']['Spain'] = 'Spanien';
 $_BL['de']['Sweden'] = 'Schweden';
 $_BL['de']['The Netherlands'] = 'Niederlande';
+$_BL['de']['Netherlands'] = 'Niederlande';
 $_BL['de']['United Kingdom'] = 'Groﬂbritannien';
 $_BL['de']['Bulgaria'] = 'Bulgarien';
 $_BL['de']['Albania'] = 'Albanien';
@@ -1027,6 +1028,7 @@ $_BL['de']['Russia'] = 'Russland';
 $_BL['de']['Romania'] = 'Rum‰nien';
 $_BL['de']['Rome'] = 'Rom';
 $_BL['de']['Lithuania'] = 'Litauen';
+$_BL['de']['Slovenia'] = 'Slovenien';
 
 //Europe: Regions
 $_BL['de']['Europe'] = 'Europa';

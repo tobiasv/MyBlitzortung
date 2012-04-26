@@ -335,6 +335,11 @@
 @define('BO_DISTANCES_REGION', '10, 25, 50, 100, 200, 500, 1000, 2000');
 
 
+//Update "offline hours counter" only if station was online some time before (hours)
+@define('BO_STATISTICS_COUNT_OFFLINE_AFTER_MIN_ONLINE_HOURS', 96);
+
+
+
 /*******************************************************************/
 /*** Image Maps: General settings                                ***/
 
@@ -745,14 +750,19 @@
 // interval between each data point
 @define('BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES',  30); 
 
-//default time review
-@define('BO_GRAPH_STAT_HOURS_BACK', 24);
+//default time reviews (hours)
+@define('BO_GRAPH_STAT_HOURS_BACK', "24,6,12,48,72,96");
 
-//max. review time for non-loggedin
+//max. review time for non-loggedin (hours)
 @define('BO_GRAPH_STAT_HOURS_BACK_MAX', 96);
 
-//default review time for station graph
-@define('BO_GRAPH_STAT_HOURS_BACK_STATIONS', 72);
+//default review time for station graph (days)
+@define('BO_GRAPH_STAT_DAYS_BACK', "3,7,14,30");
+
+//max. review time for station graph for non-loggedin (hours)
+@define('BO_GRAPH_STAT_DAYS_BACK_MAX', 30);
+
+
 
 //main appearance
 @define('BO_GRAPH_STAT_W', 550);

@@ -24,7 +24,7 @@
 if (!defined("BO_VER"))
 {
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.7.6-dev5');
+	define("BO_VER", '0.7.6-dev6');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -170,41 +170,43 @@ if (!defined("BO_VER"))
 		bo_show_login();
 		exit;
 	}
-	else if (isset($_GET['icon']))
+	else if (!headers_sent())
 	{
-		bo_icon($_GET['icon']);
-		exit;
+		if (isset($_GET['bo_icon']))
+		{
+			bo_icon($_GET['bo_icon']);
+			exit;
+		}
+		else if (isset($_GET['bo_graph'])) {
+			bo_graph_raw();
+			exit;
+		}
+		else if (isset($_GET['image']))
+		{
+			bo_get_image($_GET['image']);
+			exit;
+		}
+		else if (isset($_GET['graph_statistics']))
+		{
+			bo_graph_statistics();
+			exit;
+		}
+		else if (isset($_GET['density']))
+		{
+			bo_get_density_image();
+			exit;
+		}
+		elseif (isset($_GET['map']))
+		{
+			bo_get_map_image();
+			exit;
+		}
+		elseif (isset($_GET['animation']))
+		{
+			bo_get_map_image_ani();
+			exit;
+		}
 	}
-	else if (isset($_GET['graph'])) {
-        bo_graph_raw();
-        exit;
-    }
-	else if (isset($_GET['image']))
-	{
-		bo_get_image($_GET['image']);
-		exit;
-	}
-	else if (isset($_GET['graph_statistics']))
-	{
-		bo_graph_statistics($_GET['graph_statistics'], intval($_GET['id']), intval($_GET['hours']));
-		exit;
-	}
-	else if (isset($_GET['density']))
-	{
-		bo_get_density_image();
-		exit;
-	}
-	elseif (isset($_GET['map']))
-	{
-		bo_get_map_image();
-		exit;
-	}
-	elseif (isset($_GET['animation']))
-	{
-		bo_get_map_image_ani();
-		exit;
-	}
-
 
 	//Order maps
 	if (defined('BO_MAPS_ORDER') && strlen(BO_MAPS_ORDER))

@@ -260,6 +260,7 @@ color: #666;
 #myblitzortung .bo_map_header {
 margin: 0px 2px 4px 2px;
 padding-top:8px;
+max-width: 650px;
 }
 
 /*** Raw-Signals ***/
@@ -774,6 +775,21 @@ margin-left: 10px;
 #myblitzortung .bo_graph_img {
 margin-left: 10px;
 border: 1px solid #f0f0f0;
+}
+
+#myblitzortung .bo_graph_img_container {
+position: relative;
+}
+
+#myblitzortung .bo_graph_img_form {
+position: absolute;
+top: 10px;
+right: 10px;
+opacity: 0.8;
+background: #ffd;
+border: 1px solid #eee;
+padding: 4px;
+display: none;
 }
 
 /*** User ***/

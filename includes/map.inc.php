@@ -383,7 +383,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 
 			$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
 			$url = bo_bofile_url().'?map='.$static_map_id.($period_id ? '&period='.$period : '').'&bo_lang='._BL();
-			$img_dim = bo_archive_get_dim($static_map_id);
+			$img_dim = bo_archive_get_dim_html($static_map_id);
 
 			echo '<form method="GET">';
 			echo bo_insert_html_hidden(array('bo_showmap'));
@@ -441,10 +441,12 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			echo '</fieldset>';
 			echo '</form>';
 			
-			echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
+			echo '<div id="bo_arch_maplinks_container_all">';
 			
 			if ($cfg['header'])
 				echo '<div class="bo_map_header">'._BC($cfg['header'], true).'</div>';
+			
+			echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 			
 			if ($archive_maps_enabled && intval(BO_ANIMATIONS_INTERVAL) && $cfg['archive'])
 			{

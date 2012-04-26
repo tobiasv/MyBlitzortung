@@ -1896,8 +1896,14 @@ function bo_update_stations($force = false)
 			else
 			{
 				bo_set_conf('station_last_inactive'.$add, $time);
-				$time_interval += bo_get_conf('longtime_station_inactive_time'.$add);
-				bo_set_conf('longtime_station_inactive_time'.$add, $time_interval);
+				
+				//don't update offline counter if station is in test phase (first days)
+				if (bo_get_conf('longtime_station_active_time'.$add) > 3600 * BO_STATISTICS_COUNT_OFFLINE_AFTER_MIN_ONLINE_HOURS)
+				{
+					$time_interval += bo_get_conf('longtime_station_inactive_time'.$add);
+					bo_set_conf('longtime_station_inactive_time'.$add, $time_interval);
+				}
+				
 				$cnt = bo_get_conf('longtime_station_inactive_count'.$add);
 				bo_set_conf('longtime_station_inactive_count'.$add, $cnt);
 			}

@@ -446,7 +446,7 @@ function bo_show_archive_density()
 	
 	
 	//image dimensions
-	$img_dim = bo_archive_get_dim($map, 150);
+	$img_dim = bo_archive_get_dim_html($map, 150);
 	
 	echo '<span class="bo_form_descr">'._BL('Year').':</span> ';
 	echo '<select name="bo_year" id="bo_arch_dens_select_year" onchange="submit();">';

@@ -11,9 +11,9 @@ function bo_graph_raw()
 	bo_session_close();
 
 	$type = null;
-	if (isset($_GET['spectrum']))
+	if (isset($_GET['bo_spectrum']))
 		$type = 'spectrum';
-	elseif (isset($_GET['xy']))
+	elseif (isset($_GET['bo_xy']))
 		$type = 'xy';
 
 	$id = intval($_GET['graph']);
@@ -130,7 +130,7 @@ function bo_graph_raw()
 	exit;
 }
 
-function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = null)
+function bo_graph_statistics()
 {
 	global $_BO;
 
@@ -139,16 +139,35 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 	bo_session_close();
 
-	if (!$hours_back)
+	$type = $_GET['graph_statistics'];
+	$station_id = intval($_GET['bo_station_id']);
+	$hours_back = intval($_GET['bo_hours']);
+	
+	if ($type == 'stations' || $type == 'signals_all')
 	{
-		if ($type == 'stations')
-			$hours_back = intval(BO_GRAPH_STAT_HOURS_BACK_STATIONS) + (int)date('H');
-		else
-			$hours_back = intval(BO_GRAPH_STAT_HOURS_BACK);
+		$hours_back_default = intval(BO_GRAPH_STAT_DAYS_BACK) * 24;
+		$hours_back_max = intval(BO_GRAPH_STAT_DAYS_BACK_MAX) * 24;
+		$align_day = true;
+	}
+	else
+	{
+		$hours_back_default = intval(BO_GRAPH_STAT_HOURS_BACK);
+		$hours_back_max = intval(BO_GRAPH_STAT_HOURS_BACK_MAX);
+		$align_day = false;
 	}
 
-	$hours_back = intval($hours_back) ? intval($hours_back) : 24;
-	$hours_back = !bo_user_get_level() && $hours_back > 96 ? 96 : $hours_back;
+	if ($hours_back <= 0)
+		$hours_back = $hours_back_default;
+	
+	if (!bo_user_get_level() && $hours_back > hours_back_max)
+		$hours_back = $hours_back_max;
+
+	if ($align_day || $hours_back > 36)
+	{
+		$hours_back += (int)date('H') - 1;
+		$align_day = true;
+	}
+		
 
 	$group_minutes = intval($_GET['group_minutes']);
 	if ($group_minutes < BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES)
@@ -193,7 +212,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	$channel = intval($_GET['channel']);
 	
 	//Country
-	$country = trim(strtolower($_GET['bo_country']));
+	$country = trim($_GET['bo_country']);
 
 	if ($channel)
 	{
@@ -677,7 +696,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 		}
 
-		$graph_type = 'datlin';
+		$graph_type = 'datint';
 
 	}
 	else if ($type == 'participants' || $type == 'deviations')
@@ -918,7 +937,7 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$Y3[$i] = $all_all;
 		}
 
-		$graph_type = 'datlin';
+		$graph_type = 'datint';
 
 		$caption  = $count_all.' '._BL('total strikes');
 		$caption .= "\n";
@@ -1378,14 +1397,15 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		}
 
 		$sqlw_country = '';
-		if ($country)
+		if ($country && $type == 'stations')
 		{
+			$show_country = true;
 			$stations = bo_stations();
 			
 			$ids = array();
 			foreach($stations as $id => $d)
 			{
-				if (strtolower($d['country']) == $country)
+				if (strtolower($d['country']) == strtolower($country))
 				{	
 					$ids[] = $id;
 				}
@@ -1418,6 +1438,8 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 
 			if ($hours_back < 7 * 24)
 				$sql .= ", HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
+			else if ($hours_back < 22 * 24)
+				$sql .= ", HOUR(time)";
 			else
 				$interval = 24 * 60;
 			
@@ -1499,7 +1521,10 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			$ymax = 100;
 		}
 
-		$graph_type = 'datlin';
+		if ($type == 'stations')
+			$graph_type = 'datint';
+		else
+			$graph_type = 'datlin';
 	}
 
 	$info_station_id = $station_id ? $station_id : $stId;
@@ -1508,12 +1533,17 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 	{
 		$add_title .= ' '._BL('of the last', true).' ';
 		
-		if ($hours_back > 96)
-			$add_title .= round($hours_back / 24).' '._BL('days');
+		if ($align_day)
+			$add_title .= floor($hours_back / 24).' '._BL('days');
 		else
 			$add_title .= $hours_back.'h';
 	}
 
+	if ($show_country)
+	{
+		$add_title .= ' ('._BL($country, true).')';
+	}
+	
 	$stInfo = bo_station_info($station_id);
 	$city = $stInfo['city'];
 	if (!$no_title_station && $station_id)
@@ -1947,7 +1977,13 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 			}
 			*/
 
-			if (!$country)
+			if ($show_country)
+			{
+				$sql_country = "SELECT COUNT(*) cnt
+					FROM ".BO_DB_PREF."stations
+					WHERE status != '-' AND country='".BoDb::esc($country)."'";
+			}
+			else
 			{
 				$max_stations = bo_get_conf('longtime_count_max_active_stations_sig');
 				if ($max_stations)
@@ -1957,31 +1993,32 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 					$sline->SetLegend(_BL('graph_legend_stations_max_active_signal'));
 					$graph->AddLine($sline);
 				}
-
-				// currently available stations
-				$sql = "SELECT COUNT(*) cnt
-						FROM ".BO_DB_PREF."stations
-						WHERE status != '-'";
-				$res = BoDb::query($sql);
-				$row = $res->fetch_assoc();
-				$available = $row['cnt'];
-
-				if ($available)
-				{
-					$sline  = new PlotLine(HORIZONTAL, $available, BO_GRAPH_STAT_STA_COLOR_L2, 1);
-					$sline->SetWeight(BO_GRAPH_STAT_STA_WIDTH_4);
-					$sline->SetLegend(_BL('graph_legend_stations_available'));
-					$graph->AddLine($sline);
-				}
 				
-				$max = max($max_stations, $available);
-				$graph->yscale->SetAutoMax($max+1);
-
-				if ($max/2 < min($Y[0]['cnt']))
-					$graph->yscale->SetAutoMin($max/2);
+				$sql_country = "SELECT COUNT(*) cnt
+					FROM ".BO_DB_PREF."stations
+					WHERE status != '-'";
 				
 			}
 
+			// currently available stations
+			$res = BoDb::query($sql_country);
+			$row = $res->fetch_assoc();
+			$available_stations = $row['cnt'];
+
+			if ($available_stations)
+			{
+				$sline  = new PlotLine(HORIZONTAL, $available_stations, BO_GRAPH_STAT_STA_COLOR_L2, 1);
+				$sline->SetWeight(BO_GRAPH_STAT_STA_WIDTH_4);
+				$sline->SetLegend(_BL('graph_legend_stations_available'));
+				$graph->AddLine($sline);
+			}
+			
+			$max = max($max_stations, $available_stations);
+			$graph->yscale->SetAutoMax($max+1);
+
+			if ($max/2 < min($Y[0]['cnt']))
+				$graph->yscale->SetAutoMin($max/2-1);
+			
 			$graph->xaxis->title->Set(_BL('Time'));
 			$graph->yaxis->title->Set(_BL('Count'));
 
@@ -2503,9 +2540,9 @@ function bo_graph_statistics($type = 'strikes', $station_id = 0, $hours_back = n
 		$graph->ynaxis[0]->SetTitleMargin(45);
 	}
 
-	if ($graph_type == 'datlin')
+	if ($graph_type == 'datlin' || $graph_type == 'datint' )
 	{
-		if ($X[count($X)-1] - $X[0] > 3600 * 350)
+		if ($X[count($X)-1] - $X[0] > 3600 * 24 * 14)
 		{
 			$graph->xaxis->title->Set(_BL('day'));
 			$graph->xaxis->scale->SetDateFormat('d.m');
