@@ -159,7 +159,7 @@ function bo_graph_statistics()
 	if ($hours_back <= 0)
 		$hours_back = $hours_back_default;
 	
-	if (!bo_user_get_level() && $hours_back > hours_back_max)
+	if (!bo_user_get_level() && $hours_back > $hours_back_max)
 		$hours_back = $hours_back_max;
 
 	if ($align_day || $hours_back > 36)
