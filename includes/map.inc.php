@@ -464,7 +464,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 
 			echo '</div>';
 			echo '</div>';
-
+			echo '</div>';
 
 ?>
 
