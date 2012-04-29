@@ -12,7 +12,7 @@ function bo_tile()
 	$x            = intval($_GET['x']);
 	$y            = intval($_GET['y']);
 	$zoom         = intval($_GET['zoom']);
-	$station_info = intval($_GET['sid']);
+	$station_info_id = intval($_GET['sid']);
 	$only_station = isset($_GET['os']);
 	$only_info    = isset($_GET['info']);
 	$show_count   = isset($_GET['count']);
@@ -29,8 +29,8 @@ function bo_tile()
 
 	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
 	
-	if ($station_info && $only_station)
-		$station_id = $station_info;
+	if ($station_info_id && $only_station)
+		$station_id = $station_info_id;
 	else
 		$station_id = false;
 	
@@ -128,7 +128,7 @@ function bo_tile()
 		$time_max        = count($times_max) ? max($times_max) : 0;
 		
 		if ($_GET['stat'] == 2)
-			$type = 'count_stat_'.($only_station ? 'only_' : '').$type;
+			$type = 'count_stat_'.($only_station ? 'only_' : '').'_'.$station_info_id.$type;
 		else
 			$type = 'count_'.$type;
 	}
@@ -325,6 +325,9 @@ function bo_tile()
 			$stations = bo_stations();
 			$stations_count = array();
 			
+			if ($station_info_id)
+				$stations_count[$station_info_id] = 0;
+			
 			$sql = "SELECT ss.station_id sid, COUNT(s.time) cnt 
 					FROM ".BO_DB_PREF."stations_strikes ss 
 					JOIN ".BO_DB_PREF."strikes s $index_sql ON s.id=ss.strike_id
@@ -389,7 +392,7 @@ function bo_tile()
 		$twidth = bo_imagetextwidth($textsize, $bold, $text)+3;
 		$theight = bo_imagetextheight($textsize, $bold, $text)+2;
 		$white = imagecolorallocatealpha($I, 255,255,255,0);
-		$color2   = imagecolorallocatealpha($I, 255,255,200,0);
+		$color2   = imagecolorallocatealpha($I, 255,220,170,0);
 		imagefilledrectangle( $I, 0, 0, $twidth, $theight, $col);
 		bo_imagestring($I, $textsize, 2, 2, $text, $white, $bold);
 		
@@ -401,7 +404,7 @@ function bo_tile()
 			{
 				arsort($stations_count);
 				$theight-=1;
-				$selected_station_displayed = $station_info ? false : true;
+				$selected_station_displayed = $station_info_id ? false : true;
 				
 				$i = 0;
 				$j = 0;
@@ -413,7 +416,7 @@ function bo_tile()
 					{
 						if ($selected_station_displayed)
 							break;
-						elseif ($station_info == $sid)
+						elseif ($station_info_id == $sid)
 							$selected_station_displayed = true;
 						else
 							continue;
@@ -423,11 +426,14 @@ function bo_tile()
 					
 					$text = round($cnt / $strike_count * 100).'% ';
 					$text .= trim($stations[$sid]['city']);
-
+					
+					if ($sid == $station_info_id)
+						$text .= " ($cnt)";
+					
 					$twidth = bo_imagetextwidth($textsize-1, $bold, $text);
 					
 					imagefilledrectangle($I, 0, $theight*$i, $twidth+10, $theight*($i+1), $col);
-					bo_imagestring($I, $textsize-1, 2, $theight*$i+3, $text, $sid == $station_info ? $color2 : $white, false);
+					bo_imagestring($I, $textsize-1, 2, $theight*$i+3, $text, $sid == $station_info_id ? $color2 : $white, false);
 					
 
 					

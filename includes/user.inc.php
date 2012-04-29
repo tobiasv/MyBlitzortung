@@ -926,7 +926,7 @@ function bo_show_calibrate_antennas()
 
 function bo_cache_info()
 {
-	$dirs['Tiles'] = array('cache/tiles/', 5);
+	$dirs['Tiles'] = array('cache/tiles/', 8);
 	$dirs['Icons'] = array('cache/icons/', 5);
 	$dirs['Maps']  = array('cache/maps/', 5, 1);
 
