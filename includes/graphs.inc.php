@@ -6,7 +6,6 @@
 function bo_graph_raw()
 {
 	require_once 'classes/SignalGraphs.class.php';
-	$graph = new BoSignalGraph();
 
 	bo_session_close();
 
@@ -16,15 +15,16 @@ function bo_graph_raw()
 	elseif (isset($_GET['bo_xy']))
 		$type = 'xy';
 
-	$id = intval($_GET['graph']);
+	$id = intval($_GET['bo_graph']);
 	$station_id = intval($_GET['bo_station_id']);
 	$time = $_GET['bo_time'];
-	
-	$graph->fullscale = isset($_GET['full']);
+
 	
 	if ($id) //get graph from own station
 	{
-	
+		$graph = new BoSignalGraph(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
+		$graph->fullscale = isset($_GET['full']);
+
 		$sql = "SELECT id, time, time_ns, lat, lon, height, data, channels, ntime
 				FROM ".BO_DB_PREF."raw
 				WHERE id='$id'";
@@ -38,14 +38,13 @@ function bo_graph_raw()
 
 		$row = $erg->fetch_assoc();
 		BoDb::close();
-		
-
-		$channels = BO_ANTENNAS;
-		
 		$graph->SetData($type, $row['data'], $row['channels'], $row['ntime']);
 	}
 	elseif ($station_id && $time) //try to get graph from other station
 	{
+		$graph = new BoSignalGraph(BO_GRAPH_RAW_W2, BO_GRAPH_RAW_H2);
+		$graph->fullscale = isset($_GET['full']);
+
 		$info = bo_station_info($station_id);
 		$user = $info['user'];
 		list($date, $nsec) = explode('.', $time);
@@ -65,6 +64,17 @@ function bo_graph_raw()
 		}
 		else
 		{
+			//avoid simultaneous downloads
+			clearstatcache();
+			$dfile = $cache_file.'.download';
+			while (file_exists($dfile) && time() - filemtime($dfile) <= 2)
+			{
+				usleep(400000);
+				clearstatcache;
+			}
+			
+			touch($dfile);
+			
 			$url = bo_access_url().BO_IMPORT_PATH_RAW.$user.'/'.gmdate('H', $tstamp).'.log';
 			$lines = bo_get_file($url, $code, 'raw_data_other'.$station_id, $dummy1, $dummy2, true);
 			
@@ -76,6 +86,8 @@ function bo_graph_raw()
 
 				file_put_contents($cache_file, $lines);
 			}
+			
+			@unlink($dfile);
 		}
 		
 		if (!$lines || (is_array($lines) && empty($lines)))
@@ -114,7 +126,7 @@ function bo_graph_raw()
 		if (strlen($raw_data) > 10 && abs($last_dt) < $max_tolerance)
 		{
 			$bdata = bo_hex2bin($raw_data);
-			$graph->SetMaxTime(300);
+			$graph->SetMaxTime(BO_GRAPH_RAW_MAX_TIME2);
 			$graph->SetData($type, $bdata, $channels, $ntime);
 			$graph->AddText(date('H:i:s', $last_time).'.'.$nsec.'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs');
 		}

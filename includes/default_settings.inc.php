@@ -720,8 +720,23 @@
 /***********************/
 /*** Raw Data Graphs ***/
 
+//width, height
 @define('BO_GRAPH_RAW_W', 200);
 @define('BO_GRAPH_RAW_H', 100);
+
+//spectrum settings
+@define('BO_GRAPH_RAW_SPEC_WIDTH', 1);
+@define('BO_GRAPH_RAW_SPEC_MAX_X', 160); //kHz
+@define('BO_GRAPH_RAW_SPEC_MAX_Y', 7);
+
+//width, height when displaying all graphs to a stroke
+@define('BO_GRAPH_RAW_W2', 350);
+@define('BO_GRAPH_RAW_H2', 160);
+
+//max. time in µs for displaying all graphs to a stroke
+@define('BO_GRAPH_RAW_MAX_TIME2', 350);
+
+//Colors
 @define('BO_GRAPH_RAW_COLOR1', '#f00@0.5');
 @define('BO_GRAPH_RAW_COLOR2', '#0f0@0.5');
 @define('BO_GRAPH_RAW_COLOR3', '#800@0.6');
@@ -734,9 +749,6 @@
 @define('BO_GRAPH_RAW_COLOR_YGRID', '#eee');
 @define('BO_GRAPH_RAW_COLOR_XAXIS', '#666');
 @define('BO_GRAPH_RAW_COLOR_YAXIS', '#666');
-@define('BO_GRAPH_RAW_SPEC_WIDTH', 1);
-@define('BO_GRAPH_RAW_SPEC_MAX_X', 160); //kHz
-@define('BO_GRAPH_RAW_SPEC_MAX_Y', 7);
 
 
 /************************/

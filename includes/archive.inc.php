@@ -902,6 +902,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$channels   = bo_get_conf('raw_channels');
 	$raw_bpv    = bo_get_conf('raw_bitspervalue');
 	$raw_values = bo_get_conf('raw_values');
+	$station_info = bo_station_info($station_id);
 	
 	if ($page < 0)
 		$page = 0;
@@ -1136,9 +1137,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	}
 	
 	
-	$show_signal   = $own_station;
-	$show_spectrum = $own_station && BO_ARCHIVE_SHOW_SPECTRUM;
-	$show_xy_graph = $own_station && $channels > 1 && BO_ARCHIVE_SHOW_XY;
+	$show_signal   = !$own_station || ($raw_bpv == 8 && $raw_values > 10 && BO_UP_INTVL_RAW > 0);
+	$show_spectrum = $show_signal && BO_ARCHIVE_SHOW_SPECTRUM;
+	$show_xy_graph = $show_signal && (!$own_station || $channels > 1) && BO_ARCHIVE_SHOW_XY;
 	
 	if ($own_station)
 		$sql_raw = ",	r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data,
@@ -1184,13 +1185,25 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	while($row = $res->fetch_assoc())
 	{
-
 		if ($show_empty_sig && $res->num_rows == 1)
 			$strike_id = $row['strike_id'];
 
 		$count++;
 		$stime = strtotime($row['stime'].' UTC');
 		$cdev_text = '';
+
+		
+		if ($own_station)
+		{
+			$bearing  = bo_latlon2bearing($row['lat'], $row['lon']);
+			$distance = $row['distance'];
+		}
+		elseif ($station_id && !$own_station)
+		{
+			$bearing  = bo_latlon2bearing($row['lat'], $row['lon'], $station_info['lat'], $station_info['lon']);
+			$distance = bo_latlon2dist($row['lat'], $row['lon'], $station_info['lat'], $station_info['lon']);
+		}
+		
 		
 		if ($row['raw_id'])
 		{
@@ -1199,16 +1212,17 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			if ($row['strike_id'])
 			{
 				$time_diff = $rtime - $stime + ($row['rtimens'] - $row['stimens']) * 1E-9;
-				$residual_time = $time_diff - $row['distance'] / BO_C;
+				$residual_time = $time_diff - $distance / BO_C;
 
-				$cdev = $row['distance'] / $time_diff / BO_C;
+				$cdev = $distance / $time_diff / BO_C;
 				$cdev_text =  number_format($residual_time*1E6, 1, _BL('.'), _BL(','))._BC('µs');
-				$cdev_text .= ' / '.number_format($cdev, 5, _BL('.'), _BL(',')).'c';
-				$cdev_text .= ' / '.round(($cdev-1)*$row['distance']).'m';
+				$cdev_text .= ' / '.number_format($cdev, 4, _BL('.'), _BL(',')).'c';
+				//$cdev_text .= ' / '.round(($cdev-1)*$distance).'m';
 			}
 		}
+		
 
-		$bearing = bo_latlon2bearing($row['lat'], $row['lon']);
+		
 
 		
 		
@@ -1329,69 +1343,71 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		}
 		
 		echo '</span>';
-
 		echo '</td>';
 
-		if ($raw_bpv == 8 && $raw_values > 10 && BO_UP_INTVL_RAW > 0)
+		/***** Graphs *****/
+		$alt = htmlspecialchars(_BL('rawgraph'));
+		$url = bo_signal_url($station_id, $row['raw_id'], $stime, $row['stimens'], $distance);
+		
+		if ($show_signal)
 		{
-			$alt = _BL('rawgraph');
-			if ($show_signal)
+			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
+			if ($row['raw_id'] || !$own_station)
 			{
-				echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
-				if ($row['raw_id'])
-				{
-					$url = bo_bofile_url().'?bo_graph='.$row['raw_id'].'&bo_lang='._BL();
-					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
-				}
-				else if ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
-				{
-					echo _BL('signal not found');
-				}
-				else
-					echo _BL('No signal received');
-					
-				echo '</td>';
-			}
-			
-			if ($show_spectrum)
-			{
-				echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
-				if ($row['raw_id'])
-				{
-					$url = bo_bofile_url().'?bo_graph='.$row['raw_id'].'&bo_spectrum&bo_lang='._BL();
-					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_spec_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
-				}
-				elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
-				{
-					echo _BL('signal not found');
-				}
-				else
-					echo _BL('No signal received');
 				
-				echo '</td>';
+				echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.$alt.'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
 			}
-
-            if ($show_xy_graph)
-            {
-                echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_H.'px;">';
-                if ($row['raw_id'])
-                {
-                    $url = bo_bofile_url().'?bo_graph='.$row['raw_id'].'&bo_xy&bo_lang='._BL();
-                    echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_H.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" id="bo_graph_xy_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
-                }
-                elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
-                {
-                    echo _BL('signal not found');
-                }
-                else
-                    echo _BL('No signal received');
-
-                echo '</td>';
-            }
+			else if ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
+			{
+				echo _BL('signal not found');
+			}
+			else
+				echo _BL('No signal received');
+				
+			echo '</td>';
 		}
+		
+		if ($show_spectrum)
+		{
+			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
+			if ($row['raw_id'] || !$own_station)
+			{
+				$spec_url = $url.'&bo_spectrum';
+				echo '<img src="'.$spec_url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.$alt.'" id="bo_graph_spec_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$spec_url.'\'">';
+			}
+			elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
+			{
+				echo _BL('signal not found');
+			}
+			else
+				echo _BL('No signal received');
+			
+			echo '</td>';
+		}
+
+		if ($show_xy_graph)
+		{
+			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_H.'px;">';
+			if ($row['raw_id'] || !$own_station)
+			{
+				$xy_url = $url.'&bo_xy';
+				echo '<img src="'.$xy_url.'" style="width:'.BO_GRAPH_RAW_H.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.$alt.'" id="bo_graph_xy_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$xy_url.'\'">';
+			}
+			elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
+			{
+				echo _BL('signal not found');
+			}
+			else
+				echo _BL('No signal received');
+
+			echo '</td>';
+		}
+		
 		
 		echo '</tr><tr>';
 
+		
+		/**** Info ****/
 		echo '<td class="bo_sig_table_strikeinfo">';
 		echo '<ul>';
 		
@@ -1421,17 +1437,18 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo '</span>';
 				echo '</li>';
 
-
-				echo '<li>';
-				echo '<span class="bo_descr">';
-				echo _BL('Distance').': ';
-				echo '</span>';
-				echo '<span class="bo_value">';
-				echo number_format($row['distance'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
-				echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
-				echo '</span>';
-				echo '</li>';
 			}
+
+			echo '<li>';
+			echo '<span class="bo_descr">';
+			echo _BL('Distance').': ';
+			echo '</span>';
+			echo '<span class="bo_value">';
+			echo number_format($row['distance'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
+			echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
+			echo '</span>';
+			echo '</li>';
+
 			
 			echo '<li>';
 			echo '<span class="bo_descr">';
@@ -1648,18 +1665,12 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				
 				if ($show_other_graphs)
 				{
-					//station time to signal
-					$station_time  = $stime;
-					$station_ntime = $dist / BO_C + $row['stimens'] * 1E-9;
-					$station_time  = $station_ntime > 1 ? $stime+1 : $stime;
-					$station_ntime = $station_ntime > 1 ? $station_ntime-1 : $station_ntime;
-					
+					$url = bo_signal_url($sid, null, $stime, $row['stimens'], $dist);
+
 					echo ' +'.round($dist/1000).'km / ';
 					echo round($s_bears[0][$sid]).'&deg;';
 					echo '</a>';
-					
-					$url = bo_bofile_url().'?bo_graph&bo_station_id='.$sid.'&bo_time='.urlencode(gmdate('Y-m-d H:i:s',$station_time).'.'.round($station_ntime * 1E9)).'&bo_lang='._BL();
-					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.htmlspecialchars($alt).'" class="bo_graph_sig_other" onmouseover="this.src+=\'&bo_spectrum&full\'" onmouseout="this.src=\''.$url.'\'">';
+					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W2.'px;height:'.BO_GRAPH_RAW_H2.'px"  class="bo_graph_sig_other" onmouseover="this.src+=\'&bo_spectrum&full\'" onmouseout="this.src=\''.$url.'\'">';
 				}
 				else
 					echo '</a>';
@@ -1997,6 +2008,33 @@ function bo_animation_prev()
 window.setTimeout("bo_maps_load();", 500);
 </script>
 <?php
+
+}
+
+					
+function bo_signal_url($station_id, $raw_id = null, $strike_time = null, $strike_time_ns = null, $dist = null)
+{
+	$url = bo_bofile_url().'?';
+	
+	if (!$raw_id)
+	{
+		//station time to signal
+		$station_time  = $strike_time;
+		$station_ntime = $dist / BO_C + $strike_time_ns * 1E-9;
+		$station_time  = $station_ntime > 1 ? $strike_time+1 : $strike_time;
+		$station_ntime = $station_ntime > 1 ? $station_ntime-1 : $station_ntime;
+		
+		$url .= 'bo_graph&bo_station_id='.$station_id.'&bo_time='.urlencode(gmdate('Y-m-d H:i:s',$station_time).'.'.round($station_ntime * 1E9));
+		
+	}
+	else
+	{
+		$url .= 'bo_graph='.$raw_id;
+	}
+
+	$url .= '&bo_lang='._BL();
+	
+	return $url;
 
 }
 

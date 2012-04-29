@@ -5,16 +5,21 @@ class BoSignalGraph
 	var $graph;
 	var $fullscale = false;
 	var $MaxTime = null;
+	var $width  = 0;
+	var $height = 0;
 	
-	function __construct()
+	function __construct($w, $h)
 	{
 		if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
-			bo_graph_error(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
+			bo_graph_error($w, $h);
 	
 		require_once BO_DIR.'includes/jpgraph/jpgraph.php';
 		require_once BO_DIR.'includes/jpgraph/jpgraph_line.php';
 		require_once BO_DIR.'includes/jpgraph/jpgraph_bar.php';
 		require_once BO_DIR.'includes/jpgraph/jpgraph_plotline.php';
+		
+		$this->width = $w;
+		$this->height = $h;
 	}
 	
 	
@@ -31,13 +36,10 @@ class BoSignalGraph
 		$tickMajPositions = array();
 		$tickPositions = array();	
 	
-		if ($type == 'xy') {
-			$width = BO_GRAPH_RAW_H;
-		} else {
-			$width = BO_GRAPH_RAW_W;
-		}
+		if ($type == 'xy') 
+			$this->width = $this->height;
 
-		$this->graph = new Graph($width, BO_GRAPH_RAW_H, "auto");
+		$this->graph = new Graph($this->width, $this->height, "auto");
 		$this->graph->ClearTheme();
 
 		if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
@@ -293,7 +295,7 @@ class BoSignalGraph
 	{
 		if (!is_object($this->graph))
 		{
-			bo_graph_error(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
+			bo_graph_error($this->width, $this->height);
 		}
 		else
 		{
