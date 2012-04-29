@@ -3217,7 +3217,7 @@ function bo_purge_cache($force = false)
 	if (intval(BO_CACHE_PURGE_MAPS_RAND) > 0 && rand(0, BO_CACHE_PURGE_MAPS_RAND) == 1)
 	{	
 		bo_echod("=== Cache Purge: Maps ===");
-		$count = bo_delete_files(BO_DIR.'cache/maps/', intval(BO_CACHE_PURGE_MAPS_HOURS), 3);
+		$count = bo_delete_files(BO_DIR.'cache/maps/', intval(BO_CACHE_PURGE_MAPS_HOURS), 8);
 		bo_echod(" -> Deleted $count files");
 		$whole_count += $count;
 	}
@@ -3227,7 +3227,7 @@ function bo_purge_cache($force = false)
 	if (intval(BO_CACHE_PURGE_TILES_RAND) > 0 && rand(0, BO_CACHE_PURGE_TILES_RAND) == 1)
 	{
 		bo_echod("=== Cache Purge: Tiles ===");
-		$count = bo_delete_files(BO_DIR.'cache/tiles/', BO_CACHE_PURGE_TILES_HOURS, 5);
+		$count = bo_delete_files(BO_DIR.'cache/tiles/', BO_CACHE_PURGE_TILES_HOURS, 8);
 		bo_echod(" -> Deleted $count files");
 		$whole_count += $count;
 	}
@@ -3239,7 +3239,7 @@ function bo_purge_cache($force = false)
 		bo_echod("=== Cache Purge: Densities ===");
 		
 		if (BO_CACHE_SUBDIRS === true)
-			$count = bo_delete_files(BO_DIR.'cache/densitymap', intval(BO_CACHE_PURGE_DENS_HOURS), 3);
+			$count = bo_delete_files(BO_DIR.'cache/densitymap', intval(BO_CACHE_PURGE_DENS_HOURS), 8);
 		else
 			$count = bo_delete_files(BO_DIR.'cache', intval(BO_CACHE_PURGE_DENS_HOURS), 0);
 		
@@ -3254,11 +3254,11 @@ function bo_purge_cache($force = false)
 		bo_echod("=== Cache Purge: Other Files ===");
 		
 		if (BO_CACHE_SUBDIRS === true)
-			$count = bo_delete_files(BO_DIR.'cache/signals', intval(BO_CACHE_PURGE_OTHER_HOURS), 3);
+			$count = bo_delete_files(BO_DIR.'cache/signals', intval(BO_CACHE_PURGE_OTHER_HOURS), 8);
 		else
 			$count = bo_delete_files(BO_DIR.'cache', intval(BO_CACHE_PURGE_OTHER_HOURS), 0);
 		
-		$count += bo_delete_files(BO_DIR.'cache/icons', intval(BO_CACHE_PURGE_OTHER_HOURS), 3);
+		$count += bo_delete_files(BO_DIR.'cache/icons', intval(BO_CACHE_PURGE_OTHER_HOURS), 8);
 		
 		bo_echod(" -> Deleted $count files");
 		$whole_count += $count;

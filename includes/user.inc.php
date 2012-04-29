@@ -927,11 +927,11 @@ function bo_show_calibrate_antennas()
 function bo_cache_info()
 {
 	$dirs['Tiles'] = array('cache/tiles/', 8);
-	$dirs['Icons'] = array('cache/icons/', 5);
-	$dirs['Maps']  = array('cache/maps/', 5, 1);
+	$dirs['Icons'] = array('cache/icons/', 8);
+	$dirs['Maps']  = array('cache/maps/',  8);
 
 	if (BO_CACHE_SUBDIRS === true)
-		$dirs['Density maps'] = array('cache/densitymap/', 2);
+		$dirs['Density maps'] = array('cache/densitymap/', 8);
 
 	$dirs['Other'] = array('cache/', 0);
 
@@ -941,7 +941,6 @@ function bo_cache_info()
 	{
 		$dir = $d[0];
 		$depth = $d[1];
-		$delete_dir_depth = $d[2] ? $d[2] : false;
 
 		echo '<h4>'.$name.' <em>'.$dir.'</em></h4>';
 
@@ -949,7 +948,7 @@ function bo_cache_info()
 
 		if ($_GET['bo_action2'] == 'unlink')
 		{
-			bo_delete_files($dir, 0, $depth, $delete_dir_depth);
+			bo_delete_files($dir, 0, $depth);
 			flush();
 			clearstatcache();
 		}
