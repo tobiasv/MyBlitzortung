@@ -18,13 +18,18 @@ function bo_graph_raw()
 	$id = intval($_GET['bo_graph']);
 	$station_id = intval($_GET['bo_station_id']);
 	$time = $_GET['bo_time'];
+	$size = $_GET['bo_size'];
+
+	if ($size == 2)
+		$graph = new BoSignalGraph(BO_GRAPH_RAW_W2, BO_GRAPH_RAW_H2);
+	else
+		$graph = new BoSignalGraph(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
+		
+	$graph->fullscale = isset($_GET['full']);
 
 	
 	if ($id) //get graph from own station
 	{
-		$graph = new BoSignalGraph(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
-		$graph->fullscale = isset($_GET['full']);
-
 		$sql = "SELECT id, time, time_ns, lat, lon, height, data, channels, ntime
 				FROM ".BO_DB_PREF."raw
 				WHERE id='$id'";
@@ -42,9 +47,6 @@ function bo_graph_raw()
 	}
 	elseif ($station_id && $time) //try to get graph from other station
 	{
-		$graph = new BoSignalGraph(BO_GRAPH_RAW_W2, BO_GRAPH_RAW_H2);
-		$graph->fullscale = isset($_GET['full']);
-
 		$info = bo_station_info($station_id);
 		$user = $info['user'];
 		list($date, $nsec) = explode('.', $time);

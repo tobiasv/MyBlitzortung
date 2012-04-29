@@ -1137,7 +1137,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	}
 	
 	
-	$show_signal   = !$own_station || ($raw_bpv == 8 && $raw_values > 10 && BO_UP_INTVL_RAW > 0);
+	$show_signal   = (!$own_station && $station_id > 0) || ($own_station && $raw_bpv == 8 && $raw_values > 10 && BO_UP_INTVL_RAW > 0);
 	$show_spectrum = $show_signal && BO_ARCHIVE_SHOW_SPECTRUM;
 	$show_xy_graph = $show_signal && (!$own_station || $channels > 1) && BO_ARCHIVE_SHOW_XY;
 	
@@ -1666,7 +1666,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				if ($show_other_graphs)
 				{
 					$url = bo_signal_url($sid, null, $stime, $row['stimens'], $dist);
-
+					$url .= '&bo_size=2';
+					
 					echo ' +'.round($dist/1000).'km / ';
 					echo round($s_bears[0][$sid]).'&deg;';
 					echo '</a>';
