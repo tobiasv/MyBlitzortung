@@ -533,7 +533,7 @@
 //Enables archive (maps by date and animations) for guests
 @define('BO_ENABLE_ARCHIVE_MAPS', false); 
 
-//Enables densities for guests (set the also next option to true)
+//Enables densities for guests (set the also BO_CALC_DENSITIES option to true)
 @define('BO_ENABLE_DENSITIES', false); 
 
 //Enables strike search

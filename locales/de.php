@@ -1045,8 +1045,17 @@ $_BL['de']['Sardinia'] = 'Sardinien';
 
 /*** OCEANIA ***/
 $_BL['de']['New Zealand'] = 'Neuseeland';
+$_BL['de']['Oceania'] = 'Ozeanien';
 
 
+/*** USA/America ***/
+$_BL['de']['America'] = 'Amerika';
+
+
+
+/*** OTHER REGIONS ***/
+$_BL['de']['Asia'] = 'Asien';
+$_BL['de']['Africa'] = 'Afrika';
 
 
 /*** OTHER TEMPLATE NAMES***/

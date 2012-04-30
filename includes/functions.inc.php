@@ -446,6 +446,43 @@ function _BL($msgid='', $noutf = false)
 	if (!$msg)
 	{
 		$msg = $msgid;
+		
+		//Try to find some known words in short strings, i.e. country names
+		if (strlen($msg) < 200 && strlen($msg) > 5)
+		{
+			$words = preg_split("@[,;:/\(\)\<\> ]@", $msg, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
+
+			if (count($words) > 1)
+			{
+				$offset_diff = 0;
+				foreach ($words as $d)
+				{
+					$word   = $d[0];
+					$offset = $d[1];
+					$len    = strlen(trim($word));
+					
+					if ($len > 2)
+					{
+						$word_new = _BL($word, true);
+						$len_new  = strlen($word_new);
+						
+						if ($word_new && $word_new != $word)
+						{
+							$msg_new  = substr($msg, 0, $offset + $offset_diff);
+							$msg_new .= $word_new;
+							$msg_new .= substr($msg, $offset + $offset_diff + $len);
+							
+							$offset_diff = $len_new - $len;
+							
+							$msg = $msg_new;
+							//$msg = strtr($msg, array($word => $word_new));
+						}
+					}
+				}
+			}
+		}
+		
+		
 	}
 	else
 	{
