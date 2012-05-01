@@ -639,7 +639,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		$mapcfg[$i]['upd_intv'] = max($cfg['upd_intv'], BO_UP_INTVL_STRIKES);
 		
 		if ($min_upd_interval == null || $min_upd_interval > $mapcfg[$i]['upd_intv'])
-			$min_upd_interval = $cfg['upd_intv'];
+			$min_upd_interval = $mapcfg[$i]['upd_intv'];
 		
 		$name = strtr($cfg['sel_name'], array('min' => _BL('unit_minutes'), 'h' => _BL('unit_hours'), 'days' => _BL('unit_days')));
 		echo '<span class="bo_form_checkbox_text">';
