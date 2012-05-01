@@ -238,7 +238,188 @@ function bo_graph_statistics()
 		$sql_part = ' (s.part>0) ';
 	}
 
-	if ($type == 'strikes_now')
+	
+	if ($type == 'strikes_advanced')
+	{
+		if (!bo_user_get_level())
+			exit;
+		
+		$last_uptime = bo_get_conf('uptime_strikes');
+		$time_max = time();
+		$no_title_station = true;
+
+		$group_minutes = intval($_GET['group_minutes']);
+		if ($group_minutes < BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES)
+			$group_minutes = BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES;
+
+		if ($hours_back > 24)
+			$group_minutes *= ceil($hours_back / 24);
+
+		$time_max = floor($time_max / 60 / $group_minutes) * 60 * $group_minutes; //round
+
+		
+		//get whole data
+		$S = array();
+		$old_id = 0;
+		$sql = "SELECT s.id id, s.time time, s.users users, ss.station_id station_id
+				FROM ".BO_DB_PREF."strikes s
+				LEFT JOIN ".BO_DB_PREF."stations_strikes ss
+							ON s.id=ss.strike_id
+				WHERE s.time BETWEEN '".gmdate('Y-m-d H:i:s', $time_max - 3600 * $hours_back)."' AND '".gmdate('Y-m-d H:i:s', $time_max)."'
+						".bo_region2sql($region, $station_id)."";
+						
+		$res = BoDb::query($sql);
+		while ($row = $res->fetch_assoc())
+		{
+			$time = strtotime($row['time'].' UTC');
+			$index = floor( ($time - $time_max + $hours_back * 3600) / 60 / $group_minutes);
+			$id = $row['id'];
+			
+			
+			if ($old_id != $id)
+			{
+				$S[$id] = array(
+					'time'  => $time,
+					'users' => $row['users']
+					);
+				$Y[$index]++;
+			}
+			
+			$S[$id]['stations'][$row['station_id']] = true;
+			
+			$old_id = $id;
+		}
+
+		
+		
+		//filter data
+		$filters = explode(';', $_GET['bo_filter']);
+		$filt_text = '';
+		foreach($filters as $filter)
+		{
+			$tmp = explode(',', $filter);
+			$filter_type = $tmp[0];
+			unset($tmp[0]);
+			$filter_opts = $tmp;
+
+			$S_include = array();
+			$S_exclude = array();
+			
+			//todo: more filters
+			switch($filter_type)
+			{
+				case 'stations':
+					
+					$stations = $filter_opts;
+					foreach($S as $strikeid => $d)
+					{
+						$exclude = false;
+						
+						if (array_search(0, $stations))
+							$include = true;
+						else
+							$include = false;
+						
+						foreach($stations as $stationid)
+						{
+							if (isset($d['stations'][abs($stationid)]))
+							{
+								if ($stationid < 0) // exclude always (OR)
+								{
+									$S_exclude[$strikeid] = true;
+									break;
+								}
+								else //include with AND
+								{
+									$include = true;
+								}
+							}
+							elseif ($stationid > 0)
+								$exclude = true;
+						
+						}
+						
+						if ($include && !$exclude)
+							$S_include[$strikeid] = true;
+					}
+					
+					$filt_text .= '  Stations ('.implode(' ', $stations).')';
+				
+				break;
+			
+				
+				case 'users':
+				
+					$users_counts = $filter_opts;
+					foreach($S as $strikeid => $d)
+					{
+						if (array_search(0, $users_counts))
+							$include = true;
+						else
+							$include = false;
+							
+						foreach($users_counts as $users)
+						{
+							if ($users > 0 && $d['users'] == $users)
+								$include = true;
+							elseif ($users < 0 && $d['users'] == abs($users))
+								$S_exclude[$strikeid] = true;
+						}
+						
+						
+						if ($include)
+							$S_include[$strikeid] = true;
+						
+					}
+					
+					$filt_text .= '  Participants ('.implode(' ', $users_counts).')';
+				
+				
+				break;
+			
+			}
+
+
+			//include/exclude 
+			$T = $S;
+			$S = array();
+			foreach($T as $strikeid => $d)
+			{
+				if (isset($S_include[$strikeid]) && !isset($S_exclude[$strikeid]))
+					$S[$strikeid] = $T[$strikeid];
+			}
+			
+		}
+
+		
+	
+		//group strikes
+		foreach($S as $strikeid => $d)
+		{
+			$index = floor( ($d['time'] - $time_max + $hours_back * 3600) / 60 / $group_minutes);
+			$Y2[$index]++;
+		}
+
+		//prepare for jpgraph
+		for ($i = 0; $i < $hours_back * 60 / $group_minutes; $i++)
+		{
+			$X[$i]  = $time_max + ($i * $group_minutes - $hours_back * 60) * 60;
+			$Y[$i]  = (double)$Y[$i];
+			$Y2[$i] = (double)$Y2[$i];
+		}
+		
+		$graph_type = 'datlin';
+
+		$caption  = array_sum($Y).' '._BL('total strikes');
+		if ($show_station)
+		{
+			$caption .= "\n";
+			$caption .= array_sum($Y2).' Filter: '.$filt_text;
+		}
+		
+		$type = 'strikes_now';
+	}
+	else if ($type == 'strikes_now')
 	{
 		$last_uptime = bo_get_conf('uptime_strikes');
 		$time_max = time();
