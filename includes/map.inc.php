@@ -955,6 +955,9 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		{
 			if (isset($cfg['img']))
 			{
+				if (strpos($cfg['img'], '?') === false)
+					$cfg['img'] .= '?';
+
 				echo '
 					bo_ExtraOverlay['.$ovlid.'] = {
 						bo_image: "'.$cfg['img'].'",
@@ -1396,6 +1399,8 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	{
 		var i;
 		var bo_add_transparent_layer = false;
+		var now = new Date();
+		var time = now.getTime() / 1000;
 		
 		if (bo_ExtraOverlayMaps.length == 0)
 		{
@@ -1407,12 +1412,12 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 				}
 				else if (bo_ExtraOverlay[i].bo_tomercator)
 				{
-					bo_ExtraOverlayMaps[i] = new google.maps.GroundOverlay(bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds);
+					bo_ExtraOverlayMaps[i] = new google.maps.GroundOverlay(bo_ExtraOverlay[i].bo_image + '&' + Math.floor(time / 60 / 5),   bo_ExtraOverlay[i].bo_bounds);
 					bo_ExtraOverlayMaps[i].clickable = false;
 				}
 				else
 				{
-					bo_ExtraOverlayMaps[i] = new bo_ProjectedOverlay(bo_map, bo_ExtraOverlay[i].bo_image, bo_ExtraOverlay[i].bo_bounds, {opacity: bo_ExtraOverlay[i].bo_opacity, layer: bo_ExtraOverlay[i].bo_layer}) ;
+					bo_ExtraOverlayMaps[i] = new bo_ProjectedOverlay(bo_map, bo_ExtraOverlay[i].bo_image + '&' + Math.floor(time / 60 / 5), bo_ExtraOverlay[i].bo_bounds, {opacity: bo_ExtraOverlay[i].bo_opacity, layer: bo_ExtraOverlay[i].bo_layer}) ;
 				}
 			}
 		}
