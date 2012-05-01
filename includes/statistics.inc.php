@@ -1764,7 +1764,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 				echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_station_residual_time">';
 				echo _BL('bo_graph_descr_strikes_station_residual_time');
 				echo '</p>';
-				bo_show_graph('strikes_station_residual_time', true, $add_graph);
+				bo_show_graph('strikes_station_residual_time', $add_graph, true);
 			}
 
 		
