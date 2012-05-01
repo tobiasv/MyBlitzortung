@@ -491,6 +491,24 @@
 //Allow selection of stations
 @define('BO_MAP_STATION_SELECT', false);
 
+//reloads whole map page when user didn't make any activities 
+//and is active again after defined interval (minutes)
+//good when you use visitor counters
+@define('BO_MAP_PAGE_RELOAD_INACTIVITY', 0);
+
+//Allow auto update
+//set to a value in minutes, 
+//then auto update ends when user didn't make any activities
+//set to a very high value like 99999999 to "disable" auto-end
+@define('BO_MAP_AUTOUPDATE', 99999999);
+
+//displays message if autoupdate ends due to timeout
+@define('BO_MAP_AUTOUPDATE_STALL_MSG', true);
+
+//reload whole page after autoupdate-stalled message
+@define('BO_MAP_AUTOUPDATE_STALL_RELOAD', false);
+
+
 
 /*******************************************************************/
 /*** Calculate tracks                                            ***/

@@ -1058,5 +1058,7 @@ $_BL['en']['Exclude region'] = 'Exclude region';
 $_BL['en']['Only station'] = 'Only station';
 $_BL['en']['City names'] = 'City names';
 $_BL['en']['Only strikes of selected station'] = 'Only strikes of selected station';
+$_BL['en']['map_autoupdate_stalled_msg'] = 'No user activity. Auto-update was stalled.';
+
 
 ?>
