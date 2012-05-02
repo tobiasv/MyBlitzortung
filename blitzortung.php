@@ -56,28 +56,38 @@ if (!defined("BO_VER"))
 	require_once 'includes/default_settings.inc.php'; //after config.php!
 	require_once 'includes/default_templates.inc.php'; //after config.php!
 
-	if (defined('BO_DEBUG') && BO_DEBUG)
-	{
-		error_reporting(E_ALL & ~E_NOTICE);
-		ini_set('display_errors', 1);
-	}
-	else
-	{
-		ini_set('display_errors', 0);
-	}
-
-	date_default_timezone_set(BO_TIMEZONE);
-
-
 	//includes #1
 	require_once 'includes/functions.inc.php';
 	require_once 'includes/data.inc.php';
 	require_once 'includes/user.inc.php';
 	require_once 'includes/tiles.inc.php';
 
+	//Classes
 	require_once 'includes/classes/Db.class.php';
 	require_once 'includes/classes/DateTime.class.php';
 
+	
+	//Debug Mode?
+	if (BO_DEBUG === true)
+	{
+		error_reporting(E_ALL & ~E_NOTICE);
+		ini_set('display_errors', 1);
+	}
+	elseif (BO_DEBUG === "file")
+	{
+		error_reporting(E_ALL & ~E_NOTICE);
+		ini_set('display_errors', 0);
+		set_error_handler("bo_error_handler");
+	}
+	else
+	{
+		ini_set('display_errors', 0);
+	}
+
+
+	//timezone
+	date_default_timezone_set(BO_TIMEZONE);
+	
 	//User init (session, cookie, etc...)
 	bo_user_init();
 

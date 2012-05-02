@@ -2077,4 +2077,64 @@ function bo_region2name($region, $bo_station_id = false)
 }
 
 
+
+function bo_error_handler($errno, $errstr, $errfile, $errline)
+{
+	
+	$logfile = BO_DIR.'cache/error.log';
+
+	// This error code is not included in error_reporting
+    if (!(error_reporting() & $errno)) 
+        return;
+	
+	$exit = false;
+	
+	switch ($errno) 
+	{
+		case E_ERROR:
+		case E_USER_ERROR:
+			$exit = true;
+			$type = "ERROR";
+			break;
+
+		case E_WARNING:
+		case E_USER_WARNING:
+			$type = "WARNING";
+			break;
+
+		case E_NOTICE:
+		case E_USER_NOTICE:
+			$type = "Notice";
+			break;
+
+		default:
+			$type = "Unknown ERROR";
+			break;
+    }
+	
+	$text  = "$type ";
+	$text .= "on line $errline ";
+	$text .= "in file $errfile:\t";
+	//$text .= "[$errno]\t";
+	$text .= " *** $errstr *** \t";
+	$text .= "MB: ".BO_VER."\t";
+	$text .= "PHP ".PHP_VERSION." (".PHP_OS.")";
+	$text .= "\n";
+	
+	$date = gmdate('Y-m-d H:i:s');
+	
+	$ok = @file_put_contents($logfile, $date." | ".$text, FILE_APPEND);
+	
+	if ($exit)
+	{
+		echo $text;
+		echo "Aborting...<br />\n";
+		exit();
+	}
+	
+	// Don't execute PHP internal error handler
+    return true;
+	
+}
+
 ?>

@@ -887,7 +887,7 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 	header("Content-Type: image/png");
 	if ($caching)
 	{
-		$ok = @imagepng($I, $file);
+		$ok = imagepng($I, $file);
 		
 		if (!$ok)
 			bo_image_cache_error($tile_size, $tile_size);
@@ -961,7 +961,7 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 			exit;
 		}
 		
-		$ok = @imagepng($I, $file);
+		$ok = imagepng($I, $file);
 		
 		if (!$ok)
 			bo_image_cache_error($tile_size, $tile_size);
