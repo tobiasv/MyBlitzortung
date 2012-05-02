@@ -2035,7 +2035,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 
 function bo_show_graph($type, $add_graph='', $hour_select = false, $width=BO_GRAPH_STAT_W, $height=BO_GRAPH_STAT_H)
 {
-	$hours = intval($_GET['bo_hours']);
+	$hours = intval($_GET['bo_hours_graph']);
 	$options = array();
 	
 	if (!(bo_user_get_level() & BO_PERM_NOLIMIT))
@@ -2090,7 +2090,7 @@ function bo_show_graph($type, $add_graph='', $hour_select = false, $width=BO_GRA
 		sort($options);
 		echo '<a name="bo_graph_form_'.$type.'"></a>';
 		echo '<form class="bo_graph_img_form" id="bo_graph_img_form_'.$type.'" action="?#bo_graph_form_'.$type.'">';
-		echo '<select name="bo_hours" onchange="submit();">';
+		echo '<select name="bo_hours_graph" onchange="submit();">';
 		foreach ($options as $hour)
 		{
 			echo '<option value="'.$hour.'" '.($hour == $hours ? 'selected' : '').'>';
@@ -2098,7 +2098,7 @@ function bo_show_graph($type, $add_graph='', $hour_select = false, $width=BO_GRA
 			echo '</option>';
 		}
 		echo '</select>';
-		echo bo_insert_html_hidden(array('bo_hours'));
+		echo bo_insert_html_hidden(array('bo_hours_graph'));
 		echo '</form>';
 	}
 	
