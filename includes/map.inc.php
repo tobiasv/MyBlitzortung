@@ -1140,7 +1140,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		var now = new Date();
 		var time = now.getTime() / 1000;
 		
-		if (time-bo_user_last_activity > <?php echo intval(BO_MAP_AUTOUPDATE)*60 ?>)
+		if (bo_autoupdate && time-bo_user_last_activity > <?php echo intval(BO_MAP_AUTOUPDATE)*60 ?>)
 		{
 			bo_map_toggle_autoupdate(false);
 			document.getElementById("bo_check_autoupdate").checked=false;
