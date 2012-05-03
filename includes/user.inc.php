@@ -933,6 +933,8 @@ function bo_cache_info()
 	if (BO_CACHE_SUBDIRS === true)
 		$dirs['Density maps'] = array('cache/densitymap/', 8);
 
+	$dirs['Graphs'] = array('cache/graphs/', 0);
+		
 	$dirs['Other'] = array('cache/', 0);
 
 	echo '<h3>'._BL('File cache info').'</h3>';

@@ -153,9 +153,36 @@ function bo_graph_statistics()
 
 	bo_session_close();
 
+	
 	$type = $_GET['graph_statistics'];
 	$station_id = intval($_GET['bo_station_id']);
 	$hours_back = intval($_GET['bo_hours']);
+
+
+	/*** Caching ***/
+	$dir = BO_DIR."cache/graphs/";
+	$uniqe_id = md5(serialize($_GET)._BL());
+	$cache_file = $dir.$uniqe_id.'.png';
+
+	if (substr($type, 0, 7) == 'strikes')
+		$update_interval = BO_UP_INTVL_STRIKES * 60;
+	else
+		$update_interval = BO_UP_INTVL_STATIONS * 60;
+	
+	$mod_time = floor(time() / $update_interval) * $update_interval;
+	
+	
+	header("Pragma: ");
+	header("Cache-Control: public, max-age=".($mod_time + $update_interval - time()));
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $mod_time + $update_interval)." GMT");
+
+	if (BO_CACHE_DISABLE !== true && file_exists($cache_file) && filemtime($cache_file) >= $mod_time)
+	{
+		header("Content-Type: image/png");
+		bo_output_cache_file($cache_file);
+		exit;
+	}
 	
 	if ($type == 'stations' || $type == 'signals_all')
 	{
@@ -238,6 +265,7 @@ function bo_graph_statistics()
 		$sql_part = ' (s.part>0) ';
 	}
 
+	
 	
 	if ($type == 'strikes_advanced')
 	{
@@ -2763,17 +2791,9 @@ function bo_graph_statistics()
 	BoDb::close();
 	bo_session_close(true);
 
-	header("Content-Type: image/png");
-	header("Pragma: ");
-	header("Cache-Control: public, max-age=".($time_end + BO_UP_INTVL_STATIONS * 60 - time()));
-	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $time_end)." GMT");
-	header("Expires: ".gmdate("D, d M Y H:i:s", $time_end + BO_UP_INTVL_STATIONS * 60)." GMT");
-
-
 	$I = $graph->Stroke(_IMG_HANDLER);
-	imagepng($I);
-
-
+	bo_graph_output($I, $cache_file, $mod_time);
+	exit;
 }
 
 function bo_graph_error($w=400, $h=300)
@@ -2782,6 +2802,28 @@ function bo_graph_error($w=400, $h=300)
 	bo_image_error($text, $w, $h);
 }
 
+
+function bo_graph_output($I, $cache_file, $mod_time = 0)
+{
+	$dir = dirname($cache_file).'/';
+	header("Content-Type: image/png");
+	
+
+	if (BO_CACHE_DISABLE === true || !is_writeable($dir) || (file_exists($cache_file) && !is_writeable($cache_file)) )
+	{
+		imagepng($I);
+	}
+	else
+	{
+		$ok = imagepng($I, $cache_file);
+		
+		if (!$ok)
+			bo_image_cache_error(imagesx($I), imagesy($I));
+		
+		touch($cache_file, $mod_time);
+		readfile($cache_file);
+	}
+}
 
 
 function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend = array(), $sub = '', $dseg = 22.5, $title = '', $antennas = false)

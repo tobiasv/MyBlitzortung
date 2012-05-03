@@ -688,8 +688,10 @@ function bo_get_density_image()
 	
 	
 	//todo: needs adjustments
-	$last_update = strtotime('today +  4 hours');
-	$expire      = strtotime('today + 28 hours');
+	$last_update = strtotime('today +4 hours');
+	if (time() < $last_update)
+		$last_update -= 24 * 3600;
+	$expire      = $last_update + 24 * 3600;
 	
 	
 	//Headers
@@ -704,7 +706,7 @@ function bo_get_density_image()
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
 		header("Content-Type: $mime");
-		readfile($cache_file);
+		bo_output_cache_file($cache_file, $last_update);
 		exit;
 	}
 	
@@ -886,7 +888,7 @@ function bo_get_density_image()
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_changed)
 	{
 		header("Content-Type: $mime");
-		readfile($cache_file);
+		bo_output_cache_file($cache_file, $last_update);
 		exit;
 	}
 
@@ -1252,7 +1254,7 @@ function bo_get_density_image()
 				mkdir($dir, 0777, true);
 		}
 
-		$ok = @bo_imageout($I, $extension, $cache_file);
+		$ok = @bo_imageout($I, $extension, $cache_file, $last_update);
 		
 		if (!$ok)
 			bo_image_cache_error($w, $h);
