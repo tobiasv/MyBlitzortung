@@ -228,7 +228,7 @@ function bo_tile()
 		if ($cur_minute == $file_minute && time() - $filetime < $update_interval * 60 )
 		{
 			header("Content-Type: image/png");
-			readfile($file);
+			bo_output_cache_file($file, $mod_time);
 			exit;
 		}
 	}
@@ -664,11 +664,15 @@ function bo_tile_tracks()
 	global $_BO;
 	bo_session_close();
 	@set_time_limit(BO_TILE_CREATION_TIMEOUT);
-	
-	if (!intval(BO_TRACKS_SCANTIME)) //disabled
-		exit;
-	
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+	$scantime = intval(BO_TRACKS_SCANTIME) * 60;
+	
+	if (!$scantime) //disabled
+	{
+		bo_tile_message('tile_tracks_disabled', 'tracks_na', $caching);
+		exit;
+	}
+	
 	$x = intval($_GET['x']);
 	$y = intval($_GET['y']);
 	$zoom = intval($_GET['zoom']);
@@ -677,13 +681,24 @@ function bo_tile_tracks()
 	if (BO_CACHE_SUBDIRS === true)
 		$file = strtr($file, array('_' => '/'));
 	$file = BO_DIR.'cache/tiles/'.$file;
-		
+	
+	
+	//estimate the last update, otherwise we have to parse the array...
+	$lastscan = floor(time() / $scantime) * $scantime;
+	$exp_time = $lastscan + $scantime;
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $lastscan)." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
+	header("Content-Disposition: inline; filename=\"MyBlitzortungTile.png\"");
+	header("Pragma: ");
+	header("Cache-Control: public, max-age=".($exp_time - time()));
+
+	
 	if (file_exists($file) && $caching)
 	{
 		if (file_exists($file) && filemtime($file) + intval(BO_UP_INTVL_TRACKS) > time())
 		{
 			header("Content-Type: image/png");
-			readfile($file);
+			bo_output_cache_file($file, $lastscan);
 			exit;
 		}
 	}

@@ -2137,4 +2137,31 @@ function bo_error_handler($errno, $errstr, $errfile, $errline)
 	
 }
 
+function bo_output_cache_file($cache_file, $mod_time = 0)
+{
+	if (!file_exists($cache_file))
+		return false;
+	
+	if (function_exists('apache_request_headers'))
+	{
+		$request = apache_request_headers();
+		$ifmod = $request['If-Modified-Since'] ? strtotime($request['If-Modified-Since']) : false;
+		
+		if (!$mod_time)
+		{
+			clearstatcache();
+			$mod_time = filemtime($cache_file);
+		}
+			
+		if ($mod_time - $ifmod <= 1)
+		{
+			header("HTTP/1.1 304 Not Modified");
+			return;
+		}
+			
+	}
+	
+	readfile($cache_file);
+}
+
 ?>

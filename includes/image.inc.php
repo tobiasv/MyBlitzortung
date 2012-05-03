@@ -321,7 +321,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		{
 			$cache_file .= '_nobg';
 			$file = '';
-			$expire = time() + 15 * 60;
+			
+			//set expire if file may appear in the next 24 hours after strike time
+			if (time() - $time_max < 3600 * 24)
+				$expire = time() + BO_UP_INTVL_STRIKES * 60;
 		}
 		else
 		{
@@ -370,10 +373,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.".$extension."\"");
 
 	//Caching
-	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update - $update_interval )
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update - $update_interval)
 	{
 		header("Content-Type: $mime");
-		readfile($cache_file);
+		bo_output_cache_file($cache_file);
 		exit;
 	}
 
@@ -815,7 +818,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				@mkdir($dir, 0777, true);
 		}
 
-		$ok = bo_imageout($I, $extension, $cache_file);
+		$ok = bo_imageout($I, $extension, $cache_file, $last_update);
 
 		if (!$ok)
 			bo_image_cache_error($w, $h);
@@ -863,7 +866,7 @@ function bo_get_map_image_ani()
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
 	{
 		header("Content-Type: image/gif");
-		readfile($cache_file);
+		bo_output_cache_file($cache_file);
 		exit;
 	}
 
@@ -896,18 +899,18 @@ function bo_get_map_image_ani()
 		$frames[] = $file;
 	}
 	
-	$loops = 0;
-	$disposal = 2;
-
 	BoDb::close();
 	bo_session_close(true);
-	
+
+	$loops = 0;
+	$disposal = 2;
 	$gif = new GIFEncoder($frames, $framed, $loops, $disposal, 0, 0, 0, "url"); 
 
 	header('Content-type: image/gif'); 
 	if ($caching)
 	{
 		file_put_contents($cache_file, $gif->GetAnimation());
+		touch($cache_file, $last_update);
 		readfile($cache_file);
 	}
 	else
@@ -1103,7 +1106,7 @@ function bo_get_image($img)
 	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
 	header("Cache-Control: public, max-age=".$age);
 
-	readfile($file);
+	bo_output_cache_file($file, $mod_time);
 	exit;
 }
 
@@ -1594,7 +1597,7 @@ function bo_imagecreatefromfile($file)
 	return $I;
 }
 
-function bo_imageout($I, $extension = 'png', $file = null, $quality = BO_IMAGE_JPEG_QUALITY)
+function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quality = BO_IMAGE_JPEG_QUALITY)
 {
 	$extension = strtr($extension, array('.' => ''));
 	
@@ -1608,7 +1611,10 @@ function bo_imageout($I, $extension = 'png', $file = null, $quality = BO_IMAGE_J
 		$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
 	else
 		$ret = imagejpeg($I, $file, $quality);
-		
+	
+	if ($mtime !== null)
+		touch($file, $mtime);
+	
 	return $ret;
 }
 
