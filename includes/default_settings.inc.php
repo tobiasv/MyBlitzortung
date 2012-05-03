@@ -481,7 +481,7 @@
 @define('BO_MAP_MYBO_ICON', 'http://labs.google.com/ridefinder/images/mm_20_blue.png');
 
 //Version of Google Maps API
-@define('BO_GMAP_API_VERSION', '3.7');
+@define('BO_GMAP_API_VERSION', '3.8');
 
 //Google Maps additional parameters
 // - API Key: &key={key}
