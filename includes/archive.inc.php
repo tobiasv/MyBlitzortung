@@ -190,7 +190,7 @@ function bo_show_archive_map()
 			if ($ani_preset == 'now')
 			{
 				$hour_range = $ani_default_range; // + ($hours_interval <= 6 ? $hours_interval : 0);
-				$hour_from = date('H') - $hour_range;
+				$hour_from = date('H') - $hour_range - $ani_pic_range / 60;
 				$day = date('d');
 			}
 			elseif ($ani_preset == 'day')
