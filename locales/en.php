@@ -282,14 +282,14 @@ $_BL['en']['timezone_is'] = 'Current date/time and default timezone:';
 /*************************************************************/
 
 
-$_BL['en']['main_title_map'] = 'Strike map';
+$_BL['en']['main_title_map'] = 'Lightning map';
 $_BL['en']['main_title_statistics'] = 'Statistics';
 $_BL['en']['main_title_info'] = 'Information';
-$_BL['en']['main_title_archive'] = 'Archive';
+$_BL['en']['main_title_archive'] = 'Archives';
 $_BL['en']['main_title_login'] = 'User area';
 
-$_BL['en']['main_menu_map'] = 'Strike map';
-$_BL['en']['main_menu_archive'] = 'Archive';
+$_BL['en']['main_menu_map'] = 'Live lightning maps';
+$_BL['en']['main_menu_archive'] = 'Archives';
 $_BL['en']['main_menu_statistics'] = 'Statistics';
 $_BL['en']['main_menu_info'] = 'Information';
 $_BL['en']['main_menu_login'] = 'User area';
@@ -300,9 +300,7 @@ $_BL['en']['main_menu_login'] = 'User area';
 /*************************************************************/
 $_BL['en']['map_options'] = 'Options';
 $_BL['en']['only own strikes'] = 'Only strikes detected by station {STATION}';
-$_BL['en']['tile not available'] = 'In this zoom level
-at this position
-no strike data available!';
+$_BL['en']['tile not available'] = 'Lightning data here\nis only available for\nlogged in users!';
 $_BL['en']['update map'] = 'Update';
 $_BL['en']['Click to set the map to Home'] = 'Click to set the map to Home.';
 $_BL['en']['Dynamic map'] = 'Dynamic map';
@@ -428,17 +426,17 @@ $_BL['en']['rawgraph'] = 'Signal graph';
 $_BL['en']['lightning_info'] = 'Strike info';
 $_BL['en']['strikedetected'] = 'Blitz detected';
 $_BL['en']['button_search'] = 'Search';
-$_BL['en']['h3_arch_search'] = 'Searching for strikes in an area';
+$_BL['en']['h3_arch_search'] = 'Search for lightning discharges in an area';
 $_BL['en']['h3_arch_last_signals'] = 'Last received signals';
 $_BL['en']['You have to place the pointer inside the red circle!'] = 'You have to place the pointer inside the red circle!';
 $_BL['en']['archive_legend'] = 'Search options';
 $_BL['en']['No strikes found!'] = 'No strikes found!';
 $_BL['en']['arch_navi_maps'] = 'Maps';
-$_BL['en']['h3_arch_maps'] = 'Strike archive: Maps and animations';
+$_BL['en']['h3_arch_maps'] = 'Lightning archive: Maps and animations';
 $_BL['en']['legend_arch_strikes'] = 'Options';
 $_BL['en']['Strike density'] = 'Strike density';
-$_BL['en']['arch_navi_density'] = 'Strike densities';
-$_BL['en']['h3_arch_density'] = 'Strike densities';
+$_BL['en']['arch_navi_density'] = 'Densities';
+$_BL['en']['h3_arch_density'] = 'Lightning densities';
 $_BL['en']['legend_arch_densities'] = 'Options';
 $_BL['en']['arch_select_dates_between'] = 'Only data from {START} to {END} available!';
 $_BL['en']['Max strikes density'] = 'Max strike density';
@@ -453,7 +451,7 @@ $_BL['en']['Min time'] = 'Min time';
 $_BL['en']['Max time'] = 'Max time';
 $_BL['en']['enter_time_hint'] = 'Enter time values like "YYYY-MM-DD HH:MM:SS". You can omit the smaller time units, for example "YYYY-MM" is also possible.';
 $_BL['en']['Time range'] = 'Time range';
-$_BL['en']['arch_navi_strikes'] = 'Strikes';
+$_BL['en']['arch_navi_strikes'] = 'List';
 $_BL['en']['Distances between all stations'] = 'Distances between all stations';
 $_BL['en']['Distances between stations used for locating'] = 'Distances between stations used for locating';
 $_BL['en']['check_show_hyps'] = 'Show hyperbolic curves';
@@ -488,7 +486,7 @@ $_BL['en']['h3_stat_database'] = 'Statistics from the local database';
 $_BL['en']['h4_stat_other_antennas'] = 'Antenna bearing';
 $_BL['en']['h4_stat_signals'] = 'Signals';
 $_BL['en']['h4_new_stations'] = 'New stations';
-$_BL['en']['h3_arch_last_strikes'] = 'Last strikes';
+$_BL['en']['h3_arch_last_strikes'] = 'List of lightning discharges';
 $_BL['en']['h3_stat_strikes_now'] = 'Current lightning';
 $_BL['en']['h3_stat_strikes_time'] = 'Monthly and yearly strike count';
 $_BL['en']['h3_stat_advanced'] = 'Advanced statistics';
@@ -527,7 +525,7 @@ $_BL['en']['Sum of Strikes'] = 'Sum of strikes';
 $_BL['en']['Strikes detected'] = 'Strikes detected';
 $_BL['en']['of the last'] = 'of the last';
 $_BL['en']['Currently no GPS coordinates available!'] = 'Currently no GPS coordinates available!';
-$_BL['en']['stat_navi_strikes'] = 'Strikes';
+$_BL['en']['stat_navi_strikes'] = 'Lightning';
 $_BL['en']['total strikes'] = 'total strikes';
 $_BL['en']['total strikes station'] = 'total strikes station {STATION}';
 $_BL['en']['Strikes station'] = 'Strikes station {STATION}';
@@ -658,7 +656,7 @@ $_BL['en']['user_perm7'] = 'Archive';
 $_BL['en']['stat_navi_station'] = 'Station';
 $_BL['en']['stat_navi_other'] = 'Other';
 $_BL['en']['stat_navi_network'] = 'Network';
-$_BL['en']['arch_navi_search'] = 'Strike search';
+$_BL['en']['arch_navi_search'] = 'Search';
 $_BL['en']['arch_navi_signals'] = 'Signals';
 $_BL['en']['stat_navi_longtime'] = 'Long-time';
 $_BL['en']['stat_navi_advanced'] = 'Advanced';
@@ -1059,6 +1057,8 @@ $_BL['en']['Only station'] = 'Only station';
 $_BL['en']['City names'] = 'City names';
 $_BL['en']['Only strikes of selected station'] = 'Only strikes of selected station';
 $_BL['en']['map_autoupdate_stalled_msg'] = 'No user activity. Auto-update was stalled.';
-
+$_BL['en']['tile_zoom_not_allowed'] = 'Zoom level\nnot allowed here!';
+$_BL['en']['tile_station_not_allowed'] = 'Station selection\nnot allowed!';
+$_BL['en']['tile_station_not_allowed'] = 'Cell tracks disabled!';
 
 ?>

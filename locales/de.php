@@ -284,7 +284,7 @@ $_BL['de']['main_title_info'] = 'Informationen';
 $_BL['de']['main_title_archive'] = 'Archiv';
 $_BL['de']['main_title_login'] = 'Interner Bereich';
 
-$_BL['de']['main_menu_map'] = 'Blitzkarte';
+$_BL['de']['main_menu_map'] = 'Blitzkarten';
 $_BL['de']['main_menu_archive'] = 'Archiv';
 $_BL['de']['main_menu_statistics'] = 'Statistiken';
 $_BL['de']['main_menu_info'] = 'Infos';
@@ -296,9 +296,7 @@ $_BL['de']['main_menu_login'] = 'Intern';
 /*************************************************************/
 $_BL['de']['map_options'] = 'Anzeige';
 $_BL['de']['only own strikes'] = 'nur Blitze der Station {STATION}';
-$_BL['de']['tile not available'] = 'In dieser Zoomstufe
-hier keine Blitzdaten
-verfügbar!';
+$_BL['de']['tile not available'] = 'Die Blitzdaten sind\nhier nur für angemeldete\nBenutzer verfügbar!';
 $_BL['de']['update map'] = 'Aktualisieren';
 $_BL['de']['Click to set the map to Home'] = 'Klicken um wieder zur Anfangsposition zu gelangen.';
 $_BL['de']['Dynamic map'] = 'Dynamische Karte';
@@ -1120,5 +1118,8 @@ $_BL['de']['Only station'] = 'Nur Station';
 $_BL['de']['City names'] = 'Städtenamen';
 $_BL['de']['Only strikes of selected station'] = 'Nur Blitze der gewählten Station';
 $_BL['de']['map_autoupdate_stalled_msg'] = 'Info: Die automatische Aktualisierung wurde deaktiviert, da es keine Nutzeraktivität mehr gab.';
+$_BL['en']['tile_zoom_not_allowed'] = 'Dieser Zoomstufe\nist nicht erlaubt!';
+$_BL['en']['tile_station_not_allowed'] = 'Auswahl von Stationen\nnicht erlaubt!';
+$_BL['en']['tile_station_not_allowed'] = 'Zugrichtungen sind deaktiviert!';
 
 ?>

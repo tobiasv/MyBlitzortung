@@ -922,13 +922,15 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 {
 	$dir = BO_DIR.'cache/tiles/';
 	
+	bo_load_locale();
+	
 	$file  = $dir.$type.'_';
 	$file .= bo_user_get_level().'_';
 	$file .= _BL().'.png';
 	
 	if (!file_exists($file) || !$caching)
 	{
-		bo_load_locale();
+		
 		$text = strtr(_BL($text, true), $replace);
 		
 		$I = imagecreate($tile_size, $tile_size);

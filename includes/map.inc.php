@@ -1508,7 +1508,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		c = new bo_tile_coord(zoom, coord, tile_size);
 		if (!c.ok) return c.failimg;
 		
-		var url = "<?php echo bo_bofile_url() ?>?tile&zoom="+zoom+"&x="+c.x+"&y="+c.y;
+		var url = "<?php echo bo_bofile_url() ?>?tile&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&bo_lang=<?php echo _BL(); ?>";
 		
 		if (bo_select_stationid > 0)
 			url=url+"&sid="+bo_select_stationid;
@@ -1572,7 +1572,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			}
 		}
 		
-		var url="<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&zoom="+zoom+"&x="+c.x+"&y="+c.y;
+		var url="<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&bo_lang=<?php echo _BL(); ?>";
 		
 		if (bo_select_stationid > 0)
 			url=url+"&sid="+bo_select_stationid;
@@ -1595,7 +1595,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		var now = new Date();
 		var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
 		
-		return "<?php echo bo_bofile_url() ?>?tile&tracks&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&"+add;
+		return "<?php echo bo_bofile_url() ?>?tile&tracks&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&bo_lang=<?php echo _BL(); ?>"+"&"+add;
 	}
 	
 	function bo_reload_mapinfo() 
@@ -1639,7 +1639,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 				if (bo_manual_timerange)
 					add = "from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2)+"&" + add;
 				
-				infoImg.src = "<?php echo bo_bofile_url() ?>?tile&info&type="+bo_OverlayMaps[i].bo_mapid+"&"+add;
+				infoImg.src = "<?php echo bo_bofile_url() ?>?tile&info&bo_lang=<?php echo _BL(); ?>&type="+bo_OverlayMaps[i].bo_mapid+"&"+add;
 				infoImg.style.paddingTop = '5px';
 				infoImg.style.display = 'block';
 				infoImg.style.opacity = 0.7;
