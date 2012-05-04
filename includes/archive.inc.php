@@ -30,6 +30,7 @@ function bo_show_archive()
 	if (!$show)
 		return;
 	
+	echo '<div id="bo_archives">';
 	
 	echo '<ul id="bo_menu">';
 
@@ -50,36 +51,39 @@ function bo_show_archive()
 
 	echo '</ul>';
 
+	
+	
 	switch($show)
 	{
 		
 		case 'maps':
-			echo '<h3>'._BL('h3_arch_maps').' </h3>';
+			echo '<h3 class="bo_main_title">'._BL('h3_arch_maps').' </h3>';
 			bo_show_archive_map();
 			break;
 
 		case 'density':
-			echo '<h3>'._BL('h3_arch_density').' </h3>';
+			echo '<h3 class="bo_main_title">'._BL('h3_arch_density').' </h3>';
 			bo_show_archive_density();
 			break;
 		
 		default:
 		case 'search':
-			echo '<h3>'._BL('h3_arch_search').' </h3>';
+			echo '<h3 class="bo_main_title">'._BL('h3_arch_search').' </h3>';
 			bo_show_archive_search();
 			break;
 
 		case 'signals':
-			echo '<h3>'._BL('h3_arch_last_signals').'</h3>';
+			echo '<h3 class="bo_main_title">'._BL('h3_arch_last_signals').'</h3>';
 			bo_show_archive_table();
 			break;
 		
 		case 'strikes':
-			echo '<h3>'._BL('h3_arch_last_strikes').'</h3>';
+			echo '<h3 class="bo_main_title">'._BL('h3_arch_last_strikes').'</h3>';
 			bo_show_archive_table(true);
 			break;
 	}
 
+	echo '</div>';
 
 
 	bo_copyright_footer();
@@ -185,7 +189,7 @@ function bo_show_archive_map()
 			
 			if ($ani_preset == 'now')
 			{
-				$hour_range = $ani_default_range + ($hours_interval <= 6 ? $hours_interval : 0);
+				$hour_range = $ani_default_range; // + ($hours_interval <= 6 ? $hours_interval : 0);
 				$hour_from = date('H') - $hour_range;
 				$day = date('d');
 			}
