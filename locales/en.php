@@ -1060,5 +1060,7 @@ $_BL['en']['map_autoupdate_stalled_msg'] = 'No user activity. Auto-update was st
 $_BL['en']['tile_zoom_not_allowed'] = 'Zoom level\nnot allowed here!';
 $_BL['en']['tile_station_not_allowed'] = 'Station selection\nnot allowed!';
 $_BL['en']['tile_station_not_allowed'] = 'Cell tracks disabled!';
+$_BL['en']['Last time without GPS'] = 'Last time without GPS';
+
 
 ?>

@@ -1118,8 +1118,9 @@ $_BL['de']['Only station'] = 'Nur Station';
 $_BL['de']['City names'] = 'Städtenamen';
 $_BL['de']['Only strikes of selected station'] = 'Nur Blitze der gewählten Station';
 $_BL['de']['map_autoupdate_stalled_msg'] = 'Info: Die automatische Aktualisierung wurde deaktiviert, da es keine Nutzeraktivität mehr gab.';
-$_BL['en']['tile_zoom_not_allowed'] = 'Dieser Zoomstufe\nist nicht erlaubt!';
-$_BL['en']['tile_station_not_allowed'] = 'Auswahl von Stationen\nnicht erlaubt!';
-$_BL['en']['tile_station_not_allowed'] = 'Zugrichtungen sind deaktiviert!';
+$_BL['de']['tile_zoom_not_allowed'] = 'Diese Zoomstufe\nist nicht erlaubt!';
+$_BL['de']['tile_station_not_allowed'] = 'Auswahl von Stationen\nnicht erlaubt!';
+$_BL['de']['tile_station_not_allowed'] = 'Zugrichtungen sind deaktiviert!';
+$_BL['de']['Last time without GPS'] = 'GPS-Signal zuletzt verloren';
 
 ?>
