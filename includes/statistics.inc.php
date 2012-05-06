@@ -489,7 +489,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 			echo ' (';
 			echo number_format($part_own_percent, 1, _BL('.'), _BL(',')).'%';
-			echo ' - '._BL('Score').': '.number_format($part_own_percent * $stations, 0, _BL('.'), _BL(',')).'%';
+			//echo ' - '._BL('Score').': '.number_format($part_own_percent * $stations, 0, _BL('.'), _BL(',')).'%';
 			echo ') ';
 		}
 
@@ -519,10 +519,12 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	//Show GPS Info
 	if ($show_gps)
 	{
-		$js_data = '';
+		$js_text = '';
+		$js_time = '';
 		$height = array();
 		$lat = array();
 		$lon = array();
+		$pos_text = array();
 		$mean_lat = 0;
 		$mean_lat = 0;
 		$show_map = false;
@@ -542,10 +544,16 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			}
 
 			ksort($tmp);
-			foreach($tmp as $d)
+			foreach($tmp as $t => $d)
 			{
 				$lat[] = $d['lat'];
 				$lon[] = $d['lon'];
+				$pos_text[] = date(_BL('_datetime'), $t).' '.
+								(isset($d['height']) ? _BL('Height').': '.$d['height'].'m' : '').' '.
+								_BL('Status').': '.$d['status'].' '.
+								_BL('Signals/h').': '.$d['sig'].' '.
+								_BL('Strikes/h').': '.$d['strikes'].' '
+								;
 				
 				if (isset($d['height']))
 					$height[] = $d['height'];
@@ -564,7 +572,6 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			foreach($lat as $id => $val)
 			{
 				$dist_dev += bo_latlon2dist($mean_lat, $mean_lon, $lat[$id], $lon[$id]);
-				$js_data .= ($js_data ? ',' : '').'new google.maps.LatLng('.$lat[$id].','.$lon[$id].')';
 			}
 			$dist_dev /= count($lat);
 
@@ -580,6 +587,13 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 				$height_dev = sqrt($height_dev/(count($height)-1));
 			}
 
+			//Javascript data
+			foreach($lat as $id => $val)
+			{
+				$js_pos  .= ($js_pos  ? ',' : '').'new google.maps.LatLng('.$lat[$id].','.$lon[$id].')';
+				$js_text .= ($js_text ? ',' : '').'"'.$pos_text[$id].'"';
+			}
+			
 		}
 		elseif ((double)$stInfo['lat'] != 0.0 && (double)$stInfo['lon'] != 0.0)
 		{
@@ -676,8 +690,8 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 				
 				bounds.extend(myLatlng);
 			
-				var coordinates;
-				coordinates = [ <?php echo $js_data ?> ];
+				var coordinates = [ <?php echo $js_pos ?> ];
+				var postext     = [ <?php echo $js_text ?> ];
 
 				if (coordinates.length > 0)
 				{
@@ -690,12 +704,23 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 						});
 					gpsPath.setMap(bo_map);
 
-
-					for (var i = 0; i < coordinates.length; i++) {
+					var bo_gps_image = new google.maps.MarkerImage("<?php echo  bo_bofile_url() ?>?size=1&bo_icon=0000ff");
+									
+					for (var i = 0; i < coordinates.length; i++) 
+					{
 						bounds.extend(coordinates[i]);
+
+						var bo_gps_marker = new google.maps.Marker({
+							position: coordinates[i], 
+							map: bo_map, 
+							title:postext[i],
+							icon:bo_gps_image
+							});
+						
 					}
 
 					<?php echo BO_STATISTICS_GPS_MAP_ZOOM == 0 ? 'bo_map.fitBounds(bounds);' : ''; ?>
+
 				}
 				else
 				{

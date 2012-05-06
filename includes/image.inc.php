@@ -5,12 +5,14 @@
 // returns png-image for map-marker
 function bo_icon($icon)
 {
+	$c = intval($_GET['size']) < 20 ? intval($_GET['size']) : 3;
+	
 	$dir = BO_DIR."cache/icons/";
-	$file = $dir.$icon.'.png';
+	$file = $dir.$icon.'_'.$c.'.png';
 
 	if (BO_CACHE_DISABLE === true || !file_exists($file) || time() - filemtime($file) > 3600 * 24 * 30)
 	{
-		$c = 3;
+		
 
 		$I = imagecreate($c*2+1, $c*2+1);
 		$bg = imagecolorallocate($I, 255, 255, 255);
