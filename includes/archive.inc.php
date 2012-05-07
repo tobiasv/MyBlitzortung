@@ -186,7 +186,7 @@ function bo_show_archive_map()
 			//now is default for maps with chaning backgrounds
 			if (!$ani_preset && isset($cfg['file_time']))
 				$ani_preset = 'now';
-			
+
 			if ($ani_preset == 'now')
 			{
 				$hour_range = $ani_default_range; // + ($hours_interval <= 6 ? $hours_interval : 0);
@@ -308,7 +308,7 @@ function bo_show_archive_map()
 			echo '<span class="bo_form_descr">'._BL('Animation').':</span> ';
 			echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false, true);" '.($ani_forced ? ' disabled' : '').'>';
 			echo '<label for="bo_archive_maps_animation_off">'._BL('Off').'</label>';
-			echo '<input type="radio" name="bo_animation" value="1" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true, true);">';
+			echo '<input type="radio" name="bo_animation" value="'.htmlentities($ani_preset).'" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true, true);">';
 			echo '<label for="bo_archive_maps_animation_on">'._BL('On').'</label>';
 		}
 		
