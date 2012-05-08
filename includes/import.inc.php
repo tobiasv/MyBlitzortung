@@ -1324,12 +1324,6 @@ function bo_match_strike2raw()
 
 	$amp_trigger = (BO_TRIGGER_VOLTAGE * BO_STR2SIG_TRIGGER_FACTOR / BO_MAX_VOLTAGE) * 256 / 2;
 
-	//Get last recorded strike
-	$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
-	$row = BoDb::query($sql)->fetch_assoc();
-	$maxtime = strtotime($row['mtime'].' UTC');
-	$mintime = strtotime($row['mtime'].' UTC') - 3600 * 24 * 30;
-
 	//time of last update
 	$last_modified = bo_get_conf('uptime_strikes_modified');
 	
@@ -1337,6 +1331,7 @@ function bo_match_strike2raw()
 	//because younger ones could be updated during the next strike-import
 	//and this will overwrite "part" and "raw_id"!
 	$maxtime = $last_modified - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60 - 60;
+	$mintime = $maxtime - 3600 * 2;
 	
 	$u = array();
 	$n = array();
