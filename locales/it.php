@@ -726,7 +726,7 @@ La stazione di {STATION_CITY} riceve i segnali elettromagnetici emessi dalle sca
 <br>I segnali, dopo essere stati elaborati, vengono immessi in rete e, con l\'aiuto di altre stazioni, viene calcolata la posizione e l\'ora esatta dell\'evento.
 Affinchè una scarica sia validata la stessa deve essere stata registrata da almeno {MIN_PARTICIPANTS} stazioni.
 I dati riferiti alla singola stazione di {STATION_CITY} sono quindi stati registrati almeno da altre {MIN_PARTICIPANTS} stazioni.
-<br>Tutti i dati seguenti sono riferiti all\'intervallo temporale dei 60 minuti precedenti l\'ultimo aggiornamento e sono relativi alla sola stazione di {STATION_CITY}:';
+<br>Tutti i dati seguenti sono relativi alla sola stazione di {STATION_CITY}:';
 $_BL['it']['bo_graph_descr_radi'] = 'Percentuale di localizzazione in rapporto alla distanza dalla stazione.
 <br>Viene riportato anche il totale delle fulminazioni, sempre rapportato alla distanza.';
 $_BL['it']['bo_graph_descr_strikes'] = 'Il grafico riporta il totale delle fulminazioni per ora dell\'intera rete, e della stazione di {STATION_CITY}.

@@ -743,9 +743,7 @@ ermittelt werden. Allerdings rührt nicht jedes Signal aus einem Blitz, auch wird
 Ortungs- und Blitzquoten geben darüber Auskunft (siehe unten). Zudem müssen mindestens {MIN_PARTICIPANTS}
 Stationen das Signal eines Blitzes empfangen, damit daraus die Position berechnet wird.
 Hat die Station {STATION_CITY} bei einer Ortung mit nur {MIN_PARTICIPANTS} Stationen teilgenommen, so wird dies
-als "eigener" Blitz gewertet.
-Alle Angaben folgenden
-beziehen sich auf einen Zeitraum von 60 Minuten vor der letzten Aktualisierung und beziehen sich nur auf die Station {STATION_CITY}:';
+als "eigener" Blitz gewertet.';
 $_BL['de']['bo_graph_descr_radi'] = 'Übersicht über die eigene Ortungsqute in Abhängigkeit von der Entfernung zur Station {STATION_CITY}. Zum Vergleich ist die Gesamtanzahl an Blitzen aufgetragen.';
 $_BL['de']['bo_graph_descr_strikes'] = 'Zu sehen ist die Gesamtanzahl an Blitzen pro Stunde aus dem Ortungsnetzwerk, die Anzahl der detektierten Blitze der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
 $_BL['de']['bo_graph_descr_signals'] = 'Die Anzahl der empfangenen Signale pro Stunde der Station {STATION_CITY} sowie zum Vergleich der Durchschnitt aller Stationen.';
@@ -1122,5 +1120,8 @@ $_BL['de']['tile_zoom_not_allowed'] = 'Diese Zoomstufe\nist nicht erlaubt!';
 $_BL['de']['tile_station_not_allowed'] = 'Auswahl von Stationen\nnicht erlaubt!';
 $_BL['de']['tile_station_not_allowed'] = 'Zugrichtungen sind deaktiviert!';
 $_BL['de']['Last time without GPS'] = 'GPS-Signal zuletzt verloren';
+$_BL['de']['h4_stat_station_general'] = 'Allgemeine Statistiken der letzten Stunde';
+
+
 
 ?>

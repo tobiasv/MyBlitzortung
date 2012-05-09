@@ -403,6 +403,8 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	echo strtr(_BL('bo_stat_station_descr_lasth'), array('{STATION_CITY}' => $city, '{MIN_PARTICIPANTS}' => bo_participants_locating_min()));
 	echo '</p>';
 
+	
+	echo '<h4>'._BL('h4_stat_station_general').'</h4>';
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Station active').': </span>';
 	echo '<span class="bo_value">';
@@ -500,11 +502,8 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo '<li><span class="bo_descr">'._BL('Last signal').': </span><span class="bo_value">'.date(_BL('_datetime'), $last_signal).'</span>';
 	}
 
-	if ($nogps_last_time)
-	{
-		echo '<li><span class="bo_descr">'._BL('Last time without GPS').': </span><span class="bo_value">'.date(_BL('_datetime'), $nogps_last_time).'</span>';
-	}
-
+	echo '<li><span class="bo_descr">'._BL('Tracker').': </span><span class="bo_value">'._BC($stInfo['tracker']).'</span>';
+	
 	echo '</ul>';
 
 	
@@ -667,6 +666,13 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		}
 		else
 			echo '<li><span class="bo_descr">'._BL('Currently no GPS coordinates available!').'</span>';
+
+		if ($nogps_last_time)
+		{
+			echo '<li><span class="bo_descr">'._BL('Last time without GPS').': </span><span class="bo_value">'.date(_BL('_datetime'), $nogps_last_time).'</span>';
+		}
+
+			
 		echo '</ul>';
 
 

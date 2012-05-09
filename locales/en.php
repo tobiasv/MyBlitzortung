@@ -727,7 +727,7 @@ $_BL['en']['bo_stat_longtime_descr'] = 'All information here is updated since be
 $_BL['en']['bo_stat_other_database_descr'] = 'All strike, signal and station data is saved in a local database on this page:';
 $_BL['en']['bo_stat_other_updates_descr'] = 'New data is collected from blitzortung.org in defined time intervals:';
 $_BL['en']['bo_stat_other_gps_descr'] = 'Some information about the GPS receiver, which is used for receiving the exact time an position. If known, the antenna bearings are also displayed (red, green).';
-$_BL['en']['bo_stat_station_descr_lasth'] = 'All information applies to the time range 60 minutes before the last update.';
+$_BL['en']['bo_stat_station_descr_lasth'] = 'Here you can find statistics of the TOA lightning detection station {STATION_CITY}.';
 $_BL['en']['bo_graph_descr_radi'] = 'Overview about the own locating ratio over distance from stations. Whole strike count over distance is also visible.';
 $_BL['en']['bo_graph_descr_strikes'] = 'Here you can see the whole strike count per hours detected by the lightning network, the count of detected strikes/h of the station {STATION_CITY} and the mean strike count for all stations';
 $_BL['en']['bo_graph_descr_signals'] = 'The count of received signals per hour of the station {STATION_CITY} and also mean value of all stations.';
@@ -1061,6 +1061,6 @@ $_BL['en']['tile_zoom_not_allowed'] = 'Zoom level\nnot allowed here!';
 $_BL['en']['tile_station_not_allowed'] = 'Station selection\nnot allowed!';
 $_BL['en']['tile_station_not_allowed'] = 'Cell tracks disabled!';
 $_BL['en']['Last time without GPS'] = 'Last time without GPS';
-
+$_BL['en']['h4_stat_station_general'] = 'General statistics of the last hour';
 
 ?>
