@@ -691,7 +691,7 @@ Vous devez construire votre propre récepteur,et ainsi participer au réseau et ob
 Plus d\'information ici:
 <a href="http://www.blitzortung.org/Webpages/index.php?lang=fr&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>.
 et ici:
-<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a>
+<a href="http://www.blitzortung.fr" target="_blank">Forum Blitzortung en français</a>
 ';
 
 $_BL['fr']['info_usage_text'] = '
@@ -1057,7 +1057,9 @@ $_BL['fr']['min.'] = 'min.';
 $_BL['fr']['Select station'] = 'Choisir une station';
 $_BL['fr']['Show only region'] = 'Montrer une région';
 $_BL['fr']['Exclude region'] = 'Exclure une région';
-
+$_BL['fr']['h4_stat_station_general'] = 'Information sur la station';
+$_BL['fr']['Tracker'] = 'Version logiciel tracker';
+$_BL['fr']['Status'] = 'Etat';
 
 
 /********************/
@@ -1073,8 +1075,7 @@ $_BL['fr']['graph_stat_title_strikes_station_residual_time'] = '';
 $_BL['fr']['arch_select_dates_between'] = '';
 $_BL['fr']['tile_zoom_not_allowed'] = '';
 $_BL['fr']['graph_stat_title_signals_all'] = '';
+$_BL['fr']['Vendée'] = '';
+$_BL['fr']['map_autoupdate_stalled_msg'] = '';
 
-
-
-
-
+?>
