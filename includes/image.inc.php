@@ -5,7 +5,8 @@
 // returns png-image for map-marker
 function bo_icon($icon)
 {
-	$c = intval($_GET['size']) < 20 ? intval($_GET['size']) : 3;
+	$c = intval($_GET['size']) < 20 ? intval($_GET['size']) : 0;
+	$c = $c > 0 ? $c : 3;
 	
 	$dir = BO_DIR."cache/icons/";
 	$file = $dir.$icon.'_'.$c.'.png';
