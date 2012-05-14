@@ -1,9 +1,9 @@
 #
-# Status config file for MyBlitzortung
+# Example status config file for MyBlitzortung
 #
 # Enable with:
 #    define("BO_ENABLE_STATUS_FILES", true);
-# in config.php
+# in config.php and rename this file to status.cfg!
 #
 #
 # Format of this config-file:
