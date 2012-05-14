@@ -1617,8 +1617,15 @@ function bo_update_stations($force = false)
 				$activebyuser[$stUser] = array('id' => $stId, 'sig' => $stSignals, 'lat' => $stLat, 'lon' => $stLon);
 
 			//mark Offline?
-			if ($stStatus != '-' && time() - $stTimeU > (double)BO_STATION_OFFLINE_MINUTES * 60)
+			if ($stStatus != '-' && 
+					(  
+						   time() - $stTimeU > (double)BO_STATION_OFFLINE_MINUTES * 60
+						|| $stTimeU - time() > 3600 * 24
+					)
+				)
+			{
 				$stStatus = 'O';  //Special offline status
+			}
 
 			//Data for statistics
 			$StData[$stId] = array('time' => $stTimeU, 'lat' => $stLat, 'lon' => $stLon);
