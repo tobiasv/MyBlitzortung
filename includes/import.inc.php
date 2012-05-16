@@ -745,6 +745,12 @@ function bo_update_strikes($force = false)
 		{
 			if ($code == 304) //wasn't modified
 			{
+				if ($last_modified > 0 && time() - $last_modified > 3600 * 2)
+				{
+					bo_echod("Last modified time too old (Blitzortung.org down?). Setting modified to now!");
+					bo_set_conf('uptime_strikes_modified', time());
+				}
+				
 				bo_set_conf('uptime_strikes', time());
 				bo_echod("File not changed since last download (".date('r', $modified).")");
 				return false;
@@ -1528,7 +1534,8 @@ function bo_update_stations($force = false)
 		$time = time();
 
 		//send a last modified header
-		$modified = bo_get_conf('uptime_stations_modified');
+		$last_modified = bo_get_conf('uptime_stations_modified');
+		$modified = $last_modified;
 		$range = 0;
 		$file = bo_get_file(bo_access_url().BO_IMPORT_PATH_STATIONS, $code, 'stations', $range, $modified);
 
@@ -1536,6 +1543,12 @@ function bo_update_stations($force = false)
 		//wasn't modified
 		if ($code == 304)
 		{
+			if ($last_modified > 0 && time() - $last_modified > 3600 * 2)
+			{
+				bo_echod("Last modified time too old (Blitzortung.org down?). Setting modified to now!");
+				bo_set_conf('uptime_strikes_modified', time());
+			}
+
 			bo_set_conf('uptime_stations', time());
 			bo_echod("File not changed since last download (".date('r', $modified).")");
 			return false;
