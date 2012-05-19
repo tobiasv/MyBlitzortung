@@ -833,6 +833,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$whole_sig_ratio_cnt 	= 0;
 	$whole_strike_ratio 	= 0;
 	$whole_strike_ratio_cnt = 0;
+	$active_stations        = 0;
 	$under_construction     = array();
 
 	if (intval(BO_STATISTICS_NETWORK_RANGES))
@@ -881,6 +882,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 						 DATE_FORMAT(time, '%Y%m%d%H') h
 					FROM ".BO_DB_PREF."stations_stat
 					WHERE time BETWEEN '$table_time_start' AND '$table_time_end'
+							AND station_id != 0
 					GROUP BY station_id, h";
 	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
@@ -888,7 +890,8 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		$D[$row['station_id']]['strikesh'] += $row['strikesh'];
 		$D[$row['station_id']]['signalsh'] += $row['signalsh'];
 	}
-
+	$active_stations = count($D);
+	
 
 	// currently available stations
 	$sql = "SELECT COUNT(*) cnt
@@ -1082,7 +1085,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo $whole_strike_ratio ? number_format($whole_strike_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
 	echo '</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.number_format($whole_sig_count, 0, _BL('.'), _BL(',')).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format(count($D), 0, _BL('.'), _BL(',')).' ('.number_format($stations_nogps, 0, _BL('.'), _BL(',')).' '._BL('w/o GPS-signal').')</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format($active_stations, 0, _BL('.'), _BL(',')).' ('.number_format($stations_nogps, 0, _BL('.'), _BL(',')).' '._BL('w/o GPS-signal').')</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span></li>';
 
 	if (intval(BO_STATISTICS_SHOW_STATIONS_UNDER_CONSTR))
