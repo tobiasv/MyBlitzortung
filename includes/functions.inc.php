@@ -1403,7 +1403,9 @@ function bo_raw2array($raw = false, $calc_spec = false, $channels = -1, $ntime =
 	$bpv      =  $bpv > 0      ? $bpv      : $std_bpv;
 	$utime    = ($ntime > 0	  ? $ntime    : $std_ntime) / 1000;
 
-
+	if (!$bpv)
+		$bpv = 8;
+		
 	if ($channels <= 0 || $bpv <= 0 || $utime <= 0)
 		return false;
 
