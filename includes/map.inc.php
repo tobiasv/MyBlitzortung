@@ -656,7 +656,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	$mapcfg[-1]['id'] = -1;
 	
 	echo ' <input type="submit" value="'._BL('more').' &dArr;" onclick="return bo_map_show_more();" id="bo_map_more">';
-	echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_reload_overlays(); return false;" id="bo_map_reload">';
+	echo ' <input type="submit" value="'._BL('update map').'" onclick="bo_map_update(); return false;" id="bo_map_reload">';
 
 	if (intval(BO_MAP_AUTOUPDATE))
 	{
@@ -1343,6 +1343,12 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		}
 		
 		
+	}
+	
+	function bo_map_update()
+	{
+		bo_map_reload_overlays();
+		bo_map_user_activity();
 	}
 	
 	function bo_map_toggle_overlay(checked, type)

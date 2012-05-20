@@ -3205,7 +3205,7 @@ function bo_download_external($force = false)
 					continue;
 				}
 				
-				$kbytes = round(strlen($file_content)) / 1024;
+				$kbytes = round(strlen($file_content) / 1024, 1);
 				
 				bo_echod("    -> Success: Saved $kbytes kB");
 			}
