@@ -1443,16 +1443,18 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 
 			}
 
-			echo '<li>';
-			echo '<span class="bo_descr">';
-			echo _BL('Distance').': ';
-			echo '</span>';
-			echo '<span class="bo_value">';
-			echo number_format($row['distance'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
-			echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
-			echo '</span>';
-			echo '</li>';
-
+			if ($own_station || $station_id > 0)
+			{
+				echo '<li>';
+				echo '<span class="bo_descr">';
+				echo _BL('Distance').': ';
+				echo '</span>';
+				echo '<span class="bo_value">';
+				echo number_format($row['distance'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
+				echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
+				echo '</span>';
+				echo '</li>';
+			}
 			
 			echo '<li>';
 			echo '<span class="bo_descr">';
@@ -1822,7 +1824,7 @@ function bo_archive_select_map(&$map)
 		if ($map < 0)
 			$map = $id;
 		
-		if ($map == $id)
+		if ((string)$id === (string)$map)
 			$map_ok = true;
 	}
 	$ret .= '</select></span> ';

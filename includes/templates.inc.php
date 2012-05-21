@@ -527,9 +527,9 @@ $_BO['tpl_imgmap']['usa_big']['point_style'] = array(2, 2, 'f008', 0);
 
 
 
-//Oceania (mini) - with stations
+//North America (mini) - with stations
 $_BO['tpl_imgmap']['namerica_mini_stations'] = $_BO['tpl_imgmap_stations_mini'];
-$_BO['tpl_imgmap']['namerica_mini_stations']['name'] = 'Oceania stations (mini)';
+$_BO['tpl_imgmap']['namerica_mini_stations']['name'] = 'North America stations (mini)';
 $_BO['tpl_imgmap']['namerica_mini_stations']['file'] = 'maps_namerica/map_namerica_mini_dark.png';
 $_BO['tpl_imgmap']['namerica_mini_stations']['coord'] = array(57, -55, 8, -135); //North, East, South, West (Degrees)
 
