@@ -846,7 +846,7 @@ function bo_get_map_image_ani()
 
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);	
 	$dir = BO_DIR.'cache/maps/';
-	$id = intval($_GET['animation']);
+	$id = $_GET['animation'];
 	$cfg = $_BO['mapimg'][$id];
 	
 	if (!is_array($cfg) || empty($cfg))
