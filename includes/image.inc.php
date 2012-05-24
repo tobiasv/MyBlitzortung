@@ -545,6 +545,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	$time_range  = $time_max - $time_min + 59;
 	$color_intvl = count($cfg['col']) > 0 ? $time_range / count($cfg['col']) : 1;
 	
+	$count = array();
 	
 	//get the strikes
 	if (!$blank)

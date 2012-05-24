@@ -33,6 +33,8 @@ switch(BO_REGION)
 
 		/***************** EUROPE *****************/
 
+		
+		/*** Maps ***/
 		if (!isset($_BO['mapimg'][0]))
 			$_BO['mapimg'][0] = $_BO['tpl_imgmap']['europe'];
 
@@ -77,6 +79,7 @@ switch(BO_REGION)
 	
 		/***************** OCEANIA *****************/
 	
+		/*** Maps ***/
 		if (!isset($_BO['mapimg']['oceania']))
 			$_BO['mapimg']['oceania'] = $_BO['tpl_imgmap']['oceania'];
 
@@ -93,12 +96,25 @@ switch(BO_REGION)
 		
 		/***************** NORTH AMERICA *****************/
 
+		
+		/*** Maps ***/
 		if (!isset($_BO['mapimg']['usa']))
 			$_BO['mapimg']['usa'] = $_BO['tpl_imgmap']['usa'];
 
 		if (!isset($_BO['mapimg']['stations_mini']))
 			$_BO['mapimg']['stations_mini'] = $_BO['tpl_imgmap']['namerica_mini_stations'];		
+
+		if (!isset($_BO['mapimg']['usa_mini']))
+			$_BO['mapimg']['usa_mini'] = $_BO['tpl_imgmap']['usa_mini'];			
 	
+	
+		/*** Densities ***/
+		if (!isset($_BO['density'][0]))
+			$_BO['density'][0] = $_BO['tpl_density']['namerica'];
+
+		if (!isset($_BO['density'][1]))
+			$_BO['density'][1] = $_BO['tpl_density']['usa'];
+
 		break;
 		
 	
