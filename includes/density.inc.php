@@ -407,17 +407,37 @@ function bo_show_archive_density()
 	$start_time = strtotime($row['mindate']);
 	$end_time = strtotime($row['maxdate_end']);
 	
+	if (!$start_time || !$end_time)
+	{
+		$start_time = time();
+		$year = date('Y');
+	}
+	
 	if ($month && $month < date('m', $start_time) && $year == date('Y', $start_time))
 		$month = date('m', $start_time);
 	elseif ($month && $month > date('m', $end_time) && $year == date('Y', $end_time))
 		$month = date('m', $end_time);
+	
+	
 	
 	$row = BoDb::query("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities WHERE status=5")->fetch_assoc();
 	$show_whole_timerange = $row['cnt'] ? true : false;
 	
 	$station_infos = bo_stations('id', '', false);
 	$station_infos[0]['city'] = _BL('All', false);
+
 	$stations = bo_get_density_stations();
+	$stations_text = array();
+	
+	foreach ($stations as $id )
+	{
+		if ($id >= 0 && $station_infos[$id]['city'] && $station_infos[$id]['country'])
+		{
+			$stations_text[$id] = _BL($station_infos[$id]['country']).': '._BC($station_infos[$id]['city']);
+		}
+	}
+	
+	asort($stations_text);
 	
 	
 	echo '<div id="bo_dens_maps">';
@@ -461,19 +481,18 @@ function bo_show_archive_density()
 	echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
 	echo '<select name="bo_station_id" id="bo_arch_dens_select_station" onchange="submit();">';
 	echo '<option></option>';
-	foreach ($stations as $id )
+		
+	foreach ($stations_text as $id => $text)
 	{
-		if ($id >= 0 && $station_infos[$id]['city'] && $station_infos[$id]['country'])
-		{
-			echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>';
-			echo _BC($station_infos[$id]['city']).($id ? ' ('._BL($station_infos[$id]['country']).')' : '');
-			echo '</option>';
-		}
+		echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>';
+		echo $text;
+		echo '</option>';
 	}
+
 	echo '</select>';
 	echo '<input type="submit" value="'._BL('Ok').'" id="bo_archive_density_submit" class="bo_form_submit">';
 	
-	if ($year > 0)
+	if ($year > 0 && $end_time > 0)
 	{
 		echo '<div id="bo_archive_density_yearmonth_container">';
 		echo ' <a href="'.bo_insert_url(array('bo_year', 'bo_month'), $year).'#bo_arch_strikes_form" class="bo_archive_density_yearurl';
@@ -1397,17 +1416,17 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 
 		
 		//current month and year to yesterday
-		if (defined('BO_CALC_DENSITIES_CURRENT') && BO_CALC_DENSITIES_CURRENT && gmdate('d') != 1)
+		if (gmdate('d') != 1)
 		{
 			$end_time = gmmktime(0,0,0,gmdate('m'),gmdate('d'),gmdate('Y'))-1;
 			
 			if (gmdate('t', $end_time) != gmdate('d', $end_time))
 			{
 				//current month to yesterday
-				$ranges[] = array(gmmktime(0,0,0,gmdate('m'),1,gmdate('Y')), $end_time, -2 ); //month
+				$ranges[] = array(gmmktime(0,0,0,gmdate('m'),1,gmdate('Y')), $end_time, -2, 'current' => true ); //month
 				
 				//current year to yesterday
-				$ranges[] = array(gmmktime(0,0,0,1,1,gmdate('Y')),           $end_time, -3 ); //year
+				$ranges[] = array(gmmktime(0,0,0,1,1,gmdate('Y')),           $end_time, -3, 'current' => true ); //year
 			}
 			
 			
@@ -1449,6 +1468,8 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 		$date_start = gmdate('Y-m-d', $r[0]);
 		$date_end   = gmdate('Y-m-d', $r[1]);
 		$status     = intval($r[2]);
+		$is_current = $r['current'] == true;
+		
 		$new = false;
 
 		if ($r[0] >= $r[1])
@@ -1475,19 +1496,26 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 				
 				foreach($stations as $station_id)
 				{
-					$sql = "INSERT IGNORE INTO ".BO_DB_PREF."densities 
-							SET date_start='$date_start', date_end='$date_end', 
-							type='$type_id', station_id='$station_id', status=$status,
-							lat_min='$lat_min',lon_min='$lon_min',
-							lat_max='$lat_max',lon_max='$lon_max',
-							length='$length', info='', data=''
-							";
-					if (BoDb::query($sql))
-					{
-						$count++;
-						$new = true;
-					}
 					
+					if (!$is_current 
+						|| (BO_CALC_DENSITIES_CURRENT == true && $station_id == bo_station_id())
+						|| (BO_CALC_DENSITIES_CURRENT_ALL == true))
+					{
+						
+						$sql = "INSERT IGNORE INTO ".BO_DB_PREF."densities 
+								SET date_start='$date_start', date_end='$date_end', 
+								type='$type_id', station_id='$station_id', status=$status,
+								lat_min='$lat_min',lon_min='$lon_min',
+								lat_max='$lat_max',lon_max='$lon_max',
+								length='$length', info='', data=''
+								";
+						if (BoDb::query($sql))
+						{
+							$count++;
+							$new = true;
+						}
+						
+					}
 				}
 			}
 		}
