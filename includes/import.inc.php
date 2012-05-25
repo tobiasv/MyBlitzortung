@@ -1271,7 +1271,7 @@ function bo_update_strikes($force = false)
 			{
 				$row = BoDb::query("SELECT MIN(users) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*$min_hours)."'")->fetch_assoc();
 
-				if ($row['minusers'] >= 4)
+				if ($row['minusers'] >= 3)
 				{
 					//reset counter if last value differs from new value
 					if ($tmp['last'] != $row['minusers'])
@@ -1294,7 +1294,7 @@ function bo_update_strikes($force = false)
 		}
 
 		//Maximum Participants
-		if (intval(BO_FIND_MAX_PARTICIPANTS_HOURS) && $max_participants >= 4)
+		if (intval(BO_FIND_MAX_PARTICIPANTS_HOURS) && $max_participants >= 3)
 		{
 			$tmp = unserialize(bo_get_conf('bo_participants_locating_max'));
 			$tmp['value_last'] = max($tmp['value_last'], $max_participants);

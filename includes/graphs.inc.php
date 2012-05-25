@@ -616,7 +616,7 @@ function bo_graph_statistics()
 			}
 		}
 
-		$caption  = (array_sum($Y) + array_sum($Y2)).' '._BL('total strikes');
+		$caption  = array_sum($Y3).' '._BL('total strikes');
 
 		if (bo_station_id() > 0 && !$station_id)
 		{
@@ -645,11 +645,19 @@ function bo_graph_statistics()
 		$own = unserialize(bo_get_conf('longtime_dist_own'.$add));
 		$all = unserialize(bo_get_conf('longtime_dist'.$add));
 
+		$sum_all = 0;
+		$sum_own = 0;
+		
 		if (is_array($own) && is_array($all))
 		{
 			foreach($own as $dist => $cnt)
 			{
-				if ($cnt < 3 || !is_numeric($dist)) //don't display ratios with low strike counts
+				if (!is_numeric($dist))
+					continue;
+					
+				$sum_own += $cnt;
+				
+				if ($cnt < 3) //don't display ratios with low strike counts
 					continue;
 
 				$X[$dist] = $dist * 10;
@@ -668,6 +676,7 @@ function bo_graph_statistics()
 				{
 					$Y2[$dist] = $cnt;
 					$max_dist = max($max_dist, $dist);
+					$sum_all += $cnt;
 				}
 			}
 
@@ -688,6 +697,10 @@ function bo_graph_statistics()
 
 			}
 
+			$caption  = $sum_all.' '._BL('total strikes');
+			$caption .= "\n";
+			$caption .= $sum_own.' '._BL('total strikes station');
+			
 		}
 
 		$graph_type = 'textlin';
@@ -698,6 +711,9 @@ function bo_graph_statistics()
 		else
 			$add_title = ' '._BL('since begin of data logging');
 
+			
+		
+			
 		$ymin = 0;
 		$ymax = 100;
 	}
@@ -832,6 +848,9 @@ function bo_graph_statistics()
 		if ($type == 'ratio_bearing')
 			$ticks = 360 / $bear_div;
 
+		$sum_all= 0;
+		$sum_own= 0;
+			
 		for($i=0;$i<$ticks;$i++)
 		{
 			if ($type == 'ratio_bearing')
@@ -857,6 +876,9 @@ function bo_graph_statistics()
 				$Y[$i] = 0;
 
 			$Y2[$i] = intval($tmp[0][$i]+$tmp[1][$i]);
+			
+			$sum_all += ($tmp[0][$i]+$tmp[1][$i]);
+			$sum_own += $tmp[1][$i];
 		}
 
 		$graph_type = 'textlin';
@@ -867,6 +889,11 @@ function bo_graph_statistics()
 			$tickMajPositions[] = $i;
 		}
 
+		$caption  = $sum_all.' '._BL('total strikes');
+		$caption .= "\n";
+		$caption .= $sum_own.' '._BL('total strikes station');
+
+		
 		$ymin = 0;
 		$ymax = 100;
 	}
@@ -930,7 +957,9 @@ function bo_graph_statistics()
 		{
 			case 'participants':
 				$groupby = "s.users";
-				$xmin = bo_participants_locating_min();
+				$part_min = bo_participants_locating_min();
+				$part_max = bo_participants_locating_max();
+				$xmin = $part_min;
 				$is_logarithmic = BO_GRAPH_STAT_PARTICIPANTS_LOG === true;
 				break;
 
@@ -992,11 +1021,6 @@ function bo_graph_statistics()
 			$Y[$i] = intval($tmp['own'][$i]);
 			$Y2[$i] = intval($tmp['all'][$i]);
 
-			if ($is_logarithmic)
-			{
-				$Y[$i] = $Y[$i] ? $Y[$i] + 0.1 : $Y[$i];
-				$Y2[$i] = $Y2[$i] ? $Y2[$i] + 0.1 : $Y2[$i];
-			}
 
 			if ($Y[$i] + $Y2[$i])
 				$Y3[$i] = $Y[$i] / ($Y[$i] + $Y2[$i]) * 100;
@@ -1018,6 +1042,51 @@ function bo_graph_statistics()
 			$graph_type = 'linlin';
 		}
 
+		$total = array_sum($Y) + array_sum($Y2);
+		$caption  = ($total).' '._BL('total strikes');
+		$caption .= '      '.array_sum($Y).' '._BL('strikes_station2');
+
+		if ($total > 0)
+			$caption .= '      '._BL('mean ratio').': '.round(array_sum($Y)/$total*100).'%'."\n";
+		
+		if ($type == 'participants')
+		{
+			$caption .= strtr(_BL('station strikes with MIN participants'), array('{MIN}' => $part_min, '{MAX}' => $part_max)).': ';
+			$caption .= intval($Y[$part_min]);
+			
+			if ($total > 0)
+			{
+				$caption .= '      '._BL('ratio of all strikes is').': ';
+				$caption .= number_format($Y[$part_min] / $total*100, 1, _BL('.'), _BL(',')).'%';
+			}
+			$caption .= "\n";
+			
+			
+			$sum_minmax = 0;
+			for ($i=$part_min; $i<= $part_max; $i++)
+				$sum_minmax += $Y[$i];
+			
+			$caption .= strtr(_BL('station strikes with MIN-MAX participants'), array('{MIN}' => $part_min, '{MAX}' => $part_max)).': ';
+			$caption .= intval($sum_minmax);
+			
+			if ($total > 0)
+			{
+				$caption .= '      '._BL('ratio of all strikes is').': ';
+				$caption .= number_format($sum_minmax / $total*100, 1, _BL('.'), _BL(',')).'%';
+			}
+			$caption .= "\n";
+		}
+		
+		// to see value 1; after caption!
+		if ($is_logarithmic)
+		{
+			for($i=0;$i<$xmax;$i++)
+			{
+				$Y[$i] = $Y[$i] == 1 ? $Y[$i] + 0.1 : $Y[$i];
+				$Y2[$i] = $Y2[$i] == 1? $Y2[$i] + 0.1 : $Y2[$i];
+			}
+		}
+		
 		$tickLabels[] = '';
 	}
 	else if ($type == 'participants_time' || $type == 'deviations_time')
@@ -2361,7 +2430,7 @@ function bo_graph_statistics()
 				$plot->SetFillColor(BO_GRAPH_STAT_PARTICIPANTS_COLOR_F3);
 			$plot->SetWeight(BO_GRAPH_STAT_PARTICIPANTS_WIDTH2);
 			$plot->SetLegend(_BL('graph_legend_participants_ratio'));
-			$graph->SetYScale(0,'lin', 0, 110);
+			$graph->SetYScale(0,'lin', 0, 130);
 			$graph->AddY(0,$plot);
 
 			$graph->yaxis->title->Set(_BL('Count'));
@@ -2397,7 +2466,7 @@ function bo_graph_statistics()
 				$plot->SetFillColor(BO_GRAPH_STAT_DEVIATIONS_COLOR_F3);
 			$plot->SetWeight(BO_GRAPH_STAT_DEVIATIONS_WIDTH2);
 			$plot->SetLegend(_BL('graph_legend_deviations_ratio'));
-			$graph->SetYScale(0,'lin', 0, 110);
+			$graph->SetYScale(0,'lin', 0, 120);
 			$graph->AddY(0,$plot);
 
 			$graph->yaxis->title->Set(_BL('Count'));
@@ -2826,7 +2895,7 @@ function bo_graph_output($I, $cache_file, $mod_time = 0)
 }
 
 
-function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend = array(), $sub = '', $dseg = 22.5, $title = '', $antennas = false)
+function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend = array(), $sub = '', $dseg = 22.5, $title = '', $antennas = false, $caption = '')
 {
 
 	$pcircle = 0.85; // Anteil, welcher der Kreis im Bild einnimmt

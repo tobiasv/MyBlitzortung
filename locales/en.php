@@ -237,7 +237,7 @@ $_BL['en']['Thunder cells'] = 'Thunder cells';
 $_BL['en']['Id'] = 'Id';
 
 $_BL['en']['Strike count per minute'] = 'Strike count per minute';
-$_BL['en']['total strikes station2'] = 'Total strikes station {STATION_CITY}';
+$_BL['en']['total strikes station2'] = 'total strikes station {STATION_CITY}';
 $_BL['en']['time_year_month'] = 'Year an month';
 $_BL['en']['stat_advanced_show_strike_ratios'] = 'Ratios';
 $_BL['en']['With strikes connected'] = 'With strikes connected';
@@ -981,6 +981,7 @@ $_BL['en']['Russia'] = 'Russia';
 $_BL['en']['Romania'] = 'Romania';
 $_BL['en']['Rome'] = 'Rome';
 $_BL['en']['Lithuania'] = 'Lithuania';
+$_BL['en']['Ireland'] = 'Ireland';
 
 //Europe: Regions
 $_BL['en']['Europe'] = 'Europe';
@@ -1062,5 +1063,11 @@ $_BL['en']['tile_station_not_allowed'] = 'Station selection\nnot allowed!';
 $_BL['en']['tile_station_not_allowed'] = 'Cell tracks disabled!';
 $_BL['en']['Last time without GPS'] = 'Last time without GPS';
 $_BL['en']['h4_stat_station_general'] = 'General statistics of the last hour';
+
+$_BL['en']['station strikes with MIN participants'] = 'Strikes {STATION_CITY} with {MIN} participants';
+$_BL['en']['station strikes with MIN-MAX participants'] = 'Strikes {STATION_CITY} with {MIN}-{MAX} participants';
+$_BL['en']['strikes_station2'] = '{STATION_CITY}';
+$_BL['en']['mean ratio'] = 'mean ratio';
+$_BL['en']['ratio of all strikes is'] = 'ratio of all strikes is';
 
 ?>

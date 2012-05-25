@@ -1025,6 +1025,7 @@ $_BL['de']['Romania'] = 'Rumänien';
 $_BL['de']['Rome'] = 'Rom';
 $_BL['de']['Lithuania'] = 'Litauen';
 $_BL['de']['Slovenia'] = 'Slovenien';
+$_BL['en']['Ireland'] = 'Irland';
 
 //Europe: Regions
 $_BL['de']['Europe'] = 'Europa';
@@ -1122,6 +1123,11 @@ $_BL['de']['tile_station_not_allowed'] = 'Zugrichtungen sind deaktiviert!';
 $_BL['de']['Last time without GPS'] = 'GPS-Signal zuletzt verloren';
 $_BL['de']['h4_stat_station_general'] = 'Allgemeine Statistiken der letzten Stunde';
 
+$_BL['de']['station strikes with MIN participants'] = 'Blitze {STATION_CITY} mit {MIN} Teilnehmern';
+$_BL['de']['station strikes with MIN-MAX participants'] = 'Blitze {STATION_CITY} mit {MIN}-{MAX} Teilnehmern';
+$_BL['de']['strikes_station2'] = '{STATION_CITY}';
+$_BL['de']['mean ratio'] = 'Mittlere Quote';
+$_BL['de']['ratio of all strikes is'] = 'Quote alle Blitze';
 
 
 ?>

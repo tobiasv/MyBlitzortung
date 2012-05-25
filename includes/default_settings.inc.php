@@ -1109,7 +1109,7 @@
 
 //Min and max count of participants - values are only used if
 //automatic getting from participants.txt failed
-@define('BO_MIN_PARTICIPANTS', 8);
+@define('BO_MIN_PARTICIPANTS', 6);
 @define('BO_MAX_PARTICIPANTS', 12);
 
 //max. signal level
