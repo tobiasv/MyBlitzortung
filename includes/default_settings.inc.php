@@ -686,6 +686,30 @@
 @define('BO_ALERT_SEND_INTERVAL', 45);
 
 
+/*******************************************************************/
+/*** E-Mail settings                                             ***/
+
+
+//From header
+//Example: "MyBlitzortung <mail@example.com>"
+@define('BO_EMAIL_FROM', "");
+
+
+//additional email headers
+@define('BO_EMAIL_HEADERS', "");
+
+
+//use SMTP
+// You have to upload phpmailer-files into "includes/phpmailer"
+// URL: http://code.google.com/a/apache-extras.org/p/phpmailer/
+@define('BO_EMAIL_SMTP', false);
+
+//SMTP settings
+@define('BO_EMAIL_SMTP_SERVER', '');
+@define('BO_EMAIL_SMTP_PORT',   25); //or use 587
+@define('BO_EMAIL_SMTP_USERNAME', '');
+@define('BO_EMAIL_SMTP_PASSWORD', '');
+
 
 
 

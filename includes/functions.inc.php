@@ -1759,11 +1759,87 @@ function bo_owner_mail($subject, $text)
 
 	if ($mail)
 	{
-		$ret = mail($mail, $subject, $text, "From: MyBlitzortung");
-		echo '<p>Sent E-Mail to '.$mail.':</p><p>'.$subject.'</p><pre>'.$text.'</pre>';
+		$ret = bo_mail($mail, $subject, $text);
 	}
 
 	return $ret;
+}
+
+
+function bo_mail($mail, $subject = '', $text = '', $headers = '', $from = '')
+{
+	if (!trim($from))
+	{
+		if (BO_EMAIL_FROM)
+		{
+			$from = BO_EMAIL_FROM;
+		}
+		else
+		{
+			//create a pseudo address
+			$from = _BL('MyBlitzortung_notags').' <noreply@'.$_SERVER['HTTP_HOST'].'>';
+		}
+	}
+
+	$from    = trim($from);
+	$headers = trim($headers);
+	$mail    = trim($mail);
+	
+	bo_echod("Sending email to \"$mail\" from \"$from\" with subject \"$subject\"");
+		
+	if (BO_EMAIL_SMTP !== true)
+	{
+		if ($headers && $from)
+			$from = "From: $from\n";
+		elseif ($from)
+			$from = "From: $from";
+		
+		$ok = mail($mail, $subject, $text, $from.$headers);
+	}
+	else
+	{
+		if (preg_match("/^(.*)[ ]+\<(.*)\>/", $from, $r))
+		{
+			$mail_from = $r[2];
+			$mail_from_name = $r[1];
+		}
+		else
+		{
+			$mail_from = $from;
+			$mail_from_name = '';
+		}
+		
+		require_once('phpmailer/class.phpmailer.php');
+
+		$PHPMailer = new PHPMailer();
+		$PHPMailer->IsSMTP();
+		$PHPMailer->Host       = BO_EMAIL_SMTP_SERVER;
+		$PHPMailer->Port       = BO_EMAIL_SMTP_PORT;
+		$PHPMailer->Subject    = $subject;
+		$PHPMailer->Body       = $text;
+		//$PHPMailer->SMTPDebug  = 2; 
+		
+		$PHPMailer->SetFrom($mail_from, $mail_from_name);
+		$PHPMailer->AddAddress($mail);
+		
+		
+		if (BO_EMAIL_SMTP_USERNAME && BO_EMAIL_SMTP_PASSWORD)
+		{
+			$PHPMailer->SMTPAuth   = true;
+			$PHPMailer->Username   = BO_EMAIL_SMTP_USERNAME;
+			$PHPMailer->Password   = BO_EMAIL_SMTP_PASSWORD;
+		}
+
+		$ok = $PHPMailer->Send();
+
+	}
+	
+	if ($ok)
+		bo_echod("Mail successfully sent.");
+	else
+		bo_echod("ERROR sending mail!");
+	
+	return $ok;
 }
 
 function bo_output_kml()
