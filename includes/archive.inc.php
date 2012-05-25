@@ -602,7 +602,7 @@ function bo_show_archive_search()
 
 			$description  = '<div class=\'bo_archiv_map_infowindow\'>';
 			$description .= '<ul class=\'bo_archiv_map_infowindow_list\'>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Time').':</span><span class=\'bo_value\'> '.date(_BL('_datetime'), $time).'.'.$row['time_ns'].'</span></li>';
+			$description .= '<li><span class=\'bo_descr\'>'._BL('Time').':</span><span class=\'bo_value\'> '.date(_BL('_datetime'), $time).'.'.$row['time_ns'].' '._BL(date('T')).'</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Deviation').':</span><span class=\'bo_value\'> '.number_format($row['deviation'] / 1000, 1, _BL('.'), _BL(',')).'km</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Current').':</span><span class=\'bo_value\'> '.number_format($row['current'], 1, _BL('.'), _BL(',')).'kA ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Polarity').':</span><span class=\'bo_value\'> '.($row['polarity'] === null ? '?' : ($row['polarity'] < 0 ? _BL('negative') : _BL('positive'))).' ('._BL('experimental').')</span></li>';
@@ -646,10 +646,10 @@ function bo_show_archive_search()
 			echo '<li><span class="bo_descr">'._BL('Time range').': </span> ';
 			
 			if ($utime_from)
-				echo _BL('time_from').' '.date(_BL('_datetime'), $utime_from).' ';
+				echo _BL('time_from').' '.date(_BL('_datetime'), $utime_from).' '._BL(date('T')).' ';
 				
 			if ($utime_to)
-				echo _BL('time_to').' '.date(_BL('_datetime'), $utime_to);
+				echo _BL('time_to').' '.date(_BL('_datetime'), $utime_to)._BL(date('T'));
 			
 			echo '</li>';
 		}
@@ -670,8 +670,8 @@ function bo_show_archive_search()
 			echo '</span>';
 			echo '</li>';
 
-			echo '<li><span class="bo_descr">'._BL('Oldest').':</span><span class="bo_value"> '.date(_BL('_datetime'), $time_min).'</value></li>';
-			echo '<li><span class="bo_descr">'._BL('Newest').':</span><span class="bo_value"> '.date(_BL('_datetime'), $time_max).'</value></li>';
+			echo '<li><span class="bo_descr">'._BL('Oldest').':</span><span class="bo_value"> '.date(_BL('_datetime'), $time_min).' '._BL(date('T')).'</value></li>';
+			echo '<li><span class="bo_descr">'._BL('Newest').':</span><span class="bo_value"> '.date(_BL('_datetime'), $time_max).' '._BL(date('T')).'</value></li>';
 		}
 		else
 		{
@@ -1326,9 +1326,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '<span class="bo_value">';
 
 		if ($show_empty_sig)
-			$ttime = date(_BL('_datetime'), $stime).'.'.sprintf('%09d', $row['stimens']);
+			$ttime = date(_BL('_datetime'), $stime).'.'.sprintf('%09d', $row['stimens']).' '._BL(date('T'));
 		else
-			$ttime = date(_BL('_datetime'), $rtime).'.'.sprintf('%09d', $row['rtimens']);
+			$ttime = date(_BL('_datetime'), $rtime).'.'.sprintf('%09d', $row['rtimens']).' '._BL(date('T'));
 
 		if (!$strike_id && $perm && $row['strike_id'])
 		{

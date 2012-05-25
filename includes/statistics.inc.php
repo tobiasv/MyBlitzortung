@@ -247,7 +247,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
 
 	echo '<li><span class="bo_descr">'._BL('Last detected strike').': </span>';
-	echo '<span class="bo_value">'.($last_strike ? date(_BL('_datetime'), $last_strike) : '?').'</span></li>';
+	echo '<span class="bo_value">'.($last_strike ? date(_BL('_datetime'), $last_strike).' '._BL(date('T')) : '?').'</span></li>';
 
 	echo '<li><span class="bo_descr">'._BL('Current strike rate').': </span>';
 	echo '<span class="bo_value">';
@@ -456,7 +456,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(','))." ".(0 && $last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Last detected strike').': </span>';
 	echo '<span class="bo_value">';
-	echo $last_strike ? date(_BL('_datetime'), $last_strike) : _BL('no_strike_yet');
+	echo $last_strike ? date(_BL('_datetime'), $last_strike).' '._BL(date('T')) : _BL('no_strike_yet');
 	echo '</span>';
 	echo '</li>';
 
@@ -499,7 +499,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	}
 	elseif ($last_signal)
 	{
-		echo '<li><span class="bo_descr">'._BL('Last signal').': </span><span class="bo_value">'.date(_BL('_datetime'), $last_signal).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Last signal').': </span><span class="bo_value">'.date(_BL('_datetime'), $last_signal).' '._BL(date('T')).'</span>';
 	}
 
 	echo '<li><span class="bo_descr">'._BL('Tracker').': </span><span class="bo_value">'._BC($stInfo['tracker']).'</span>';
@@ -547,7 +547,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			{
 				$lat[] = $d['lat'];
 				$lon[] = $d['lon'];
-				$pos_text[] = date(_BL('_datetime'), $t).' '.
+				$pos_text[] = date(_BL('_datetime'), $t).' '._BL(date('T')).' '.
 								(isset($d['height']) ? _BL('Height').': '.$d['height'].'m' : '').' '.
 								_BL('Status').': '.$d['status'].' '.
 								_BL('Signals/h').': '.$d['sig'].' '.
@@ -669,7 +669,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 		if ($nogps_last_time)
 		{
-			echo '<li><span class="bo_descr">'._BL('Last time without GPS').': </span><span class="bo_value">'.date(_BL('_datetime'), $nogps_last_time).'</span>';
+			echo '<li><span class="bo_descr">'._BL('Last time without GPS').': </span><span class="bo_value">'.date(_BL('_datetime'), $nogps_last_time).' '._BL(date('T')).'</span>';
 		}
 
 			
@@ -1300,7 +1300,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 				echo '</span>';
 				echo '<span class="bo_value">';
-				echo date(_BL('_date'), $d[0]).' '.date('H', $d[0]).' '._BL('oclock');
+				echo date(_BL('_date'), $d[0]).' '.date('H', $d[0]).' '._BL('oclock').' '._BL(date('T'));
 				echo '</span>';
 				$i++;
 
@@ -1515,7 +1515,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	echo '<ul class="bo_stat_overview">';
 
 	if (!$own_station && $first_update_station)
-		echo '<li><span class="bo_descr">'._BL('Record longtime data since').': </span><span class="bo_value">'.date(_BL('_datetime'), $first_update_station).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Record longtime data since').': </span><span class="bo_value">'.date(_BL('_datetime'), $first_update_station).' '._BL(date('T')).'</span>';
 
 	echo '<li><span class="bo_descr">'._BL('Strikes detected').': </span><span class="bo_value">'.number_format($str_own, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Active').': </span><span class="bo_value">'.number_format($active_days, 1, _BL('.'), _BL(',')).' '._BL('days').'</span>';
@@ -1563,7 +1563,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	echo '<h4>'._BL('MyBlitzortung_notags').'</h4>';
 
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('First data').': </span><span class="bo_value">'.date(_BL('_datetime'), $first_update).'</span>';
+	echo '<li><span class="bo_descr">'._BL('First data').': </span><span class="bo_value">'.date(_BL('_datetime'), $first_update).' '._BL(date('T')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Lightning data imports').': </span><span class="bo_value">'.number_format($download_count, 0, _BL('.'), _BL(',')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'.number_format(array_sum($kb_per_day), 0, _BL('.'), _BL(',')).' kB/'._BL('day').'</span>';
 
@@ -1651,12 +1651,12 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'
 				._BL('Last update strikes').': </span><span class="bo_value">'
-					.date(_BL('_datetime'), $last_str)
+					.date(_BL('_datetime'), $last_str).' '._BL(date('T'))
 					.' ('._BL('update every').' '.intval(BO_UP_INTVL_STRIKES).' '._BL('unit_minutes').')'
 				.'</span>';
 	echo '<li><span class="bo_descr">'
 				._BL('Last update stations').': </span><span class="bo_value">'
-					.date(_BL('_datetime'), $last_net)
+					.date(_BL('_datetime'), $last_net).' '._BL(date('T'))
 					.' ('._BL('update every').' '.intval(BO_UP_INTVL_STATIONS).' '._BL('unit_minutes').')'
 				.'</span>';
 
@@ -1664,7 +1664,7 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	{
 		echo '<li><span class="bo_descr">'
 					._BL('Last update signals').': </span><span class="bo_value">'
-						.date(_BL('_datetime'), $last_sig)
+						.date(_BL('_datetime'), $last_sig).' '._BL(date('T'))
 						.' ('._BL('update every').' '.intval(BO_UP_INTVL_RAW).' '._BL('unit_minutes').')'
 						.'</span>';
 	}

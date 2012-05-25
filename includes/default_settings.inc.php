@@ -332,7 +332,7 @@
 
 
 //Pre defined distances for region select box
-@define('BO_DISTANCES_REGION', '10, 25, 50, 100, 200, 500, 1000, 2000');
+@define('BO_DISTANCES_REGION', '10, 25, 50, 100, 200, 300, 400, 500, 750, 1000, 1500, 2000, 3000');
 
 
 //Update "offline hours counter" only if station was online some time before (hours)
