@@ -180,6 +180,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$row = $res->fetch_assoc();
 		$time_min = $time_max = strtotime($row['time'].' UTC');
 		$time_string = date(_BL('_date').' H:i:s', $time_min).'.'.substr($row['time_ns'], 0, 6);
+		$time_string .= ' '._BL(date('T'));
 		
 		$file_by_time = true;
 		$caching = false;
@@ -230,15 +231,18 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$time_string = date(_BL('_date').' ', $time_min);
 		$time_string .= date('H:i', $time_min);
 		
+		
 		if ($time_max > $last_update)
 		{
 			$time_max = $last_update;
 			$time_string .= ' - '.date('H:i', $time_max);
+			$time_string .= ' '._BL(date('T'));
 			$expire = time() + $update_interval / 1.5;
 		}
 		else
 		{
 			$last_update  = $time_max + 3600;
+			$time_string .= ' '._BL(date('T'));
 			$time_string .= ' +'.round($duration / 60).'h';
 			$expire       = time() + 3600;
 		}
@@ -265,6 +269,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		else
 			$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
 
+		$time_string .= ' '._BL(date('T'));
+			
 		if ($period_id)
 			$cache_file .= '_p'.$ranges[$period_id];
 			
