@@ -106,7 +106,7 @@
 @define('BO_SHOW_TIMEZONE', false);
 
 //Use miles
-@define('BO_IMPERIAL', true);
+@define('BO_IMPERIAL', false);
 
 
 /*******************************************************************/
