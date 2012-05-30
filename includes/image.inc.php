@@ -1412,7 +1412,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 					{
 						list($lat, $lon) = bo_distbearing2latlong($r, rad2deg($phi2)+$alpha, $stations[$id1]['lat'], $stations[$id1]['lon']);
 						
-						if ($lon < -170 || $lon > 170 || $lat < -90 || $lat > 90)
+						if ($lon <= -180 || $lon >= 180 || $lat < -90 || $lat > 90)
 							continue;
 		
 						list($x, $y) = $Projection->LatLon2Image($lat, $lon);
@@ -1438,10 +1438,12 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 						foreach($polyline[$i] as $j => $d)
 						{
 							list($x, $y) = $d;
-							imageline($I, $x, $y, $xl, $yl, $pcolor);
 							$in_pic = $x >= 0 && $y >= 0 && $x < $w && $y < $h;
 							
-							if ($in_pic_last === true && !$in_pic)
+							if ($in_pic)
+								imageline($I, $x, $y, $xl, $yl, $pcolor);
+							
+							if ($in_pic_last && !$in_pic)
 								break;
 							
 							$xl = $x;

@@ -570,9 +570,6 @@ function bo_latlon2tile($lat, $lon, $zoom)
 
 function bo_latlon2mercator($lat, $lon)
 {
-	if ($lon > 180)
-		$lon -= 360;
-
 	$lon /= 360;
 	$lat = log(tan(M_PI/4 + deg2rad($lat)/2))/M_PI/2;
 	return array($lon, $lat);
