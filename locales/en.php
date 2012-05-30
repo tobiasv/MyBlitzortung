@@ -57,6 +57,10 @@ $_BL['en']['unit_us_short'] = 'µs';
 $_BL['en']['unit_ksps'] = 'Kilosamples per second';
 $_BL['en']['unit_days'] = 'days';
 $_BL['en']['unit_kilometers'] = 'km';
+$_BL['en']['unit_meters'] = 'm';
+$_BL['en']['unit_miles'] = 'mi';
+$_BL['en']['unit_meters'] = 'm';
+$_BL['en']['unit_yards'] = 'yd';
 $_BL['en']['days'] = 'days';
 $_BL['en']['hours'] = 'hours';
 $_BL['en']['number_every_minutes'] = 'every {NUMBER} minutes';
@@ -446,7 +450,6 @@ $_BL['en']['Maximum strike density calculated'] = 'Maximum strike density calcul
 $_BL['en']['Maximum mean strike density displayed'] = 'Maximum mean strike density displayed';
 $_BL['en']['densities_strikes_station'] = 'Strikes station {STATION_CITY}';
 $_BL['en']['Legend'] = 'Legend';
-$_BL['en']['Strikes per square kilometer'] = 'Strikes per square kilometer';
 $_BL['en']['Min time'] = 'Min time';
 $_BL['en']['Max time'] = 'Max time';
 $_BL['en']['enter_time_hint'] = 'Enter time values like "YYYY-MM-DD HH:MM:SS". You can omit the smaller time units, for example "YYYY-MM" is also possible.';
@@ -1069,5 +1072,6 @@ $_BL['en']['station strikes with MIN-MAX participants'] = 'Strikes {STATION_CITY
 $_BL['en']['strikes_station2'] = '{STATION_CITY}';
 $_BL['en']['mean ratio'] = 'mean ratio';
 $_BL['en']['ratio of all strikes is'] = 'ratio of all strikes is';
+$_BL['en']['Strikes per'] = 'Strikes per';
 
 ?>

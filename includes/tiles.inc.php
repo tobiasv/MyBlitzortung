@@ -212,7 +212,7 @@ function bo_tile()
 
 
 	//Caching
-	$dir = BO_DIR.'cache/tiles/';
+	$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
 	$filename = $type.'_'.$zoom.'_'.$station_id.'_'.$x.'x'.$y.'-'.(bo_user_get_level() ? 1 : 0).'.png';
 	
 	if (BO_CACHE_SUBDIRS === true)
@@ -386,7 +386,7 @@ function bo_tile()
 		if ($station_id > 0 && intval($whole_strike_count))
 		{
 			$ratio = $strike_count / $whole_strike_count * 100;
-			$text .= ' / '.number_format($ratio, 1, _BL('.'), _BL(',')).'%';
+			$text .= ' / '._BN($ratio, 1).'%';
 		}
 		
 		$twidth = bo_imagetextwidth($textsize, $bold, $text)+3;
@@ -680,7 +680,7 @@ function bo_tile_tracks()
 	$file = 'tracks_'.$zoom.'_'.$x.'x'.$y.'.png';
 	if (BO_CACHE_SUBDIRS === true)
 		$file = strtr($file, array('_' => '/'));
-	$file = BO_DIR.'cache/tiles/'.$file;
+	$file = BO_DIR.BO_CACHE_DIR.'/tiles/'.$file;
 	
 	
 	//estimate the last update, otherwise we have to parse the array...
@@ -815,7 +815,7 @@ function bo_tile_tracks()
 								if ($strikechange > 0)
 									$strikechange = '+'.$strikechange;
 								
-								$strikepermin = number_format($cell['count'] / $time_range * 60, 1, _BL('.'), _BL(','));
+								$strikepermin = _BN($cell['count'] / $time_range * 60, 1);
 
 								//speed
 								$speed = $cell['dist'][$did] / $time_range * 3.6;
@@ -920,7 +920,7 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 
 function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile_size = BO_TILE_SIZE)
 {
-	$dir = BO_DIR.'cache/tiles/';
+	$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
 	
 	bo_load_locale();
 	

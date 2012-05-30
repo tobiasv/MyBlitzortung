@@ -244,20 +244,20 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	echo '<ul class="bo_stat_overview">';
 
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
-	echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
+	echo '<span class="bo_value">'._BL('_before')._BN($last_update_minutes, 1).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
 
 	echo '<li><span class="bo_descr">'._BL('Last detected strike').': </span>';
-	echo '<span class="bo_value">'.($last_strike ? date(_BL('_datetime'), $last_strike).' '._BL(date('T')) : '?').'</span></li>';
+	echo '<span class="bo_value">'.($last_strike ? _BDT($last_strike) : '?').'</span></li>';
 
 	echo '<li><span class="bo_descr">'._BL('Current strike rate').': </span>';
 	echo '<span class="bo_value">';
-	echo number_format($strike_rate, 1, _BL('.'), _BL(',')).' '.(0 && $strike_rate === 1.0 ? _BL('unit_strikesperminute_one') : _BL('unit_strikesperminute'));
+	echo _BN($strike_rate, 1).' '.(0 && $strike_rate === 1.0 ? _BL('unit_strikesperminute_one') : _BL('unit_strikesperminute'));
 	echo '</span></li>';
 
 	if (!$region && intval(BO_TRACKS_SCANTIME) && $num_cells >= 0)
 	{
 		echo '<li><span class="bo_descr">'._BL('Thunder cells').': </span>';
-		echo '<span class="bo_value">'.number_format($num_cells, 0, _BL('.'), _BL(',')).' ('._BL('experimental').')</span></li>';
+		echo '<span class="bo_value">'._BN($num_cells, 0).' ('._BL('experimental').')</span></li>';
 	}
 
 	echo '</ul>';
@@ -446,35 +446,35 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		}
 		else
 		{
-			echo _BL('_before').number_format($last_active, 1, _BL('.'), _BL(','))." ";
+			echo _BL('_before')._BN($last_active, 1)." ";
 			echo (0 && $last_active == 1 ? _BL('_minute_ago') : _BL('_minutes_ago'));
 		}
 
 		echo '</span>';
 	}
 
-	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(','))." ".(0 && $last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before')._BN($last_update, 1)." ".(0 && $last_update == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Last detected strike').': </span>';
 	echo '<span class="bo_value">';
-	echo $last_strike ? date(_BL('_datetime'), $last_strike).' '._BL(date('T')) : _BL('no_strike_yet');
+	echo $last_strike ? _BDT($last_strike) : _BL('no_strike_yet');
 	echo '</span>';
 	echo '</li>';
 
 	if ($active) //don't display this part when inactive, there may be still some non-zero values
 	{
-		echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.number_format($strikesh_own, 0, _BL('.'), _BL(','));
+		echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'._BN($strikesh_own, 0);
 		
 		if (bo_user_get_level() & BO_PERM_ARCHIVE)
 			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=strikes&bo_station_id='.$station_id.'&bo_datetime_start='.urlencode(date('Y-m-d H:i', time() - 4000)).'">'._BL('List').'</a>)';
 
 		echo '</span>';
-		echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.number_format($signalsh_own, 0, _BL('.'), _BL(',')).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'._BN($signalsh_own, 0).'</span>';
 
 		echo '<li><span class="bo_descr">'._BL('Locating ratio').': </span><span class="bo_value">';
-		echo $signalsh_own ? number_format($strikesh_own / $signalsh_own * 100, 1, _BL('.'), _BL(',')).'%' : '-';
+		echo $signalsh_own ? _BN($strikesh_own / $signalsh_own * 100, 1).'%' : '-';
 		echo '</span></li>';
 		echo '<li><span class="bo_descr">'._BL('Strike ratio').': </span><span class="bo_value">';
-		echo $strikesh ? number_format($strikesh_own / $strikesh * 100, 1, _BL('.'), _BL(',')).'%' : '-';
+		echo $strikesh ? _BN($strikesh_own / $strikesh * 100, 1).'%' : '-';
 
 		if ($dens_stations[$station_id])
 			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=density&bo_station_id='.$station_id.'&bo_ratio=1">'._BL('Map').'</a>)';
@@ -483,15 +483,15 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 		echo '<li><span class="bo_descr">'._BL('Strikes station min participants').': </span>';
 		echo '<span class="bo_value">';
-		echo number_format($strikes_part_min_own, 0, _BL('.'), _BL(','));
+		echo _BN($strikes_part_min_own, 0);
 
 		if ($strikesh)
 		{
 			$part_own_percent = $strikes_part_min_own / $strikesh * 100;
 
 			echo ' (';
-			echo number_format($part_own_percent, 1, _BL('.'), _BL(',')).'%';
-			//echo ' - '._BL('Score').': '.number_format($part_own_percent * $stations, 0, _BL('.'), _BL(',')).'%';
+			echo _BN($part_own_percent, 1).'%';
+			//echo ' - '._BL('Score').': '._BN($part_own_percent * $stations, 0).'%';
 			echo ') ';
 		}
 
@@ -499,7 +499,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	}
 	elseif ($last_signal)
 	{
-		echo '<li><span class="bo_descr">'._BL('Last signal').': </span><span class="bo_value">'.date(_BL('_datetime'), $last_signal).' '._BL(date('T')).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Last signal').': </span><span class="bo_value">'._BDT($last_signal).'</span>';
 	}
 
 	echo '<li><span class="bo_descr">'._BL('Tracker').': </span><span class="bo_value">'._BC($stInfo['tracker']).'</span>';
@@ -547,8 +547,8 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			{
 				$lat[] = $d['lat'];
 				$lon[] = $d['lon'];
-				$pos_text[] = date(_BL('_datetime'), $t).' '._BL(date('T')).' '.
-								(isset($d['height']) ? _BL('Height').': '.$d['height'].'m' : '').' '.
+				$pos_text[] = _BDT($t).' '.
+								(isset($d['height']) ? _BL('Height').': '._BM($d['height']) : '').' '.
 								_BL('Status').': '.$d['status'].' '.
 								_BL('Signals/h').': '.$d['sig'].' '.
 								_BL('Strikes/h').': '.$d['strikes'].' '
@@ -654,22 +654,22 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		if ($lat[0] && $lon[0])
 		{
 			echo '<li><span class="bo_descr">'._BL('Mean coordinates').': </span>';
-			echo '<span class="bo_value">'.number_format($mean_lat,6,_BL('.'), _BL(',')).'&deg; / '.number_format($mean_lon,6,_BL('.'), _BL(',')).'&deg (&plusmn;'.number_format($dist_dev, 1, _BL('.'), _BL(',')).'m)</span>';
+			echo '<span class="bo_value">'._BN($mean_lat,6).'&deg; / '._BN($mean_lon,6).'&deg (&plusmn;'._BM($dist_dev, 1).')</span>';
 
 			if (count($height) > 1)
-				echo '<li><span class="bo_descr">'._BL('Height').': </span><span class="bo_value">'.$st_height.'m (&plusmn;'.number_format($height_dev, 1, _BL('.'), _BL(',')).'m)</span>';
+				echo '<li><span class="bo_descr">'._BL('Height').': </span><span class="bo_value">'._BM($st_height).' (&plusmn;'._BM($height_dev, 1).')</span>';
 		}
 		elseif ($show_map)
 		{
 			echo '<li><span class="bo_descr">'._BL('Last position').': </span>';
-			echo '<span class="bo_value">'.number_format($stInfo['lat'],6,_BL('.'), _BL(',')).'&deg; / '.number_format($stInfo['lon'],6,_BL('.'), _BL(',')).'&deg</span>';
+			echo '<span class="bo_value">'._BN($stInfo['lat'],6).'&deg; / '._BN($stInfo['lon'],6).'&deg</span>';
 		}
 		else
 			echo '<li><span class="bo_descr">'._BL('Currently no GPS coordinates available!').'</span>';
 
 		if ($nogps_last_time)
 		{
-			echo '<li><span class="bo_descr">'._BL('Last time without GPS').': </span><span class="bo_value">'.date(_BL('_datetime'), $nogps_last_time).' '._BL(date('T')).'</span>';
+			echo '<li><span class="bo_descr">'._BL('Last time without GPS').': </span><span class="bo_value">'._BDT($nogps_last_time).'</span>';
 		}
 
 			
@@ -1074,19 +1074,19 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	}
 
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before').number_format($last_update, 1, _BL('.'), _BL(',')).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'.number_format($strikes_range, 0, _BL('.'), _BL(',')).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'.number_format($avg_part, 1, _BL('.'), _BL(',')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Last update').': </span><span class="bo_value">'._BL('_before')._BN($last_update, 1).' '.($last_update == 1 && 0 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'._BN($strikes_range, 0).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'._BN($max_part, 0).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'._BN($avg_part, 1).'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Mean locating ratio').': </span><span class="bo_value">';
-	echo $whole_sig_ratio ? number_format($whole_sig_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
+	echo $whole_sig_ratio ? _BN($whole_sig_ratio * 100, 1).'%' : '-';
 	echo '</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Mean strike ratio').': </span><span class="bo_value">';
-	echo $whole_strike_ratio ? number_format($whole_strike_ratio * 100, 1, _BL('.'), _BL(',')).'%' : '-';
+	echo $whole_strike_ratio ? _BN($whole_strike_ratio * 100, 1).'%' : '-';
 	echo '</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'.number_format($whole_sig_count, 0, _BL('.'), _BL(',')).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'.number_format($active_stations, 0, _BL('.'), _BL(',')).' ('.number_format($stations_nogps, 0, _BL('.'), _BL(',')).' '._BL('w/o GPS-signal').')</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'.number_format($available, 0, _BL('.'), _BL(',')).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'._BN($whole_sig_count, 0).'</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'._BN($active_stations, 0).' ('._BN($stations_nogps, 0).' '._BL('w/o GPS-signal').')</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'._BN($available, 0).'</span></li>';
 
 	if (intval(BO_STATISTICS_SHOW_STATIONS_UNDER_CONSTR))
 	{
@@ -1104,7 +1104,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			echo ' &bull; ';
 		}
 		echo '">';
-		echo number_format(array_sum($under_construction), 0, _BL('.'), _BL(','));
+		echo _BN(array_sum($under_construction), 0);
 		echo '</span></li>';
 	}
 
@@ -1215,7 +1215,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		echo '<td class="bo_numbers '.($sort == 'distance' ? 'bo_marked' : '').'">';
 		
 		if ($own_station || $station_id > 0)
-			echo number_format($d['distance'] / 1000, 0, _BL('.'), _BL(',')).'km';
+			echo _BK($d['distance'] / 1000, 0);
 		else
 			echo '-';
 			
@@ -1226,7 +1226,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'strikes' ? 'bo_marked' : '').'">';
-		echo number_format($d['strikesh_ratio'] * 100, 1, _BL('.'), _BL(',')).'%';
+		echo _BN($d['strikesh_ratio'] * 100, 1).'%';
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'signals' ? 'bo_marked' : '').'">';
@@ -1234,15 +1234,15 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'signals_ratio' ? 'bo_marked' : '').'">';
-		echo number_format($d['signalsh_ratio'] * 100, 1, _BL('.'), _BL(',')).'%';
+		echo _BN($d['signalsh_ratio'] * 100, 1).'%';
 		echo '</td>';
 
 		echo '<td class="bo_numbers '.($sort == 'efficiency' ? 'bo_marked' : '').'">';
 
 		if ($d['efficiency'] <= -10)
-			echo '< -'.number_format(999, 0, _BL('.'), _BL(',')).'%';
+			echo '< -'._BN(999, 0).'%';
 		else
-			echo number_format($d['efficiency'] * 100, 1, _BL('.'), _BL(',')).'%';
+			echo _BN($d['efficiency'] * 100, 1).'%';
 
 		echo '</td>';
 
@@ -1300,7 +1300,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 				echo '</span>';
 				echo '<span class="bo_value">';
-				echo date(_BL('_date'), $d[0]).' '.date('H', $d[0]).' '._BL('oclock').' '._BL(date('T'));
+				echo _BD($d[0]).' '.date('H', $d[0]).' '._BL('oclock');
 				echo '</span>';
 				$i++;
 
@@ -1383,7 +1383,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				if ($first_seen - $mybo_first_update < 48 * 3600 * 7)
 					echo '?';
 				else
-					echo date(_BL('_date'), $first_seen);
+					echo _BD($first_seen);
 				echo '</span>';
 
 				$i++;
@@ -1494,12 +1494,12 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 
 
 	if (intval($strikes))
-		$strike_ratio = number_format($str_own / $strikes * 100, 1, _BL('.'), _BL(',')).'%';
+		$strike_ratio = _BN($str_own / $strikes * 100, 1).'%';
 	else
 		$strike_ratio = '-';
 
 	if (intval($signals))
-		$signal_ratio = number_format($str_own / $signals * 100, 1, _BL('.'), _BL(',')).'%';
+		$signal_ratio = _BN($str_own / $signals * 100, 1).'%';
 	else
 		$signal_ratio = '-';
 
@@ -1515,57 +1515,57 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	echo '<ul class="bo_stat_overview">';
 
 	if (!$own_station && $first_update_station)
-		echo '<li><span class="bo_descr">'._BL('Record longtime data since').': </span><span class="bo_value">'.date(_BL('_datetime'), $first_update_station).' '._BL(date('T')).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Record longtime data since').': </span><span class="bo_value">'._BDT($first_update_station).'</span>';
 
-	echo '<li><span class="bo_descr">'._BL('Strikes detected').': </span><span class="bo_value">'.number_format($str_own, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Active').': </span><span class="bo_value">'.number_format($active_days, 1, _BL('.'), _BL(',')).' '._BL('days').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Strikes detected').': </span><span class="bo_value">'._BN($str_own, 0).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Active').': </span><span class="bo_value">'._BN($active_days, 1).' '._BL('days').'</span>';
 	echo '<li><span class="bo_descr">'._BL('Inactive').': </span><span class="bo_value">';
-	echo number_format($inactive_days, 1, _BL('.'), _BL(',')).' '._BL('days');
-	echo $nogps_whole_time > 360 ? ' ('.number_format($nogps_whole_time / 3600, 1, _BL('.'), _BL(',')).' '._BL('hours').' '._BL('without GPS').')' : '';
+	echo _BN($inactive_days, 1).' '._BL('days');
+	echo $nogps_whole_time > 360 ? ' ('._BN($nogps_whole_time / 3600, 1).' '._BL('hours').' '._BL('without GPS').')' : '';
 	echo '</span>';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'.number_format($max_str_own, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'._BN($max_str_own, 0).'</span>';
 
 	if ($own_station)
 	{
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_own[0], 0, _BL('.'), _BL(',')).($max_str_day_own[1] > 0 ? ' ('.date(_BL('_date'), $max_str_day_own[1]).')' : '' ).'</span>';
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS_STAT.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_own[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_own[1] ? ' ('.date(_BL('_date'), $max_str_dayrad_own[1]).')' : '').'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'._BN($max_str_day_own[0], 0).($max_str_day_own[1] > 0 ? ' ('._BD($max_str_day_own[1]).')' : '' ).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '._BK(BO_RADIUS_STAT).') : </span><span class="bo_value">'._BN($max_str_dayrad_own[0], 0).($max_str_dayrad_own[1] ? ' ('._BD($max_str_dayrad_own[1]).')' : '').'</span>';
 	}
 
-	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'.number_format($min_dist_own, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'.number_format($max_dist_own, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
-	echo '<li><span class="bo_descr">'._BL('Signals detected').': </span><span class="bo_value">'.number_format($signals, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_own, 1).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_own, 1).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Signals detected').': </span><span class="bo_value">'._BN($signals, 0).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Strike ratio').': </span><span class="bo_value">'.$strike_ratio.'</span>';
 	echo '<li><span class="bo_descr">'._BL('Signal ratio').': </span><span class="bo_value">'.$signal_ratio.'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'.number_format($max_sig_own, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'._BN($max_sig_own, 0).'</span>';
 	echo '</ul>';
 
 	echo '<a name="longtime_network"></a>';
 	echo '<h4>'._BL('h4_stat_longtime_network').'</h4>';
 
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'.number_format($max_str_all, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'._BN($max_str_all, 0).'</span>';
 
 	if ($own_station)
 	{
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'.number_format($max_str_day_all[0], 0, _BL('.'), _BL(',')).($max_str_day_all[1] ? ' ('.date(_BL('_date'), $max_str_day_all[1]).')' : '').'</span>';
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '.BO_RADIUS_STAT.'km) : </span><span class="bo_value">'.number_format($max_str_dayrad_all[0], 0, _BL('.'), _BL(',')).($max_str_dayrad_all[1] ? ' ('.date(_BL('_date'), $max_str_dayrad_all[1]).')' : '').'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'._BN($max_str_day_all[0], 0).($max_str_day_all[1] ? ' ('._BD($max_str_day_all[1]).')' : '').'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '._BK(BO_RADIUS_STAT).') : </span><span class="bo_value">'._BN($max_str_dayrad_all[0], 0).($max_str_dayrad_all[1] ? ' ('._BD($max_str_dayrad_all[1]).')' : '').'</span>';
 	}
 
-	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'.number_format($min_dist_all, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'.number_format($max_dist_all, 1, _BL('.'), _BL(',')).' '._BL('unit_kilometers').'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'.number_format($max_sig_all, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'.number_format($max_part, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max active stations').': </span><span class="bo_value">'.number_format($max_active_sig, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max available stations').': </span><span class="bo_value">'.number_format($max_available, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_all, 1).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_all, 1).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'._BN($max_sig_all, 0).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'._BN($max_part, 0).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max active stations').': </span><span class="bo_value">'._BN($max_active_sig, 0).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Max available stations').': </span><span class="bo_value">'._BN($max_available, 0).'</span>';
 	echo '</ul>';
 
 	echo '<a name="longtime_network"></a>';
 	echo '<h4>'._BL('MyBlitzortung_notags').'</h4>';
 
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('First data').': </span><span class="bo_value">'.date(_BL('_datetime'), $first_update).' '._BL(date('T')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Lightning data imports').': </span><span class="bo_value">'.number_format($download_count, 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'.number_format(array_sum($kb_per_day), 0, _BL('.'), _BL(',')).' kB/'._BL('day').'</span>';
+	echo '<li><span class="bo_descr">'._BL('First data').': </span><span class="bo_value">'._BDT($first_update).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Lightning data imports').': </span><span class="bo_value">'._BN($download_count, 0).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'._BN(array_sum($kb_per_day), 0).' kB/'._BL('day').'</span>';
 
 	//print detailed stat
 	if (bo_user_get_level() & BO_PERM_NOLIMIT)
@@ -1577,11 +1577,11 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 			$kb_per_day_single = $kb_per_day[$type];
 			unset($kb_per_day[$type]);
 
-			echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL($name).': </span><span class="bo_value">'.number_format($kb_per_day_single, 0, _BL('.'), _BL(',')).' kB/'._BL('day').'</span>';
+			echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL($name).': </span><span class="bo_value">'._BN($kb_per_day_single, 0).' kB/'._BL('day').'</span>';
 		}
 
-		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Other').': </span><span class="bo_value">'.number_format(array_sum($kb_per_day), 0, _BL('.'), _BL(',')).' kB/'._BL('day').'</span>';
-		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Total').': </span><span class="bo_value">'.number_format($kb_traffic, 0, _BL('.'), _BL(',')).' kB</span>';
+		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Other').': </span><span class="bo_value">'._BN(array_sum($kb_per_day), 0).' kB/'._BL('day').'</span>';
+		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Total').': </span><span class="bo_value">'._BN($kb_traffic, 0).' kB</span>';
 
 	}
 
@@ -1651,12 +1651,12 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'
 				._BL('Last update strikes').': </span><span class="bo_value">'
-					.date(_BL('_datetime'), $last_str).' '._BL(date('T'))
+					._BDT($last_str)
 					.' ('._BL('update every').' '.intval(BO_UP_INTVL_STRIKES).' '._BL('unit_minutes').')'
 				.'</span>';
 	echo '<li><span class="bo_descr">'
 				._BL('Last update stations').': </span><span class="bo_value">'
-					.date(_BL('_datetime'), $last_net).' '._BL(date('T'))
+					._BDT($last_net)
 					.' ('._BL('update every').' '.intval(BO_UP_INTVL_STATIONS).' '._BL('unit_minutes').')'
 				.'</span>';
 
@@ -1664,12 +1664,12 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	{
 		echo '<li><span class="bo_descr">'
 					._BL('Last update signals').': </span><span class="bo_value">'
-						.date(_BL('_datetime'), $last_sig).' '._BL(date('T'))
+						._BDT($last_sig)
 						.' ('._BL('update every').' '.intval(BO_UP_INTVL_RAW).' '._BL('unit_minutes').')'
 						.'</span>';
 	}
 
-	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'.number_format($kb_today, 0, _BL('.'), _BL(',')).' kB ('._BL('Today').')</span>';
+	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'._BN($kb_today, 0).' kB ('._BL('Today').')</span>';
 
 	echo '</ul>';
 
@@ -1680,13 +1680,13 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	echo '</p>';
 
 	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'.number_format($D['rows']['strikes'], 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'.number_format($D['rows']['raw'], 0, _BL('.'), _BL(',')).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Entries (all data)').': </span><span class="bo_value">'.number_format($entries_all, 0, _BL('.'), _BL(',')).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'._BN($D['rows']['strikes'], 0).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'._BN($D['rows']['raw'], 0).'</span>';
+	echo '<li><span class="bo_descr">'._BL('Entries (all data)').': </span><span class="bo_value">'._BN($entries_all, 0).'</span>';
 	echo '<li>
 			<span class="bo_descr">'._BL('Memory usage').':
-			</span><span class="bo_value">'.number_format($mem_all, 1, _BL('.'), _BL(',')).'MB
-					('.number_format($mem_keys, 1, _BL('.'), _BL(',')).'% '._BL('for keys').')
+			</span><span class="bo_value">'._BN($mem_all, 1).'MB
+					('._BN($mem_keys, 1).'% '._BL('for keys').')
 			</span>';
 
 
@@ -1695,9 +1695,9 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 		foreach($D['rows'] as $type => $rows)
 		{
 			echo '<li><span class="bo_descr">'._BL('Usage').' "'.$type.'": </span><span class="bo_value">';
-			echo number_format($D['rows'][$type], 0, _BL('.'), _BL(',')).' rows / ';
-			echo number_format( ($D['data'][$type]+$D['keys'][$type])  / 1024 / 1024, 1, _BL('.'), _BL(',')).' MB / ';
-			echo number_format( $D['keys'][$type]/($D['data'][$type]+$D['keys'][$type])*100, 1, _BL('.'), _BL(',')).'% '._BL('for keys');
+			echo _BN($D['rows'][$type], 0).' rows / ';
+			echo _BN( ($D['data'][$type]+$D['keys'][$type])  / 1024 / 1024, 1).' MB / ';
+			echo _BN( $D['keys'][$type]/($D['data'][$type]+$D['keys'][$type])*100, 1).'% '._BL('for keys');
 			echo '</span>';
 
 		}
@@ -1877,14 +1877,14 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 			echo '<span class="bo_form_descr">'._BL('Min').':</span>';
 			echo '<select name="bo_region" onchange="bo_change_value(this.value, \'deviations_time\', \'value\');" id="bo_stat_deviations_time_min" disabled>';
 			for($i=0;$i<20000;$i+=100)
-				echo '<option value="'.$i.'">'.number_format($i / 1000, 1, _BL('.'), _BL(',')).'</option>';
+				echo '<option value="'.$i.'">'._BN($i / 1000, 1).'</option>';
 			echo '</select> ';
 			echo '</span>';
 			echo '<span class="bo_form_group">';
 			echo '<span class="bo_form_descr">'._BL('Max').':</span>';
 			echo '<select onchange="bo_change_value(this.value, \'deviations_time\', \'value_max\');" id="bo_stat_deviations_time_max" disabled>';
 			for($i=0;$i<20000;$i+=100)
-				echo '<option value="'.$i.'" '.($i == 1000 ? 'selected' : '').'>'.number_format($i / 1000, 1, _BL('.'), _BL(',')).'</option>';
+				echo '<option value="'.$i.'" '.($i == 1000 ? 'selected' : '').'>'._BN($i / 1000, 1).'</option>';
 			echo '</select> ';
 			echo '</span>';
 			echo '</fieldset>';
@@ -2042,14 +2042,14 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 				echo '<span class="bo_form_descr">'._BL('Min').':</span> ';
 				echo '<select name="bo_participants_min" onchange="bo_change_value(this.value, \'amplitudes_time\', \'value\');" id="bo_stat_amplitudes_time_min" disabled>';
 				for($i=0;$i<=26;$i++)
-					echo '<option value="'.round(($i/26)*BO_MAX_VOLTAGE*10).'">'.number_format(($i/26)*BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V</option>';
+					echo '<option value="'.round(($i/26)*BO_MAX_VOLTAGE*10).'">'._BN(($i/26)*BO_MAX_VOLTAGE, 1).'V</option>';
 				echo '</select> ';
 				echo '</span>';
 				echo '<span class="bo_form_group">';
 				echo '<span class="bo_form_descr">'._BL('Max').':</span>';
 				echo '<select name="bo_participants_max" onchange="bo_change_value(this.value, \'amplitudes_time\', \'value_max\');" id="bo_stat_amplitudes_time_max" disabled>';
 				for($i=0;$i<=26;$i++)
-					echo '<option value="'.round(($i/26)*BO_MAX_VOLTAGE*10).'" '.($i == 10 ? 'selected' : '').'>'.number_format(($i/26)*BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V</option>';
+					echo '<option value="'.round(($i/26)*BO_MAX_VOLTAGE*10).'" '.($i == 10 ? 'selected' : '').'>'._BN(($i/26)*BO_MAX_VOLTAGE, 1).'V</option>';
 				echo '</select> ';
 				echo '</span>';
 				echo '</div>';
@@ -2166,17 +2166,17 @@ function bo_signal_info_list()
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
-	echo '<span class="bo_value">'._BL('_before').number_format($last_update_minutes, 1, _BL('.'), _BL(',')).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
+	echo '<span class="bo_value">'._BL('_before')._BN($last_update_minutes, 1).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Channels').': </span>';
 	echo '<span class="bo_value">'.$channels.'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Samples per Channel').': </span>';
 	echo '<span class="bo_value">'.$values.'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Recording time').': </span>';
-	echo '<span class="bo_value">'.number_format($utime * $values, 0, _BL('.'), _BL(','))._BL('unit_us_short').'</span></li>';
+	echo '<span class="bo_value">'._BN($utime * $values, 0)._BL('unit_us_short').'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Bits per Sample').': </span>';
 	echo '<span class="bo_value">'.$bpv.'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Sample rate').': </span>';
-	echo '<span class="bo_value">'.number_format(1 / $utime * 1000, 0, _BL('.'), _BL(',')).' '._BL('unit_ksps').'</span></li>';
+	echo '<span class="bo_value">'._BN(1 / $utime * 1000, 0).' '._BL('unit_ksps').'</span></li>';
 	echo '</ul>';
 }
 

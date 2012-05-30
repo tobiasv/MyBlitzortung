@@ -83,9 +83,9 @@ function bo_show_login()
 				echo '<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>';
  
 				if ($lastlogin && $_SESSION['bo_external_login'] !== true)
-					echo '<li>'._BL('user_lastlogin_text').': <strong>'.date(_BL('_datetime'), $lastlogin).'</strong></li>';
+					echo '<li>'._BL('user_lastlogin_text').': <strong>'._BDT($lastlogin).'</strong></li>';
 
-				echo '<li>'._BL('user_sessiontime_text').': <strong>'.number_format($sessiontime / 60, 1, _BL('.'), _BL(',')).' '._BL('unit_minutes').'</strong></li>';
+				echo '<li>'._BL('user_sessiontime_text').': <strong>'._BN($sessiontime / 60, 1).' '._BL('unit_minutes').'</strong></li>';
 				echo '</ul>';
 
 				if (BO_PERM_ADMIN & $level)
@@ -926,25 +926,29 @@ function bo_show_calibrate_antennas()
 
 function bo_cache_info()
 {
-	$dirs['Tiles'] = array('cache/tiles/', 8);
-	$dirs['Icons'] = array('cache/icons/', 8);
-	$dirs['Maps']  = array('cache/maps/',  8);
+	$dirs['Tiles'] = array('tiles/', 8);
+	$dirs['Icons'] = array('icons/', 8);
+	$dirs['Maps']  = array('maps/',  8);
 
 	if (BO_CACHE_SUBDIRS === true)
-		$dirs['Density maps'] = array('cache/densitymap/', 8);
+		$dirs['Density maps'] = array('densitymap/', 8);
 
-	$dirs['Graphs'] = array('cache/graphs/', 0);
+	$dirs['Graphs'] = array('graphs/', 0);
 		
-	$dirs['Other'] = array('cache/', 0);
+	$dirs['Other'] = array('', 0);
 
+	
 	echo '<h3>'._BL('File cache info').'</h3>';
-
+	echo '<p><a href="'.bo_insert_url().'&bo_action2=unlink">'._BL('Click here to delete all files').'</a></p>';
+	flush();
+	
+	echo '<h3>'._BL('Folders').'</h3>';
 	foreach($dirs as $name => $d)
 	{
-		$dir = $d[0];
+		$dir = BO_CACHE_DIR.'/'.$d[0];
 		$depth = $d[1];
 
-		echo '<h4>'.$name.' <em>'.$dir.'</em></h4>';
+		echo '<h4>'.$name.': <em>'.$dir.'</em></h4>';
 
 		$dir = BO_DIR.$dir;
 
@@ -988,15 +992,12 @@ function bo_cache_info()
 			}
 		}
 
-		echo '<p>'._BL('Files').': <strong>'.$count.'</strong> ('.number_format($size / 1024, 1, _BL('.'), _BL(',')).' kB)</p>';
+		echo '<p>'._BL('Files').': <strong>'.$count.'</strong> ('._BN($size / 1024, 1).' kB)</p>';
 
 		flush();
 	}
 
 
-	echo '<h3>'._BL('Clear all files').'</h3>';
-
-	echo '<p><a href="'.bo_insert_url().'&bo_action2=unlink">'._BL('Click here to delete all files').'</a></p>';
 }
 
 function bo_my_station_update_form()

@@ -674,7 +674,7 @@ function bo_get_density_image()
 	
 	//Caching
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
-	$cache_file = BO_DIR.'cache/';
+	$cache_file = BO_DIR.BO_CACHE_DIR.'/';
 	
 	if (BO_CACHE_SUBDIRS === true)
 		$cache_file .= 'densitymap/'.$map_id.'/';
@@ -849,7 +849,7 @@ function bo_get_density_image()
 			$date_start = $row['date_start'];
 		
 		$date_end = $row['date_end'];
-		$time_string = date(_BL('_date'), strtotime($date_start)).' - '.date(_BL('_date'), strtotime($row['date_end']));
+		$time_string = _BD(strtotime($date_start)).' - '._BD(strtotime($row['date_end']));
 		$last_changed = $row['changed'];
 		
 		//coordinates
@@ -858,7 +858,7 @@ function bo_get_density_image()
 		$DensLat_end   = $row['lat_max'];
 		$DensLon_end   = $row['lon_max'];
 		$length        = $row['length'];
-		$area          = pow($length, 2);
+		$area          = pow(bo_km($length), 2);
 		
 		//SECOND DATABASE CALL
 		if ($ratio || $participants)
@@ -1111,17 +1111,17 @@ function bo_get_density_image()
 	
 	if ($ratio)
 	{
-		$legend_text = 'Strike ratio';
+		$legend_text = _BL('Strike ratio', true);
 		$extra_text  = 'Strike ratio';
 	}
 	elseif ($participants)
 	{
-		$legend_text = 'Avg. participants per strike locating';
+		$legend_text = _BL('Avg. participants per strike locating', true);
 		$extra_text  = 'Participants';
 	}
 	else
 	{
-		$legend_text = 'Strikes per square kilometer';
+		$legend_text = _BL('Strikes per', true).' '._BK().'²';
 		$extra_text  = 'Strike density';
 	}	
 	
@@ -1146,7 +1146,7 @@ function bo_get_density_image()
 		$PosY += 10;
 	
 		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Mean strike ratio', true).':', $text_col, $LegendWidth);
-		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, number_format($COUNT2 / $COUNT1 * 100, 1, _BL('.'), _BL(',')).'%', $text_col, $LegendWidth, true);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, _BN($COUNT2 / $COUNT1 * 100, 1).'%', $text_col, $LegendWidth, true);
 		$PosY += 25;
 	}
 	else
@@ -1154,7 +1154,7 @@ function bo_get_density_image()
 	
 	/*
 	//Area elements (calculation)
-	$length_text = number_format($length, 1, _BL('.'), _BL(','));
+	$length_text = _BN($length, 1);
 	$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL("Calculation basis are elements with area", true).':', $text_col, $LegendWidth);
 	$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, " ".$length_text.'km x '.$length_text.'km', $text_col, $LegendWidth);
 	$PosY += 10;
@@ -1165,7 +1165,7 @@ function bo_get_density_image()
 		
 		//Strike density
 		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Maximum strike density calculated', true).':', $text_col, $LegendWidth);
-		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, " ".number_format($max_real_density, 1, _BL('.'), _BL(',')).'/km^2', $text_col, $LegendWidth);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, " "._BN($max_real_density, 1).'/km^2', $text_col, $LegendWidth);
 		$PosY += 10;
 	}
 	
@@ -1177,7 +1177,7 @@ function bo_get_density_image()
 		//Max. participants per block
 		$max_count = $max_count_block;
 		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Maximum mean participants', true).':', $text_col, $LegendWidth);
-		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, number_format($max_count, 1, _BL('.'), _BL(',')), $text_col, $LegendWidth, true);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, _BN($max_count, 1), $text_col, $LegendWidth, true);
 		$PosY += 15;
 	}
 	elseif (!$ratio)
@@ -1185,13 +1185,13 @@ function bo_get_density_image()
 		//Max. density per block
 		$max_density = $max_count_block / $area;
 		$PosY = bo_imagestring_max($I, $size_title, $PosX, $PosY, _BL('Maximum mean strike density displayed', true).':', $text_col, $LegendWidth);
-		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, number_format($max_density, 2, _BL('.'), _BL(',')).'/km²', $text_col, $LegendWidth, true);
+		$PosY = bo_imagestring_max($I, $size_text, $PosX+$MarginX, $PosY, _BN($max_density, 2).'/'._BK().'²', $text_col, $LegendWidth, true);
 		$PosY += 15;
 	}
 	
 	$PosY += 10;
 	$PosY = bo_imagestring_max($I, $size_title_legend, $PosX, $PosY, _BL('Legend', true), $text_col, $LegendWidth);
-	$PosY = bo_imagestring_max($I, $size_title, $PosX+$MarginX, $PosY, '('._BL($legend_text, true).')', $text_col, $LegendWidth);
+	$PosY = bo_imagestring_max($I, $size_title, $PosX+$MarginX, $PosY, '('.$legend_text.')', $text_col, $LegendWidth);
 	
 	if ($PosY + 15 > $ColorBarY)
 	{
@@ -1212,7 +1212,7 @@ function bo_get_density_image()
 	if ($ratio)
 	{
 		$max_ratio = $max_count_block;
-		$text_top = number_format($max_ratio*100, 1, _BL('.'), _BL(',')).'%';
+		$text_top = _BN($max_ratio*100, 1).'%';
 		$text_middle = '50%';
 		$text_bottom = '0%';
 	}
@@ -1229,8 +1229,8 @@ function bo_get_density_image()
 			$decs = 0;
 		}
 			
-		$text_top = number_format($max_density, $decs, _BL('.'), _BL(','));
-		$text_middle = number_format($max_density/2, $decs, _BL('.'), _BL(','));
+		$text_top = _BN($max_density, $decs);
+		$text_middle = _BN($max_density/2, $decs);
 		$text_bottom = '0';
 		
 		if ($max_display_block < $max_count_block)

@@ -80,12 +80,6 @@
 @define('BO_UPDATE_SECRET', '');
 
 
-/*******************************************************************/
-/*** Default timezone                                            ***/
-
-@define('BO_TIMEZONE', 'UTC');
-
-
 
 /*******************************************************************/
 /*** Default Port for MySQL                                      ***/
@@ -100,6 +94,19 @@
 
 @define('BO_ANTENNAS', 2);
 
+
+/*******************************************************************/
+/*** Some general important stuff                                ***/
+
+
+//Default timezone
+@define('BO_TIMEZONE', 'UTC');
+
+//Show timezone in every time
+@define('BO_SHOW_TIMEZONE', false);
+
+//Use miles
+@define('BO_IMPERIAL', true);
 
 
 /*******************************************************************/
@@ -251,6 +258,9 @@
 
 //create subdirs for faster access (may not work with php safemode ON)
 @define('BO_CACHE_SUBDIRS', true);  
+
+//cache dir
+@define('BO_CACHE_DIR', 'cache');
 
 //purges tiles when older that specified value (hours)
 @define('BO_CACHE_PURGE_TILES_HOURS', 24); 
@@ -846,6 +856,12 @@
 @define('BO_GRAPH_STAT_FONTSIZE_TITLE', 8);
 @define('BO_GRAPH_STAT_FONTSIZE_XAXIS', 7);
 @define('BO_GRAPH_STAT_FONTSIZE_YAXIS', 7);
+
+
+//Grouping of values by time for different time periods (hours)
+@define('BO_GRAPH_STAT_GROUP_NONE',     7*24);
+@define('BO_GRAPH_STAT_GROUP_HOURLY',  20*24);
+@define('BO_GRAPH_STAT_GROUP_6HOURLY', 50*24);
 
 
 /*** Statistics Graph (individual settings for each graph) ***/

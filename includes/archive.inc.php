@@ -253,7 +253,7 @@ function bo_show_archive_map()
 	if ($strikes_available)
 	{
 		echo '<p class="bo_general_description" id="bo_archive_density_info">';
-		echo strtr(_BL('archive_map_info'), array('{DATE_START}' => date(_BL('_date'), $start_time),'{DATE_END}' => date(_BL('_date'), $end_time)));
+		echo strtr(_BL('archive_map_info'), array('{DATE_START}' => _BD($start_time),'{DATE_END}' => _BD($end_time)));
 		echo '</p>';
 
 		echo '<a name="bo_arch_strikes_maps_form"></a>';
@@ -391,7 +391,7 @@ function bo_show_archive_map()
 			echo '<div style="position:absolute;top:0px;left:0px" id="bo_arch_map_nodata_white"></div>';
 			echo '<div style="position:absolute;top:0px;left:0px" id="bo_arch_map_nodata_text">';
 			echo '<p>';
-			echo strtr($text, array('{START}' => date(_BL('_date'), $start_time), '{END}' => date(_BL('_date'), $end_time) ));
+			echo strtr($text, array('{START}' => _BD($start_time), '{END}' => _BD($end_time) ));
 			echo '</p>';
 			echo '</div>';
 			echo '</div>';
@@ -421,7 +421,7 @@ function bo_show_archive_map()
 					break;
 			}
 
-			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time).' ('._BL('Animation').')';
+			$alt = _BL('Lightning map').' '.$mapname.' '._BD($time).' ('._BL('Animation').')';
 			
 			bo_insert_animation_js($images, $bo_file_url, $img_file, $ani_delay, $ani_delay_end, $img_dim, $alt);
 		}
@@ -443,7 +443,7 @@ function bo_show_archive_map()
 				$date_arg .= sprintf('%02d', $uhour_from).'00-'.($hour_range*60);
 			}
 		
-			$alt = _BL('Lightning map').' '.$mapname.' '.date(_BL('_date'), $time);
+			$alt = _BL('Lightning map').' '.$mapname.' '._BD($time);
 			$img_file = bo_bofile_url().'?map='.$map.'&date='.$date_arg.'&bo_lang='._BL();
 			echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
 		}
@@ -602,9 +602,9 @@ function bo_show_archive_search()
 
 			$description  = '<div class=\'bo_archiv_map_infowindow\'>';
 			$description .= '<ul class=\'bo_archiv_map_infowindow_list\'>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Time').':</span><span class=\'bo_value\'> '.date(_BL('_datetime'), $time).'.'.$row['time_ns'].' '._BL(date('T')).'</span></li>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Deviation').':</span><span class=\'bo_value\'> '.number_format($row['deviation'] / 1000, 1, _BL('.'), _BL(',')).'km</span></li>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Current').':</span><span class=\'bo_value\'> '.number_format($row['current'], 1, _BL('.'), _BL(',')).'kA ('._BL('experimental').')</span></li>';
+			$description .= '<li><span class=\'bo_descr\'>'._BL('Time').':</span><span class=\'bo_value\'> '._BDT($time, false).'.'.$row['time_ns']._BZ($time).'</span></li>';
+			$description .= '<li><span class=\'bo_descr\'>'._BL('Deviation').':</span><span class=\'bo_value\'> '._BK($row['deviation'] / 1000, 1).'</span></li>';
+			$description .= '<li><span class=\'bo_descr\'>'._BL('Current').':</span><span class=\'bo_value\'> '._BN($row['current'], 1).'kA ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Polarity').':</span><span class=\'bo_value\'> '.($row['polarity'] === null ? '?' : ($row['polarity'] < 0 ? _BL('negative') : _BL('positive'))).' ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participated').':</span><span class=\'bo_value\'> '.($row['part'] > 0 ? _BL('yes') : _BL('no')).'</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participants').':</span><span class=\'bo_value\'> '.intval($row['users']).'</span></li>';
@@ -646,10 +646,10 @@ function bo_show_archive_search()
 			echo '<li><span class="bo_descr">'._BL('Time range').': </span> ';
 			
 			if ($utime_from)
-				echo _BL('time_from').' '.date(_BL('_datetime'), $utime_from).' '._BL(date('T')).' ';
+				echo _BL('time_from').' '._BDT($utime_from).' ';
 				
 			if ($utime_to)
-				echo _BL('time_to').' '.date(_BL('_datetime'), $utime_to)._BL(date('T'));
+				echo _BL('time_to').' '._BDT($utime_to).' ';
 			
 			echo '</li>';
 		}
@@ -670,8 +670,8 @@ function bo_show_archive_search()
 			echo '</span>';
 			echo '</li>';
 
-			echo '<li><span class="bo_descr">'._BL('Oldest').':</span><span class="bo_value"> '.date(_BL('_datetime'), $time_min).' '._BL(date('T')).'</value></li>';
-			echo '<li><span class="bo_descr">'._BL('Newest').':</span><span class="bo_value"> '.date(_BL('_datetime'), $time_max).' '._BL(date('T')).'</value></li>';
+			echo '<li><span class="bo_descr">'._BL('Oldest').':</span><span class="bo_value"> '._BDT($time_min).'</value></li>';
+			echo '<li><span class="bo_descr">'._BL('Newest').':</span><span class="bo_value"> '._BDT($time_max).'</value></li>';
 		}
 		else
 		{
@@ -1219,8 +1219,8 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				$residual_time = $time_diff - $distance / BO_C;
 
 				$cdev = $distance / $time_diff / BO_C;
-				$cdev_text =  number_format($residual_time*1E6, 1, _BL('.'), _BL(','))._BC('µs');
-				$cdev_text .= ' / '.number_format($cdev, 4, _BL('.'), _BL(',')).'c';
+				$cdev_text =  _BN($residual_time*1E6, 1)._BC('µs');
+				$cdev_text .= ' / '._BN($cdev, 4).'c';
 				//$cdev_text .= ' / '.round(($cdev-1)*$distance).'m';
 			}
 		}
@@ -1326,9 +1326,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		echo '<span class="bo_value">';
 
 		if ($show_empty_sig)
-			$ttime = date(_BL('_datetime'), $stime).'.'.sprintf('%09d', $row['stimens']).' '._BL(date('T'));
+			$ttime = _BDT($stime, false).'.'.sprintf('%09d', $row['stimens']).' '._BZ($stime);
 		else
-			$ttime = date(_BL('_datetime'), $rtime).'.'.sprintf('%09d', $row['rtimens']).' '._BL(date('T'));
+			$ttime = _BDT($rtime, false).'.'.sprintf('%09d', $row['rtimens']).' '._BZ($stime);
 
 		if (!$strike_id && $perm && $row['strike_id'])
 		{
@@ -1430,7 +1430,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				{
 					echo $cdev_text;
 					echo '">';
-					echo number_format($time_diff * 1000, 4, _BL('.'), _BL(','))._BL('unit_millisec');
+					echo _BN($time_diff * 1000, 4)._BL('unit_millisec');
 				}
 				else
 				{
@@ -1450,7 +1450,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo _BL('Distance').': ';
 				echo '</span>';
 				echo '<span class="bo_value">';
-				echo number_format($row['distance'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
+				echo _BK($row['distance'] / 1000, 1);
 				echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
 				echo '</span>';
 				echo '</li>';
@@ -1461,7 +1461,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo _BL('Deviation').': ';
 			echo '</span>';
 			echo '<span class="bo_value">';
-			echo number_format($row['deviation'] / 1000, 1, _BL('.'), _BL(','))._BL('unit_kilometers');
+			echo _BK($row['deviation'] / 1000, 1);
 			echo '</span>';
 			echo '</li>';
 			
@@ -1470,7 +1470,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo _BL('Current').': ';
 			echo '</span>';
 			echo '<span class="bo_value">';
-			echo number_format($row['current'], 1, _BL('.'), _BL(',')).'kA';
+			echo _BN($row['current'], 1).'kA';
 			echo '</span>';
 			echo '</li>';
 
@@ -1497,7 +1497,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo _BL('Participants').': ';
 			echo '</span>';
 			echo '<span class="bo_value">';
-			echo number_format($row['users'], 0, _BL('.'), _BL(','));
+			echo _BN($row['users'], 0);
 			echo '</span>';
 			echo '</li>';
 
@@ -1543,10 +1543,10 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</span>';
 			echo '<span class="bo_value">';
 			
-			echo number_format($loc_angle[1], 0, _BL('.'), _BL(','));
+			echo _BN($loc_angle[1], 0);
 			echo '&deg; ';
 
-			echo '('.number_format($loc_angle[0], 0, _BL('.'), _BL(','));
+			echo '('._BN($loc_angle[0], 0);
 			echo '&deg;)';
 			
 			echo '</span>';
@@ -1635,7 +1635,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo ' href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$sid.'" ';
 				echo ' title="';
 				echo htmlentities($participated_stations[$sid]['city']).': ';
-				echo round($dist/1000).'km / ';
+				echo _BK(round($dist/1000)).' / ';
 				echo round($s_bears[0][$sid]).'&deg; '.bo_bearing2direction($s_bears[0][$sid]);
 				
 				echo '" style="display:inline-block;';
@@ -1674,7 +1674,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 					$url = bo_signal_url($sid, null, $stime, $row['stimens'], $dist);
 					$url .= '&bo_size=2';
 					
-					echo ' +'.round($dist/1000).'km / ';
+					echo ' +'._BK(round($dist/1000)).' / ';
 					echo round($s_bears[0][$sid]).'&deg;';
 					echo '</a>';
 					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W2.'px;height:'.BO_GRAPH_RAW_H2.'px"  class="bo_graph_sig_other" onmouseover="this.src+=\'&bo_spectrum&full\'" onmouseout="this.src=\''.$url.'\'">';
@@ -1760,7 +1760,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 						echo '</td>';
 					}
 					
-					echo '<th style="text-align:right">'.round($d1/1000).'km</th>';
+					echo '<th style="text-align:right">'._BK(round($d1/1000)).'</th>';
 					
 					echo '</tr>';
 				}

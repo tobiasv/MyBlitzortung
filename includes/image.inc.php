@@ -8,7 +8,7 @@ function bo_icon($icon)
 	$c = intval($_GET['size']) < 20 ? intval($_GET['size']) : 0;
 	$c = $c > 0 ? $c : 3;
 	
-	$dir = BO_DIR."cache/icons/";
+	$dir = BO_DIR.BO_CACHE_DIR."/icons/";
 	$file = $dir.$icon.'_'.$c.'.png';
 
 	if (BO_CACHE_DISABLE === true || !file_exists($file) || time() - filemtime($file) > 3600 * 24 * 30)
@@ -142,7 +142,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$update_interval = $cfg['upd_intv'][$period_id] * 60;
 	
 	//Cache file naming
-	$cache_file = BO_DIR.'cache/maps/';
+	$cache_file = BO_DIR.BO_CACHE_DIR.'/maps/';
 	$cache_file .= _BL().'_';
 	
 	if (BO_CACHE_SUBDIRS === true)
@@ -179,8 +179,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$res = BoDb::query($sql);
 		$row = $res->fetch_assoc();
 		$time_min = $time_max = strtotime($row['time'].' UTC');
-		$time_string = date(_BL('_date').' H:i:s', $time_min).'.'.substr($row['time_ns'], 0, 6);
-		$time_string .= ' '._BL(date('T'));
+		$time_string = _BDT($time_min, false).'.'.substr($row['time_ns'], 0, 6)._BZ($time_min);
 		
 		$file_by_time = true;
 		$caching = false;
@@ -235,14 +234,13 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		if ($time_max > $last_update)
 		{
 			$time_max = $last_update;
-			$time_string .= ' - '.date('H:i', $time_max);
-			$time_string .= ' '._BL(date('T'));
+			$time_string .= ' - '.date('H:i', $time_max)._BZ($time_max);
 			$expire = time() + $update_interval / 1.5;
 		}
 		else
 		{
 			$last_update  = $time_max + 3600;
-			$time_string .= ' '._BL(date('T'));
+			$time_string .= _BZ($time_max);
 			$time_string .= ' +'.round($duration / 60).'h';
 			$expire       = time() + 3600;
 		}
@@ -269,7 +267,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		else
 			$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
 
-		$time_string .= ' '._BL(date('T'));
+		$time_string .= ' '._BZ($time_min);
 			
 		if ($period_id)
 			$cache_file .= '_p'.$ranges[$period_id];
@@ -852,7 +850,7 @@ function bo_get_map_image_ani()
 	include 'gifencoder/GIFEncoder.class.php';
 
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);	
-	$dir = BO_DIR.'cache/maps/';
+	$dir = BO_DIR.BO_CACHE_DIR.'/maps/';
 	$id = $_GET['animation'];
 	$cfg = $_BO['mapimg'][$id];
 	

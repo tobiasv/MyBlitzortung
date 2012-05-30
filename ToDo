@@ -3,12 +3,9 @@ A to-do and suggestion list for MyBlitzortung...
 
 Bugs / Improvements
 -------------------
-- new switch: use SMTP instead of mail()
-- cache for graphs
 - create maps/tiles/graphs at defined time intervals --> no creation on demand --> faster
 - cell/track detection
-- improve duplicate strike handling (statistics...)
-
+- switch from DATETIME to simple timestamp (faster, less space usage)
 
 
 
@@ -16,14 +13,12 @@ Features
 --------
 - Add some sort of "GetStrikes" Class (for internal usage and as an API for external apps)
 - implement Openstreetmap as a 2nd dynamic map
-- General Overlay for locating accuracy (created manually, hosted on Blitzortung.org?)
 - Submenu on "Info" page: Overview / Participate -> Small howto + images/descriptions of existing stations
 - GUI for config
 - auto zoom-out if not enough strikes in map
 - tool for converting borders -> regions (GoogleEarth-Polygon -> boxes)
 - Statistics/graphs: strike current/polarity
 - yearly statistics grouped by month
-- better/faster time handling: "SET time_zone = '+00:00';" and use UNIX_TIMESTAMP (faster than strtotime?)
 - limit at many datasets
 - current lighning density / heatmap
 - lightning alerts based on position of Smartphone
@@ -41,4 +36,3 @@ Features
 - amcharts instead of jpgraph (www.amcharts.com)
 - top-list of strike currents (calc. of current has to be improved first!)
 - statistics about GPS-status of own station/all stations (GPS yes/no, mean value and value w/o GPS)
-- add date to longtime vars (values are already saved with date) and maybe a link to archive map (if enabled)

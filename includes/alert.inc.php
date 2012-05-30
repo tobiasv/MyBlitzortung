@@ -104,12 +104,12 @@ function bo_alert_settings()
 					echo _BC($d['address']);
 					
 				echo '</td>';
-				echo '<td>'.number_format($d['lat'], 4, _BL('.'), _BL(',')).'&deg; / '.number_format($d['lon'], 4, _BL('.'), _BL(',')).'&deg;</td>';
-				echo '<td>'.number_format($d['dist'], 0, _BL('.'), _BL(',')).'km</td>';
-				echo '<td>'.number_format($d['count'], 0, _BL('.'), _BL(',')).' / '.$d['interval'].'min</td>';
+				echo '<td>'._BN($d['lat'], 4).'&deg; / '._BN($d['lon'], 4).'&deg;</td>';
+				echo '<td>'._BN($d['dist'], 0).'km</td>';
+				echo '<td>'._BN($d['count'], 0).' / '.$d['interval'].'min</td>';
 				
-				echo '<td>'.($d['last_send'] ? date(_BL('_datetime'), $d['last_send']) : '-').'</td>';
-				echo '<td>'.number_format($d['send_count'], 0, _BL('.'), _BL(',')).'</td>';
+				echo '<td>'.($d['last_send'] ? _BDT($d['last_send']) : '-').'</td>';
+				echo '<td>'._BN($d['send_count'], 0).'</td>';
 				
 				echo '</tr>';
 			}
@@ -532,8 +532,8 @@ function bo_alert_send()
 						$replace = array(
 									'{name}' 	=> $d['name'],
 									'{strikes}' => $row2['cnt'],
-									'{time}'	=> date(_BL('_datetime', true), strtotime($row2['maxtime'].' UTC')),
-									'{first}'	=> date(_BL('_datetime', true), strtotime($row2['mintime'].' UTC')),
+									'{time}'	=> _BDT(strtotime($row2['maxtime'].' UTC')),
+									'{first}'	=> _BDT(strtotime($row2['mintime'].' UTC')),
 									'{dist}'	=> $dist,
 									'{bear}'	=> $bear,
 									'{userid}'	=> $user_id
@@ -546,7 +546,7 @@ function bo_alert_send()
 							case 1: //E-Mail
 
 								$text = _BL('alert_mail_description', true)."\n\n".
-										_BL('alert_mail_time range', true).': '.date(_BL('_datetime', true), $search_time).' - '.date(_BL('_datetime', true), $max_time)."\n".
+										_BL('alert_mail_time range', true).': '._BDT($search_time).' - '._BDT($max_time)."\n".
 										_BL('alert_mail_strikes', true).': '.$row2['cnt']."\n".
 										_BL('alert_mail_distance', true).': '.$dist." "._BL('unit_kilometers', true)." (".$bear.")\n".
 										_BL('alert_mail_first_strike', true).': '.date('H:i:s', strtotime($row2['mintime'].' UTC'))."\n".
@@ -704,7 +704,7 @@ function bo_alert_log($all = false)
 				$d['name'] = '?';
 			
 			echo '<tr>';
-			echo '<td>'.date(_BL('_datetime'), $time).'</td>';
+			echo '<td>'._BDT($time).'</td>';
 			echo '<td>'.bo_user_get_name($user_id).'</td>';
 			echo '<td><a href="'.bo_insert_url('bo_action2', 'alert_form,'.$user_id.','.$alert_id).'">'._BC($d['name']).'</a></td>';
 			echo '<td>';

@@ -3,18 +3,34 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.6 (2012-xx-xx)
+Version 0.7.6 (2012-05-31)
 -------------------------------
+- new: dutch translation (thanks to willem!)
 - new: GEOS projection method (for satellite images)
 - new: auto download of external pictures/maps (i. e. satellite)
 - new: map grouping
 - new: select stations on main map
 - new: select time period for graphs
 - new: select country for "active stations" graph
+- new: distance to a station for regions
 - new: timezone on maps and in statistics
 - new: maps for USA
 - new: send mails over smtp
+- new: show signals in strike list for every station
+- new: translate single words in short phrases
+- new: log PHP errors to file
+- new: cache for graphs
+- new: send 304 not modified header (less traffic)
+- new: advanced graph (no GUI for that)
+- new: info for each GPS point in station statistics
+- new: option to change cache dir
+- new: possibility to change to imperial system (miles, yards)
+- improved: auto update on main map (with timeout)
+- improved: nicer circles on main map for some older PHP versions
+- improved: file cache purging - now done during update
 - fix: allow longer contry names
+- fix: download strike/station data even if file was not modified
+- some other fixes
 
 
 Version 0.7.5b (2012-03-24)

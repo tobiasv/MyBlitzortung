@@ -455,7 +455,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				echo '</div>';
 			}
 
-			$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name']).' '.date(_BL('_datetime'), $last_update);
+			$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name']).' '._BDT($last_update);
 			echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
 			echo '<img src="'.$url.'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.bo_bofile_url().'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
 

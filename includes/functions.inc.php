@@ -2107,8 +2107,8 @@ function bo_get_regions($bo_station_id = false)
 				$dist = intval($dist);
 				if ($dist > 0)
 				{
-					$regions[0]['dist'.$dist] = _BL('max.').' '.$dist.'km '._BL('to station').' '._BC($name);
-					$regions[1]['-dist'.$dist] = _BL('min.').' '.$dist.'km '._BL('to station').' '._BC($name);
+					$regions[0]['dist'.$dist] = _BL('max.').' '._BK($dist).' '._BL('to station').' '._BC($name);
+					$regions[1]['-dist'.$dist] = _BL('min.').' '._BK($dist).' '._BL('to station').' '._BC($name);
 				}
 			}
 		}
@@ -2159,7 +2159,7 @@ function bo_region2name($region, $bo_station_id = false)
 function bo_error_handler($errno, $errstr, $errfile, $errline)
 {
 	
-	$logfile = BO_DIR.'cache/error.log';
+	$logfile = BO_DIR.BO_CACHE_DIR.'/error.log';
 
 	// This error code is not included in error_reporting
     if (!(error_reporting() & $errno)) 
@@ -2240,6 +2240,86 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 	}
 	
 	readfile($cache_file);
+}
+
+
+function _BDT($time, $show_tz = true)
+{
+	return date(_BL('_datetime'), $time).($show_tz ? _BZ($time) : '');
+}
+
+function _BD($time)
+{
+	return date(_BL('_date'), $time);
+}
+
+function _BZ($time)
+{
+	return BO_SHOW_TIMEZONE === true ? ' '._BL(date('T', $time)) : '';
+}
+
+function _BN($number, $decs = 0)
+{
+	return number_format($number, $decs, _BL('.'), _BL(','));
+}
+
+
+function _BK($km = false, $decs = 0)
+{
+	if ($km === false)
+	{
+		return BO_IMPERIAL === true ? _BL('unit_miles') : _BL('unit_kilometers');
+	}
+	
+	if (BO_IMPERIAL === true)
+		return _BN(km2mi($km), $decs)._BL('unit_miles');
+	else
+		return _BN($km, $decs)._BL('unit_kilometers');
+}
+
+function _BM($m = false, $decs = 0)
+{
+	if ($m === false)
+	{
+		return BO_IMPERIAL === true ? _BL('unit_yards') : _BL('unit_meters');
+	}
+
+	if (BO_IMPERIAL === true)
+		return _BN(m2yd($m), $decs)._BL('unit_yards');
+	else
+		return _BN($m, $decs)._BL('unit_meters');
+}
+
+
+function bo_km($km)
+{
+	return BO_IMPERIAL === true ? km2mi($km) : $km;
+}
+
+function bo_m($m)
+{
+	return BO_IMPERIAL === true ? m2yd($m) : $m;
+}
+
+
+function m2yd($val)
+{
+	return $val / 0.9144;
+}
+
+function yd2m($val)
+{
+	return $val * 0.9144;
+}
+
+function km2mi($val)
+{
+	return $val / 1.609;
+}
+
+function mi2km($val)
+{
+	return $val * 1.609;
 }
 
 ?>

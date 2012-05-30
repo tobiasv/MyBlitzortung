@@ -2733,21 +2733,21 @@ function bo_update_status_files($type)
 
 	$last_strikes_region = unserialize(bo_get_conf('last_strikes_region'));
 	$rate_strikes_region = unserialize(bo_get_conf('rate_strikes_region'));
-	$STRIKE_RATE = number_format($rate_strikes_region[0], 1, _BL('.'), _BL(','));
-	$LAST_STRIKE = date(_BL('_datetime'), $last_strikes_region[0]);
+	$STRIKE_RATE = _BN($rate_strikes_region[0], 1);
+	$LAST_STRIKE = _BDT($last_strikes_region[0]);
 
 	$tmp = @unserialize(bo_get_conf('last_strikes_stations'));
-	$STATION_LAST_STRIKE   = date(_BL('_datetime'), $tmp[$station_id][0]);
+	$STATION_LAST_STRIKE   = _BDT($tmp[$station_id][0]);
 
 	$act_time = bo_get_conf('station_last_active');
 	$inact_time = bo_get_conf('station_last_inactive');
-	$STATION_LAST_ACTIVE   = date(_BL('_datetime'), $act_time);
-	$STATION_LAST_INACTIVE = date(_BL('_datetime'), $inact_time);
+	$STATION_LAST_ACTIVE   = _BDT($act_time);
+	$STATION_LAST_INACTIVE = _BDT($inact_time);
 	$STATION_ACTIVE        = $act_time > $inact_time ? _BL('yes') : _BL('no');
 
-	$IMPORT_LAST_STRIKES   = date(_BL('_datetime'), bo_get_conf('uptime_strikes'));
-	$IMPORT_LAST_STATIONS  = date(_BL('_datetime'), bo_get_conf('uptime_stations'));
-	$IMPORT_LAST_SIGNALS   = date(_BL('_datetime'), bo_get_conf('uptime_raw'));
+	$IMPORT_LAST_STRIKES   = _BDT(bo_get_conf('uptime_strikes'));
+	$IMPORT_LAST_STATIONS  = _BDT(bo_get_conf('uptime_stations'));
+	$IMPORT_LAST_SIGNALS   = _BDT(bo_get_conf('uptime_raw'));
 
 	$replace = array(
 		'{STATION_CURRENT_STRIKES}'  => $STATION_CURRENT_STRIKES,
@@ -3232,7 +3232,7 @@ function bo_purge_cache($force = false)
 	if (intval(BO_CACHE_PURGE_MAPS_RAND) > 0 && rand(0, BO_CACHE_PURGE_MAPS_RAND) == 1)
 	{	
 		bo_echod("=== Cache Purge: Maps ===");
-		$count = bo_delete_files(BO_DIR.'cache/maps/', intval(BO_CACHE_PURGE_MAPS_HOURS), 8);
+		$count = bo_delete_files(BO_DIR.BO_CACHE_DIR.'/maps/', intval(BO_CACHE_PURGE_MAPS_HOURS), 8);
 		bo_echod(" -> Deleted $count files");
 		$whole_count += $count;
 	}
@@ -3242,7 +3242,7 @@ function bo_purge_cache($force = false)
 	if (intval(BO_CACHE_PURGE_TILES_RAND) > 0 && rand(0, BO_CACHE_PURGE_TILES_RAND) == 1)
 	{
 		bo_echod("=== Cache Purge: Tiles ===");
-		$count = bo_delete_files(BO_DIR.'cache/tiles/', BO_CACHE_PURGE_TILES_HOURS, 8);
+		$count = bo_delete_files(BO_DIR.BO_CACHE_DIR.'/tiles/', BO_CACHE_PURGE_TILES_HOURS, 8);
 		bo_echod(" -> Deleted $count files");
 		$whole_count += $count;
 	}
@@ -3254,9 +3254,9 @@ function bo_purge_cache($force = false)
 		bo_echod("=== Cache Purge: Densities ===");
 		
 		if (BO_CACHE_SUBDIRS === true)
-			$count = bo_delete_files(BO_DIR.'cache/densitymap', intval(BO_CACHE_PURGE_DENS_HOURS), 8);
+			$count = bo_delete_files(BO_DIR.BO_CACHE_DIR.'/densitymap', intval(BO_CACHE_PURGE_DENS_HOURS), 8);
 		else
-			$count = bo_delete_files(BO_DIR.'cache', intval(BO_CACHE_PURGE_DENS_HOURS), 0);
+			$count = bo_delete_files(BO_DIR.BO_CACHE_DIR, intval(BO_CACHE_PURGE_DENS_HOURS), 0);
 		
 		bo_echod(" -> Deleted $count files");
 		$whole_count += $count;
@@ -3267,19 +3267,19 @@ function bo_purge_cache($force = false)
 	if (intval(BO_CACHE_PURGE_OTHER_RAND) > 0 && rand(0, BO_CACHE_PURGE_OTHER_RAND) == 1)
 	{
 		bo_echod("=== Cache Purge: Other Files ===");
-		$count = bo_delete_files(BO_DIR.'cache', intval(BO_CACHE_PURGE_OTHER_HOURS), 0);
+		$count = bo_delete_files(BO_DIR.BO_CACHE_DIR, intval(BO_CACHE_PURGE_OTHER_HOURS), 0);
 		
 		if (BO_CACHE_SUBDIRS === true)
 		{
 			bo_echod(" * Signals");
-			$count = bo_delete_files(BO_DIR.'cache/signals', intval(BO_CACHE_PURGE_OTHER_HOURS), 8);
+			$count = bo_delete_files(BO_DIR.BO_CACHE_DIR.'/signals', intval(BO_CACHE_PURGE_OTHER_HOURS), 8);
 		}
 		
 		bo_echod(" * Icons");
-		$count += bo_delete_files(BO_DIR.'cache/icons', intval(BO_CACHE_PURGE_OTHER_HOURS), 8);
+		$count += bo_delete_files(BO_DIR.BO_CACHE_DIR.'/icons', intval(BO_CACHE_PURGE_OTHER_HOURS), 8);
 
 		bo_echod(" * Graphs");
-		$count += bo_delete_files(BO_DIR.'cache/graphs', intval(BO_CACHE_PURGE_OTHER_HOURS), 8);
+		$count += bo_delete_files(BO_DIR.BO_CACHE_DIR.'/graphs', intval(BO_CACHE_PURGE_OTHER_HOURS), 8);
 		
 		bo_echod(" -> Deleted $count files");
 		$whole_count += $count;

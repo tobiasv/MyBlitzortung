@@ -442,7 +442,6 @@ $_BL['de']['Maximum strike density calculated'] = 'Maximale berechnete Blitzdich
 $_BL['de']['Maximum mean strike density displayed'] = 'Maximale mittlere Blitzdichte';
 $_BL['de']['densities_strikes_station'] = 'Blitze Station {STATION_CITY}';
 $_BL['de']['Legend'] = 'Legende';
-$_BL['de']['Strikes per square kilometer'] = 'Blitze pro Quadratkilometer';
 $_BL['de']['Min time'] = 'Min Zeit';
 $_BL['de']['Max time'] = 'Max Zeit';
 $_BL['de']['enter_time_hint'] = 'Zeitangaben im Format "JJJJ-MM-TT HH:MM:SS", wobei kleinere Zeiteinheiten auch weggelassen werden können, z.B. "JJJJ-MM".';
@@ -1128,6 +1127,6 @@ $_BL['de']['station strikes with MIN-MAX participants'] = 'Blitze {STATION_CITY}
 $_BL['de']['strikes_station2'] = '{STATION_CITY}';
 $_BL['de']['mean ratio'] = 'Mittlere Quote';
 $_BL['de']['ratio of all strikes is'] = 'Quote alle Blitze';
-
+$_BL['de']['Strikes per'] = 'Blitze pro';
 
 ?>

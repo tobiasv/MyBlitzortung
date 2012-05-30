@@ -56,7 +56,7 @@ function bo_graph_raw()
 			$graph->DisplayEmpty(true);
 		
 		$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
-		$cache_file  = BO_DIR.'cache/';
+		$cache_file  = BO_DIR.BO_CACHE_DIR.'/';
 		$cache_file .= BO_CACHE_SUBDIRS === true ? 'signals/' : 'signal_';
 		$cache_file .= $user.'_'.gmdate('YmdH', $tstamp).'.log';
 		
@@ -160,7 +160,7 @@ function bo_graph_statistics()
 
 
 	/*** Caching ***/
-	$dir = BO_DIR."cache/graphs/";
+	$dir = BO_DIR.BO_CACHE_DIR."/graphs/";
 	$uniqe_id = md5(serialize($_GET)._BL());
 	$cache_file = $dir.$uniqe_id.'.png';
 
@@ -660,8 +660,6 @@ function bo_graph_statistics()
 				if ($cnt < 3) //don't display ratios with low strike counts
 					continue;
 
-				$X[$dist] = $dist * 10;
-
 				if ($all[$dist])
 					$Y[$dist] = $cnt / $all[$dist] * 100;
 				else
@@ -680,18 +678,22 @@ function bo_graph_statistics()
 				}
 			}
 
+			$last = -1;
 			for ($i=0;$i<=$max_dist;$i++)
 			{
 				$Y[$i] = isset($Y[$i]) ? $Y[$i] : null;
 				$Y2[$i] = isset($Y2[$i]) ? $Y2[$i] : null;
-
+				
+				
 				if ( !($i%5))
 					$tickPositions[] = $i;
 
-				if ( !($i%50))
+				$dist = bo_km(10*$i);
+				if ($last != floor($dist / 500))
 				{
-					$tickLabels[] = $i * 10;
+					$tickLabels[] = floor($dist / 500) * 500;
 					$tickMajPositions[] = $i;
+					$last = floor($dist / 500);
 				}
 
 
@@ -939,10 +941,10 @@ function bo_graph_statistics()
 			$Y2[$i] = 0;
 
 			if (intval($tmp['all_cnt'][$i]) != 0)
-				$Y[$i] = $tmp['all_sum'][$i] / $tmp['all_cnt'][$i] / 1000;
+				$Y[$i] = bo_km($tmp['all_sum'][$i] / $tmp['all_cnt'][$i] / 1000);
 
 			if (intval($tmp['own_cnt'][$i]) != 0)
-				$Y2[$i] = $tmp['own_sum'][$i] / $tmp['own_cnt'][$i] / 1000;
+				$Y2[$i] = bo_km($tmp['own_sum'][$i] / $tmp['own_cnt'][$i] / 1000);
 
 		}
 
@@ -1013,7 +1015,7 @@ function bo_graph_statistics()
 					break;
 
 				case 'deviations':
-					$tickLabels[$i] = number_format($i/10, 1, _BL('.'), _BL(',')).'km';
+					$tickLabels[$i] = _BM($i/10, 1);
 					$X[$i] = $i/10;
 					break;
 			}
@@ -1057,7 +1059,7 @@ function bo_graph_statistics()
 			if ($total > 0)
 			{
 				$caption .= '      '._BL('ratio of all strikes is').': ';
-				$caption .= number_format($Y[$part_min] / $total*100, 1, _BL('.'), _BL(',')).'%';
+				$caption .= _BN($Y[$part_min] / $total*100, 1).'%';
 			}
 			$caption .= "\n";
 			
@@ -1072,7 +1074,7 @@ function bo_graph_statistics()
 			if ($total > 0)
 			{
 				$caption .= '      '._BL('ratio of all strikes is').': ';
-				$caption .= number_format($sum_minmax / $total*100, 1, _BL('.'), _BL(',')).'%';
+				$caption .= _BN($sum_minmax / $total*100, 1).'%';
 			}
 			$caption .= "\n";
 		}
@@ -1170,12 +1172,12 @@ function bo_graph_statistics()
 				}
 				else if ($value_max)
 				{
-					$deviations_text = number_format($value / 1000, 1, _BL('.'), _BL(',')).'-'.number_format($value_max / 1000, 1, _BL('.'), _BL(',')).'km';
+					$deviations_text = _BN(bo_km($value / 1000), 1).'-'._BK($value_max / 1000, 1);
 					$sql_select .= ", s.deviation BETWEEN '$value' AND '$value_max' extra ";
 				}
 				else
 				{
-					$deviations_text = number_format($value / 1000, 1, _BL('.'), _BL(',')).'km';
+					$deviations_text = _BK($value / 1000, 1);
 					$sql_select .= ", s.deviation='$value' extra ";
 				}
 
@@ -1432,7 +1434,7 @@ function bo_graph_statistics()
 
 				$caption .= _BL('Mean value channel').' '.$channel.': ';
 				if (intval($count))
-					$caption .= number_format(($amp_sum / $count * $amp_divisor) / 256 * BO_MAX_VOLTAGE, 3, _BL('.'), _BL(',')).'V';
+					$caption .= _BN(($amp_sum / $count * $amp_divisor) / 256 * BO_MAX_VOLTAGE, 3).'V';
 				else
 					$caption .= '?';
 
@@ -1441,7 +1443,7 @@ function bo_graph_statistics()
 
 			foreach($Y[1] as $amp_id => $dummy)
 			{
-				$tickLabels[$amp_id] = number_format(($amp_id * $amp_divisor) / 256 * BO_MAX_VOLTAGE, 1, _BL('.'), _BL(',')).'V';
+				$tickLabels[$amp_id] = _BN(($amp_id * $amp_divisor) / 256 * BO_MAX_VOLTAGE, 1).'V';
 				$X[$amp_id] = $amp_id;
 			}
 		}
@@ -1540,7 +1542,7 @@ function bo_graph_statistics()
 					$amp_min = $value / 10 / BO_MAX_VOLTAGE * 255;
 					$amp_max = $value_max / 10 / BO_MAX_VOLTAGE * 255 + 1;
 
-					$values_text = number_format($value/10, 1, _BL('.'), _BL(',')).'-'.number_format($value_max/10, 1, _BL('.'), _BL(',')).'V';
+					$values_text = _BN($value/10, 1).'-'._BN($value_max/10, 1).'V';
 					$sql_select .= ", ABS(CONVERT(r.amp{CHANNEL}$ampmax, SIGNED) - 128)*2 BETWEEN '$amp_min' AND '$amp_max' extra ";
 				}
 
@@ -1728,12 +1730,24 @@ function bo_graph_statistics()
 					WHERE time BETWEEN '$date_start' AND '$date_end' AND $sqlw $sqlw_country
 					GROUP BY TO_DAYS(time)";
 
-			if ($hours_back < 7 * 24)
+			if ($hours_back < BO_GRAPH_STAT_GROUP_NONE)
+			{
 				$sql .= ", HOUR(time), FLOOR(MINUTE(time) / ".$interval.")";
-			else if ($hours_back < 22 * 24)
+			}
+			else if ($hours_back < BO_GRAPH_STAT_GROUP_HOURLY)
+			{
 				$sql .= ", HOUR(time)";
+				$interval = 60;
+			}
+			else if ($hours_back < BO_GRAPH_STAT_GROUP_6HOURLY)
+			{
+				$sql .= ", FLOOR(HOUR(time)/6)";
+				$interval = 6 * 60;
+			}
 			else
+			{
 				$interval = 24 * 60;
+			}
 			
 			$ticks = ($time_end - $time_start) / 60 / $interval;
 			
@@ -2232,7 +2246,7 @@ function bo_graph_statistics()
 			$graph->Add($plot);
 
 			$graph->xaxis->title->Set(_BL('Time'));
-			$graph->yaxis->title->Set(_BL('Distance').'   [km]');
+			$graph->yaxis->title->Set(_BL('Distance').'   ['._BK().']');
 
 			break;
 
@@ -2354,7 +2368,7 @@ function bo_graph_statistics()
 			if (count($tickMajPositions) > 1)
 				$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
 				
-			$graph->xaxis->title->Set(_BL('Distance').'   [km]');
+			$graph->xaxis->title->Set(_BL('Distance').'   ['._BK().']');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
 
 			$graph->ynaxis[0]->title->Set(_BL('Count'));
@@ -3076,7 +3090,7 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 
 		list($x, $y) = bo_rotate(0, $s/2, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_ANGLE1-180, $xm, $ym);
 		$e = ($max * $i / $circles);
-		$e = $e >= 10 ? round($e) : number_format($e,1,_BL('.'),_BL(','));
+		$e = $e >= 10 ? round($e) : _BN($e,1);
 		$e .= '%';
 		bo_imagestring($I, $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_SIZE, $x, $y, $e, $color1);
 
@@ -3085,7 +3099,7 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 		{
 			list($x, $y) = bo_rotate(0, $s/2, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_ANGLE2-180, $xm, $ym);
 			$e = (max($D2) * $i / $circles);
-			$e = $e >= 10 ? round($e) : number_format($e,1,_BL('.'),_BL(','));
+			$e = $e >= 10 ? round($e) : _BN($e,1);
 			$e .= ' '._BL('strikes');
 			bo_imagestring($I, $fontsize * BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_NUMBERS_SIZE, $x, $y, $e, $color2);
 		}
