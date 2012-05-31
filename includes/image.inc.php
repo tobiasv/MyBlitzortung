@@ -267,7 +267,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		else
 			$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
 
-		$time_string .= ' '._BZ($time_min);
+		$time_string .= _BZ($time_min);
 			
 		if ($period_id)
 			$cache_file .= '_p'.$ranges[$period_id];
