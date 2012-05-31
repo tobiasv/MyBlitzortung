@@ -652,7 +652,7 @@ function bo_graph_statistics()
 		{
 			foreach($own as $dist => $cnt)
 			{
-				if (!is_numeric($dist))
+				if (!is_numeric($dist) || $dist*10 > bo_km(BO_GRAPH_STAT_MAX_DISTANCE))
 					continue;
 					
 				$sum_own += $cnt;
@@ -670,33 +670,20 @@ function bo_graph_statistics()
 
 			foreach($all as $dist => $cnt)
 			{
-				if (is_numeric($dist))
-				{
-					$Y2[$dist] = $cnt;
-					$max_dist = max($max_dist, $dist);
-					$sum_all += $cnt;
-				}
+				if (!is_numeric($dist) || $dist*10 > bo_km(BO_GRAPH_STAT_MAX_DISTANCE))
+					continue;
+					
+				$Y2[$dist] = $cnt;
+				$max_dist = max($max_dist, $dist);
+				$sum_all += $cnt;
 			}
 
 			$last = -1;
 			for ($i=0;$i<=$max_dist;$i++)
 			{
+				$X[$i] = bo_km($i*10);
 				$Y[$i] = isset($Y[$i]) ? $Y[$i] : null;
 				$Y2[$i] = isset($Y2[$i]) ? $Y2[$i] : null;
-				
-				
-				if ( !($i%5))
-					$tickPositions[] = $i;
-
-				$dist = bo_km(10*$i);
-				if ($last != floor($dist / 500))
-				{
-					$tickLabels[] = floor($dist / 500) * 500;
-					$tickMajPositions[] = $i;
-					$last = floor($dist / 500);
-				}
-
-
 			}
 
 			$caption  = $sum_all.' '._BL('total strikes');
@@ -705,7 +692,7 @@ function bo_graph_statistics()
 			
 		}
 
-		$graph_type = 'textlin';
+		$graph_type = 'linlin';
 		$title_no_hours = true;
 
 		if (isset($own['time']) && $own['time'] && $station_id != 0)
@@ -713,13 +700,10 @@ function bo_graph_statistics()
 		else
 			$add_title = ' '._BL('since begin of data logging');
 
-			
-		
-			
 		$ymin = 0;
 		$ymax = 100;
 	}
-	else if($type == 'ratio_bearing_longtime')
+	else if ($type == 'ratio_bearing_longtime')
 	{
 		if (BO_ENABLE_LONGTIME_ALL !== true)
 			$station_id = 0;
@@ -757,18 +741,9 @@ function bo_graph_statistics()
 
 			for ($i=0;$i<360;$i++)
 			{
+				$X[$i] = $i;
 				$Y[$i] = isset($Y[$i]) ? $Y[$i] : null;
 				$Y2[$i] = isset($Y2[$i]) ? $Y2[$i] : null;
-
-				if ( !($i%5))
-					$tickPositions[] = $i;
-
-				if ( !($i%45))
-				{
-					$tickLabels[] = $i;
-					$tickMajPositions[] = $i;
-				}
-
 			}
 
 		}
@@ -790,11 +765,6 @@ function bo_graph_statistics()
 	{
 		$dist_div = BO_GRAPH_STAT_RATIO_DIST_DIV; //interval in km
 		$bear_div = BO_GRAPH_STAT_RATIO_BEAR_DIV;
-
-
-		$xmin = 0;
-		if ($type == 'ratio_bearing')
-			$xmax = floor(360 / $bear_div) -1 ;
 
 		$tmp = array();
 		$ticks = 0;
@@ -849,28 +819,15 @@ function bo_graph_statistics()
 
 		if ($type == 'ratio_bearing')
 			$ticks = 360 / $bear_div;
-
+		else 
+			$ticks = min($ticks, BO_GRAPH_STAT_MAX_DISTANCE / $dist_div);
+			
 		$sum_all= 0;
 		$sum_own= 0;
 			
 		for($i=0;$i<$ticks;$i++)
 		{
-			if ($type == 'ratio_bearing')
-			{
-				if ( !(($i*$bear_div)%45))
-				{
-					$tickLabels[] = $i*$bear_div;
-					$tickMajPositions[] = $i;
-				}
-			}
-			else
-			{
-				if ( !(($i*$dist_div)%500))
-				{
-					$tickLabels[] = $i*$dist_div;
-					$tickMajPositions[] = $i;
-				}
-			}
+			$X[$i] = $type == 'ratio_bearing' ? $i*$bear_div : bo_km($i*$dist_div);
 
 			if ($tmp[0][$i])
 				$Y[$i] = $tmp[1][$i] / ($tmp[0][$i]+$tmp[1][$i]) * 100;
@@ -883,18 +840,15 @@ function bo_graph_statistics()
 			$sum_own += $tmp[1][$i];
 		}
 
-		$graph_type = 'textlin';
-
-		if (count($tickMajPositions) < 2)
-		{
-			$tickLabels[] = $i*$dist_div;
-			$tickMajPositions[] = $i;
-		}
+		$graph_type = 'linlin';
 
 		$caption  = $sum_all.' '._BL('total strikes');
 		$caption .= "\n";
 		$caption .= $sum_own.' '._BL('total strikes station');
 
+		$xmin = 0;
+		if ($type == 'ratio_bearing')
+			$xmax = 360;
 		
 		$ymin = 0;
 		$ymax = 100;
@@ -2337,12 +2291,12 @@ function bo_graph_statistics()
 
 			if (BO_GRAPH_STAT_RATIO_DIST_LINE)
 			{
-				$plot=new LinePlot($Y);
+				$plot=new LinePlot($Y, $X);
 				$plot->SetWeight(BO_GRAPH_STAT_RATIO_DIST_WIDTH1);
 			}
 			else
 			{
-				$plot=new BarPlot($Y);
+				$plot=new BarPlot($Y, $X);
 				if (BO_GRAPH_STAT_RATIO_DIST_WIDTH1)
 					$plot->SetWidth(BO_GRAPH_STAT_RATIO_DIST_WIDTH1);
 			}
@@ -2356,7 +2310,7 @@ function bo_graph_statistics()
 			$graph->Add($plot);
 
 
-			$plot=new LinePlot($Y2);
+			$plot=new LinePlot($Y2, $X);
 			$plot->SetColor(BO_GRAPH_STAT_RATIO_DIST_COLOR_L2);
 			if (BO_GRAPH_STAT_RATIO_DIST_COLOR_F2)
 				$plot->SetFillColor(BO_GRAPH_STAT_RATIO_DIST_COLOR_F2);
@@ -2365,12 +2319,8 @@ function bo_graph_statistics()
 			$graph->SetYScale(0,'lin');
 			$graph->AddY(0,$plot);
 
-			if (count($tickMajPositions) > 1)
-				$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
-				
 			$graph->xaxis->title->Set(_BL('Distance').'   ['._BK().']');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
-
 			$graph->ynaxis[0]->title->Set(_BL('Count'));
 
 			break;
@@ -2382,12 +2332,12 @@ function bo_graph_statistics()
 
 			if (BO_GRAPH_STAT_RATIO_BEAR_LINE)
 			{
-				$plot=new LinePlot($Y);
+				$plot=new LinePlot($Y, $X);
 				$plot->SetWeight(BO_GRAPH_STAT_RATIO_BEAR_WIDTH1);
 			}
 			else
 			{
-				$plot=new BarPlot($Y);
+				$plot=new BarPlot($Y, $X);
 				if (BO_GRAPH_STAT_RATIO_BEAR_WIDTH1)
 					$plot->SetWidth(BO_GRAPH_STAT_RATIO_BEAR_WIDTH1);
 			}
@@ -2399,7 +2349,7 @@ function bo_graph_statistics()
 			$graph->Add($plot);
 
 
-			$plot=new LinePlot($Y2);
+			$plot=new LinePlot($Y2, $X);
 			$plot->SetColor(BO_GRAPH_STAT_RATIO_BEAR_COLOR_L2);
 			if (BO_GRAPH_STAT_RATIO_BEAR_COLOR_F2)
 				$plot->SetFillColor(BO_GRAPH_STAT_RATIO_BEAR_COLOR_F2);
@@ -2407,13 +2357,10 @@ function bo_graph_statistics()
 			$plot->SetLegend(_BL('graph_legend_count_bearing'));
 			$graph->SetYScale(0,'lin');
 			$graph->AddY(0,$plot);
-
-			if (count($tickMajPositions) > 1)
-				$graph->xaxis->SetTickPositions($tickMajPositions,$tickPositions,$tickLabels);
-				
+		
+			$graph->xaxis->scale->ticks->Set(45);
 			$graph->xaxis->title->Set(_BL('Bearing').'   [°]');
 			$graph->yaxis->title->Set(_BL('Percent').'   [%]');
-
 			$graph->ynaxis[0]->title->Set(_BL('Count'));
 
 			break;

@@ -2236,6 +2236,7 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 			
 	}
 	
+	header("X-MyBlitzortung: from-cache");
 	readfile($cache_file);
 }
 

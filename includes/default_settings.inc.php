@@ -829,7 +829,8 @@
 //max. review time for station graph for non-loggedin (hours)
 @define('BO_GRAPH_STAT_DAYS_BACK_MAX', 30);
 
-
+//max. distance (km)
+@define('BO_GRAPH_STAT_MAX_DISTANCE', 5000);
 
 //main appearance
 @define('BO_GRAPH_STAT_W', 550);
@@ -940,7 +941,7 @@
 @define('BO_GRAPH_STAT_RATIO_DIST_LINE', false);
 @define('BO_GRAPH_STAT_RATIO_DIST_COLOR_L1', '#00f@1');
 @define('BO_GRAPH_STAT_RATIO_DIST_COLOR_F1', '#ada@0.2');
-@define('BO_GRAPH_STAT_RATIO_DIST_WIDTH1',  null);
+@define('BO_GRAPH_STAT_RATIO_DIST_WIDTH1',  1.2);
 @define('BO_GRAPH_STAT_RATIO_DIST_COLOR_L2', '#22f@0.8');
 @define('BO_GRAPH_STAT_RATIO_DIST_COLOR_F2', '#22f@0.95');
 @define('BO_GRAPH_STAT_RATIO_DIST_WIDTH2',  1);
@@ -950,7 +951,7 @@
 @define('BO_GRAPH_STAT_RATIO_BEAR_LINE', false);
 @define('BO_GRAPH_STAT_RATIO_BEAR_COLOR_L1', '#00f@1');
 @define('BO_GRAPH_STAT_RATIO_BEAR_COLOR_F1', '#ada@0.2');
-@define('BO_GRAPH_STAT_RATIO_BEAR_WIDTH1',  null);
+@define('BO_GRAPH_STAT_RATIO_BEAR_WIDTH1',  1.2);
 @define('BO_GRAPH_STAT_RATIO_BEAR_COLOR_L2', '#22f@0.8');
 @define('BO_GRAPH_STAT_RATIO_BEAR_COLOR_F2', '#22f@0.95');
 @define('BO_GRAPH_STAT_RATIO_BEAR_WIDTH2',  1);
