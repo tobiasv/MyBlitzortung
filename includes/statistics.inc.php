@@ -876,19 +876,26 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	//Station statistics
 	$D = array();
-	$sql = "SELECT  AVG(signalsh) signalsh,
-						 AVG(strikesh) strikesh,
-						 station_id,
-						 DATE_FORMAT(time, '%Y%m%d%H') h
+	$count = 0;
+	$sql = "SELECT  	SUM(signalsh) signalsh_sum,
+						SUM(strikesh) strikesh_sum,
+						COUNT(*) cnt, station_id,
+						DATE_FORMAT(time, '%Y%m%d%H') h
 					FROM ".BO_DB_PREF."stations_stat
 					WHERE time BETWEEN '$table_time_start' AND '$table_time_end'
-							AND station_id != 0
-					GROUP BY station_id, h";
+					GROUP BY station_id, h
+					ORDER BY h, station_id";
 	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 	{
-		$D[$row['station_id']]['strikesh'] += $row['strikesh'];
-		$D[$row['station_id']]['signalsh'] += $row['signalsh'];
+		if ($row['station_id'] == 0)
+		{
+			$count = $row['cnt'];
+			continue;
+		}
+		
+		$D[$row['station_id']]['strikesh'] += $row['strikesh_sum'] / $count;
+		$D[$row['station_id']]['signalsh'] += $row['signalsh_sum'] / $count;
 	}
 	$active_stations = count($D);
 	
