@@ -18,10 +18,10 @@ $_BL['locale'] = 'nl';
 
 
 //Naam (titel) MyBlitzortung met html tags
-$_BL['nl']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">LightningDetection</span>';
+$_BL['nl']['MyBlitzortung'] = '<span class="bo_my">Mijn</span><span class="bo_mybo">Bliksemdetector</span>';
 
 //TNaam (titel) van MyBlitzortung zonder html tags
-$_BL['nl']['MyBlitzortung_notags'] = 'MyLightningDetection';
+$_BL['nl']['MyBlitzortung_notags'] = 'MijnBliksemdetector';
 
 //Extra toevoeging in footer
 $_BL['nl']['copyright_extra'] = 'Vertaling Nederlands: Willem <a href="http://www.meteomoes.be/paginas" target="_blank">MeteoMoes</a>';
@@ -749,10 +749,10 @@ $_BL['nl']['archive_map_info'] = 'Op deze pagina kunnen blikseminslagen getoond 
 ';
 
 $_BL['nl']['archive_density_info'] = '
-Hier kan de dichtheid van de inslagen weergegeven worden. Deze gegevens zijn fzonderlijk opgeslagen, onafhankelijk van andere info.
+Hier kan de dichtheid van de inslagen weergegeven worden. Deze gegevens zijn afzonderlijk opgeslagen, onafhankelijk van andere info.
 <br>
 <br>
-Enkel tips: De getoonde gegevens zijn niet gestandariseerd, de resultaten kunnen dan ook niet vergeleken worden over langere perioden of grotere regios. Dit doordat verschillende stations verschillende kwaliteit aan informatie doorsturen. Men kan van station en beelden wisselen.
+Enkel tips: De getoonde gegevens zijn niet gestandariseerd, de resultaten kunnen dan ook niet vergeleken worden over langere periodes of grotere regios. Dit doordat verschillende stations verschillende kwaliteit aan informatie doorsturen. Men kan van station en beelden wisselen.
 ';
 
 $_BL['nl']['archive_signaltable_info'] = '
