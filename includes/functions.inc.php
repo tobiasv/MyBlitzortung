@@ -2087,8 +2087,8 @@ function bo_get_regions($bo_station_id = false)
 			}
 		}
 
-		ksort($regions[0]);
-		ksort($regions[1]);
+		asort($regions[0]);
+		asort($regions[1]);
 	}
 
 	//Distances
@@ -2115,32 +2115,33 @@ function bo_get_regions($bo_station_id = false)
 
 }
 
-function bo_show_select_region($region, $bo_station_id = false, $show_exclude = true)
+function bo_get_select_region($region, $bo_station_id = false, $show_exclude = true)
 {
 	$regions = bo_get_regions($bo_station_id);
+	$ret = '';
 	
 	if (count($regions[0]) > 1)
 	{
-		echo '<select name="bo_region" onchange="submit();" id="bo_stat_strikes_select_now" class="bo_select_region">';
-		echo '<option value="">'._BL('No limit').'</option>';
+		$ret .= '<select name="bo_region" onchange="submit();" id="bo_stat_strikes_select_now" class="bo_select_region">';
+		$ret .= '<option value="">'._BL('No limit').'</option>';
 		
-		echo '<optgroup label="'._BL('Show only region').'">';
+		$ret .= '<optgroup label="'._BL('Show only region').'">';
 		foreach($regions[0] as $i => $y)
-			echo '<option value="'.$i.'" '.($i === $region ? 'selected' : '').'>'.$y.'</option>';
-		echo '</optgroup>';
+			$ret .= '<option value="'.$i.'" '.($i === $region ? 'selected' : '').'>'.$y.'</option>';
+		$ret .= '</optgroup>';
 
 		if ($show_exclude && count($regions[1]) > 1)
 		{
-			echo '<optgroup label="'._BL('Exclude region').'">';
+			$ret .= '<optgroup label="'._BL('Exclude region').'">';
 			foreach($regions[1] as $i => $y)
-				echo '<option value="'.$i.'" '.($i === $region ? 'selected' : '').'>'.$y.'</option>';
-			echo '</optgroup>';
+				$ret .= '<option value="'.$i.'" '.($i === $region ? 'selected' : '').'>'.$y.'</option>';
+			$ret .= '</optgroup>';
 		}
 		
-		echo '</select>';
+		$ret .= '</select>';
 	}
 
-
+	return $ret;
 }
 
 function bo_region2name($region, $bo_station_id = false)

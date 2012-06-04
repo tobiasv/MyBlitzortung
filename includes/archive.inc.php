@@ -1045,9 +1045,14 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			
 			if ($show_empty_sig || $only_strikes)
 			{
-				echo ' <span class="bo_form_descr">'._BL('Region').':&nbsp;';
-				bo_show_select_region($region, $station_id);
-				echo '</span>&nbsp;&nbsp; ';
+				$region_select = bo_get_select_region($region, $station_id);
+	
+				if ($region_select)
+				{
+					echo ' <span class="bo_form_descr">'._BL('Region').':&nbsp;';
+					echo $region_select;
+					echo '</span>&nbsp;&nbsp; ';
+				}
 			}
 			
 			if ($show_details)

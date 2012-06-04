@@ -231,15 +231,19 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	echo strtr(_BL('bo_descr_strikes_now'), array('{UPDATE_INTERVAL}' => _BLN(BO_UP_INTVL_STRIKES, 'every_minute'), '{RATE_INTERVAL}' => _BLN($group_minutes)));
 	echo '</p>';
 
-	echo '<form action="?" method="GET" class="bo_stat_strikes_form">';
-	echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_region'));
-	echo '<fieldset>';
-	echo '<legend>'._BL('legend_stat_strikes_now').'</legend>';
-	echo '<span class="bo_form_descr">'._BL('Region').': </span>';
-	bo_show_select_region($region, $station_id);
-	echo '</fieldset>';
-	echo '</form>';
-
+	$region_select = bo_get_select_region($region, $station_id);
+	
+	if ($region_select)
+	{
+		echo '<form action="?" method="GET" class="bo_stat_strikes_form">';
+		echo bo_insert_html_hidden(array('bo_year', 'bo_month', 'bo_region'));
+		echo '<fieldset>';
+		echo '<legend>'._BL('legend_stat_strikes_now').'</legend>';
+		echo '<span class="bo_form_descr">'._BL('Region').': </span>';
+		echo $region_select;
+		echo '</fieldset>';
+		echo '</form>';
+	}
 
 	echo '<ul class="bo_stat_overview">';
 
@@ -288,8 +292,14 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 			echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').' style="'.($i <= 0 ? 'font-weight:bold;' : '').'">'.$m.'</option>';
 		echo '</select>';
 
-		echo ' &nbsp; &bull; &nbsp; <span class="bo_form_descr">'._BL('Region').': </span>';
-		bo_show_select_region($region, false, false);
+		$region_select = bo_get_select_region($region, false, false);
+	
+		if ($region_select)
+		{
+			echo ' &nbsp; &bull; &nbsp; <span class="bo_form_descr">'._BL('Region').': </span>';
+			echo $region_select;
+		}	
+		
 		echo '</fieldset>';
 
 
@@ -1773,11 +1783,16 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 	echo '</select> ';
 	echo '</span>&nbsp;';
 
-	echo '<span class="bo_form_group">';
-	echo '<span class="bo_form_descr">'._BL('Region').': </span>';
-	bo_show_select_region($region, $station_id);
-	echo '</span>&nbsp;';
-
+	$region_select = bo_get_select_region($region, $station_id);
+	
+	if ($region_select)
+	{
+		echo '<span class="bo_form_group">';
+		echo '<span class="bo_form_descr">'._BL('Region').': </span>';
+		echo $region_select;
+		echo '</span>&nbsp;';
+	}
+	
 	if ($own_station && $channels > 1)
 	{
 		echo '<span class="bo_form_group">';
