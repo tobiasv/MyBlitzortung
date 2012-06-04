@@ -1497,7 +1497,8 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 				foreach($stations as $station_id)
 				{
 					
-					if (!$is_current 
+					if ($station_id <= 0 
+						|| !$is_current
 						|| (BO_CALC_DENSITIES_CURRENT == true && $station_id == bo_station_id())
 						|| (BO_CALC_DENSITIES_CURRENT_ALL == true))
 					{
