@@ -3078,11 +3078,20 @@ function bo_delete_station($id = 0)
 		$deleted_stations[] = $station_info;
 		bo_set_conf('stations_deleted', serialize($deleted_stations));
 
+		
+		//delete data from "new_id" -> otherwise update would not work it sth did wrong before
+		BoDb::query("DELETE FROM ".BO_DB_PREF."conf             WHERE name LIKE '%#".$new_id."#%'");
+		BoDb::query("DELETE FROM ".BO_DB_PREF."stations_stat    WHERE station_id='$new_id'");
+		BoDb::query("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE station_id='$new_id'");
+		BoDb::query("DELETE FROM ".BO_DB_PREF."densities        WHERE station_id='$new_id'");
+		BoDb::query("DELETE FROM ".BO_DB_PREF."stations         WHERE id='$new_id'");
+
+		
 		//reassign IDs
-		BoDb::query("UPDATE ".BO_DB_PREF."conf SET name=REPLACE(name, '#".$id."#', '#".$new_id."#') WHERE name LIKE '%#".$id."#%'");
-		BoDb::query("UPDATE ".BO_DB_PREF."stations_stat    SET station_id='$new_id' WHERE station_id='$id'");
-		BoDb::query("UPDATE ".BO_DB_PREF."stations_strikes SET station_id='$new_id' WHERE station_id='$id'");
-		BoDb::query("UPDATE ".BO_DB_PREF."densities        SET station_id='$new_id' WHERE station_id='$id'");
+		BoDb::query("UPDATE ".BO_DB_PREF."conf SET name=REPLACE(name, '#".$id."#', '#".$new_id."#') WHERE name LIKE '%#".$id."#%'", false);
+		BoDb::query("UPDATE ".BO_DB_PREF."stations_stat    SET station_id='$new_id' WHERE station_id='$id'", false);
+		BoDb::query("UPDATE ".BO_DB_PREF."stations_strikes SET station_id='$new_id' WHERE station_id='$id'", false);
+		BoDb::query("UPDATE ".BO_DB_PREF."densities        SET station_id='$new_id' WHERE station_id='$id'", false);
 
 		$last_strikes = unserialize(bo_get_conf('last_strikes_stations'));
 		$last_strikes[$new_id] = $last_strikes[$id];
