@@ -620,6 +620,9 @@
 @define('BO_ANIMATIONS_WAITTIME_END', 1000); //Wait at the and of a loop (milliseconds)
 @define('BO_ANIMATIONS_RANGE_STEP', 1);  //Step time in select box (hours)
 
+//Animation of the strike locating, default count of pics (0 = disable)
+@define('BO_ARCHIVE_STRIKE_INFO_ANIM', 20);
+
 
 
 /*******************************************************************/

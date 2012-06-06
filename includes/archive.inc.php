@@ -955,6 +955,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		//Special effects ;-)
 		$hyps = intval($_GET['bo_hyps']);
 		
+		if (BO_ARCHIVE_STRIKE_INFO_ANIM <= 0)
+			exit('Disabled');
+		
 		$images = array();
 		for($i=$strike_id-$strikes_before;$i<=$strike_id;$i++)
 			$images[] = $i;
@@ -1194,7 +1197,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 	while($row = $res->fetch_assoc())
 	{
-		if ($show_empty_sig && $res->num_rows == 1)
+		if ($row['strike_id'] && $res->num_rows == 1)
 			$strike_id = $row['strike_id'];
 
 		$count++;
@@ -1694,11 +1697,11 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			echo '</div>';
 			
 				
-			if (!$show_details)
+			if (!$show_details && (int)BO_ARCHIVE_STRIKE_INFO_ANIM > 0)
 			{
 				echo '<fieldset>';
 				echo bo_archive_select_map($map);
-				echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $row['strike_id']).'&bo_strikes_before=100">'._BL('Animation').'</a>';
+				echo ' &bull; <a href="'.bo_insert_url(array('bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom'), $row['strike_id']).'&bo_strikes_before='.BO_ARCHIVE_STRIKE_INFO_ANIM.'">'._BL('Animation').'</a>';
 				echo '</fieldset>';
 			}
 			
