@@ -1458,7 +1458,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				echo _BL('Distance').': ';
 				echo '</span>';
 				echo '<span class="bo_value">';
-				echo _BK($row['distance'] / 1000, 1);
+				echo _BK($distance / 1000, 1);
 				echo '&nbsp;('._BL(bo_bearing2direction($bearing)).')';
 				echo '</span>';
 				echo '</li>';
