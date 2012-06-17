@@ -493,13 +493,17 @@ $_BO['tpl_region']['bavaria']['rect_rem'] = array(	49.4, 9.5, 47.7, 10,
 
 $_BO['tpl_region']['belgium']['name'] = 'Belgium';
 $_BO['tpl_region']['belgium']['visible'] = true; 
-$_BO['tpl_region']['belgium']['rect_add'] = array(	51.57, 2.32, 49.39, 6.6 );
-$_BO['tpl_region']['belgium']['rect_rem'] = array(	49.3, 2.32, 50.2, 3.9,
-													49.3, 3.9, 49.8, 4.7,
-													50.6, 2.32, 50.2, 3.10,
-													51.57,5.2,51.3,6.6,
-													51.57,5.6,50.6,6.6
+$_BO['region']['belgium']['rect_add'] = array(
+													51.57, 6.6, 49.39, 2.32
 													);
+$_BO['region']['belgium']['rect_rem'] = array(
+													50.2, 3.9, 49.3, 2.32,
+													49.8, 4.7, 49.3, 3.9,
+													50.6, 3.10, 50.2, 2.32,
+													51.57, 6.6, 51.3, 5.2,
+													51.57, 6.6, 50.6, 5.6
+													);
+
 
 													
 /**************************************/
