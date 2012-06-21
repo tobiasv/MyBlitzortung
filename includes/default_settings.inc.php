@@ -1092,6 +1092,10 @@
 /*** Some special/expert settings                                ***/
 /*** You shouldn't change them unless you know what you're doing ***/
 
+//Default socket timeout
+@define('BO_SOCKET_TIMEOUT', 40);
+
+
 // Fuzzy strike update to avoid duplicates
 @define('BO_UP_STRIKES_FUZZY_NSEC', 400000);
 @define('BO_UP_STRIKES_FUZZY_KM',   50);

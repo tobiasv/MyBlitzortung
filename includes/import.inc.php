@@ -16,7 +16,7 @@ function bo_update_all($force = false, $only = '')
 
 	session_write_close();
 	ignore_user_abort(true);
-	ini_set('default_socket_timeout', 10);
+	ini_set('default_socket_timeout', BO_SOCKET_TIMEOUT);
 
 	$start_time = time();
 	$debug = defined('BO_DEBUG') && BO_DEBUG;
