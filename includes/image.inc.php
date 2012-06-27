@@ -80,8 +80,37 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	
 	if (!is_array($cfg) || empty($cfg))
+	{
 		return;
+	}
+	else
+	{
+		//add missing settings
+		
+		if (!isset($cfg['trange']))
+			$cfg['trange'] = $_BO['tpl_imgmap_default']['trange'];
+		if (!isset($cfg['upd_intv']))
+			$cfg['upd_intv'] = $_BO['tpl_imgmap_default']['upd_intv'];
+		if (!isset($cfg['col']))
+			$cfg['col'] = $_BO['tpl_imgmap_default']['col'];
+		if (!isset($cfg['top_font']))
+			$cfg['top_font'] = $_BO['tpl_imgmap_default']['top_font'];
+		if (!isset($cfg['top_style']))
+			$cfg['top_style'] = $_BO['tpl_imgmap_default']['top_style'];
+		if (!isset($cfg['bottom_font']))
+			$cfg['bottom_font'] = $_BO['tpl_imgmap_default']['bottom_font'];
+		if (!isset($cfg['bottom_style']))
+			$cfg['bottom_style'] = $_BO['tpl_imgmap_default']['bottom_style'];
+		if (!isset($cfg['menu']))
+			$cfg['menu'] = $_BO['tpl_imgmap_default']['menu'];
+		if (!isset($cfg['point_style']))
+			$cfg['point_style'] = $_BO['tpl_imgmap_default']['point_style'];
+		if (!isset($cfg['legend']))
+			$cfg['legend'] = $_BO['tpl_imgmap_default']['legend'];
+		if (!isset($cfg['legend_font']))
+			$cfg['legend_font'] = $_BO['tpl_imgmap_default']['legend_font'];
 
+	}
 		
 	
 	if ($return_img)
