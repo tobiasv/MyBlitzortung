@@ -1128,5 +1128,15 @@ $_BL['de']['strikes_station2'] = '{STATION_CITY}';
 $_BL['de']['mean ratio'] = 'Mittlere Quote';
 $_BL['de']['ratio of all strikes is'] = 'Quote alle Blitze';
 $_BL['de']['Strikes per'] = 'Blitze pro';
+$_BL['de']['Latvia'] = 'Lettland';
+$_BL['de']['Ukraine'] = 'Ukraine';
+
+$_BL['de']['lang_en'] = 'Englisch';
+$_BL['de']['lang_de'] = 'Deutsch';
+$_BL['de']['lang_fr'] = 'Französisch';
+$_BL['de']['lang_hu'] = 'Ungarisch';
+$_BL['de']['lang_it'] = 'Italienisch';
+$_BL['de']['lang_nl'] = 'Niederländisch';
+
 
 ?>

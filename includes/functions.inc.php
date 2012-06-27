@@ -286,11 +286,13 @@ function bo_insert_html_hidden($exclude = array())
 {
 	foreach($_GET as $name => $val)
 	{
-		if (array_search($name, $exclude) !== false)
+		if (array_search($name, $exclude) !== false || $name == BO_LANG_ARGUMENT)
 			continue;
 
 		echo "\n".'<input type="hidden" name="'.htmlentities($name).'" value="'.htmlentities($val).'">';
 	}
+	if (BO_LOCALE != _BL())
+		echo "\n".'<input type="hidden" name="'.BO_LANG_ARGUMENT.'" value="'._BL().'">';
 }
 
 function bo_insert_url($exclude = array(), $add = null)
@@ -306,8 +308,9 @@ function bo_insert_url($exclude = array(), $add = null)
 	$query = '';
 	foreach($_GET as $name => $val)
 	{
-
-		if (array_search($name, $exclude) !== false || ($exclude_bo && substr($name,0,3) == 'bo_' && $name != 'bo_page') )
+		if (array_search($name, $exclude) !== false 
+			|| ($exclude_bo && substr($name,0,3) == 'bo_' && $name != 'bo_page') 
+			|| $name == BO_LANG_ARGUMENT)
 			continue;
 
 		$query .= urlencode($name).(strlen($val) ? '='.urlencode($val) : '').'&';
@@ -316,7 +319,11 @@ function bo_insert_url($exclude = array(), $add = null)
 	if (count($exclude) && $add !== null)
 		$query .= $exclude[0].'='.urlencode($add).'&';
 
+	//Always add current language in url if not default (ie nedded for caching)
+	if (BO_LOCALE != _BL() && array_search(BO_LANG_ARGUMENT, $exclude) === false)
+		$query .=  BO_LANG_ARGUMENT.'='._BL().'&';
 
+		
 	$url = $_SERVER['REQUEST_URI'];
 	preg_match('@/([^/\?]+)\?|$@', $url, $r);
 
@@ -365,15 +372,19 @@ function bo_copyright_footer()
 		echo _BL('Languages').': ';
 		foreach($languages as $lang)
 		{
+			$title = _BL('lang_'.$lang) != 'lang_'.$lang ? _BL('lang_'.$lang) : $lang;
+			
 			if (BO_SHOW_LANG_FLAGS == true && file_exists(BO_DIR.'images/flags/'.$lang.'.png'))
-				$a_lang = '<img src="'.bo_bofile_url().'?image=flag_'.$lang.'" class="bo_flag" title="'.$lang.'">';
+				$a_lang = '<img src="'.bo_bofile_url().'?image=flag_'.$lang.'" class="bo_flag" title="'.$title.'">';
 			else
 				$a_lang = $lang;
 
 			if (trim($lang) == _BL())
 				echo ' <strong>'.trim($a_lang).'</strong> ';
 			else
-				echo ' <a href="'.bo_insert_url('bo_lang', trim($lang)).'">'.trim($a_lang).'</a> ';
+			{
+				echo ' <a href="'.bo_insert_url(BO_LANG_ARGUMENT, trim($lang)).'" title="'.$title.'">'.trim($a_lang).'</a> ';
+			}
 
 		}
 
@@ -855,9 +866,9 @@ function bo_load_locale($locale = '')
 	//individual locale for user (link, session, cookie)
 	if ($locale == '')
 	{
-		if (isset($_GET['bo_lang']) && preg_match('/^[a-zA-Z]{2}$/', $_GET['bo_lang']))
+		if (isset($_GET[BO_LANG_ARGUMENT]) && preg_match('/^[a-zA-Z]{2}$/', $_GET[BO_LANG_ARGUMENT]))
 		{
-			$locale = strtolower($_GET['bo_lang']);
+			$locale = strtolower($_GET[BO_LANG_ARGUMENT]);
 			$_SESSION['bo_locale'] = $locale;
 			@setcookie("bo_locale", $locale, time()+3600*24*365*10,'/');
 		}
@@ -888,7 +899,7 @@ function bo_load_locale($locale = '')
 	//Send the language
 	if (!headers_sent())
 		header("Content-Language: $locale");
-
+		
 }
 
 function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0, $as_array = false, $depth=0)
@@ -1871,7 +1882,7 @@ function bo_output_kml()
 				if (!$d['kml'])
 					continue;
 
-				$imgurl = $url."?map=".$id."&amp;bo_lang="._BL();
+				$imgurl = $url."?map=".$id."&amp;".BO_LANG_ARGUMENT."="._BL();
 
 				if (!$d['file'])
 					$imgurl .= "&amp;transparent";
@@ -1911,7 +1922,7 @@ function bo_output_kml()
 			echo "<refreshVisibility>0</refreshVisibility>\n";
 			echo "<flyToView>0</flyToView>\n";
 			echo "<Link>\n";
-			echo "  <href>".$url."?kml=1&amp;bo_lang="._BL()."</href>\n";
+			echo "  <href>".$url."?kml=1&amp;".BO_LANG_ARGUMENT."="._BL()."</href>\n";
 			echo "</Link>\n";
 			echo "</NetworkLink>\n";
 
@@ -2319,6 +2330,14 @@ function km2mi($val)
 function mi2km($val)
 {
 	return $val * 1.609;
+}
+
+function bo_str_max($str, $max = 35)
+{
+	if (strlen($str) > $max)
+		return substr($str,0,$max-20).($max > 30 ? '...'.substr($str,-8) : '');
+	else
+		return $str;
 }
 
 ?>

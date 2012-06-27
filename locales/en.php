@@ -1073,5 +1073,15 @@ $_BL['en']['strikes_station2'] = '{STATION_CITY}';
 $_BL['en']['mean ratio'] = 'mean ratio';
 $_BL['en']['ratio of all strikes is'] = 'ratio of all strikes is';
 $_BL['en']['Strikes per'] = 'Strikes per';
+$_BL['en']['Latvia'] = 'Latvia';
+$_BL['en']['Ukraine'] = 'Ukraine';
+
+$_BL['en']['lang_en'] = 'English';
+$_BL['en']['lang_de'] = 'German';
+$_BL['en']['lang_fr'] = 'French';
+$_BL['en']['lang_hu'] = 'Hungarian';
+$_BL['en']['lang_it'] = 'Italien';
+$_BL['en']['lang_nl'] = 'Dutch';
+
 
 ?>

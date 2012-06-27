@@ -1129,6 +1129,8 @@
 //  BO_RADIUS -> 0
 @define('BO_NO_DEFAULT_STATION', false);
 
+//argument that specifies language
+@define('BO_LANG_ARGUMENT', 'bo_lang');
 
 
 /*******************************************************************/

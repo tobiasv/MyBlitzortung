@@ -1309,11 +1309,11 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
 				{
 					echo '<a href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">';
-					echo _BC($d[1]).' ('._BL($d[2]).')';
+					echo bo_str_max(_BC($d[1])).' ('._BL($d[2]).')';
 					echo '</a>';
 				}
 				else
-					echo _BC($d[1]).' ('._BL($d[2]).')';
+					echo bo_str_max(_BC($d[1])).' ('._BL($d[2]).')';
 
 				echo '</span>';
 				echo '<span class="bo_value">';
@@ -2134,7 +2134,7 @@ function bo_show_graph($type, $add_graph='', $hour_select = false, $width=BO_GRA
 			onmouseout="document.getElementById(\'bo_graph_img_form_'.$type.'\').style.display=\'none\';"
 			>';
 	
-	echo '<img src="'.bo_bofile_url().'?graph_statistics='.$type.'&bo_lang='._BL().$add_graph.'"
+	echo '<img src="'.bo_bofile_url().'?graph_statistics='.$type.'&'.BO_LANG_ARGUMENT.'='._BL().$add_graph.'"
 			class="bo_graph_img"
 			style="width:'.$width.'px;height:'.$height.'px;background-image:url(\''.bo_bofile_url().'?image=wait\');"
 			id="bo_graph_'.$type.'_img"

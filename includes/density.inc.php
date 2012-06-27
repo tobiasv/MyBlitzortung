@@ -537,7 +537,7 @@ function bo_show_archive_density()
 	$img_file  = bo_bofile_url().'?density&map='.$map;
 	if ($year > 0)
 		$img_file .= '&bo_year='.$year.'&bo_month='.$month;
-	$img_file .= '&bo_lang='._BL();
+	$img_file .= '&'.BO_LANG_ARGUMENT.'='._BL();
 	$img_file .= '&'.floor(time() / 3600);
 	$img_file_start = $img_file.'&id='.$station_id.($ratio ? '&ratio' : '');
 	
