@@ -1541,6 +1541,12 @@ function bo_examine_signal($data, $channels=0, $ntime=0, &$amp = array(), &$amp_
 		}
 	}
 
+	if (0 > $freq_amp[0] || $freq_amp[0] > 255)
+		$freq_amp[0] = 0;
+
+	if (0 > $freq_amp[1] || $freq_amp[1] > 255)
+		$freq_amp[1] = 0;
+	
 	$sql = "amp1='$amp[0]', amp2='$amp[1]',
 			amp1_max='$amp_max[0]', amp2_max='$amp_max[1]',
 			freq1='$freq[0]', freq2='$freq[1]',
