@@ -130,8 +130,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			bo_load_locale(BO_LOCALE);
 	}
 	
-	$last_update = bo_get_conf('uptime_strikes_modified');
-	
 	//blank map?
 	if ($blank)
 	{
@@ -170,6 +168,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	else
 		$update_interval = $cfg['upd_intv'][$period_id] * 60;
 	
+	
 	//Cache file naming
 	$cache_file = BO_DIR.BO_CACHE_DIR.'/maps/';
 	$cache_file .= _BL().'_';
@@ -189,123 +188,149 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if (preg_match('/[0-9a-z]+/i', $region) && isset($_BO['region'][$region]['rect_add']))
 		$cache_file .= 'region'.$region.'_';
 
+		
+	if (BO_CACHE_FAST)
+		$last_update = floor(time() / $update_interval) * $update_interval;
+	else
+		$last_update = bo_get_conf('uptime_strikes_modified');
 
 	$sql_where_id = '';
 	
+	
 	if ($strike_id)
+		$image_type = 'single_strike';
+	elseif (preg_match('/^[0-9\-]+$/', $date))
+		$image_type = 'by_date';
+	else
+		$image_type = 'live';
+		
+
+	switch ($image_type)
 	{
-		//image with only one strike
+		case 'single_strike':
+	
+			//image with only one strike
+			
+			if (!$archive_maps_enabled)
+				bo_image_error('Forbidden!');
+			
+			$sql_where_id .= " AND id='$strike_id' ";
+			
+			//no legend
+			$cfg['legend'] = array();
+			
+			$sql = "SELECT time, time_ns FROM ".BO_DB_PREF."strikes s WHERE id='$strike_id' ";
+			$res = BoDb::query($sql);
+			$row = $res->fetch_assoc();
+			$time_min = $time_max = strtotime($row['time'].' UTC');
+			$time_string = _BDT($time_min, false).'.'.substr($row['time_ns'], 0, 6)._BZ($time_min);
+			
+			$file_by_time = true;
+			$caching = false;
+			
+			break;
+			
 		
-		if (!$archive_maps_enabled)
-			bo_image_error('Forbidden!');
+		case 'by_date';
 		
-		$sql_where_id .= " AND id='$strike_id' ";
+			//the archive images
+			
+			if (!$archive_maps_enabled)
+				bo_image_error('Forbidden!');
+			
+			$year     = sprintf('%04d', substr($date, 0, 4));
+			$month    = sprintf('%02d', substr($date, 4, 2));
+			$day      = sprintf('%02d', substr($date, 6, 2));
+			$hour     = sprintf('%02d', substr($date, 8, 2));
+			$minute   = sprintf('%02d', substr($date, 10, 2));
+			$duration = intval(substr($date, 13));
+
 		
-		//no legend
-		$cfg['legend'] = array();
+			if (!bo_user_get_level() && $duration != $cfg['animation']['range'])
+			{
+				if ( ($duration > 60 * BO_SMAP_MAX_RANGE || ($duration && $duration < BO_SMAP_MIN_RANGE)) )
+					bo_image_error('Time range not allowed!');
+				
+				//allow only specific settings for guests
+				$minute   = floor($minute / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
+				$duration = floor($duration / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
+			}
+			
+			if ($duration)
+			{
+				//When duration/time then use UTC!
+				$time_min = strtotime("$year-$month-$day $hour:$minute:00 UTC");
+				$time_max = strtotime("$year-$month-$day $hour:$minute:00 +$duration minutes UTC");
+			}
+			else
+			{
+				$time_min = strtotime("$year-$month-$day 00:00:00");
+				$time_max = strtotime("$year-$month-$day 23:59:59");
+				$duration = 24 * 60;
+			}
+
+			if (BO_CACHE_SUBDIRS === true)
+				$cache_file .= gmdate('Y/m/d/', $time_min);
+			
+			$cache_file .= $id.'_'.gmdate('YmdHi', $time_min).'_'.$duration;
+			
+			$time_string = date(_BL('_date').' ', $time_min);
+			$time_string .= date('H:i', $time_min);
+			
+			
+			if ($time_max > $last_update)
+			{
+				$time_max = $last_update;
+				$time_string .= ' - '.date('H:i', $time_max)._BZ($time_max);
+				$expire = time() + $update_interval / 1.5;
+			}
+			else
+			{
+				$last_update  = $time_max + 3600;
+				$time_string .= _BZ($time_max);
+				$time_string .= ' +'.round($duration / 60).'h';
+				$expire       = time() + 3600;
+			}
+
+			$file_by_time = true;
+			
+			break;
 		
-		$sql = "SELECT time, time_ns FROM ".BO_DB_PREF."strikes s WHERE id='$strike_id' ";
-		$res = BoDb::query($sql);
-		$row = $res->fetch_assoc();
-		$time_min = $time_max = strtotime($row['time'].' UTC');
-		$time_string = _BDT($time_min, false).'.'.substr($row['time_ns'], 0, 6)._BZ($time_min);
-		
-		$file_by_time = true;
-		$caching = false;
+		case 'live':
+
+			//the normal "live" image
+			$sql_where_id .= " AND (status>0 OR time > '".gmdate('Y-m-d H:i:s', $last_update - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)."') ";
+			
+			$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
+			
+			if (isset($cfg['tstart']))
+				$time = $cfg['tstart'];
+			else
+				$time = $last_update;
+			
+			$time_min = $time - 3600 * $ranges[$period_id];
+			$time_max = $time;
+			
+			if ($time_max - $time_min > 3600 * 12)
+				$time_string  = date(_BL('_date').' H:i', $time_max).' -'.round( ($time_max-$time_min)/3600).'h';
+			else
+				$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
+
+			$time_string .= _BZ($time_min);
+				
+			if ($period_id)
+				$cache_file .= '_p'.$ranges[$period_id];
+				
+			$cache_file .= $id;
+			
+			$file_by_time = false;
+			
+			break;
 	}
-	else if (preg_match('/^[0-9\-]+$/', $date))
-	{
-		//the archive images
-		
-		if (!$archive_maps_enabled)
-			bo_image_error('Forbidden!');
-		
-		$year     = sprintf('%04d', substr($date, 0, 4));
-		$month    = sprintf('%02d', substr($date, 4, 2));
-		$day      = sprintf('%02d', substr($date, 6, 2));
-		$hour     = sprintf('%02d', substr($date, 8, 2));
-		$minute   = sprintf('%02d', substr($date, 10, 2));
-		$duration = intval(substr($date, 13));
 
 	
-		if (!bo_user_get_level() && $duration != $cfg['animation']['range'])
-		{
-			if ( ($duration > 60 * BO_SMAP_MAX_RANGE || ($duration && $duration < BO_SMAP_MIN_RANGE)) )
-				bo_image_error('Time range not allowed!');
-			
-			//allow only specific settings for guests
-			$minute   = floor($minute / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
-			$duration = floor($duration / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
-		}
-		
-		if ($duration)
-		{
-			//When duration/time then use UTC!
-			$time_min = strtotime("$year-$month-$day $hour:$minute:00 UTC");
-			$time_max = strtotime("$year-$month-$day $hour:$minute:00 +$duration minutes UTC");
-		}
-		else
-		{
-			$time_min = strtotime("$year-$month-$day 00:00:00");
-			$time_max = strtotime("$year-$month-$day 23:59:59");
-			$duration = 24 * 60;
-		}
-
-		if (BO_CACHE_SUBDIRS === true)
-			$cache_file .= gmdate('Y/m/d/', $time_min);
-		
-		$cache_file .= $id.'_'.gmdate('YmdHi', $time_min).'_'.$duration;
-		
-		$time_string = date(_BL('_date').' ', $time_min);
-		$time_string .= date('H:i', $time_min);
-		
-		
-		if ($time_max > $last_update)
-		{
-			$time_max = $last_update;
-			$time_string .= ' - '.date('H:i', $time_max)._BZ($time_max);
-			$expire = time() + $update_interval / 1.5;
-		}
-		else
-		{
-			$last_update  = $time_max + 3600;
-			$time_string .= _BZ($time_max);
-			$time_string .= ' +'.round($duration / 60).'h';
-			$expire       = time() + 3600;
-		}
-
-		$file_by_time = true;
-	}
-	else
-	{
-		//the normal "live" image
-		$sql_where_id .= " AND (status>0 OR time > '".gmdate('Y-m-d H:i:s', $last_update - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)."') ";
-		
-		$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
-		
-		if (isset($cfg['tstart']))
-			$time = $cfg['tstart'];
-		else
-			$time = $last_update;
-		
-		$time_min = $time - 3600 * $ranges[$period_id];
-		$time_max = $time;
-		
-		if ($time_max - $time_min > 3600 * 12)
-			$time_string  = date(_BL('_date').' H:i', $time_max).' -'.round( ($time_max-$time_min)/3600).'h';
-		else
-			$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
-
-		$time_string .= _BZ($time_min);
-			
-		if ($period_id)
-			$cache_file .= '_p'.$ranges[$period_id];
-			
-		$cache_file .= $id;
-		
-		$file_by_time = false;
-	}
-
+	
+	
 	if ($cfg['date_min'] && strtotime($cfg['date_min']) && $time_min < strtotime($cfg['date_min']))
 		bo_image_error('Minimum date is '.$cfg['date_min']);
 	
@@ -416,6 +441,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		exit;
 	}
 
+	if (BO_CACHE_FAST)
+		$last_update = bo_get_conf('uptime_strikes_modified');
+
+	
 	//dimensions are set
 	if (isset($cfg['dim']))
 	{
@@ -896,17 +925,40 @@ function bo_get_map_image_ani()
 	@set_time_limit(20);
 		
 	$cfg_ani = $cfg['gif_animation'];
-	$cache_file = $dir._BL().'_ani_'.$id.'.gif';	
-	$last_update = bo_get_conf('uptime_strikes_modified');
+	$cache_file = $dir._BL().'_ani_'.$id.'.gif';
+	
+	if (!is_array($cfg['upd_intv']))
+		$update_interval = $cfg['upd_intv'] * 60;
+	elseif (!$cfg['upd_intv'][$period_id])
+		$update_interval = $cfg['upd_intv'][0] * 60;
+	else
+		$update_interval = $cfg['upd_intv'][$period_id] * 60;
 
+	if (BO_CACHE_FAST)
+		$last_update = floor(time() / $update_interval) * $update_interval;
+	else
+		$last_update = bo_get_conf('uptime_strikes_modified');
+		
+	$expire = time() + $update_interval / 1.5;
+	
+	//Headers
+	header("Pragma: ");
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
+	header("Cache-Control: public, max-age=".($expire - time()));
+	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMapAnimated.gif\"");
+	
 	//Caching
-	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update - $update_interval)
 	{
 		header("Content-Type: image/gif");
 		bo_output_cache_file($cache_file);
 		exit;
 	}
 
+	if (BO_CACHE_FAST)
+		$last_update = bo_get_conf('uptime_strikes_modified');
+	
 	$time_start = $last_update - $cfg_ani['minutes'] * 60;
 	$cfg_single = $cfg;
 	

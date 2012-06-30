@@ -256,6 +256,9 @@
 //when true, disables caching of maps and map tiles (you should leave it on false!)
 @define('BO_CACHE_DISABLE', false); 
 
+//try not to use 
+@define('BO_CACHE_FAST', false); 
+
 //create subdirs for faster access (may not work with php safemode ON)
 @define('BO_CACHE_SUBDIRS', true);  
 
