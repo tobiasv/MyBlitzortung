@@ -20,15 +20,16 @@ function bo_get_conf($name, &$changed=0)
 // Save config in database
 function bo_set_conf($name, $data)
 {
-	$name_esc = BoDb::esc($name);
-	$data_esc = BoDb::esc($data);
-
 	if ($data === null)
 	{
 		$sql = "DELETE FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
 		return BoDb::query($sql);
 	}
-	
+
+	$data = utf8_encode($data);
+	$name_esc = BoDb::esc($name);
+	$data_esc = BoDb::esc($data);
+
 	$sql = "SELECT data, name FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
 	$row = BoDb::query($sql)->fetch_object();
 
