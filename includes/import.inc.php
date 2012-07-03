@@ -1612,18 +1612,30 @@ function bo_update_stations($force = false)
 
 
 			$stUser 	= $cols[1];
-			$stCity 	= utf8_encode(strtr(html_entity_decode($cols[3]), array(chr(160) => ' ')));
-			$stCountry 	= utf8_encode(strtr(html_entity_decode($cols[4]), array(chr(160) => ' ')));
+			$stCity 	= strtr(html_entity_decode($cols[3]), array(chr(160) => ' '));
+			$stCountry 	= strtr(html_entity_decode($cols[4]), array(chr(160) => ' '));
 			$stLat	 	= $cols[5];
 			$stLon 		= $cols[6];
 			$stTime 	= substr($cols[7], 0, 10).' '.substr($cols[7], 16, 8);
 			$stTimeMs 	= substr($cols[7], 25);
 			$stStatus 	= $cols[8];
 			$stDist 	= bo_latlon2dist($stLat, $stLon);
-			$stTracker	= utf8_encode(strtr(html_entity_decode($cols[9]), array(chr(160) => ' ')));
+			$stTracker	= strtr(html_entity_decode($cols[9]), array(chr(160) => ' '));
 			$stSignals	= (int)$cols[10];
 			$stTimeU    = strtotime($stTime.' UTC');
 
+			if (function_exists('iconv'))
+			{
+				$stCity    = iconv("Windows-1250", "UTF-8", $stCity);
+				$stCountry = iconv("Windows-1250", "UTF-8", $stCountry);
+				$stTracker = iconv("Windows-1250", "UTF-8", $stTracker);
+			}
+			else
+			{
+				$stCity    = utf8_encode($stCity);
+				$stCountry = utf8_encode($stCountry);
+				$stTracker = utf8_encode($stTracker);
+			}
 
 			//station has been active by user (~ a year ago)
 			if (time() - $stTimeU < 3600 * 24 * 366)
