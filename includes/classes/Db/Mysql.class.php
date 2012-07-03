@@ -56,7 +56,7 @@ class BoDbMain
 	public static function set_charset($charset = false, $die_on_error = true)
 	{
 		if (!$charset)
-			$charset = 'latin1';
+			$charset = 'utf8';
 			
 		$ok = mysql_set_charset($charset, self::$dbh);
 		if (!$ok && $die_on_error)

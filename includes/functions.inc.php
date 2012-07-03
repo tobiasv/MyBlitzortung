@@ -226,7 +226,7 @@ function bo_station_info($id = 0)
 		$tmp = bo_stations('user', BO_USER);
 
 		if (defined('BO_STATION_NAME') && BO_STATION_NAME)
-			$tmp[BO_USER]['city'] = BO_STATION_NAME;
+			$tmp[BO_USER]['city'] = utf8_encode(BO_STATION_NAME);
 
 		$ret = $tmp[BO_USER];
 	}
@@ -430,15 +430,19 @@ function _BL($msgid='', $noutf = false)
 {
 	global $_BL;
 
-	$locale = $_BL['locale'];
-
+	$locale  = $_BL['locale'];
+	$utf_out = BO_UTF8 && !$noutf;
+	$utf_in  = false;
+	
 	if ($msgid === '')
 		return $locale;
 
-	$msg = $_BL[$locale][$msgid];
-
-	$utf = defined('BO_UTF8') && BO_UTF8 && !$noutf;
-
+	if (isset($_BL[$locale][$msgid]))
+	{
+		$msg     = $_BL[$locale][$msgid];
+		$utf_in  = $_BL[$locale]['is_utf8'] == true;
+	}
+	
 	if ($msg === false)
 	{
 		return '';
@@ -451,7 +455,12 @@ function _BL($msgid='', $noutf = false)
 			bo_add_locale_msgid('en', $msgid);
 		}
 
-		$msg = $_BL['en'][$msgid];
+		if (isset($_BL['en'][$msgid]))
+		{
+			$msg    = $_BL['en'][$msgid];
+			$utf_in = $_BL['en']['is_utf8'] == true;
+		}
+		
 	}
 
 	if (!$msg)
@@ -510,9 +519,13 @@ function _BL($msgid='', $noutf = false)
 		$msg = strtr($msg, $replace);
 	}
 
-	if ($utf)
+	if ($utf_out && !$utf_in)
 		$msg = utf8_encode($msg);
-
+	elseif (!$utf_out && $utf_in)
+		$msg = utf8_decode($msg);
+	else
+		$msg = $msg;
+		
 	return $msg;
 }
 
@@ -529,8 +542,8 @@ function _BLN($number, $unit = 'minute')
 //charset
 function _BC($text, $nospecialchars=false)
 {
-	if (defined('BO_UTF8') && BO_UTF8)
-		return utf8_encode($text);
+	if (BO_UTF8 === false)
+		return utf8_decode($text);
 	else if ($nospecialchars)
 		return $text;
 	else
@@ -1585,7 +1598,7 @@ function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = fals
 		$h = $angle ? 0 : $size;
 		$w = $angle ? $size : 0;
 
-		$text = utf8_encode($text);
+		//$text = utf8_encode($text);
 
 		return bo_imagettftextborder($I, $size, $angle, $x+$w, $y+$h, $color, $font, $text, $bordercolor, $px);
 	}
@@ -2343,6 +2356,49 @@ function bo_str_max($str, $max = 35)
 		return substr($str,0,$max-20).($max > 30 ? '...'.substr($str,-8) : '');
 	else
 		return $str;
+}
+
+
+function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quality = BO_IMAGE_JPEG_QUALITY)
+{
+	$extension = strtr($extension, array('.' => ''));
+	
+	//there seems to be an error in very rare cases
+	//we retry to save the image if it didn't work
+	$i=0;
+		
+	do
+	{
+		if ($i)
+			usleep(100000);
+
+		if ($extension == 'png')
+			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
+		else if ($extension == 'gif')
+			$ret = imagegif($I, $file);
+		else if ($extension == 'jpeg')
+			$ret = imagejpeg($I, $file, $quality);
+		else if (imageistruecolor($I) === false)
+			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
+		else
+			$ret = imagejpeg($I, $file, $quality);
+	}
+	while ($i++ < 4 && !$ret && imagesx($I));
+
+	
+	if ($file)
+	{
+		if (filesize($file) == 0)
+		{
+			unlink($file);
+		}
+		else if ($mtime !== null)
+		{
+			touch($file, $mtime);
+		}
+	}
+	
+	return $ret;
 }
 
 ?>

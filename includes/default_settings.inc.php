@@ -396,6 +396,10 @@
 // automatic update off by default
 @define('BO_MAPS_AUTOUPDATE_DEFAULTON', true);
 
+//archived images: when should the image expire
+@define('BO_MAPS_ARCHIVE_EXPIRE_SEC', 3600);
+
+
 
 
 /*******************************************************************/

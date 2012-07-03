@@ -206,7 +206,7 @@ function bo_tile()
 
 		
 		header("Content-Type: image/png");
-		imagepng($I);
+		bo_imageout($I);
 		exit;
 	}
 
@@ -220,7 +220,7 @@ function bo_tile()
 
 	$file = $dir.$filename;
 
-	if (file_exists($file) && $caching)
+	if (file_exists($file) && filesize($file) > 0 && $caching)
 	{
 		$filetime = filemtime($file);
 		$file_minute = intval(intval(date('i', $filetime)) / $update_interval);
@@ -902,7 +902,7 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 	header("Content-Type: image/png");
 	if ($caching)
 	{
-		$ok = imagepng($I, $file);
+		$ok = bo_imageout($I, 'png', $file);
 		
 		if (!$ok)
 			bo_image_cache_error($tile_size, $tile_size);
@@ -910,7 +910,7 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 		readfile($file);
 	}
 	else
-		imagepng($I);
+		bo_imageout($I);
 		
 	imagedestroy($I);
 
@@ -974,11 +974,11 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 		if (!$caching)
 		{
 			header("Content-Type: image/png");
-			imagepng($I);
+			bo_imageout($I, 'png');
 			exit;
 		}
 		
-		$ok = imagepng($I, $file);
+		$ok = bo_imageout($I, 'png', $file);
 		
 		if (!$ok)
 			bo_image_cache_error($tile_size, $tile_size);

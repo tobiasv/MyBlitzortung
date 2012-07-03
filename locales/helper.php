@@ -5,7 +5,7 @@
 $in  = 'en';
 
 //Ouput language
-$out = 'hu';
+$out = 'de';
 
 
 /*
@@ -100,6 +100,8 @@ $I = file_get_contents($in.'.php');
 $lines = explode("\n", $I);
 $first_lines = true;
 
+$in_utf  = $_BL[$in]['is_utf8'] == true;
+$out_utf = $_BL[$out]['is_utf8'] == true;
 
 foreach($lines as $line)
 {
@@ -107,31 +109,38 @@ foreach($lines as $line)
 	$line1 = substr($line,0,1);
 	$line2 = substr($line,0,2);
 
-	if (preg_match('/\$_BL\[\'[a-z]+\'\]\[\'([^\]]+)\'\]/', $line, $r))
+	if (preg_match('/\$_BL\[\'([a-z]+)\'\]\[\'([^\]]+)\'\]/', $line, $r))
 	{
+		$id = $r[2];
 		$first_lines = false;
 
-		$text = $_BL[$out][$r[1]];
+		if ($r[1] != $in)
+		{
+			continue;
+		}
+		elseif ($id == 'is_utf8')
+		{
+			$O .= '$_BL[\''.$out.'\'][\'is_utf8\'] = '.($_BL[$out]['is_utf8'] ? 'true' : 'false').';<br>';
+			continue;
+		}
+			
+
+		$text = $_BL[$out][$id];
 		$translated = $text === false || strlen($text) > 0;
 
-		if (!strlen($text) && $out == 'en' && strpos($r[1], '_') === false)
-			$text = strtr($r[1], array("\\'" => "'"));
+		if (!strlen($text) && $out == 'en' && strpos($id, '_') === false)
+			$text = strtr($id, array("\\'" => "'"));
 
-		$text = strtr(htmlentities($text), array("'" => "\\'"));
+		if (!$out_utf)
+			$text = htmlentities($text);
+			
+		$text = nl2br(strtr($text, array("'" => "\\'")));
 
-		if (0 && !$translated)
-		{
-			$text = '<input type="text" value="'.$text.'">';
-		}
-		else
-		{
-			$text = nl2br($text);
-		}
 
 		$T  = '<span style="'.($translated ? '' : 'color: red').'">';
-		$T .= '$_BL[\''.$out.'\'][\'<strong>'.$r[1].'</strong>\'] = ';
+		$T .= '$_BL[\''.$out.'\'][\'<strong>'.$id.'</strong>\'] = ';
 
-		if ($_BL[$out][$r[1]] === false)
+		if ($_BL[$out][$id] === false)
 			$T .= 'false';
 		else
 			$T .= '\''.$text.'\'';
@@ -145,7 +154,14 @@ foreach($lines as $line)
 		}
 		else
 		{
-			$comment = htmlentities(strtr($_BL[$in][$r[1]], array("'" => "\\'")));
+			if ($out_utf && !$in_utf)
+				$text_in = utf8_encode($_BL[$in][$id]);
+			else if (!$out_utf && $in_utf)
+				$text_in = utf8_decode($_BL[$in][$id]);
+			else if (!$out_utf && !$in_utf)
+				$text_in = htmlentities($_BL[$in][$id]);
+			
+			$comment = strtr($text_in, array("'" => "\\'"));
 			$comment = strtr($comment, array("\n" => "<br>//      "));
 
 			$U .= '<span style="color:#080">';
@@ -154,8 +170,8 @@ foreach($lines as $line)
 			$U .= $T;
 		}
 
-		if (isset($_BL[$out][$r[1]]))
-			unset($_BL[$out][$r[1]]);
+		if (isset($_BL[$out][$id]))
+			unset($_BL[$out][$id]);
 	}
 	elseif (preg_match('/\$_BL\[\'locale\'\]/', $line))
 	{
@@ -173,19 +189,33 @@ if (!empty($_BL[$out]))
 {
 	foreach($_BL[$out] as $id => $text)
 	{
+		if ($id == 'is_utf8')
+			continue;
+			
 		$X .= '$_BL[\''.$out.'\'][\''.$id.'\'] = ';
 
 		if ($text === false)
 			$X .= 'false';
 		else
-			$X .= '\''.strtr(htmlentities($text), array("'" => "\\'")).'\'';
+		{
+			if (!$out_utf)
+				$text = htmlentities($text);
+			
+			$X .= '\''.strtr($text, array("'" => "\\'")).'\'';
+		}
 
 		$X .= ';<br>';
 	}
 }
 
-?>
 
+if ($out_utf)
+	header("Content-Type: text/html; charset=UTF-8");
+else
+	header("Content-Type: text/html; charset=ISO-8859-1");
+
+
+?><!DOCTYPE html>
 <html>
 <head>
 <style>

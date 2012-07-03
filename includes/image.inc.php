@@ -1,20 +1,18 @@
 <?php
 
-
-
 // returns png-image for map-marker
 function bo_icon($icon)
 {
+	$max_age = 3600 * 24 * 7;
+	
 	$c = intval($_GET['size']) < 20 ? intval($_GET['size']) : 0;
 	$c = $c > 0 ? $c : 3;
 	
 	$dir = BO_DIR.BO_CACHE_DIR."/icons/";
 	$file = $dir.$icon.'_'.$c.'.png';
 
-	if (BO_CACHE_DISABLE === true || !file_exists($file) || time() - filemtime($file) > 3600 * 24 * 30)
+	if (BO_CACHE_DISABLE === true || !file_exists($file) || time() - filemtime($file) > $max_age)
 	{
-		
-
 		$I = imagecreate($c*2+1, $c*2+1);
 		$bg = imagecolorallocate($I, 255, 255, 255);
 		$trans = imagecolortransparent($I, $bg);
@@ -35,7 +33,17 @@ function bo_icon($icon)
 		imagepng($I, $file);
 		imagedestroy($I);
 	}
+
 	
+	
+	$last_update = time();
+	$expire = time() + $max_age;
+	
+	header("Pragma: ");
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
+	header("Cache-Control: public, max-age=".($expire - time()));
+	header("Content-Disposition: inline; filename=\"MyBlitzortungIcon.png");
 	header("Content-type: image/png");
 	readfile($file);
 
@@ -289,7 +297,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				$last_update  = $time_max + 3600;
 				$time_string .= _BZ($time_max);
 				$time_string .= ' +'.round($duration / 60).'h';
-				$expire       = time() + 3600;
+				$expire       = time() + BO_MAPS_ARCHIVE_EXPIRE_SEC;
 			}
 
 			$file_by_time = true;
@@ -426,6 +434,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$extension = "png";
 	}
 	
+	
 	//Headers
 	header("Pragma: ");
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
@@ -434,7 +443,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.".$extension."\"");
 
 	//Caching
-	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update - $update_interval)
+	if ($caching && file_exists($cache_file) && filesize($cache_file) > 0 && filemtime($cache_file) >= $last_update - $update_interval)
 	{
 		header("Content-Type: $mime");
 		bo_output_cache_file($cache_file);
@@ -949,7 +958,7 @@ function bo_get_map_image_ani()
 	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMapAnimated.gif\"");
 	
 	//Caching
-	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update - $update_interval)
+	if ($caching && file_exists($cache_file) && filesize($cache_file) > 0 && filemtime($cache_file) >= $last_update - $update_interval)
 	{
 		header("Content-Type: image/gif");
 		bo_output_cache_file($cache_file);
@@ -1686,27 +1695,6 @@ function bo_imagecreatefromfile($file)
 		bo_image_error("Couldn't read image file:\n$file\nUnknown file format/Wrong image data");
 	
 	return $I;
-}
-
-function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quality = BO_IMAGE_JPEG_QUALITY)
-{
-	$extension = strtr($extension, array('.' => ''));
-	
-	if ($extension == 'png')
-		$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
-	else if ($extension == 'gif')
-		$ret = imagegif($I, $file);
-	else if ($extension == 'jpeg')
-		$ret = imagejpeg($I, $file, $quality);
-	else if (imageistruecolor($I) === false)
-		$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
-	else
-		$ret = imagejpeg($I, $file, $quality);
-	
-	if ($mtime !== null)
-		touch($file, $mtime);
-	
-	return $ret;
 }
 
 

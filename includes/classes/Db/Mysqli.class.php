@@ -62,7 +62,7 @@ class BoDbMain
 	public static function set_charset($charset = false, $die_on_error = true)
 	{	
 		if (!$charset)
-			$charset = 'latin1';
+			$charset = 'utf8';
 		
 		$ok = self::$dbh->set_charset($charset);
 		
