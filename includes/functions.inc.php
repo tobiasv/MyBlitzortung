@@ -2287,10 +2287,12 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 	$force_load_old_file = false;
 	clearstatcache();
 	
+	ignore_user_abort(false);
+	
 	//if file is currently created by another process -> wait
 	while (file_exists($isfile) && time() - filemtime($isfile) < 30)
 	{
-		if (microtime(true) - $start > $maxwait * 1000)
+		if (microtime(true) - $start > $maxwait * 1e-6)
 		{
 			//file didn't appear, load old one instead
 			$force_load_old_file = true;
