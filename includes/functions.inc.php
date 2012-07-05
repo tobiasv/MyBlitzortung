@@ -2321,6 +2321,10 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 	//Nothing found
 	//mark "file is currently under construction"
 	touch($isfile);
+	
+	
+	register_shutdown_function('unlink', $isfile);
+	ignore_user_abort(true);
 }
 
 function bo_cache_read_new_file($cache_file)
