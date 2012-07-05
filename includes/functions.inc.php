@@ -883,7 +883,9 @@ function bo_load_locale($locale = '')
 		{
 			$locale = strtolower($_GET[BO_LANG_ARGUMENT]);
 			$_SESSION['bo_locale'] = $locale;
-			@setcookie("bo_locale", $locale, time()+3600*24*365*10,'/');
+			
+			if ($_COOKIE['bo_locale'] != $locale)
+				@setcookie("bo_locale", $locale, time()+3600*24*365*10,'/');
 		}
 		else if (isset($_SESSION['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_SESSION['bo_locale']))
 		{
