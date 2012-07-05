@@ -442,13 +442,12 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	header("Cache-Control: public, max-age=".($expire - time()));
 	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.".$extension."\"");
 
-	//Caching
-	if ($caching && file_exists($cache_file) && filesize($cache_file) > 0 && filemtime($cache_file) >= $last_update - $update_interval)
+	
+	if ($caching)
 	{
-		header("Content-Type: $mime");
-		bo_output_cache_file($cache_file);
-		exit;
+		bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval);
 	}
+	
 
 	if (BO_CACHE_FAST)
 		$last_update = bo_get_conf('uptime_strikes_modified');
@@ -898,7 +897,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		if (!$ok)
 			bo_image_cache_error($w, $h);
 		
-		readfile($cache_file);
+		bo_output_cachefile_if_exists($cache_file);
 	}
 	else
 	{
@@ -957,14 +956,12 @@ function bo_get_map_image_ani()
 	header("Cache-Control: public, max-age=".($expire - time()));
 	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMapAnimated.gif\"");
 	
-	//Caching
-	if ($caching && file_exists($cache_file) && filesize($cache_file) > 0 && filemtime($cache_file) >= $last_update - $update_interval)
+	if ($caching)
 	{
-		header("Content-Type: image/gif");
-		bo_output_cache_file($cache_file);
-		exit;
+		bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval);
 	}
 
+	
 	if (BO_CACHE_FAST)
 		$last_update = bo_get_conf('uptime_strikes_modified');
 	
@@ -1009,7 +1006,7 @@ function bo_get_map_image_ani()
 	{
 		file_put_contents($cache_file, $gif->GetAnimation());
 		touch($cache_file, $last_update);
-		readfile($cache_file);
+		bo_cache_read_new_file($cache_file);
 	}
 	else
 	{

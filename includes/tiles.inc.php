@@ -264,20 +264,6 @@ function bo_tile()
 		}
 	}
 
-	if (BO_TILE_CREATION_SIM_WAIT)
-	{
-		//to avoid too much parallel sql queries
-		usleep(rand(0,100) * 1000);
-		$maxwait = 5000000;
-		$wait_start = microtime(true);
-		while( (int)($is_creating = bo_get_conf('is_creating_tile')) && microtime(true) - $wait_start < $maxwait)
-		{
-			usleep(rand(200,500) * 1000);
-		}
-		
-		bo_set_conf('is_creating_tile', $is_creating+1);
-	}
-	
 	//Display only strike count
 	if ($show_count) 
 	{
@@ -872,9 +858,6 @@ function bo_tile_tracks()
 
 function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE_SIZE)
 {
-	if (BO_TILE_CREATION_SIM_WAIT)
-		bo_set_conf('is_creating_tile', 0);
-
 	BoDb::close();
 	bo_session_close(true);
 	
@@ -924,7 +907,7 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 	
 	bo_load_locale();
 	
-	$file  = $dir.$type.'_';
+	$file  = $dir.$type.'_'.$tile_size.'_';
 	$file .= bo_user_get_level().'_';
 	$file .= _BL().'.png';
 	

@@ -1161,9 +1161,6 @@
 //timeout for tile creating
 @define("BO_TILE_CREATION_TIMEOUT", 5); 
 
-//waits when another tile is created
-@define("BO_TILE_CREATION_SIM_WAIT", false); 
-
 //Min and max count of participants - values are only used if
 //automatic getting from participants.txt failed
 @define('BO_MIN_PARTICIPANTS', 6);

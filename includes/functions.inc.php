@@ -2268,9 +2268,84 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 			
 	}
 	
+
 	header("X-MyBlitzortung: from-cache");
-	readfile($cache_file);
+	bo_readfile_mime($cache_file);
+	
+	$isfile = $cache_file.'.is_creating';
+	@unlink($isfile);
+	clearstatcache();
 }
+
+
+	
+function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval)
+{	
+	$isfile = $cache_file.'.is_creating';
+	$maxwait = 800;
+	$start = microtime(true);
+	$force_load_old_file = false;
+	clearstatcache();
+	
+	//if file is currently created by another process -> wait
+	while (file_exists($isfile) && time() - filemtime($isfile) < 30)
+	{
+		if (microtime(true) - $start > $maxwait * 1000)
+		{
+			//file didn't appear, load old one instead
+			$force_load_old_file = true;
+			break;
+		}
+		
+		usleep(rand(10, 300) * 1000);
+		clearstatcache();
+	}
+
+	
+	
+	//Cache-File is ok
+	if (file_exists($cache_file) && filesize($cache_file) > 0)
+	{
+		$is_new = filemtime($cache_file) >= $last_update - $update_interval;
+		$is_old = filemtime($cache_file) >= $last_update - $update_interval * 10;
+		
+		//if file is new 
+		//OR file is not too old
+		if ($is_new || ($is_old && $force_load_old_file))
+		{
+			bo_output_cache_file($cache_file);
+			exit;
+		}
+	}
+	
+	//Nothing found
+	//mark "file is currently under construction"
+	touch($isfile);
+}
+
+function bo_cache_read_new_file($cache_file)
+{
+	$isfile = $cache_file.'.is_creating';
+	@unlink($isfile);
+	clearstatcache();
+	bo_readfile_mime($cache_file);
+}
+
+function bo_readfile_mime($file)
+{
+	$extension = strtolower(substr($file, strrpos($file, '.')+1));
+	
+	if ($extension == 'jpg' || $extension == 'jpeg')
+		$mime = "image/jpeg";
+	elseif ($extension == 'gif')
+		$mime = "image/gif";
+	elseif ($extension == 'png')
+		$mime = "image/png";
+
+	header("Content-Type: $mime");
+	readfile($file);
+}
+
 
 
 function _BDT($time, $show_tz = true)
@@ -2402,5 +2477,7 @@ function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quali
 	
 	return $ret;
 }
+
+
 
 ?>
