@@ -122,7 +122,7 @@ function bo_show_archive_map()
 	//Config
 	$cfg     = $_BO['mapimg'][$map];
 	$ani_cfg = $_BO['mapimg'][$map]['animation'];
-	$mapname = _BL($cfg['name']);
+	$mapname = _BL($cfg['name'], false, BO_CONFIG_IS_UTF8);
 	
 	//Animation-config
 	if (isset($ani_cfg['force']) && $ani_cfg['force'])
@@ -360,7 +360,7 @@ function bo_show_archive_map()
 	if ($cfg['archive'])
 	{
 		if ($_BO['mapimg'][$map]['header'])
-			echo '<div class="bo_map_header">'._BC($_BO['mapimg'][$map]['header'], true).'</div>';
+			echo '<div class="bo_map_header">'._BC($_BO['mapimg'][$map]['header'], true, BO_CONFIG_IS_UTF8).'</div>';
 	
 		echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 
@@ -449,7 +449,7 @@ function bo_show_archive_map()
 		}
 		
 		if ($_BO['mapimg'][$map]['footer'])
-			echo '<div class="bo_map_footer">'._BC($_BO['mapimg'][$map]['footer'], true).'</div>';
+			echo '<div class="bo_map_footer">'._BC($_BO['mapimg'][$map]['footer'], true, BO_CONFIG_IS_UTF8).'</div>';
 		
 		echo '</div>';
 		echo '</div>';
@@ -1827,7 +1827,7 @@ function bo_archive_select_map(&$map)
 		if ($map_default === false)
 			$map_default = $id;
 			
-		$ret .= '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BL($d['name']).'</option>';
+		$ret .= '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BL($d['name'], false, BO_CONFIG_IS_UTF8).'</option>';
 		
 		if ($map < 0)
 			$map = $id;

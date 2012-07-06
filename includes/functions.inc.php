@@ -226,7 +226,12 @@ function bo_station_info($id = 0)
 		$tmp = bo_stations('user', BO_USER);
 
 		if (defined('BO_STATION_NAME') && BO_STATION_NAME)
-			$tmp[BO_USER]['city'] = utf8_encode(BO_STATION_NAME);
+		{
+			$tmp[BO_USER]['city'] = BO_STATION_NAME;
+			
+			if (BO_CONFIG_IS_UTF8 === false)
+				$tmp[BO_USER]['city'] = utf8_encode($tmp[BO_USER]['city']);
+		}
 
 		$ret = $tmp[BO_USER];
 	}
@@ -426,13 +431,12 @@ function bo_copyright_footer()
 }
 
 // translate text
-function _BL($msgid='', $noutf = false)
+function _BL($msgid='', $noutf = false, $utf_in = false)
 {
 	global $_BL;
 
 	$locale  = $_BL['locale'];
 	$utf_out = BO_UTF8 && !$noutf;
-	$utf_in  = false;
 	
 	if ($msgid === '')
 		return $locale;
@@ -507,7 +511,12 @@ function _BL($msgid='', $noutf = false)
 	else
 	{
 		if (strpos($msg, "{STATION}") !== false)
-			$msg = strtr($msg, array('{STATION}' => bo_station_city())); //needs a database lookup
+		{
+			$station_name = bo_station_city(); //always returning utf8
+			if (!$utf_in)
+				$station_name = utf8_decode($station_name);
+			$msg = strtr($msg, array('{STATION}' => $station_name)); //needs a database lookup
+		}
 
 		$replace = array(
 					'{USER}' => bo_user_get_name(),
@@ -540,10 +549,12 @@ function _BLN($number, $unit = 'minute')
 }
 
 //charset
-function _BC($text, $nospecialchars=false)
+function _BC($text, $nospecialchars=false, $is_utf8 = true)
 {
-	if (BO_UTF8 === false)
+	if ($is_utf8 && BO_UTF8 === false)
 		return utf8_decode($text);
+	else if (!$is_utf8 && BO_UTF8 === true)
+		return utf8_encode($text);
 	else if ($nospecialchars)
 		return $text;
 	else
@@ -1892,7 +1903,7 @@ function bo_output_kml()
 		case 1:
 
 			echo "<Folder>\n";
-			echo "<name>"._BL($d['name'])."</name>\n";
+			echo "<name>"._BL($d['name'], false, BO_CONFIG_IS_UTF8)."</name>\n";
 			echo "<description></description>\n";
 			echo "<visibility>0</visibility>\n";
 			echo "<refreshVisibility>0</refreshVisibility>\n";
@@ -1908,7 +1919,7 @@ function bo_output_kml()
 					$imgurl .= "&amp;transparent";
 
 				echo "<GroundOverlay>\n";
-				echo "<name>"._BL($d['name'])."</name>\n";
+				echo "<name>"._BL($d['name'], false, BO_CONFIG_IS_UTF8)."</name>\n";
 				echo "<description></description>\n";
 				echo "<Icon>\n";
 				echo "<href>".$imgurl."</href>\n";
@@ -2113,8 +2124,8 @@ function bo_get_regions($bo_station_id = false)
 		{
 			if ($d['visible'] && isset($d['rect_add']))
 			{
-				$regions[0][$reg_id] = _BL($d['name']);
-				$regions[1]['-'.$reg_id] = _BL('outside of').' '._BL($d['name']);
+				$regions[0][$reg_id] = _BL($d['name'], false, BO_CONFIG_IS_UTF8);
+				$regions[1]['-'.$reg_id] = _BL('outside of').' '._BL($d['name'], false, BO_CONFIG_IS_UTF8);
 			}
 		}
 

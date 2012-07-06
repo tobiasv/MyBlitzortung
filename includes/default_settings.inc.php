@@ -74,6 +74,13 @@
 @define('BO_UTF8', true);
 
 
+//if strings in your config.php are utf8-encoded, set to true
+//Note: You have to encode all non-utf strings in templates by yourself
+//This is only a workaround for later versions,
+//as saving utf in php files isn't a good idea at all
+@define('BO_CONFIG_IS_UTF8', false);
+
+
 /*******************************************************************/
 /*** Update secret                                               ***/
 

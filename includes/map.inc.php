@@ -349,7 +349,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				echo '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), $d[2]);
 				echo count($_BO['mapimg'][$d[2]]['trange']) > 1 ? 'bo_period='.$period : '';
 				echo '" ';
-				echo ' class="bo_navi'.($d[0] ? '_active' : '').'">'._BL($d[1]).'</a></li>';
+				echo ' class="bo_navi'.($d[0] ? '_active' : '').'">'._BL($d[1], false, BO_CONFIG_IS_UTF8).'</a></li>';
 			}
 			
 			echo '</ul>';
@@ -402,7 +402,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				foreach($map_groups[$cfg['group']] as $map_id => $map_name)
 				{
 					echo '<option value="'.$map_id.'" '.($map_id == $static_map_id ? 'selected' : '').'>';
-					echo $map_name;
+					echo _BL($map_name, false, BO_CONFIG_IS_UTF8);
 					echo '</option>';
 				}
 				echo '</select> &bull; ';
@@ -446,7 +446,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			echo '<div id="bo_arch_maplinks_container_all">';
 			
 			if ($cfg['header'])
-				echo '<div class="bo_map_header">'._BC($cfg['header'], true).'</div>';
+				echo '<div class="bo_map_header">'._BC($cfg['header'], true, BO_CONFIG_IS_UTF8).'</div>';
 			
 			echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 			
@@ -457,12 +457,12 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				echo '</div>';
 			}
 
-			$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name']).' '._BDT($last_update);
+			$alt = _BL('Lightning map').' '._BL($_BO['mapimg'][$static_map_id]['name'], false, BO_CONFIG_IS_UTF8).' '._BDT($last_update);
 			echo '<div style="position:relative;display:inline-block;" id="bo_arch_map_container">';
 			echo '<img src="'.$url.'" '.$img_dim.' id="bo_arch_map_img" style="background-image:url(\''.bo_bofile_url().'?image=wait\');" alt="'.htmlspecialchars($alt).'">';
 
 			if ($cfg['footer'])
-				echo '<div class="bo_map_footer">'._BC($cfg['footer'], true).'</div>';
+				echo '<div class="bo_map_footer">'._BC($cfg['footer'], true, BO_CONFIG_IS_UTF8).'</div>';
 
 			echo '</div>';
 			echo '</div>';
@@ -883,7 +883,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			echo '>';
 			echo '<label for="bo_map_overlay'.$id.'">';
 			if ($cfg['sel_name'])
-				echo _BL($cfg['sel_name']);
+				echo _BL($cfg['sel_name'], false, BO_CONFIG_IS_UTF8);
 			else
 				echo '<em>'._BL('Id').' '.$id.'</em>';
 			

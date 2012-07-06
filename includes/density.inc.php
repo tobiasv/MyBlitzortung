@@ -457,7 +457,7 @@ function bo_show_archive_density()
 		if (!$d['name'] || !$d['density'])
 			continue;
 			
-		echo '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BL($d['name']).'</option>';
+		echo '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BL($d['name'], false, BO_CONFIG_IS_UTF8).'</option>';
 		
 		if ($map == -1)
 			$map = $id;
@@ -528,7 +528,7 @@ function bo_show_archive_density()
 	echo '</form>';
 
 	
-	$mapname = _BL($_BO['mapimg'][$map]['name']);
+	$mapname = _BL($_BO['mapimg'][$map]['name'], false, BO_CONFIG_IS_UTF8);
 	
 	$alt = $ratio ? _BL('Strike ratio') : _BL('arch_navi_density');
 	$alt .= $station_id ? ' ('._BL('Station').' '._BC($station_infos[$station_id]['city']).')' : '';
@@ -545,7 +545,7 @@ function bo_show_archive_density()
 	$header = $_BO['mapimg'][$map]['header'];
 
 	echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
-	echo '<div class="bo_map_header">'._BC($header, true).'</div>';
+	echo '<div class="bo_map_header">'._BC($header, true, BO_CONFIG_IS_UTF8).'</div>';
 	echo '<div class="bo_arch_map_links">';
 	echo '<strong>'._BL('View').': &nbsp;</strong> ';
 
@@ -582,7 +582,7 @@ function bo_show_archive_density()
 	echo '<div style="position:relative;display:inline-block; min-width: 300px; " id="bo_arch_map_container">';
 	echo '<img style="background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file_start.'" alt="'.htmlspecialchars($alt).'">';
 	echo '</div>';
-	echo '<div class="bo_map_footer">'._BC($footer, true).'</div>';
+	echo '<div class="bo_map_footer">'._BC($footer, true, BO_CONFIG_IS_UTF8).'</div>';
 	echo '</div>';
 	echo '</div>';
 	
