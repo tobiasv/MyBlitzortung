@@ -309,7 +309,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			//the normal "live" image
 			$sql_where_id .= " AND (status>0 OR time > '".gmdate('Y-m-d H:i:s', $last_update - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)."') ";
 			
-			$expire = $last_update + 60 * BO_UP_INTVL_STRIKES + 10;
+			$expire = $last_update + $update_interval + 10;
 			
 			if (isset($cfg['tstart']))
 				$time = $cfg['tstart'];
@@ -365,8 +365,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				$j=0;
 				for ($i=$time_search-60*$sback;$i<=$time_search+60*$sforw;$i+=60*$sstep)
 				{
-					//if ($i != $time_search)
-						$search_times[(abs($time_search-$i)/60).'.'.$j] = $i;
+					$search_times[(abs($time_search-$i)/60).'.'.$j] = $i;
 					$j++;
 				}
 				
@@ -393,10 +392,14 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			
 			//set expire if file may appear in the next 24 hours after strike time
 			if (time() - $time_max < 3600 * 24)
-				$expire = time() + BO_UP_INTVL_STRIKES * 60;
+				$expire = time() + $update_interval + 10;
 		}
 		else
 		{
+			//set expire not too long if file is new
+			if (time() - $time_max < $duration * 60 * 1.5)
+				$expire = time() + $update_interval * 2;
+				
 			$cache_file .= '_'.strtr(basename($file), array('.' => '_')).'_'.filemtime(BO_DIR.'images/'.$file);
 		}
 	}
@@ -433,6 +436,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$use_truecolor = BO_IMAGE_USE_TRUECOLOR_TRANSPARENT;
 		$extension = "png";
 	}
+	
+	//correct expire, if it lies in the past
+	if ($expire < time() - 10)
+		$expire = time() + $update_interval;
 	
 	
 	//Headers
