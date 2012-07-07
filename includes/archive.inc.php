@@ -1227,7 +1227,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 				$residual_time = $time_diff - $distance / BO_C;
 
 				$cdev = $distance / $time_diff / BO_C;
-				$cdev_text =  _BN($residual_time*1E6, 1)._BC('µs');
+				$cdev_text = _BN($residual_time*1E6, 1)._BL('µs');
 				$cdev_text .= ' / '._BN($cdev, 4).'c';
 				//$cdev_text .= ' / '.round(($cdev-1)*$distance).'m';
 			}

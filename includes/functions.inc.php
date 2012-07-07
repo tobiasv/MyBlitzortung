@@ -2257,70 +2257,90 @@ function bo_error_handler($errno, $errstr, $errfile, $errline)
 
 function bo_output_cache_file($cache_file, $mod_time = 0)
 {
-	if (!file_exists($cache_file))
-		return false;
+	static $output_disabled = false;
 	
-	if (function_exists('apache_request_headers'))
+	if (!$output_disabled)
 	{
-		$request = apache_request_headers();
-		$ifmod = $request['If-Modified-Since'] ? strtotime($request['If-Modified-Since']) : false;
+		if (!file_exists($cache_file))
+		{
+			header("X-MyBlitzortung: no-cache-file", false);
+			return false;
+		}
 		
-		if (!$mod_time)
+		if (function_exists('apache_request_headers') && $mod_time !== false)
 		{
-			clearstatcache();
-			$mod_time = filemtime($cache_file);
-		}
+			$request = apache_request_headers();
+			$ifmod = $request['If-Modified-Since'] ? strtotime($request['If-Modified-Since']) : false;
 			
-		if ($mod_time - $ifmod <= 1)
-		{
-			header("HTTP/1.1 304 Not Modified");
-			return;
+			if (!$mod_time)
+			{
+				clearstatcache();
+				$mod_time = filemtime($cache_file);
+			}
+				
+			if ($mod_time - $ifmod <= 1)
+			{
+				header("X-MyBlitzortung: not-modified", false);
+				header("HTTP/1.1 304 Not Modified");
+				return;
+			}
+				
 		}
+		
+		if ($mod_time === false)
+			header("X-MyBlitzortung: new-file", false);
+		else
+			header("X-MyBlitzortung: from-cache", false);
 			
+		bo_readfile_mime($cache_file);
 	}
 	
-
-	header("X-MyBlitzortung: from-cache");
-	bo_readfile_mime($cache_file);
+	if (BO_CACHE_WAIT_SAME_FILE > 0)
+	{
+		$isfile = $cache_file.'.is_creating';
+		@unlink($isfile);
+		clearstatcache();
+	}
 	
-	$isfile = $cache_file.'.is_creating';
-	@unlink($isfile);
-	clearstatcache();
+	//don't output anything the next time the function get called
+	$output_disabled = true;
 }
 
 
 	
 function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval)
 {	
-	$isfile = $cache_file.'.is_creating';
-	$maxwait = 800;
-	$start = microtime(true);
-	$force_load_old_file = false;
-	clearstatcache();
-	
-	ignore_user_abort(false);
-	
-	//if file is currently created by another process -> wait
-	while (file_exists($isfile) && time() - filemtime($isfile) < 30)
-	{
-		if (microtime(true) - $start > $maxwait * 1e-6)
-		{
-			//file didn't appear, load old one instead
-			$force_load_old_file = true;
-			break;
-		}
-		
-		usleep(rand(10, 300) * 1000);
-		clearstatcache();
-	}
 
+	if (BO_CACHE_WAIT_SAME_FILE > 0)
+	{
+		$isfile = $cache_file.'.is_creating';
+		$start = microtime(true);
+		$force_load_old_file = false;
+		clearstatcache();
+		
+		//if file is currently created by another process -> wait
+		while (file_exists($isfile) && time() - filemtime($isfile) < 30)
+		{
+			if (microtime(true) - $start > BO_CACHE_WAIT_SAME_FILE * 1e-6)
+			{
+				//file didn't appear, load old one instead
+				$force_load_old_file = true;
+				break;
+			}
+			
+			usleep(rand(10, 300) * 1000);
+			clearstatcache();
+		}
+	}
 	
 	
 	//Cache-File is ok
 	if (file_exists($cache_file) && filesize($cache_file) > 0)
 	{
-		$is_new = filemtime($cache_file) >= $last_update - $update_interval;
-		$is_old = filemtime($cache_file) >= $last_update - $update_interval * 10;
+		$file_expired = $last_update - filemtime($cache_file);
+		
+		$is_new = $file_expired <= $update_interval;
+		$is_old = $file_expired <= $update_interval * BO_CACHE_WAIT_SAME_FILE_OLD;
 		
 		//if file is new 
 		//OR file is not too old
@@ -2329,23 +2349,37 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 			bo_output_cache_file($cache_file);
 			exit;
 		}
+
+		
+		//deliver cached file (if not too old) and after that create new file
+		if (BO_CACHE_CREATE_NEW_DELIVER_OLD > 0)
+		{
+			$deliver_old = $file_expired <= $update_interval * BO_CACHE_CREATE_NEW_DELIVER_OLD;
+		
+			if ($deliver_old)
+			{
+				//Delivering old file, which is still new enough
+				//but we need to send "outdated" headers
+				header("Last-Modified: ".gmdate("D, d M Y H:i:s", filemtime($cache_file))." GMT");
+				header("Expires: ".gmdate("D, d M Y H:i:s", time() + 10)." GMT");
+				header("Cache-Control: public, max-age=10");
+				header("X-MyBlitzortung: delivered-outdated", false);
+				
+				bo_output_cache_file($cache_file);
+				ignore_user_abort(true);
+				session_write_close();
+			}
+		}
 	}
 	
-	//Nothing found
-	//mark "file is currently under construction"
-	touch($isfile);
-	
-	
-	register_shutdown_function('unlink', $isfile);
-	ignore_user_abort(true);
-}
-
-function bo_cache_read_new_file($cache_file)
-{
-	$isfile = $cache_file.'.is_creating';
-	@unlink($isfile);
-	clearstatcache();
-	bo_readfile_mime($cache_file);
+	if (BO_CACHE_WAIT_SAME_FILE > 0)
+	{
+		//Nothing found
+		//mark "file is currently under construction"
+		touch($isfile);
+		register_shutdown_function('unlink', $isfile);
+		ignore_user_abort(true);
+	}
 }
 
 function bo_readfile_mime($file)

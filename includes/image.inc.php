@@ -176,6 +176,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	else
 		$update_interval = $cfg['upd_intv'][$period_id] * 60;
 	
+	//update interval cannot be bigger than strike update interval
+	if ($update_interval > BO_UP_INTVL_STRIKES * 60)
+		$update_interval = BO_UP_INTVL_STRIKES * 60;
 	
 	//Cache file naming
 	$cache_file = BO_DIR.BO_CACHE_DIR.'/maps/';
@@ -904,7 +907,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		if (!$ok)
 			bo_image_cache_error($w, $h);
 		
-		bo_output_cachefile_if_exists($cache_file);
+		bo_output_cache_file($cache_file, false);
 	}
 	else
 	{
@@ -949,6 +952,10 @@ function bo_get_map_image_ani()
 	else
 		$update_interval = $cfg['upd_intv'][$period_id] * 60;
 
+	//update interval cannot be bigger than strike update interval
+	if ($update_interval > BO_UP_INTVL_STRIKES * 60)
+		$update_interval = BO_UP_INTVL_STRIKES * 60;
+		
 	if (BO_CACHE_FAST)
 		$last_update = floor(time() / $update_interval) * $update_interval;
 	else
@@ -1013,7 +1020,7 @@ function bo_get_map_image_ani()
 	{
 		file_put_contents($cache_file, $gif->GetAnimation());
 		touch($cache_file, $last_update);
-		bo_cache_read_new_file($cache_file);
+		bo_output_cache_file($cache_file, false);
 	}
 	else
 	{

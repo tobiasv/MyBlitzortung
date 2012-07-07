@@ -720,13 +720,11 @@ function bo_get_density_image()
 	header("Cache-Control: public, max-age=".($expire - time()));
 	header("Content-Disposition: inline; filename=\"MyBlitzortungDensity.".$extension."\"");
 
-	
 	//Cache - First cache try
-	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_update)
+	if ($caching)
 	{
-		header("Content-Type: $mime");
-		bo_output_cache_file($cache_file, $last_update);
-		exit;
+		$update_interval = 3600 * 12;
+		bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval);
 	}
 	
 	
@@ -1278,7 +1276,7 @@ function bo_get_density_image()
 		if (!$ok)
 			bo_image_cache_error($w, $h);
 
-		readfile($cache_file);
+		bo_output_cache_file($cache_file, false);
 	}
 	else
 		bo_imageout($I, $extension);

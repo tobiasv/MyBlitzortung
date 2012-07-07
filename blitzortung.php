@@ -246,6 +246,17 @@ if (!defined("BO_VER"))
 	}
 
 
+	if (BO_SEND_CACHE_HEADER_HTML > 0 && !headers_sent())
+	{
+		$max_age = BO_SEND_CACHE_HEADER_HTML; 
+		header("Pragma: ");
+
+		$data_time = intval(time()/60)*60 - $max_age;
+		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $data_time)." GMT");
+		header("Expires: ".gmdate("D, d M Y H:i:s", time() + $max_age - 1) ." GMT");
+		header("Cache-Control: public, max-age=".$max_age);
+	}
+	
 }
 
 ?>

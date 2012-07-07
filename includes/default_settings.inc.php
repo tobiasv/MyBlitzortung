@@ -263,9 +263,6 @@
 //when true, disables caching of maps and map tiles (you should leave it on false!)
 @define('BO_CACHE_DISABLE', false); 
 
-//try not to use 
-@define('BO_CACHE_FAST', false); 
-
 //create subdirs for faster access (may not work with php safemode ON)
 @define('BO_CACHE_SUBDIRS', true);  
 
@@ -295,6 +292,38 @@
 
 //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
 @define('BO_CACHE_PURGE_OTHER_RAND',  100); 
+
+//try not to use the database
+//enable for server with high load
+@define('BO_CACHE_FAST', false); 
+
+//wait given milliseconds if same file is currently processed by another client
+//set 0 or false to disable
+@define('BO_CACHE_WAIT_SAME_FILE', false);
+
+//if option above is enabled and the wait timeout is exeeded, then
+//output old file from cache to the client, if it's still newer
+//than given multiplicated with specific update interval
+//example: given: file is 4min old, update interval is 2min, default value from below used
+//          => 2min*3 = 6min  =>  4min is smaller than 6min
+//          => old file will be served to the client instead of creating a new one
+//factor can be a decimal value (i.e. 1.4)
+@define('BO_CACHE_WAIT_SAME_FILE_OLD', 3);
+
+//deliver old cache file while creating a new one
+//user will get a new file without to wait
+//value is factor for the update interval, in which the old file will still be delivered
+//factor can be a decimal value (i.e. 1.4)
+//if file is older, then it will be created new
+//set 0 or false to disable
+@define('BO_CACHE_CREATE_NEW_DELIVER_OLD', 0);
+
+//send cache-control headers to browser for HTML pages
+//set to a value in seconds
+//i.e. 60 means, the html page should be held in cache for 1 minute by the browser
+//set to the minimum update interval (BO_UP_INTVL_STRIKES is 5 --> set to 300)
+//set 0 or false to disable
+@define('BO_SEND_CACHE_HEADER_HTML', false);
 
 
 
