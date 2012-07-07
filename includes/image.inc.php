@@ -496,10 +496,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$time_string = date(_BL('_date').' ', $time_min);
 			$time_string .= date('H:i', $time_min);
 			
-			$time_max = bo_get_latest_calc_time($last_update);
+			$last_update_calc = bo_get_latest_calc_time($last_update);
 			
-			if ($time_max >= $last_update)
+			if ($time_max >= $last_update_calc)
 			{
+				$time_max = $last_update_calc;
 				$time_string .= ' - '.date('H:i', $time_max)._BZ($time_max);
 			}
 			else
