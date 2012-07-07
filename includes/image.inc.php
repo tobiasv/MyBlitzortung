@@ -59,6 +59,13 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 	global $_BO;
 
+	
+	
+	/***********************************************************/
+	/*** Get variables *****************************************/
+	/***********************************************************/
+
+	
 	if ($id === false)
 	{
 		$id 			= $_GET['map'];
@@ -214,7 +221,12 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$image_type = 'by_date';
 	else
 		$image_type = 'live';
-		
+	
+	
+	/***********************************************************/
+	/*** Differen image types **********************************/
+	/***********************************************************/
+
 
 	switch ($image_type)
 	{
@@ -234,7 +246,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$res = BoDb::query($sql);
 			$row = $res->fetch_assoc();
 			$time_min = $time_max = strtotime($row['time'].' UTC');
-			$time_string = _BDT($time_min, false).'.'.substr($row['time_ns'], 0, 6)._BZ($time_min);
+
 			
 			$file_by_time = true;
 			$caching = false;
@@ -284,25 +296,18 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				$cache_file .= gmdate('Y/m/d/', $time_min);
 			
 			$cache_file .= $id.'_'.gmdate('YmdHi', $time_min).'_'.$duration;
-			
-			$time_string = date(_BL('_date').' ', $time_min);
-			$time_string .= date('H:i', $time_min);
-			
-			
+
 			if ($time_max > $last_update)
 			{
 				$time_max = $last_update;
-				$time_string .= ' - '.date('H:i', $time_max)._BZ($time_max);
 				$expire = time() + $update_interval / 1.5;
 			}
 			else
 			{
 				$last_update  = $time_max + 3600;
-				$time_string .= _BZ($time_max);
-				$time_string .= ' +'.round($duration / 60).'h';
 				$expire       = time() + BO_MAPS_ARCHIVE_EXPIRE_SEC;
 			}
-
+			
 			$file_by_time = true;
 			
 			break;
@@ -322,12 +327,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$time_min = $time - 3600 * $ranges[$period_id];
 			$time_max = $time;
 			
-			if ($time_max - $time_min > 3600 * 12)
-				$time_string  = date(_BL('_date').' H:i', $time_max).' -'.round( ($time_max-$time_min)/3600).'h';
-			else
-				$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
-
-			$time_string .= _BZ($time_min);
 				
 			if ($period_id)
 				$cache_file .= '_p'.$ranges[$period_id];
@@ -339,7 +338,12 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			break;
 	}
 
+
 	
+	/***********************************************************/
+	/*** Dates and file naming *********************************/
+	/***********************************************************/
+
 	
 	
 	if ($cfg['date_min'] && strtotime($cfg['date_min']) && $time_min < strtotime($cfg['date_min']))
@@ -440,6 +444,16 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$extension = "png";
 	}
 	
+	
+
+
+
+	
+	/***********************************************************/
+	/*** Cache *************************************************/
+	/***********************************************************/
+
+	
 	//correct expire, if it lies in the past
 	if ($expire < time() - 10)
 		$expire = time() + $update_interval;
@@ -462,6 +476,60 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if (BO_CACHE_FAST)
 		$last_update = bo_get_conf('uptime_strikes_modified');
 
+	
+	
+	
+	
+	/***********************************************************/
+	/*** Time strings ******************************************/
+	/***********************************************************/
+
+	
+	switch ($image_type)
+	{
+		case 'single_strike':
+			$time_string = _BDT($time_min, false).'.'.substr($row['time_ns'], 0, 6)._BZ($time_min);	
+			break;
+			
+		case 'by_date';
+		
+			$time_string = date(_BL('_date').' ', $time_min);
+			$time_string .= date('H:i', $time_min);
+			
+			$time_max = bo_get_latest_calc_time($last_update);
+			
+			if ($time_max >= $last_update)
+			{
+				$time_string .= ' - '.date('H:i', $time_max)._BZ($time_max);
+			}
+			else
+			{
+				$time_string .= _BZ($time_max);
+				$time_string .= ' +'.round($duration / 60).'h';
+			}
+			
+			break;
+
+		case 'live':
+		
+			$time_max = bo_get_latest_calc_time($last_update);
+			
+			if ($time_max - $time_min > 3600 * 12)
+				$time_string  = date(_BL('_date').' H:i', $time_max).' -'.round( ($time_max-$time_min)/3600).'h';
+			else
+				$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
+
+			$time_string .= _BZ($time_min);
+			
+			break;
+	}
+	
+	
+	
+	/***********************************************************/
+	/*** Image processing **************************************/
+	/***********************************************************/
+	
 	
 	//dimensions are set
 	if (isset($cfg['dim']))
@@ -620,7 +688,18 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if (!isset($cfg['point_style']) && $cfg['point_type'])
 		$cfg['point_style'] = array(0 => $cfg['point_type'], 1 => $cfg['point_size']);
 
-		
+	
+	
+	
+	
+	
+	
+	/***********************************************************/
+	/*** Get the data and draw *********************************/
+	/***********************************************************/
+
+	
+	
 	//time calculations
 	$time_range  = $time_max - $time_min + 59;
 	$color_intvl = count($cfg['col']) > 0 ? $time_range / count($cfg['col']) : 1;
@@ -651,7 +730,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 					".bo_region2sql($region)."
 				ORDER BY time ASC";
 		$res = BoDb::query($sql);
-		
 		
 		while ($row = $res->fetch_assoc())
 		{

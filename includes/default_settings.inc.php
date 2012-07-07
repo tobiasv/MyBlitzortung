@@ -742,6 +742,8 @@
 @define('BO_ALERT_SEND_INTERVAL', 45);
 
 
+
+
 /*******************************************************************/
 /*** E-Mail settings                                             ***/
 
@@ -1138,6 +1140,9 @@
 //Default socket timeout
 @define('BO_SOCKET_TIMEOUT', 40);
 
+//set max time in pictures to age of latest calculated strike 
+//if within given minutes from now
+@define('BO_LATEST_STRIKE_TIME_CALC', 8);
 
 // Fuzzy strike update to avoid duplicates
 @define('BO_UP_STRIKES_FUZZY_NSEC', 400000);
@@ -1174,6 +1179,9 @@
 
 //argument that specifies language
 @define('BO_LANG_ARGUMENT', 'bo_lang');
+
+
+
 
 
 /*******************************************************************/

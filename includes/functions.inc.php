@@ -2530,5 +2530,17 @@ function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quali
 }
 
 
+function bo_get_latest_calc_time($last_update = 0)
+{
+	$row = BoDb::query("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes s")->fetch_assoc();
+	$time = strtotime($row['mtime'].' UTC');
+	
+	if (time() - $time < BO_LATEST_STRIKE_TIME_CALC * 60)
+		return $time;
+	else
+		return $last_update;
+		
+}
+
 
 ?>

@@ -174,7 +174,10 @@ function bo_tile()
 	{
 		bo_load_locale();
 		
-		$time_max = min(bo_get_conf('uptime_strikes_modified'), $time_max);
+		$last_update = bo_get_conf('uptime_strikes_modified');
+		$time_max = min($last_update, $time_max);
+		$time_max = bo_get_latest_calc_time($time_max);
+		
 		$show_date = $time_manual_from || ($time_max-$time_min) > 3600 * 12 ? true : false;
 		
 		$fh = imagefontheight(BO_MAP_LEGEND_FONTSIZE);
