@@ -495,7 +495,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		
 			$time_string = date(_BL('_date').' ', $time_min);
 			$time_string .= date('H:i', $time_min);
-			
 			$last_update_calc = bo_get_latest_calc_time($last_update);
 			
 			if ($time_max >= $last_update_calc)
@@ -513,7 +512,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 
 		case 'live':
 		
-			$time_max = bo_get_latest_calc_time($last_update);
+			$last_update_calc = bo_get_latest_calc_time($last_update);
+			$time_max = min($last_update_calc, $time_max);
 			
 			if ($time_max - $time_min > 3600 * 12)
 				$time_string  = date(_BL('_date').' H:i', $time_max).' -'.round( ($time_max-$time_min)/3600).'h';
