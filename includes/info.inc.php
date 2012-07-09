@@ -1,7 +1,7 @@
 <?php
 
 
-function bo_show_info()
+function bo_show_info_page1()
 {
 
 	echo '<div id="bo_infos">';

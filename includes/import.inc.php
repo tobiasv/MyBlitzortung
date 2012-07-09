@@ -2,12 +2,6 @@
 
 
 
-function bo_access_url()
-{
-	$path = sprintf(BO_IMPORT_PATH, trim(BO_REGION));
-	return sprintf('http://%s:%s@%s/%s', trim(BO_USER), trim(BO_PASS), trim(BO_IMPORT_SERVER), $path);
-}
-
 function bo_update_all($force = false, $only = '')
 {
 	bo_echod(" ");
@@ -118,7 +112,10 @@ function bo_update_all2($force = false, $only = '')
 			if (bo_exit_on_timeout()) return;
 
 			if (!$only || $only == 'alerts')
+			{
+				require_once 'alert.inc.php';
 				bo_alert_send();
+			}
 		}
 	}
 
@@ -154,8 +151,10 @@ function bo_update_all2($force = false, $only = '')
 	if (bo_exit_on_timeout()) return;
 
 	if (!$only || $only == 'density')
+	{
+		require_once 'density.inc.php';
 		bo_update_densities($force);
-
+	}
 		
 	/*** File Cache ***/
 	if (bo_exit_on_timeout()) return;

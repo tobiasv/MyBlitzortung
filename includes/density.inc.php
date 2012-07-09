@@ -387,6 +387,8 @@ function bo_show_archive_density()
 {
 	global $_BO;
 
+	require_once 'functions_html.inc.php';
+	
 	$level = bo_user_get_level();
 	$map = isset($_GET['bo_map']) ? $_GET['bo_map'] : -1;
 	$year = intval($_GET['bo_year']) ? intval($_GET['bo_year']) : date('Y');
@@ -647,6 +649,7 @@ function bo_get_density_image()
 	if (BO_FORCE_MAP_LANG === true)
 		bo_load_locale(BO_LOCALE);
 
+	require_once 'image.inc.php';
 	
 	$year = intval($_GET['bo_year']);
 	$month = intval($_GET['bo_month']);

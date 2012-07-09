@@ -297,6 +297,12 @@
 //enable for server with high load
 @define('BO_CACHE_FAST', false); 
 
+// if file is outdated, check the last update time first
+// if it was before last file-mod time, then set file-mod
+// to now + (update-interval / divisor)
+// so the file will be valid again for some time
+@define('BO_CACHE_MOD_UPDATE_DIVISOR', false); 
+
 //wait given milliseconds if same file is currently processed by another client
 //set 0 or false to disable
 @define('BO_CACHE_WAIT_SAME_FILE', false);

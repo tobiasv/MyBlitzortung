@@ -145,16 +145,15 @@ function bo_tile()
 	if (!$time_start || !$time_min || !$time_max)
 		bo_tile_output();
 
-	//calculate some time information
-	$cur_minute = intval(intval(date('i')) / $update_interval);
-	$mod_time   = mktime(date('H'), $cur_minute * $update_interval , 0);
-	$exp_time   = $mod_time + 60 * $update_interval + 59;
+	//calculate some time information, estimate last update
+	$last_update = floor(time() / 60 / $update_interval) * 60 * $update_interval;
+	$exp_time    = $last_update + 60 * $update_interval + 59;
 	
 	if (time() - $exp_time < 10)
 		$exp_time = time() + 60;
 	
 	//Headers
-	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
 	header("Content-Disposition: inline; filename=\"MyBlitzortungTile.png\"");
 	
@@ -169,48 +168,17 @@ function bo_tile()
 		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
 	}
 
+
+	
 	//send only the info/color-legend image (colors, time)
 	if ($only_info)
 	{
-		bo_load_locale();
-		
+		//get real last update var
 		$last_update = bo_get_conf('uptime_strikes_modified');
 		$last_update = bo_get_latest_calc_time($last_update);
 		$time_max = min($last_update, $time_max);
-		
 		$show_date = $time_manual_from || ($time_max-$time_min) > 3600 * 12 ? true : false;
-		
-		$fh = imagefontheight(BO_MAP_LEGEND_FONTSIZE);
-		$w = BO_MAP_LEGEND_WIDTH;
-		$h = BO_MAP_LEGEND_HEIGHT + $fh * ($show_date ? 2 : 1)+1;
-		
-
-		$I = imagecreate($w, $h);
-		$col = imagecolorallocate($I, 50, 50, 50);
-		imagefill($I, 0, 0, $col);
-
-		$coLegendWidth = $w / count($c);
-		foreach($c as $i => $rgb)
-		{
-			$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
-			imagefilledrectangle($I, (count($c)-$i-1)*$coLegendWidth, 0, (count($c)-$i)*$coLegendWidth, BO_MAP_LEGEND_HEIGHT, $color[$i]);
-		}
-
-		
-		$col = imagecolorallocate($I, 255,255,255);
-		
-		if ($show_date)
-		{
-			imagestring($I, BO_MAP_LEGEND_FONTSIZE, 2, BO_MAP_LEGEND_HEIGHT+1,  '  '.date(_BL('_dateshort').' H:i', $time_min), $col);
-			imagestring($I, BO_MAP_LEGEND_FONTSIZE, 2, BO_MAP_LEGEND_HEIGHT+1 + $fh, '- '.date(_BL('_dateshort').' H:i', $time_max), $col);
-		}
-		else
-			imagestring($I, BO_MAP_LEGEND_FONTSIZE, 2, BO_MAP_LEGEND_HEIGHT+1, date('H:i', $time_min).' - '.date('H:i', $time_max), $col);
-
-		
-		header("Content-Type: image/png");
-		bo_imageout($I);
-		exit;
+		bo_tile_time_colors($type, $time_min, $time_max, $show_date, $caching ? $update_interval : false);
 	}
 
 
@@ -223,6 +191,13 @@ function bo_tile()
 
 	$file = $dir.$filename;
 
+	
+	if ($caching)
+	{
+		bo_output_cachefile_if_exists($file, $last_update, $update_interval * 60);
+	}
+
+/*	
 	if (file_exists($file) && filesize($file) > 0 && $caching)
 	{
 		$filetime = filemtime($file);
@@ -235,7 +210,9 @@ function bo_tile()
 			exit;
 		}
 	}
-
+*/
+	
+	
 	list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($x, $y, $zoom, $tile_size);
 	
 	//Check if zoom or position is in limit
@@ -353,6 +330,8 @@ function bo_tile()
 		
 		BoDb::close();
 		bo_session_close(true);
+		
+		require_once 'functions_image.inc.php';
 		
 		//create tile image
 		$I = imagecreate($tile_size, $tile_size);
@@ -650,6 +629,8 @@ function bo_tile()
 
 function bo_tile_tracks()
 {
+	require_once 'functions_image.inc.php';
+	
 	global $_BO;
 	bo_session_close();
 	@set_time_limit(BO_TILE_CREATION_TIMEOUT);
@@ -893,7 +874,7 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 		if (!$ok)
 			bo_image_cache_error($tile_size, $tile_size);
 		
-		readfile($file);
+		bo_output_cache_file($file, false);
 	}
 	else
 		bo_imageout($I);
@@ -906,6 +887,8 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 
 function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile_size = BO_TILE_SIZE)
 {
+	require_once 'functions_image.inc.php';
+	
 	$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
 	
 	bo_load_locale();
@@ -916,7 +899,6 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 	
 	if (!file_exists($file) || !$caching)
 	{
-		
 		$text = strtr(_BL($text, true), $replace);
 		
 		$I = imagecreate($tile_size, $tile_size);
@@ -975,6 +957,67 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 	readfile($file);
 
 
+}
+
+function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_interval)
+{
+	global $_BO;
+	
+	$cfg = $_BO['mapcfg'][$type];
+	$c = $cfg['col'];
+
+	if ($update_interval)
+	{
+		$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
+		$cache_file = $dir.'tileinfo_'.$type;
+		$cache_file .= '_'.(bo_user_get_level() ? 1 : 0).'.png';
+		bo_output_cachefile_if_exists($cache_file, $time_max, $update_interval * 60);
+	}
+
+	bo_load_locale();
+	$fh = imagefontheight(BO_MAP_LEGEND_FONTSIZE);
+	$w = BO_MAP_LEGEND_WIDTH;
+	$h = BO_MAP_LEGEND_HEIGHT + $fh * ($show_date ? 2 : 1)+1;
+
+	$I = imagecreate($w, $h);
+	$col = imagecolorallocate($I, 50, 50, 50);
+	imagefill($I, 0, 0, $col);
+
+	$coLegendWidth = $w / count($c);
+	foreach($c as $i => $rgb)
+	{
+		$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
+		imagefilledrectangle($I, (count($c)-$i-1)*$coLegendWidth, 0, (count($c)-$i)*$coLegendWidth, BO_MAP_LEGEND_HEIGHT, $color[$i]);
+	}
+
+	
+	$col = imagecolorallocate($I, 255,255,255);
+	
+	if ($show_date)
+	{
+		imagestring($I, BO_MAP_LEGEND_FONTSIZE, 2, BO_MAP_LEGEND_HEIGHT+1,  '  '.date(_BL('_dateshort').' H:i', $time_min), $col);
+		imagestring($I, BO_MAP_LEGEND_FONTSIZE, 2, BO_MAP_LEGEND_HEIGHT+1 + $fh, '- '.date(_BL('_dateshort').' H:i', $time_max), $col);
+	}
+	else
+		imagestring($I, BO_MAP_LEGEND_FONTSIZE, 2, BO_MAP_LEGEND_HEIGHT+1, date('H:i', $time_min).' - '.date('H:i', $time_max), $col);
+
+	
+	header("Content-Type: image/png");
+	if ($update_interval)
+	{
+		$ok = bo_imageout($I, 'png', $cache_file, $time_max);
+
+		if (!$ok)
+			bo_image_cache_error($w, $h);
+		
+		bo_output_cache_file($cache_file, false);
+	}
+	else
+	{
+		bo_imageout($I, $extension);
+	}
+	
+	exit;
 }
 
 ?>

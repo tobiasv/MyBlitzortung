@@ -1,99 +1,12 @@
 <?php
 
 
-
-function bo_show_archive()
-{
-	if (BO_DISABLE_ARCHIVE === true)
-		return;
-	
-	$show = $_GET['bo_show'];
-	$perm = (bo_user_get_level() & BO_PERM_ARCHIVE);
-	$enabled['maps']       = ($perm || (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS));
-	$enabled['density']    = ($perm || (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES)) && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES;
-	$enabled['search']     = ($perm || (defined('BO_ENABLE_ARCHIVE_SEARCH') && BO_ENABLE_ARCHIVE_SEARCH));
-	$enabled['signals']    = ($perm || (defined('BO_ENABLE_ARCHIVE_SIGNALS') && BO_ENABLE_ARCHIVE_SIGNALS)) && BO_UP_INTVL_RAW > 0 && bo_station_id() > 0;
-	$enabled['strikes']    = (bo_user_get_level() & BO_PERM_ARCHIVE); // to see strike table => only logged in users with archive permission!
-	
-	if (($show && !$enabled[$show]) || !$show )
-	{
-		foreach($enabled as $type => $e)
-		{
-			if ($e)
-			{
-				$show = $type;
-				break;
-			}
-		}
-	}
-	
-	if (!$show)
-		return;
-	
-	echo '<div id="bo_archives">';
-	
-	echo '<ul id="bo_menu">';
-
-	if ($enabled['maps'])
-		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'maps').'" class="bo_navi'.($show == 'maps' ? '_active' : '').'">'._BL('arch_navi_maps').'</a></li>';
-
-	if ($enabled['density'])
-		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'density').'" class="bo_navi'.($show == 'density' ? '_active' : '').'">'._BL('arch_navi_density').'</a></li>';
-	
-	if ($enabled['search'])
-		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'search').'" class="bo_navi'.($show == 'search' ? '_active' : '').'">'._BL('arch_navi_search').'</a></li>';
-
-	if ($enabled['strikes'])
-		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'" class="bo_navi'.($show == 'strikes' ? '_active' : '').'">'._BL('arch_navi_strikes').'</a></li>';
-
-	if ($enabled['signals'])
-		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'signals').'" class="bo_navi'.($show == 'signals' ? '_active' : '').'">'._BL('arch_navi_signals').'</a></li>';		
-
-	echo '</ul>';
-
-	
-	
-	switch($show)
-	{
-		
-		case 'maps':
-			echo '<h3 class="bo_main_title">'._BL('h3_arch_maps').' </h3>';
-			bo_show_archive_map();
-			break;
-
-		case 'density':
-			echo '<h3 class="bo_main_title">'._BL('h3_arch_density').' </h3>';
-			bo_show_archive_density();
-			break;
-		
-		default:
-		case 'search':
-			echo '<h3 class="bo_main_title">'._BL('h3_arch_search').' </h3>';
-			bo_show_archive_search();
-			break;
-
-		case 'signals':
-			echo '<h3 class="bo_main_title">'._BL('h3_arch_last_signals').'</h3>';
-			bo_show_archive_table();
-			break;
-		
-		case 'strikes':
-			echo '<h3 class="bo_main_title">'._BL('h3_arch_last_strikes').'</h3>';
-			bo_show_archive_table(true);
-			break;
-	}
-
-	echo '</div>';
-
-
-	bo_copyright_footer();
-
-}
-
 function bo_show_archive_map()
 {
 	global $_BO;
 
+	require_once 'functions_html.inc.php';
+	
 	$ani_div = intval(BO_ANIMATIONS_INTERVAL);
 	$ani_pic_range = intval(BO_ANIMATIONS_STRIKE_TIME);
 	$ani_default_range = intval(BO_ANIMATIONS_DEFAULT_RANGE);
@@ -108,8 +21,9 @@ function bo_show_archive_map()
 	$day_add = intval($_GET['bo_day_add']);
 	$ani = isset($_GET['bo_animation']) && $_GET['bo_animation'] !== '0' ? 1 : 0;
 	$ani_preset = trim($_GET['bo_animation']);
-	$hour_from = intval($_GET['bo_hour_from']);
-	$hour_range = intval($_GET['bo_hour_range']);
+	$hour_from = (int)($_GET['bo_hour_from']);
+	$minute_from = fmod($_GET['bo_hour_from'], 1)  * 60;
+	$hour_range = (float)($_GET['bo_hour_range']);
 	$map_changed = isset($_GET['bo_oldmap']) && $map != $_GET['bo_oldmap'];
 	$ani_changed = !isset($_GET['bo_oldani']) || $ani != $_GET['bo_oldani'] || $map_changed;
 	
@@ -155,7 +69,7 @@ function bo_show_archive_map()
 	else
 		$max_range = BO_SMAP_MAX_RANGE;
 
-	if (isset($cfg['hoursinterval']) && intval($cfg['hoursinterval'])) //interval of hours
+	if (isset($cfg['hoursinterval']) && $cfg['hoursinterval'] > 0) //interval of hours
 		$hours_interval = $cfg['hoursinterval'];
 	elseif ($ani)
 		$hours_interval = BO_ANIMATIONS_RANGE_STEP;
@@ -189,8 +103,8 @@ function bo_show_archive_map()
 
 			if ($ani_preset == 'now')
 			{
-				$hour_range = $ani_default_range; // + ($hours_interval <= 6 ? $hours_interval : 0);
-				$hour_from = date('H') - $hour_range - $ani_pic_range / 60;
+				$hour_range = $ani_default_range + time()/3600 - intval(time()/3600);  // add seconds to full hour
+				$hour_from = date('H') - $hour_range - $ani_pic_range / 60 + 1;
 				$day = date('d');
 			}
 			elseif ($ani_preset == 'day')
@@ -216,7 +130,7 @@ function bo_show_archive_map()
 	elseif (!$ani && $ani_changed)
 	{
 		$hour_from  = 0;
-		$hour_range = $max_range < 24 ? $max_range : 24;
+		$hour_range = $max_range < 24 ? min($cfg['trange'], $max_range) : 24;
 	}
 
 	if ($_GET['bo_prev_hour'])
@@ -239,8 +153,6 @@ function bo_show_archive_map()
 
 	
 	
-	
-	
 	//min/max strike-time
 	$row = BoDb::query("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$strikes_available = $row['mintime'] > 0;
@@ -258,7 +170,7 @@ function bo_show_archive_map()
 
 		echo '<a name="bo_arch_strikes_maps_form"></a>';
 		echo '<form action="?#bo_arch_strikes_maps_form" method="GET" class="bo_arch_strikes_form" id="bo_arch_strikes_maps_form">';
-		echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_get', 'bo_oldmap'));
+		echo bo_insert_html_hidden(array('bo_map', 'bo_year', 'bo_month', 'bo_day', 'bo_animation', 'bo_day_add', 'bo_hour_from', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_get', 'bo_oldmap', 'bo_oldani'));
 		echo '<input type="hidden" name="bo_oldmap" value="'.$map.'">';
 		echo '<input type="hidden" name="bo_oldani" value="'.($ani ? 1 : 0).'">';
 		
@@ -290,17 +202,50 @@ function bo_show_archive_map()
 		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
 		echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from">';
 		for($i=0;$i<=23;$i+=$hours_interval)
-			echo '<option value="'.$i.'" '.($i == $hour_from ? 'selected' : '').'>'.$i.' '._BL('oclock').'</option>';
+		{
+			echo '<option value="'.$i.'" '.(floor($i) == floor($hour_from) && fmod($i, 1)*60 == $minute_from ? 'selected' : '').'>';
+			
+			if (is_float($hours_interval))
+				echo bo_hours($i)." "._BL('oclock');
+			else
+				echo $i.' '._BL('oclock');
+			
+			echo '</option>';
+		}
 		echo '</select>';
 
-		echo '&nbsp;<input type="submit" name="bo_prev_hour" value=" &lt; " id="bo_archive_maps_prevhour" class="bo_form_submit">';
-		echo '&nbsp;<input type="submit" name="bo_next_hour" value=" &gt; " id="bo_archive_maps_nexthour" class="bo_form_submit">';
+		if (!is_float($hours_interval) || $hours_interval > 1)
+		{
+			echo '&nbsp;<input type="submit" name="bo_prev_hour" value=" &lt; " id="bo_archive_maps_prevhour" class="bo_form_submit">';
+			echo '&nbsp;<input type="submit" name="bo_next_hour" value=" &gt; " id="bo_archive_maps_nexthour" class="bo_form_submit">';
+		}
+		
+		if ($ani || (!$ani && !isset($cfg['file_time_search'])))
+		{
+			echo ' <select name="bo_hour_range" id="bo_arch_strikes_select_hour_to" '.($ani ? '' : ' onchange="submit()"').'>';
+			for($i=$hours_interval;$i<=$max_range;$i+=$hours_interval)
+			{
+				echo '<option value="'.$i.'" ';
+				
+				if (is_float($hours_interval))
+				{
+					echo $i == $hour_range ? 'selected' : '';
+					echo '>+ '.bo_hours($i)." h";
+				}
+				else
+				{
+					echo (int)$i == (int)$hour_range ? 'selected' : '';
+					echo '>+'.$i.' '._BL('hours');
+				}
 
-		echo ' <select name="bo_hour_range" id="bo_arch_strikes_select_hour_to" '.($ani ? '' : ' onchange="submit()"').'>';
-		for($i=$hours_interval;$i<=$max_range;$i+=$hours_interval)
-			echo '<option value="'.$i.'" '.($i == $hour_range ? 'selected' : '').'>+'.$i.' '._BL('hours').'</option>';
-		echo '</select> ';
-
+				echo '</option>';
+			}
+			echo '</select> ';
+		}
+		else
+		{
+			echo '<input type="hidden" name="bo_hour_range" value="'.$hours_interval.'">';
+		}
 		
 		if ($ani_div)
 		{
@@ -308,7 +253,7 @@ function bo_show_archive_map()
 			echo '<span class="bo_form_descr">'._BL('Animation').':</span> ';
 			echo '<input type="radio" name="bo_animation" value="0" id="bo_archive_maps_animation_off" class="bo_form_radio" '.(!$ani ? ' checked' : '').' onclick="bo_enable_timerange(false, true);" '.($ani_forced ? ' disabled' : '').'>';
 			echo '<label for="bo_archive_maps_animation_off">'._BL('Off').'</label>';
-			echo '<input type="radio" name="bo_animation" value="'.htmlentities($ani_preset).'" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true, true);">';
+			echo '<input type="radio" name="bo_animation" value="'.($ani_preset ? htmlentities($ani_preset) : 1).'" id="bo_archive_maps_animation_on" class="bo_form_radio" '.($ani ? ' checked' : '').' onclick="bo_enable_timerange(true, true);">';
 			echo '<label for="bo_archive_maps_animation_on">'._BL('On').'</label>';
 		}
 		
@@ -481,6 +426,9 @@ bo_enable_timerange(<?php echo $ani ? 'true' : 'false'; ?>);
 function bo_show_archive_search()
 {
 	global $_BO;
+	
+	require_once 'functions_dynmap.inc.php';
+	
 	$radius = $_BO['radius'] * 1000;
 	$max_count = intval(BO_ARCHIVE_SEARCH_STRIKECOUNT);
 	$select_count = $max_count;
@@ -881,6 +829,8 @@ function bo_show_archive_search()
 //Last raw data and strikes table
 function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null, $fuzzy = null)
 {
+	require_once 'functions_html.inc.php';
+	
 	$perm = bo_user_get_level() & BO_PERM_ARCHIVE;
 
 	$per_page = BO_ARCHIVE_TABLE_PER_PAGE;
@@ -1809,222 +1759,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	
 }
 
-
-function bo_archive_select_map(&$map)
-{
-	global $_BO;
-	
-	$map_ok = false;
-	$map_default = false;
-	
-	$ret = '<span class="bo_form_descr">'._BL('Map').':';
-	$ret .= ' <select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
-	foreach($_BO['mapimg'] as $id => $d)
-	{
-		if (!$d['name'] || !$d['archive'])
-			continue;
-		
-		if ($map_default === false)
-			$map_default = $id;
-			
-		$ret .= '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BL($d['name'], false, BO_CONFIG_IS_UTF8).'</option>';
-		
-		if ($map < 0)
-			$map = $id;
-		
-		if ((string)$id === (string)$map)
-			$map_ok = true;
-	}
-	$ret .= '</select></span> ';
-	
-	$map = $map_ok ? $map : $map_default;
-	
-	return $ret;
-}
-
-
-function bo_archive_get_dim($map)
-{
-	global $_BO;
-	
-	$cfg = $_BO['mapimg'][$map];
-	
-	if ($cfg['dim'][0] && $cfg['dim'][1])
-	{
-		$x = $cfg['dim'][0];
-		$y = $cfg['dim'][1];
-	}
-	else
-	{
-		$file = BO_DIR.'images/'.$cfg['file'];
-		if (file_exists($file) && !is_dir($file))
-		{
-			list($x,$y) = getimagesize($file);
-			
-			if (isset($cfg['resize']) && $cfg['resize'] > 0)
-			{
-				$y = $y * ($cfg['resize'] / $y);
-				$x = $cfg['resize'];
-			}
-			
-		}
-	}
-	
-	return array($x, $y);
-
-}
-
-function bo_archive_get_dim_html($map, $addx=0)
-{
-	list($x, $y) = bo_archive_get_dim($map);
-	
-	if ($x && $y)
-		$img_dim = ' width="'.($x+$addx).'" height="'.$y.'" ';	
-	else
-		$img_dim = '';
-		
-	return $img_dim;
-}
-
-
-function bo_archive_get_dim_css($map, $addx=0)
-{
-	list($x, $y) = bo_archive_get_dim($map);
-	
-	if ($x && $y)
-		$img_dim = 'width:'.($x+$addx).'px;height:'.$y.'px;';	
-	else
-		$img_dim = '';
-		
-	return $img_dim;
-}
-
-
-
-function bo_insert_animation_js($images, $bo_file_url, $img_file, $ani_delay=BO_ANIMATIONS_WAITTIME, $ani_delay_end=BO_ANIMATIONS_WAITTIME_END, $img_dim='', $alt="")
-{
-	echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
-	echo '<img style="position:absolute;top:1px;left:1px;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.$bo_file_url.$images[0].'" alt="'.htmlspecialchars($alt).'">';
-
-	echo '<div id="bo_ani_loading_container" style="display:none;">';
-	echo '<div id="bo_ani_loading_white" style="position:absolute;top:0px;left:0px;"></div>';
-	echo '<div id="bo_ani_loading_text"  style="position:absolute;top:0px;left:0px">';
-	echo '<p id="bo_ani_loading_text_percent" >'._BL('Loading...').'</p>';
-	echo '</div>';
-	echo '</div>';
-	
-	$js_img = '';
-	foreach($images as $image)
-		$js_img .= ($js_img ? ',' : '').'"'.$image.'"';
-	
-?>
-	
-<script type="text/javascript">
-
-var bo_maps_pics   = new Array(<?php echo $js_img ?>);
-var bo_maps_img    = new Array();
-var bo_maps_loaded = 0;
-var bo_maps_playing = false;
-var bo_maps_position = 0;
-
-function bo_maps_animation(nr)
-{
-	if (bo_maps_playing)
-	{
-		document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[nr].src;
-		var timeout = <?php echo intval($ani_delay); ?>;
-		if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += <?php echo intval($ani_delay_end); ?>; }
-		window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
-		bo_maps_position=nr;
-	}
-}
-
-function bo_maps_load()
-{
-	document.getElementById('bo_ani_loading_container').style.display='block';
-	for (var i=0; i<bo_maps_pics.length; i++)
-	{
-		bo_maps_img[i] = new Image();
-		bo_maps_img[i].onload=bo_maps_animation_start;
-		bo_maps_img[i].onerror=bo_maps_animation_start;
-		bo_maps_img[i].src = "<?php echo $bo_file_url ?>" + bo_maps_pics[i];
-	}
-	
-}
-
-function bo_maps_animation_start()
-{
-	if (bo_maps_loaded >= 0)
-		bo_maps_loaded++;
-	
-	if (bo_maps_loaded+1 >= bo_maps_pics.length && bo_maps_loaded >= 0)
-	{
-		bo_maps_loaded = -1;
-		bo_maps_playing = true;
-		document.getElementById('bo_ani_loading_container').style.display='none';
-		bo_maps_animation(0);
-	}
-	else if (bo_maps_loaded > 0)
-	{
-		if (bo_maps_pics.length > 0)
-			document.getElementById('bo_ani_loading_text_percent').innerHTML="<?php echo _BL('Loading...') ?> " + Math.round(bo_maps_loaded / bo_maps_pics.length * 100) + "%";
-		
-		document.getElementById('bo_arch_map_img_ani').src = bo_maps_img[bo_maps_loaded-1].src;
-	}
-}
-
-function bo_animation_pause()
-{
-	if (bo_maps_loaded == -1)
-	{
-		if (bo_maps_playing)
-		{
-			bo_maps_playing = false;
-			document.getElementById('bo_animation_dopause').innerHTML="<?php echo _BL('ani_play') ?>";
-		}
-		else
-		{
-			bo_maps_playing = true;
-			document.getElementById('bo_animation_dopause').innerHTML="<?php echo _BL('ani_pause') ?>";
-			bo_maps_animation(bo_maps_position);
-		}
-	}
-
-}
-
-function bo_animation_next()
-{
-	if (bo_maps_loaded == -1)
-	{
-		if (bo_maps_playing)
-			bo_animation_pause();
-		
-		if (++bo_maps_position >= bo_maps_img.length) bo_maps_position=0;
-		
-		document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[bo_maps_position].src;
-		
-	}
-}
-
-function bo_animation_prev()
-{
-	if (bo_maps_loaded == -1)
-	{
-		if (bo_maps_playing)
-			bo_animation_pause();
-		
-		if (--bo_maps_position < 0) bo_maps_position=bo_maps_img.length-1;
-		document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[bo_maps_position].src;
-		
-		
-	}
-}
-
-window.setTimeout("bo_maps_load();", 500);
-</script>
-<?php
-
-}
 
 					
 function bo_signal_url($station_id, $raw_id = null, $strike_time = null, $strike_time_ns = null, $dist = null)

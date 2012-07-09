@@ -5,8 +5,11 @@
 
 Version 0.7.7 (2012-??-??)
 -------------------------------
-- improvements and fixes
-- full UTF8 support
+- new: full UTF8 support
+- new: send header to cache html
+- improved: caching methods
+- improved: faster due to file inclusion changes
+- other improvements and fixes
 
 
 Version 0.7.6 (2012-05-31)

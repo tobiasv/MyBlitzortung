@@ -1,5 +1,7 @@
 <?php
 
+require_once 'functions_image.inc.php';
+
 // returns png-image for map-marker
 function bo_icon($icon)
 {
@@ -269,16 +271,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$duration = intval(substr($date, 13));
 
 		
-			if (!bo_user_get_level() && $duration != $cfg['animation']['range'])
-			{
-				if ( ($duration > 60 * BO_SMAP_MAX_RANGE || ($duration && $duration < BO_SMAP_MIN_RANGE)) )
-					bo_image_error('Time range not allowed!');
-				
-				//allow only specific settings for guests
-				$minute   = floor($minute / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
-				$duration = floor($duration / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
-			}
-			
 			if ($duration)
 			{
 				//When duration/time then use UTC!
@@ -292,6 +284,20 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				$duration = 24 * 60;
 			}
 
+			if (!bo_user_get_level() && $duration != $cfg['animation']['range'])
+			{
+				if (     $duration > 60 * BO_SMAP_MAX_RANGE 
+				     ||  $duration > 60 * $cfg['maxrange'] 
+					 || ($duration && $duration < BO_SMAP_MIN_RANGE)
+					)
+					bo_image_error('Time range not allowed!');
+				
+				//allow only specific settings for guests
+				$minute   = floor($minute / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
+				$duration = floor($duration / BO_SMAP_MIN_RANGE) * BO_SMAP_MIN_RANGE;
+			}			
+			
+			
 			if (BO_CACHE_SUBDIRS === true)
 				$cache_file .= gmdate('Y/m/d/', $time_min);
 			
@@ -505,7 +511,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			else
 			{
 				$time_string .= _BZ($time_max);
-				$time_string .= ' +'.round($duration / 60).'h';
+				
+				if ($duration % 60)
+					$time_string .= ' +'.bo_hours($duration / 60);
+				else
+					$time_string .= ' +'.round($duration / 60).'h';
 			}
 			
 			break;
@@ -1002,7 +1012,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 function bo_get_map_image_ani()
 {	
 	global $_BO;
-	include 'gifencoder/GIFEncoder.class.php';
+	require_once 'gifencoder/GIFEncoder.class.php';
 
 	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);	
 	$dir = BO_DIR.BO_CACHE_DIR.'/maps/';
@@ -1112,137 +1122,6 @@ function bo_get_map_image_ani()
 
 
 
-function bo_image_banner_top($I, $w, $h, $cfg, $time_string = null, $extra = null, $copy = true)
-{
-	//default color
-	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
-
-	$tdy = 0;
-	if (isset($cfg['top_style']))
-	{
-		imagefilledrectangle($I, 0,0, $w-1, $cfg['top_style'][0], bo_hex2color($I, $cfg['top_style'][2]));
-		$tdy = $cfg['top_style'][1];
-		
-		if ($cfg['top_style'][3])
-		{
-			imagesetthickness($I, $cfg['top_style'][3]);
-			imageline($I, 0,$cfg['top_style'][0], $w,$cfg['top_style'][0], bo_hex2color($I, $cfg['top_style'][4]));
-		}
-	}
-	
-	if (isset($cfg['top_font']))
-	{
-		$fontsize = $cfg['top_font'][0];
-		$tbold = $cfg['top_font'][1];
-		$tcol = $cfg['top_font'][2];
-	}
-	else //for old template style
-	{
-		$fontsize = $cfg['textsize'] ? $cfg['textsize'] : $w / 80;
-		$tbold = true;
-		$tcol = $text_col;
-	}
-	
-	//Date/Time/Strikes
-	if ($time_string !== null)
-		bo_imagestring($I, $fontsize, 2, 2+$tdy, $time_string, $tcol, $tbold);
-
-	//Strikes
-	if ($extra !== null)
-		bo_imagestringright($I, $fontsize, $w - 2, 2+$tdy, $extra, $tcol, $tbold);
-	
-	//Own Copyright
-	if (defined('BO_OWN_COPYRIGHT_MAPS') && trim(BO_OWN_COPYRIGHT_MAPS))
-		$copyright = strip_tags(BO_OWN_COPYRIGHT_MAPS);
-	elseif (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT) && BO_OWN_COPYRIGHT_MAPS !== false)
-		$copyright = strip_tags(BO_OWN_COPYRIGHT);
-	else
-		$copyright = '';
-	
-	if ($copyright && $copy)
-	{
-		$copy_width = bo_imagetextwidth($fontsize, $tbold, $copyright);
-		$info_text_width = bo_imagetextwidth($fontsize, $tbold, $time_string.'         '.$strike_text);
-		
-		if ($w - $info_text_width > $copy_width)
-		{
-			$copy_pos = $w / 2 - $copy_width / 2;
-			bo_imagestring($I, $fontsize, $copy_pos, 2+$tdy, $copyright, $tcol, $tbold);
-		}
-	}
-}
-
-
-function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = false)
-{
-	//default color
-	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
-
-	if (isset($cfg['top_font']))
-	{
-		$fontsize = $cfg['top_font'][0];
-		$tbold = $cfg['top_font'][1];
-		$tcol = $cfg['top_font'][2];
-	}
-	else //for old template style
-	{
-		$fontsize = $cfg['textsize'] ? $cfg['textsize'] : $w / 80;
-		$tbold = true;
-		$tcol = $text_col;
-	}
-
-	if (isset($cfg['bottom_font']))
-	{
-		$fontsize = $cfg['bottom_font'][0];
-		$tbold = $cfg['bottom_font'][1];
-		$tcol = $cfg['bottom_font'][2];
-	}
-	
-	/* BOTTOM LINE */
-	if (isset($cfg['bottom_style']))
-	{
-		imagefilledrectangle($I, 0,$h, $w, $h-$cfg['bottom_style'][0], bo_hex2color($I, $cfg['bottom_style'][2]));
-		$tdy = $cfg['bottom_style'][1];
-		
-		if ($cfg['bottom_style'][3])
-		{
-			imagesetthickness($I, $cfg['bottom_style'][3]);
-			imageline($I, 0,$h-$cfg['bottom_style'][0], $w,$h-$cfg['bottom_style'][0], bo_hex2color($I, $cfg['bottom_style'][4]));
-		}
-	}
-	
-	//Copyright
-	$text = _BL('Lightning data from Blitzortung.org', true);
-	$bo_width = bo_imagetextwidth($fontsize, $tbold, $text);
-	if ($bo_width > $w - $legend_width - 5)
-		$text = _BL('Blitzortung.org', true);
-	
-	if ($cfg['image_footer'])
-		$text .= ' '.$cfg['image_footer'];
-	
-	$tdy += bo_imagetextheight($fontsize);	
-	bo_imagestring($I, $fontsize, 4, $h - $tdy, $text, $tcol, $tbold);
-
-	//Own copyright
-	if (defined('BO_OWN_COPYRIGHT_MAPS') && trim(BO_OWN_COPYRIGHT_MAPS))
-		$copyright = strip_tags(BO_OWN_COPYRIGHT_MAPS);
-	elseif (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT) && BO_OWN_COPYRIGHT_MAPS !== false)
-		$copyright = strip_tags(BO_OWN_COPYRIGHT);
-	else
-		$copyright = '';
-	
-	if ($copyright && $copy)
-	{
-		$bo_width2 = bo_imagetextwidth($fontsize, $tbold, $copyright);
-		$bo_pos2 = $bo_width + $fontsize * 5;
-		
-		if ($bo_width2+$bo_pos2 < $w - $legend_width - 5)
-			bo_imagestring($I, $fontsize, $bo_pos2, $h - $tdy, $copyright, $tcol, $tbold);
-	}
-}
-
-
-
 //get an image from /images directory
 //we need this for easy integration of MyBlitzortung in other projects
 function bo_get_image($img)
@@ -1333,70 +1212,6 @@ function bo_value2color($value, &$colors)
 }
 
 
-function bo_image_reduce_colors(&$I, $density_map=false, $transparent=false)
-{
-	if ($transparent)
-		$colors = intval(BO_IMAGE_PALETTE_COLORS_TRANSPARENT);
-	elseif ($density_map)
-		$colors = intval(BO_IMAGE_PALETTE_COLORS_DENSITIES);
-	else
-		$colors = intval(BO_IMAGE_PALETTE_COLORS_MAPS);
-	
-	
-	if ($colors)
-	{
-		//colorstotal works only for palette images
-		$total = imagecolorstotal($I);
-		if ($total && $total <= 256)
-			return;
-
-
-		$width = imagesx($I);
-		$height = imagesy($I);
-
-		if (BO_IMAGE_PALETTE_AUTO)
-		{
-			$Itmp = ImageCreateTrueColor($width, $height);
-			
-			if ($transparent)
-			{
-				$back = imagecolorallocate($Itmp, 140, 142, 144);
-				imagefilledrectangle($Itmp, 0, 0, $width, $height, $back);
-				imagecolortransparent($Itmp, $back);
-			}
-
-			ImageCopy($Itmp, $I, 0, 0, 0, 0, $width, $height);
-		}
-		
-		//reduce colors: imagecolormatch doesn't exist in some PHP-GD modules (i.e. Ubuntu)
-		if (!$transparent && function_exists('imagecolormatch'))
-		{
-			$colors_handle = ImageCreateTrueColor($width, $height);
-			ImageCopyMerge($colors_handle, $I, 0, 0, 0, 0, $width, $height, 100 );
-			ImageTrueColorToPalette($I, false, $colors);
-			ImageColorMatch($colors_handle, $I);
-			ImageDestroy($colors_handle);
-		}
-		else
-		{
-			imagetruecolortopalette($I, false, $colors);
-		}
-
-		if (BO_IMAGE_PALETTE_AUTO)
-		{
-			if (imagecolorstotal($I) == 256) //too much colors ==> back to truecolor
-			{
-				imagedestroy($I);
-				$I = $Itmp;
-			}
-			else
-			{
-				imagedestroy($Itmp);
-			}
-		}
-		
-	}
-}
 
 
 function bo_add_cities2image($I, $cfg, $w, $h, $Projection)
@@ -1642,174 +1457,134 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 }
 
 
-function bo_drawpoint($I, $x, $y, &$style, $color = null, $use_alpha = true, $strikedata = null)
+function bo_image_banner_top($I, $w, $h, $cfg, $time_string = null, $extra = null, $copy = true)
 {
+	//default color
+	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
 
-	if ($color == null && $style[2]) //fillcolor
-		$color = bo_hex2color($I, $style[2], $use_alpha);
-
-	$bordercolor = null;
-		
-	if ($style[3]) 
+	$tdy = 0;
+	if (isset($cfg['top_style']))
 	{
-		$bordercolor = bo_hex2color($I, $style[4], $use_alpha);
-		imagesetthickness($I, $style[3]);
-	}
-
-	$s = $style[1]; //size
+		imagefilledrectangle($I, 0,0, $w-1, $cfg['top_style'][0], bo_hex2color($I, $cfg['top_style'][2]));
+		$tdy = $cfg['top_style'][1];
 		
-		
-	switch ($style[0])
-	{
-		case 1: //Circle
-			
-			if ($s == 1)
-			{
-				imagesetpixel($I, $x, $y, $color);
-			}
-			else if ($s == 2)
-			{
-				imagerectangle($I, $x, $y, $x+1, $y+1, $color);
-			}
-			else
-			{
-				imagefilledellipse($I, $x, $y, $s, $s, $color);
-			}
-			
-			if ($bordercolor !== null)
-				imageellipse($I, $x, $y, $s+1, $s+1, $bordercolor);
-				
-			break;
-		
-		
-		case 2: //Plus
-		
-			$s /= 2;
-			$x = (int)$x;
-			$y = (int)$y;
-			
-			if ($bordercolor !== null)
-			{
-				imagesetthickness($I, $style[3]+2);
-				imageline($I, $x-$s-1, $y, $x+$s+1, $y, $bordercolor);
-				imageline($I, $x, $y-$s-1, $x, $y+$s+1, $bordercolor);
-			}
-			
-			if ($style[3])
-				imagesetthickness($I, $style[3]);
-				
-			imageline($I, $x-$s, $y, $x+$s, $y, $color);
-			imageline($I, $x, $y-$s, $x, $y+$s, $color);
-			
-	
-			break;
-		
-		
-		case 3: // Square
-		
-			$s /= 2;
-			
-			if ($style[2])
-				imagefilledrectangle($I, $x-$s, $y-$s, $x+$s, $y+$s, $color);
-			
-			if ($bordercolor !== null)
-				imagerectangle($I, $x-$s-1, $y-$s-1, $x+$s+1, $y+$s+1, $bordercolor);
-				
-			break;
-		
-		case 10: // Station sign *g*
-		
-			imageline($I, $x-$s*0.6, $y+$s*0.9, $x+$s*0.6, $y+$s*0.9, $color);
-			imageline($I, $x, $y-$s, $x, $y+$s*0.9, $color);
-			
-			imagefilledellipse($I, $x, $y-$s, $s-1, $s-1, $color);
-			
-			imagearc($I, $x-$s, $y-$s, $s*4, $s*3, -30, +30, $bordercolor);
-			imagearc($I, $x+$s, $y-$s, $s*4, $s*3, -30+180, +30+180, $bordercolor);
-			
-			break;
-
-
-			
-		case 20: // Strike sign
-		
-			$points = array(
-					$x-$s*0.3, $y+$s*0.1, 
-					$x-$s*0.1, $y+$s*0.1,
-					$x-$s*0.3, $y+$s,
-					$x+$s*0.4, $y-$s*0.1, 
-					$x+$s*0.1, $y-$s*0.1,
-					$x+$s*0.7, $y-$s, 
-					$x+$s*0.1, $y-$s,
-					$x-$s*0.3, $y+$s*0.1);
-
-			if ($style[2])					
-				imagefilledpolygon($I, $points, count($points)/2, $color);
-			
-			if ($bordercolor !== null)
-				imagepolygon($I, $points, count($points)/2, $bordercolor);
-			
-			
-			break;
-			
-		
-		default:
-		
-			if (function_exists($style[0]))
-				call_user_func($style[0], $I, $x, $y, $color, $style, $strikedata);
-				
-			break;
-			
+		if ($cfg['top_style'][3])
+		{
+			imagesetthickness($I, $cfg['top_style'][3]);
+			imageline($I, 0,$cfg['top_style'][0], $w,$cfg['top_style'][0], bo_hex2color($I, $cfg['top_style'][4]));
+		}
 	}
 	
-	imagesetthickness($I, 1);
-
-}
-
-
-function bo_imagecreatefromfile($file)
-{
-	$extension = strtolower(substr($file, strrpos($file, '.')+1));
-	
-	if (!file_exists($file) || is_dir($file))
-		bo_image_error("Couldn't find image file:\n$file");
-	
-	if ($extension == 'jpg' || $extension == 'jpeg')
-		$I = imagecreatefromjpeg($file);
-	elseif ($extension == 'gif')
-		$I = imagecreatefromgif($file);
-	else // PNG is default
-		$I = imagecreatefrompng($file);
-	
-	if ($I === false)
-		bo_image_error("Couldn't read image file:\n$file\nUnknown file format/Wrong image data");
-	
-	return $I;
-}
-
-
-
-function bo_circle($I, $px, $py, $s, $col, $filled = false)
-{
-	//imagefilledarc draws much nicer circles, but has a bug in older php versions
-	//https://bugs.php.net/bug.php?id=43547
-	//imagefilledarc: not nice when size is even
-	$arc = !(!($s%2) || $s >= 8 || BO_NICE_CIRCLES == 0 || (BO_NICE_CIRCLES == 2 && $py >= imagesy($I)-$s+3));
-	
-	if ($filled)
+	if (isset($cfg['top_font']))
 	{
-		if ($arc)
-			imagefilledarc($I, $px, $py, $s, $s, 0, 360, $col, IMG_ARC_PIE);
-		else
-			imagefilledellipse($I, $px, $py, $s, $s, $col);
+		$fontsize = $cfg['top_font'][0];
+		$tbold = $cfg['top_font'][1];
+		$tcol = $cfg['top_font'][2];
 	}
+	else //for old template style
+	{
+		$fontsize = $cfg['textsize'] ? $cfg['textsize'] : $w / 80;
+		$tbold = true;
+		$tcol = $text_col;
+	}
+	
+	//Date/Time/Strikes
+	if ($time_string !== null)
+		bo_imagestring($I, $fontsize, 2, 2+$tdy, $time_string, $tcol, $tbold);
+
+	//Strikes
+	if ($extra !== null)
+		bo_imagestringright($I, $fontsize, $w - 2, 2+$tdy, $extra, $tcol, $tbold);
+	
+	//Own Copyright
+	if (defined('BO_OWN_COPYRIGHT_MAPS') && trim(BO_OWN_COPYRIGHT_MAPS))
+		$copyright = strip_tags(BO_OWN_COPYRIGHT_MAPS);
+	elseif (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT) && BO_OWN_COPYRIGHT_MAPS !== false)
+		$copyright = strip_tags(BO_OWN_COPYRIGHT);
 	else
+		$copyright = '';
+	
+	if ($copyright && $copy)
 	{
-		if ($arc)
-			imagearc($I, $px, $py, $s, $s, 0, 360, $col);
-		else
-			imageellipse($I, $px, $py, $s, $s, $col);
+		$copy_width = bo_imagetextwidth($fontsize, $tbold, $copyright);
+		$info_text_width = bo_imagetextwidth($fontsize, $tbold, $time_string.'         '.$strike_text);
+		
+		if ($w - $info_text_width > $copy_width)
+		{
+			$copy_pos = $w / 2 - $copy_width / 2;
+			bo_imagestring($I, $fontsize, $copy_pos, 2+$tdy, $copyright, $tcol, $tbold);
+		}
 	}
 }
+
+
+function bo_image_banner_bottom($I, $w, $h, $cfg, $legend_width = 0, $copy = false)
+{
+	//default color
+	$text_col = imagecolorallocate($I, $cfg['textcolor'][0], $cfg['textcolor'][1], $cfg['textcolor'][2]);
+
+	if (isset($cfg['top_font']))
+	{
+		$fontsize = $cfg['top_font'][0];
+		$tbold = $cfg['top_font'][1];
+		$tcol = $cfg['top_font'][2];
+	}
+	else //for old template style
+	{
+		$fontsize = $cfg['textsize'] ? $cfg['textsize'] : $w / 80;
+		$tbold = true;
+		$tcol = $text_col;
+	}
+
+	if (isset($cfg['bottom_font']))
+	{
+		$fontsize = $cfg['bottom_font'][0];
+		$tbold = $cfg['bottom_font'][1];
+		$tcol = $cfg['bottom_font'][2];
+	}
+	
+	/* BOTTOM LINE */
+	if (isset($cfg['bottom_style']))
+	{
+		imagefilledrectangle($I, 0,$h, $w, $h-$cfg['bottom_style'][0], bo_hex2color($I, $cfg['bottom_style'][2]));
+		$tdy = $cfg['bottom_style'][1];
+		
+		if ($cfg['bottom_style'][3])
+		{
+			imagesetthickness($I, $cfg['bottom_style'][3]);
+			imageline($I, 0,$h-$cfg['bottom_style'][0], $w,$h-$cfg['bottom_style'][0], bo_hex2color($I, $cfg['bottom_style'][4]));
+		}
+	}
+	
+	//Copyright
+	$text = _BL('Lightning data from Blitzortung.org', true);
+	$bo_width = bo_imagetextwidth($fontsize, $tbold, $text);
+	if ($bo_width > $w - $legend_width - 5)
+		$text = _BL('Blitzortung.org', true);
+	
+	if ($cfg['image_footer'])
+		$text .= ' '.$cfg['image_footer'];
+	
+	$tdy += bo_imagetextheight($fontsize);	
+	bo_imagestring($I, $fontsize, 4, $h - $tdy, $text, $tcol, $tbold);
+
+	//Own copyright
+	if (defined('BO_OWN_COPYRIGHT_MAPS') && trim(BO_OWN_COPYRIGHT_MAPS))
+		$copyright = strip_tags(BO_OWN_COPYRIGHT_MAPS);
+	elseif (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT) && BO_OWN_COPYRIGHT_MAPS !== false)
+		$copyright = strip_tags(BO_OWN_COPYRIGHT);
+	else
+		$copyright = '';
+	
+	if ($copyright && $copy)
+	{
+		$bo_width2 = bo_imagetextwidth($fontsize, $tbold, $copyright);
+		$bo_pos2 = $bo_width + $fontsize * 5;
+		
+		if ($bo_width2+$bo_pos2 < $w - $legend_width - 5)
+			bo_imagestring($I, $fontsize, $bo_pos2, $h - $tdy, $copyright, $tcol, $tbold);
+	}
+}
+
 
 ?>

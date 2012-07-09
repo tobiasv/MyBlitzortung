@@ -24,7 +24,7 @@
 if (!defined("BO_VER"))
 {
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.7.7-dev2');
+	define("BO_VER", '0.7.7-dev3');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -60,7 +60,7 @@ if (!defined("BO_VER"))
 	require_once 'includes/functions.inc.php';
 	require_once 'includes/data.inc.php';
 	require_once 'includes/user.inc.php';
-	require_once 'includes/tiles.inc.php';
+	
 
 	//Classes
 	require_once 'includes/classes/Db.class.php';
@@ -98,6 +98,9 @@ if (!defined("BO_VER"))
 		if (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !(bo_user_get_level() & BO_PERM_NOLIMIT))
 			exit('Google Maps disabled');
 
+			
+		require_once 'includes/tiles.inc.php';
+			
 		if (isset($_GET['tracks']))
 			bo_tile_tracks();
 		else
@@ -113,15 +116,8 @@ if (!defined("BO_VER"))
 	}
 
 	// includes #2
-	require_once 'includes/statistics.inc.php';
-	require_once 'includes/import.inc.php';
-	require_once 'includes/graphs.inc.php';
-	require_once 'includes/map.inc.php';
-	require_once 'includes/archive.inc.php';
-	require_once 'includes/info.inc.php';
-	require_once 'includes/alert.inc.php';
-	require_once 'includes/image.inc.php';
-	require_once 'includes/density.inc.php';
+	require_once 'includes/pages.inc.php';
+	
 
 	//Save info wether headers where sent
 	$_BO['headers_sent'] = headers_sent();
@@ -156,6 +152,7 @@ if (!defined("BO_VER"))
 	//decisions what to do begins...
 	if ($do_update)
 	{
+		require_once 'includes/import.inc.php';
 		bo_update_all($force_update, strtolower($_GET['only']));
 		exit;
 	}
@@ -182,37 +179,46 @@ if (!defined("BO_VER"))
 	}
 	else if (!headers_sent())
 	{
+
 		if (isset($_GET['bo_icon']))
 		{
+			require_once 'includes/image.inc.php';
 			bo_icon($_GET['bo_icon']);
 			exit;
 		}
-		else if (isset($_GET['bo_graph'])) {
+		else if (isset($_GET['bo_graph'])) 
+		{
+			require_once 'includes/graphs.inc.php';
 			bo_graph_raw();
 			exit;
 		}
 		else if (isset($_GET['image']))
 		{
+			require_once 'includes/image.inc.php';
 			bo_get_image($_GET['image']);
 			exit;
 		}
 		else if (isset($_GET['graph_statistics']))
 		{
+			require_once 'includes/graphs.inc.php';
 			bo_graph_statistics();
 			exit;
 		}
 		else if (isset($_GET['density']))
 		{
+			require_once 'includes/density.inc.php';
 			bo_get_density_image();
 			exit;
 		}
 		elseif (isset($_GET['map']))
 		{
+			require_once 'includes/image.inc.php';
 			bo_get_map_image();
 			exit;
 		}
 		elseif (isset($_GET['animation']))
 		{
+			require_once 'includes/image.inc.php';
 			bo_get_map_image_ani();
 			exit;
 		}
@@ -239,13 +245,13 @@ if (!defined("BO_VER"))
 		$_BO['mapimg'] = $tmp;
 	}
 
+	
 	if (isset($_GET['kml']))
 	{
 		bo_output_kml();
 		exit;
 	}
-
-
+	
 	if (BO_SEND_CACHE_HEADER_HTML > 0 && !headers_sent())
 	{
 		$max_age = BO_SEND_CACHE_HEADER_HTML; 
@@ -258,5 +264,10 @@ if (!defined("BO_VER"))
 	}
 	
 }
+
+
+
+require_once 'includes/pages.inc.php';
+
 
 ?>

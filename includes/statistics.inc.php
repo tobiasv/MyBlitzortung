@@ -1,129 +1,6 @@
 <?php
 
 
-//show all available statistics and menu
-function bo_show_statistics()
-{
-	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'strikes';
-
-	if (defined('BO_STATISTICS_ALL_STATIONS') && BO_STATISTICS_ALL_STATIONS || ((bo_user_get_level() & BO_PERM_NOLIMIT)))
-	{
-		$station_id = intval($_GET['bo_station_id']);
-
-		if ($station_id && $station_id != bo_station_id())
-		{
-			$add_stid = 'bo_station_id='.$station_id;
-			$add_graph = '&bo_station_id='.$station_id;
-			$own_station = false;
-			$city = trim(bo_station_city($station_id));
-		}
-	}
-
-	if ( (!$station_id || !$city) && bo_station_id() > 0)
-	{
-		$station_id = bo_station_id();
-		$own_station = true;
-		$city = trim(bo_station_city($station_id));
-		$add_stid = '';
-	}
-
-	if (!($station_id == bo_station_id() || BO_ENABLE_LONGTIME_ALL === true) && $show == 'longtime')
-		$show = 'station';
-
-	echo '<div id="bo_statistics">';
-
-	echo '<ul id="bo_menu">';
-
-	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').$add_stid.'" class="bo_navi'.($show == 'strikes' ? '_active' : '').'">'._BL('stat_navi_strikes').'</a></li>';
-	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'station').$add_stid.'" class="bo_navi'.($show == 'station' ? '_active' : '').'">'._BL('stat_navi_station').'</a></li>';
-	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'network').$add_stid.'" class="bo_navi'.($show == 'network' ? '_active' : '').'">'._BL('stat_navi_network').'</a></li>';
-
-	if ($station_id == bo_station_id() || BO_ENABLE_LONGTIME_ALL === true)
-		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'longtime').$add_stid.'" class="bo_navi'.($show == 'longtime' ? '_active' : '').'">'._BL('stat_navi_longtime').'</a></li>';
-
-	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'other').$add_stid.'" class="bo_navi'.($show == 'other' ? '_active' : '').'">'._BL('stat_navi_other').'</a></li>';
-	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'advanced').$add_stid.'" class="bo_navi'.($show == 'advanced' ? '_active' : '').'">'._BL('stat_navi_advanced').'</a></li>';
-
-	echo '</ul>';
-
-	if (bo_station_id() < 0)
-	{
-		echo '<div id="bo_stat_station_select">';
-		echo '<fieldset>';
-		echo '<form>';
-		echo _BL('Select station').': ';
-		echo bo_insert_html_hidden(array('bo_station_id'));
-		echo bo_get_stations_html_select($station_id);
-		echo '</form>';
-		echo '</fieldset>';
-		echo '</div>';
-	}
-
-	if (bo_station_id() >= 0 || $station_id || !$show || $show == 'strikes' || $show == 'network' || $show == 'other')
-	{
-
-		if ($add_stid && bo_station_id() >= 0)
-		{
-			echo '<div id="bo_stat_other_station_info">';
-			echo strtr(_BL('bo_stat_other_station_info'), array('{STATION_CITY}' => _BC($city)));
-			echo ' <a href="'.bo_insert_url('bo_station_id').'">'._BL('bo_stat_other_station_info_back').'</a>';
-			echo '</div>';
-		}
-
-		switch($show)
-		{
-			default:
-			case 'strikes':
-				bo_show_statistics_strikes($station_id, $own_station, $add_graph);
-				break;
-
-			case 'station':
-				bo_show_statistics_station($station_id, $own_station, $add_graph);
-				break;
-
-			case 'longtime':
-				echo '<h3>'._BL('h3_stat_longtime').'</h3>';
-				bo_show_statistics_longtime($station_id, $own_station, $add_graph);
-				break;
-
-			case 'network':
-				echo '<h3>'._BL('h3_stat_network').'</h3>';
-				bo_show_statistics_network($station_id, $own_station, $add_graph);
-				break;
-
-			case 'other':
-				echo '<h3>'._BL('h3_stat_other').'</h3>';
-				bo_show_statistics_other($station_id, $own_station, $add_graph);
-				break;
-
-			case 'advanced':
-				echo '<h3>'._BL('h3_stat_advanced').'</h3>';
-				bo_show_statistics_advanced($station_id, $own_station, $add_graph);
-				break;
-		}
-	}
-	echo '</div>';
-
-?>
-<script type="text/javascript">
-function bo_change_value (val,tid,name) {
-	var regex = new RegExp("&"+name+"=[^&]*&?", "g");
-	var img = document.getElementById("bo_graph_" + tid + "_img");
-	img.src = img.src.replace(regex, "") + "&"+name+"=" + val;
-}
-function bo_change_radio (val, type) {
-	var dis = val == 1;
-	document.getElementById("bo_stat_"+type+"_time_min").disabled=dis;
-	document.getElementById("bo_stat_"+type+"_time_max").disabled=dis;
-	var img = document.getElementById("bo_graph_"+type+"_time_img");
-	img.src = img.src.replace(/&average/g, "");
-	img.src += val == 1 ? "&average" : "";
-}
-</script>
-<?php
-	
-	bo_copyright_footer();
-}
 
 //strike statistics
 function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_graph = '')
@@ -331,6 +208,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 //show station-statistics
 function bo_show_statistics_station($station_id = 0, $own_station = true, $add_graph = '')
 {
+
 	$strikesh_own = 0;
 	$signalsh_own = 0;
 	$own_station_info = bo_station_info();
@@ -403,7 +281,10 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 
 	if (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES)
+	{
+		require_once 'density.inc.php';
 		$dens_stations = bo_get_density_stations();
+	}
 
 	echo '<h3>'.strtr(_BL('h3_stat_station'), array('{STATION_CITY}' => $city)).'</h3>';
 
@@ -751,6 +632,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 <?php
 
+			require_once 'functions_dynmap.inc.php';
 			bo_insert_map(0, $mean_lat, $mean_lon, BO_STATISTICS_GPS_MAP_ZOOM, BO_STATISTICS_GPS_MAPTYPE);
 		}
 	}
@@ -1730,7 +1612,8 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_graph = '')
 {
 	global $_BO;
-
+	require_once 'functions_html.inc.php';
+	
 	$show_options = array('strikes');
 
 	$show = $_GET['bo_show2'];
@@ -2176,31 +2059,6 @@ function bo_show_select_strike_connected($id)
 }
 
 
-function bo_signal_info_list()
-{
-
-	$channels = BO_ANTENNAS;
-	$bpv      = bo_get_conf('raw_bitspervalue');
-	$values   = bo_get_conf('raw_values');
- 	$utime    = bo_get_conf('raw_ntime') / 1000;
-	$last_update = bo_get_conf('uptime_raw');
-	$last_update_minutes = round((time()-$last_update)/60,1);
-
-	echo '<ul class="bo_stat_overview">';
-	echo '<li><span class="bo_descr">'._BL('Last update').': </span>';
-	echo '<span class="bo_value">'._BL('_before')._BN($last_update_minutes, 1).' '.($last_update_minutes == 1 ? _BL('_minute_ago') : _BL('_minutes_ago')).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Channels').': </span>';
-	echo '<span class="bo_value">'.$channels.'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Samples per Channel').': </span>';
-	echo '<span class="bo_value">'.$values.'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Recording time').': </span>';
-	echo '<span class="bo_value">'._BN($utime * $values, 0)._BL('unit_us_short').'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Bits per Sample').': </span>';
-	echo '<span class="bo_value">'.$bpv.'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Sample rate').': </span>';
-	echo '<span class="bo_value">'._BN(1 / $utime * 1000, 0).' '._BL('unit_ksps').'</span></li>';
-	echo '</ul>';
-}
 
 function bo_get_antenna_data()
 {

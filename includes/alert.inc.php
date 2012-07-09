@@ -414,6 +414,7 @@ function bo_alert_settings_form()
 	</script>
 <?php
 	
+	require_once 'functions_dynmap.inc.php';	
 	bo_insert_map( (BO_PERM_NOLIMIT & $level) ? 0 : 2);
 
 	

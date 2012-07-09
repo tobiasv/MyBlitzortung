@@ -420,7 +420,7 @@ function bo_copyright_footer()
 	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
 	{
 		echo '<div id="bo_copyright_own">';
-		echo _BC(BO_OWN_COPYRIGHT);
+		echo _BC(BO_OWN_COPYRIGHT, false, BO_CONFIG_IS_UTF8);
 		echo '</div>';
 	}
 
@@ -1581,167 +1581,6 @@ function bo_examine_signal($data, $channels=0, $ntime=0, &$amp = array(), &$amp_
 }
 
 
-
-function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = false, $angle = 0, $bordercolor = false, $px = 0)
-{
-	$font = bo_imagestring_font($size, $bold);
-
-	if (is_string($tcolor))
-	{
-		$color = bo_hex2color($I, $tcolor);
-	}
-	elseif (is_array($tcolor))
-	{
-		$color = bo_hex2color($I, $tcolor[0]);
-		$bordercolor = bo_hex2color($I, $tcolor[2]);
-		$px = $tcolor[1];
-	}
-	else
-		$color = $tcolor;
-
-	if ($size <= 5)
-	{
-		if ($angle == 90)
-			return imagestringup($I, $size, $x, $y, $text, $color);
-		else
-			return imagestring($I, $size, $x, $y, $text, $color);
-	}
-	else
-	{
-		$h = $angle ? 0 : $size;
-		$w = $angle ? $size : 0;
-
-		//$text = utf8_encode($text);
-
-		return bo_imagettftextborder($I, $size, $angle, $x+$w, $y+$h, $color, $font, $text, $bordercolor, $px);
-	}
-}
-
-function bo_imagestringright($I, $size, $x, $y, $text, $color = false, $bold = false, $angle = 0)
-{
-	$x -= bo_imagetextwidth($size, $bold, $text);
-	return bo_imagestring($I, $size, $x, $y, $text, $color, $bold);
-}
-
-function bo_imagestringcenter($I, $size, $x, $y, $text, $color = false, $bold = false, $angle = 0)
-{
-	$x -= bo_imagetextwidth($size, $bold, $text) / 2;
-	return bo_imagestring($I, $size, $x, $y, $text, $color, $bold);
-}
-
-
-//writes text with automatic line brakes into an image
-function bo_imagestring_max(&$I, $size, $x, $y, $text, $color, $maxwidth, $bold = false)
-{
-	$text = strtr($text, array(chr(160) => ' '));
-	$line_height = bo_imagetextheight($size, $bold) * 1.2;
-	$breaks = explode("\n", $text);
-	$blankwidth = bo_imagetextwidth($size, $bold, " ");
-
-	foreach($breaks as $text2)
-	{
-		$width = 0;
-		$lines = explode(" ", $text2);
-		$x2 = $x;
-
-		foreach($lines as $i=>$line)
-		{
-			$width = bo_imagetextwidth($size, $bold, $line) + $blankwidth;
-
-			if ($x2+$width+9 > $x+$maxwidth)
-			{
-				$y += $line_height;
-				$x2 = $x;
-			}
-
-			bo_imagestring($I, $size, $x2, $y, $line, $color, $bold);
-
-			$x2 += $width;
-		}
-
-		$y += $line_height;
-	}
-	return $y;
-}
-
-function bo_imagetextheight($size, $bold = false, $string = false)
-{
-	if ($size <= 5)
-	{
-		return imagefontheight($size);
-	}
-
-	$font = bo_imagestring_font($size, $bold);
-
-	$string = $string === false ? 'Ag' : $string;
-
-	if (BO_FONT_USE_FREETYPE2)
-		$tmp = imageftbbox($size, 0, $font, $string);
-	else
-		$tmp = imagettfbbox($size, 0, $font, $string);
-
-	$height = $tmp[1] - $tmp[5];
-
-	return $height;
-}
-
-function bo_imagetextwidth($size, $bold = false, $string = false)
-{
-	if ($size <= 5)
-	{
-		return imagefontwidth($size) * strlen($string);
-	}
-
-	$font = bo_imagestring_font($size, $bold);
-
-	$string = $string === false ? 'A' : $string;
-
-	if (BO_FONT_USE_FREETYPE2)
-		$tmp = imageftbbox($size, 0, $font, $string);
-	else
-		$tmp = imagettfbbox($size, 0, $font, $string);
-
-	$width = $tmp[2] - $tmp[0];
-
-	return $width;
-}
-
-
-function bo_imagestring_font(&$size, &$type)
-{
-	if ($type === true) // bold
-		$font = BO_DIR.BO_FONT_TTF_BOLD;
-	else if ((int)$type && $type == 1)
-		$font = BO_DIR.BO_FONT_TTF_MONO;
-	else
-		$font = BO_DIR.BO_FONT_TTF_NORMAL;
-
-
-	return $font;
-
-}
-
-
-function bo_imagettftextborder(&$I, $size, $angle, $x, $y, &$textcolor, $font, $text, $bordercolor = false, $px = 0)
-{
-	if ($px)
-	{
-		for($c1 = ($x-abs($px)); $c1 <= ($x+abs($px)); $c1++)
-			for($c2 = ($y-abs($px)); $c2 <= ($y+abs($px)); $c2++)
-				$bg = bo_imagefttext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
-	}
-
-   return bo_imagefttext($I, $size, $angle, $x, $y, $textcolor, $font, $text);
-}
-
-function bo_imagefttext(&$I, $size, $angle, $c1, $c2, $bordercolor, $font, $text)
-{
-	if (BO_FONT_USE_FREETYPE2)
-		return imagefttext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
-	else
-		return imagettftext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
-}
-
 function bo_hex2color(&$I, $str, $use_alpha = true)
 {
 	$rgb = bo_hex2rgb($str);
@@ -2092,25 +1931,6 @@ function bo_insert_date_string($text, $time = null)
 }
 
 
-//error output
-function bo_image_error($text, $w=400, $h=300, $size=2)
-{
-	$I = imagecreate($w, $h);
-	imagefill($I, 0, 0, imagecolorallocate($I, 255, 150, 150));
-	$black = imagecolorallocate($I, 0, 0, 0);
-	bo_imagestring($I, $size, 10, $h/2-25, $text, $black, $w-20);
-	imagerectangle($I, 0,0,$w-1,$h-1,$black);
-	
-	Header("Content-type: image/png");
-	Imagepng($I);
-	exit;
-}
-
-function bo_image_cache_error($w=400, $h=300)
-{
-	bo_image_error('Creating image failed! Please check if your cache-dirs are writeable!', $w, $h, 3);
-}
-
 function bo_get_regions($bo_station_id = false)
 {
 	global $_BO;
@@ -2311,7 +2131,16 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval)
 {	
 
-	if (BO_CACHE_WAIT_SAME_FILE > 0)
+	$file_expired_sec = $last_update - filemtime($cache_file);
+	
+	$deliver_old = (BO_CACHE_CREATE_NEW_DELIVER_OLD > 0) 
+					&& ($file_expired_sec <= $update_interval * BO_CACHE_CREATE_NEW_DELIVER_OLD);
+
+	
+	//if same file is created for a parallel client
+	//and delivering outdated files isn't possible
+	//then wait some time
+	if (BO_CACHE_WAIT_SAME_FILE > 0 && !$deliver_old)
 	{
 		$isfile = $cache_file.'.is_creating';
 		$start = microtime(true);
@@ -2337,10 +2166,9 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 	//Cache-File is ok
 	if (file_exists($cache_file) && filesize($cache_file) > 0)
 	{
-		$file_expired = $last_update - filemtime($cache_file);
 		
-		$is_new = $file_expired <= $update_interval;
-		$is_old = $file_expired <= $update_interval * BO_CACHE_WAIT_SAME_FILE_OLD;
+		$is_new = $file_expired_sec <= $update_interval;
+		$is_old = $file_expired_sec <= $update_interval * BO_CACHE_WAIT_SAME_FILE_OLD;
 		
 		//if file is new 
 		//OR file is not too old
@@ -2350,27 +2178,37 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 			exit;
 		}
 
+		//Since here, the cachefile was too old
+		//The last chance is to check the last update, 
+		//maybe no redraw is needed
+		//if then, only one database query needed
+		$last_update_real = bo_get_conf('uptime_strikes');
+		if (filemtime($cache_file) > $last_update_real && BO_CACHE_MOD_UPDATE_DIVISOR)
+		{
+			touch($cache_file, time() + $last_update_real / BO_CACHE_MOD_UPDATE_DIVISOR);
+			bo_output_cache_file($cache_file);
+			exit;
+		}
 		
 		//deliver cached file (if not too old) and after that create new file
-		if (BO_CACHE_CREATE_NEW_DELIVER_OLD > 0)
+		if ($deliver_old)
 		{
-			$deliver_old = $file_expired <= $update_interval * BO_CACHE_CREATE_NEW_DELIVER_OLD;
-		
-			if ($deliver_old)
-			{
-				//Delivering old file, which is still new enough
-				//but we need to send "outdated" headers
-				header("Last-Modified: ".gmdate("D, d M Y H:i:s", filemtime($cache_file))." GMT");
-				header("Expires: ".gmdate("D, d M Y H:i:s", time() + 10)." GMT");
-				header("Cache-Control: public, max-age=10");
-				header("X-MyBlitzortung: delivered-outdated", false);
-				
-				bo_output_cache_file($cache_file);
-				ignore_user_abort(true);
-				session_write_close();
-			}
+			//Delivering old file, which is still new enough
+			//but we need to send "outdated" headers
+			header("Last-Modified: ".gmdate("D, d M Y H:i:s", filemtime($cache_file))." GMT");
+			header("Expires: ".gmdate("D, d M Y H:i:s", time() + 10)." GMT");
+			header("Cache-Control: public, max-age=10");
+			header("X-MyBlitzortung: delivered-outdated", false);
+			
+			bo_output_cache_file($cache_file);
+			ignore_user_abort(true);
+			session_write_close();
 		}
+		
+
 	}
+	
+	
 	
 	if (BO_CACHE_WAIT_SAME_FILE > 0)
 	{
@@ -2540,6 +2378,22 @@ function bo_get_latest_calc_time($last_update = 0)
 	else
 		return $last_update;
 		
+}
+
+
+function bo_access_url()
+{
+	$path = sprintf(BO_IMPORT_PATH, trim(BO_REGION));
+	return sprintf('http://%s:%s@%s/%s', trim(BO_USER), trim(BO_PASS), trim(BO_IMPORT_SERVER), $path);
+}
+
+function bo_hours($h)
+{
+	$minute = ($h - floor($h)) * 60;
+	$minute = $minute < 10 ? "0$minute" : $minute;
+	$hour   = floor($h) < 10 ? "0".floor($h) : floor($h);
+	
+	return "$hour:$minute";
 }
 
 

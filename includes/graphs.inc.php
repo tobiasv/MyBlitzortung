@@ -2858,6 +2858,7 @@ function bo_graph_output($I, $cache_file, $mod_time = 0)
 
 function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend = array(), $sub = '', $dseg = 22.5, $title = '', $antennas = false, $caption = '')
 {
+	require_once 'functions_image.inc.php';
 
 	$pcircle = 0.85; // Anteil, welcher der Kreis im Bild einnimmt
 	$pcmax = 0.9; // wie weit reicht max. teil an $pcircle heran
