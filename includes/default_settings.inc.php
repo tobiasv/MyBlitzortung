@@ -324,6 +324,9 @@
 //set 0 or false to disable
 @define('BO_CACHE_CREATE_NEW_DELIVER_OLD', 0);
 
+//Log cache info in cache/cache.log
+@define('BO_CACHE_LOG', false);
+
 //send cache-control headers to browser for HTML pages
 //set to a value in seconds
 //i.e. 60 means, the html page should be held in cache for 1 minute by the browser

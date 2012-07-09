@@ -1256,6 +1256,7 @@ function bo_update_strikes($force = false)
 			$updated = true;
 			bo_set_conf('uptime_strikes', time());
 			bo_update_status_files('strikes');
+			bo_cache_log('Strike data updated!');
 		}
 
 		//Guess Minimum Participants

@@ -18,6 +18,7 @@ function bo_user_show_admin()
 			break;
 
 		case 'update':
+			require_once 'import.inc.php';
 			echo '<h4>'._BL('Importing data...').'</h4>';
 			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
 			bo_update_all(true, $_GET['bo_only']);

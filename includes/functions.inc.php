@@ -2075,6 +2075,31 @@ function bo_error_handler($errno, $errstr, $errfile, $errline)
 	
 }
 
+function bo_cache_log($text, $end = false)
+{
+	if (BO_CACHE_LOG !== true)
+		return;
+		
+	static $start = true, $lines = "", $msec_start = 0;
+
+	if ($end)
+	{
+		file_put_contents(BO_DIR.'cache/cache.log', $lines."---\n", FILE_APPEND);
+		return;
+	}
+	
+	$msec = microtime(true) * 1000;
+	
+	if ($start)
+	{
+		$start = false;
+		register_shutdown_function('bo_cache_log', '', true);
+		$msec_start = $msec;
+	}
+
+	$lines .= date('Y-m-d H:i:s').sprintf(" | +%4dms | %1d | %80s | ", $msec - $msec_start, BoDb::$dbh === null ? 0 : 1, $_SERVER['QUERY_STRING'])." $text\n";
+}
+
 function bo_output_cache_file($cache_file, $mod_time = 0)
 {
 	static $output_disabled = false;
@@ -2084,8 +2109,12 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 		if (!file_exists($cache_file))
 		{
 			header("X-MyBlitzortung: no-cache-file", false);
+			bo_cache_log("Out - no-cache-file");
 			return false;
 		}
+		bo_cache_log("Out - $cache_file");
+		//don't output anything the next time the function get called
+		$output_disabled = true;
 		
 		if (function_exists('apache_request_headers') && $mod_time !== false)
 		{
@@ -2102,17 +2131,28 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 			{
 				header("X-MyBlitzortung: not-modified", false);
 				header("HTTP/1.1 304 Not Modified");
+				bo_cache_log("Out - not-modified!");
 				return;
 			}
 				
 		}
 		
 		if ($mod_time === false)
+		{
 			header("X-MyBlitzortung: new-file", false);
+			bo_cache_log("Out - new-file");			
+		}
 		else
+		{
 			header("X-MyBlitzortung: from-cache", false);
+			bo_cache_log("Out - from-cache");
+		}
 			
 		bo_readfile_mime($cache_file);
+	}
+	else
+	{
+		bo_cache_log("New file created");
 	}
 	
 	if (BO_CACHE_WAIT_SAME_FILE > 0)
@@ -2121,9 +2161,6 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 		@unlink($isfile);
 		clearstatcache();
 	}
-	
-	//don't output anything the next time the function get called
-	$output_disabled = true;
 }
 
 
@@ -2136,6 +2173,15 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 	$deliver_old = (BO_CACHE_CREATE_NEW_DELIVER_OLD > 0) 
 					&& ($file_expired_sec <= $update_interval * BO_CACHE_CREATE_NEW_DELIVER_OLD);
 
+	if (filemtime($cache_file) - 300 > time())
+	{
+		@unlink($cache_file);
+		clearstatcache();
+	}
+	
+	bo_cache_log("Check - $cache_file");
+	bo_cache_log("Check - Filedate ".date('Y-m-d H:i:s', filemtime($cache_file)));
+	bo_cache_log("Check - Sec expired $file_expired_sec - Intvl: $update_interval s");
 	
 	//if same file is created for a parallel client
 	//and delivering outdated files isn't possible
@@ -2154,6 +2200,7 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 			{
 				//file didn't appear, load old one instead
 				$force_load_old_file = true;
+				bo_cache_log("Check - Waited, forced old file");
 				break;
 			}
 			
@@ -2174,6 +2221,7 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 		//OR file is not too old
 		if ($is_new || ($is_old && $force_load_old_file))
 		{
+			bo_cache_log("Check - Output cache file and exit");
 			bo_output_cache_file($cache_file);
 			exit;
 		}
@@ -2185,7 +2233,8 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 		$last_update_real = bo_get_conf('uptime_strikes');
 		if (filemtime($cache_file) > $last_update_real && BO_CACHE_MOD_UPDATE_DIVISOR)
 		{
-			touch($cache_file, time() + $last_update_real / BO_CACHE_MOD_UPDATE_DIVISOR);
+			bo_cache_log("Check - Output old cache file, no new data");
+			touch($cache_file, time() + $update_interval / BO_CACHE_MOD_UPDATE_DIVISOR);
 			bo_output_cache_file($cache_file);
 			exit;
 		}
@@ -2200,15 +2249,14 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 			header("Cache-Control: public, max-age=10");
 			header("X-MyBlitzortung: delivered-outdated", false);
 			
+			bo_cache_log("Check - Deliver old cache file, creating new one");
+			
 			bo_output_cache_file($cache_file);
 			ignore_user_abort(true);
 			session_write_close();
 		}
-		
 
 	}
-	
-	
 	
 	if (BO_CACHE_WAIT_SAME_FILE > 0)
 	{
@@ -2231,8 +2279,11 @@ function bo_readfile_mime($file)
 	elseif ($extension == 'png')
 		$mime = "image/png";
 
+	bo_cache_log("Read - $mime");
+		
 	header("Content-Type: $mime");
 	readfile($file);
+	flush();
 }
 
 

@@ -4,10 +4,13 @@
 function bo_tile()
 {
 	@set_time_limit(BO_TILE_CREATION_TIMEOUT);
-
 	global $_BO;
-
 	bo_session_close();
+
+	/***********************************************************/
+	/*** Variables  ********************************************/
+	/***********************************************************/
+
 	
 	$x            = intval($_GET['x']);
 	$y            = intval($_GET['y']);
@@ -17,22 +20,26 @@ function bo_tile()
 	$only_info    = isset($_GET['info']);
 	$show_count   = isset($_GET['count']);
 	$type         = intval($_GET['type']);
-	
-	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
-	$time = time();
-	$cfg = $_BO['mapcfg'][$type];
+	$caching      = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+	$cfg          = $_BO['mapcfg'][$type];
+	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
 	
 	if ($show_count)
 		$tile_size = BO_TILE_SIZE_COUNT;
 	else
 		$tile_size = BO_TILE_SIZE;
-
-	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
 	
 	if ($station_info_id && $only_station)
 		$station_id = $station_info_id;
 	else
 		$station_id = false;
+	
+	
+	
+	
+	/***********************************************************/
+	/*** Restriction *******************************************/
+	/***********************************************************/
 	
 	if (!$only_info && ($zoom < $min_zoom || $zoom > $max_zoom))
 	{
@@ -45,8 +52,13 @@ function bo_tile()
 		bo_tile_message('tile_station_not_allowed', 'station_na', $caching, array(), $tile_size);
 		exit;
 	}
+
+
 	
-	//manual time select
+	/***********************************************************/
+	/*** Time periods ******************************************/
+	/***********************************************************/
+	
 	if (isset($_GET['from']) && isset($_GET['to']))
 	{
 		if (!$only_info && BO_MAP_MANUAL_TIME_ENABLE !== true && !(bo_user_get_level() & BO_PERM_NOLIMIT))
@@ -82,27 +94,84 @@ function bo_tile()
 	}
 	else
 	{
-		$time = bo_get_conf('uptime_strikes_modified');
 		$time_manual_from = false;
 	}
 
 	
-	//get config
-	if ($show_count) // display strike count
+	/***********************************************************/
+	/*** Update intervals **************************************/
+	/***********************************************************/
+
+	if ($show_count) 
 	{
-		$type = 0;
-		$time_range = 0;
-		$time_start = 0;
-		$update_interval = 0;
-		
-		$time_min = array();
-		$time_max = array();
-		$update_interval = array();
+		$update_intervals = array();
 		
 		if ($time_manual_from)
 			$count_types[0] = -1;
 		else
 			$count_types = explode(',',$_GET['count']);
+
+		foreach($count_types as $i)
+		{
+			$update_intervals[$i] = $ccfg['upd_intv'];
+		}
+		
+		$update_interval = count($update_intervals) ? min($update_intervals) : 0;
+	}
+	else
+	{
+		$update_interval = $cfg['upd_intv'];
+	}
+	
+	
+	
+	
+	/***********************************************************/
+	/*** Early caching *****************************************/
+	/***********************************************************/
+	
+	//estimate last update
+	$last_update = floor(time() / 60 / $update_interval) * 60 * $update_interval;
+	bo_tile_headers($update_interval, $last_update, $caching);
+
+	//Caching
+	if ($caching)
+	{
+		$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
+		$filename = $type.'_'.$zoom.'_'.($station_id ? $station_id.'_' : '').$x.'x'.$y.'-'.(bo_user_get_level() ? 1 : 0).'.png';
+		
+		if (BO_CACHE_SUBDIRS === true)
+			$filename = strtr($filename, array('_' => '/'));
+
+		$file = $dir.$filename;
+
+		bo_output_cachefile_if_exists($file, $last_update, $update_interval * 60);
+	}
+	
+	
+	
+	
+	
+	
+	/***********************************************************/
+	/*** Time periods (2) **************************************/
+	/***********************************************************/
+	
+	//FIRST DB ACCESS!
+	if (!$time_manual_from)
+	{
+		$time = bo_get_conf('uptime_strikes_modified');
+	}
+		
+	if ($show_count) 
+	{
+		// display strike count
+		
+		$type = 0;
+		$time_range = 0;
+		$time_start = 0;
+		$time_min = array();
+		$time_max = array();
 			
 		foreach($count_types as $i)
 		{
@@ -116,14 +185,11 @@ function bo_tile()
 			if (!is_array($ccfg) || !$ccfg['upd_intv'])
 				continue;
 			
-			$time_start = $time - 60 * $ccfg['tstart'];
-			
-			$update_intervals[$i] = $ccfg['upd_intv'];
-			$times_min[$i]        = mktime(date('H', $time_start), ceil(date('i', $time_start) / $ccfg['upd_intv']) * $ccfg['upd_intv'], 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
-			$times_max[$i]        = $times_min[$i] + 60 * $ccfg['trange'] + 59;
+			$time_start    = $time - 60 * $ccfg['tstart'];
+			$times_min[$i] = mktime(date('H', $time_start), ceil(date('i', $time_start) / $ccfg['upd_intv']) * $ccfg['upd_intv'], 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
+			$times_max[$i] = $times_min[$i] + 60 * $ccfg['trange'] + 59;
 		}
 		
-		$update_interval = count($update_intervals) ? min($update_intervals) : 0;
 		$time_min        = count($times_min) ? min($times_min) : 0;
 		$time_max        = count($times_max) ? max($times_max) : 0;
 		
@@ -132,11 +198,12 @@ function bo_tile()
 		else
 			$type = 'count_'.$type;
 	}
-	else //normal strike display
+	else 
 	{
+		//normal strike display
+		
 		$time_start = $time - 60 * $cfg['tstart'];
 		$time_range = $cfg['trange'];
-		$update_interval = $cfg['upd_intv'];
 		$c = $cfg['col'];
 		$time_min   = mktime(date('H', $time_start), ceil(date('i', $time_start) / $update_interval) * $update_interval, 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
 		$time_max   = $time_min + 60 * $time_range + 59;
@@ -145,73 +212,30 @@ function bo_tile()
 	if (!$time_start || !$time_min || !$time_max)
 		bo_tile_output();
 
-	//calculate some time information, estimate last update
-	$last_update = floor(time() / 60 / $update_interval) * 60 * $update_interval;
-	$exp_time    = $last_update + 60 * $update_interval + 59;
+		
 	
-	if (time() - $exp_time < 10)
-		$exp_time = time() + 60;
-	
-	//Headers
-	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
-	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
-	header("Content-Disposition: inline; filename=\"MyBlitzortungTile.png\"");
-	
-	if ($caching)
-	{
-		header("Pragma: ");
-		header("Cache-Control: public, max-age=".($exp_time - time()));
-	}
-	else
-	{
-		header("Pragma: no-cache");
-		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
-	}
 
 
-	
+
 	//send only the info/color-legend image (colors, time)
 	if ($only_info)
 	{
 		//get real last update var
-		$last_update = bo_get_conf('uptime_strikes_modified');
 		$last_update = bo_get_latest_calc_time($last_update);
 		$time_max = min($last_update, $time_max);
 		$show_date = $time_manual_from || ($time_max-$time_min) > 3600 * 12 ? true : false;
+		bo_tile_headers($update_interval, $last_update, $caching);
 		bo_tile_time_colors($type, $time_min, $time_max, $show_date, $caching ? $update_interval : false);
+		exit;
 	}
 
 
-	//Caching
-	$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
-	$filename = $type.'_'.$zoom.'_'.$station_id.'_'.$x.'x'.$y.'-'.(bo_user_get_level() ? 1 : 0).'.png';
 	
-	if (BO_CACHE_SUBDIRS === true)
-		$filename = strtr($filename, array('_' => '/'));
-
-	$file = $dir.$filename;
-
 	
-	if ($caching)
-	{
-		bo_output_cachefile_if_exists($file, $last_update, $update_interval * 60);
-	}
+	/***********************************************************/
+	/*** Start of calculations *********************************/
+	/***********************************************************/
 
-/*	
-	if (file_exists($file) && filesize($file) > 0 && $caching)
-	{
-		$filetime = filemtime($file);
-		$file_minute = intval(intval(date('i', $filetime)) / $update_interval);
-
-		if ($cur_minute == $file_minute && time() - $filetime < $update_interval * 60 )
-		{
-			header("Content-Type: image/png");
-			bo_output_cache_file($file, $mod_time);
-			exit;
-		}
-	}
-*/
-	
 	
 	list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($x, $y, $zoom, $tile_size);
 	
@@ -1018,6 +1042,31 @@ function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_in
 	}
 	
 	exit;
+}
+
+
+function bo_tile_headers($update_interval, $last_update, $caching)
+{
+	$exp_time    = $last_update + 60 * $update_interval + 59;
+	
+	if (time() - $exp_time < 10)
+		$exp_time = time() + 60;
+	
+	//Headers
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
+	header("Content-Disposition: inline; filename=\"MyBlitzortungTile.png\"");
+	
+	if ($caching)
+	{
+		header("Pragma: ");
+		header("Cache-Control: public, max-age=".($exp_time - time()));
+	}
+	else
+	{
+		header("Pragma: no-cache");
+		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+	}
 }
 
 ?>

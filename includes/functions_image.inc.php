@@ -10,8 +10,12 @@ function bo_image_error($text, $w=400, $h=300, $size=2)
 	$black = imagecolorallocate($I, 0, 0, 0);
 	bo_imagestring($I, $size, 10, $h/2-25, $text, $black, $w-20);
 	imagerectangle($I, 0,0,$w-1,$h-1,$black);
-	
+
+	$expire = time() + 30;
 	Header("Content-type: image/png");
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", time())." GMT");
+	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
+	header("Cache-Control: public, max-age=".($expire - time()));
 	Imagepng($I);
 	exit;
 }
