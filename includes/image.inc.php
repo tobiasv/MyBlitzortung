@@ -287,7 +287,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			if (!bo_user_get_level() && $duration != $cfg['animation']['range'])
 			{
 				if (     $duration > 60 * BO_SMAP_MAX_RANGE 
-				     ||  $duration > 60 * $cfg['maxrange'] 
+				     || ($duration > 60 * $cfg['maxrange'] && $cfg['maxrange'])
 					 || ($duration && $duration < BO_SMAP_MIN_RANGE)
 					)
 					bo_image_error('Time range not allowed!');
