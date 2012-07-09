@@ -652,6 +652,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		<?php
 
 		$round = (bo_user_get_level() & BO_PERM_SETTINGS) ? 8 : 1;
+		require_once 'functions_dynmap.inc.php';
 		bo_insert_map(0, round($stInfo['lat'],$round), round($stInfo['lon'],$round), 10, BO_STATISTICS_STATION_MAPTYPE);
 	}
 	

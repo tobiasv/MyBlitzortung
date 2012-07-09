@@ -2829,6 +2829,7 @@ function bo_graph_statistics()
 function bo_graph_error($w=400, $h=300)
 {
 	$text = 'File "includes/jpgraph/jpgraph.php" not found!';
+	require_once 'functions_image.inc.php';
 	bo_image_error($text, $w, $h);
 }
 
