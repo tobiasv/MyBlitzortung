@@ -3,7 +3,7 @@
 
 function bo_show_map($var1=null,$var2=null)
 {
-	require_once 'includes/map.inc.php';
+	require_once 'map.inc.php';
 	bo_show_lightning_map($var1,$var2);
 	bo_copyright_footer();
 }
@@ -14,8 +14,8 @@ function bo_show_archive()
 	if (BO_DISABLE_ARCHIVE === true)
 		return;
 
-	require_once 'includes/archive.inc.php';
-	require_once 'includes/density.inc.php';	
+	require_once 'archive.inc.php';
+	require_once 'density.inc.php';	
 		
 	$show = $_GET['bo_show'];
 	$perm = (bo_user_get_level() & BO_PERM_ARCHIVE);
@@ -106,7 +106,7 @@ function bo_show_archive()
 //show all available statistics and menu
 function bo_show_statistics()
 {
-	require_once 'includes/statistics.inc.php';
+	require_once 'statistics.inc.php';
 	
 	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'strikes';
 
@@ -299,7 +299,7 @@ function bo_show_login()
 			case 'alert':
 				if (BO_PERM_ALERT & $level)
 				{
-					require_once 'includes/alert.inc.php';
+					require_once 'alert.inc.php';
 					bo_alert_settings();
 				}
 				break;
@@ -360,7 +360,7 @@ function bo_show_login()
 
 function bo_show_info()
 {
-	require_once 'includes/info.inc.php';
+	require_once 'info.inc.php';
 	bo_show_info_page1();
 }
 
