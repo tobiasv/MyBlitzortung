@@ -306,11 +306,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			if ($time_max > $last_update)
 			{
 				$time_max = $last_update;
-				$expire = time() + $update_interval / 1.5;
+				$expire = time() + $update_interval / 1.5 + 60;
 			}
 			else
 			{
-				$last_update  = $time_max + $update_interval * 2;
+				$last_update  = $time_max + $update_interval * 2 + 300; //add some extra time for blitzortung compute delay;
 				$expire       = time() + BO_MAPS_ARCHIVE_EXPIRE_SEC;
 			}
 			
