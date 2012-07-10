@@ -545,7 +545,9 @@ function bo_update_raw_signals($force = false)
 
 		if ($update_err)
 			$update_errs++;
-
+		else
+			$update_errs = 0;
+		
 		if (!$timeout)
 			$auto_force = false;
 

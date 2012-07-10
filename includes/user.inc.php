@@ -882,6 +882,8 @@ function bo_cache_info()
 
 function bo_my_station_update_form()
 {
+	require_once 'import.inc.php';
+	
 	if ($_POST['ok'])
 	{
 		$url = trim($_POST['bo_url']);
