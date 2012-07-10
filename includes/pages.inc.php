@@ -329,7 +329,7 @@ function bo_show_login()
 
 				echo '<h4>'._BL('Version information').'</h4>';
 				echo '<ul>';
-				echo '<li>'._BL('MyBlitzortung version').': <strong>'.bo_get_conf('version').'</strong></li>';
+				echo '<li>'._BL('MyBlitzortung version').': <strong>'.BoData::get('version').'</strong></li>';
 				if (BO_PERM_ADMIN & $level)
 				{
 					$res = BoDb::query("SHOW VARIABLES LIKE 'version'");

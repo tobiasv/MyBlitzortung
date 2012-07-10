@@ -212,7 +212,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if (BO_CACHE_FAST)
 		$last_update = floor(time() / $update_interval) * $update_interval;
 	else
-		$last_update = bo_get_conf('uptime_strikes_modified');
+		$last_update = BoData::get('uptime_strikes_modified');
 
 	$sql_where_id = '';
 	
@@ -480,7 +480,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 
 	if (BO_CACHE_FAST)
-		$last_update = bo_get_conf('uptime_strikes_modified');
+		$last_update = BoData::get('uptime_strikes_modified');
 
 	
 	
@@ -1047,7 +1047,7 @@ function bo_get_map_image_ani()
 	if (BO_CACHE_FAST)
 		$last_update = floor(time() / $update_interval) * $update_interval;
 	else
-		$last_update = bo_get_conf('uptime_strikes_modified');
+		$last_update = BoData::get('uptime_strikes_modified');
 		
 	$expire = time() + $update_interval / 1.5;
 	
@@ -1065,7 +1065,7 @@ function bo_get_map_image_ani()
 
 	
 	if (BO_CACHE_FAST)
-		$last_update = bo_get_conf('uptime_strikes_modified');
+		$last_update = BoData::get('uptime_strikes_modified');
 	
 	$time_start = $last_update - $cfg_ani['minutes'] * 60;
 	$cfg_single = $cfg;

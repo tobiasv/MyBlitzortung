@@ -141,7 +141,7 @@ function bo_alert_settings_form()
 
 	if ($alert_id)
 	{
-		$A = unserialize(bo_get_conf('alert_'.$user_id.'_'.$alert_id));
+		$A = unserialize(BoData::get('alert_'.$user_id.'_'.$alert_id));
 		
 	}
 	else
@@ -194,7 +194,7 @@ function bo_alert_settings_form()
 		if ($_POST['delete'])
 		{
 			if ($alert_id)
-				bo_set_conf('alert_'.$user_id.'_'.$alert_id, null);
+				BoData::set('alert_'.$user_id.'_'.$alert_id, null);
 				
 			return true;
 		}
@@ -232,7 +232,7 @@ function bo_alert_settings_form()
 
 			if ($alert_id)
 			{
-				bo_set_conf('alert_'.$user_id.'_'.$alert_id, serialize($A));
+				BoData::set('alert_'.$user_id.'_'.$alert_id, serialize($A));
 			}
 			else
 			{
@@ -240,7 +240,7 @@ function bo_alert_settings_form()
 				preg_match('/alert_([0-9]+)_([0-9]+)/', $row['name'], $r);
 				$alert_id = intval($r[2]) + 1;
 
-				bo_set_conf('alert_'.$user_id.'_'.$alert_id, serialize($A));
+				BoData::set('alert_'.$user_id.'_'.$alert_id, serialize($A));
 				
 			}
 			
@@ -421,7 +421,7 @@ function bo_alert_send()
 
 	ini_set('default_socket_timeout', 2); // should be enough!
 	
-	$is_sending = bo_get_conf('is_sending_alerts');
+	$is_sending = BoData::get('is_sending_alerts');
 
 	//Check if sth. went wrong on the last update (if older than 120sec continue)
 	if ($is_sending && time() - $is_sending < 300)
@@ -430,7 +430,7 @@ function bo_alert_send()
 		return false;
 	}
 
-	bo_set_conf('is_sending_alerts', time());
+	BoData::set('is_sending_alerts', time());
 	
 	$Alerts = array();
 	$log = array();
@@ -447,7 +447,7 @@ function bo_alert_send()
 	else
 		$min_send_interval = 45; 
 	
-	$max_time = bo_get_conf('uptime_strikes_modified');
+	$max_time = BoData::get('uptime_strikes_modified');
 	
 	//strike data is to old --> do nothing
 	if (time() - $max_time < 30 * 60)
@@ -592,7 +592,7 @@ function bo_alert_send()
 					
 					$d['last_check'] = $max_time;
 					
-					bo_set_conf($alert_dbname, serialize($d));
+					BoData::set($alert_dbname, serialize($d));
 				}
 				elseif ($d['disarmed'] || $d['no_checking'])
 				{
@@ -603,14 +603,14 @@ function bo_alert_send()
 						//RESET
 						$d['disarmed'] = false;
 						$d['no_checking'] = false;
-						bo_set_conf($alert_dbname, serialize($d));
+						BoData::set($alert_dbname, serialize($d));
 					}
 					else if (!$d['no_checking'])
 					{
 						//no strike detected and disarmed
 						//do NOTHING during the next minutes
 						$d['no_checking'] = true;
-						bo_set_conf($alert_dbname, serialize($d));
+						BoData::set($alert_dbname, serialize($d));
 					}
 				}
 			}
@@ -619,7 +619,7 @@ function bo_alert_send()
 		
 		if (!empty($log))
 		{
-			$oldlog = unserialize(bo_get_conf('alerts_log'));
+			$oldlog = unserialize(BoData::get('alerts_log'));
 			$newlog = array();
 
 			if (is_array($oldlog))
@@ -643,7 +643,7 @@ function bo_alert_send()
 				}
 			}
 			
-			bo_set_conf('alerts_log', serialize($newlog));
+			BoData::set('alerts_log', serialize($newlog));
 		
 			bo_echod("Sent ".count($log)." alerts.");
 		}
@@ -652,14 +652,14 @@ function bo_alert_send()
 		
 	}
 	
-	bo_set_conf('is_sending_alerts', 0);
+	BoData::set('is_sending_alerts', 0);
 
 }
 
 
 function bo_alert_log($all = false)
 {
-	$log = unserialize(bo_get_conf('alerts_log'));
+	$log = unserialize(BoData::get('alerts_log'));
 	$count = 0;
 	
 	if (is_array($log))

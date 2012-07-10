@@ -1189,8 +1189,11 @@
 //argument that specifies language
 @define('BO_LANG_ARGUMENT', 'bo_lang');
 
+//max length of query string (currently only for bulk inserts)
+@define('BO_DB_MAX_QUERY_LEN', 50000);
 
-
+//low priority updates for some update queries
+@define('BO_DB_UPDATE_LOW_PRIORITY', false);
 
 
 /*******************************************************************/

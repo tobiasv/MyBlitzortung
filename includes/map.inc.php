@@ -16,7 +16,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 	$static_map_id = $show_static_maps ? $show_static_maps : $_GET['bo_showmap'];
 	$show_static_maps = $show_static_maps === null || $show_static_maps;
 	$show_menu = $show_static_maps;
-	$last_update = bo_get_conf('uptime_strikes_modified');
+	$last_update = BoData::get('uptime_strikes_modified');
 	
 	if ($show_static_maps)
 	{
@@ -261,11 +261,11 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	}
 	
 	//Get MyBo Stations
-	$mybo_info = unserialize(bo_get_conf('mybo_stations_info'));
+	$mybo_info = unserialize(BoData::get('mybo_stations_info'));
 	$js_mybo_stations = '';
 	if (is_array($mybo_info) && count($mybo_info) > 1)
 	{
-		$mybo_urls = unserialize(bo_get_conf('mybo_stations'));
+		$mybo_urls = unserialize(BoData::get('mybo_stations'));
 		
 		foreach($mybo_info['lats'] as $id => $dummy)
 		{

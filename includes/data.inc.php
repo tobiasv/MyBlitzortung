@@ -105,34 +105,34 @@ function bo_db_recreate_strike_keys($quiet = false)
 	//3. Add/change columns if needed
 	if (!isset($cols['time_x']) && $bytes_time)
 	{
-		bo_set_conf('db_keys_update', 1);
+		BoData::set('db_keys_update', 1);
 		$sql_alter[] = 'ADD `time_x` '.$byte2mysql[$bytes_time].' UNSIGNED NOT NULL';
 	}
 	else if (isset($cols['time_x']) && $bytes_time && $cols['time_x'] != $bytes_time)
 	{
-		bo_set_conf('db_keys_update', 1);
+		BoData::set('db_keys_update', 1);
 		$sql_alter[] = 'CHANGE `time_x` `time_x` '.$byte2mysql[$bytes_time].' UNSIGNED NOT NULL';
 	}
 		
 	if (!isset($cols['lat_x']) && $bytes_latlon)
 	{
-		bo_set_conf('db_keys_update', 1);
+		BoData::set('db_keys_update', 1);
 		$sql_alter[] = 'ADD `lat_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL';
 	}
 	else if (isset($cols['lat_x']) && $bytes_latlon && $cols['lat_x'] != $bytes_latlon)
 	{
-		bo_set_conf('db_keys_update', 1);
+		BoData::set('db_keys_update', 1);
 		$sql_alter[] = 'CHANGE `lat_x` `lat_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL';
 	}
 
 	if (!isset($cols['lon_x']) && $bytes_latlon)
 	{
-		bo_set_conf('db_keys_update', 1);
+		BoData::set('db_keys_update', 1);
 		$sql_alter[] = 'ADD `lon_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL';
 	}
 	else if (isset($cols['lon_x']) && $bytes_latlon && $cols['lon_x'] != $bytes_latlon)
 	{
-		bo_set_conf('db_keys_update', 1);
+		BoData::set('db_keys_update', 1);
 		$sql_alter[] = 'CHANGE `lon_x` `lon_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL';
 	}
 
@@ -157,9 +157,9 @@ function bo_db_recreate_strike_keys($quiet = false)
 
 		
 	//5. update values
-	list($t1, $t2, $p1, $p2) = unserialize(bo_get_conf('db_keys_settings'));
+	list($t1, $t2, $p1, $p2) = unserialize(BoData::get('db_keys_settings'));
 	
-	if ( bo_get_conf('db_keys_update') == 1
+	if ( BoData::get('db_keys_update') == 1
 			|| $t1 != BO_DB_EXTRA_KEYS_TIME_START
 			|| $t2 != BO_DB_EXTRA_KEYS_TIME_DIV_MINUTES
 			|| $p1 != BO_DB_EXTRA_KEYS_LAT_DIV
@@ -189,8 +189,8 @@ function bo_db_recreate_strike_keys($quiet = false)
 		
 		if ($ok)
 		{
-			bo_set_conf('db_keys_update', 0);
-			bo_set_conf('db_keys_settings', 
+			BoData::set('db_keys_update', 0);
+			BoData::set('db_keys_settings', 
 					serialize(array(BO_DB_EXTRA_KEYS_TIME_START, 
 									BO_DB_EXTRA_KEYS_TIME_DIV_MINUTES, 
 									BO_DB_EXTRA_KEYS_LAT_DIV, 

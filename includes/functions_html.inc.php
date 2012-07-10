@@ -222,10 +222,10 @@ function bo_signal_info_list()
 {
 
 	$channels = BO_ANTENNAS;
-	$bpv      = bo_get_conf('raw_bitspervalue');
-	$values   = bo_get_conf('raw_values');
- 	$utime    = bo_get_conf('raw_ntime') / 1000;
-	$last_update = bo_get_conf('uptime_raw');
+	$bpv      = BoData::get('raw_bitspervalue');
+	$values   = BoData::get('raw_values');
+ 	$utime    = BoData::get('raw_ntime') / 1000;
+	$last_update = BoData::get('uptime_raw');
 	$last_update_minutes = round((time()-$last_update)/60,1);
 
 	echo '<ul class="bo_stat_overview">';

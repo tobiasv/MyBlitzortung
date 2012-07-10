@@ -157,7 +157,7 @@ function bo_tile()
 	//FIRST DB ACCESS!
 	if (!$time_manual_from)
 	{
-		$time = bo_get_conf('uptime_strikes_modified');
+		$time = BoData::get('uptime_strikes_modified');
 	}
 		
 	if ($show_count) 
@@ -706,7 +706,7 @@ function bo_tile_tracks()
 
 	if ($zoom >= BO_TRACKS_MAP_ZOOM_MIN && $zoom <= BO_TRACKS_MAP_ZOOM_MAX)
 	{
-		$data = unserialize(gzinflate(bo_get_conf('strike_cells')));
+		$data = unserialize(gzinflate(BoData::get('strike_cells')));
 		
 		if (is_array($data['cells']))
 		{

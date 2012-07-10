@@ -14,7 +14,7 @@ function bo_update_all($force = false, $only = '')
 
 	$start_time = time();
 	$debug = defined('BO_DEBUG') && BO_DEBUG;
-	$is_updating = (int)bo_get_conf('is_updating');
+	$is_updating = (int)BoData::get('is_updating');
 	$max_time = bo_update_get_timeout();
 	bo_getset_timeout($max_time);
 
@@ -27,8 +27,8 @@ function bo_update_all($force = false, $only = '')
 		return;
 	}
 
-	bo_set_conf('is_updating', time());
-	register_shutdown_function('bo_set_conf', 'is_updating', 0);
+	BoData::set('is_updating', time());
+	register_shutdown_function('BoData::set', 'is_updating', 0);
 
 
 	// to avoid to much connections from different stations to blitzortung.org at the same time
@@ -47,7 +47,7 @@ function bo_update_all($force = false, $only = '')
 	bo_echod("Import finished. Exiting...");
 	bo_echod(" ");
 
-	bo_set_conf('is_updating', 0);
+	BoData::set('is_updating', 0);
 
 	return;
 }
@@ -56,8 +56,8 @@ function bo_update_all($force = false, $only = '')
 function bo_update_all2($force = false, $only = '')
 {
 
-	if (!bo_get_conf('first_update_time'))
-		bo_set_conf('first_update_time', time());
+	if (!BoData::get('first_update_time'))
+		BoData::set('first_update_time', time());
 
 
 	//check if we should do an async update
@@ -169,7 +169,7 @@ function bo_update_all2($force = false, $only = '')
 // Login to blitzortung.org an return login-string
 function bo_get_login_str()
 {
-	$fail = unserialize(bo_get_conf('login_string_fail'));
+	$fail = unserialize(BoData::get('login_string_fail'));
 
 	if (isset($fail['last']) && isset($fail['count']))
 	{
@@ -181,7 +181,7 @@ function bo_get_login_str()
 		else
 		{
 			$fail = array();
-			bo_set_conf('login_string_fail', serialize($fail));
+			BoData::set('login_string_fail', serialize($fail));
 		}
 	}
 
@@ -191,7 +191,7 @@ function bo_get_login_str()
 	{
 		bo_update_error('archivelogin', true);
 		$bo_login_id = $r[1];
-		bo_set_conf('bo_login_id', $bo_login_id);
+		BoData::set('bo_login_id', $bo_login_id);
 		return $bo_login_id;
 	}
 	else
@@ -199,7 +199,7 @@ function bo_get_login_str()
 		//sth. got wrong
 		$fail['count'] = $fail['count'] + 1;
 		$fail['last']  = time();
-		bo_set_conf('login_string_fail', serialize($fail));
+		BoData::set('login_string_fail', serialize($fail));
 
 		if ($file === false)
 		{
@@ -225,7 +225,7 @@ function bo_get_archive($args='', $bo_login_id=false, $as_array=false)
 
 	if (!$bo_login_id)
 	{
-		//$bo_login_id = bo_get_conf('bo_login_id');
+		//$bo_login_id = BoData::get('bo_login_id');
 		$auto_id = true;
 	}
 
@@ -293,11 +293,10 @@ function bo_update_raw_signals($force = false)
 		return true;
 	}
 
-	list($last_update, $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified) = @unserialize(bo_get_conf('uptime_raw_data'));
+	list($last_update, $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified) = @unserialize(BoData::get('uptime_raw_data'));
 
 	$count_inserted = 0;
 	$count_exists = 0;
-	$count_updated = 0;
 
 	$do_update = time() - $last_update > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last_update;
 
@@ -311,7 +310,7 @@ function bo_update_raw_signals($force = false)
 	if ($do_update)
 	{
 		//set only the important entries to avoid problems if import crashes
-		bo_set_conf('uptime_raw_data', serialize(array(time(), 0, $update_errs+1)));
+		BoData::set('uptime_raw_data', serialize(array(time(), 0, $update_errs+1)));
 
 		$max_signal_back_hours = 22;
 		$read_back_seconds = 180;
@@ -377,8 +376,8 @@ function bo_update_raw_signals($force = false)
 
 
 		//Debug output
-		$loadcount = bo_get_conf('upcount_raw');
-		bo_set_conf('upcount_raw', $loadcount+1);
+		$loadcount = BoData::get('upcount_raw');
+		BoData::set('upcount_raw', $loadcount+1);
 		bo_echod('Last signal: '.date('Y-m-d H:i:s', $last_signal).
 				' *** Importing only signals newer than: '.date('Y-m-d H:i:s', $update_time_start).
 				' *** Loading '.count($hours).' files'.
@@ -508,33 +507,21 @@ function bo_update_raw_signals($force = false)
 				elseif (strlen($data) % 2)
 					$data .= '0';
 
-				$sql = "	time='$date $time',
-							time_ns='$time_ns',
-							lat='$lat',lon='$lon',
-							height='$height',
-							strike_id='0',
-							channels='$channels',
-							ntime='$ntime',
-							data=x'$data'
-							";
-
-				// signal examinations
+				// signal examinations adn SQL
 				$bdata = bo_hex2bin($data);
-				$sql .= ",".bo_examine_signal($bdata, $channels, $ntime);
-
-				if ($id)
-				{
-					$sql = "UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='$id'";
-					BoDb::query($sql, 1);
-					$count_updated++;
-				}
-				else
-				{
-					$sql = "INSERT INTO ".BO_DB_PREF."raw SET $sql";
-					BoDb::query($sql, 1);
-					$count_inserted++;
-				}
-
+				$sql_data = bo_examine_signal($bdata, $channels, $ntime);
+				$sql_data['time'] = "$date $time";
+				$sql_data['time_ns'] = $time_ns;
+				$sql_data['lat'] = $lat;
+				$sql_data['lon'] = $lon;
+				$sql_data['height'] = $height;
+				$sql_data['strike_id'] = '0';
+				$sql_data['channels'] = $channels;
+				$sql_data['ntime'] = $ntime;
+				$sql_data['data'] = array($data, 'hex');
+							
+				BoDb::bulk_insert('raw', $sql_data);
+				
 				//Timeout
 				if (bo_exit_on_timeout())
 				{
@@ -562,27 +549,30 @@ function bo_update_raw_signals($force = false)
 		if (!$timeout)
 			$auto_force = false;
 
+		//Write stuff
+		BoDb::bulk_insert('raw');
+			
 		//bo_echod("Pos: $last_file_pos Hour: $last_hour");
 
-		bo_set_conf('uptime_raw_data', serialize(array(time(), $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified)));
+		BoData::set('uptime_raw_data', serialize(array(time(), $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified)));
 
-		bo_echod("Lines: $lines *** Files: $files *** New Raw Data: $count_inserted *** Updated: $count_updated *** Already read: $count_exists");
+		bo_echod("Lines: $lines *** Files: $files *** New Raw Data: $count_inserted *** Already read: $count_exists");
 
 		if ($channels && $values && $bpv)
 		{
-			bo_set_conf('raw_channels', $channels);
-			bo_set_conf('raw_values', $values);
-			bo_set_conf('raw_bitspervalue', $bpv);
-			bo_set_conf('raw_ntime', $ntime);
+			BoData::set('raw_channels', $channels);
+			BoData::set('raw_values', $values);
+			BoData::set('raw_bitspervalue', $bpv);
+			BoData::set('raw_ntime', $ntime);
 		}
 
 		//Longtime
-		$count = bo_get_conf('count_raw_signals');
-		bo_set_conf('count_raw_signals', $count + $count_inserted);
+		$count = BoData::get('count_raw_signals');
+		BoData::set('count_raw_signals', $count + $count_inserted);
 
 		if (!$timeout)
 		{
-			bo_set_conf('uptime_raw', time());
+			BoData::set('uptime_raw', time());
 			bo_match_strike2raw();
 			bo_update_status_files('signals');
 			$updated = true;
@@ -609,14 +599,14 @@ function bo_update_strikes($force = false)
 {
 	global $_BO;
 
-	$last = bo_get_conf('uptime_strikes_try');
+	$last = BoData::get('uptime_strikes_try');
 
 	bo_echod(" ");
 	bo_echod("=== Strikes ===");
 
 	if (time() - $last > BO_UP_INTVL_STRIKES * 60 - 30 || $force || time() < $last)
 	{
-		bo_set_conf('uptime_strikes_try', time());
+		BoData::set('uptime_strikes_try', time());
 
 		$start_time = time();
 		$stations = bo_stations();
@@ -678,16 +668,17 @@ function bo_update_strikes($force = false)
 
 
 		/***** PREPARATIONS BEFORE READING *****/
-		$res = BoDb::query("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes");
+		$res = BoDb::query("SELECT MAX(time) mtime, MAX(id) max_id FROM ".BO_DB_PREF."strikes");
 		$row = $res->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
+		$max_id = $row['max_id'];
 
 		if ($last_strike > time())
 			$last_strike = time() - 3600 * 24;
 		else if ($last_strike <= 0 || !$last_strike)
 			$last_strike = strtotime('2000-01-01');
 
-		$last_modified = bo_get_conf('uptime_strikes_modified');
+		$last_modified = BoData::get('uptime_strikes_modified');
 
 		if ($last_modified)
 			$time_update = $last_modified - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60;
@@ -713,7 +704,7 @@ function bo_update_strikes($force = false)
 		$range = $calc_range;
 
 		//adjust range
-		$tmp = unserialize(bo_get_conf('import_strike_filelength'));
+		$tmp = unserialize(BoData::get('import_strike_filelength'));
 
 		// use old file size if range got wrong the last time
 		if (is_array($tmp) && !empty($tmp))
@@ -747,10 +738,10 @@ function bo_update_strikes($force = false)
 				if ($last_modified > 0 && time() - $last_modified > 3600 * 2)
 				{
 					bo_echod("Last modified time too old (Blitzortung.org down?). Setting modified to now!");
-					bo_set_conf('uptime_strikes_modified', time());
+					BoData::set('uptime_strikes_modified', time());
 				}
 				
-				bo_set_conf('uptime_strikes', time());
+				BoData::set('uptime_strikes', time());
 				bo_echod("File not changed since last download (".date('r', $modified).")");
 				return false;
 			}
@@ -770,7 +761,7 @@ function bo_update_strikes($force = false)
 		{
 			$filesize = strlen(implode('', $file));
 			bo_echod("Partial download didn't work, got whole file instead (sent range $sent_range got $filesize bytes)");
-			bo_set_conf('import_strike_filelength', serialize(array($filesize, time(), 0)));
+			BoData::set('import_strike_filelength', serialize(array($filesize, time(), 0)));
 		}
 		else if ($file === false || $first_strike_file > $last_strike)
 		{
@@ -790,7 +781,7 @@ function bo_update_strikes($force = false)
 
 			if ($code == 304) //wasn't modified
 			{
-				bo_set_conf('uptime_strikes', time());
+				BoData::set('uptime_strikes', time());
 				bo_echod("File not changed since last download (".date('r', $modified).")");
 				return false;
 			}
@@ -811,19 +802,19 @@ function bo_update_strikes($force = false)
 		else
 		{
 			bo_echod("Using partial download! Beginning with strike ".date('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]+1).") from ".$range[2].". ".(intval($range[2]) ? "This saved ".round($range[0] / $range[2] * 100)."% traffic." : ""));
-			bo_set_conf('import_strike_filelength', serialize(array($range[2], time(), $calc_range)));
+			BoData::set('import_strike_filelength', serialize(array($range[2], time(), $calc_range)));
 		}
 
 		//set the modified header
 		if (intval($modified) <= 0)
 			$modified = time() - 180;
-		bo_set_conf('uptime_strikes_modified', $modified);
+
 
 		/***** SOME MORE PREPARATIONS BEFORE READING *****/
 		bo_update_error('strikedata', true); //reset error reporting
-		$loadcount = bo_get_conf('upcount_strikes');
-		bo_set_conf('upcount_strikes', $loadcount+1);
-		$last_strikes = unserialize(bo_get_conf('last_strikes_stations'));
+		$loadcount = BoData::get('upcount_strikes');
+		BoData::set('upcount_strikes', $loadcount+1);
+		$last_strikes = unserialize(BoData::get('last_strikes_stations'));
 		bo_echod('Last strike: '.date('Y-m-d H:i:s', $last_strike).
 				' *** Importing only strikes newer than: '.date('Y-m-d H:i:s', $time_update).
 				' *** This is update #'.$loadcount);
@@ -982,50 +973,56 @@ function bo_update_strikes($force = false)
 				}
 			}
 
-
-			$sql = "
-				time='$date $time',
-				time_ns='$time_ns',
-				lat='$lat',lon='$lon',
-				distance='$dist',
-				bearing='$bear',
-				deviation='$deviation',
-				current='$cur',
-				users='$users',
-				part='$part',
-				raw_id=NULL
-				";
-
+			$sql_data=array();
+			$sql_data['time']="$date $time";
+			$sql_data['time_ns']=$time_ns;
+			$sql_data['lat']=$lat;
+			$sql_data['lon']=$lon;
+			$sql_data['distance']=$dist;
+			$sql_data['bearing']=$bear;
+			$sql_data['deviation']=$deviation;
+			$sql_data['current']=$cur;
+			$sql_data['users']=$users;
+			$sql_data['part']=$part;
+			$sql_data['raw_id']=NULL;
 
 			if ($key_bytes_time)
-				$sql .= ', time_x=(FLOOR(('.($utime-$key_time_start).')/60/'.$key_time_div.')%'.$key_time_vals.')';
+			{
+				$sql_data['time_x'] = array('(FLOOR(('.($utime-$key_time_start).')/60/'.$key_time_div.')%'.$key_time_vals.')');
+			}
 
 
 			if ($key_bytes_latlon)
-				$sql .= ', lat_x=FLOOR((('.(90+$lat).')%'.$key_lat_div.')/'.$key_lat_div.'*'.$key_latlon_vals.')
-						 , lon_x=FLOOR((('.(180+$lon).')%'.$key_lon_div.')/'.$key_lon_div.'*'.$key_latlon_vals.')';
+			{
+				$sql_data['lat_x'] = array('FLOOR((('.(90+$lat).')%'.$key_lat_div.')/'.$key_lat_div.'*'.$key_latlon_vals.')');
+				$sql_data['lon_x'] = array('FLOOR((('.(180+$lon).')%'.$key_lon_div.')/'.$key_lon_div.'*'.$key_latlon_vals.')');
+			}
 
 
 			if (!$id) //new strike
 			{
+				//auto_increment!!
+				$max_id++;
+				$sql_data['id'] = $max_id;
+				
 				if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
-					$sql .= " , status=2 ";
+					$sql_data['status']=2;
 				else
-					$sql .= " , status=0 ";
+					$sql_data['status']=0;
 
-				$id = BoDb::query("INSERT INTO ".BO_DB_PREF."strikes SET $sql", false);
+				BoDb::bulk_insert('strikes', $sql_data);
 				$count_inserted++;
-
+				$id = $max_id;
 				$new_strike = true;
 			}
 			else //update
 			{
 				if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
-					$sql .= " , status=2 ";
+					$sql_data['status']=2;
 				else
-					$sql .= " , status=1 ";
+					$sql_data['status']=1;
 
-				BoDb::query("UPDATE ".BO_DB_PREF."strikes SET $sql WHERE id='$id'");
+				BoDb::update_data('strikes', $sql_data, "id='$id'");
 				$count_updated++;
 				$new_strike = false;
 			}
@@ -1034,18 +1031,16 @@ function bo_update_strikes($force = false)
 			//Update Strike <-> All Participated Stations
 			if ($id && !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true) )
 			{
-				$sql = '';
+				$sql_data = array();
+				
 				foreach($participants as $user)
 				{
 					$stId = $user2id[$user];
 					$last_strikes[$stId] = array($utime, $time_ns, $id);
-					$sql .= ($sql ? ',' : '')." ('$id', '$stId') ";
-				}
-
-				if ($sql)
-				{
-					$sql = "REPLACE INTO ".BO_DB_PREF."stations_strikes (strike_id, station_id) VALUES $sql";
-					BoDb::query($sql);
+					
+					$sql_data['strike_id'] = $id;
+					$sql_data['station_id'] = $stId;
+					BoDb::bulk_insert('stations_strikes', $sql_data);
 				}
 			}
 
@@ -1059,9 +1054,7 @@ function bo_update_strikes($force = false)
 			//statistics relative to station(s)
 			if ($new_strike)
 			{
-
 				// *** Own station *** //
-
 				$bear_id      = intval($bear);
 				$dist_id      = intval($dist / 10 / 1000);
 
@@ -1129,15 +1122,21 @@ function bo_update_strikes($force = false)
 			}
 		}
 
+		//Insert rest of data
+		BoDb::bulk_insert('strikes');
+		BoDb::bulk_insert('stations_strikes');
+		
+		
 		bo_echod("Lines: ".count($file)." *** New Strikes: $count_inserted *** Updated: $count_updated *** Already read: $count_exists");
 
+
 		//General
-		bo_set_conf('last_strikes_stations', serialize($last_strikes));
-		$count = bo_get_conf('longtime_max_participants');
+		BoData::set('last_strikes_stations', serialize($last_strikes));
+		$count = BoData::get('longtime_max_participants');
 		if ($count < $max_users)
 		{
-			bo_set_conf('longtime_max_participants', $max_users);
-			bo_set_conf('longtime_max_participants_time', time());
+			BoData::set('longtime_max_participants', $max_users);
+			BoData::set('longtime_max_participants_time', time());
 		}
 
 		//strike count per region
@@ -1147,8 +1146,8 @@ function bo_update_strikes($force = false)
 		$sql_template = "SELECT MAX(time) mtime, COUNT(id) cnt
 			FROM ".BO_DB_PREF."strikes s
 			WHERE time BETWEEN '$time_start' AND '$time_end' {where} ";
-		$last_strikes_region = unserialize(bo_get_conf('last_strikes_region'));
-		$rate_strikes_region = unserialize(bo_get_conf('rate_strikes_region'));
+		$last_strikes_region = unserialize(BoData::get('last_strikes_region'));
+		$rate_strikes_region = unserialize(BoData::get('rate_strikes_region'));
 		foreach ($_BO['region'] as $reg_id => $d)
 		{
 			$sql = strtr($sql_template,array('{where}' => bo_region2sql($reg_id)));
@@ -1158,42 +1157,41 @@ function bo_update_strikes($force = false)
 			if ($row['mtime'])
 				$last_strikes_region[$reg_id] = strtotime($row['mtime'].' UTC');
 		}
-		bo_set_conf('last_strikes_region', serialize($last_strikes_region));
-		bo_set_conf('rate_strikes_region', serialize($rate_strikes_region));
+		BoData::set('last_strikes_region', serialize($last_strikes_region));
+		BoData::set('rate_strikes_region', serialize($rate_strikes_region));
 
 
 		//Update Longtime statistics per station for detected strikes
 		foreach($strikesperstation as $stId => $count)
 		{
 			$add = $stId == $own_id ? '' : '#'.$stId.'#';
+			
+			BoData::update_add('count_strikes_own'.$add, $count);
 
-			$oldcount = bo_get_conf('count_strikes_own'.$add);
-			bo_set_conf('count_strikes_own'.$add, $oldcount + $count);
-
-			$bear_data_tmp = unserialize(bo_get_conf('longtime_bear_own'.$add));
+			$bear_data_tmp = unserialize(BoData::get('longtime_bear_own'.$add));
 			if (!$bear_data_tmp['time']) $bear_data_tmp['time'] = time();
 			foreach($bear_data_own[$stId] as $bear_id => $bear_count)
 				$bear_data_tmp[$bear_id] += $bear_count;
-			bo_set_conf('longtime_bear_own'.$add, serialize($bear_data_tmp));
+			BoData::set('longtime_bear_own'.$add, serialize($bear_data_tmp));
 
-			$dist_data_tmp = unserialize(bo_get_conf('longtime_dist_own'.$add));
+			$dist_data_tmp = unserialize(BoData::get('longtime_dist_own'.$add));
 			if (!$dist_data_tmp['time']) $dist_data_tmp['time'] = time();
 			foreach($dist_data_own[$stId] as $dist_id => $dist_count)
 				$dist_data_tmp[$dist_id] += $dist_count;
-			bo_set_conf('longtime_dist_own'.$add, serialize($dist_data_tmp));
+			BoData::set('longtime_dist_own'.$add, serialize($dist_data_tmp));
 
-			$max = bo_get_conf('longtime_max_dist_own'.$add);
+			$max = BoData::get('longtime_max_dist_own'.$add);
 			if ($max < $max_dist_own[$stId])
 			{
-				bo_set_conf('longtime_max_dist_own'.$add, $max_dist_own[$stId]);
-				bo_set_conf('longtime_max_dist_own_time'.$add, time());
+				BoData::set('longtime_max_dist_own'.$add, $max_dist_own[$stId]);
+				BoData::set('longtime_max_dist_own_time'.$add, time());
 			}
 
-			$min = bo_get_conf('longtime_min_dist_own'.$add);
+			$min = BoData::get('longtime_min_dist_own'.$add);
 			if (!$min || $min > $min_dist_own[$stId])
 			{
-				bo_set_conf('longtime_min_dist_own'.$add, $min_dist_own[$stId]);
-				bo_set_conf('longtime_min_dist_own_time'.$add, time());
+				BoData::set('longtime_min_dist_own'.$add, $min_dist_own[$stId]);
+				BoData::set('longtime_min_dist_own_time'.$add, time());
 			}
 
 		}
@@ -1205,42 +1203,40 @@ function bo_update_strikes($force = false)
 			//update only if station is active or got some strikes during the update
 			if ($stations[$stId]['status'] == 'A' || $strikesperstation[$stId])
 			{
-
 				$add = $stId == $own_id ? '' : '#'.$stId.'#';
 
-				$count = bo_get_conf('count_strikes'.$add);
-				bo_set_conf('count_strikes'.$add, $count + $count_inserted);
+				BoData::update_add('count_strikes'.$add, $count_inserted);
 
 				if (isset($dist_data[$stId]))
 				{
-					$dist_data_tmp = unserialize(bo_get_conf('longtime_dist'.$add));
+					$dist_data_tmp = unserialize(BoData::get('longtime_dist'.$add));
 					if (!$dist_data_tmp) $dist_data_tmp['time'] = time();
 					foreach($dist_data[$stId] as $dist_id => $dist_count)
 						$dist_data_tmp[$dist_id] += $dist_count;
-					bo_set_conf('longtime_dist'.$add, serialize($dist_data_tmp));
+					BoData::set('longtime_dist'.$add, serialize($dist_data_tmp));
 				}
 
 				if (isset($bear_data[$stId]))
 				{
-					$bear_data_tmp = unserialize(bo_get_conf('longtime_bear'.$add));
+					$bear_data_tmp = unserialize(BoData::get('longtime_bear'.$add));
 					if (!$bear_data_tmp) $bear_data_tmp['time'] = time();
 					foreach($bear_data[$stId] as $bear_id => $bear_count)
 						$bear_data_tmp[$bear_id] += $bear_count;
-					bo_set_conf('longtime_bear'.$add, serialize($bear_data_tmp));
+					BoData::set('longtime_bear'.$add, serialize($bear_data_tmp));
 				}
 
-				$max = bo_get_conf('longtime_max_dist_all'.$add);
+				$max = BoData::get('longtime_max_dist_all'.$add);
 				if ($max < $max_dist_all[$stId])
 				{
-					bo_set_conf('longtime_max_dist_all'.$add, $max_dist_all[$stId]);
-					bo_set_conf('longtime_max_dist_all_time'.$add, time());
+					BoData::set('longtime_max_dist_all'.$add, $max_dist_all[$stId]);
+					BoData::set('longtime_max_dist_all_time'.$add, time());
 				}
 
-				$min = bo_get_conf('longtime_min_dist_all'.$add);
+				$min = BoData::get('longtime_min_dist_all'.$add);
 				if (!$min || $min > $min_dist_all[$stId])
 				{
-					bo_set_conf('longtime_min_dist_all'.$add, $min_dist_all[$stId]);
-					bo_set_conf('longtime_min_dist_all_time'.$add, time());
+					BoData::set('longtime_min_dist_all'.$add, $min_dist_all[$stId]);
+					BoData::set('longtime_min_dist_all_time'.$add, time());
 				}
 			}
 
@@ -1254,7 +1250,8 @@ function bo_update_strikes($force = false)
 		else
 		{
 			$updated = true;
-			bo_set_conf('uptime_strikes', time());
+			BoData::set('uptime_strikes', time());
+			BoData::set('uptime_strikes_modified', $modified);
 			bo_update_status_files('strikes');
 			bo_cache_log('Strike data updated!');
 		}
@@ -1264,7 +1261,7 @@ function bo_update_strikes($force = false)
 		{
 			$min_hours        = BO_FIND_MIN_PARTICIPANTS_HOURS;
 			$see_same         = BO_FIND_MIN_PARTICIPANTS_COUNT;
-			$tmp              = unserialize(bo_get_conf('bo_participants_locating_min'));
+			$tmp              = unserialize(BoData::get('bo_participants_locating_min'));
 			$min_participants = $tmp['value'];
 
 			if (time() - $tmp['time'] > 3600 * BO_FIND_MIN_PARTICIPANTS_HOURS)
@@ -1288,7 +1285,7 @@ function bo_update_strikes($force = false)
 
 					$tmp['last'] = $row['minusers'];
 					$tmp['time'] = time();
-					bo_set_conf('bo_participants_locating_min', serialize($tmp));
+					BoData::set('bo_participants_locating_min', serialize($tmp));
 				}
 			}
 		}
@@ -1296,7 +1293,7 @@ function bo_update_strikes($force = false)
 		//Maximum Participants
 		if (intval(BO_FIND_MAX_PARTICIPANTS_HOURS) && $max_participants >= 3)
 		{
-			$tmp = unserialize(bo_get_conf('bo_participants_locating_max'));
+			$tmp = unserialize(BoData::get('bo_participants_locating_max'));
 			$tmp['value_last'] = max($tmp['value_last'], $max_participants);
 			if (time() - $tmp['time'] > 3600 * BO_FIND_MAX_PARTICIPANTS_HOURS && $max_participants >= $min_participants)
 			{
@@ -1304,7 +1301,7 @@ function bo_update_strikes($force = false)
 				$tmp['value'] = $tmp['value_last'];
 				$tmp['value_last'] = 0; //if max value shrinks!
 			}
-			bo_set_conf('bo_participants_locating_max', serialize($tmp));
+			BoData::set('bo_participants_locating_max', serialize($tmp));
 		}
 
 	}
@@ -1331,7 +1328,7 @@ function bo_match_strike2raw()
 	$amp_trigger = (BO_TRIGGER_VOLTAGE * BO_STR2SIG_TRIGGER_FACTOR / BO_MAX_VOLTAGE) * 256 / 2;
 
 	//time of last update
-	$last_modified = bo_get_conf('uptime_strikes_modified');
+	$last_modified = BoData::get('uptime_strikes_modified');
 	
 	//update only strikes that are "old enough"
 	//because younger ones could be updated during the next strike-import
@@ -1512,7 +1509,7 @@ function bo_match_strike2raw()
 // Get stations-data and statistics from blitzortung.org
 function bo_update_stations($force = false)
 {
-	$last = bo_get_conf('uptime_stations_try');
+	$last = BoData::get('uptime_stations_try');
 
 	bo_echod(" ");
 	bo_echod("=== Stations ===");
@@ -1527,14 +1524,14 @@ function bo_update_stations($force = false)
 
 	if (time() - $last > BO_UP_INTVL_STATIONS * 60 - 30 || $force)
 	{
-		bo_set_conf('uptime_stations_try', time());
+		BoData::set('uptime_stations_try', time());
 
 		$StData = array();
 		$signal_count = 0;
 		$time = time();
 
 		//send a last modified header
-		$last_modified = bo_get_conf('uptime_stations_modified');
+		$last_modified = BoData::get('uptime_stations_modified');
 		$modified = $last_modified;
 		$range = 0;
 		$file = bo_get_file(bo_access_url().BO_IMPORT_PATH_STATIONS, $code, 'stations', $range, $modified);
@@ -1546,10 +1543,10 @@ function bo_update_stations($force = false)
 			if ($last_modified > 0 && time() - $last_modified > 3600 * 2)
 			{
 				bo_echod("Last modified time too old (Blitzortung.org down?). Setting modified to now!");
-				bo_set_conf('uptime_strikes_modified', time());
+				BoData::set('uptime_strikes_modified', time());
 			}
 
-			bo_set_conf('uptime_stations', time());
+			BoData::set('uptime_stations', time());
 			bo_echod("File not changed since last download (".date('r', $modified).")");
 			return false;
 		}
@@ -1558,7 +1555,7 @@ function bo_update_stations($force = false)
 		//set the modified header
 		if (intval($modified) <= 0)
 			$modified = time() - 180;
-		bo_set_conf('uptime_stations_modified', $modified);
+		BoData::set('uptime_stations_modified', $modified);
 
 
 		//ERROR
@@ -1579,15 +1576,15 @@ function bo_update_stations($force = false)
 		if ($lines < count($all_stations) * BO_UP_STATION_DIFFER)
 		{
 			bo_update_error('stationcount', 'Station count differs too much: '.count($all_stations).'Database / '.$lines.' stations.txt');
-			bo_set_conf('uptime_stations', time());
+			BoData::set('uptime_stations', time());
 
 			return;
 		}
 
 
 		//Debug output
-		$loadcount = bo_get_conf('upcount_stations');
-		bo_set_conf('upcount_stations', $loadcount+1);
+		$loadcount = BoData::get('upcount_stations');
+		BoData::set('upcount_stations', $loadcount+1);
 		bo_echod('Last update: '.date('Y-m-d H:i:s', $last).' *** This is update #'.$loadcount);
 
 		//reset error counter
@@ -1701,7 +1698,7 @@ function bo_update_stations($force = false)
 
 		bo_echod("Stations: ".(count($lines)-2)." *** New Stations: $count_inserted *** Updated: $count_updated");
 
-		//Check wether stations still exists
+		//Check whether stations still exists
 		foreach($all_stations as $id => $d)
 		{
 			//station was deleted in stations.txt :(
@@ -1713,13 +1710,13 @@ function bo_update_stations($force = false)
 
 
 		//New stations (by user name)
-		$data = unserialize(bo_get_conf('stations_new_date'));
+		$data = unserialize(BoData::get('stations_new_date'));
 		if (!$data) //first call!
 		{
 			foreach($activebyuser as $user => $d)
 				$data[$user] = false; // mark as not new
 
-			bo_set_conf('stations_new_date', serialize($data));
+			BoData::set('stations_new_date', serialize($data));
 		}
 		else
 		{
@@ -1735,7 +1732,7 @@ function bo_update_stations($force = false)
 
 					//construction time if mybo installation is not too new ;-)
 					$changed = strtotime($all_stations[$d['id']]['changed']);
-					if ($changed - bo_get_conf('first_update_time') > 3600 * 24);
+					if ($changed - BoData::get('first_update_time') > 3600 * 24);
 						$cdata_tmp[$user] = $time - $changed;
 
 					$new = true;
@@ -1746,16 +1743,16 @@ function bo_update_stations($force = false)
 
 			if ($new)
 			{
-				bo_set_conf('stations_new_date', serialize($data));
+				BoData::set('stations_new_date', serialize($data));
 
 				//extra data
-				$cdata = unserialize(bo_get_conf('stations_new_data'));
+				$cdata = unserialize(BoData::get('stations_new_data'));
 				if (!is_array($cdata))
 					$cdata = $cdata_tmp;
 				else
 					$cdata = array_merge($cdata, $cdata_tmp);
 
-				bo_set_conf('stations_new_data', serialize($cdata));
+				BoData::set('stations_new_data', serialize($cdata));
 			}
 		}
 
@@ -1782,7 +1779,7 @@ function bo_update_stations($force = false)
 		$active_sig_stations = 0;
 		$active_avail_stations = 0;
 		$active_nogps = 0;
-		$stat_sql = '';
+		$sql_data = array();
 		
 		foreach($StData as $id => $data)
 		{
@@ -1791,8 +1788,11 @@ function bo_update_stations($force = false)
 
 			if ($id && ($data['sig'] || $data['strikes']))
 			{
-				$stat_sql .= ($stat_sql ? ',' : '');
-				$stat_sql .= "('$id', '$datetime', '".intval($data['sig'])."', '".intval($data['strikes'])."')";
+				$sql_data['station_id'] = $id;
+				$sql_data['time'] = $datetime;
+				$sql_data['signalsh'] = intval($data['sig']);
+				$sql_data['strikesh'] = intval($data['strikes']);
+				BoDb::bulk_insert('stations_stat', $sql_data);
 			}
 
 			if ($data['status'] == 'A') //GPS is/was active
@@ -1808,61 +1808,62 @@ function bo_update_stations($force = false)
 				$active_sig_stations++;
 		}
 
-		if ($stat_sql)
-			BoDb::query("INSERT INTO ".BO_DB_PREF."stations_stat (station_id, time, signalsh, strikesh) VALUES $stat_sql");
-		
-		bo_set_conf('active_stations_nogps', $active_nogps);
-
 		//Update whole strike count for dummy station "0"
 		$sql = "SELECT COUNT(id) cnt
 				FROM ".BO_DB_PREF."strikes
 				WHERE time > '$datetime_back'";
 		$row = BoDb::query($sql)->fetch_assoc();
 		$strike_count = $row['cnt'];
-		BoDb::query("INSERT INTO ".BO_DB_PREF."stations_stat
-				SET station_id='0', time='$datetime',
-					signalsh='".intval($signal_count)."', strikesh='".intval($strike_count)."'");
+
+		$sql_data['station_id'] = 0;
+		$sql_data['time'] = $datetime;
+		$sql_data['signalsh'] = intval($signal_count);
+		$sql_data['strikesh'] = intval($strike_count);
+		BoDb::bulk_insert('stations_stat', $sql_data);
+		BoDb::bulk_insert('stations_stat');
+		BoData::set('active_stations_nogps', $active_nogps);
 
 
+		
 		/*** Update Longtime statistics ***/
 		//max active stations ever
-		$max = bo_get_conf('longtime_count_max_active_stations');
+		$max = BoData::get('longtime_count_max_active_stations');
 		if ($active_stations > $max)
 		{
-			bo_set_conf('longtime_count_max_active_stations', max($max, $active_stations));
-			bo_set_conf('longtime_count_max_active_stations_time', $time);
+			BoData::set('longtime_count_max_active_stations', max($max, $active_stations));
+			BoData::set('longtime_count_max_active_stations_time', $time);
 		}
 
 		//max active stations (sending signals) ever
-		$max = bo_get_conf('longtime_count_max_active_stations_sig');
+		$max = BoData::get('longtime_count_max_active_stations_sig');
 		if ($active_sig_stations > $max)
 		{
-			bo_set_conf('longtime_count_max_active_stations_sig', max($max, $active_sig_stations));
-			bo_set_conf('longtime_count_max_active_stations_sig_time', $time);
+			BoData::set('longtime_count_max_active_stations_sig', max($max, $active_sig_stations));
+			BoData::set('longtime_count_max_active_stations_sig_time', $time);
 		}
 
 		//max available stations (had sent some signales, no matter when)
-		$max = bo_get_conf('longtime_count_max_avail_stations');
+		$max = BoData::get('longtime_count_max_avail_stations');
 		if ($active_avail_stations > $max)
 		{
-			bo_set_conf('longtime_count_max_avail_stations', max($max, $active_avail_stations));
-			bo_set_conf('longtime_count_max_avail_stations_time', $time);
+			BoData::set('longtime_count_max_avail_stations', max($max, $active_avail_stations));
+			BoData::set('longtime_count_max_avail_stations_time', $time);
 		}
 
 		//max signals/h
-		$max = bo_get_conf('longtime_max_signalsh');
+		$max = BoData::get('longtime_max_signalsh');
 		if ($signal_count > $max)
 		{
-			bo_set_conf('longtime_max_signalsh', max($max, $signal_count));
-			bo_set_conf('longtime_max_signalsh_time', $time);
+			BoData::set('longtime_max_signalsh', max($max, $signal_count));
+			BoData::set('longtime_max_signalsh_time', $time);
 		}
 
 		//max strikes/h
-		$max = bo_get_conf('longtime_max_strikesh');
+		$max = BoData::get('longtime_max_strikesh');
 		if ($strike_count > $max)
 		{
-			bo_set_conf('longtime_max_strikesh', max($max, $strike_count));
-			bo_set_conf('longtime_max_strikesh_time', $time);
+			BoData::set('longtime_max_strikesh', max($max, $strike_count));
+			BoData::set('longtime_max_strikesh_time', $time);
 		}
 
 
@@ -1882,57 +1883,51 @@ function bo_update_stations($force = false)
 			//whole signals count (not exact)
 			if ($last > 0 && $StData[$stId]['sig'])
 			{
-				$count = bo_get_conf('count_raw_signals2'.$add);
-				bo_set_conf('count_raw_signals2'.$add, $count + ($StData[$stId]['sig']*($time-$last)/3600));
+				BoData::update_add('count_raw_signals2'.$add, $StData[$stId]['sig']*($time-$last)/3600);
 			}
 
 			//max signals/h (own)
-			$max = bo_get_conf('longtime_max_signalsh_own'.$add);
-			if ($StData[$stId]['sig'] > $max)
+			if ($StData[$stId]['sig'])
 			{
-				bo_set_conf('longtime_max_signalsh_own'.$add, max($max, $StData[$stId]['sig']));
-				bo_set_conf('longtime_max_signalsh_own_time'.$add, $time);
+				$new = BoData::update_if('longtime_max_signalsh_own'.$add, $StData[$stId]['sig'], '< '.intval($StData[$stId]['sig']));
+				if ($new > 0)
+					BoData::set('longtime_max_signalsh_own_time'.$add, $time);
 			}
 
 			//max strikes/h (own)
-			$max = bo_get_conf('longtime_max_strikesh_own'.$add);
-			if ($StData[$stId]['strikes'] > $max)
+			if ($StData[$stId]['strikes'])
 			{
-				bo_set_conf('longtime_max_strikesh_own'.$add, max($max, $StData[$stId]['strikes']));
-				bo_set_conf('longtime_max_strikesh_own_time'.$add, $time);
+				$new = BoData::update_if('longtime_max_strikesh_own'.$add, $StData[$stId]['strikes'], '< '.intval($StData[$stId]['strikes']));
+				if ($new > 0)
+					BoData::set('longtime_max_strikesh_own_time'.$add, $time);
 			}
-
+				
 			//Activity/inactivity counter
 			$time_interval = $last ? $time - $last : 0;
 			if ($StData[$stId]['status'] == 'A')
 			{
-
 				//save first data-time
 				if ($stId != $own_id)
 				{
-					$longtime_time = bo_get_conf('longtime_station_first_time'.$add);
+					$longtime_time = BoData::get('longtime_station_first_time'.$add);
 
 					if (!$longtime_time)
-						bo_set_conf('longtime_station_first_time'.$add, time());
+						BoData::set('longtime_station_first_time'.$add, time());
 				}
 
-				bo_set_conf('station_last_active'.$add, $time);
-				$time_interval += bo_get_conf('longtime_station_active_time'.$add);
-				bo_set_conf('longtime_station_active_time'.$add, $time_interval);
+				BoData::set('station_last_active'.$add, $time);
+				BoData::update_add('longtime_station_active_time'.$add, $time_interval);
 			}
 			else
 			{
-				bo_set_conf('station_last_inactive'.$add, $time);
+				BoData::set('station_last_inactive'.$add, $time);
+				BoData::update_add('longtime_station_inactive_count'.$add, 1);
 				
 				//don't update offline counter if station is in test phase (first days)
-				if (bo_get_conf('longtime_station_active_time'.$add) > 3600 * BO_STATISTICS_COUNT_OFFLINE_AFTER_MIN_ONLINE_HOURS)
+				if (BoData::get('longtime_station_active_time'.$add) > 3600 * BO_STATISTICS_COUNT_OFFLINE_AFTER_MIN_ONLINE_HOURS)
 				{
-					$time_interval += bo_get_conf('longtime_station_inactive_time'.$add);
-					bo_set_conf('longtime_station_inactive_time'.$add, $time_interval);
+					BoData::update_add('longtime_station_inactive_time'.$add, $time_interval);
 				}
-				
-				$cnt = bo_get_conf('longtime_station_inactive_count'.$add);
-				bo_set_conf('longtime_station_inactive_count'.$add, $cnt);
 			}
 
 
@@ -1940,17 +1935,16 @@ function bo_update_stations($force = false)
 			$time_interval = $last ? $time - $last : 0;
 			if ($StData[$stId]['status'] == 'V')
 			{
-				bo_set_conf('station_last_nogps'.$add, $time);
-				$time_interval += bo_get_conf('longtime_station_nogps_time'.$add);
-				bo_set_conf('longtime_station_nogps_time'.$add, $time_interval);
-				$cnt = bo_get_conf('longtime_station_nogps_count'.$add);
-				bo_set_conf('longtime_station_nogps_count'.$add, $cnt);
+				BoData::set('station_last_nogps'.$add, $time);
+				BoData::update_add('longtime_station_nogps_time'.$add, $time_interval);
+				BoData::update_add('longtime_station_nogps_count'.$add, 1);
 			}
 
+			
 			//Station positions for last 24h, every station-update interval (15min)
 			if (time() - $StData[$stId]['time'] < 3600 * 2)
 			{
-				$data = unserialize(bo_get_conf('station_data24h'.$add));
+				$data = unserialize(BoData::get('station_data24h'.$add));
 				if ($data['time'] != $StData[$stId]['time'])
 				{
 					//add height to own station
@@ -1967,20 +1961,20 @@ function bo_update_stations($force = false)
 					
 					$time_floor = floor(date('Hi', $StData[$stId]['time']) / BO_UP_INTVL_STATIONS);
 					$data[$time_floor] = $StData[$stId];
-					bo_set_conf('station_data24h'.$add, serialize($data));
+					BoData::set('station_data24h'.$add, serialize($data));
 				}
 			}
 
 		}
 
 
-		bo_set_conf('uptime_stations', time());
+		BoData::set('uptime_stations', time());
 
 
 		//send mail to owner if no signals
 		if (BO_TRACKER_WARN_ENABLED === true && $own_id > 0)
 		{
-			$data = unserialize(bo_get_conf('warn_tracker_offline'));
+			$data = unserialize(BoData::get('warn_tracker_offline'));
 
 			if ($StData[$own_id]['sig'] == 0)
 			{
@@ -1992,7 +1986,7 @@ function bo_update_stations($force = false)
 					if (time() - $data['last_msg'] >= ((double)BO_TRACKER_WARN_RESEND_HOURS * 3600))
 					{
 						$data['last_msg'] = time();
-						bo_set_conf('warn_tracker_offline', serialize($data));
+						BoData::set('warn_tracker_offline', serialize($data));
 						bo_owner_mail('Station OFFLINE', "Your station/tracker didn't send any signals since ".date(_BL('_datetime'),$data['offline_since'] - 3600)." ! If there is lightning near your station, your tracker might be in interference mode. In this case you can ignore this message.");
 					}
 				}
@@ -2003,7 +1997,7 @@ function bo_update_stations($force = false)
 				bo_owner_mail('Station ONLINE', "Your station/tracker is online again! ".$StData[$own_id]['sig']." signals in the last 60 minutes.");
 			}
 
-			bo_set_conf('warn_tracker_offline', serialize($data));
+			BoData::set('warn_tracker_offline', serialize($data));
 		}
 
 		bo_update_status_files('stations');
@@ -2029,7 +2023,7 @@ function bo_update_daily_stat()
 	//Update strike-count per day
 	$ytime = mktime(date('H')-3,0,0,date("n"),date('j')-1);
 	$day_id = gmdate('Ymd', $ytime);
-	$data = unserialize(bo_get_conf('strikes_'.$day_id));
+	$data = unserialize(BoData::get('strikes_'.$day_id));
 
 	// Daily Statistics and longtime strike-count
 	if (!$data || !is_array($data) || !$data['done'])
@@ -2041,8 +2035,8 @@ function bo_update_daily_stat()
 		$yesterday_start = gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 00:00:00', $ytime)));
 		$yesterday_end =   gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 23:59:59', $ytime)));
 
-		$stat_ok = bo_get_conf('uptime_stations') > $yesterday_end + 60;
-		$raw_ok  = bo_get_conf('uptime_raw') > $yesterday_end + 60;
+		$stat_ok = BoData::get('uptime_stations') > $yesterday_end + 60;
+		$raw_ok  = BoData::get('uptime_raw') > $yesterday_end + 60;
 
 		// Strikes SQL template
 		$sql_template = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes s WHERE {where} time BETWEEN '$yesterday_start' AND '$yesterday_end'";
@@ -2067,7 +2061,7 @@ function bo_update_daily_stat()
 						);
 
 			$data['status'] = 1;
-			bo_set_conf('strikes_'.$day_id, serialize($data));
+			BoData::set('strikes_'.$day_id, serialize($data));
 		}
 		else if ($data['status'] == 1 )
 		{
@@ -2088,7 +2082,7 @@ function bo_update_daily_stat()
 
 			$data[7] = $strikes_region;
 			$data['status'] = 2;
-			bo_set_conf('strikes_'.$day_id, serialize($data));
+			BoData::set('strikes_'.$day_id, serialize($data));
 		}
 		else if ($data['status'] == 2 && $stat_ok)
 		{
@@ -2104,7 +2098,7 @@ function bo_update_daily_stat()
 
 			$data[10] = $stations;
 			$data['status'] = 3;
-			bo_set_conf('strikes_'.$day_id, serialize($data));
+			BoData::set('strikes_'.$day_id, serialize($data));
 
 		}
 		else if ($data['status'] == 3 && $raw_ok)
@@ -2131,13 +2125,12 @@ function bo_update_daily_stat()
 			$data[6] = round($signals[1]);
 
 			$data['status'] = 4;
-			bo_set_conf('strikes_'.$day_id, serialize($data));
+			BoData::set('strikes_'.$day_id, serialize($data));
 		}
 		else if ($data['status'] == 4 && $raw_ok)
 		{
 			$start_time = time();
-			//$channels = bo_get_conf('raw_channels');
-			$max_lines = 10000;
+			$max_lines = 2000;
 			$limit = intval($data['raw_limit']);
 
 			bo_echod("Analyzing signals: Start at $limit");
@@ -2232,32 +2225,32 @@ function bo_update_daily_stat()
 				$data['raw_limit'] = $limit + $rows;
 			}
 
-			bo_set_conf('strikes_'.$day_id, serialize($data));
+			BoData::set('strikes_'.$day_id, serialize($data));
 		}
 
 		bo_echod("Datasets: ".count($data)."");
 
 
 		/*** Longtime statistics ***/
-		$D = unserialize(bo_get_conf('longtime_max_strikes_day_all'));
+		$D = unserialize(BoData::get('longtime_max_strikes_day_all'));
 		if ($D[0] < $row_all['cnt'])
-			bo_set_conf('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $ytime)));
+			BoData::set('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $ytime)));
 
-		$D = unserialize(bo_get_conf('longtime_max_strikes_day_all_rad'));
+		$D = unserialize(BoData::get('longtime_max_strikes_day_all_rad'));
 		if ($D[0] < $row_all_rad['cnt'])
-			bo_set_conf('longtime_max_strikes_day_all_rad', serialize(array($row_all_rad['cnt'], $ytime)));
+			BoData::set('longtime_max_strikes_day_all_rad', serialize(array($row_all_rad['cnt'], $ytime)));
 
-		$D = unserialize(bo_get_conf('longtime_max_strikes_day_own'));
+		$D = unserialize(BoData::get('longtime_max_strikes_day_own'));
 		if ($D[0] < $row_own['cnt'])
-			bo_set_conf('longtime_max_strikes_day_own', serialize(array($row_own['cnt'], $ytime)));
+			BoData::set('longtime_max_strikes_day_own', serialize(array($row_own['cnt'], $ytime)));
 
-		$D = unserialize(bo_get_conf('longtime_max_strikes_day_own_rad'));
+		$D = unserialize(BoData::get('longtime_max_strikes_day_own_rad'));
 		if ($D[0] < $row_own_rad['cnt'])
-			bo_set_conf('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $ytime)));
+			BoData::set('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $ytime)));
 
-		$D = unserialize(bo_get_conf('longtime_max_signals_day_own'));
+		$D = unserialize(BoData::get('longtime_max_signals_day_own'));
 		if ($D[0] < $signals_exact['cnt'])
-			bo_set_conf('longtime_max_signals_day_own', serialize(array($signals_exact['cnt'], $ytime)));
+			BoData::set('longtime_max_signals_day_own', serialize(array($signals_exact['cnt'], $ytime)));
 
 		$ret = true;
 	}
@@ -2265,7 +2258,7 @@ function bo_update_daily_stat()
 	//Update strike-count per month
 	$ytime = mktime(date('H')-1,0,0,date("n")-1,date('j'));
 	$month_id = gmdate('Ym', $ytime);
-	$last_month_count = bo_get_conf('strikes_month_'.$month_id);
+	$last_month_count = BoData::get('strikes_month_'.$month_id);
 
 	// Monthly Statistics
 	if (!$last_month_count)
@@ -2286,7 +2279,7 @@ function bo_update_daily_stat()
 			$data['daycount']++;
 		}
 
-		bo_set_conf('strikes_month_'.$month_id, serialize($data));
+		BoData::set('strikes_month_'.$month_id, serialize($data));
 
 		$ret = true;
 	}
@@ -2297,15 +2290,15 @@ function bo_update_daily_stat()
 
 function bo_my_station_autoupdate($force)
 {
-	if (bo_get_conf('mybo_stations_autoupdate'))
+	if (BoData::get('mybo_stations_autoupdate'))
 	{
-		$last = bo_get_conf('uptime_mybo_stations');
+		$last = BoData::get('uptime_mybo_stations');
 
 		if (time() - $last > 24 * 3600 - 30 || $force)
 		{
-			bo_set_conf('uptime_mybo_stations', time());
+			BoData::set('uptime_mybo_stations', time());
 
-			$st_urls = unserialize(bo_get_conf('mybo_stations'));
+			$st_urls = unserialize(BoData::get('mybo_stations'));
 
 			if (is_array($st_urls) && trim($st_urls[bo_station_id()]))
 				bo_my_station_update(trim($st_urls[bo_station_id()]));
@@ -2324,7 +2317,7 @@ function bo_my_station_update($url, $force_bo_login = false)
 
 	if (!$force_bo_login)
 	{
-		$authid = bo_get_conf('mybo_authid');
+		$authid = BoData::get('mybo_authid');
 
 		if ($authid)
 		{
@@ -2396,12 +2389,12 @@ function bo_my_station_update($url, $force_bo_login = false)
 					$info['lons'] = $R['lons'];
 					$info['rads'] = $R['rads'];
 
-					bo_set_conf('mybo_authid', $R['authid']);
+					BoData::set('mybo_authid', $R['authid']);
 
 					if (is_array($urls))
 					{
-						bo_set_conf('mybo_stations', serialize($urls));
-						bo_set_conf('mybo_stations_info', serialize($info));
+						BoData::set('mybo_stations', serialize($urls));
+						BoData::set('mybo_stations_info', serialize($info));
 
 						if (!$authid)
 							bo_echod(_BL('Auth ID is').': *'.$R['authid'].'*');
@@ -2465,14 +2458,14 @@ function bo_update_tracks($force = false)
 
 	$start_time = time();
 
-	$last = bo_get_conf('uptime_tracks');
+	$last = BoData::get('uptime_tracks');
 
 	bo_echod(" ");
 	bo_echod("=== Tracks ===");
 
 	if (time() - $last > BO_UP_INTVL_TRACKS * 60 - 30 || $force || time() < $last)
 	{
-		bo_set_conf('uptime_tracks', time());
+		BoData::set('uptime_tracks', time());
 		$time = time();
 
 		//Debug
@@ -2674,7 +2667,7 @@ function bo_update_tracks($force = false)
 				bo_echod($line);
 		}
 
-		bo_set_conf('strike_cells', gzdeflate(serialize($data)));
+		BoData::set('strike_cells', gzdeflate(serialize($data)));
 	}
 	else
 	{
@@ -2689,12 +2682,12 @@ function bo_update_error($type, $extra = null)
 	// reset
 	if ($extra === true)
 	{
-		bo_set_conf('uperror_'.$type, serialize(array()));
+		BoData::set('uperror_'.$type, serialize(array()));
 		return;
 	}
 
 	//Read
-	$data = unserialize(bo_get_conf('uperror_'.$type));
+	$data = unserialize(BoData::get('uperror_'.$type));
 
 	//Update
 	if (!$data['first'])
@@ -2719,7 +2712,7 @@ function bo_update_error($type, $extra = null)
 	}
 
 	//Write
-	bo_set_conf('uperror_'.$type, serialize($data));
+	BoData::set('uperror_'.$type, serialize($data));
 }
 
 
@@ -2739,23 +2732,23 @@ function bo_update_status_files($type)
 	$STATION_CURRENT_SIGNALS = $row['signalsh'];
 
 
-	$last_strikes_region = unserialize(bo_get_conf('last_strikes_region'));
-	$rate_strikes_region = unserialize(bo_get_conf('rate_strikes_region'));
+	$last_strikes_region = unserialize(BoData::get('last_strikes_region'));
+	$rate_strikes_region = unserialize(BoData::get('rate_strikes_region'));
 	$STRIKE_RATE = _BN($rate_strikes_region[0], 1);
 	$LAST_STRIKE = _BDT($last_strikes_region[0]);
 
-	$tmp = @unserialize(bo_get_conf('last_strikes_stations'));
+	$tmp = @unserialize(BoData::get('last_strikes_stations'));
 	$STATION_LAST_STRIKE   = _BDT($tmp[$station_id][0]);
 
-	$act_time = bo_get_conf('station_last_active');
-	$inact_time = bo_get_conf('station_last_inactive');
+	$act_time = BoData::get('station_last_active');
+	$inact_time = BoData::get('station_last_inactive');
 	$STATION_LAST_ACTIVE   = _BDT($act_time);
 	$STATION_LAST_INACTIVE = _BDT($inact_time);
 	$STATION_ACTIVE        = $act_time > $inact_time ? _BL('yes') : _BL('no');
 
-	$IMPORT_LAST_STRIKES   = _BDT(bo_get_conf('uptime_strikes'));
-	$IMPORT_LAST_STATIONS  = _BDT(bo_get_conf('uptime_stations'));
-	$IMPORT_LAST_SIGNALS   = _BDT(bo_get_conf('uptime_raw'));
+	$IMPORT_LAST_STRIKES   = _BDT(BoData::get('uptime_strikes'));
+	$IMPORT_LAST_STATIONS  = _BDT(BoData::get('uptime_stations'));
+	$IMPORT_LAST_SIGNALS   = _BDT(BoData::get('uptime_raw'));
 
 	$replace = array(
 		'{STATION_CURRENT_STRIKES}'  => $STATION_CURRENT_STRIKES,
@@ -2846,11 +2839,11 @@ function bo_purge_olddata($force = false)
 	{
 		bo_echod(" ");
 		bo_echod("=== Purging data ===");
-		$last = bo_get_conf('purge_time');
+		$last = BoData::get('purge_time');
 
 		if ($force || (defined('BO_PURGE_MAIN_INTVL') && BO_PURGE_MAIN_INTVL && time() - $last > 3600 * BO_PURGE_MAIN_INTVL))
 		{
-			bo_set_conf('purge_time', time());
+			BoData::set('purge_time', time());
 
 			$num_strikes = 0;
 			$num_stations = 0;
@@ -3082,9 +3075,9 @@ function bo_delete_station($id = 0)
 			$new_id = intval(BO_DELETED_STATION_MIN_ID);
 
 		//save old data in extra variable
-		$deleted_stations = unserialize(bo_get_conf('stations_deleted'));
+		$deleted_stations = unserialize(BoData::get('stations_deleted'));
 		$deleted_stations[] = $station_info;
-		bo_set_conf('stations_deleted', serialize($deleted_stations));
+		BoData::set('stations_deleted', serialize($deleted_stations));
 
 		
 		//delete data from "new_id" -> otherwise update would not work it sth did wrong before
@@ -3101,10 +3094,10 @@ function bo_delete_station($id = 0)
 		BoDb::query("UPDATE ".BO_DB_PREF."stations_strikes SET station_id='$new_id' WHERE station_id='$id'", false);
 		BoDb::query("UPDATE ".BO_DB_PREF."densities        SET station_id='$new_id' WHERE station_id='$id'", false);
 
-		$last_strikes = unserialize(bo_get_conf('last_strikes_stations'));
+		$last_strikes = unserialize(BoData::get('last_strikes_stations'));
 		$last_strikes[$new_id] = $last_strikes[$id];
 		unset($last_strikes[$id]);
-		bo_set_conf('last_strikes_stations', serialize($last_strikes));
+		BoData::set('last_strikes_stations', serialize($last_strikes));
 
 		//last not least the station itself (last update, if former queries fail)
 		BoDb::query("UPDATE ".BO_DB_PREF."stations         SET id='$new_id', status='-' WHERE id='$id'");
@@ -3128,13 +3121,13 @@ function bo_download_external($force = false)
 	bo_echod(" ");
 	bo_echod("=== File Downloads ===");
 
-	$data = unserialize(bo_get_conf('uptime_ext_downloads'));
+	$data = unserialize(BoData::get('uptime_ext_downloads'));
 
 	if (time() - $data['last_update'] > BO_UP_INTVL_DOWNLOADS * 60 - 30 || $force || time() < $data['last_update'])
 	{
 		//pre-save time to avoid errors when downloads hang...
 		$data['last_update'] = time();
-		bo_set_conf('uptime_ext_downloads', serialize($data));
+		BoData::set('uptime_ext_downloads', serialize($data));
 	
 	
 		
@@ -3232,7 +3225,7 @@ function bo_download_external($force = false)
 		
 		
 		$data['last_update'] = time();
-		bo_set_conf('uptime_ext_downloads', serialize($data));
+		BoData::set('uptime_ext_downloads', serialize($data));
 
 	}
 	

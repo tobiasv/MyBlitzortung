@@ -707,12 +707,12 @@ function bo_strike2polarity($data, $bearing)
 
 	if ($cache == 0)
 	{
-		$antbear[0] = bo_get_conf('antenna1_bearing_elec');
-		$antbear[1] = bo_get_conf('antenna2_bearing_elec');
+		$antbear[0] = BoData::get('antenna1_bearing_elec');
+		$antbear[1] = BoData::get('antenna2_bearing_elec');
 		$cache = 1;
 	}
 
-	$channels = bo_get_conf('raw_channels');
+	$channels = BoData::get('raw_channels');
 
 	$ant_arc = 80;
 
@@ -1080,7 +1080,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 
 	if ($type)
 	{
-		$data = unserialize(bo_get_conf('download_statistics'));
+		$data = unserialize(BoData::get('download_statistics'));
 		$data[$type]['count'][$err]++;
 
 		if ($content_size)
@@ -1103,7 +1103,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 		if (!$data[$type]['time_first'])
 			$data[$type]['time_first'] = time();
 
-		bo_set_conf('download_statistics', serialize($data));
+		BoData::set('download_statistics', serialize($data));
 	}
 
 	if ($range > 0)
@@ -1427,10 +1427,10 @@ function bo_raw2array($raw = false, $calc_spec = false, $channels = -1, $ntime =
 	//load default values
 	if ($std_channels == -1 && $std_bpv == -1 && $std_ntime == -1 && $std_values == -1)
 	{
-		$std_channels = bo_get_conf('raw_channels');
-		$std_bpv      = bo_get_conf('raw_bitspervalue');
-		$std_ntime    = bo_get_conf('raw_ntime');
-		$std_values   = bo_get_conf('raw_values');
+		$std_channels = BoData::get('raw_channels');
+		$std_bpv      = BoData::get('raw_bitspervalue');
+		$std_ntime    = BoData::get('raw_ntime');
+		$std_values   = BoData::get('raw_values');
 	}
 
 	$channels =  $channels > 0 ? $channels : $std_channels;
@@ -1572,12 +1572,16 @@ function bo_examine_signal($data, $channels=0, $ntime=0, &$amp = array(), &$amp_
 	$freq_amp[1] = max($freq_amp[1], 0);
 	$freq_amp[1] = min($freq_amp[1], 255);
 	
-	$sql = "amp1='$amp[0]', amp2='$amp[1]',
-			amp1_max='$amp_max[0]', amp2_max='$amp_max[1]',
-			freq1='$freq[0]', freq2='$freq[1]',
-			freq1_amp='$freq_amp[0]', freq2_amp='$freq_amp[1]' ";
+	$s['amp1']=$amp[0];
+	$s['amp2']=$amp[1];
+	$s['amp1_max']=$amp_max[0];
+	$s['amp2_max']=$amp_max[1];
+	$s['freq1']=$freq[0];
+	$s['freq2']=$freq[1];
+	$s['freq1_amp']=$freq_amp[0];
+	$s['freq2_amp']=$freq_amp[1];
 
-	return $sql;
+	return $s;
 }
 
 
@@ -1829,7 +1833,7 @@ function bo_participants_locating_min()
 
 	if ($value === false && intval(BO_FIND_MIN_PARTICIPANTS_HOURS))
 	{
-		$tmp = unserialize(bo_get_conf('bo_participants_locating_min'));
+		$tmp = unserialize(BoData::get('bo_participants_locating_min'));
 		$value = intval($tmp['value']);
 	}
 
@@ -1845,7 +1849,7 @@ function bo_participants_locating_max()
 
 	if ($value === false && intval(BO_FIND_MAX_PARTICIPANTS_HOURS))
 	{
-		$tmp = unserialize(bo_get_conf('bo_participants_locating_max'));
+		$tmp = unserialize(BoData::get('bo_participants_locating_max'));
 		$value = intval($tmp['value']);
 	}
 
@@ -2169,21 +2173,33 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 	
 function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval)
 {	
-
-	$file_expired_sec = $last_update - filemtime($cache_file);
-	
-	$deliver_old = (BO_CACHE_CREATE_NEW_DELIVER_OLD > 0) 
-					&& ($file_expired_sec <= $update_interval * BO_CACHE_CREATE_NEW_DELIVER_OLD);
-
-	if (filemtime($cache_file) - 300 > time())
-	{
-		@unlink($cache_file);
-		clearstatcache();
-	}
 	
 	bo_cache_log("Check - $cache_file");
-	bo_cache_log("Check - Filedate ".date('Y-m-d H:i:s', filemtime($cache_file)));
-	bo_cache_log("Check - Sec expired $file_expired_sec - Intvl: $update_interval s");
+	
+	if (file_exists($cache_file))
+	{
+		
+		$deliver_old = (BO_CACHE_CREATE_NEW_DELIVER_OLD > 0) 
+						&& ($file_expired_sec <= $update_interval * BO_CACHE_CREATE_NEW_DELIVER_OLD);
+
+		$file_expired_sec = $last_update - @filemtime($cache_file);
+		
+		//Delete files that are to new
+		if (filemtime($cache_file) - 300 > time())
+		{
+			@unlink($cache_file);
+			clearstatcache();
+			bo_cache_log("Check - Was to new!");
+		}
+		
+		bo_cache_log("Check - Filedate ".date('Y-m-d H:i:s', @filemtime($cache_file)));
+		bo_cache_log("Check - Sec expired $file_expired_sec - Intvl: $update_interval s");
+
+	}
+	else
+	{
+		bo_cache_log("Check - Doesn't exist");
+	}
 	
 	//if same file is created for a parallel client
 	//and delivering outdated files isn't possible
@@ -2231,7 +2247,7 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 		//The last chance is to check the last update, 
 		//maybe no redraw is needed
 		//if then, only one database query needed
-		$last_update_real = bo_get_conf('uptime_strikes');
+		$last_update_real = BoData::get('uptime_strikes');
 		if (filemtime($cache_file) > $last_update_real && BO_CACHE_MOD_UPDATE_DIVISOR)
 		{
 			bo_cache_log("Check - Output old cache file, no new data");
@@ -2403,6 +2419,50 @@ function bo_hours($h)
 	$hour   = floor($h) < 10 ? "0".floor($h) : floor($h);
 	
 	return "$hour:$minute";
+}
+
+
+
+function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quality = BO_IMAGE_JPEG_QUALITY)
+{
+	$extension = strtr($extension, array('.' => ''));
+	
+	//there seems to be an error in very rare cases
+	//we retry to save the image if it didn't work
+	$i=0;
+		
+	do
+	{
+		if ($i)
+			usleep(100000);
+
+		if ($extension == 'png')
+			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
+		else if ($extension == 'gif')
+			$ret = imagegif($I, $file);
+		else if ($extension == 'jpeg')
+			$ret = imagejpeg($I, $file, $quality);
+		else if (imageistruecolor($I) === false)
+			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
+		else
+			$ret = imagejpeg($I, $file, $quality);
+	}
+	while ($i++ < 3 && !$ret && imagesx($I));
+
+	
+	if ($file)
+	{
+		if (filesize($file) == 0)
+		{
+			unlink($file);
+		}
+		else if ($mtime !== null)
+		{
+			touch($file, $mtime);
+		}
+	}
+	
+	return $ret;
 }
 
 

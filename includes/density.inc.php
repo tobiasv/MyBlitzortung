@@ -20,10 +20,10 @@ function bo_update_densities($force = false)
 	}
 
 	//check for new time-range and insert them
-	$last = bo_get_conf('uptime_densities');
+	$last = BoData::get('uptime_densities');
 	if (time() - $last > 3600 || $force)
 	{
-		bo_set_conf('uptime_densities', time());
+		BoData::set('uptime_densities', time());
 		$ranges = bo_get_new_density_ranges(0,0);
 		bo_density_insert_ranges($ranges, $force);
 	}
@@ -329,20 +329,20 @@ function bo_update_densities($force = false)
 				{
 					$ant = array();
 					
-					$ant[0] = bo_get_conf('antenna1_bearing');
+					$ant[0] = BoData::get('antenna1_bearing');
 					if ($ant[0] !== '' && $ant[0] !== null)
 					{
 						$info['antennas']['bearing'][0] = $ant[0];
-						$info['antennas']['bearing_elec'][0] = bo_get_conf('antenna1_bearing_elec');
+						$info['antennas']['bearing_elec'][0] = BoData::get('antenna1_bearing_elec');
 					}
 
 					if (BO_ANTENNAS == 2)
 					{
-						$ant[1] = bo_get_conf('antenna2_bearing');
+						$ant[1] = BoData::get('antenna2_bearing');
 						if ($ant[1] !== '' && $ant[1] !== null)
 						{
 							$info['antennas']['bearing'][1] = $ant[1];
-							$info['antennas']['bearing_elec'][1] = bo_get_conf('antenna2_bearing_elec');
+							$info['antennas']['bearing_elec'][1] = BoData::get('antenna2_bearing_elec');
 						}
 					}
 					

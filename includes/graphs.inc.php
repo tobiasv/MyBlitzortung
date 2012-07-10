@@ -214,7 +214,7 @@ function bo_graph_statistics()
 	if ($group_minutes < BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES)
 		$group_minutes = BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES;
 
-	$date_end = gmdate('Y-m-d H:i:s', bo_get_conf('uptime_stations'));
+	$date_end = gmdate('Y-m-d H:i:s', BoData::get('uptime_stations'));
 	$time_end = strtotime($date_end." UTC");
 	$date_start = gmdate('Y-m-d H:i:s', time() - 3600 * $hours_back);
 	$time_start = strtotime($date_start." UTC");
@@ -272,7 +272,7 @@ function bo_graph_statistics()
 		if (!bo_user_get_level())
 			exit;
 		
-		$last_uptime = bo_get_conf('uptime_strikes');
+		$last_uptime = BoData::get('uptime_strikes');
 		$time_max = time();
 		$no_title_station = true;
 
@@ -449,7 +449,7 @@ function bo_graph_statistics()
 	}
 	else if ($type == 'strikes_now')
 	{
-		$last_uptime = bo_get_conf('uptime_strikes');
+		$last_uptime = BoData::get('uptime_strikes');
 		$time_max = time();
 		$no_title_station = true;
 
@@ -642,8 +642,8 @@ function bo_graph_statistics()
 		else
 			$add = '';
 
-		$own = unserialize(bo_get_conf('longtime_dist_own'.$add));
-		$all = unserialize(bo_get_conf('longtime_dist'.$add));
+		$own = unserialize(BoData::get('longtime_dist_own'.$add));
+		$all = unserialize(BoData::get('longtime_dist'.$add));
 
 		$sum_all = 0;
 		$sum_own = 0;
@@ -715,8 +715,8 @@ function bo_graph_statistics()
 
 		$bear_div = 1;
 
-		$own = unserialize(bo_get_conf('longtime_bear_own'.$add));
-		$all = unserialize(bo_get_conf('longtime_bear'.$add));
+		$own = unserialize(BoData::get('longtime_bear_own'.$add));
+		$all = unserialize(BoData::get('longtime_bear'.$add));
 
 		if (is_array($own) && is_array($all))
 		{
@@ -1074,7 +1074,7 @@ function bo_graph_statistics()
 
 		}
 
-		$last_uptime = bo_get_conf('uptime_strikes');
+		$last_uptime = BoData::get('uptime_strikes');
 		$time_max = time();
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
@@ -1206,7 +1206,7 @@ function bo_graph_statistics()
 		if ($hours_back > 24)
 			$group_minutes *= ceil($hours_back / 24);
 
-		$last_uptime = bo_get_conf('uptime_raw'); //RAW-update time!!!!
+		$last_uptime = BoData::get('uptime_raw'); //RAW-update time!!!!
 		$time_max = time();
 		$time_max = floor($time_max / 60 / $group_minutes) * 60 * $group_minutes; //round
 
@@ -1259,7 +1259,7 @@ function bo_graph_statistics()
 		$station_id = 0;
 
 		$channels = BO_ANTENNAS;
-		$last_uptime = bo_get_conf('uptime_raw'); //RAW-update time!!!!
+		$last_uptime = BoData::get('uptime_raw'); //RAW-update time!!!!
 		$time_max = time();
 		$participated = intval($_GET['participated']);
 
@@ -1415,7 +1415,7 @@ function bo_graph_statistics()
 		$participated = intval($_GET['participated']);
 
 		$channels = BO_ANTENNAS;
-		$last_uptime = bo_get_conf('uptime_raw');
+		$last_uptime = BoData::get('uptime_raw');
 		$time_max = time();
 
 		if ($hours_back > 24)
@@ -2225,7 +2225,7 @@ function bo_graph_statistics()
 			$plot->SetLegend(_BL('graph_legend_stations_active_signals'));
 			$graph->Add($plot);
 
-			$max_stations = bo_get_conf('longtime_count_max_active_stations');
+			$max_stations = BoData::get('longtime_count_max_active_stations');
 			if ($max_stations)
 			{
 				$sline  = new PlotLine(HORIZONTAL, $max_stations, BO_GRAPH_STAT_STA_COLOR_L2, 1);
@@ -2245,7 +2245,7 @@ function bo_graph_statistics()
 			}
 			else
 			{
-				$max_stations = bo_get_conf('longtime_count_max_active_stations_sig');
+				$max_stations = BoData::get('longtime_count_max_active_stations_sig');
 				if ($max_stations)
 				{
 					$sline  = new PlotLine(HORIZONTAL, $max_stations, BO_GRAPH_STAT_STA_COLOR_L4, 1);
@@ -2997,8 +2997,8 @@ function bo_windrose($D1, $D2 = array(), $size = 500, $einheit = null, $legend =
 	}
 
 	//Antennas
-	$ant1 = bo_get_conf('antenna1_bearing');
-	$ant2 = bo_get_conf('antenna2_bearing');
+	$ant1 = BoData::get('antenna1_bearing');
+	$ant2 = BoData::get('antenna2_bearing');
 	imagesetthickness($I,BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_ANTENNA_WIDTH);
 
 	if ($antennas && $ant1 !== '' && $ant1 !== null)

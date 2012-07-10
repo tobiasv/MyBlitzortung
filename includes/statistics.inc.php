@@ -13,7 +13,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	
 
 	/*** Strikes NOW ***/
-	$last_update = bo_get_conf('uptime_strikes');
+	$last_update = BoData::get('uptime_strikes');
 	$last_update_minutes = round((time()-$last_update)/60,1);
 	$group_minutes = BO_GRAPH_STAT_STRIKES_NOW_GROUP_MINUTES;
 
@@ -37,8 +37,8 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	}
 	else
 	{
-		$last_strikes_region = unserialize(bo_get_conf('last_strikes_region'));
-		$rate_strikes_region = unserialize(bo_get_conf('rate_strikes_region'));
+		$last_strikes_region = unserialize(BoData::get('last_strikes_region'));
+		$rate_strikes_region = unserialize(BoData::get('rate_strikes_region'));
 		$strike_rate = $rate_strikes_region[$region];
 		$last_strike = $last_strikes_region[$region];
 	}
@@ -46,7 +46,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	if (!$region && intval(BO_TRACKS_SCANTIME))
 	{
 		$num_cells = -1;
-		$cells_data = unserialize(gzinflate(bo_get_conf('strike_cells')));
+		$cells_data = unserialize(gzinflate(BoData::get('strike_cells')));
 		if (is_array($cells_data['cells']))
 		{
 			$num_cells = count($cells_data['cells'][BO_TRACKS_DIVISOR-1]);
@@ -254,9 +254,9 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 	if ($own_station || (defined('BO_STATISTICS_ALL_STATIONS') && BO_STATISTICS_ALL_STATIONS))
 	{
-		$act_time = bo_get_conf('station_last_active'.$add);
-		$inact_time = bo_get_conf('station_last_inactive'.$add);
-		$nogps_last_time = bo_get_conf('station_last_nogps'.$add);
+		$act_time = BoData::get('station_last_active'.$add);
+		$inact_time = BoData::get('station_last_inactive'.$add);
+		$nogps_last_time = BoData::get('station_last_nogps'.$add);
 	}
 
 	//Get the last non-zero signals or strikes for the station
@@ -274,7 +274,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 
 
-	$tmp = @unserialize(bo_get_conf('last_strikes_stations'));
+	$tmp = @unserialize(BoData::get('last_strikes_stations'));
 	$last_strike = $tmp[$station_id][0];
 	$last_signal = strtotime($stInfo['last_time'].' UTC');
 	$active = $stInfo['status'] == 'A' || $stInfo['status'] == 'V';
@@ -419,9 +419,9 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		$mean_lat = 0;
 		$show_map = false;
 
-		$data = unserialize(bo_get_conf('station_data24h'.$add));
+		$data = unserialize(BoData::get('station_data24h'.$add));
 		$add = $own_station ? '' : '#'.$station_id.'#';
-		$data = unserialize(bo_get_conf('station_data24h'.$add));
+		$data = unserialize(BoData::get('station_data24h'.$add));
 		if (isset($data) && is_array($data))
 		{
 			$tmp = array();
@@ -719,8 +719,8 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 {
 	$sort 					= $_GET['bo_sort'];
 	$range                  = abs(intval($_GET['bo_hours']));
-	$mybo_first_update		= bo_get_conf('first_update_time');
-	$stations_nogps         = bo_get_conf('active_stations_nogps');
+	$mybo_first_update		= BoData::get('first_update_time');
+	$stations_nogps         = BoData::get('active_stations_nogps');
 	$whole_sig_count 		= 0;
 	$whole_sig_ratio 		= 0;
 	$whole_sig_ratio_cnt 	= 0;
@@ -1062,7 +1062,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			break;
 	}
 
-	$urls = unserialize(bo_get_conf('mybo_stations'));
+	$urls = unserialize(BoData::get('mybo_stations'));
 
 	$pos = 1;
 	foreach($S as $id => $d)
@@ -1161,7 +1161,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	
 	if (intval(BO_STATISTICS_SHOW_NEW_STATIONS))
 	{
-		$data = unserialize(bo_get_conf('stations_new_date'));
+		$data = unserialize(BoData::get('stations_new_date'));
 		$new_stations = array();
 
 		foreach($data as $user => $time)
@@ -1313,49 +1313,49 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 		$add .= '#'.$station_id.'#';
 
 		//not exact signal count for other stations
-		$signals 			= bo_get_conf('count_raw_signals2'.$add);
+		$signals 			= BoData::get('count_raw_signals2'.$add);
 	}
 	else
 	{
 		//whole signal count
-		$signals 			= bo_get_conf('count_raw_signals');
+		$signals 			= BoData::get('count_raw_signals');
 
 		//Daily longtime: Own
-		$max_str_day_own	= unserialize(bo_get_conf('longtime_max_strikes_day_own'));
-		$max_str_dayrad_own	= unserialize(bo_get_conf('longtime_max_strikes_day_own_rad'));
+		$max_str_day_own	= unserialize(BoData::get('longtime_max_strikes_day_own'));
+		$max_str_dayrad_own	= unserialize(BoData::get('longtime_max_strikes_day_own_rad'));
 
 		//Daily longtime: All
-		$max_str_day_all	= unserialize(bo_get_conf('longtime_max_strikes_day_all'));
-		$max_str_dayrad_all	= unserialize(bo_get_conf('longtime_max_strikes_day_all_rad'));
+		$max_str_day_all	= unserialize(BoData::get('longtime_max_strikes_day_all'));
+		$max_str_dayrad_all	= unserialize(BoData::get('longtime_max_strikes_day_all_rad'));
 	}
 
 	//Own
-	$str_own	 		  = bo_get_conf('count_strikes_own'.$add);
-	$active_days 		  = bo_get_conf('longtime_station_active_time'.$add) / 3600 / 24;
-	$inactive_days 		  = bo_get_conf('longtime_station_inactive_time'.$add) / 3600 / 24;
-	$min_dist_own 		  = bo_get_conf('longtime_min_dist_own'.$add) / 1000;
-	$max_dist_own 		  = bo_get_conf('longtime_max_dist_own'.$add) / 1000;
-	$max_str_own 		  = (double)bo_get_conf('longtime_max_strikesh_own'.$add);
-	$max_sig_own 		  = (double)bo_get_conf('longtime_max_signalsh_own'.$add);
-	$first_update_station = bo_get_conf('longtime_station_first_time'.$add);
-	$nogps_whole_time     = bo_get_conf('longtime_station_nogps_time'.$add);
+	$str_own	 		  = BoData::get('count_strikes_own'.$add);
+	$active_days 		  = BoData::get('longtime_station_active_time'.$add) / 3600 / 24;
+	$inactive_days 		  = BoData::get('longtime_station_inactive_time'.$add) / 3600 / 24;
+	$min_dist_own 		  = BoData::get('longtime_min_dist_own'.$add) / 1000;
+	$max_dist_own 		  = BoData::get('longtime_max_dist_own'.$add) / 1000;
+	$max_str_own 		  = (double)BoData::get('longtime_max_strikesh_own'.$add);
+	$max_sig_own 		  = (double)BoData::get('longtime_max_signalsh_own'.$add);
+	$first_update_station = BoData::get('longtime_station_first_time'.$add);
+	$nogps_whole_time     = BoData::get('longtime_station_nogps_time'.$add);
 
 
 	//Global
-	$strikes	  		= bo_get_conf('count_strikes'.$add);
-	$min_dist_all 		= bo_get_conf('longtime_min_dist_all'.$add) / 1000;
-	$max_dist_all 		= bo_get_conf('longtime_max_dist_all'.$add) / 1000;
-	$max_str_all 		= (double)bo_get_conf('longtime_max_strikesh');
-	$max_sig_all 		= (double)bo_get_conf('longtime_max_signalsh');
-	$max_active 		= (double)bo_get_conf('longtime_count_max_active_stations');
-	$max_active_sig		= (double)bo_get_conf('longtime_count_max_active_stations_sig');
-	$max_available		= (double)bo_get_conf('longtime_count_max_avail_stations');
-	$max_part			= (double)bo_get_conf('longtime_max_participants');
+	$strikes	  		= BoData::get('count_strikes'.$add);
+	$min_dist_all 		= BoData::get('longtime_min_dist_all'.$add) / 1000;
+	$max_dist_all 		= BoData::get('longtime_max_dist_all'.$add) / 1000;
+	$max_str_all 		= (double)BoData::get('longtime_max_strikesh');
+	$max_sig_all 		= (double)BoData::get('longtime_max_signalsh');
+	$max_active 		= (double)BoData::get('longtime_count_max_active_stations');
+	$max_active_sig		= (double)BoData::get('longtime_count_max_active_stations_sig');
+	$max_available		= (double)BoData::get('longtime_count_max_avail_stations');
+	$max_part			= (double)BoData::get('longtime_max_participants');
 
 	//MyBO
-	$first_update		= bo_get_conf('first_update_time');
-	$download_count     = bo_get_conf('upcount_strikes');
-	$download_stat      = unserialize(bo_get_conf('download_statistics'));
+	$first_update		= BoData::get('first_update_time');
+	$download_count     = BoData::get('upcount_strikes');
+	$download_stat      = unserialize(BoData::get('download_statistics'));
 
 	$kb_per_day = array();
 	$kb_today = 0;
@@ -1530,15 +1530,15 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 		}
 	}
 
-	$last_str = bo_get_conf('uptime_strikes');
-	$last_net = bo_get_conf('uptime_stations');
-	$last_sig = bo_get_conf('uptime_raw');
+	$last_str = BoData::get('uptime_strikes');
+	$last_net = BoData::get('uptime_stations');
+	$last_sig = BoData::get('uptime_raw');
 
 	$mem_all = (array_sum($D['data']) + array_sum($D['keys'])) / 1024 / 1024;
 	$mem_keys = array_sum($D['keys']) / (array_sum($D['data']) + array_sum($D['keys'])) * 100;
 	$entries_all = array_sum($D['rows']);
 
-	$download_stat      = unserialize(bo_get_conf('download_statistics'));
+	$download_stat      = unserialize(BoData::get('download_statistics'));
 	$kb_today = 0;
 	foreach($download_stat as $type => $d)
 		$kb_today += $d['traffic_today']  / 1024;
@@ -1639,10 +1639,10 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 	}
 
 	$channels = BO_ANTENNAS;
-	$bpv      = bo_get_conf('raw_bitspervalue');
-	$values   = bo_get_conf('raw_values');
-	$utime    = bo_get_conf('raw_ntime') / 1000;
-	$last_update = bo_get_conf('uptime_raw');
+	$bpv      = BoData::get('raw_bitspervalue');
+	$values   = BoData::get('raw_values');
+	$utime    = BoData::get('raw_ntime') / 1000;
+	$last_update = BoData::get('uptime_raw');
 
 
 	echo '<div id="bo_stat_advanced">';
@@ -2065,8 +2065,8 @@ function bo_get_antenna_data()
 {
 	if (BO_ANTENNAS == 2)
 	{
-		$ant1 = bo_get_conf('antenna1_bearing');
-		$ant2 = bo_get_conf('antenna2_bearing');
+		$ant1 = BoData::get('antenna1_bearing');
+		$ant2 = BoData::get('antenna2_bearing');
 
 		if ($ant1 !== '' && $ant1 !== null && $ant2 !== '' && $ant2 !== null)
 		{

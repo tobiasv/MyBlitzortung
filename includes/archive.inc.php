@@ -853,9 +853,9 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	$station_id = $perm && $_GET['bo_station_id'] ? intval($_GET['bo_station_id']) : bo_station_id();
 	$own_station   = bo_station_id() > 0 && bo_station_id() == $station_id;
 	
-	$channels   = bo_get_conf('raw_channels');
-	$raw_bpv    = bo_get_conf('raw_bitspervalue');
-	$raw_values = bo_get_conf('raw_values');
+	$channels   = BoData::get('raw_channels');
+	$raw_bpv    = BoData::get('raw_bitspervalue');
+	$raw_values = BoData::get('raw_values');
 	$station_info = bo_station_info($station_id);
 	
 	if ($page < 0)
@@ -1037,7 +1037,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	else //display signals
 	{
 		//time of last strike update
-		$last_modified_strikes = bo_get_conf('uptime_strikes_modified');
+		$last_modified_strikes = BoData::get('uptime_strikes_modified');
 		$last_modified_strikes -= BO_MIN_MINUTES_STRIKE_CONFIRMED * 60 - 60;
 
 		//time of last signal

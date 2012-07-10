@@ -41,11 +41,11 @@ function bo_check_for_update()
 		}
 		else
 		{
-			$cur_version = bo_get_conf('version');
+			$cur_version = BoData::get('version');
 			
 			if (!$cur_version) //if no or wrong version is saved
 			{
-				bo_set_conf('version', BO_VER);
+				BoData::set('version', BO_VER);
 				$cur_version = BO_VER;
 			}
 				
@@ -87,8 +87,8 @@ function bo_check_for_update()
 		if ($cur_version_num >= $number)
 			continue;
 
-		bo_set_conf('is_updating', time());
-		register_shutdown_function('bo_set_conf', 'is_updating', 0);
+		BoData::set('is_updating', time());
+		register_shutdown_function('BoData::set', 'is_updating', 0);
 
 		$db_update = true;
 
@@ -437,8 +437,8 @@ function bo_check_for_update()
 				BoDb::query($sql, false);
 				$ok = true;
 				
-				$channels = bo_get_conf('raw_channels');
-				$ntime    = bo_get_conf('raw_ntime');
+				$channels = BoData::get('raw_channels');
+				$ntime    = BoData::get('raw_ntime');
 				$sql = "UPDATE `".BO_DB_PREF."raw` SET channels='$channels', ntime='$ntime' WHERE channels=0 AND ntime=0";
 				echo '<li><em>'.$sql.'</em>: <b>';
 				flush();
@@ -473,7 +473,7 @@ function bo_check_for_update()
 
 		if ($ok)
 		{
-			bo_set_conf('version', $new_version);
+			BoData::set('version', $new_version);
 			$cur_version = $new_version;
 			$cur_version_num = $number;
 			$updated = true;
@@ -499,31 +499,8 @@ function bo_check_for_update()
 
 	if ($cur_version != $bo_version && (!$db_update || $updated) || $_GET['bo_update_from'])
 	{
-		bo_set_conf('version', $bo_version);
+		BoData::set('version', $bo_version);
 		echo '<h4>'._BL('Update-Info: Setting version number to').' '.$bo_version.'</h4>';
-	}
-
-	if (isset($_GET['bo_update_signals']))
-	{
-		session_write_close();
-		$limit = intval($_GET['bo_update_signals']);
-		if (!$limit)
-			$limit = 5000;
-
-		echo '<p>Updating '.$limit.' signals!</p>';
-		flush();
-
-		$res = BoDb::query("SELECT id, data FROM ".BO_DB_PREF."raw WHERE amp1=0 AND freq1=0 ORDER BY id DESC LIMIT $limit");
-		$i = 0;
-		while ($row = $res->fetch_assoc())
-		{
-			$sql = bo_examine_signal($row['data']);
-			BoDb::query("UPDATE ".BO_DB_PREF."raw SET $sql WHERE id='".$row['id']."'");
-			$i++;
-			$last_id = $row['id'];
-		}
-
-		echo '<p>Examined '.$i.' signals. Last ID was '.$last_id.'. <a href="'.bo_insert_url(array('bo_action','bo_update_from','bo_update_signals'), 'do_update').'&bo_update_signals='.$limit.'">'._BL('Update more...').'</a></p>';
 	}
 
 	echo '</div>';

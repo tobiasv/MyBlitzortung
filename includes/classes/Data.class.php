@@ -7,12 +7,12 @@ class BoData
 	static $bulk_save = false;
 	static $query = false;
 	static $search_string = "";
-
+	static $do_cache = false;
+	
 	public static function cache_load($name)
 	{
-	
-	
-	
+		//todo
+		self::$cache['data'][$name] = $row->data;
 	}
 	
 	public static function get($name, &$changed=0)
@@ -21,7 +21,9 @@ class BoData
 		$row = BoDb::query($sql)->fetch_object();
 		$changed = $row->changed;
 		$row->data = $row->data;
-		self::$cache['data'][$name] = $row->data;
+		
+		if (self::$do_cache)
+			self::$cache['data'][$name] = $row->data;
 		
 		return $row->data;
 	}
@@ -46,8 +48,9 @@ class BoData
 			$query = false;
 			return false;
 		}
-
-		self::$cache['data'][$row['name']] = $row['data'];
+		
+		if (self::$do_cache)
+			self::$cache['data'][$row['name']] = $row['data'];
 		
 		return array('name' => $row['name'], 
 			'data' => $row['data'], 
@@ -76,30 +79,67 @@ class BoData
 			$update = $row->name;
 		}
 		
-		self::$cache['data'][$name] = $data;
-		
 		//insert data
 		$data_esc = BoDb::esc($data);
 		
 		if (!$update)
+		{
 			$sql = "INSERT INTO ".BO_DB_PREF."conf SET data='$data_esc', name='$name_esc'";
+		}
 		elseif ($update && $row->data != $data)
-			$sql = "UPDATE ".BO_DB_PREF."conf SET data='$data_esc' WHERE name='$name_esc'";
+		{
+			$low_prio = BO_DB_UPDATE_LOW_PRIORITY ? "LOW_PRIORITY" : "";
+			$sql = "UPDATE $low_prio ".BO_DB_PREF."conf SET data='$data_esc' WHERE name='$name_esc'";
+		}
 		else
 			$sql = NULL; // no update necessary
 
-		return $sql ? BoDb::query($sql) : true;
+		$ok = BoDb::query($sql);
+		
+		if ($ok && self::$do_cache)
+			self::$cache['data'][$name] = $data;
+			
+		return $sql ? $ok : true;
 	}
 
 	public static function update_add($name, $add)
 	{
-	
 		//unset cache, as we cannot be sure about the value after update
 		unset(self::$cache['data'][$name]);
 	
-	
+		$name_esc = BoDb::esc($name);
+		$low_prio = BO_DB_UPDATE_LOW_PRIORITY ? "LOW_PRIORITY" : "";
+		$sql = "UPDATE $low_prio ".BO_DB_PREF."conf SET data=data+$add WHERE name='$name_esc'";
+		$ok = BoDb::query($sql, false);
+		
+		if ($ok === false) //!
+		{
+			//update failed, try insert
+			$ok = self::set($name, $add);
+		}
+		
+		return $ok;
 	}
 
+	public static function update_if($name, $value, $if)
+	{
+		//unset cache, as we cannot be sure about the value after update
+		unset(self::$cache['data'][$name]);
+	
+		$name_esc = BoDb::esc($name);
+		$low_prio = BO_DB_UPDATE_LOW_PRIORITY ? "LOW_PRIORITY" : "";
+		$sql = "UPDATE $low_prio ".BO_DB_PREF."conf SET data='$value' WHERE name='$name_esc' AND data $if";
+		$ok = BoDb::query($sql, false);
+		
+		if ($ok === false) //!
+		{
+			//update failed, try insert
+			$ok = self::set($name, $value);
+		}
+		
+		return $ok;
+	}
+	
 	public static function delete($name)
 	{
 		$sql = "DELETE FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";

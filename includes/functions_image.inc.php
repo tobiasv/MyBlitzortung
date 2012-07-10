@@ -427,47 +427,5 @@ function bo_drawpoint($I, $x, $y, &$style, $color = null, $use_alpha = true, $st
 
 
 
-function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quality = BO_IMAGE_JPEG_QUALITY)
-{
-	$extension = strtr($extension, array('.' => ''));
-	
-	//there seems to be an error in very rare cases
-	//we retry to save the image if it didn't work
-	$i=0;
-		
-	do
-	{
-		if ($i)
-			usleep(100000);
-
-		if ($extension == 'png')
-			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
-		else if ($extension == 'gif')
-			$ret = imagegif($I, $file);
-		else if ($extension == 'jpeg')
-			$ret = imagejpeg($I, $file, $quality);
-		else if (imageistruecolor($I) === false)
-			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
-		else
-			$ret = imagejpeg($I, $file, $quality);
-	}
-	while ($i++ < 3 && !$ret && imagesx($I));
-
-	
-	if ($file)
-	{
-		if (filesize($file) == 0)
-		{
-			unlink($file);
-		}
-		else if ($mtime !== null)
-		{
-			touch($file, $mtime);
-		}
-	}
-	
-	return $ret;
-}
-
 
 ?>

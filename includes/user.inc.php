@@ -83,7 +83,7 @@ function bo_user_show_admin()
 			echo '<ul>';
 
 /*
-			$bo_login_id = bo_get_conf('bo_login_id');
+			$bo_login_id = BoData::get('bo_login_id');
 			if ($bo_login_id)
 				echo '<li><a href="http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$bo_login_id.'" target="_blank">Blitzortung.org</a> (with your Login-String)</li>';
 */
@@ -528,23 +528,23 @@ function bo_user_show_useradmin()
 
 function bo_show_calibrate_antennas()
 {
-	$channels = bo_get_conf('raw_channels');
+	$channels = BoData::get('raw_channels');
 
 	if (!$_POST['bo_calibrate'])
 	{
 		if ($_POST['bo_calibrate_manual'] && (bo_user_get_level() & BO_PERM_ADMIN))
 		{
 			if (strlen(trim($_POST['bo_antenna1_bearing'])))
-				bo_set_conf('antenna1_bearing', (double)$_POST['bo_antenna1_bearing']);
+				BoData::set('antenna1_bearing', (double)$_POST['bo_antenna1_bearing']);
 
 			if (strlen(trim($_POST['bo_antenna2_bearing'])))
-				bo_set_conf('antenna2_bearing', (double)$_POST['bo_antenna2_bearing']);
+				BoData::set('antenna2_bearing', (double)$_POST['bo_antenna2_bearing']);
 
 			if (strlen(trim($_POST['bo_antenna1_bearing_elec'])))
-				bo_set_conf('antenna1_bearing_elec', (double)$_POST['bo_antenna1_bearing_elec']);
+				BoData::set('antenna1_bearing_elec', (double)$_POST['bo_antenna1_bearing_elec']);
 
 			if (strlen(trim($_POST['bo_antenna2_bearing_elec'])))
-				bo_set_conf('antenna2_bearing_elec', (double)$_POST['bo_antenna2_bearing_elec']);
+				BoData::set('antenna2_bearing_elec', (double)$_POST['bo_antenna2_bearing_elec']);
 		}
 
 		echo '<h3>'._BL('Manual antenna calibration').'</h3>';
@@ -555,14 +555,14 @@ function bo_show_calibrate_antennas()
 		echo '<legend>'._BL('admin_calibrate_manual_legend').'</legend>';
 
 		echo '<span class="bo_form_descr">'._BL('Antenna 1 bearing').' (0-180&deg;):</span>';
-		echo '<input type="text" name="bo_antenna1_bearing" value="'.(double)bo_get_conf('antenna1_bearing').'" id="bo_antenna1_bearing_id" class="bo_form_text bo_form_input">';
+		echo '<input type="text" name="bo_antenna1_bearing" value="'.(double)BoData::get('antenna1_bearing').'" id="bo_antenna1_bearing_id" class="bo_form_text bo_form_input">';
 		echo '<span class="bo_form_descr">'._BL('Antenna 2 bearing').' (0-180&deg;):</span>';
-		echo '<input type="text" name="bo_antenna2_bearing" value="'.(double)bo_get_conf('antenna2_bearing').'" id="bo_antenna2_bearing_id" class="bo_form_text bo_form_input">';
+		echo '<input type="text" name="bo_antenna2_bearing" value="'.(double)BoData::get('antenna2_bearing').'" id="bo_antenna2_bearing_id" class="bo_form_text bo_form_input">';
 
 		echo '<span class="bo_form_descr">'._BL('Antenna 1 electrical bearing').' (0-360&deg;):</span>';
-		echo '<input type="text" name="bo_antenna1_bearing_elec" value="'.(double)bo_get_conf('antenna1_bearing_elec').'" id="bo_antenna1_elec_bearing_id" class="bo_form_text bo_form_input">';
+		echo '<input type="text" name="bo_antenna1_bearing_elec" value="'.(double)BoData::get('antenna1_bearing_elec').'" id="bo_antenna1_elec_bearing_id" class="bo_form_text bo_form_input">';
 		echo '<span class="bo_form_descr">'._BL('Antenna 2 electrical bearing').' (0-360&deg;):</span>';
-		echo '<input type="text" name="bo_antenna2_bearing_elec" value="'.(double)bo_get_conf('antenna2_bearing_elec').'" id="bo_antenna2_elec_bearing_id" class="bo_form_text bo_form_input">';
+		echo '<input type="text" name="bo_antenna2_bearing_elec" value="'.(double)BoData::get('antenna2_bearing_elec').'" id="bo_antenna2_elec_bearing_id" class="bo_form_text bo_form_input">';
 
 
 		echo '<input type="submit" name="bo_calibrate_manual" value="'._BL('Ok').'" id="bo_admin_submit" class="bo_form_submit">';
@@ -891,14 +891,14 @@ function bo_my_station_update_form()
 		echo '</pre>';
 
 		if ($ret && $url)
-			bo_set_conf('mybo_stations_autoupdate', $_POST['bo_auto'] ? 1 : 0);
+			BoData::set('mybo_stations_autoupdate', $_POST['bo_auto'] ? 1 : 0);
 		else
-			bo_set_conf('mybo_stations_autoupdate', 0);
+			BoData::set('mybo_stations_autoupdate', 0);
 	}
 	else
 	{
 
-		$st_urls = unserialize(bo_get_conf('mybo_stations'));
+		$st_urls = unserialize(BoData::get('mybo_stations'));
 
 		if (is_array($st_urls) && $st_urls[bo_station_id()])
 			$url = $st_urls[bo_station_id()];
@@ -914,7 +914,7 @@ function bo_my_station_update_form()
 		echo '<input type="text" name="bo_url" id="bo_mylink_url" value="'._BC($url).'" class="bo_form_text" style="width:100%">';
 		echo '<div class="bo_input_container">';
 		echo '<span class="bo_form_descr">'.' '._BL('Do an auto update every 24h to retrieve new stations').':</span>';
-		echo '<input type="checkbox" value="1" name="bo_auto" '.(bo_get_conf('mybo_stations_autoupdate') == 1 ? ' checked ' : '').'>';
+		echo '<input type="checkbox" value="1" name="bo_auto" '.(BoData::get('mybo_stations_autoupdate') == 1 ? ' checked ' : '').'>';
 		echo '</div>';
 		echo '<input type="submit" name="ok" value="'._BL('Agree and Send').'" id="bo_login_submit" class="bo_form_submit" onclick="return confirm(\''._BL('Really continue?').'\');">';
 		echo '</fieldset>';
@@ -982,7 +982,7 @@ function bo_set_conf_user($name, $data, $id=0)
 	$id = $id > 0 ? $id : bo_user_get_id();
 
 	if ($id > 0)
-		return bo_set_conf('user_'.$name.'_'.$id, $data);
+		return BoData::set('user_'.$name.'_'.$id, $data);
 	else
 		return false;
 }
@@ -993,7 +993,7 @@ function bo_get_conf_user($name, $id=0)
 	$id = $id > 0 ? $id : bo_user_get_id();
 
 	if ($id > 0)
-		return bo_get_conf('user_'.$name.'_'.$id);
+		return BoData::get('user_'.$name.'_'.$id);
 	else
 		return false;
 }
