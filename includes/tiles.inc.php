@@ -134,8 +134,9 @@ function bo_tile()
 	$last_update = floor(time() / 60 / $update_interval) * 60 * $update_interval;
 	bo_tile_headers($update_interval, $last_update, $caching);
 
-	//Caching
-	if ($caching)
+	
+	//Caching, but nor for info image
+	if ($caching && !$only_info)
 	{
 		$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
 		$filename = $type.'_'.$zoom.'_'.($station_id ? $station_id.'_' : '').$x.'x'.$y.'-'.(bo_user_get_level() ? 1 : 0).'.png';
@@ -147,10 +148,6 @@ function bo_tile()
 
 		bo_output_cachefile_if_exists($file, $last_update, $update_interval * 60);
 	}
-	
-	
-	
-	
 	
 	
 	/***********************************************************/

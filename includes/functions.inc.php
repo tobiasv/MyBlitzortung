@@ -2109,10 +2109,12 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 		if (!file_exists($cache_file))
 		{
 			header("X-MyBlitzortung: no-cache-file", false);
+			header("Pragma: no-cache");
+			header("Cache-Control: no-cache");
 			bo_cache_log("Out - no-cache-file");
 			return false;
 		}
-		bo_cache_log("Out - $cache_file");
+		
 		//don't output anything the next time the function get called
 		$output_disabled = true;
 		
@@ -2208,7 +2210,6 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 			clearstatcache();
 		}
 	}
-	
 	
 	//Cache-File is ok
 	if (file_exists($cache_file) && filesize($cache_file) > 0)
@@ -2373,49 +2374,6 @@ function bo_str_max($str, $max = 35)
 		return substr($str,0,$max-20).($max > 30 ? '...'.substr($str,-8) : '');
 	else
 		return $str;
-}
-
-
-function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quality = BO_IMAGE_JPEG_QUALITY)
-{
-	$extension = strtr($extension, array('.' => ''));
-	
-	//there seems to be an error in very rare cases
-	//we retry to save the image if it didn't work
-	$i=0;
-		
-	do
-	{
-		if ($i)
-			usleep(100000);
-
-		if ($extension == 'png')
-			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
-		else if ($extension == 'gif')
-			$ret = imagegif($I, $file);
-		else if ($extension == 'jpeg')
-			$ret = imagejpeg($I, $file, $quality);
-		else if (imageistruecolor($I) === false)
-			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
-		else
-			$ret = imagejpeg($I, $file, $quality);
-	}
-	while ($i++ < 4 && !$ret && imagesx($I));
-
-	
-	if ($file)
-	{
-		if (filesize($file) == 0)
-		{
-			unlink($file);
-		}
-		else if ($mtime !== null)
-		{
-			touch($file, $mtime);
-		}
-	}
-	
-	return $ret;
 }
 
 

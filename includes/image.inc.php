@@ -647,13 +647,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 
 	
-	//Init the Projection method
-	require_once 'classes/MapProjection.class.php';
-	$Projection = new BoMapProjection($cfg['proj'], $w, $h, $cfg['coord']);
-
-	//bounds for sql-Query
-	list($latN, $lonE, $latS, $lonW) = $Projection->GetBounds();
-	
 	//main strike colors
 	$color_tmp = array();
 	if (isset($cfg['col']) && is_array($cfg['col']))
@@ -703,12 +696,18 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	
 	
-	
-	
+
 	/***********************************************************/
 	/*** Get the data and draw *********************************/
 	/***********************************************************/
 
+
+	//Init the Projection method
+	require_once 'classes/MapProjection.class.php';
+	$Projection = new BoMapProjection($cfg['proj'], $w, $h, $cfg['coord']);
+
+	//bounds for sql-Query
+	list($latN, $lonE, $latS, $lonW) = $Projection->GetBounds();
 	
 	
 	//time calculations
@@ -991,7 +990,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				@mkdir($dir, 0777, true);
 		}
 
-		$ok = bo_imageout($I, $extension, $cache_file, $last_update);
+		$ok = bo_imageout($I, $extension, $cache_file);
 
 		if (!$ok)
 			bo_image_cache_error($w, $h);

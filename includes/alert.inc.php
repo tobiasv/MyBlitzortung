@@ -25,12 +25,7 @@ function bo_alert_settings()
 	
 	$Alerts = array();
 	
-	$sql = "SELECT name, data, changed
-			FROM ".BO_DB_PREF."conf
-			WHERE name LIKE '$like'
-			";
-	$res = BoDb::query($sql);
-	while ($row = $res->fetch_assoc())
+	while ($row = BoData::get_all($like))
 	{
 		$data = unserialize($row['data']);
 		
@@ -40,7 +35,6 @@ function bo_alert_settings()
 			$alert_cnt = $r[2];
 			$Alerts[$user_id][$alert_cnt] = $data;
 		}
-		
 	
 	}
 	
@@ -242,10 +236,7 @@ function bo_alert_settings_form()
 			}
 			else
 			{
-				$sql = "SELECT name FROM ".BO_DB_PREF."conf WHERE name LIKE 'alert\_".$user_id."\_%' ORDER BY name DESC LIMIT 1";
-				$res = BoDb::query($sql);
-				$row = $res->fetch_assoc();
-
+				$row = BoData::get_all('alert\_".$user_id."\_%', 1);
 				preg_match('/alert_([0-9]+)_([0-9]+)/', $row['name'], $r);
 				$alert_id = intval($r[2]) + 1;
 
@@ -462,11 +453,7 @@ function bo_alert_send()
 	if (time() - $max_time < 30 * 60)
 	{
 		//Warning! May cause very high Database load!
-		$sql = "SELECT name, data, changed
-				FROM ".BO_DB_PREF."conf
-				WHERE name LIKE 'alert\_%'";
-		$res = BoDb::query($sql);
-		while ($row = $res->fetch_assoc())
+		while ($row = BoData::get_all('alert\_%'))
 		{
 			$d = unserialize($row['data']);
 			

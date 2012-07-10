@@ -1,5 +1,6 @@
 <?php
 
+require_once 'classes/Data.class.php';
 
 /* For compatibility. */
 function bo_db($query = '', $die = true)
@@ -7,40 +8,19 @@ function bo_db($query = '', $die = true)
 	return BoDb::query($query, $die);
 }
 
-
 // Load config from database
 function bo_get_conf($name, &$changed=0)
 {
-	$row = BoDb::query("SELECT data, UNIX_TIMESTAMP(changed) changed FROM ".BO_DB_PREF."conf WHERE name='".BoDb::esc($name)."'")->fetch_object();
-	$changed = $row->changed;
-
-	return $row->data;
+	return BoData::get($name, $changed);
 }
 
 // Save config in database
 function bo_set_conf($name, $data)
 {
 	if ($data === null)
-	{
-		$sql = "DELETE FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
-		return BoDb::query($sql);
-	}
-
-	$data = utf8_encode($data);
-	$name_esc = BoDb::esc($name);
-	$data_esc = BoDb::esc($data);
-
-	$sql = "SELECT data, name FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
-	$row = BoDb::query($sql)->fetch_object();
-
-	if (!$row->name)
-		$sql = "INSERT ".BO_DB_PREF."conf SET data='$data_esc', name='$name_esc'";
-	elseif ($row->data != $data)
-		$sql = "UPDATE ".BO_DB_PREF."conf SET data='$data_esc' WHERE name='$name_esc'";
+		return BoData::delete($data);
 	else
-		$sql = NULL; // no update necessary
-
-	return $sql ? BoDb::query($sql) : true;
+		return BoData::set($name, $data);
 }
 
 

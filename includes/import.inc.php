@@ -2273,11 +2273,7 @@ function bo_update_daily_stat()
 		$data = array();
 		$data['daycount'] = 0;
 
-		$sql = "SELECT data
-				FROM ".BO_DB_PREF."conf
-				WHERE name LIKE 'strikes_".$month_id."%'";
-		$res = BoDb::query($sql);
-		while($row = $res->fetch_assoc())
+		while($row = BoData::get_all('strikes_".$month_id."%'))
 		{
 			$d = unserialize($row['data']);
 
@@ -3092,7 +3088,7 @@ function bo_delete_station($id = 0)
 
 		
 		//delete data from "new_id" -> otherwise update would not work it sth did wrong before
-		BoDb::query("DELETE FROM ".BO_DB_PREF."conf             WHERE name LIKE '%#".$new_id."#%'");
+		BoData::delete_all("%#".$new_id."#%");
 		BoDb::query("DELETE FROM ".BO_DB_PREF."stations_stat    WHERE station_id='$new_id'");
 		BoDb::query("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE station_id='$new_id'");
 		BoDb::query("DELETE FROM ".BO_DB_PREF."densities        WHERE station_id='$new_id'");

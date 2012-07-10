@@ -403,7 +403,7 @@ function bo_user_show_useradmin()
 	if ($_GET['bo_action2'] == 'delete' && $user_id > 1 && (bo_user_get_level() & BO_PERM_ADMIN) )
 	{
 		BoDb::query("DELETE FROM ".BO_DB_PREF."user WHERE id='$user_id'");
-		BoDb::query("DELETE FROM ".BO_DB_PREF."conf WHERE name LIKE 'alert_$user_id%'");
+		BoData::delete_all('alert_'.$user_id.'%');
 		$user_id = 0;
 	}
 
