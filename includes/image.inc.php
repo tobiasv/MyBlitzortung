@@ -310,7 +310,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			}
 			else
 			{
-				$last_update  = $time_max;
+				$last_update  = $time_max + $update_interval * 2;
 				$expire       = time() + BO_MAPS_ARCHIVE_EXPIRE_SEC;
 			}
 			
