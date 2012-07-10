@@ -124,6 +124,7 @@ function bo_tile()
 
 		foreach($count_types as $i)
 		{
+			$ccfg = $time_manual_from ? $cfg : $_BO['mapcfg'][$i];
 			$update_intervals[$i] = $ccfg['upd_intv'];
 		}
 		
@@ -184,12 +185,8 @@ function bo_tile()
 		foreach($count_types as $i)
 		{
 			$type += pow(2, $i);
+			$ccfg = $time_manual_from ? $cfg : $_BO['mapcfg'][$i];
 			
-			if (!$time_manual_from)
-				$ccfg = $_BO['mapcfg'][$i];
-			else
-				$ccfg = $cfg;
-
 			if (!is_array($ccfg) || !$ccfg['upd_intv'])
 				continue;
 			
