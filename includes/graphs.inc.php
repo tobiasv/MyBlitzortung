@@ -177,12 +177,11 @@ function bo_graph_statistics()
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $mod_time)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $mod_time + $update_interval)." GMT");
 
-	if (BO_CACHE_DISABLE !== true && file_exists($cache_file) && filemtime($cache_file) >= $mod_time)
+	if (BO_CACHE_DISABLE !== true)
 	{
-		header("Content-Type: image/png");
-		bo_output_cache_file($cache_file);
-		exit;
+		bo_output_cachefile_if_exists($cache_file, $mod_time, $update_interval);
 	}
+
 	
 	if ($type == 'stations' || $type == 'signals_all')
 	{
@@ -2846,13 +2845,12 @@ function bo_graph_output($I, $cache_file, $mod_time = 0)
 	}
 	else
 	{
-		$ok = imagepng($I, $cache_file);
+		$ok = bo_imageout($I, 'png', $cache_file);
 		
 		if (!$ok)
 			bo_image_cache_error(imagesx($I), imagesy($I));
 		
-		touch($cache_file, $mod_time);
-		readfile($cache_file);
+		bo_output_cache_file($cache_file, false);
 	}
 }
 
