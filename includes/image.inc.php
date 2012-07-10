@@ -1107,7 +1107,6 @@ function bo_get_map_image_ani()
 	if ($caching)
 	{
 		file_put_contents($cache_file, $gif->GetAnimation());
-		touch($cache_file, $last_update);
 		bo_output_cache_file($cache_file, false);
 	}
 	else
