@@ -534,7 +534,7 @@ function bo_show_archive_search()
 				FROM ".BO_DB_PREF."strikes s $index_sql
 				WHERE 1
 					$sql_where
-				ORDER BY s.time DESC
+				ORDER BY s.id DESC
 				LIMIT ".intval($select_count + 1);
 
 		$res = BoDb::query($sql);
@@ -1016,7 +1016,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 		
 		echo '</fieldset>';
 
-		$hours_back = $show_empty_sig ? 24 * 30 : 24;
+		$hours_back = 24;
 		$date_end_max_sec = 180;
 	}
 
@@ -1029,7 +1029,6 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 	}
 	else if ($show_empty_sig) // display strikes
 	{
-		
 		$time_end = time();
 		$time_start = $time_end - 3600 * $hours_back;
 		$sort = 'DESC';
@@ -1117,7 +1116,7 @@ function bo_show_archive_table($show_empty_sig = false, $lat = null, $lon = null
 			WHERE 1
 					$sql_where
 					".bo_region2sql($region, $station_id)."
-			ORDER BY $table.time $sort, $table.time_ns $sort
+			ORDER BY $table.id $sort
 			LIMIT ".($page * $per_page).", ".($per_page+1)."";
 	$res = BoDb::query($sql);
 

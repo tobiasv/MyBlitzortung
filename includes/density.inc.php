@@ -1459,7 +1459,10 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 	global $_BO;
 	
 	if (empty($stations))
+	{
 		$stations = bo_get_density_stations();
+		$station_infos = bo_stations();
+	}
 
 	$count = 0;
 	
@@ -1503,6 +1506,10 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 						|| (BO_CALC_DENSITIES_CURRENT == true && $station_id == bo_station_id())
 						|| (BO_CALC_DENSITIES_CURRENT_ALL == true))
 					{
+						
+						//no range, if station didn't exist in this period
+						if ($station_id > 0 && strtotime($date_end) < strtotime($station_infos['first_seen']))
+							continue;
 						
 						$sql = "INSERT IGNORE INTO ".BO_DB_PREF."densities 
 								SET date_start='$date_start', date_end='$date_end', 

@@ -185,9 +185,9 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	else
 		$update_interval = $cfg['upd_intv'][$period_id] * 60;
 	
-	//update interval cannot be bigger than strike update interval
-	if ($update_interval > BO_UP_INTVL_STRIKES * 60)
-		$update_interval = BO_UP_INTVL_STRIKES * 60;
+	//update interval cannot be smaller than half of strike update interval
+	if ($update_interval < BO_UP_INTVL_STRIKES * 60 / 2)
+		$update_interval = BO_UP_INTVL_STRIKES * 60 / 2;
 	
 	//Cache file naming
 	$cache_file = BO_DIR.BO_CACHE_DIR.'/maps/';
