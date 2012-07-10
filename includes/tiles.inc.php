@@ -23,6 +23,7 @@ function bo_tile()
 	$caching      = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$cfg          = $_BO['mapcfg'][$type];
 	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
+	$restricted   = false;
 	
 	if ($show_count)
 		$tile_size = BO_TILE_SIZE_COUNT;
@@ -47,10 +48,15 @@ function bo_tile()
 		exit;
 	}
 	
-	if ( $station_id > 0 && $station_id != bo_station_id() && (!(bo_user_get_level() & BO_PERM_NOLIMIT) || BO_MAP_STATION_SELECT !== true) )
+	if ( $station_id > 0 && $station_id != bo_station_id() && BO_MAP_STATION_SELECT !== true )
 	{
-		bo_tile_message('tile_station_not_allowed', 'station_na', $caching, array(), $tile_size);
-		exit;
+		if (!(bo_user_get_level() & BO_PERM_NOLIMIT))
+		{
+			bo_tile_message('tile_station_not_allowed', 'station_na', $caching, array(), $tile_size);
+			exit;
+		}
+		
+		$restricted = true;
 	}
 
 
@@ -61,10 +67,15 @@ function bo_tile()
 	
 	if (isset($_GET['from']) && isset($_GET['to']))
 	{
-		if (!$only_info && BO_MAP_MANUAL_TIME_ENABLE !== true && !(bo_user_get_level() & BO_PERM_NOLIMIT))
+		if (!$only_info && BO_MAP_MANUAL_TIME_ENABLE !== true)
 		{
-			bo_tile_message('tile_time_range_na_err', 'range_na', $caching, array(), $tile_size);
-			exit;
+			if (!(bo_user_get_level() & BO_PERM_NOLIMIT))
+			{
+				bo_tile_message('tile_time_range_na_err', 'range_na', $caching, array(), $tile_size);
+				exit;
+			}
+			
+			$restricted = true;
 		}
 		
 		$time_manual_from = strtotime($_GET['from']);
@@ -139,7 +150,7 @@ function bo_tile()
 	if ($caching && !$only_info)
 	{
 		$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
-		$filename = $type.'_'.$zoom.'_'.($station_id ? $station_id.'_' : '').$x.'x'.$y.'-'.(bo_user_get_level() ? 1 : 0).'.png';
+		$filename = $type.'_'.$zoom.'_'.($station_id ? $station_id.'_' : '').$x.'x'.$y.'-'.($restricted ? 1 : 0).'.png';
 		
 		if (BO_CACHE_SUBDIRS === true)
 			$filename = strtr($filename, array('_' => '/'));

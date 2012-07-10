@@ -14,6 +14,8 @@ class BoMapProjection
 	var $ImageCoor;
 	var $StrikeBounds = array();
 	
+	public $UseSql = false;
+	
 	function __construct($proj = '', $w, $h, $coord)
 	{
 		$this->ImageWidth  = $w;
@@ -48,6 +50,26 @@ class BoMapProjection
 		
 	}
 	
+	function SqlSelect($lat_name, $lon_name, $as_x = '', $as_y = '')
+	{
+		switch ($this->Method)
+		{
+			default:
+				$this->UseSql = true;
+				$lon_x = " ROUND( $lon_name / 360 * $this->ImageCalibrationX - $this->ImageOffsetX ) ";
+				$lat_y = " ROUND( -LOG(TAN( PI()/4 + RADIANS($lat_name)/2 )) / PI() / 2 * $this->ImageCalibrationY + $this->ImageOffsetY ) ";
+				$sql = " $lat_y $as_y, $lon_x $as_x ";
+				break;
+			
+			case 'plate':
+			case 'geos':
+				$sql = " $lat_name, $lon_name";
+				break;
+		}
+		
+		return $sql;
+	}
+	
 	
 	function LatLon2Image($lat, $lon)
 	{
@@ -67,6 +89,11 @@ class BoMapProjection
 	
 	function Calculate($lat, $lon)
 	{
+		if ($UseSqlSelect)
+		{
+			return array($lon, $lat);
+		}
+		
 		switch ($this->Method)
 		{
 

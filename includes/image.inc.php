@@ -727,7 +727,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		//the where clause
 		$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $latS, $latN, $lonW, $lonE);
 	
-		$sql = "SELECT time, lat, lon, status
+		$sql = "SELECT time,
+				".$Projection->SqlSelect('lat', 'lon', 'x', 'y')."
 				FROM ".BO_DB_PREF."strikes s
 				$index_sql
 				WHERE 1 AND
@@ -746,8 +747,17 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			
 			if (isset($cfg['point_style']))
 			{
-				list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon']);
 				
+				if ($Projection->UseSql)
+				{
+					$x = $row['x'];
+					$y = $row['y'];
+				}
+				else
+				{
+					list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon']);
+				}
+
 				//point out of bounds?
 				if (   $x < -$cfg['point_style'][1] + $boundsW
 					|| $y < -$cfg['point_style'][1] + $boundsN
