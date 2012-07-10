@@ -2178,12 +2178,11 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 	
 	if (file_exists($cache_file))
 	{
+		$file_expired_sec = $last_update - @filemtime($cache_file);
 		
 		$deliver_old = (BO_CACHE_CREATE_NEW_DELIVER_OLD > 0) 
 						&& ($file_expired_sec <= $update_interval * BO_CACHE_CREATE_NEW_DELIVER_OLD);
 
-		$file_expired_sec = $last_update - @filemtime($cache_file);
-		
 		//Delete files that are to new
 		if (filemtime($cache_file) - 300 > time())
 		{
@@ -2243,18 +2242,6 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 			exit;
 		}
 
-		//Since here, the cachefile was too old
-		//The last chance is to check the last update, 
-		//maybe no redraw is needed
-		//if then, only one database query needed
-		$last_update_real = BoData::get('uptime_strikes');
-		if (filemtime($cache_file) > $last_update_real && BO_CACHE_MOD_UPDATE_DIVISOR)
-		{
-			bo_cache_log("Check - Output old cache file, no new data");
-			touch($cache_file, time() + $update_interval / BO_CACHE_MOD_UPDATE_DIVISOR);
-			bo_output_cache_file($cache_file);
-			exit;
-		}
 		
 		//deliver cached file (if not too old) and after that create new file
 		if ($deliver_old)
@@ -2272,6 +2259,21 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 			ignore_user_abort(true);
 			session_write_close();
 		}
+
+		
+		//Since here, the cachefile was too old
+		//The last chance is to check the last update, 
+		//maybe no redraw is needed
+		//if then, only one database query needed
+		$last_update_real = BoData::get('uptime_strikes');
+		if (filemtime($cache_file) > $last_update_real && BO_CACHE_MOD_UPDATE_DIVISOR)
+		{
+			bo_cache_log("Check - Output old cache file, no new data");
+			touch($cache_file, time() + $update_interval / BO_CACHE_MOD_UPDATE_DIVISOR);
+			bo_output_cache_file($cache_file);
+			exit;
+		}
+		
 
 	}
 	
