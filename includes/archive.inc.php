@@ -129,8 +129,8 @@ function bo_show_archive_map()
 	}
 	elseif (!$ani && $ani_changed)
 	{
-		$hour_from  = 0;
-		$hour_range = $max_range < 24 ? min($cfg['trange'], $max_range) : 24;
+		$hour_from = 0;
+		$hour_range = $max_range < 24 || $cfg['trange'] < 24 ? min($cfg['trange'], $max_range) : 24;
 	}
 
 	if ($_GET['bo_prev_hour'])
