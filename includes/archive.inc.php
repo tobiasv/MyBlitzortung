@@ -199,8 +199,14 @@ function bo_show_archive_map()
 		echo '<input type="submit" value="'._BL('update map').'" id="bo_archive_maps_submit" class="bo_form_submit">';
 
 		echo '<div class="bo_input_container">';
+		
 		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
-		echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from">';
+		
+		$show_range_sel = $ani || (!$ani && !isset($cfg['file_time_search']));
+		
+		echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from"';
+		echo !$show_range_sel ? ' onchange="submit()"' : '';
+		echo '>';
 		for($i=0;$i<=23;$i+=$hours_interval)
 		{
 			echo '<option value="'.$i.'" '.(floor($i) == floor($hour_from) && fmod($i, 1)*60 == $minute_from ? 'selected' : '').'>';
@@ -220,7 +226,7 @@ function bo_show_archive_map()
 			echo '&nbsp;<input type="submit" name="bo_next_hour" value=" &gt; " id="bo_archive_maps_nexthour" class="bo_form_submit">';
 		}
 		
-		if ($ani || (!$ani && !isset($cfg['file_time_search'])))
+		if ($show_range_sel)
 		{
 			echo ' <select name="bo_hour_range" id="bo_arch_strikes_select_hour_to" '.($ani ? '' : ' onchange="submit()"').'>';
 			for($i=$hours_interval;$i<=$max_range;$i+=$hours_interval)
