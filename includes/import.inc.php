@@ -673,21 +673,16 @@ function bo_update_strikes($force = false)
 		$res = BoDb::query("SELECT MAX(time) mtime, MAX(id) max_id FROM ".BO_DB_PREF."strikes");
 		$row = $res->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
+		$last_modified = BoData::get('uptime_strikes_modified');
 		$max_id = $row['max_id'];
 
 		if ($last_strike > time())
 			$last_strike = time() - 3600 * 24;
 		else if ($last_strike <= 0 || !$last_strike)
 			$last_strike = strtotime('2000-01-01');
-
-		$last_modified = BoData::get('uptime_strikes_modified');
-
-		if ($last_modified)
-			$time_update = $last_modified - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60;
-		else
-			$time_update = $last_strike - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60;
-
-
+		
+		$time_update = $last_strike - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60 + 60;
+		
 
 		/***** PARTIAL DOWNLOAD OF STRIKEDATA *****/
 		//estimate the size of the participants.txt before none-imported strikes
@@ -1119,6 +1114,7 @@ function bo_update_strikes($force = false)
 			//Timeout
 			if (bo_exit_on_timeout())
 			{
+				$last_strike_time = $utime;
 				$timeout = true;
 				break;
 			}
@@ -1248,6 +1244,7 @@ function bo_update_strikes($force = false)
 		if ($timeout)
 		{
 			$updated = false;
+			BoData::set('uptime_strikes_modified', $last_strike_time);
 		}
 		else
 		{
@@ -1256,56 +1253,58 @@ function bo_update_strikes($force = false)
 			BoData::set('uptime_strikes_modified', $modified);
 			bo_update_status_files('strikes');
 			bo_cache_log('Strike data updated!');
-		}
 
-		//Guess Minimum Participants
-		if (intval(BO_FIND_MIN_PARTICIPANTS_HOURS))
-		{
-			$min_hours        = BO_FIND_MIN_PARTICIPANTS_HOURS;
-			$see_same         = BO_FIND_MIN_PARTICIPANTS_COUNT;
-			$tmp              = unserialize(BoData::get('bo_participants_locating_min'));
-			$min_participants = $tmp['value'];
 
-			if (time() - $tmp['time'] > 3600 * BO_FIND_MIN_PARTICIPANTS_HOURS)
+			//Guess Minimum Participants
+			if (intval(BO_FIND_MIN_PARTICIPANTS_HOURS))
 			{
-				$row = BoDb::query("SELECT MIN(users) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*$min_hours)."'")->fetch_assoc();
+				$min_hours        = BO_FIND_MIN_PARTICIPANTS_HOURS;
+				$see_same         = BO_FIND_MIN_PARTICIPANTS_COUNT;
+				$tmp              = unserialize(BoData::get('bo_participants_locating_min'));
+				$min_participants = $tmp['value'];
 
-				if ($row['minusers'] >= 3)
+				if (time() - $tmp['time'] > 3600 * BO_FIND_MIN_PARTICIPANTS_HOURS)
 				{
-					//reset counter if last value differs from new value
-					if ($tmp['last'] != $row['minusers'])
-						$tmp['count'] = 0;
+					$row = BoDb::query("SELECT MIN(users) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*$min_hours)."'")->fetch_assoc();
 
-					//only save the value after some same values
-					if ($tmp['count'] >= $see_same)
+					if ($row['minusers'] >= 3)
 					{
-						$tmp['value'] = $row['minusers'];
-						$tmp['count'] = 0;
-					}
-					else
-						$tmp['count']++;
+						//reset counter if last value differs from new value
+						if ($tmp['last'] != $row['minusers'])
+							$tmp['count'] = 0;
 
-					$tmp['last'] = $row['minusers'];
-					$tmp['time'] = time();
-					BoData::set('bo_participants_locating_min', serialize($tmp));
+						//only save the value after some same values
+						if ($tmp['count'] >= $see_same)
+						{
+							$tmp['value'] = $row['minusers'];
+							$tmp['count'] = 0;
+						}
+						else
+							$tmp['count']++;
+
+						$tmp['last'] = $row['minusers'];
+						$tmp['time'] = time();
+						BoData::set('bo_participants_locating_min', serialize($tmp));
+					}
 				}
 			}
-		}
 
-		//Maximum Participants
-		if (intval(BO_FIND_MAX_PARTICIPANTS_HOURS) && $max_participants >= 3)
-		{
-			$tmp = unserialize(BoData::get('bo_participants_locating_max'));
-			$tmp['value_last'] = max($tmp['value_last'], $max_participants);
-			if (time() - $tmp['time'] > 3600 * BO_FIND_MAX_PARTICIPANTS_HOURS && $max_participants >= $min_participants)
+			//Maximum Participants
+			if (intval(BO_FIND_MAX_PARTICIPANTS_HOURS) && $max_participants >= 3)
 			{
-				$tmp['time'] = time();
-				$tmp['value'] = $tmp['value_last'];
-				$tmp['value_last'] = 0; //if max value shrinks!
+				$tmp = unserialize(BoData::get('bo_participants_locating_max'));
+				$tmp['value_last'] = max($tmp['value_last'], $max_participants);
+				if (time() - $tmp['time'] > 3600 * BO_FIND_MAX_PARTICIPANTS_HOURS && $max_participants >= $min_participants)
+				{
+					$tmp['time'] = time();
+					$tmp['value'] = $tmp['value_last'];
+					$tmp['value_last'] = 0; //if max value shrinks!
+				}
+				BoData::set('bo_participants_locating_max', serialize($tmp));
 			}
-			BoData::set('bo_participants_locating_max', serialize($tmp));
+		
 		}
-
+		
 	}
 	else
 	{
