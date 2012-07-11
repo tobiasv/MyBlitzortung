@@ -190,6 +190,16 @@
 /*******************************************************************/
 /*** Session handling                                            ***/
 
+//name of session 
+//leave blank, then default PHP (i.e. PHPSESSID)
+@define('BO_SESSION_NAME', '');
+
+//default path of session cookie
+@define('BO_SESSION_COOKIE_PATH', '/');
+
+//lifetime of session cookie (seconds)
+@define('BO_SESSION_COOKIE_LIFETIME', 3600 * 24);
+
 //close sessions before output
 //so the browser use more that one concurrent connection at once
 //hint: set it to 0 or 1 if you have problems

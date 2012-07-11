@@ -1013,6 +1013,11 @@ function bo_user_init()
 		return;
 	}
 	
+	session_set_cookie_params(BO_SESSION_COOKIE_LIFETIME, BO_SESSION_COOKIE_PATH);
+	
+	if (BO_SESSION_NAME)
+		session_id(BO_SESSION_NAME);
+	
 	//Session handling
 	@session_start();
 
