@@ -97,6 +97,16 @@ function bo_update_all2($force = false, $only = '')
 
 		if (!$only || $only == 'signals')
 			$signals_imported  = bo_update_raw_signals($force);
+		
+		
+		//Assign strikes->signals
+		if (bo_exit_on_timeout()) return;
+		
+		if (BO_UP_INTVL_RAW && 
+			BoData::get('uptime_strikes_modified') - BO_MIN_MINUTES_STRIKE_CONFIRMED*60-60 < BoData::get('uptime_raw'))
+		{
+			bo_match_strike2raw();
+		}
 
 
 		//Daily statistics
@@ -286,7 +296,7 @@ function bo_update_raw_signals($force = false)
 {
 	bo_echod(" ");
 	bo_echod("=== Raw-Data ===");
-
+			
 	if (!defined('BO_UP_INTVL_RAW') || !BO_UP_INTVL_RAW)
 	{
 		bo_echod("Disabled!");
@@ -521,6 +531,7 @@ function bo_update_raw_signals($force = false)
 				$sql_data['data'] = array($data, 'hex');
 							
 				BoDb::bulk_insert('raw', $sql_data);
+				$count_inserted++;
 				
 				//Timeout
 				if (bo_exit_on_timeout())
@@ -575,8 +586,8 @@ function bo_update_raw_signals($force = false)
 		if (!$timeout)
 		{
 			BoData::set('uptime_raw', time());
-			bo_match_strike2raw();
 			bo_update_status_files('signals');
+			bo_match_strike2raw();
 			$updated = true;
 		}
 		else
@@ -1302,7 +1313,7 @@ function bo_update_strikes($force = false)
 				}
 				BoData::set('bo_participants_locating_max', serialize($tmp));
 			}
-		
+
 		}
 		
 	}
@@ -1320,6 +1331,11 @@ function bo_update_strikes($force = false)
 // Update strike_id <-> raw_id
 function bo_match_strike2raw()
 {
+	static $done = false;
+	if (!BO_UP_INTVL_RAW || $done)
+		return;
+	$done = true;
+		
 	//not really physical values but determined empirical
 	$c = BO_STR2SIG_C;
 	$fuzz = BO_STR2SIG_FUZZ_SEC ; //minimum fuzzy-seconds
@@ -3050,7 +3066,7 @@ function bo_update_get_timeout()
 		$max_time = $overall_timeout;
 
 	bo_echod( "Information: PHP Execution timeout is ".$exec_timeout.'s '.
-				($exec_timeout < 25 ? ' - Not good :(' : ' --> Fine :)').
+				($exec_timeout && $exec_timeout < 25 ? ' - Not good :(' : ' --> Fine :)').
 				' *** Setting MyBlitzortung timeout to: '.$max_time."s");
 
 	return $max_time;

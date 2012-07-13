@@ -20,6 +20,7 @@ function bo_user_show_admin()
 		case 'update':
 			require_once 'import.inc.php';
 			echo '<h4>'._BL('Importing data...').'</h4>';
+			echo '<div style="display:none;">'.str_repeat('&nbsp;', 1000).'</div>'; //send some output, so that browsers display the page
 			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
 			bo_update_all(true, $_GET['bo_only']);
 			echo '</div></pre>';
