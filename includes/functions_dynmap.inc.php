@@ -282,6 +282,9 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 	function bo_show_circle(zoom)
 	{
+		if (typeof(boDistCircle) == 'undefined')
+			return;
+			
 		if (zoom < <?php echo intval(BO_MAP_CIRCLE_SHOW_ZOOM); ?>)
 		{
 			boDistCircle.setMap(null);
