@@ -14,7 +14,8 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 		
 	$station_lat = BO_LAT;
 	$station_lon = BO_LON;
-	
+	$center_lat = BO_MAP_LAT ? BO_MAP_LAT : BO_LAT;
+	$center_lon = BO_MAP_LON ? BO_MAP_LON : BO_LON;
 	
 ?>
 
@@ -43,11 +44,12 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	var bo_home_zoom;
 	var bo_infobox;
 	var bo_loggedin = <?php echo intval(bo_user_get_level()) ?>;
+	var boDistCircle;
 	
 	function bo_gmap_init() 
 	{ 
 		bo_home = new google.maps.LatLng(<?php echo  $lat ?>, <?php echo  $lon ?>);
-		bo_home_zoom = <?php echo  $zoom ?>;
+		bo_home_zoom = <?php echo $zoom ?>;
 
 		var mapOptions = {
 		  zoom: bo_home_zoom,
@@ -59,11 +61,14 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 		};
 
 		bo_map = new google.maps.Map(document.getElementById("bo_gmap"), mapOptions);
-<?php
-	if (($show_station & 1) && bo_station_id() > 0)
-	{
-?>
-		var myLatlng = new google.maps.LatLng(<?php echo  "$station_lat,$station_lon" ?>);
+
+
+<?php if (($show_station & 1)) { ?>
+
+		var myLatlng = new google.maps.LatLng(<?php echo "$station_lat,$station_lon" ?>);
+		
+<?php if (BO_MAP_STATION_ICON) { ?>
+
 		var marker = new google.maps.Marker({
 		  position: myLatlng, 
 		  map: bo_map, 
@@ -71,28 +76,29 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 		  icon: '<?php echo BO_MAP_STATION_ICON ?>' 
 		});
 		
-<?php
-	}
-	
-	if (($show_station & 2) && $radius && bo_station_id() > 0)
-	{
-?>
-		var boDistCircle = {
-			clickable: false,
-			strokeColor: "<?php echo  BO_MAP_CIRCLE_COLOR_LINE ?>",
-			strokeOpacity: <?php echo  BO_MAP_CIRCLE_OPAC_LINE ?>,
-			strokeWeight: 1,
-			fillColor: "<?php echo  BO_MAP_CIRCLE_COLOR_FILL ?>",
-			fillOpacity: <?php echo  BO_MAP_CIRCLE_OPAC_FILL ?>,
-			map: bo_map,
-			center: new google.maps.LatLng(<?php echo  "$station_lat,$station_lon" ?>),
-			radius: <?php echo  $radius + 1000 ?>
-		};
+<?php } ?>
 
-		new google.maps.Circle(boDistCircle);
-<?php
-	}
-?>
+<?php } ?>
+
+
+<?php if (($show_station & 2) && $radius) { ?>
+
+		boDistCircle = new google.maps.Circle( {
+			clickable: false,
+			strokeColor: "<?php echo BO_MAP_CIRCLE_COLOR_LINE ?>",
+			strokeOpacity: <?php echo BO_MAP_CIRCLE_OPAC_LINE ?>,
+			strokeWeight: "<?php echo BO_MAP_CIRCLE_STROKE_LINE ?>",
+			fillColor: "<?php echo BO_MAP_CIRCLE_COLOR_FILL ?>",
+			fillOpacity: <?php echo BO_MAP_CIRCLE_OPAC_FILL ?>,
+			map: bo_map,
+			center: new google.maps.LatLng(<?php echo "$center_lat,$center_lon" ?>),
+			radius: <?php echo $radius + 1000 ?>
+		} );
+
+		bo_show_circle(bo_home_zoom);
+		//google.maps.event.addListener(bo_map, 'zoom_changed', bo_show_circle());
+		
+<?php } ?>
 
 
 
@@ -272,6 +278,20 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 			return '';
 		}
 	}
+
+
+	function bo_show_circle(zoom)
+	{
+		if (zoom < <?php echo intval(BO_MAP_CIRCLE_SHOW_ZOOM); ?>)
+		{
+			boDistCircle.setMap(null);
+		}
+		else
+		{
+			boDistCircle.setMap(bo_map);
+		}
+	}
+		
 
 
 	</script>

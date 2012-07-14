@@ -790,27 +790,6 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		bo_station2_marker = new google.maps.Marker();
 		bo_map_toggle_stations(0);
 		
-		var map_lat = bo_getcookie('bo_map_lat');
-		var map_lon = bo_getcookie('bo_map_lon');
-		var map_zoom = bo_getcookie('bo_map_zoom');
-		var map_type = bo_getcookie('bo_map_type');
-		
-		if (map_zoom < <?php echo $min_zoom ?> || map_zoom > <?php echo $max_zoom ?>)
-		{
-			map_zoom = <?php echo BO_DEFAULT_ZOOM ?>;
-			map_lat  = <?php echo BO_LAT ?>;
-			map_lon  = <?php echo BO_LON ?>;
-		}
-		
-		if (map_lat > 0 && map_lon > 0 && <?php echo $cookie_load_defaults ? 'true' : 'false' ?>)
-			bo_map.setOptions({ center: new google.maps.LatLng(map_lat,map_lon) });
-		
-		if (map_zoom > 0 && <?php echo $cookie_load_defaults ? 'true' : 'false' ?>)
-			bo_map.setOptions({ zoom: parseInt(map_zoom) });
-
-		if (map_type.match(/[a-z]+/i))
-			bo_map.setOptions({ mapTypeId: map_type });
-		
 <?php  if (bo_user_get_level()) { ?>
 		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
 		if (bo_map.getZoom() > 3)
@@ -837,6 +816,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			
 			bo_map_toggle_stations(0);
 			bo_map_user_activity();
+			bo_show_circle(this.getZoom());
 		}); 
 
 		google.maps.event.addListener(bo_map, 'maptypeid_changed', function() {
@@ -844,7 +824,28 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			bo_map_user_activity();
 		});
 		
+				
+		var map_lat = bo_getcookie('bo_map_lat');
+		var map_lon = bo_getcookie('bo_map_lon');
+		var map_zoom = bo_getcookie('bo_map_zoom');
+		var map_type = bo_getcookie('bo_map_type');
 		
+		if (map_zoom < <?php echo $min_zoom ?> || map_zoom > <?php echo $max_zoom ?>)
+		{
+			map_zoom = <?php echo BO_DEFAULT_ZOOM ?>;
+			map_lat  = <?php echo BO_LAT ?>;
+			map_lon  = <?php echo BO_LON ?>;
+		}
+		
+		if (map_lat > 0 && map_lon > 0 && <?php echo $cookie_load_defaults ? 'true' : 'false' ?>)
+			bo_map.setOptions({ center: new google.maps.LatLng(map_lat,map_lon) });
+		
+		if (map_zoom > 0 && <?php echo $cookie_load_defaults ? 'true' : 'false' ?>)
+			bo_map.setOptions({ zoom: parseInt(map_zoom) });
+
+		if (map_type.match(/[a-z]+/i))
+			bo_map.setOptions({ mapTypeId: map_type });
+
 		bo_map_user_activity();
 		bo_map_timer();
 	}	

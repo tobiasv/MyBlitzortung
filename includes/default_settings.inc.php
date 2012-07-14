@@ -30,14 +30,14 @@
 /*******************************************************************/
 
 
-	
+
 
 /*******************************************************************/
 /*** Your Region                                                 ***/
 /*     1 = Europe                                                  */
 /*     2 = Oceania                                                 */
 /*     3 = North America                                           */
-/*     4 = Japan                                                   */                             
+/*     4 = Japan                                                   */
 
 @define('BO_REGION', 1);
 
@@ -161,15 +161,15 @@
 //available locales
 @define('BO_LANGUAGES', 'en,de,fr,it,hu,nl');
 
-//show links in the footer   
-@define('BO_SHOW_LANGUAGES', true); 
+//show links in the footer
+@define('BO_SHOW_LANGUAGES', true);
 
 //show flags
 @define('BO_SHOW_LANG_FLAGS', true);
 
 //force default language in maps (true)
 //otherwise an extra map for each language will be generated and saved in cache!
-@define('BO_FORCE_MAP_LANG', true); 
+@define('BO_FORCE_MAP_LANG', true);
 
 
 
@@ -183,14 +183,14 @@
 @define('BO_LOGIN_ALLOW', 2); //0=nobody, 1=you, 2=all
 
 // days where automatic login cookie is valid. set to false to disable auto login
-@define('BO_LOGIN_COOKIE_TIME', 60); 
+@define('BO_LOGIN_COOKIE_TIME', 60);
 
 
 
 /*******************************************************************/
 /*** Session handling                                            ***/
 
-//name of session 
+//name of session
 //leave blank, then default PHP (i.e. PHPSESSID)
 @define('BO_SESSION_NAME', '');
 
@@ -206,7 +206,7 @@
 //0: never close (let php do it)
 //1: late
 //2: early
-@define('BO_SESSION_CLOSE', 2); 
+@define('BO_SESSION_CLOSE', 2);
 
 
 
@@ -229,16 +229,16 @@
 /*** Import error handling                                       ***/
 
 // min count, error occured (0 disables reporting)
-@define('BO_UP_ERR_MIN_COUNT',   1);     
+@define('BO_UP_ERR_MIN_COUNT',   1);
 
 // time in minutes in which the error occurs
-@define('BO_UP_ERR_MIN_MINUTES', 30);    
+@define('BO_UP_ERR_MIN_MINUTES', 30);
 
 // if error persits, send mail max. every defined minutes
-@define('BO_UP_ERR_SEND_INTERVAL', 720);  
+@define('BO_UP_ERR_SEND_INTERVAL', 720);
 
 // if new station count is too low -> don't read new data
-@define('BO_UP_STATION_DIFFER',   0.9);     
+@define('BO_UP_STATION_DIFFER',   0.9);
 
 
 
@@ -271,47 +271,47 @@
 /*** The file cache                                              ***/
 
 //when true, disables caching of maps and map tiles (you should leave it on false!)
-@define('BO_CACHE_DISABLE', false); 
+@define('BO_CACHE_DISABLE', false);
 
 //create subdirs for faster access (may not work with php safemode ON)
-@define('BO_CACHE_SUBDIRS', true);  
+@define('BO_CACHE_SUBDIRS', true);
 
 //cache dir
 @define('BO_CACHE_DIR', 'cache');
 
 //purges tiles when older that specified value (hours)
-@define('BO_CACHE_PURGE_TILES_HOURS', 24); 
+@define('BO_CACHE_PURGE_TILES_HOURS', 24);
 
 //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
-@define('BO_CACHE_PURGE_TILES_RAND',  1000); 
+@define('BO_CACHE_PURGE_TILES_RAND',  1000);
 
 //purges maps when older that specified value (hours)
-@define('BO_CACHE_PURGE_MAPS_HOURS', 24 * 4); 
+@define('BO_CACHE_PURGE_MAPS_HOURS', 24 * 4);
 
 //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
-@define('BO_CACHE_PURGE_MAPS_RAND',  1000); 
+@define('BO_CACHE_PURGE_MAPS_RAND',  1000);
 
 //purges density maps when older that specified value (hours)
-@define('BO_CACHE_PURGE_DENS_HOURS', 24 * 10); 
+@define('BO_CACHE_PURGE_DENS_HOURS', 24 * 10);
 
 //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
-@define('BO_CACHE_PURGE_DENS_RAND',  1000); 
+@define('BO_CACHE_PURGE_DENS_RAND',  1000);
 
 //purges other files when older that specified value (hours)
-@define('BO_CACHE_PURGE_OTHER_HOURS', 24); 
+@define('BO_CACHE_PURGE_OTHER_HOURS', 24);
 
 //how often the purge should start (0 = never, 1 = every call, 2 = ever 2nd call...)
-@define('BO_CACHE_PURGE_OTHER_RAND',  100); 
+@define('BO_CACHE_PURGE_OTHER_RAND',  100);
 
 //try not to use the database
 //enable for server with high load
-@define('BO_CACHE_FAST', false); 
+@define('BO_CACHE_FAST', false);
 
 // if file is outdated, check the last update time first
 // if it was before last file-mod time, then set file-mod
 // to now + (update-interval / divisor)
 // so the file will be valid again for some time
-@define('BO_CACHE_MOD_UPDATE_DIVISOR', false); 
+@define('BO_CACHE_MOD_UPDATE_DIVISOR', false);
 
 //wait given milliseconds if same file is currently processed by another client
 //set 0 or false to disable
@@ -351,9 +351,9 @@
 /*** Statistics                                                  ***/
 
 
-// Show GPS Info                                               
-// You can set your BO_LAT, BO_LON to rough coordinates and     
-// disable this option. So nobody can see your exact position.  
+// Show GPS Info
+// You can set your BO_LAT, BO_LON to rough coordinates and
+// disable this option. So nobody can see your exact position.
 @define('BO_SHOW_GPS_INFO', true);
 
 
@@ -370,11 +370,11 @@
 @define('BO_STATION_STAT_DISABLE', false);
 
 
-// Mark stations offline after specified time with no activity  
+// Mark stations offline after specified time with no activity
 @define('BO_STATION_OFFLINE_MINUTES', 15);
 
 
-// Show new stations                                           
+// Show new stations
 @define('BO_STATISTICS_SHOW_NEW_STATIONS', 0);
 
 
@@ -382,7 +382,7 @@
 @define('BO_STATISTICS_SHOW_STATIONS_UNDER_CONSTR', 1);
 
 
-// Statistics for all station                                  
+// Statistics for all station
 @define('BO_STATISTICS_ALL_STATIONS', 0); // 0 = disable, 1 = with specific link, 2 = links from table for everyone
 
 
@@ -416,10 +416,10 @@
 
 //use true color images for internal drawing
 //gives nicer transparency effects - higer CPU usage and bigger files size
-@define('BO_IMAGE_USE_TRUECOLOR', true); 
+@define('BO_IMAGE_USE_TRUECOLOR', true);
 
 //use truecolor images for drawing transparent images
-@define('BO_IMAGE_USE_TRUECOLOR_TRANSPARENT', false); 
+@define('BO_IMAGE_USE_TRUECOLOR_TRANSPARENT', false);
 
 //use palette images for MAPS with defined colors for output (0 disables)
 // --> reduces colors to defined for smaller file sizes
@@ -428,22 +428,22 @@
 
 //use palette images for DENSITY MAPS with defined colors for output (0 disables)
 // --> reduces colors to defined for smaller file sizes
-@define('BO_IMAGE_PALETTE_COLORS_DENSITIES', 0); 
+@define('BO_IMAGE_PALETTE_COLORS_DENSITIES', 0);
 
 //use palette images for TRANSPARENT MAPS with defined colors for output (0 disables)
 // --> reduces colors to defined for smaller file sizes
-@define('BO_IMAGE_PALETTE_COLORS_TRANSPARENT', 0); 
+@define('BO_IMAGE_PALETTE_COLORS_TRANSPARENT', 0);
 
 //automatically use true color if colorcount in palette image is above 256
 //set BO_IMAGE_PALETTE_COLORS_MAPS to 256
 //you will automatically get the smallest file, but also truecolor images when needed
-@define('BO_IMAGE_PALETTE_AUTO', true); 
+@define('BO_IMAGE_PALETTE_AUTO', true);
 
 //PNG compression: the highter the slower!!!
-@define('BO_IMAGE_PNG_COMPRESSION', 7); 
+@define('BO_IMAGE_PNG_COMPRESSION', 7);
 
 //Set it to PNG_ALL_FILTERS for better compression (doesn't seem to make any difference)
-@define('BO_IMAGE_PNG_FILTERS', PNG_NO_FILTER); 
+@define('BO_IMAGE_PNG_FILTERS', PNG_NO_FILTER);
 
 //Jpeg Quality 100 = best
 @define('BO_IMAGE_JPEG_QUALITY', 90);
@@ -461,13 +461,13 @@
 /*** Fonts: General settings                                     ***/
 
 // normal truetype font file
-@define('BO_FONT_TTF_NORMAL', 'fonts/DejaVuSans.ttf'); 
+@define('BO_FONT_TTF_NORMAL', 'fonts/DejaVuSans.ttf');
 
 // normal bold font file
 @define('BO_FONT_TTF_BOLD', 'fonts/DejaVuSans-Bold.ttf');
 
-// mono truetype font file 
-@define('BO_FONT_TTF_MONO', 'fonts/DejaVuSansMono.ttf'); 
+// mono truetype font file
+@define('BO_FONT_TTF_MONO', 'fonts/DejaVuSansMono.ttf');
 
 // set to false if fonts in pictures do not work
 @define('BO_FONT_USE_FREETYPE2', true);
@@ -483,13 +483,13 @@
 /*** otherwise autolinking will not work!                        ***/
 
 // (kilometers) limits strike display to radius around station
-@define('BO_RADIUS', 50);             
+@define('BO_RADIUS', 50);
 
 // (kilometers) radius for statistics
-@define('BO_RADIUS_STAT', 50);             
+@define('BO_RADIUS_STAT', 50);
 
 // when zoom reaches this level, strike display is limited to max. distance around station (BO_RADIUS)
-@define('BO_MAX_ZOOM_LIMIT', 8);      
+@define('BO_MAX_ZOOM_LIMIT', 8);
 
 //Completely disable the dynamic map
 @define('BO_MAP_DISABLE', false);
@@ -498,28 +498,35 @@
 @define('BO_DEFAULT_ZOOM', 7);
 
 // default zoom level for archive
-@define('BO_DEFAULT_ZOOM_ARCHIVE', 10);        
+@define('BO_DEFAULT_ZOOM_ARCHIVE', 10);
 
 // max. zoom level for guest, even in the area of your station
-@define('BO_MAX_ZOOM_IN', 12);        
+@define('BO_MAX_ZOOM_IN', 12);
 
 // minimal zoom level for guests
 @define('BO_MIN_ZOOM_OUT', 4);
 
 // max. zoom level for users
-@define('BO_MAX_ZOOM_IN_USER', 14);        
+@define('BO_MAX_ZOOM_IN_USER', 14);
 
 // minimal zoom level for users
 @define('BO_MIN_ZOOM_OUT_USER', 2);
 
 // the default map style (you can also use satellite, hybrid, street)
-@define('BO_DEFAULT_MAP', 'TERRAIN'); 
+@define('BO_DEFAULT_MAP', 'TERRAIN');
+
+// if you want another lat,lon for your radius area
+@define('BO_MAP_LAT', 0);
+@define('BO_MAP_LON', 0);
 
 //some default colors and sizes
 @define('BO_MAP_CIRCLE_COLOR_LINE', '#FF0000');
 @define('BO_MAP_CIRCLE_OPAC_LINE', '0.8');
+@define('BO_MAP_CIRCLE_STROKE_LINE', 1);
 @define('BO_MAP_CIRCLE_COLOR_FILL', '#FF0000');
 @define('BO_MAP_CIRCLE_OPAC_FILL', '0.05');
+@define('BO_MAP_CIRCLE_SHOW_ZOOM', 0);
+
 
 //displaying of strikes
 @define('BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM', 7);
@@ -537,8 +544,8 @@
 @define('BO_MAP_LEGEND_HEIGHT', 10); //only colorbar
 @define('BO_MAP_LEGEND_FONTSIZE', 2); //no TTF!
 @define('BO_MAP_NA_FONTSIZE', 3); //no TTF!
-@define('BO_MAP_COUNT_FONTSIZE', 8); 
-@define('BO_MAP_COUNT_FONTBOLD', true); 
+@define('BO_MAP_COUNT_FONTSIZE', 8);
+@define('BO_MAP_COUNT_FONTBOLD', true);
 @define('BO_MAP_COUNT_STATIONS', 15);
 
 //Manual time ranges
@@ -563,13 +570,13 @@
 //Allow selection of stations
 @define('BO_MAP_STATION_SELECT', false);
 
-//reloads whole map page when user didn't make any activities 
+//reloads whole map page when user didn't make any activities
 //and is active again after defined interval (minutes)
 //good when you use visitor counters
 @define('BO_MAP_PAGE_RELOAD_INACTIVITY', 0);
 
 //Allow auto update
-//set to a value in minutes, 
+//set to a value in minutes,
 //then auto update ends when user didn't make any activities
 //set to a very high value like 99999999 to "disable" auto-end
 @define('BO_MAP_AUTOUPDATE', 99999999);
@@ -589,10 +596,10 @@
 
 
 //scan time in minutes (set to 0 to disable tracks)
-@define('BO_TRACKS_SCANTIME', 0);  
+@define('BO_TRACKS_SCANTIME', 0);
 
 //update tracks every x minutes
-@define('BO_UP_INTVL_TRACKS', 5);  
+@define('BO_UP_INTVL_TRACKS', 5);
 
 //divide the scantime into given intervals (minimum 2 for tracks)
 @define('BO_TRACKS_DIVISOR',  2);
@@ -603,13 +610,13 @@
 @define('BO_TRACKS_RADIUS_SEARCH_OLD_CELLS', 30);
 
 //display of cells/tracks
-@define('BO_TRACKS_MAP_OPACITY', 0.7); 
-@define('BO_TRACKS_MAP_ZOOM_MIN', 6); 
-@define('BO_TRACKS_MAP_ZOOM_MAX', 10); 
+@define('BO_TRACKS_MAP_OPACITY', 0.7);
+@define('BO_TRACKS_MAP_ZOOM_MIN', 6);
+@define('BO_TRACKS_MAP_ZOOM_MAX', 10);
 @define('BO_TRACKS_MAP_ZOOM_INFO', 7);
 @define('BO_TRACKS_MAP_TIME_FORCAST', 60);
 @define('BO_TRACKS_MAP_MIN_STRIKES_DISPLAY', 10);
-@define('BO_TRACKS_SHOW_UNTRACKED', false); 
+@define('BO_TRACKS_SHOW_UNTRACKED', false);
 
 
 
@@ -618,31 +625,31 @@
 /*** Archive                                                     ***/
 
 //Completely disables archive
-@define('BO_DISABLE_ARCHIVE', false); 
+@define('BO_DISABLE_ARCHIVE', false);
 
 //Enables archive (maps by date and animations) for guests
-@define('BO_ENABLE_ARCHIVE_MAPS', false); 
+@define('BO_ENABLE_ARCHIVE_MAPS', false);
 
 //Enables densities for guests (set the also BO_CALC_DENSITIES option to true)
-@define('BO_ENABLE_DENSITIES', false); 
+@define('BO_ENABLE_DENSITIES', false);
 
 //Enables strike search
-@define('BO_ENABLE_ARCHIVE_SEARCH', true); 
+@define('BO_ENABLE_ARCHIVE_SEARCH', true);
 
 //Enable signal page
-@define('BO_ENABLE_ARCHIVE_SIGNALS', true); 
+@define('BO_ENABLE_ARCHIVE_SIGNALS', true);
 
-//Calculates Densities 
-@define('BO_CALC_DENSITIES', false); 
+//Calculates Densities
+@define('BO_CALC_DENSITIES', false);
 
 //Calculates Densities for current year/month
-@define('BO_CALC_DENSITIES_CURRENT', true); 
+@define('BO_CALC_DENSITIES_CURRENT', true);
 
 //Calculates Densities for current year/month also for other stations than yours
-@define('BO_CALC_DENSITIES_CURRENT_ALL', false); 
+@define('BO_CALC_DENSITIES_CURRENT_ALL', false);
 
 //When displaying densities, group max values (higher =>more grouping, 0=no)
-@define('BO_DENSITIES_GROUP_MAX', 30); 
+@define('BO_DENSITIES_GROUP_MAX', 30);
 
 //maximum no. of strikes displayed when searching for them
 @define('BO_ARCHIVE_SEARCH_STRIKECOUNT', 10);
@@ -697,10 +704,10 @@
 @define('BO_PURGE_MAIN_INTVL', 6);
 
 //optimizes table if deleted rows are bigger than value (0 disables)
-@define('BO_PURGE_OPTIMIZE_TABLES', 0); 
+@define('BO_PURGE_OPTIMIZE_TABLES', 0);
 
 // min-age in hours, 0 disables
-@define('BO_PURGE_SIG_NS', 24);     //signals with no strike assigned        
+@define('BO_PURGE_SIG_NS', 24);     //signals with no strike assigned
 @define('BO_PURGE_SIG_ALL', 192);   //all signals
 @define('BO_PURGE_STR_NP', 0);      //strikes not participated
 @define('BO_PURGE_STR_ALL', 0);     //all strikes
@@ -813,7 +820,7 @@
 @define('BO_EXPERIMENTAL_POLARITY_CHECK', false);
 
 //maximum distance in kilometers from your station where polarities
-//should be not too far, as polarity of the wave changes 
+//should be not too far, as polarity of the wave changes
 //after some hundrets of kilometers
 @define('BO_EXPERIMENTAL_POLARITY_MAX_DIST', 300);
 
@@ -882,7 +889,7 @@
 //time settings
 
 // interval between each data point
-@define('BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES',  30); 
+@define('BO_GRAPH_STAT_STRIKES_ADV_GROUP_MINUTES',  30);
 
 //default time reviews (hours)
 @define('BO_GRAPH_STAT_HOURS_BACK', "24,6,12,48,72,96");
@@ -1159,7 +1166,7 @@
 //Default socket timeout
 @define('BO_SOCKET_TIMEOUT', 40);
 
-//set max time in pictures to age of latest calculated strike 
+//set max time in pictures to age of latest calculated strike
 //if within given minutes from now
 @define('BO_LATEST_STRIKE_TIME_CALC', 8);
 
@@ -1176,10 +1183,10 @@
 
 // set to true, if you want to use "file_get_contents"
 // you wouldn't be able to use partial downloads with setting "true"!
-@define('BO_USE_PHPURLWRAPPER', false); 
+@define('BO_USE_PHPURLWRAPPER', false);
 
 // use experimental mysql key for faster strike search
-// by time *and* latlon                                         
+// by time *and* latlon
 @define('BO_DB_USE_LATLON_TIME_INDEX', false);
 
 //enable longtime statistics for all stations
@@ -1225,7 +1232,7 @@
 @define("BO_TILE_SIZE_COUNT", 256);
 
 //timeout for tile creating
-@define("BO_TILE_CREATION_TIMEOUT", 5); 
+@define("BO_TILE_CREATION_TIMEOUT", 5);
 
 //Min and max count of participants - values are only used if
 //automatic getting from participants.txt failed
@@ -1254,7 +1261,7 @@
 @define('BO_STR2SIG_FUZZ_SEC', 0.00001); //minimum fuzzy-seconds
 @define('BO_STR2SIG_FUZZ_SECM', 0.0001); //fuzzy-seconds per meter
 @define('BO_STR2SIG_FUZZ_OFFSET', 0); //fuzzy offset
-@define('BO_STR2SIG_TRIGGER_FACTOR', 0.9); //factor for BO_TRIGGER_VOLTAGE 
+@define('BO_STR2SIG_TRIGGER_FACTOR', 0.9); //factor for BO_TRIGGER_VOLTAGE
 
 //speed of light for runtime in archive table (and perhaps other display)
 @define('BO_C', 299792458); // Blitzortung.org uses c/1.000198

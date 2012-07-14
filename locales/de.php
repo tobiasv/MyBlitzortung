@@ -1132,6 +1132,8 @@ $_BL['de']['ratio of all strikes is'] = 'Quote alle Blitze';
 $_BL['de']['Strikes per'] = 'Blitze pro';
 $_BL['de']['Latvia'] = 'Lettland';
 $_BL['de']['Ukraine'] = 'Ukraine';
+$_BL['de']['Croatia'] = 'Kroatien';
+
 
 $_BL['de']['lang_en'] = 'Englisch';
 $_BL['de']['lang_de'] = 'Deutsch';

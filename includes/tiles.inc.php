@@ -45,7 +45,6 @@ function bo_tile()
 	if (!$only_info && ($zoom < $min_zoom || $zoom > $max_zoom))
 	{
 		bo_tile_message('tile_zoom_not_allowed', 'zoom_na', $caching, array(), $tile_size);
-		exit;
 	}
 	
 	if ( $station_id > 0 && $station_id != bo_station_id() && BO_MAP_STATION_SELECT !== true )
@@ -53,7 +52,6 @@ function bo_tile()
 		if (!(bo_user_get_level() & BO_PERM_NOLIMIT))
 		{
 			bo_tile_message('tile_station_not_allowed', 'station_na', $caching, array(), $tile_size);
-			exit;
 		}
 		
 		$restricted = true;
@@ -72,7 +70,6 @@ function bo_tile()
 			if (!(bo_user_get_level() & BO_PERM_NOLIMIT))
 			{
 				bo_tile_message('tile_time_range_na_err', 'range_na', $caching, array(), $tile_size);
-				exit;
 			}
 			
 			$restricted = true;
@@ -92,12 +89,10 @@ function bo_tile()
 		if (!$only_info && $time_manual_to < $time_manual_from)
 		{
 			bo_tile_message('tile_wrong_time_range_err', 'range_wrong', $caching, array(), $tile_size);
-			exit;
 		}
 		else if (!$only_info && intval(BO_MAP_MANUAL_TIME_MAX_HOURS) < $cfg['trange']/60 && bo_user_get_id() != 1)
 		{
 			bo_tile_message('tile_maximum_time_range_err', 'range_max', $caching, array('{HOURS}' => intval(BO_MAP_MANUAL_TIME_MAX_HOURS)), $tile_size);
-			exit;
 		}
 		
 		//disable caching
@@ -159,6 +154,43 @@ function bo_tile()
 		$file = $dir.$filename;
 
 		bo_output_cachefile_if_exists($file, $last_update, $update_interval * 60);
+	}
+	
+	
+	
+	/***********************************************************/
+	/*** Is in Radius around station? **************************/
+	/***********************************************************/
+		
+	list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($x, $y, $zoom, $tile_size);
+	
+	//Check if zoom or position is in limit
+	$radius = $_BO['radius'] * 1000; //max. Distance
+	if ($radius)
+	{
+		if ($zoom < BO_MAX_ZOOM_LIMIT) //set max. distance to 0 (no limit) for small zoom levels
+		{
+			$radius = 0;
+		}
+		else
+		{
+			$center_lat = BO_MAP_LAT ? BO_MAP_LAT : BO_LAT;
+			$center_lon = BO_MAP_LON ? BO_MAP_LON : BO_LON;
+			
+			//return text if outside of radius
+			
+			list($max_lat, $max_lon) = bo_distbearing2latlong($radius * sqrt(2), 45 , $center_lat, $center_lon);
+			if ( ($lat1 > $max_lat && $lat2 > $max_lat) || ($lon1 > $max_lon && $lon2 > $max_lon) )
+				bo_tile_message('tile not available', 'na', $caching, array(), $tile_size);
+				
+			list($min_lat, $min_lon) = bo_distbearing2latlong($radius * sqrt(2), 225, $center_lat, $center_lon);
+			if ( ($lat1 < $min_lat && $lat2 < $min_lat) || ($lon1 < $min_lon && $lon2 < $min_lon) )
+				bo_tile_message('tile not available', 'na', $caching, array(), $tile_size);
+
+				
+			$tile_mean_lat = abs($lat1 - $lat2) / 2;
+			$tile_mean_lon = abs($lon1 - $lon2) / 2;
+		}
 	}
 	
 	
@@ -242,34 +274,17 @@ function bo_tile()
 	/***********************************************************/
 
 	
-	list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($x, $y, $zoom, $tile_size);
-	
-	//Check if zoom or position is in limit
-	$radius = $_BO['radius'] * 1000; //max. Distance
+	//Radius
+	$sql_where_radius = '';
 	if ($radius)
 	{
-		if ($zoom < BO_MAX_ZOOM_LIMIT) //set max. distance to 0 (no limit) for small zoom levels
+		if (!BO_MAP_LAT && !BO_MAP_LON)
 		{
-			$radius = 0;
+			$sql_where_radius .= " AND s.distance < $radius ";
 		}
 		else
 		{
-			list($min_lat, $min_lon) = bo_distbearing2latlong($radius * sqrt(2), 225);
-			list($max_lat, $max_lon) = bo_distbearing2latlong($radius * sqrt(2), 45);
-
-			//return text if outside of radius
-			if ( 	($lat1 > $max_lat && $lat2 > $max_lat) ||
-					($lat1 < $min_lat && $lat2 < $min_lat) ||
-					($lon1 > $max_lon && $lon2 > $max_lon) ||
-					($lon1 < $min_lon && $lon2 < $min_lon)
-				)
-			{
-
-				$text = _BL('tile not available', true);
-				bo_tile_message($text, 'na', $caching, array(), $tile_size);
-				exit;
-			}
-
+			$sql_where_radius .= " AND ".bo_sql_latlon2dist(BO_MAP_LAT, BO_MAP_LON, 's.lat', 's.lon')." < $radius ";
 		}
 	}
 
@@ -290,11 +305,8 @@ function bo_tile()
 			$sql_where .= " OR s.time BETWEEN '$date_min' AND '$date_max' ";
 		}
 		$sql_where .= ') ';
-		
-		//the where clause
 		$sql_where .= ' AND '.bo_strikes_sqlkey($index_sql, min($times_min), max($times_max), $lat1, $lat2, $lon1, $lon2);
-		$sql_where .= $radius ? " AND s.distance < $radius " : "";
-
+		$sql_where .= $sql_where_radius;
 		
 		if ($station_id && $station_id == bo_station_id())
 		{
@@ -467,7 +479,7 @@ function bo_tile()
 	
 	/* WHERE */
 	$sql_where  = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat1, $lat2, $lon1, $lon2);
-	$sql_where .= $radius ? "AND distance < $radius" : "";
+	$sql_where .= $sql_where_radius;
 	
 	/* Station Filter */
 	if ($station_id && $station_id == bo_station_id())
@@ -669,7 +681,6 @@ function bo_tile_tracks()
 	if (!$scantime) //disabled
 	{
 		bo_tile_message('tile_tracks_disabled', 'tracks_na', $caching);
-		exit;
 	}
 	
 	$x = intval($_GET['x']);
@@ -985,7 +996,7 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 	header("Content-Type: image/png");
 	readfile($file);
 
-
+	exit;
 }
 
 function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_interval)

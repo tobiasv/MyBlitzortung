@@ -1077,6 +1077,7 @@ $_BL['en']['ratio of all strikes is'] = 'ratio of all strikes is';
 $_BL['en']['Strikes per'] = 'Strikes per';
 $_BL['en']['Latvia'] = 'Latvia';
 $_BL['en']['Ukraine'] = 'Ukraine';
+$_BL['en']['Croatia'] = 'Croatia';
 
 $_BL['en']['lang_en'] = 'English';
 $_BL['en']['lang_de'] = 'German';
