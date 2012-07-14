@@ -896,7 +896,7 @@ function bo_load_locale($locale = '')
 			$_SESSION['bo_locale'] = $locale;
 			
 			if ($_COOKIE['bo_locale'] != $locale)
-				@setcookie("bo_locale", $locale, time()+3600*24*365*10,'/');
+				bo_setcookie("bo_locale", $locale, time()+3600*24*365*10, '/');
 		}
 		else if (isset($_SESSION['bo_locale']) && preg_match('/^[a-zA-Z]{2}$/', $_SESSION['bo_locale']))
 		{
@@ -926,6 +926,15 @@ function bo_load_locale($locale = '')
 	if (!headers_sent())
 		header("Content-Language: $locale");
 		
+}
+
+function bo_setcookie($name, $value, $expire = 0, $path = '/')
+{
+	//don't set cookie on non-cookie domain
+	if (!BO_FILE_NOCOOKIE || strpos(BO_FILE_NOCOOKIE, 'http://'.$_SERVER['HTTP_HOST'].'/') === false)
+	{
+		@setcookie($name, $value, $expire, $path);
+	}
 }
 
 function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0, $as_array = false, $depth=0)
