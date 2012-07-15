@@ -584,12 +584,10 @@ function bo_tile()
 	
 	
 	//no points --> blank tile
-	/*
 	if ($num == 0)
 	{
 		bo_tile_output($file, $caching);
 	}
-	*/
 
 	//create Image
 	$I = imagecreate($tile_size, $tile_size);
@@ -618,15 +616,7 @@ function bo_tile()
 		$style = 1;
 	}
 	
-	if ($bla)
-	{
-	$black = imagecolorallocate($I, 1, 0, 0);
-	list($px, $py)     = bo_latlon2tile($tile_center_lat, $tile_center_lon, $zoom);
-	$px -= ($tile_size * $x);
-	$py -= ($tile_size * $y);
-	imagefilledarc($I, $px, $py, 25, 25, 0, 360, $black, IMG_ARC_PIE);
-	}
-	
+
 	// get the data and paint tile
 	while ($row = $erg->fetch_assoc())
 	{
