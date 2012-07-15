@@ -174,23 +174,82 @@ function bo_tile()
 		}
 		else
 		{
-			$center_lat = BO_MAP_LAT ? BO_MAP_LAT : BO_LAT;
-			$center_lon = BO_MAP_LON ? BO_MAP_LON : BO_LON;
+			$circle_center_lat = BO_MAP_LAT ? BO_MAP_LAT : BO_LAT;
+			$circle_center_lon = BO_MAP_LON ? BO_MAP_LON : BO_LON;
 			
 			//return text if outside of radius
-			
-			list($max_lat, $max_lon) = bo_distbearing2latlong($radius * sqrt(2), 45 , $center_lat, $center_lon);
+			//Step 1: Easy and fast way to detect tile outside of square around circle
+			list($max_lat, $max_lon) = bo_distbearing2latlong($radius * sqrt(2), 45 , $circle_center_lat, $circle_center_lon);
 			if ( ($lat1 > $max_lat && $lat2 > $max_lat) || ($lon1 > $max_lon && $lon2 > $max_lon) )
 				bo_tile_message('tile not available', 'na', $caching, array(), $tile_size);
-				
-			list($min_lat, $min_lon) = bo_distbearing2latlong($radius * sqrt(2), 225, $center_lat, $center_lon);
+			list($min_lat, $min_lon) = bo_distbearing2latlong($radius * sqrt(2), 225, $circle_center_lat, $circle_center_lon);
 			if ( ($lat1 < $min_lat && $lat2 < $min_lat) || ($lon1 < $min_lon && $lon2 < $min_lon) )
 				bo_tile_message('tile not available', 'na', $caching, array(), $tile_size);
 
+			
+			//Step 2: Closer look, check distance to nearest tile edge
+			list($dummy1, $dummy2, $tile_center_lat, $tile_center_lon) = bo_get_tile_dim($x*2, $y*2+1, $zoom, $tile_size/2);
+
+			$bear = bo_latlon2bearing($tile_center_lat, $tile_center_lon, $circle_center_lat, $circle_center_lon);
+
+			//Step 2b: Find closest/farthest edge of tile
+			if (0 <= $bear && $bear < 90) //tile is NE of center
+			{
+				$tile_check_lat_close = $lat1;
+				$tile_check_lon_close = $lon1;
+				$circle_check_lat_border = $lat1 < $max_lat;
+				$circle_check_lon_border = $lon1 < $max_lon;
+			}
+			else if (90 <= $bear && $bear < 180) //tile is SE of center
+			{
+				$tile_check_lat_close = $lat2;
+				$tile_check_lon_close = $lon1;
+				$circle_check_lat_border = $lat2 > $min_lat;
+				$circle_check_lon_border = $lon1 < $max_lon;
+			}
+			else if (180 <= $bear && $bear < 270) //tile is SW of center
+			{
+				$tile_check_lat_close = $lat2;
+				$tile_check_lon_close = $lon2;
+				$circle_check_lat_border = $lat2 > $min_lat;
+				$circle_check_lon_border = $lon2 > $min_lon;
+			}
+			else  //tile is NW of center
+			{
+				$tile_check_lat_close = $lat1;
+				$tile_check_lon_close = $lon2;
+				$circle_check_lat_border = $lat1 < $max_lat;
+				$circle_check_lon_border = $lon2 > $min_lon;
+			}
+			
+			//Step 2c: Distance of edges
+			$dist_close = bo_latlon2dist($tile_check_lat_close, $tile_check_lon_close, $circle_center_lat, $circle_center_lon);
+			
+			//Step 2d: Closest edge is outside and whole circle doesn't lie inside?
+			if ($dist_close > $radius && !($min_lat > $lat1 && $max_lat < $lat2 && $min_lon > $lon1 && $max_lon < $lon2))
+			{
 				
-			$tile_mean_lat = abs($lat1 - $lat2) / 2;
-			$tile_mean_lon = abs($lon1 - $lon2) / 2;
+				//special case: 
+				// closest edge is outside
+				// && center of circle is bewteen min/max height or min/max width of tile
+				//  ===> border intersects with circle
+				if (   ($lat1 < $circle_center_lat && $circle_center_lat < $lat2 && $circle_check_lat_border)
+				    || ($lon1 < $circle_center_lon && $circle_center_lon < $lon2 && $circle_check_lon_border)
+				   )
+				{
+					if ($tile_size > 256)
+					{
+						//Todo:
+						//output a message on blank parts of the tile
+					}
+				}
+				else
+				{
+					bo_tile_message('tile not available', 'na', $caching, array(), $tile_size);
+				}
+			}
 		}
+		
 	}
 	
 	
@@ -525,10 +584,12 @@ function bo_tile()
 	
 	
 	//no points --> blank tile
+	/*
 	if ($num == 0)
 	{
 		bo_tile_output($file, $caching);
 	}
+	*/
 
 	//create Image
 	$I = imagecreate($tile_size, $tile_size);
@@ -556,7 +617,15 @@ function bo_tile()
 		$s = BO_MAP_STRIKE_SIZE;
 		$style = 1;
 	}
-
+	
+	if ($bla)
+	{
+	$black = imagecolorallocate($I, 1, 0, 0);
+	list($px, $py)     = bo_latlon2tile($tile_center_lat, $tile_center_lon, $zoom);
+	$px -= ($tile_size * $x);
+	$py -= ($tile_size * $y);
+	imagefilledarc($I, $px, $py, 25, 25, 0, 360, $black, IMG_ARC_PIE);
+	}
 	
 	// get the data and paint tile
 	while ($row = $erg->fetch_assoc())
@@ -914,7 +983,7 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 		if (!$ok)
 			bo_image_cache_error($tile_size, $tile_size);
 		
-		bo_output_cache_file($file, false);
+		bo_output_cache_file($file, $time_max + $update_interval * 60);
 	}
 	else
 		bo_imageout($I);
@@ -1050,7 +1119,7 @@ function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_in
 		if (!$ok)
 			bo_image_cache_error($w, $h);
 		
-		bo_output_cache_file($cache_file, false);
+		bo_output_cache_file($cache_file, $time_max + $update_interval * 60);
 	}
 	else
 	{
@@ -1084,5 +1153,52 @@ function bo_tile_headers($update_interval, $last_update, $caching)
 		header("Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
 	}
 }
+
+
+
+function bo_get_tile_dim($x,$y,$zoom, $size=BO_TILE_SIZE)
+{
+	$tilesZoom = ((1 << $zoom) * 256 / $size);
+	$lonW = 360.0 / $tilesZoom;
+	$lon = -180 + ($x * $lonW);
+
+	$MtopLat = $y / $tilesZoom;
+	$MbottomLat = $MtopLat + 1 / $tilesZoom;
+
+	$lat = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * $MbottomLat))))) - (M_PI / 2));
+	$lat2 = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * $MtopLat))))) - (M_PI / 2));
+
+	return array($lat, $lon, $lat2, $lon+$lonW);
+}
+
+
+function bo_latlon2tile($lat, $lon, $zoom)
+{
+	list($x, $y) = bo_latlon2mercator($lat, $lon);
+	$x += 0.5;
+	$y = abs($y-0.5);
+	$scale = (1 << $zoom) * 256;
+
+	return array((int)($x * $scale), (int)($y * $scale));
+}
+
+function bo_sql_lat2tiley($name, $zoom)
+{
+	$scale = (1 << $zoom) * 256;
+	$lat_mercator = " (  LOG(TAN( PI()/4 + RADIANS($name)/2 )) / PI() / 2 ) ";
+	$y = " ROUND( ABS( $lat_mercator - 0.5 ) * $scale ) ";
+
+	return $y;
+}
+
+function bo_sql_lon2tilex($name, $zoom)
+{
+	$scale = (1 << $zoom) * 256;
+	$lon_mercator = " ( $name / 360 ) ";
+	$x = " ROUND( ($lon_mercator+0.5) * $scale ) ";
+
+	return $x;
+}
+
 
 ?>
