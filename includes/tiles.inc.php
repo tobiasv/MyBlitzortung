@@ -82,7 +82,7 @@ function bo_tile()
 		$time = $time_manual_to;
 		
 		// add config
-		$cfg['trange'] = ($time_manual_to - $time_manual_from - 59) / 60; 
+		$cfg['trange'] = ($time_manual_to - $time_manual_from) / 60; 
 		$cfg['upd_intv'] = 1;
 		$cfg['tstart'] = ($time_manual_to - $time_manual_from) / 60;
 
@@ -266,7 +266,6 @@ function bo_tile()
 	if ($show_count) 
 	{
 		// display strike count
-		
 		$type = 0;
 		$time_range = 0;
 		$time_start = 0;
@@ -281,9 +280,8 @@ function bo_tile()
 			if (!is_array($ccfg) || !$ccfg['upd_intv'])
 				continue;
 			
-			$time_start    = $time - 60 * $ccfg['tstart'];
-			$times_min[$i] = mktime(date('H', $time_start), ceil(date('i', $time_start) / $ccfg['upd_intv']) * $ccfg['upd_intv'], 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
-			$times_max[$i] = $times_min[$i] + 60 * $ccfg['trange'] + 59;
+			$times_min[$i] = ceil(($time - 60*$ccfg['tstart']) / $ccfg['upd_intv'] / 60) * $ccfg['upd_intv'] * 60;
+			$times_max[$i] = $times_min[$i] + 60 * $ccfg['trange'];
 		}
 		
 		$time_min        = count($times_min) ? min($times_min) : 0;
@@ -297,20 +295,13 @@ function bo_tile()
 	else 
 	{
 		//normal strike display
-		
-		$time_start = $time - 60 * $cfg['tstart'];
-		$time_range = $cfg['trange'];
 		$c = $cfg['col'];
-		$time_min   = mktime(date('H', $time_start), ceil(date('i', $time_start) / $update_interval) * $update_interval, 0, date('m', $time_start), date('d', $time_start), date('Y', $time_start));
-		$time_max   = $time_min + 60 * $time_range + 59;
+		$time_min   = ceil(($time - 60*$cfg['tstart']) / $update_interval / 60) * $update_interval * 60;
+		$time_max   = $time_min + 60 * $cfg['trange'];
 	}
 	
-	if (!$time_start || !$time_min || !$time_max)
+	if (!$time_min || !$time_max)
 		bo_tile_output();
-
-		
-	
-
 
 
 	//send only the info/color-legend image (colors, time)
@@ -956,6 +947,7 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 	{
 		$img = file_get_contents(BO_DIR.'images/blank_tile.png');
 		$ok = @file_put_contents($file, $img);
+		touch($file);
 		
 		if (!$ok && $caching)
 			bo_image_cache_error($tile_size, $tile_size);

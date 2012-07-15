@@ -2137,7 +2137,7 @@ function bo_output_cache_file($cache_file, $mod_time = 0)
 
 
 	
-function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval)
+function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval, $allow_old = true)
 {	
 	
 	bo_cache_log("Check - $cache_file");
@@ -2146,26 +2146,27 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 	{
 		$file_expired_sec = $last_update - @filemtime($cache_file);
 		
-		$deliver_old = (BO_CACHE_CREATE_NEW_DELIVER_OLD > 0) 
+		$deliver_old = $allow_old && (BO_CACHE_CREATE_NEW_DELIVER_OLD > 0) 
 						&& ($file_expired_sec <= $update_interval * BO_CACHE_CREATE_NEW_DELIVER_OLD);
 
+		bo_cache_log("Check - Data now: ".date('Y-m-d H:i:s', $last_update));
+						
 		//Delete files that are to new
 		if (filemtime($cache_file) - 300 > time())
 		{
 			@unlink($cache_file);
 			clearstatcache();
-			bo_cache_log("Check - Was to new!");
+			bo_cache_log("Check - Cache file deleted, was to new!");
 		}
 		
-		bo_cache_log("Check - Filedate ".date('Y-m-d H:i:s', @filemtime($cache_file)));
+		bo_cache_log("Check - Filedate: ".date('Y-m-d H:i:s', @filemtime($cache_file)));
 		bo_cache_log("Check - Sec expired $file_expired_sec - Intvl: $update_interval s");
-
 	}
 	else
 	{
 		bo_cache_log("Check - Doesn't exist");
 	}
-	
+
 	//if same file is created for a parallel client
 	//and delivering outdated files isn't possible
 	//then wait some time
@@ -2214,7 +2215,7 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 		{
 			//Delivering old file, which is still new enough
 			//but we need to send "outdated" headers
-			header("Last-Modified: ".gmdate("D, d M Y H:i:s", filemtime($cache_file))." GMT");
+			header("Last-Modified: ".gmdate("D, d M Y H:i:s", filemtime($cache_file) - $update_interval)." GMT");
 			header("Expires: ".gmdate("D, d M Y H:i:s", time() + 10)." GMT");
 			header("Cache-Control: public, max-age=10");
 			header("X-MyBlitzortung: delivered-outdated", false);

@@ -1728,6 +1728,9 @@ function bo_update_stations($force = false)
 				)
 			{
 				bo_delete_station($id);
+				
+				//only one station per update
+				break;
 			}
 		}
 
