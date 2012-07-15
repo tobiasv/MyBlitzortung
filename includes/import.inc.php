@@ -1722,7 +1722,10 @@ function bo_update_stations($force = false)
 			//we also check the last activity -> delete only if too long ago
 			//this doesn't touch change in username (handled above) and is a workaround 
 			//for problems when downloading stations.txt
-			if (!isset($StData[$id]) && time() - strtotime($d['last_time']) > 24*3600*365)
+			if (!isset($StData[$id])
+				&& time() - strtotime($d['last_time'])  > 24*3600*BO_DELETE_STATION_DAYS
+				&& time() - strtotime($d['first_seen']) > 24*3600*BO_DELETE_STATION_DAYS
+				)
 			{
 				bo_delete_station($id);
 			}
