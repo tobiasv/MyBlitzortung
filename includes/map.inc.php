@@ -1362,7 +1362,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			if ( ((i >= 0 && !bo_manual_timerange) || (bo_manual_timerange && i == -1)) && bo_OverlayMaps[i].bo_show)
 			{
 				var now = new Date();
-				var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / bo_OverlayMaps[i].bo_interval) * 2;
+				var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / bo_OverlayMaps[i].bo_interval * 5);
 				var infoImg = document.createElement('IMG');
 				
 				if (bo_manual_timerange)
