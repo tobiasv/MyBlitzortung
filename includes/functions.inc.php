@@ -2196,8 +2196,8 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 	if (file_exists($cache_file) && filesize($cache_file) > 0)
 	{
 		
-		$is_new = $file_expired_sec <= $update_interval;
-		$is_old = $file_expired_sec <= $update_interval * BO_CACHE_WAIT_SAME_FILE_OLD;
+		$is_new = $file_expired_sec < $update_interval;
+		$is_old = $file_expired_sec < $update_interval * BO_CACHE_WAIT_SAME_FILE_OLD;
 		
 		//if file is new 
 		//OR file is not too old
