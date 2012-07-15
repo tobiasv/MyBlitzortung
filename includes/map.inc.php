@@ -642,7 +642,8 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	var bo_autoupdate_running = false;
 	var bo_manual_timerange = false;
 	var bo_user_last_activity = 0;
-
+	var bo_reload_mapinfo_next = false;
+	
 	function bo_gmap_init2()
 	{ 
 		var i;
@@ -847,7 +848,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			bo_map.setOptions({ mapTypeId: map_type });
 
 		bo_map_user_activity();
-		bo_map_timer();
+		window.setTimeout("bo_map_timer();", 1000 * 60);
 	}	
 	
 	function bo_map_timer()
@@ -869,7 +870,8 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			<?php } ?>			
 			
 		}
-	
+		
+		bo_reload_mapinfo_next = true;
 		window.setTimeout("bo_map_timer();", 1000 * 60);
 	}
 	
@@ -886,6 +888,12 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		<?php } ?>	
 
 		bo_user_last_activity = now.getTime() / 1000;
+		
+		if (bo_reload_mapinfo_next)
+		{
+			bo_reload_mapinfo_next = false;
+			bo_reload_mapinfo();
+		}
 	}
 	
 	function bo_map_reload_page()

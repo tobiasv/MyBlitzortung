@@ -238,7 +238,7 @@
 @define('BO_UP_ERR_SEND_INTERVAL', 720);
 
 // if new station count is too low -> don't read new data
-@define('BO_UP_STATION_DIFFER',   0.9);
+@define('BO_UP_STATION_DIFFER', 0.95);
 
 
 

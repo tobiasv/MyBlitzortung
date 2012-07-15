@@ -1719,7 +1719,10 @@ function bo_update_stations($force = false)
 		foreach($all_stations as $id => $d)
 		{
 			//station was deleted in stations.txt :(
-			if (!isset($StData[$id]) && time() - strtotime($d['last_time']) > 24*3600*7)
+			//we also check the last activity -> delete only if too long ago
+			//this doesn't touch change in username (handled above) and is a workaround 
+			//for problems when downloading stations.txt
+			if (!isset($StData[$id]) && time() - strtotime($d['last_time']) > 24*3600*365)
 			{
 				bo_delete_station($id);
 			}
