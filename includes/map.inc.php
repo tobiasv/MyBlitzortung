@@ -1212,22 +1212,16 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	function bo_tile_coord(zoom, coord, tile_size)
 	{
 		this.failimg = "<?php echo bo_bofile_url() ?>?image=bt";
+		var a = Math.pow(2, zoom) / (tile_size/256);
 		
-		var x = coord.x;
-		var y = coord.y;
-		var a = Math.pow(2,zoom - tile_size/256 + 1);
-		
-		if (y < 0 || y >= a)
+		if (coord.y < 0 || coord.y >= a)
 		{
 			this.ok = false;
 		}
 		else
 		{
-			x = x < 0 ? x%a+a : x;
-			x = x%a;
-			
-			this.x = x;
-			this.y = y;
+			this.x = coord.x < 0 ? coord.x%a+a : coord.x%a;
+			this.y = coord.y;
 			this.ok = true;
 		}
 	}

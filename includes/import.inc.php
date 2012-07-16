@@ -1616,14 +1616,20 @@ function bo_update_stations($force = false)
 			$stId = intval($cols[0]);
 
 			if (!$l || !$stId)
-				continue;
-
-			if (!$stId || count($cols) < 10)
 			{
-				bo_echod("Wrong line format: \"$l\"");
+				$file_truncated = true;
 				continue;
 			}
 
+			if (!$stId || count($cols) < 10)
+			{
+				$file_truncated = true;
+				bo_echod("Wrong line format: \"$l\"");
+				continue;
+			}
+			
+			
+			$file_truncated = false;
 
 			$stUser 	= $cols[1];
 			$stCity 	= strtr(html_entity_decode($cols[3]), array(chr(160) => ' '));
@@ -1722,7 +1728,7 @@ function bo_update_stations($force = false)
 			//we also check the last activity -> delete only if too long ago
 			//this doesn't touch change in username (handled above) and is a workaround 
 			//for problems when downloading stations.txt
-			if (!isset($StData[$id])
+			if (!isset($StData[$id]) && !$file_truncated
 				&& time() - strtotime($d['last_time'])  > 24*3600*BO_DELETE_STATION_DAYS
 				&& time() - strtotime($d['first_seen']) > 24*3600*BO_DELETE_STATION_DAYS
 				)

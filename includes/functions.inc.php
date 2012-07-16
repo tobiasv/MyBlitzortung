@@ -2362,15 +2362,19 @@ function bo_str_max($str, $max = 35)
 }
 
 
-function bo_get_latest_calc_time($last_update = 0)
+function bo_get_latest_strike_calc_time()
 {
 	$row = BoDb::query("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes s")->fetch_assoc();
 	$time = strtotime($row['mtime'].' UTC');
 	
 	if (time() - $time < BO_LATEST_STRIKE_TIME_CALC * 60)
+	{
 		return $time;
+	}
 	else
-		return $last_update;
+	{
+		return BoData::get('uptime_strikes_modified');
+	}
 		
 }
 

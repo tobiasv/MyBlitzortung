@@ -79,7 +79,7 @@ function bo_tile()
 		$time_manual_to = strtotime($_GET['to']);
 
 		// set "current" time
-		$time = $time_manual_to;
+		$last_update_time = $time_manual_to;
 		
 		// add config
 		$cfg['trange'] = ($time_manual_to - $time_manual_from) / 60; 
@@ -138,8 +138,8 @@ function bo_tile()
 	/***********************************************************/
 	
 	//estimate last update
-	$last_update = floor(time() / 60 / $update_interval) * 60 * $update_interval;
-	bo_tile_headers($update_interval, $last_update, $caching);
+	$last_update_time = floor(time() / 60 / $update_interval) * 60 * $update_interval;
+	bo_tile_headers($update_interval, $last_update_time, $caching);
 
 	
 	//Caching, but nor for info image
@@ -153,7 +153,7 @@ function bo_tile()
 
 		$file = $dir.$filename;
 
-		bo_output_cachefile_if_exists($file, $last_update, $update_interval * 60);
+		bo_output_cachefile_if_exists($file, $last_update_time, $update_interval * 60);
 	}
 	
 	
@@ -161,97 +161,33 @@ function bo_tile()
 	/***********************************************************/
 	/*** Is in Radius around station? **************************/
 	/***********************************************************/
-		
-	list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($x, $y, $zoom, $tile_size);
 	
-	//Check if zoom or position is in limit
-	$radius = $_BO['radius'] * 1000; //max. Distance
-	if ($radius)
+	if (!$only_info)
 	{
-		if ($zoom < BO_MAX_ZOOM_LIMIT) //set max. distance to 0 (no limit) for small zoom levels
-		{
-			$radius = 0;
-		}
-		else
-		{
-			$circle_center_lat = BO_MAP_LAT ? BO_MAP_LAT : BO_LAT;
-			$circle_center_lon = BO_MAP_LON ? BO_MAP_LON : BO_LON;
-			
-			//return text if outside of radius
-			//Step 1: Easy and fast way to detect tile outside of square around circle
-			list($max_lat, $max_lon) = bo_distbearing2latlong($radius * sqrt(2), 45 , $circle_center_lat, $circle_center_lon);
-			if ( ($lat1 > $max_lat && $lat2 > $max_lat) || ($lon1 > $max_lon && $lon2 > $max_lon) )
-				bo_tile_message('tile not available', 'na', $caching, array(), $tile_size);
-			list($min_lat, $min_lon) = bo_distbearing2latlong($radius * sqrt(2), 225, $circle_center_lat, $circle_center_lon);
-			if ( ($lat1 < $min_lat && $lat2 < $min_lat) || ($lon1 < $min_lon && $lon2 < $min_lon) )
-				bo_tile_message('tile not available', 'na', $caching, array(), $tile_size);
-
-			
-			//Step 2: Closer look, check distance to nearest tile edge
-			list($dummy1, $dummy2, $tile_center_lat, $tile_center_lon) = bo_get_tile_dim($x*2, $y*2+1, $zoom, $tile_size/2);
-
-			$bear = bo_latlon2bearing($tile_center_lat, $tile_center_lon, $circle_center_lat, $circle_center_lon);
-
-			//Step 2b: Find closest/farthest edge of tile
-			if (0 <= $bear && $bear < 90) //tile is NE of center
-			{
-				$tile_check_lat_close = $lat1;
-				$tile_check_lon_close = $lon1;
-				$circle_check_lat_border = $lat1 < $max_lat;
-				$circle_check_lon_border = $lon1 < $max_lon;
-			}
-			else if (90 <= $bear && $bear < 180) //tile is SE of center
-			{
-				$tile_check_lat_close = $lat2;
-				$tile_check_lon_close = $lon1;
-				$circle_check_lat_border = $lat2 > $min_lat;
-				$circle_check_lon_border = $lon1 < $max_lon;
-			}
-			else if (180 <= $bear && $bear < 270) //tile is SW of center
-			{
-				$tile_check_lat_close = $lat2;
-				$tile_check_lon_close = $lon2;
-				$circle_check_lat_border = $lat2 > $min_lat;
-				$circle_check_lon_border = $lon2 > $min_lon;
-			}
-			else  //tile is NW of center
-			{
-				$tile_check_lat_close = $lat1;
-				$tile_check_lon_close = $lon2;
-				$circle_check_lat_border = $lat1 < $max_lat;
-				$circle_check_lon_border = $lon2 > $min_lon;
-			}
-			
-			//Step 2c: Distance of edges
-			$dist_close = bo_latlon2dist($tile_check_lat_close, $tile_check_lon_close, $circle_center_lat, $circle_center_lon);
-			
-			//Step 2d: Closest edge is outside and whole circle doesn't lie inside?
-			if ($dist_close > $radius && !($min_lat > $lat1 && $max_lat < $lat2 && $min_lon > $lon1 && $max_lon < $lon2))
-			{
-				
-				//special case: 
-				// closest edge is outside
-				// && center of circle is bewteen min/max height or min/max width of tile
-				//  ===> border intersects with circle
-				if (   ($lat1 < $circle_center_lat && $circle_center_lat < $lat2 && $circle_check_lat_border)
-				    || ($lon1 < $circle_center_lon && $circle_center_lon < $lon2 && $circle_check_lon_border)
-				   )
-				{
-					if ($tile_size > 256)
-					{
-						//Todo:
-						//output a message on blank parts of the tile
-					}
-				}
-				else
-				{
-					bo_tile_message('tile not available', 'na', $caching, array(), $tile_size);
-				}
-			}
-		}
+		list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($x, $y, $zoom, $tile_size);
 		
+		//Check if zoom or position is in limit
+		$radius = $_BO['radius'] * 1000; //max. Distance
+		if ($radius)
+		{
+			if ($zoom < BO_MAX_ZOOM_LIMIT) //set max. distance to 0 (no limit) for small zoom levels
+			{
+				$radius = 0;
+			}
+			else
+			{
+				$circle_center_lat = BO_MAP_LAT ? BO_MAP_LAT : BO_LAT;
+				$circle_center_lon = BO_MAP_LON ? BO_MAP_LON : BO_LON;
+				$na_positions = bo_tile_check_na_positions($radius, $x, $y, $zoom, $tile_size, $lat1, $lon1, $lat2, $lon2, $circle_center_lat, $circle_center_lon, $caching);
+				
+				//all positions are not available
+				if ($na_positions && $na_positions == bo_tile_positions_all($tile_size))
+				{
+					bo_tile_message('tile not available', 'na', $caching, array(), $tile_size);		
+				}
+			}
+		}
 	}
-	
 	
 	/***********************************************************/
 	/*** Time periods (2) **************************************/
@@ -260,7 +196,7 @@ function bo_tile()
 	//FIRST DB ACCESS!
 	if (!$time_manual_from)
 	{
-		$time = BoData::get('uptime_strikes_modified');
+		$last_update_time = bo_get_latest_strike_calc_time();
 	}
 		
 	if ($show_count) 
@@ -280,7 +216,7 @@ function bo_tile()
 			if (!is_array($ccfg) || !$ccfg['upd_intv'])
 				continue;
 			
-			$times_min[$i] = ceil(($time - 60*$ccfg['tstart']) / $ccfg['upd_intv'] / 60) * $ccfg['upd_intv'] * 60;
+			$times_min[$i] = ceil(($last_update_time - 60*$ccfg['tstart']) / $ccfg['upd_intv'] / 60) * $ccfg['upd_intv'] * 60;
 			$times_max[$i] = $times_min[$i] + 60 * $ccfg['trange'];
 		}
 		
@@ -296,22 +232,23 @@ function bo_tile()
 	{
 		//normal strike display
 		$c = $cfg['col'];
-		$time_min   = ceil(($time - 60*$cfg['tstart']) / $update_interval / 60) * $update_interval * 60;
+		$time_min   = ceil(($last_update_time - 60*$cfg['tstart']) / $update_interval / 60) * $update_interval * 60;
 		$time_max   = $time_min + 60 * $cfg['trange'];
 	}
 	
 	if (!$time_min || !$time_max)
-		bo_tile_output();
+		bo_tile_output($file, $caching);
 
-
+		
+	//Update headers, time may be updated now!
+	if ($caching) 
+		bo_tile_headers($update_interval, $last_update_time, $caching);
+	
 	//send only the info/color-legend image (colors, time)
 	if ($only_info)
 	{
 		//get real last update var
-		$last_update = bo_get_latest_calc_time($last_update);
-		$time_max = min($last_update, $time_max);
 		$show_date = $time_manual_from || ($time_max-$time_min) > 3600 * 12 ? true : false;
-		bo_tile_headers($update_interval, $last_update, $caching);
 		bo_tile_time_colors($type, $time_min, $time_max, $show_date, $caching ? $update_interval : false);
 		exit;
 	}
@@ -575,7 +512,7 @@ function bo_tile()
 	
 	
 	//no points --> blank tile
-	if ($num == 0)
+	if ($num == 0 && $na_positions == 0)
 	{
 		bo_tile_output($file, $caching);
 	}
@@ -712,6 +649,11 @@ function bo_tile()
 			imageellipse($I, $px, $py, $deviation, $deviation, $col);
 		}
 		
+	}
+	
+	if ($na_positions > 0)
+	{
+		bo_tile_insert_text($I, 'tile not available', $tile_size, array(), $na_positions);
 	}
 	
 	imagecolortransparent($I, $blank);
@@ -946,11 +888,9 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 	if ($I === null)
 	{
 		$img = file_get_contents(BO_DIR.'images/blank_tile.png');
-		$ok = @file_put_contents($file, $img);
-		touch($file);
 		
-		if (!$ok && $caching)
-			bo_image_cache_error($tile_size, $tile_size);
+		if ($caching && $file)
+			file_put_contents($file, $img);
 		
 		header("Content-Type: image/png");
 		echo $img;
@@ -990,44 +930,10 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 	
 	if (!file_exists($file) || !$caching)
 	{
-		$text = strtr(_BL($text, true), $replace);
-		
 		$I = imagecreate($tile_size, $tile_size);
-
 		$blank = imagecolorallocate($I, 255, 255, 255);
-		$textcol = imagecolorallocate($I, 70, 70, 70);
-		$box_bg  = imagecolorallocate($I, 210, 210, 255);
-		$box_line  = imagecolorallocate($I, 255, 255, 255);
-
-		imagefilledrectangle( $I, 0, 0, $tile_size, $tile_size, $blank);
-		
-		$text = strtr($text, array('\n' => "\n"));
-		
-		$lines = explode("\n", $text);
-		$height = (count($lines));
-		$width = 0;
-		foreach($lines as $line)
-			$width = max(strlen($line), $width);
-		
-		$fwidth  = imagefontwidth(BO_MAP_NA_FONTSIZE);
-		$fheight = imagefontheight(BO_MAP_NA_FONTSIZE);
-
-		//rows/columns if tile > 256
-		for ($x=0; $x < $tile_size; $x+=256)
-		{
-			for ($y=0; $y < $tile_size; $y+=256)
-			{
-
-				//draw text
-				imagefilledrectangle( $I, 25+$x, 115+$y, 35+$width*$fwidth+$x, 127+$height*$fheight+$y, $box_bg  );
-				imagerectangle(       $I, 25+$x, 115+$y, 35+$width*$fwidth+$x, 127+$height*$fheight+$y, $box_line);
-
-				foreach($lines as $i=>$line)
-					imagestring($I, BO_MAP_NA_FONTSIZE, 30+$x, 120+$i*$fheight+$y, $line, $textcol);
-			
-			}
-		}
-		
+		imagefilledrectangle($I, 0, 0, $tile_size, $tile_size, $blank);
+		bo_tile_insert_text($I, $text, $tile_size, $replace);
 		imagecolortransparent($I, $blank);
 		
 		if (!$caching)
@@ -1048,6 +954,49 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 	readfile($file);
 
 	exit;
+}
+
+function bo_tile_insert_text($I, $text, $tile_size = BO_TILE_SIZE, $replace = array(), $positions = false)
+{
+	bo_load_locale();
+	
+	if ($positions === false)
+		$positions = bo_tile_positions_all($tile_size);
+		
+	$text = strtr(_BL($text, true), $replace);
+	$text = strtr($text, array('\n' => "\n"));
+	$lines = explode("\n", $text);
+	$height = (count($lines));
+	$width = 0;
+	foreach($lines as $line)
+		$width = max(strlen($line), $width);
+	
+	$fwidth   = imagefontwidth(BO_MAP_NA_FONTSIZE);
+	$fheight  = imagefontheight(BO_MAP_NA_FONTSIZE);
+	$textcol  = imagecolorallocate($I, 70, 70, 70);
+	$box_bg   = imagecolorallocate($I, 210, 210, 255);
+	$box_line = imagecolorallocate($I, 255, 255, 255);
+	imagesetthickness($I, 1);
+	
+	//rows/columns if tile > 256
+	$pos = 0;
+	for ($y=0; $y < $tile_size; $y+=256)
+	{
+		for ($x=0; $x < $tile_size; $x+=256)
+		{
+			//draw text if position is set
+			if ( (1<<$pos) & $positions)
+			{
+				imagefilledrectangle( $I, 25+$x, 115+$y, 35+$width*$fwidth+$x, 127+$height*$fheight+$y, $box_bg  );
+				imagerectangle(       $I, 25+$x, 115+$y, 35+$width*$fwidth+$x, 127+$height*$fheight+$y, $box_line);
+
+				foreach($lines as $i=>$line)
+					imagestring($I, BO_MAP_NA_FONTSIZE, 30+$x, 120+$i*$fheight+$y, $line, $textcol);
+			}
+			
+			$pos++;
+		}
+	}
 }
 
 function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_interval)
@@ -1112,15 +1061,15 @@ function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_in
 }
 
 
-function bo_tile_headers($update_interval, $last_update, $caching)
+function bo_tile_headers($update_interval, $last_update_time, $caching)
 {
-	$exp_time    = $last_update + 60 * $update_interval + 59;
+	$exp_time    = $last_update_time + 60 * $update_interval + 59;
 	
 	if (time() - $exp_time < 10)
 		$exp_time = time() + 60;
 	
 	//Headers
-	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
+	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update_time)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
 	header("Content-Disposition: inline; filename=\"MyBlitzortungTile.png\"");
 	
@@ -1146,10 +1095,11 @@ function bo_get_tile_dim($x,$y,$zoom, $size=BO_TILE_SIZE)
 
 	$MtopLat = $y / $tilesZoom;
 	$MbottomLat = $MtopLat + 1 / $tilesZoom;
+	$lat  = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * $MbottomLat))))) - (M_PI / 2));
+	$lat2 = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * $MtopLat)))))    - (M_PI / 2));
 
-	$lat = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * $MbottomLat))))) - (M_PI / 2));
-	$lat2 = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * $MtopLat))))) - (M_PI / 2));
-
+	//echo " $lat / $lat2 --- $lon / ".($lon+$lonW)." "; exit;
+	
 	return array($lat, $lon, $lat2, $lon+$lonW);
 }
 
@@ -1182,5 +1132,106 @@ function bo_sql_lon2tilex($name, $zoom)
 	return $x;
 }
 
+function bo_tile_positions_all($tile_size)
+{
+	return pow(2, pow($tile_size/256, 2)) - 1;
+}
+
+
+function bo_tile_check_na_positions($radius, $x, $y, $zoom, $tile_size, $lat1, $lon1, $lat2, $lon2, $circle_center_lat, $circle_center_lon, $caching)
+{
+	//Step 1: Easy and fast way to detect tile outside of square around circle
+	list($max_lat, ) = bo_distbearing2latlong($radius, 0  , $circle_center_lat, $circle_center_lon);
+	list(, $max_lon) = bo_distbearing2latlong($radius, 90 , $circle_center_lat, $circle_center_lon);
+	if ( ($lat1 > $max_lat && $lat2 > $max_lat) || ($lon1 > $max_lon && $lon2 > $max_lon) )
+		return bo_tile_positions_all($tile_size);
+		
+	list($min_lat, ) = bo_distbearing2latlong($radius, 180, $circle_center_lat, $circle_center_lon);
+	list(, $min_lon) = bo_distbearing2latlong($radius, 270, $circle_center_lat, $circle_center_lon);
+	if ( ($lat1 < $min_lat && $lat2 < $min_lat) || ($lon1 < $min_lon && $lon2 < $min_lon) )
+		return bo_tile_positions_all($tile_size);
+		
+	//Step 2: Closer look, find center, split tile into 4 tiles
+	$x = $x*2;
+	$y = $y*2;
+	list($dummy1, $dummy2, $tile_center_lat, $tile_center_lon) = bo_get_tile_dim($x, $y+1, $zoom, $tile_size/2);
+	$bear = bo_latlon2bearing($tile_center_lat, $tile_center_lon, $circle_center_lat, $circle_center_lon);
+
+	
+	//Step 2b: Find closest/farthest edge of tile
+	if (0 <= $bear && $bear < 90) //tile is NE of center
+	{
+		$tile_check_lat_close = $lat1;
+		$tile_check_lon_close = $lon1;
+		$circle_check_lat_border = $lat1 < $max_lat;
+		$circle_check_lon_border = $lon1 < $max_lon;
+	}
+	else if (90 <= $bear && $bear < 180) //tile is SE of center
+	{
+		$tile_check_lat_close = $lat2;
+		$tile_check_lon_close = $lon1;
+		$circle_check_lat_border = $lat2 > $min_lat;
+		$circle_check_lon_border = $lon1 < $max_lon;
+	}
+	else if (180 <= $bear && $bear < 270) //tile is SW of center
+	{
+		$tile_check_lat_close = $lat2;
+		$tile_check_lon_close = $lon2;
+		$circle_check_lat_border = $lat2 > $min_lat;
+		$circle_check_lon_border = $lon2 > $min_lon;
+	}
+	else  //tile is NW of center
+	{
+		$tile_check_lat_close = $lat1;
+		$tile_check_lon_close = $lon2;
+		$circle_check_lat_border = $lat1 < $max_lat;
+		$circle_check_lon_border = $lon2 > $min_lon;
+	}
+	
+	//Step 2c: Distance of edges
+	$dist_close = bo_latlon2dist($tile_check_lat_close, $tile_check_lon_close, $circle_center_lat, $circle_center_lon);
+	
+	
+	
+	//Step 2d: Closest edge is outside
+	$na_positions = 0;
+		
+	
+	
+	//special case: center of circle is bewteen min/max height or min/max width of tile
+	// -> tile border is a tangent to circle
+	$tile_tangent = ($lat1 < $circle_center_lat && $circle_center_lat < $lat2 && $circle_check_lon_border)
+				 || ($lon1 < $circle_center_lon && $circle_center_lon < $lon2 && $circle_check_lat_border);
+
+	
+	// OR closest edge is inside circle
+	//  ===> border intersects with circle
+	if ($dist_close < $radius || $tile_tangent)
+	{
+	
+		//if tile is bigger than 256pixels, then check for each area 
+		//output a message on blank parts of the tile
+		if ($tile_size > 256)
+		{
+			//todo: works only for 512px tiles, not bigger!
+			$res = bo_tile_check_na_positions($radius, $x, $y, $zoom, $tile_size/2, $tile_center_lat, $lon1, $lat2, $tile_center_lon, $circle_center_lat, $circle_center_lon, $caching);
+			$na_positions |= $res << 0;
+			$res = bo_tile_check_na_positions($radius, $x+1, $y, $zoom, $tile_size/2, $tile_center_lat, $tile_center_lon, $lat2, $lon2, $circle_center_lat, $circle_center_lon, $caching);
+			$na_positions |= $res << 1;
+			$res = bo_tile_check_na_positions($radius, $x, $y+1, $zoom, $tile_size/2, $lat1, $lon1, $tile_center_lat, $tile_center_lon, $circle_center_lat, $circle_center_lon, $caching);
+			$na_positions |= $res << 2;
+			$res = bo_tile_check_na_positions($radius, $x+1, $y+1, $zoom, $tile_size/2, $lat1, $tile_center_lon, $tile_center_lat, $lon2, $circle_center_lat, $circle_center_lon, $caching);
+			$na_positions |= $res << 3;
+		}
+	}
+	else if (!($min_lat > $lat1 && $max_lat < $lat2 && $min_lon > $lon1 && $max_lon < $lon2))
+	{
+		//if whole circle doesn't lie inside the tile
+		return bo_tile_positions_all($tile_size);
+	}
+	
+	
+	return $na_positions;
+}
 
 ?>
