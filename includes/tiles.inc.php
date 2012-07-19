@@ -24,6 +24,8 @@ function bo_tile()
 	$cfg          = $_BO['mapcfg'][$type];
 	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
 	$restricted   = false;
+	$user_nolimit = (bo_user_get_level() & BO_PERM_NOLIMIT);
+	
 	
 	if ($show_count)
 		$tile_size = BO_TILE_SIZE_COUNT;
@@ -49,7 +51,7 @@ function bo_tile()
 	
 	if ( $station_id > 0 && $station_id != bo_station_id() && BO_MAP_STATION_SELECT !== true )
 	{
-		if (!(bo_user_get_level() & BO_PERM_NOLIMIT))
+		if (!$user_nolimit)
 		{
 			bo_tile_message('tile_station_not_allowed', 'station_na', $caching, array(), $tile_size);
 		}
@@ -57,6 +59,12 @@ function bo_tile()
 		$restricted = true;
 	}
 
+	if ($zoom >= BO_MAX_ZOOM_LIMIT && $user_nolimit)
+	{
+		//for correct naming of cache file, we have to set this here
+		//real testing of limit is done after caching
+		$restricted = true;
+	}
 
 	
 	/***********************************************************/
@@ -67,7 +75,7 @@ function bo_tile()
 	{
 		if (!$only_info && BO_MAP_MANUAL_TIME_ENABLE !== true)
 		{
-			if (!(bo_user_get_level() & BO_PERM_NOLIMIT))
+			if (!$user_nolimit)
 			{
 				bo_tile_message('tile_time_range_na_err', 'range_na', $caching, array(), $tile_size);
 			}
