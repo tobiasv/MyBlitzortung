@@ -491,6 +491,9 @@ function bo_check_for_update()
 			break;
 		}
 	}
+	
+	bo_update_db_compression();
+	
 
 	if ($updated)
 	{
@@ -518,6 +521,28 @@ function bo_version2number($version)
 		$num += (abs(ord($r[6]) - ord('a')) + 1) * 0.01;
 	
 	return $num;
+}
+
+
+function bo_update_db_compression()
+{
+	
+	//for compression, the data type has to be changed to longblob
+	//no need to change back, even if compression gets disabled again
+	if (BO_DB_COMPRESSION === true)
+	{
+		$row = BoDb::query("SHOW COLUMNS FROM `".BO_DB_PREF."conf` WHERE Field='data' AND Type != 'mediumblob'")->fetch_assoc();
+		
+		if ($row['Type'] && strtolower($row['Type']) != 'mediumblob')
+		{
+			$sql = 'ALTER TABLE `'.BO_DB_PREF.'conf` CHANGE  `data`  `data` MEDIUMBLOB NOT NULL';
+			$ok = BoDb::query($sql, false);
+			echo '<ul><li>Converting data column to enable compression (EXPERIMENTAL!)</li>';
+			echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+			echo '</ul>';
+			flush();
+		}
+	}
 }
 
 

@@ -18,14 +18,14 @@ class BoData
 	public static function get($name, &$changed=0)
 	{
 		$sql = "SELECT data, UNIX_TIMESTAMP(changed) changed FROM ".BO_DB_PREF."conf WHERE name='".BoDb::esc($name)."'";
-		$row = BoDb::query($sql)->fetch_object();
-		$changed = $row->changed;
-		$row->data = $row->data;
+		$row = BoDb::query($sql)->fetch_assoc();
+		$changed = $row['changed'];
+		self::uncompress($row['data']);
 		
 		if (self::$do_cache)
-			self::$cache['data'][$name] = $row->data;
+			self::$cache['data'][$name] = $row['data'];
 		
-		return $row->data;
+		return $row['data'];
 	}
 	
 	public static function get_all($search, $limit = 0)
@@ -48,6 +48,8 @@ class BoData
 			$query = false;
 			return false;
 		}
+		
+		self::uncompress($row['data']);
 		
 		if (self::$do_cache)
 			self::$cache['data'][$row['name']] = $row['data'];
@@ -80,6 +82,7 @@ class BoData
 		}
 		
 		//insert data
+		self::compress($data);
 		$data_esc = BoDb::esc($data);
 		
 		if (!$update)
@@ -104,6 +107,9 @@ class BoData
 
 	public static function update_add($name, $add)
 	{
+		if ($add == 0)
+			return true;
+		
 		//unset cache, as we cannot be sure about the value after update
 		unset(self::$cache['data'][$name]);
 	
@@ -155,6 +161,30 @@ class BoData
 		
 		$sql = "DELETE FROM ".BO_DB_PREF."conf WHERE name LIKE '$search'";
 		return BoDb::query($sql);
+	}
+	
+	private static function compress(&$data)
+	{
+		//never compress numbers or short text!
+		if (BO_DB_COMPRESSION === true && strlen($data) > 100)
+		{
+			$zdata = gzcompress($data);
+			
+			if ($zdata)
+				$data = $zdata;
+		}
+	}
+
+	private static function uncompress(&$data)
+	{
+		//check if it is compressed data
+		if (ord($data[0]) == 120 && ord($data[1]) == 156)
+		{
+			$udata = gzuncompress($data);
+			
+			if ($udata)
+				$data = $udata;
+		}
 	}
 
 }

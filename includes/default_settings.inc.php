@@ -1212,6 +1212,11 @@
 //low priority updates for some update queries
 @define('BO_DB_UPDATE_LOW_PRIORITY', false);
 
+//compression for the "conf" table (mainly used for statistics)
+//can speed up import of data
+//note: immediately after enabling this setting, login to user area as admin
+//a update is needed! 
+@define('BO_DB_COMPRESSION', false);
 
 /*******************************************************************/
 /*** Some special settings which shouldn't be changed            ***/
