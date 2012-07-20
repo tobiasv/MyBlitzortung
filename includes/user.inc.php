@@ -186,7 +186,7 @@ function bo_user_do_login_byid($id, $pass)
 	{
 		$user = BO_USER;
 	}
-	else
+	elseif ($id > 1)
 	{
 		$row = BoDb::query("SELECT login FROM ".BO_DB_PREF."user WHERE id='$id'")->fetch_assoc();
 		$user = $row['login'];
@@ -268,6 +268,9 @@ function bo_user_get_name($user_id = 0)
 	if ($user_id == 1)
 		return BO_USER;
 
+	if (!$user_id)
+		return '';
+		
 	if (!isset($names[$user_id]))
 	{
 		$res = BoDb::query("SELECT login FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
