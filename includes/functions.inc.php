@@ -2054,7 +2054,7 @@ function bo_cache_log($text, $end = false)
 
 	if ($end)
 	{
-		file_put_contents(BO_DIR.'cache/cache.log', $lines."---\n", FILE_APPEND);
+		file_put_contents(BO_DIR.BO_CACHE_DIR.'/cache.log', $lines."---\n", FILE_APPEND);
 		return;
 	}
 	
