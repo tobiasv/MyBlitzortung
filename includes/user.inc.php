@@ -1,5 +1,7 @@
 <?php
 
+//workaround for myblitzortung.ORG
+@define(BO_DB_PREF_USER, BO_DB_PREF);
 
 
 function bo_user_show_admin()
@@ -161,7 +163,7 @@ function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 		if ($md5pass == false)
 			$pass = md5($pass);
 
-		$res = BoDb::query("SELECT id, login, level FROM ".BO_DB_PREF."user WHERE login='$user' AND password='$pass'");
+		$res = BoDb::query("SELECT id, login, level FROM ".BO_DB_PREF_USER."user WHERE login='$user' AND password='$pass'");
 
 		if ($res->num_rows == 1)
 		{
@@ -188,7 +190,7 @@ function bo_user_do_login_byid($id, $pass)
 	}
 	elseif ($id > 1)
 	{
-		$row = BoDb::query("SELECT login FROM ".BO_DB_PREF."user WHERE id='$id'")->fetch_assoc();
+		$row = BoDb::query("SELECT login FROM ".BO_DB_PREF_USER."user WHERE id='$id'")->fetch_assoc();
 		$user = $row['login'];
 	}
 
@@ -252,7 +254,7 @@ function bo_user_get_level($user_id = 0)
 	if ($user_id == 1)
 		return pow(2, BO_PERM_COUNT) - 1;
 
-	$res = BoDb::query("SELECT level FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+	$res = BoDb::query("SELECT level FROM ".BO_DB_PREF_USER."user WHERE id='".intval($user_id)."'");
 	$row = $res->fetch_assoc();
 
 	return $row['level'];
@@ -273,7 +275,7 @@ function bo_user_get_name($user_id = 0)
 		
 	if (!isset($names[$user_id]))
 	{
-		$res = BoDb::query("SELECT login FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+		$res = BoDb::query("SELECT login FROM ".BO_DB_PREF_USER."user WHERE id='".intval($user_id)."'");
 		$row = $res->fetch_assoc();
 		$names[$user_id] = $row['login'];
 		
@@ -295,7 +297,7 @@ function bo_user_get_mail($user_id = 0)
 
 	if (!isset($mails[$user_id]))
 	{
-		$res = BoDb::query("SELECT mail FROM ".BO_DB_PREF."user WHERE id='".intval($user_id)."'");
+		$res = BoDb::query("SELECT mail FROM ".BO_DB_PREF_USER."user WHERE id='".intval($user_id)."'");
 		$row = $res->fetch_assoc();
 		$mails[$user_id] = $row['mail'];
 	}
@@ -313,7 +315,7 @@ function bo_user_show_passw_change()
 		if ($pass1 && $pass2 && $pass1 == $pass2)
 		{
 			$pass = md5($pass1);
-			BoDb::query("UPDATE ".BO_DB_PREF."user SET password='$pass' WHERE id='".bo_user_get_id()."'");
+			BoDb::query("UPDATE ".BO_DB_PREF_USER."user SET password='$pass' WHERE id='".bo_user_get_id()."'");
 			echo '<div class="bo_info_ok">';
 			echo _BL('Password changed!');
 			echo '</div>';
@@ -370,7 +372,7 @@ function bo_user_show_useradmin()
 				}
 			}
 
-			$sql = " ".BO_DB_PREF."user SET mail='$new_user_mail' ";
+			$sql = " ".BO_DB_PREF_USER."user SET mail='$new_user_mail' ";
 
 			if ($user_id != 1)
 			{
@@ -384,7 +386,7 @@ function bo_user_show_useradmin()
 			}
 
 			//To be sure, if creation of main user during install failed
-			BoDb::query("INSERT IGNORE INTO ".BO_DB_PREF."user SET id=1", false);
+			BoDb::query("INSERT IGNORE INTO ".BO_DB_PREF_USER."user SET id=1", false);
 
 			if ($user_id)
 				$ok = BoDb::query("UPDATE $sql WHERE id='$user_id'", false);
@@ -406,7 +408,7 @@ function bo_user_show_useradmin()
 
 	if ($_GET['bo_action2'] == 'delete' && $user_id > 1 && (bo_user_get_level() & BO_PERM_ADMIN) )
 	{
-		BoDb::query("DELETE FROM ".BO_DB_PREF."user WHERE id='$user_id'");
+		BoDb::query("DELETE FROM ".BO_DB_PREF_USER."user WHERE id='$user_id'");
 		BoData::delete_all('alert_'.$user_id.'%');
 		$user_id = 0;
 	}
@@ -431,7 +433,7 @@ function bo_user_show_useradmin()
 	}
 
 	$sql = "SELECT id, login, password, level, mail
-			FROM ".BO_DB_PREF."user
+			FROM ".BO_DB_PREF_USER."user
 			ORDER BY id
 			";
 	$res = BoDb::query($sql);
