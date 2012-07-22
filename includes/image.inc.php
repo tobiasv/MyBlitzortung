@@ -461,14 +461,15 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if ($expire < time() - 10)
 		$expire = time() + $update_interval;
 	
-	
-	//Headers
-	header("Pragma: ");
-	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
-	header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
-	header("Cache-Control: public, max-age=".($expire - time()));
-	header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.".$extension."\"");
-
+	if ($return_img)
+	{
+		//Headers
+		header("Pragma: ");
+		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update)." GMT");
+		header("Expires: ".gmdate("D, d M Y H:i:s", $expire)." GMT");
+		header("Cache-Control: public, max-age=".($expire - time()));
+		header("Content-Disposition: inline; filename=\"MyBlitzortungStrikeMap.".$extension."\"");
+	}
 	
 	if ($caching)
 	{
