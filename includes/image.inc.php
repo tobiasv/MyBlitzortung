@@ -984,7 +984,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	bo_image_reduce_colors($I, false, $transparent);
 
-	header("Content-Type: $mime");
+	
 	if ($caching)
 	{
 		if (BO_CACHE_SUBDIRS === true)
@@ -1108,7 +1108,7 @@ function bo_get_map_image_ani()
 	$disposal = 2;
 	$gif = new GIFEncoder($frames, $framed, $loops, $disposal, 0, 0, 0, "url"); 
 
-	header('Content-type: image/gif'); 
+
 	if ($caching)
 	{
 		file_put_contents($cache_file, $gif->GetAnimation());
@@ -1116,6 +1116,7 @@ function bo_get_map_image_ani()
 	}
 	else
 	{
+		header('Content-type: image/gif');
 		echo $gif->GetAnimation(); 
 	}
 	

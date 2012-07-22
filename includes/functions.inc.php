@@ -2244,20 +2244,24 @@ function bo_output_cachefile_if_exists($cache_file, $last_update, $update_interv
 
 	}
 	
-	if (BO_CACHE_WAIT_SAME_FILE > 0)
+	if (BO_CACHE_WAIT_SAME_FILE > 0 && $isfile)
 	{
 		//Nothing found
 		//mark "file is currently under construction"
-		touch($isfile);
-		register_shutdown_function('unlink', $isfile);
+		@mkdir(dirname($cache_file), 0777, true);
+		if (touch($isfile))
+			register_shutdown_function('unlink_quiet', $isfile);
 		ignore_user_abort(true);
 	}
 }
 
-function bo_readfile_mime($file)
+function unlink_quiet($f)
 {
-	$extension = strtolower(substr($file, strrpos($file, '.')+1));
-	
+	@unlink($f);
+}
+
+function extension2mime($extension)
+{
 	if ($extension == 'jpg' || $extension == 'jpeg')
 		$mime = "image/jpeg";
 	elseif ($extension == 'gif')
@@ -2265,8 +2269,14 @@ function bo_readfile_mime($file)
 	elseif ($extension == 'png')
 		$mime = "image/png";
 
+	return $mime;
+}
+
+function bo_readfile_mime($file)
+{
+	$extension = strtolower(substr($file, strrpos($file, '.')+1));
+	$mime = extension2mime($extension);
 	bo_cache_log("Read - $mime");
-		
 	header("Content-Type: $mime");
 	readfile($file);
 	flush();
@@ -2399,6 +2409,11 @@ function bo_hours($h)
 function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quality = BO_IMAGE_JPEG_QUALITY)
 {
 	$extension = strtr($extension, array('.' => ''));
+
+	if (!headers_sent() && $file === null)
+	{
+		header("Content-Type: ".extension2mime($extension));
+	}
 	
 	//there seems to be an error in very rare cases
 	//we retry to save the image if it didn't work

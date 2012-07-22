@@ -707,7 +707,6 @@ function bo_tile_tracks()
 	{
 		if (file_exists($file) && filemtime($file) + intval(BO_UP_INTVL_TRACKS) > time())
 		{
-			header("Content-Type: image/png");
 			bo_output_cache_file($file, $lastscan);
 			exit;
 		}
@@ -898,14 +897,20 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 		$img = file_get_contents(BO_DIR.'images/blank_tile.png');
 		
 		if ($caching && $file)
+		{
 			file_put_contents($file, $img);
+			bo_output_cache_file($file, $time_max + $update_interval * 60);
+		}
+		else
+		{
+			header("Content-Type: image/png");
+			echo $img;
+		}
 		
-		header("Content-Type: image/png");
-		echo $img;
 		exit;
 	}
 		
-	header("Content-Type: image/png");
+	
 	if ($caching)
 	{
 		$ok = bo_imageout($I, 'png', $file);
@@ -916,7 +921,10 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 		bo_output_cache_file($file, $time_max + $update_interval * 60);
 	}
 	else
+	{
+		header("Content-Type: image/png");
 		bo_imageout($I);
+	}
 		
 	imagedestroy($I);
 
@@ -946,7 +954,6 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 		
 		if (!$caching)
 		{
-			header("Content-Type: image/png");
 			bo_imageout($I, 'png');
 			exit;
 		}
@@ -1050,7 +1057,7 @@ function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_in
 		imagestring($I, BO_MAP_LEGEND_FONTSIZE, 2, BO_MAP_LEGEND_HEIGHT+1, date('H:i', $time_min).' - '.date('H:i', $time_max), $col);
 
 	
-	header("Content-Type: image/png");
+	
 	if ($update_interval)
 	{
 		$ok = bo_imageout($I, 'png', $cache_file, $time_max);
@@ -1062,6 +1069,7 @@ function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_in
 	}
 	else
 	{
+		header("Content-Type: image/png");
 		bo_imageout($I, $extension);
 	}
 	
