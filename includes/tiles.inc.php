@@ -1079,6 +1079,9 @@ function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_in
 
 function bo_tile_headers($update_interval, $last_update_time, $caching)
 {
+	if (headers_sent())
+		return;
+		
 	$exp_time    = $last_update_time + 60 * $update_interval + 59;
 	
 	if (time() - $exp_time < 10)
