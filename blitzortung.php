@@ -79,6 +79,11 @@ if (!defined("BO_VER"))
 		ini_set('display_errors', 0);
 		set_error_handler("bo_error_handler");
 	}
+	elseif (BO_DEBUG === "silent")
+	{
+		ini_set('display_errors', 0);
+		error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+	}
 	else
 	{
 		ini_set('display_errors', 0);

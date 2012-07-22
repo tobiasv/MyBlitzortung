@@ -461,7 +461,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if ($expire < time() - 10)
 		$expire = time() + $update_interval;
 	
-	if ($return_img)
+	if (!$return_img)
 	{
 		//Headers
 		header("Pragma: ");
