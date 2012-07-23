@@ -2836,11 +2836,9 @@ function bo_graph_error($w=400, $h=300)
 function bo_graph_output($I, $cache_file, $mod_time = 0)
 {
 	$dir = dirname($cache_file).'/';
-	header("Content-Type: image/png");
-	
-
 	if (BO_CACHE_DISABLE === true || !is_writeable($dir) || (file_exists($cache_file) && !is_writeable($cache_file)) )
 	{
+		header("Content-Type: image/png");
 		imagepng($I);
 	}
 	else
