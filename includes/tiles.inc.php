@@ -119,6 +119,7 @@ function bo_tile()
 	if ($show_count) 
 	{
 		$update_intervals = array();
+		$type = 0;
 		
 		if ($time_manual_from)
 			$count_types[0] = -1;
@@ -127,10 +128,16 @@ function bo_tile()
 
 		foreach($count_types as $i)
 		{
+			$type += pow(2, $i);
 			$ccfg = $time_manual_from ? $cfg : $_BO['mapcfg'][$i];
 			$update_intervals[$i] = $ccfg['upd_intv'];
 		}
-		
+
+		if ($_GET['stat'] == 2)
+			$type = 'count_stat_'.($only_station ? 'only_' : '').'_'.$station_info_id.$type;
+		else
+			$type = 'count_'.$type;
+			
 		$update_interval = count($update_intervals) ? min($update_intervals) : 0;
 	}
 	else
@@ -210,7 +217,6 @@ function bo_tile()
 	if ($show_count) 
 	{
 		// display strike count
-		$type = 0;
 		$time_range = 0;
 		$time_start = 0;
 		$time_min = array();
@@ -218,7 +224,6 @@ function bo_tile()
 			
 		foreach($count_types as $i)
 		{
-			$type += pow(2, $i);
 			$ccfg = $time_manual_from ? $cfg : $_BO['mapcfg'][$i];
 			
 			if (!is_array($ccfg) || !$ccfg['upd_intv'])
@@ -230,11 +235,6 @@ function bo_tile()
 		
 		$time_min        = count($times_min) ? min($times_min) : 0;
 		$time_max        = count($times_max) ? max($times_max) : 0;
-		
-		if ($_GET['stat'] == 2)
-			$type = 'count_stat_'.($only_station ? 'only_' : '').'_'.$station_info_id.$type;
-		else
-			$type = 'count_'.$type;
 	}
 	else 
 	{
