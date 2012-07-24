@@ -910,7 +910,10 @@ function bo_load_locale($locale = '')
 		}
 	}
 	
-	if (BO_LANG_REDIRECT === true && empty($_POST) && !headers_sent() 
+	if (BO_LANG_REDIRECT === true 
+		&& empty($_POST) 
+		&& !headers_sent()
+		&& php_sapi_name() != 'cli'
 		&& $main_lang 
 		&& (!isset($_GET[BO_LANG_ARGUMENT]) || $_GET[BO_LANG_ARGUMENT] != $main_lang) 
 		)
