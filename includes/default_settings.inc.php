@@ -179,7 +179,7 @@
 @define('BO_TRANSLATE_SINGLE_WORDS', 0);
 
 //redirect so that always the correct "bo_lang=xx" in URL
-@define('BO_LANG_REDIRECT', true);
+@define('BO_LANG_REDIRECT', false);
 
 
 

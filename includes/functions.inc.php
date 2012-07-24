@@ -276,6 +276,14 @@ function bo_get_current_stationid()
 	if (!$station_id && intval($_COOKIE['bo_select_stationid']))
 	{
 		$station_id = intval($_COOKIE['bo_select_stationid']);
+		
+		//Redirect, so that URL matches to content (for caching!)
+		if (!headers_sent())
+		{
+			$url = bo_insert_url('bo_station_id', $station_id, true);
+			header("Location: http://".$_SERVER['HTTP_HOST'].$url);
+			exit;
+		}
 	}
 	
 	return $station_id;

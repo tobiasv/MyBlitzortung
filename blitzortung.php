@@ -259,13 +259,23 @@ if (!defined("BO_VER"))
 	
 	if (BO_SEND_CACHE_HEADER_HTML > 0 && !headers_sent())
 	{
-		$max_age = BO_SEND_CACHE_HEADER_HTML; 
-		header("Pragma: ");
+		if (intval($_COOKIE['bo_select_stationid']) || bo_user_get_level())
+		{
+			$max_age = 5;
+			header("Cache-Control: private, max-age=".$max_age);
+		}
+		else
+		{
+			$max_age = BO_SEND_CACHE_HEADER_HTML;
+			header("Cache-Control: public, max-age=".$max_age);
+		}
 
 		$data_time = intval(time()/60)*60 - $max_age;
+		header("Pragma: ");
 		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $data_time)." GMT");
 		header("Expires: ".gmdate("D, d M Y H:i:s", time() + $max_age - 1) ." GMT");
-		header("Cache-Control: public, max-age=".$max_age);
+		
+		
 	}
 	
 }
