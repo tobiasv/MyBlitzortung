@@ -278,7 +278,7 @@ function bo_get_current_stationid()
 		$station_id = intval($_COOKIE['bo_select_stationid']);
 		
 		//Redirect, so that URL matches to content (for caching!)
-		if (!headers_sent())
+		if (empty($_POST) && !headers_sent())
 		{
 			$url = bo_insert_url('bo_station_id', $station_id, true);
 			header("Location: http://".$_SERVER['HTTP_HOST'].$url);
@@ -910,7 +910,10 @@ function bo_load_locale($locale = '')
 		}
 	}
 	
-	if (BO_LANG_REDIRECT === true && $main_lang && (!isset($_GET[BO_LANG_ARGUMENT]) || $_GET[BO_LANG_ARGUMENT] != $main_lang) )
+	if (BO_LANG_REDIRECT === true && empty($_POST) && !headers_sent() 
+		&& $main_lang 
+		&& (!isset($_GET[BO_LANG_ARGUMENT]) || $_GET[BO_LANG_ARGUMENT] != $main_lang) 
+		)
 	{
 		$url = bo_insert_url(BO_LANG_ARGUMENT, $main_lang, true);
 		header("Location: http://".$_SERVER['HTTP_HOST'].$url);
