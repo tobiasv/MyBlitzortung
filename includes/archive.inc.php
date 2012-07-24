@@ -951,7 +951,9 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	{
 		//default is displaying own signals!
 		$hours_back = 24;
-		$own_station = true;
+		
+		if (bo_station_id() > 0)
+			$own_station = true;
 	}
 	
 	
