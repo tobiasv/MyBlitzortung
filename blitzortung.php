@@ -273,6 +273,6 @@ if (!defined("BO_VER"))
 
 
 require_once 'includes/pages.inc.php';
-
+require_once 'includes/functions_html.inc.php';
 
 ?>

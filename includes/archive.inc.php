@@ -854,8 +854,14 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	$show_details = $_GET['bo_show_details'];
 	$show_other_graphs = isset($_GET['bo_other_graphs']) && $perm;
 	$show_cities = isset($_GET['bo_show_cities']);
-	$station_id = $perm && $_GET['bo_station_id'] ? intval($_GET['bo_station_id']) : bo_station_id();
 	$own_station   = bo_station_id() > 0 && bo_station_id() == $station_id;
+
+	if ($perm)
+	{
+		$station_id = bo_get_current_stationid();
+	}
+	else
+		$station_id = bo_station_id();
 	
 	$channels   = BoData::get('raw_channels');
 	$raw_bpv    = BoData::get('raw_bitspervalue');

@@ -112,8 +112,8 @@ function bo_show_statistics()
 
 	if (defined('BO_STATISTICS_ALL_STATIONS') && BO_STATISTICS_ALL_STATIONS || ((bo_user_get_level() & BO_PERM_NOLIMIT)))
 	{
-		$station_id = intval($_GET['bo_station_id']);
-
+		$station_id = bo_get_current_stationid();
+		
 		if ($station_id && $station_id != bo_station_id())
 		{
 			$add_stid = 'bo_station_id='.$station_id;

@@ -268,36 +268,17 @@ function bo_get_station_list(&$style_class = array())
 	return $opts;
 }
 
-function bo_get_stations_html_select($station_id)
+
+function bo_get_current_stationid()
 {
-	$opts = bo_get_station_list($style_class);
+	$station_id = intval($_GET['bo_station_id']);
 
-	$text = '<select name="bo_station_id" onchange="submit()">';
-	$text .= '<option></option>';
-	foreach($opts as $id => $name)
+	if (!$station_id && intval($_COOKIE['bo_select_stationid']))
 	{
-		$text .= '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').' class="'.$style_class[$id].'">';
-		$text .= $name;
-		$text .= '</option>';
+		$station_id = intval($_COOKIE['bo_select_stationid']);
 	}
-	$text .= '</select>';
-
-	return $text;
-}
-
-
-//insert HTML-hidden tags of actual GET-Request
-function bo_insert_html_hidden($exclude = array())
-{
-	foreach($_GET as $name => $val)
-	{
-		if (array_search($name, $exclude) !== false || $name == BO_LANG_ARGUMENT)
-			continue;
-
-		echo "\n".'<input type="hidden" name="'.htmlentities($name).'" value="'.htmlentities($val).'">';
-	}
-	if (BO_LOCALE != _BL())
-		echo "\n".'<input type="hidden" name="'.BO_LANG_ARGUMENT.'" value="'._BL().'">';
+	
+	return $station_id;
 }
 
 function bo_insert_url($exclude = array(), $add = null)
