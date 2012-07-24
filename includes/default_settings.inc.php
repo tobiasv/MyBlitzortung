@@ -658,6 +658,11 @@
 //Calculates Densities for current year/month also for other stations than yours
 @define('BO_CALC_DENSITIES_CURRENT_ALL', false);
 
+//Calculates Densities for given stations ids, separated by comma
+//otherwise only general densitiy and your densitiy will be calculated
+//set to 'all' to calculate for all stations
+@define('BO_DENSITY_STATIONS', '');
+
 //When displaying densities, group max values (higher =>more grouping, 0=no)
 @define('BO_DENSITIES_GROUP_MAX', 30);
 
