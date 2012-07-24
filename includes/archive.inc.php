@@ -854,7 +854,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	$show_details = $_GET['bo_show_details'];
 	$show_other_graphs = isset($_GET['bo_other_graphs']) && $perm;
 	$show_cities = isset($_GET['bo_show_cities']);
-	$own_station   = bo_station_id() > 0 && bo_station_id() == $station_id;
+	$own_station = bo_station_id() > 0 && bo_station_id() == $station_id;
 
 	if ($perm)
 	{
@@ -949,7 +949,9 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	}
 	else
 	{
+		//default is displaying own signals!
 		$hours_back = 24;
+		$own_station = true;
 	}
 	
 	
@@ -957,7 +959,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	{
 		$time_start = $datetime_start;
 		$time_end   = time();
-		$sort = 'DESC';
+		$sort = 'ASC';
 	}
 	else if ($show_strike_list) // display strikes
 	{
@@ -984,7 +986,6 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			$time_start = $time_end - 3600 * $hours_back;
 		}
 		
-		
 		$sort = 'DESC';
 	}
 	else //display signals
@@ -1009,7 +1010,6 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		}
 		elseif (!$time_end)
 			$time_end = time();
-		
 		
 		$time_start = $time_end - 3600 * $hours_back;
 		$sort = 'DESC';
@@ -1088,18 +1088,24 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			LIMIT ".($page * $per_page).", ".($per_page+1)."";
 	$res = BoDb::query($sql);
 
-	if ($sort == 'DESC')
+
+
+	$page_nav = '';
+	if ($res->num_rows > $per_page && $page < $max_pages)
 	{
-		$sort1_text = 'Older';
-		$sort2_text = 'Newer';
+		if ($sort == 'DESC')
+			$page_nav .= '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
+		else
+			$page_nav .= '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt</a>';
 	}
-	else
+	
+	if ($page)
 	{
-		$sort1_text = 'Newer';
-		$sort2_text = 'Older';
-	}	
-	
-	
+		if ($sort == 'DESC')
+			$page_nav .= '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL('Newer').' &gt;</a>';
+		else
+			$page_nav .= '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL('Older').'</a>';
+	}
 		
 	
 	if ($show_strike_list)
@@ -1182,18 +1188,11 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 
 	}
 
-	echo '<div class="bo_sig_navi">';
-	if ($res->num_rows > $per_page && $page < $max_pages)
-		echo '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL($sort1_text).'</a>';
-	if ($page)
-		echo '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL($sort2_text).' &gt;</a>';
-	echo '</div>';
-
+	echo '<div class="bo_sig_navi">'.$page_nav.'</div>';
 	echo '<table class="bo_sig_table';
 	echo $show_spectrum ? ' bo_sig_table_spectrum' : '';
 	echo $show_xy_graph ? ' bo_sig_table_xy_graph' : '';
 	echo '">';
-
 	
 	while($row = $res->fetch_assoc())
 	{
@@ -1788,16 +1787,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 
 	echo '</table>';
 
-	if ($count && ($count == $per_page && $page < $max_pages || $page))
-	{
-		echo '<div class="bo_sig_navi">';
-		if ($count == $per_page && $page < $max_pages)
-			echo '<a href="'.bo_insert_url('bo_action', $page+1).'#bo_arch_table_form" class="bo_sig_prev" rel="nofollow">&lt; '._BL($sort1_text).'</a>';
-		if ($page)
-			echo '<a href="'.bo_insert_url('bo_action', $page-1).'#bo_arch_table_form" class="bo_sig_next" rel="nofollow">'._BL($sort2_text).' &gt;</a>';
-		echo '</div>';
-	}
-
+	echo '<div class="bo_sig_navi">'.$page_nav.'</div>';
 	
 	echo '</form>';
 	
