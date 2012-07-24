@@ -128,15 +128,15 @@ if (!defined("BO_VER"))
 	$_BO['headers_sent'] = headers_sent();
 
 	//Update with new data from blitzortung.org
-	$do_update = false;
-	$force_update = false;
+	$bo_do_update = false;
+	$bo_force_update = false;
 	if (isset($_GET['update']))
 	{
 		if (defined('BO_UPDATE_SECRET') && BO_UPDATE_SECRET && $_GET['secret'] !== BO_UPDATE_SECRET)
 			exit('Wrong secret: "<b>'.htmlentities($_GET['secret']).'</b>"  Look in your config.php for "<b>BO_UPDATE_SECRET</b>"');
 
-		$do_update = true;
-		$force_update = isset($_GET['force']);
+		$bo_do_update = true;
+		$bo_force_update = isset($_GET['force']);
 
 		header("Content-Type: text/plain");
 	}
@@ -145,9 +145,9 @@ if (!defined("BO_VER"))
 		foreach ($argv as $a)
 		{
 			if ($a == 'update')
-				$do_update = true;
+				$bo_do_update = true;
 			elseif ($a == 'force')
-				$force_update = true;
+				$bo_force_update = true;
 		}
 	}
 
@@ -155,20 +155,20 @@ if (!defined("BO_VER"))
 	bo_load_locale();
 
 	//decisions what to do begins...
-	if ($do_update)
+	if ($bo_do_update)
 	{
 		require_once 'includes/import.inc.php';
-		bo_update_all($force_update, strtolower($_GET['only']));
+		bo_update_all($bo_force_update, strtolower($_GET['only']));
 		exit;
 	}
 	else if (isset($_POST['bo_do_login']))
 	{
 		//Login
-		$login_name   = BoDb::esc(bo_gpc_prepare($_POST['bo_user']));
-		$login_pass   = BoDb::esc(bo_gpc_prepare($_POST['bo_pass']));
-		$login_cookie = $_POST['bo_login_cookie'] ? true : false;
+		$bo_login_name   = BoDb::esc(bo_gpc_prepare($_POST['bo_user']));
+		$bo_login_pass   = BoDb::esc(bo_gpc_prepare($_POST['bo_pass']));
+		$bo_login_cookie = $_POST['bo_login_cookie'] ? true : false;
 
-		if (!bo_user_do_login($login_name, $login_pass, $login_cookie))
+		if (!bo_user_do_login($bo_login_name, $bo_login_pass, $bo_login_cookie))
 			$_BO['login_fail'] = true;
 	}
 	else if (isset($_GET['bo_logout']))
@@ -232,22 +232,22 @@ if (!defined("BO_VER"))
 	//Order maps
 	if (defined('BO_MAPS_ORDER') && strlen(BO_MAPS_ORDER))
 	{
-		$order = explode(',',BO_MAPS_ORDER);
-		$tmp = array();
+		$bo_order = explode(',',BO_MAPS_ORDER);
+		$bo_tmp = array();
 		ksort($_BO['mapimg']);
 
-		foreach($order as $id)
+		foreach($bo_order as $id)
 		{
-			$tmp[$id] = $_BO['mapimg'][$id];
+			$bo_tmp[$id] = $_BO['mapimg'][$id];
 		}
 
 		foreach($_BO['mapimg'] as $id => $data)
 		{
-			if (!isset($tmp[$id]))
-				$tmp[$id] = $_BO['mapimg'][$id];
+			if (!isset($bo_tmp[$id]))
+				$bo_tmp[$id] = $_BO['mapimg'][$id];
 		}
 
-		$_BO['mapimg'] = $tmp;
+		$_BO['mapimg'] = $bo_tmp;
 	}
 
 	
@@ -261,19 +261,19 @@ if (!defined("BO_VER"))
 	{
 		if (intval($_COOKIE['bo_select_stationid']) || bo_user_get_level())
 		{
-			$max_age = 5;
-			header("Cache-Control: private, max-age=".$max_age);
+			$bo_max_age = 5;
+			header("Cache-Control: private, max-age=".$bo_max_age);
 		}
 		else
 		{
-			$max_age = BO_SEND_CACHE_HEADER_HTML;
-			header("Cache-Control: public, max-age=".$max_age);
+			$bo_max_age = BO_SEND_CACHE_HEADER_HTML;
+			header("Cache-Control: public, max-age=".$bo_max_age);
 		}
 
-		$data_time = intval(time()/60)*60 - $max_age;
+		$bo_data_time = intval(time()/60)*60 - $bo_max_age;
 		header("Pragma: ");
-		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $data_time)." GMT");
-		header("Expires: ".gmdate("D, d M Y H:i:s", time() + $max_age - 1) ." GMT");
+		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $bo_data_time)." GMT");
+		header("Expires: ".gmdate("D, d M Y H:i:s", time() + $bo_max_age - 1) ." GMT");
 		
 		
 	}

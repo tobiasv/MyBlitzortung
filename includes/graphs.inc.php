@@ -570,6 +570,9 @@ function bo_graph_statistics()
 			$d = substr($row['time'], 6, 2);
 			$time = strtotime("$y-$m-$d");
 			$i = date('z', $time) - $day_offset;
+			
+			//ToDo...!
+			BoData::uncompress($row['data']);
 			$d = unserialize($row['data']);
 
 			if ($region)

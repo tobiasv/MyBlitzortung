@@ -1138,7 +1138,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 		if (!$data[$type]['time_first'])
 			$data[$type]['time_first'] = time();
 
-		BoData::set('download_statistics', serialize($data));
+		BoData::set_delayed('download_statistics', serialize($data));
 	}
 
 	if ($range > 0)

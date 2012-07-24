@@ -8,15 +8,13 @@ class BoData
 	static $query = false;
 	static $search_string = "";
 	static $do_cache = false;
-	
-	public static function cache_load($name)
-	{
-		//todo
-		self::$cache['data'][$name] = $row->data;
-	}
-	
+	static $do_write_on_exit = false;
+
 	public static function get($name, &$changed=0)
 	{
+		if (isset(self::$cache['data'][$name]))
+			return self::$cache['data'][$name];
+		
 		$sql = "SELECT data, UNIX_TIMESTAMP(changed) changed FROM ".BO_DB_PREF."conf WHERE name='".BoDb::esc($name)."'";
 		$row = BoDb::query($sql)->fetch_assoc();
 		$changed = $row['changed'];
@@ -59,50 +57,28 @@ class BoData
 			'changed' => $row['changed']);
 	}
 
-	public static function set($name, $data)
+	public static function set($name, $data, $ignore_cache = false)
 	{
 		//data hasn't changed
-		if (isset(self::$cache['data'][$name]) && self::$cache['data'][$name] == $data)
+		if (!$ignore_cache && isset(self::$cache['data'][$name]) && self::$cache['data'][$name] == $data)
 			return true;
-		
-		$data = utf8_encode($data);
+
+		$data_utf8 = utf8_encode($data);
+		self::compress($data_utf8);
+		$data_esc = BoDb::esc($data_utf8);
 		$name_esc = BoDb::esc($name);
 		
-		//we don't need to ask the database whether row exists, if it's in cache
-		// --> Maybe dangerous!??
-		if (isset(self::$cache['data'][$name]))
-		{
-			$update = true;
-		}
-		else
-		{
-			$sql = "SELECT data, name FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
-			$row = BoDb::query($sql)->fetch_object();
-			$update = $row->name;
-		}
-		
-		//insert data
-		self::compress($data);
-		$data_esc = BoDb::esc($data);
-		
-		if (!$update)
-		{
-			$sql = "INSERT INTO ".BO_DB_PREF."conf SET data='$data_esc', name='$name_esc'";
-		}
-		elseif ($update && $row->data != $data)
-		{
-			$low_prio = BO_DB_UPDATE_LOW_PRIORITY ? "LOW_PRIORITY" : "";
-			$sql = "UPDATE $low_prio ".BO_DB_PREF."conf SET data='$data_esc' WHERE name='$name_esc'";
-		}
-		else
-			$sql = NULL; // no update necessary
-
+		$low_prio = BO_DB_UPDATE_LOW_PRIORITY ? "LOW_PRIORITY" : "";
+		$sql = "REPLACE $low_prio INTO ".BO_DB_PREF."conf SET data='$data_esc', name='$name_esc'";
 		$ok = BoDb::query($sql);
 		
 		if ($ok && self::$do_cache)
+		{
 			self::$cache['data'][$name] = $data;
+			unset(self::$cache['delay'][$name]);
+		}
 			
-		return $sql ? $ok : true;
+		return $ok;
 	}
 
 	public static function update_add($name, $add)
@@ -146,6 +122,7 @@ class BoData
 		return $ok;
 	}
 	
+
 	public static function delete($name)
 	{
 		$sql = "DELETE FROM ".BO_DB_PREF."conf WHERE name='$name_esc'";
@@ -163,7 +140,49 @@ class BoData
 		return BoDb::query($sql);
 	}
 	
-	private static function compress(&$data)
+	
+	
+	
+	
+	/************* Delayed Writes **************/
+	// if multipe ::set with same name have been called, only the last one is used
+	
+	public static function set_delayed($name, $data)
+	{
+		//data hasn't changed
+		if (isset(self::$cache['data'][$name]) && self::$cache['data'][$name] == $data)
+			return true;
+	
+		if (!self::$do_write_on_exit)
+		{
+			register_shutdown_function('BoData::write_shutdown');
+			self::$do_write_on_exit = true;
+		}
+		
+		self::$cache['data'][$name] = $data;
+		self::$cache['delay'][$name] = true;
+	}
+	
+	public static function write_shutdown()
+	{
+		if (is_array(self::$cache['delay']))
+		{
+			foreach(self::$cache['delay'] as $name => $data)
+			{
+				if (isset(self::$cache['data'][$name]))
+				{
+					self::set($name, self::$cache['data'][$name], true);
+				}
+			}
+		}
+	
+	}
+	
+	
+	
+	/************* Compression **************/
+	
+	public static function compress(&$data)
 	{
 		//never compress numbers or short text!
 		if (BO_DB_COMPRESSION === true && strlen($data) > 100)
@@ -175,7 +194,7 @@ class BoData
 		}
 	}
 
-	private static function uncompress(&$data)
+	public static function uncompress(&$data)
 	{
 		//check if it is compressed data
 		if (ord($data[0]) == 120 && ord($data[1]) == 156)

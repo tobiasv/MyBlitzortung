@@ -146,8 +146,8 @@ function bo_db_recreate_strike_keys($quiet = false)
 	if (!$keys['timelatlon'] && $bytes_time && $bytes_latlon)
 		$sql_alter[] = 'ADD INDEX `timelatlon_index` (`time_x`,`lat_x`,`lon_x`)';
 
-	if (!$keys['time'] && $bytes_time)
-		$sql_alter[] = 'ADD INDEX `time_index` (`time_x`)';
+	//if (!$keys['time'] && $bytes_time)
+	//	$sql_alter[] = 'ADD INDEX `time_index` (`time_x`)';
 
 	if (!$keys['latlon'] && $bytes_latlon)
 		$sql_alter[] = 'ADD INDEX `latlon_index` (`lat_x`,`lon_x`)';

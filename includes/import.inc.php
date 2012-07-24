@@ -2046,16 +2046,24 @@ function bo_update_stations($force = false)
 }
 
 // Daily and longtime strike counts
-function bo_update_daily_stat()
+function bo_update_daily_stat($time = false, $force_renew = false)
 {
 	global $_BO;
 
 	$ret = false;
 
-	//Update strike-count per day
-	$ytime = mktime(date('H')-3,0,0,date("n"),date('j')-1);
-	$day_id = gmdate('Ymd', $ytime);
-	$data = unserialize(BoData::get('strikes_'.$day_id));
+	//default yesterday
+	if (!$time) 
+	{
+		$time = mktime(date('H')-3,0,0,date("n"),date('j')-1);
+		$day_id = gmdate('Ymd', $time);
+	}
+	
+	if (!$force_renew)
+	{
+		$data = unserialize(BoData::get('strikes_'.$day_id));
+	}
+	
 
 	// Daily Statistics and longtime strike-count
 	if (!$data || !is_array($data) || !$data['done'])
@@ -2064,14 +2072,14 @@ function bo_update_daily_stat()
 		bo_echod("=== Updating daily statistics ===");
 
 		$radius = BO_RADIUS_STAT * 1000;
-		$yesterday_start = gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 00:00:00', $ytime)));
-		$yesterday_end =   gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 23:59:59', $ytime)));
+		$day_start = gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 00:00:00', $time)));
+		$day_end =   gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 23:59:59', $time)));
 
-		$stat_ok = BoData::get('uptime_stations') > $yesterday_end + 60;
-		$raw_ok  = BoData::get('uptime_raw') > $yesterday_end + 60;
+		$stat_ok = BoData::get('uptime_stations') > $day_end + 60;
+		$raw_ok  = BoData::get('uptime_raw') > $day_end + 60;
 
 		// Strikes SQL template
-		$sql_template = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes s WHERE {where} time BETWEEN '$yesterday_start' AND '$yesterday_end'";
+		$sql_template = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes s WHERE {where} time BETWEEN '$day_start' AND '$day_end'";
 
 		if (!is_array($data) || $data['status'] < 1)
 		{
@@ -2092,8 +2100,25 @@ function bo_update_daily_stat()
 							3 => $row_own_rad['cnt']
 						);
 
+						
+			/*** Longtime statistics ***/
+			$D = unserialize(BoData::get('longtime_max_strikes_day_all'));
+			if ($D[0] < $row_all['cnt'])
+				BoData::set('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $time)));
+
+			$D = unserialize(BoData::get('longtime_max_strikes_day_all_rad'));
+			if ($D[0] < $row_all_rad['cnt'])
+				BoData::set('longtime_max_strikes_day_all_rad', serialize(array($row_all_rad['cnt'], $time)));
+
+			$D = unserialize(BoData::get('longtime_max_strikes_day_own'));
+			if ($D[0] < $row_own['cnt'])
+				BoData::set('longtime_max_strikes_day_own', serialize(array($row_own['cnt'], $time)));
+
+			$D = unserialize(BoData::get('longtime_max_strikes_day_own_rad'));
+			if ($D[0] < $row_own_rad['cnt'])
+				BoData::set('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $time)));
+						
 			$data['status'] = 1;
-			BoData::set('strikes_'.$day_id, serialize($data));
 		}
 		else if ($data['status'] == 1 )
 		{
@@ -2114,7 +2139,6 @@ function bo_update_daily_stat()
 
 			$data[7] = $strikes_region;
 			$data['status'] = 2;
-			BoData::set('strikes_'.$day_id, serialize($data));
 		}
 		else if ($data['status'] == 2 && $stat_ok)
 		{
@@ -2130,20 +2154,18 @@ function bo_update_daily_stat()
 
 			$data[10] = $stations;
 			$data['status'] = 3;
-			BoData::set('strikes_'.$day_id, serialize($data));
-
 		}
 		else if ($data['status'] == 3 && $raw_ok)
 		{
 
 			/*** Signals ***/
 			//own exact value
-			$signals_exact = BoDb::query("SELECT COUNT(id) cnt FROM ".BO_DB_PREF."raw WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end'")->fetch_assoc();
+			$signals_exact = BoDb::query("SELECT COUNT(id) cnt FROM ".BO_DB_PREF."raw WHERE time BETWEEN '$day_start' AND '$day_end'")->fetch_assoc();
 
 			//all from station statistics
 			$sql = "SELECT SUM(signalsh) cnt, COUNT(DISTINCT time) entries, station_id=".bo_station_id()." own
 							FROM ".BO_DB_PREF."stations_stat
-							WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end' AND station_id != 0
+							WHERE time BETWEEN '$day_start' AND '$day_end' AND station_id != 0
 							GROUP BY own, HOUR(time)";
 			$res = BoDb::query($sql);
 			while ($row = $res->fetch_assoc())
@@ -2156,12 +2178,17 @@ function bo_update_daily_stat()
 			$data[5] = round($signals[0]);
 			$data[6] = round($signals[1]);
 
+			
+			/*** Longtime statistics ***/
+			$D = unserialize(BoData::get('longtime_max_signals_day_own'));
+			if ($D[0] < $signals_exact['cnt'])
+				BoData::set('longtime_max_signals_day_own', serialize(array($signals_exact['cnt'], $time)));
+
+				
 			$data['status'] = 4;
-			BoData::set('strikes_'.$day_id, serialize($data));
 		}
 		else if ($data['status'] == 4 && $raw_ok)
 		{
-			$start_time = time();
 			$max_lines = 2000;
 			$limit = intval($data['raw_limit']);
 
@@ -2183,7 +2210,7 @@ function bo_update_daily_stat()
 							freq1, freq2, freq1_amp, freq2_amp,
 							channels, ntime
 					FROM ".BO_DB_PREF."raw
-					WHERE time BETWEEN '$yesterday_start' AND '$yesterday_end'
+					WHERE time BETWEEN '$day_start' AND '$day_end'
 					LIMIT $limit,$max_lines";
 			$res = BoDb::query($sql);
 			while ($row = $res->fetch_assoc())
@@ -2257,65 +2284,48 @@ function bo_update_daily_stat()
 				$data['raw_limit'] = $limit + $rows;
 			}
 
-			BoData::set('strikes_'.$day_id, serialize($data));
 		}
 
-		bo_echod("Datasets: ".count($data)."");
-
-
-		/*** Longtime statistics ***/
-		$D = unserialize(BoData::get('longtime_max_strikes_day_all'));
-		if ($D[0] < $row_all['cnt'])
-			BoData::set('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $ytime)));
-
-		$D = unserialize(BoData::get('longtime_max_strikes_day_all_rad'));
-		if ($D[0] < $row_all_rad['cnt'])
-			BoData::set('longtime_max_strikes_day_all_rad', serialize(array($row_all_rad['cnt'], $ytime)));
-
-		$D = unserialize(BoData::get('longtime_max_strikes_day_own'));
-		if ($D[0] < $row_own['cnt'])
-			BoData::set('longtime_max_strikes_day_own', serialize(array($row_own['cnt'], $ytime)));
-
-		$D = unserialize(BoData::get('longtime_max_strikes_day_own_rad'));
-		if ($D[0] < $row_own_rad['cnt'])
-			BoData::set('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $ytime)));
-
-		$D = unserialize(BoData::get('longtime_max_signals_day_own'));
-		if ($D[0] < $signals_exact['cnt'])
-			BoData::set('longtime_max_signals_day_own', serialize(array($signals_exact['cnt'], $ytime)));
-
+		$sdata = serialize($data);
+		BoData::set('strikes_'.$day_id, $sdata);
+		bo_echod("Datasets: ".count($data)." Length: ".strlen($sdata));
 		$ret = true;
-	}
-
-	//Update strike-count per month
-	$ytime = mktime(date('H')-1,0,0,date("n")-1,date('j'));
-	$month_id = gmdate('Ym', $ytime);
-	$last_month_count = BoData::get('strikes_month_'.$month_id);
-
-	// Monthly Statistics
-	if (!$last_month_count)
-	{
-		$data = array();
-		$data['daycount'] = 0;
-
-		while($row = BoData::get_all('strikes_".$month_id."%'))
+		
+		
+		
+		//Update strike-count per month
+		if ($data['done'])
 		{
-			$d = unserialize($row['data']);
-
-			foreach($d as $id => $cnt)
+			$month_id = gmdate('Ym', $month_time);
+			$last_month_count = BoData::get('strikes_month_'.$month_id);
+			
+			if (!$last_month_count)
 			{
-				if (!is_array($cnt))
-					$data[$id] += $cnt;
+				$data = array();
+				$data['daycount'] = 0;
+
+				while($row = BoData::get_all('strikes_'.$month_id.'%'))
+				{
+					$d = unserialize($row['data']);
+
+					foreach($d as $id => $cnt)
+					{
+						if (!is_array($cnt))
+							$data[$id] += $cnt;
+					}
+
+					$data['daycount']++;
+				}
+
+				BoData::set('strikes_month_'.$month_id, serialize($data));
+
+				bo_echod("Monthly data '$month_id' updated.");
 			}
-
-			$data['daycount']++;
 		}
-
-		BoData::set('strikes_month_'.$month_id, serialize($data));
-
-		$ret = true;
+		
 	}
 
+	
 	return $ret;
 }
 
