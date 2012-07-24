@@ -259,7 +259,15 @@ function bo_get_stations_html_select($station_id)
 		$text .= '</option>';
 	}
 	$text .= '</select>';
-
+	
+	if ($station_id)
+	{
+		$text .= '
+			<script type="text/javascript">
+			document.cookie="bo_select_stationid='.$station_id.';";
+			</script>';
+	}
+	
 	return $text;
 }
 
