@@ -281,7 +281,7 @@ function bo_get_current_stationid()
 	return $station_id;
 }
 
-function bo_insert_url($exclude = array(), $add = null)
+function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 {
 	if (!is_array($exclude))
 		$exclude = array($exclude);
@@ -306,16 +306,26 @@ function bo_insert_url($exclude = array(), $add = null)
 		$query .= $exclude[0].'='.urlencode($add).'&';
 
 	//Always add current language in url if not default (ie nedded for caching)
-	if (BO_LOCALE != _BL() && array_search(BO_LANG_ARGUMENT, $exclude) === false)
+	if ( (BO_LOCALE != _BL() || BO_LANG_REDIRECT) && array_search(BO_LANG_ARGUMENT, $exclude) === false)
 		$query .=  BO_LANG_ARGUMENT.'='._BL().'&';
-
-		
+	
+	$query = strtr($query, array('&&' => '&'));	
 	$url = $_SERVER['REQUEST_URI'];
-	preg_match('@/([^/\?]+)\?|$@', $url, $r);
-
-	$query = strtr($query, array('&&' => '&'));
-
-	return $r[1].'?'.$query;
+	
+	if ($absolute)
+	{
+		//add the requested file with path
+		preg_match('@([^\?]+)(\?|$)@', $url, $r);
+		$url = $r[1].'?'.$query;
+	}
+	else
+	{
+		//add the requested file
+		preg_match('@/([^/\?]+)(\?|$)@', $url, $r);
+		$url = $r[1].'?'.$query;
+	}
+	
+	return $url;
 }
 
 
@@ -806,23 +816,26 @@ function bo_load_locale($locale = '')
 {
 	global $_BL;
 	$locdir = BO_DIR.'locales/';
+	$load = array();
+	$langs = array_flip(explode(',', BO_LANGUAGES));
 
+	
 	if (BO_LOCALE2 && file_exists($locdir.BO_LOCALE2.'.php')) // 2nd locale -> include first
 	{
-		include $locdir.BO_LOCALE2.'.php';
+		$load[] = BO_LOCALE2;
 	}
 
 	if (file_exists($locdir.BO_LOCALE.'.php')) //main locale -> overwrites 2nd
 	{
-		include $locdir.BO_LOCALE.'.php';
+		$load[] = BO_LOCALE;
 	}
 	elseif (BO_LOCALE2 != 'en')
 	{
-		include $locdir.'en.php';
+		$load[] = 'en';
 	}
 
 	if (file_exists($locdir.'own.php')) //own translation (language independent)
-		include $locdir.'own.php';
+		$load[] = 'own';
 
 
 	//individual locale for user (link, session, cookie)
@@ -845,25 +858,86 @@ function bo_load_locale($locale = '')
 			$_SESSION['bo_locale'] = $_COOKIE['bo_locale'];
 			$locale = $_COOKIE['bo_locale'];
 		}
+		else
+		{
+			$acc_langs = bo_get_accepted_langs();
+			foreach($acc_langs as $lang => $q)
+			{
+				$lang = substr($lang,0,2);
+				if (isset($langs[$lang]))
+				{
+					$locale = $lang;
+					break;
+				}
+			}
+		
+		}
 
 		if ($locale && file_exists($locdir.$locale.'.php') && $locale != BO_LOCALE)
 		{
-			include $locdir.$locale.'.php';
+			$load[] = $locale;
 
 			if (file_exists($locdir.'own.php')) //include this 2nd time (must overwrite the manual specified language!)
-				include $locdir.'own.php';
+				$load[] = 'own';
 		}
 	}
 	elseif ($locale !== false)
 	{
 		if (file_exists($locdir.$locale.'.php'))
-			include $locdir.$locale.'.php';
+			$load[] = $locale;
 	}
 
+	
+	foreach ($load as $lang)
+	{
+		if (file_exists($locdir.$lang.'.php'))
+		{
+			if (BO_FORCE_LANGS === true && $lang != 'own' && !isset($langs[$lang]))
+				continue;
+			
+			include $locdir.$lang.'.php';
+			
+			if ($lang != 'own')
+				$main_lang = $lang;
+		}
+	}
+	
+	if (BO_LANG_REDIRECT === true && $main_lang && (!isset($_GET[BO_LANG_ARGUMENT]) || $_GET[BO_LANG_ARGUMENT] != $main_lang) )
+	{
+		$url = bo_insert_url(BO_LANG_ARGUMENT, $main_lang, true);
+		header("Location: http://".$_SERVER['HTTP_HOST'].$url);
+		exit;
+	}
+	
 	//Send the language
 	if (!headers_sent())
 		header("Content-Language: $locale");
 		
+}
+
+function bo_get_accepted_langs()
+{
+	$langs = array();
+
+	if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) 
+	{
+		preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+
+		if (count($lang_parse[1])) 
+		{
+			$langs = array_combine($lang_parse[1], $lang_parse[4]);
+			
+			foreach ($langs as $lang => $val) 
+			{
+				if ($val === '') 
+					$langs[$lang] = 1;
+			}
+
+			arsort($langs, SORT_NUMERIC);
+		}
+	}
+	
+	return $langs;
 }
 
 function bo_setcookie($name, $value, $expire = 0, $path = '/')

@@ -167,12 +167,19 @@
 //show flags
 @define('BO_SHOW_LANG_FLAGS', true);
 
+//force selectable languages (BO_LANGUAGES)
+//otherwise changing the language with "&bo_lang=xx" in URL would be possible
+@define('BO_FORCE_LANGS', false);
+
 //force default language in maps (true)
 //otherwise an extra map for each language will be generated and saved in cache!
 @define('BO_FORCE_MAP_LANG', true);
 
 //translate single words that which are longer than given length
 @define('BO_TRANSLATE_SINGLE_WORDS', 0);
+
+//redirect so that always the correct "bo_lang=xx" in URL
+@define('BO_LANG_REDIRECT', true);
 
 
 

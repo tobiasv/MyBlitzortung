@@ -1191,7 +1191,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 				if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
 				{
-					echo '<a href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">';
+					echo '<a href="'.bo_insert_url('bo_*').'bo_show=station&bo_station_id='.$id.'" rel="nofollow">';
 					echo bo_str_max(_BC($d[1])).' ('._BL($d[2]).')';
 					echo '</a>';
 				}
