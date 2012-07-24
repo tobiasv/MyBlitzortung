@@ -453,7 +453,7 @@ function _BL($msgid='', $noutf = false, $utf_in = false)
 		$msg = $msgid;
 		
 		//Try to find some known words in short strings, i.e. country names
-		if (strlen($msg) < 200 && strlen($msg) > 5)
+		if (BO_TRANSLATE_SINGLE_WORDS > 0 && strlen($msg) < 200 && strlen($msg) > BO_TRANSLATE_SINGLE_WORDS)
 		{
 			$words = preg_split("@[,;:/\(\)\<\> ]@", $msg, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
 
