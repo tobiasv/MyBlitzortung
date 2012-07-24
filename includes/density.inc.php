@@ -907,7 +907,6 @@ function bo_get_density_image()
 	//Cache - Second cache try
 	if ($caching && file_exists($cache_file) && filemtime($cache_file) >= $last_changed)
 	{
-		header("Content-Type: $mime");
 		bo_output_cache_file($cache_file, $last_update);
 		exit;
 	}
@@ -1264,7 +1263,6 @@ function bo_get_density_image()
 	bo_session_close(true);
 	bo_image_reduce_colors($I, true);
 
-	header("Content-Type: $mime");
 	if ($caching)
 	{
 		if (BO_CACHE_SUBDIRS === true)
@@ -1282,7 +1280,10 @@ function bo_get_density_image()
 		bo_output_cache_file($cache_file, false);
 	}
 	else
+	{
+		header("Content-Type: $mime");
 		bo_imageout($I, $extension);
+	}
 
 	exit;
 	
