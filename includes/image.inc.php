@@ -982,8 +982,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	BoDb::close();
 	bo_session_close(true);
+
 	
-	bo_image_reduce_colors($I, false, $transparent);
+	if ($extension == 'png' || $extension == 'gif')
+		bo_image_reduce_colors($I, false, $transparent);
 
 	
 	if ($caching)
