@@ -3261,7 +3261,7 @@ function bo_download_external($force = false)
 				{
 					$db_name = 'download_';
 					$db_name .= bo_insert_date_string($d['store_db'], $file_time);
-					$ok = BoData::set($db_name, $file_content);
+					$ok = BoData::set($db_name, $file_content, true);
 
 					if (!$ok)
 					{

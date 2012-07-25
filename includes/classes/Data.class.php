@@ -57,15 +57,15 @@ class BoData
 			'changed' => $row['changed']);
 	}
 
-	public static function set($name, $data, $ignore_cache = false)
+	public static function set($name, $data, $is_binary = false, $ignore_cache = false)
 	{
 		//data hasn't changed
 		if (!$ignore_cache && isset(self::$cache['data'][$name]) && self::$cache['data'][$name] == $data)
 			return true;
 
-		$data_utf8 = utf8_encode($data);
-		self::compress($data_utf8);
-		$data_esc = BoDb::esc($data_utf8);
+		$data_enc = $is_binary ? $data : utf8_encode($data);
+		self::compress($data_enc);
+		$data_esc = BoDb::esc($data_enc);
 		$name_esc = BoDb::esc($name);
 		
 		$low_prio = BO_DB_UPDATE_LOW_PRIORITY ? "LOW_PRIORITY" : "";
@@ -147,7 +147,7 @@ class BoData
 	/************* Delayed Writes **************/
 	// if multipe ::set with same name have been called, only the last one is used
 	
-	public static function set_delayed($name, $data)
+	public static function set_delayed($name, $data, $is_binary = false)
 	{
 		//data hasn't changed
 		if (isset(self::$cache['data'][$name]) && self::$cache['data'][$name] == $data)
@@ -161,6 +161,7 @@ class BoData
 		
 		self::$cache['data'][$name] = $data;
 		self::$cache['delay'][$name] = true;
+		self::$cache['is_binary'][$name] = $is_binary;
 	}
 	
 	public static function write_shutdown()
@@ -171,7 +172,7 @@ class BoData
 			{
 				if (isset(self::$cache['data'][$name]))
 				{
-					self::set($name, self::$cache['data'][$name], true);
+					self::set($name, self::$cache['data'][$name], self::$cache['is_binary'][$name], true);
 				}
 			}
 		}
