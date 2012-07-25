@@ -3181,7 +3181,9 @@ function bo_download_external($force = false)
 			bo_echod(" - $name [$id] / Last download: ".date('Y-m-d H:i:s', $data['data'][$id]['last']).' / Last modified: '.date('Y-m-d H:i:s', $data['data'][$id]['modified']));
 			
 			//Download if min minute is gone and last update was interval-time before
-			if (!$force && ((int)date('i') < $d['after_minute'] || time() - $data['data'][$id]['last'] < $d['interval'] * 60))
+			if (!$force 
+					&& ((int)date('i') < $d['after_minute'] || time() - $data['data'][$id]['last'] < $d['interval'] * 60)
+				)
 			{
 				bo_echod("    -> Needs no download");
 				continue;
@@ -3189,18 +3191,42 @@ function bo_download_external($force = false)
 
 			clearstatcache();
 			
-			//Download!
-			$modified = $force ? 0 : $data['data'][$id]['modified'];
-			$range = 0;
+			//Replace date/time modifiers of the remote url/file
+			$d['url'] = bo_insert_date_string($d['url'], floor((time()+$d['time_add_remote']*60)/$d['time_floor']/60) * $d['time_floor']*60);
 			$data['data'][$id]['last'] = time();
-			$file_content = bo_get_file($d['url'], $code, 'download_'.$id, $range, $modified);
+			$modified = $force ? 0 : $data['data'][$id]['modified'];
+			
+			//Download!
+			if (substr($d['url'],0,3) == 'ftp')
+			{
+				//quick&dirty solution, php ftp function would be nicer
+				//Todo: Download a whole directory
+				$curl = curl_init();
+				curl_setopt($curl, CURLOPT_URL, $d['url']);
+				curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($curl, CURLOPT_FILETIME, true);
+				$file_content = curl_exec($curl);
+				
+				if ($file_content !== false)
+				{
+					$modified = curl_getinfo($curl, CURLINFO_FILETIME);
+				}
+				
+				curl_close($curl);
+			}
+			else
+			{
+				
+				$range = 0;
+				$file_content = bo_get_file($d['url'], $code, 'download_'.$id, $range, $modified);
+			}
 			
 			if ($file_content === false)
 			{
 				if ($code == 304)
 					bo_echod("    -> File not modified, no download. ");
 				else
-					bo_echod("    -> Error: Download failed (Code: $code)!");
+					bo_echod("    -> Error: Download failed (URL: ".$d['url']." Code: $code)!");
 				
 				continue;
 			}
@@ -3218,48 +3244,62 @@ function bo_download_external($force = false)
 				if (isset($d['time_floor']) && (int)$d['time_floor'])
 					$file_time = floor($file_time/$d['time_floor']/60) * $d['time_floor']*60;
 				
-				//File/Directory handling
-				$dir = BO_DIR.'/'.$d['dir'].'/';
-				$file = bo_insert_date_string($d['file'], $file_time);
-				$dir = $dir.dirname($file);
-				$file = $dir.'/'.basename($file);
-				
-				if (!file_exists($file))
-					@mkdir($dir, 0777, true);
-				
-				if (file_exists($file) && is_dir($file))
+				if (isset($d['store_db']) && $d['store_db'])
 				{
-					bo_echod("    -> Error: Filename is a directory!");
-					continue;
+					$db_name = 'download_';
+					$db_name .= bo_insert_date_string($d['store_db'], $file_time);
+					$ok = BoData::set($db_name, $file_content);
+
+					if (!$ok)
+					{
+						bo_echod("    -> Error: Writing data in Db ($ok)!");
+						continue;
+					}
 				}
-				elseif (file_exists($file) && !$d['overwrite'])
+				else
 				{
-					bo_echod("    -> File exists! Overwrite disabled!");
-					continue;
-				}
-				elseif(file_exists($file) && !is_writeable($file))
-				{
-					bo_echod("    -> Error: Directory/file is not writeable!");
-					continue;
-				}
-				elseif(!file_exists($file) && !is_writeable($dir))
-				{
-					bo_echod("    -> Error: Directory/file is not writeable!");
-					continue;
-				}
-				
-				//Save it
-				$put = file_put_contents($file, $file_content);
-				
-				if (!$put)
-				{
-					bo_echod("    -> Error: Writing to file!");
-					continue;
+					//File/Directory handling
+					$dir = BO_DIR.'/'.$d['dir'].'/';
+					$file = bo_insert_date_string($d['file'], $file_time);
+					$dir = $dir.dirname($file);
+					$file = $dir.'/'.basename($file);
+					
+					if (!file_exists($file))
+						@mkdir($dir, 0777, true);
+					
+					if (file_exists($file) && is_dir($file))
+					{
+						bo_echod("    -> Error: Filename is a directory!");
+						continue;
+					}
+					elseif (file_exists($file) && !$d['overwrite'])
+					{
+						bo_echod("    -> File exists! Overwrite disabled!");
+						continue;
+					}
+					elseif(file_exists($file) && !is_writeable($file))
+					{
+						bo_echod("    -> Error: Directory/file is not writeable!");
+						continue;
+					}
+					elseif(!file_exists($file) && !is_writeable($dir))
+					{
+						bo_echod("    -> Error: Directory/file is not writeable!");
+						continue;
+					}
+					
+					//Save it
+					$put = file_put_contents($file, $file_content);
+					
+					if (!$put)
+					{
+						bo_echod("    -> Error: Writing to file!");
+						continue;
+					}
 				}
 				
 				$kbytes = round(strlen($file_content) / 1024, 1);
-				
-				bo_echod("    -> Success: Saved $kbytes kB");
+				bo_echod("    -> Success: Saved $kbytes kB, File last modified: ".gmdate('Y-m-d H:i:s', $modified).' UTC');
 			}
 			
 		}
