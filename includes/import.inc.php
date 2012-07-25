@@ -3181,14 +3181,27 @@ function bo_download_external($force = false)
 			bo_echod(" - $name [$id] / Last download: ".date('Y-m-d H:i:s', $data['data'][$id]['last']).' / Last modified: '.date('Y-m-d H:i:s', $data['data'][$id]['modified']));
 			
 			//Download if min minute is gone and last update was interval-time before
-			if (!$force 
-					&& ((int)date('i') < $d['after_minute'] || time() - $data['data'][$id]['last'] < $d['interval'] * 60)
-				)
+			if (!$force)
 			{
-				bo_echod("    -> Needs no download");
-				continue;
-			}
+				if (isset($d['after_minute']) && (int)date('i') < $d['after_minute'])
+				{
+					bo_echod("    -> No download, minute has to be greater than ".$d['after_minute']);
+					continue;
+				}
 
+				if (isset($data['data'][$id]['last']) && time() - $data['data'][$id]['last'] < $d['interval'] * 60)
+				{
+					bo_echod("    -> Needs no download, last download too close (interval ".$d['interval']."min)");
+					continue;
+				}
+				
+				if (isset($d['modified_interval']) && time() - $data['data'][$id]['last'] < $d['modified_interval'] * 60)
+				{
+					bo_echod("    -> Needs no download, last modified time too close (interval ".$d['modified_interval'].")");
+					continue;
+				}
+
+			}
 			clearstatcache();
 			
 			//Replace date/time modifiers of the remote url/file
