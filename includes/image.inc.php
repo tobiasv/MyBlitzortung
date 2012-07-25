@@ -451,6 +451,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	
 	
+	
 
 	/***********************************************************/
 	/*** Cache *************************************************/
@@ -705,10 +706,26 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	//bounds for sql-Query
 	list($latN, $lonE, $latS, $lonW) = $Projection->GetBounds();
 	
-	
 	//time calculations
 	$time_range  = $time_max - $time_min + 59;
 	$color_intvl = count($cfg['col']) > 0 ? $time_range / count($cfg['col']) : 1;
+
+
+
+		
+
+	/***********************************************************/
+	/*** External Overlays *************************************/
+	/***********************************************************/
+
+	if (isset($cfg['overlays']) && is_array($cfg['overlays']))
+	{
+		foreach($cfg['overlays'] as $ovl_id => $ovl)
+		{
+			include BO_DIR.'plugins/'.$ovl['type'].'.inc.php';
+		}
+	}
+
 	
 	$count = array();
 	

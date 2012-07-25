@@ -918,15 +918,14 @@ function bo_load_locale($locale = '')
 		&& (!isset($_GET[BO_LANG_ARGUMENT]) || $_GET[BO_LANG_ARGUMENT] != $main_lang) 
 		)
 	{
-		$url = bo_insert_url(BO_LANG_ARGUMENT, $main_lang, true);
-		header("Location: http://".$_SERVER['HTTP_HOST'].$url);
-		exit;
+		return $main_lang;
 	}
 	
 	//Send the language
 	if (!headers_sent())
 		header("Content-Language: $locale");
-		
+	
+	return false;
 }
 
 function bo_get_accepted_langs()

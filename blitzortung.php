@@ -152,8 +152,8 @@ if (!defined("BO_VER"))
 	}
 
 	//load locale after tiles
-	bo_load_locale();
-
+	$bo_redir_lang = bo_load_locale();
+	
 	//decisions what to do begins...
 	if ($bo_do_update)
 	{
@@ -277,12 +277,21 @@ if (!defined("BO_VER"))
 		
 		
 	}
+
+	
+	//Redirect to correct language (only on pages)
+	if ($bo_redir_lang)
+	{
+		$url = bo_insert_url(BO_LANG_ARGUMENT, $bo_redir_lang, true);
+		header("Location: http://".$_SERVER['HTTP_HOST'].$url);
+		exit;
+	}
+
+	require_once 'includes/pages.inc.php';
+	require_once 'includes/functions_html.inc.php';
+
 	
 }
 
-
-
-require_once 'includes/pages.inc.php';
-require_once 'includes/functions_html.inc.php';
 
 ?>
