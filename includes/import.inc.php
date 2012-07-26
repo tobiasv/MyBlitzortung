@@ -3195,7 +3195,7 @@ function bo_download_external($force = false)
 					continue;
 				}
 				
-				if (isset($d['modified_interval']) && time() - $data['data'][$id]['last'] < $d['modified_interval'] * 60)
+				if (isset($d['modified_interval']) && time() - $data['data'][$id]['modified'] < $d['modified_interval'] * 60)
 				{
 					bo_echod("    -> Needs no download, last modified time too close (interval ".$d['modified_interval'].")");
 					continue;

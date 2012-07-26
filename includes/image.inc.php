@@ -485,52 +485,6 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 	
 	
-	/***********************************************************/
-	/*** Time strings ******************************************/
-	/***********************************************************/
-
-	
-	switch ($image_type)
-	{
-		case 'single_strike':
-			$time_string = _BDT($time_min, false).'.'.substr($row['time_ns'], 0, 6)._BZ($time_min);	
-			break;
-			
-		case 'by_date';
-		
-			$time_string = date(_BL('_date').' ', $time_min);
-			$time_string .= date('H:i', $time_min);
-			
-			if ($time_max >= $last_update)
-			{
-				$time_max = $last_update;
-				$time_string .= ' - '.date('H:i', $time_max)._BZ($time_max);
-			}
-			else
-			{
-				$time_string .= _BZ($time_max);
-				
-				if ($duration % 60)
-					$time_string .= ' +'.bo_hours($duration / 60);
-				else
-					$time_string .= ' +'.round($duration / 60).'h';
-			}
-			
-			break;
-
-		case 'live':
-		
-			$time_max = min($last_update, $time_max);
-			
-			if ($time_max - $time_min > 3600 * 12)
-				$time_string  = date(_BL('_date').' H:i', $time_max).' -'.round( ($time_max-$time_min)/3600).'h';
-			else
-				$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
-
-			$time_string .= _BZ($time_min);
-			
-			break;
-	}
 	
 	
 	
@@ -695,7 +649,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	
 
 	/***********************************************************/
-	/*** Get the data and draw *********************************/
+	/*** Projection method *************************************/
 	/***********************************************************/
 
 
@@ -724,6 +678,54 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		{
 			include BO_DIR.'plugins/'.$ovl['type'].'.inc.php';
 		}
+	}
+
+
+	/***********************************************************/
+	/*** Time strings ******************************************/
+	/***********************************************************/
+
+	
+	switch ($image_type)
+	{
+		case 'single_strike':
+			$time_string = _BDT($time_min, false).'.'.substr($row['time_ns'], 0, 6)._BZ($time_min);	
+			break;
+			
+		case 'by_date';
+		
+			$time_string = date(_BL('_date').' ', $time_min);
+			$time_string .= date('H:i', $time_min);
+			
+			if ($time_max >= $last_update)
+			{
+				$time_max = $last_update;
+				$time_string .= ' - '.date('H:i', $time_max)._BZ($time_max);
+			}
+			else
+			{
+				$time_string .= _BZ($time_max);
+				
+				if ($duration % 60)
+					$time_string .= ' +'.bo_hours($duration / 60);
+				else
+					$time_string .= ' +'.round($duration / 60).'h';
+			}
+			
+			break;
+
+		case 'live':
+		
+			$time_max = min($last_update, $time_max);
+			
+			if ($time_max - $time_min > 3600 * 12)
+				$time_string  = date(_BL('_date').' H:i', $time_max).' -'.round( ($time_max-$time_min)/3600).'h';
+			else
+				$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
+
+			$time_string .= _BZ($time_min);
+			
+			break;
 	}
 
 	
