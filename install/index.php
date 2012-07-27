@@ -304,7 +304,8 @@ switch($step)
 
 	case 3:
 
-		include $path.'blitzortung.php';
+		require_once $path.'blitzortung.php';
+		require_once $path.'includes/import.inc.php';
 		bo_set_conf('version', BO_VER);
 		
 		echo '<h2>Testing data collection</h2>';
@@ -327,7 +328,7 @@ switch($step)
 
 	case 4:
 	
-		include '../blitzortung.php';
+		require_once '../blitzortung.php';
 
 		echo '<h2>Almost finished!</h2>';
 
