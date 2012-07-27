@@ -337,6 +337,44 @@ $_BO['tpl_imgmap']['switzerland']['cities'][2] = $_BO['points']['whitered1'];
 
 
 
+
+/* ============================= POLAND ============================= */
+
+$_BO['tpl_imgmap']['poland'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['poland']['name'] = 'Poland';
+$_BO['tpl_imgmap']['poland']['file'] = 'maps_europe/map_poland.png';
+//$_BO['tpl_imgmap']['poland']['borders'] = array('maps_europe/map_poland_borders.png', 70);
+$_BO['tpl_imgmap']['poland']['coord'] = array(56, 25.51, 48.295, 12.7); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['poland']['cities'][1] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['poland']['cities'][2] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['poland']['cities'][6] = $_BO['points']['whitered1'];
+
+$_BO['tpl_imgmap']['poland_big'] = $_BO['tpl_imgmap']['poland'];
+$_BO['tpl_imgmap']['poland_big']['name'] = 'Poland (Big)';
+$_BO['tpl_imgmap']['poland_big']['file'] = 'maps_europe/map_poland_big.png';
+
+
+
+
+/* ============================= BALTIC ============================= */
+
+$_BO['tpl_imgmap']['baltic'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['baltic']['name'] = 'Baltic States';
+$_BO['tpl_imgmap']['baltic']['file'] = 'maps_europe/map_baltic.png';
+//$_BO['tpl_imgmap']['poland']['borders'] = array('maps_europe/map_baltic_borders.png', 70);
+$_BO['tpl_imgmap']['baltic']['coord'] = array(60.2, 31, 53.3, 18); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['baltic']['cities'][1] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['baltic']['cities'][2] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['baltic']['cities'][3] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['baltic']['cities'][5] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['baltic']['cities'][6] = $_BO['points']['whitered1'];
+
+$_BO['tpl_imgmap']['baltic_big'] = $_BO['tpl_imgmap']['baltic'];
+$_BO['tpl_imgmap']['baltic_big']['name'] = 'Baltic States (Big)';
+$_BO['tpl_imgmap']['baltic_big']['file'] = 'maps_europe/map_baltic_big.png';
+
+
+
 /**************************************/
 /* Image Maps Mini                    */
 /**************************************/

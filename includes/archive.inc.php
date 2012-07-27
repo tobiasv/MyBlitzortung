@@ -200,7 +200,7 @@ function bo_show_archive_map()
 		
 		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
 		
-		$show_range_sel = $ani || (!$ani && !isset($cfg['file_time_search']));
+		$show_range_sel = $ani || (!$ani && !isset($cfg['file_time_search']) && !isset($cfg['overlays']));
 		
 		echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from"';
 		echo !$show_range_sel ? ' onchange="submit()"' : '';

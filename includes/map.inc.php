@@ -248,12 +248,23 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 					WHERE id != '$sid'");
 	while($row = $res->fetch_assoc())
 	{
-		if ($row['status'] == 'A')
+		if ($row['status'] != '-' && $row['lat'] && $row['lon'])
 		{
 			$round = (bo_user_get_level() & BO_PERM_SETTINGS) ? 8 : 1;
 			$js_stations .= $js_stations ? ",\n" : '';
 			$js_stations .= '{';
 			$js_stations .= 'stid:'.$row['id'].', lat:'.round($row['lat'],$round).', lon:'.round($row['lon'], $round).', city:"'._BC($row['city']).'"';
+			$js_stations .= ', status:"'.$row['status'].'"';
+			$js_stations .= ', text:"';
+			
+			switch($row['status'])
+			{
+				case 'A': $js_stations .= ' ('._BL('Active').')'; break;
+				case 'O': $js_stations .= ' ('._BL('Inactive').')'; break;
+				case 'V': $js_stations .= ' ('._BL('No GPS').')'; break;
+			}
+			
+			$js_stations .= '"';
 			$js_stations .= '}';
 		}
 		
@@ -558,7 +569,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="2" name="bo_map_station" id="bo_map_station1">';
-	echo '<label for="bo_map_station1">'._BL('Active stations').'</label> &nbsp; ';
+	echo '<label for="bo_map_station1">'._BL('Stations').'</label> &nbsp; ';
 	echo '</span>';
 
 	if (count($mybo_info) > 1)
@@ -813,7 +824,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			if (this.getZoom() > <?php echo $max_zoom ?>)
 				 this.setZoom(<?php echo $max_zoom ?>);
 			else
-				bo_setcookie('bo_map_zoom', bo_map.getZoom());
+				bo_setcookie('bo_map_zoom', this.getZoom());
 			
 			bo_map_toggle_stations(0);
 			bo_map_user_activity();
@@ -939,6 +950,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	function bo_map_toggle_stations(display)
 	{
 		bo_map_user_activity();
+		var auto = display == 0;
 		
 		if (display)
 			bo_stations_display = display;
@@ -955,18 +967,16 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			bo_station_markers[i].setMap(null);
 
 		bo_station2_marker.setMap(null);
-			
-		if (display == 0 && bo_map.getZoom() > <?php echo (bo_user_get_level() & BO_PERM_SETTINGS) ? 20 : 10; ?>)
+
+		if (auto && bo_map.getZoom() > <?php echo (bo_user_get_level() & BO_PERM_SETTINGS) ? 20 : 9; ?>)
 		{
 			document.getElementById('bo_map_station1').disabled = true;
-			
 			if (bo_stations_display == 2)
 				return;
 		}
-		else if (display == 0 && bo_map.getZoom() <= <?php echo (bo_user_get_level() & BO_PERM_SETTINGS) ? 20 : 10; ?>)
+		else if (auto && bo_map.getZoom() <= <?php echo (bo_user_get_level() & BO_PERM_SETTINGS) ? 20 : 9; ?>)
 		{
 			document.getElementById('bo_map_station1').disabled = false;
-			
 			if (bo_stations_display == 2)
 				display = 2;
 		}
@@ -975,13 +985,27 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		{
 			if (bo_station_markers.length == 0)
 			{
+				var color;
 				for (i in bo_stations)
 				{
+					switch (bo_stations[i].status)
+					{
+						case 'A': color = '00cc00'; break;
+						case 'O': color = 'cc0000'; break;
+						case 'V': color = 'cc8800'; break;
+						default:  color = '888888'; break;
+					}
+					
 					bo_station_markers[i] = new google.maps.Marker({
 					  position: new google.maps.LatLng(bo_stations[i].lat,bo_stations[i].lon), 
 					  map: bo_map, 
-					  title:bo_stations[i].city,
-					  icon: '<?php echo  BO_MAP_STATIONS_ICON ?>',
+					  title:bo_stations[i].city + bo_stations[i].text,
+					  icon: new google.maps.MarkerImage(
+								'<?php echo bo_bofile_url() ?>?bo_icon='+color+'&size=2&square',
+								new google.maps.Size(9,9),
+								new google.maps.Point(0,0),
+								new google.maps.Point(4,4)
+							),
 					  stid: bo_stations[i].stid
 					});  
 

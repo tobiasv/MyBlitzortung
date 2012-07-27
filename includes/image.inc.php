@@ -7,6 +7,7 @@ function bo_icon($icon)
 {
 	$max_age = 3600 * 24 * 7;
 	
+	$square = isset($_GET['square']);
 	$c = intval($_GET['size']) < 20 ? intval($_GET['size']) : 0;
 	$c = $c > 0 ? $c : 3;
 	
@@ -15,13 +16,19 @@ function bo_icon($icon)
 
 	if (BO_CACHE_DISABLE === true || !file_exists($file) || time() - filemtime($file) > $max_age)
 	{
-		$I = imagecreate($c*2+1, $c*2+1);
+		$width = $c*2+1;
+		$height = $c*2+1;
+		$I = imagecreate($width, $height);
 		$bg = imagecolorallocate($I, 255, 255, 255);
 		$trans = imagecolortransparent($I, $bg);
 		imagefill($I,0,0,$trans);
 
 		$col = imagecolorallocate ($I, hexdec(substr($icon,0,2)), hexdec(substr($icon,2,2)), hexdec(substr($icon,4,2)));
-		bo_circle($I, $c, $c, $c+2, $col, true);
+		
+		if ($square)
+			imagefilledrectangle($I, 0, 0, $width, $height, $col);
+		else
+			bo_circle($I, $c, $c, $c+2, $col, true);
 
 		$tag = intval(substr($icon,6,1));
 		if (0 && $tag >= 1)
@@ -481,7 +488,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if (BO_CACHE_FAST)
 		$last_update = bo_get_latest_strike_calc_time();
 
-	
+	$file_mod_time = false;
 	
 	
 	
@@ -1022,7 +1029,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		if (!$ok)
 			bo_image_cache_error($w, $h);
 		
-		bo_output_cache_file($cache_file, false);
+		bo_output_cache_file($cache_file, false, $file_mod_time);
 	}
 	else
 	{
