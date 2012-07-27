@@ -96,7 +96,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 					
 
 			$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
-			$url = bo_bofile_url().'?map='.$static_map_id.($period_id ? '&period='.$period : '').'&'.BO_LANG_ARGUMENT.'='._BL();
+			$url = bo_bofile_url().'?map='.$static_map_id.($period_id ? '&period='.$period : '').bo_lang_arg('tile');
 			$img_dim = bo_archive_get_dim_html($static_map_id);
 
 			echo '<form method="GET">';
@@ -1255,7 +1255,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		c = new bo_tile_coord(zoom, coord, tile_size);
 		if (!c.ok) return c.failimg;
 		
-		var url = "<?php echo bo_bofile_url() ?>?tile&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&<?php echo BO_LANG_ARGUMENT; ?>=<?php echo _BL(); ?>";
+		var url = "<?php echo bo_bofile_url() ?>?tile&zoom="+zoom+"&x="+c.x+"&y="+c.y+"<?php echo bo_lang_arg('tile'); ?>";
 		
 		if (bo_select_stationid > 0 && bo_show_only_stationid)
 			url=url+"&os&sid="+bo_select_stationid;
@@ -1316,7 +1316,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			}
 		}
 		
-		var url="<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&<?php echo BO_LANG_ARGUMENT; ?>=<?php echo _BL(); ?>";
+		var url="<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&<?php bo_lang_arg('tile'); ?>";
 		
 		if (bo_select_stationid > 0)
 		{
@@ -1342,7 +1342,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		var now = new Date();
 		var add = now.getDate() + '_' + now.getHours() + '_' + Math.floor(now.getMinutes() / interval) + (bo_loggedin ? '_1' : '');
 		
-		return "<?php echo bo_bofile_url() ?>?tile&tracks&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&<?php echo BO_LANG_ARGUMENT; ?>=<?php echo _BL(); ?>"+"&_bot="+add;
+		return "<?php echo bo_bofile_url() ?>?tile&tracks&zoom="+zoom+"&x="+c.x+"&y="+c.y+"<?php bo_lang_arg('tile'); ?>"+"&_bot="+add;
 	}
 	
 	function bo_reload_mapinfo() 
@@ -1386,7 +1386,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 				if (bo_manual_timerange)
 					add = "from="+bo_get_time_man(1)+"&to="+bo_get_time_man(2)+"&" + add;
 				
-				infoImg.src = "<?php echo bo_bofile_url() ?>?tile&info&<?php echo BO_LANG_ARGUMENT; ?>=<?php echo _BL(); ?>&type="+bo_OverlayMaps[i].bo_mapid+"&"+add;
+				infoImg.src = "<?php echo bo_bofile_url() ?>?tile&info<?php bo_lang_arg('tile_info'); ?>&type="+bo_OverlayMaps[i].bo_mapid+"&"+add;
 				infoImg.style.paddingTop = '5px';
 				infoImg.style.display = 'block';
 				infoImg.style.opacity = 0.7;

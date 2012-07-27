@@ -953,6 +953,17 @@ function bo_get_accepted_langs()
 	return $langs;
 }
 
+function bo_lang_arg($type = false)
+{
+	if (BO_FORCE_MAP_LANG && $type == 'map')
+		return;
+
+	if (BO_FORCE_MAP_LANG == 'tiles' && $type == 'tile')
+		return;
+
+	return '&'.BO_LANG_ARGUMENT.'='._BL();
+}
+
 function bo_setcookie($name, $value, $expire = 0, $path = '/')
 {
 	//don't set cookie on non-cookie domain
