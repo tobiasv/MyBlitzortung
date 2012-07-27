@@ -96,7 +96,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 					
 
 			$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
-			$url = bo_bofile_url().'?map='.$static_map_id.($period_id ? '&period='.$period : '').bo_lang_arg('tile');
+			$url = bo_bofile_url().'?map='.$static_map_id.($period_id ? '&period='.$period : '').bo_lang_arg('map');
 			$img_dim = bo_archive_get_dim_html($static_map_id);
 
 			echo '<form method="GET">';
