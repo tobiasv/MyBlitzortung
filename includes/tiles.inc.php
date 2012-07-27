@@ -153,11 +153,17 @@ function bo_tile()
 	/***********************************************************/
 	
 	//estimate last update
-	$last_update_time = floor(time() / 60 / $update_interval) * 60 * $update_interval;
+	$cache_fast = BO_CACHE_FAST && BO_CACHE_FAST != 'maps';
+	if ($cache_fast)
+		$last_update_time = floor(time() / 60 / $update_interval) * 60 * $update_interval;
+	else
+		$last_update_time = bo_get_latest_strike_calc_time();
+		
+		
 	bo_tile_headers($update_interval, $last_update_time, $caching);
 
 	
-	//Caching, but nor for info image
+	//Caching, but not for info image
 	if ($caching && !$only_info)
 	{
 		$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
@@ -209,7 +215,7 @@ function bo_tile()
 	/***********************************************************/
 	
 	//FIRST DB ACCESS!
-	if (!$time_manual_from)
+	if (!$time_manual_from && BO_CACHE_FAST != 'tiles')
 	{
 		$last_update_time = bo_get_latest_strike_calc_time();
 	}

@@ -1370,7 +1370,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			if ( ((i >= 0 && !bo_manual_timerange) || (bo_manual_timerange && i == -1)) && bo_OverlayMaps[i].bo_show)
 			{
 				var now = new Date();
-				var add = now.getUTCDate() + '_' + now.getUTCHours() + '_' + Math.floor(now.getUTCMinutes() / bo_OverlayMaps[i].bo_interval * 5);
+				var add = bo_get_time_arg(bo_OverlayMaps[i].bo_interval);
 				var infoImg = document.createElement('IMG');
 				
 				if (bo_manual_timerange)
