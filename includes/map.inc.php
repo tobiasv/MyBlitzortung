@@ -1429,23 +1429,24 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 
 	function bo_get_time_arg(interval)
 	{
+		var multiplicator = <?php echo (int)BO_TILE_UPDATE_MULTI; ?>; //update twice in interval
+		var sub = <?php echo (int)BO_TILE_UPDATE_SUB; ?>; //our strikes are a bit behind
+		sub = sub > interval ? 0 : sub * 60 * 1000;
+		
 		//adjust to server timestamp
 		var now_local = new Date();
 		var tstamp_local_start = bo_date2tstamp(bo_start_time_local);
 		var diff = tstamp_local_start - bo_start_time_server;
 		var tstamp_now = bo_date2tstamp(now_local);
-		var now = new Date(tstamp_now - diff);
+		var now = new Date(tstamp_now - diff - sub);
 
-		var multiplicator = <?php echo (int)BO_TILE_UPDATE_MULTI; ?>; //update twice in interval
-		var sub = <?php echo (int)BO_TILE_UPDATE_SUB; ?>; //our strikes are a bit behind
 		var arg = now.getUTCDate() + '_' + now.getUTCHours();
 		
+
+			
 		if (interval > 0)
 		{
-			if (sub > interval)
-				sub = 0;
-				
-			arg = arg + '_' + Math.floor( (now.getUTCMinutes()-sub) / interval * multiplicator);
+			arg = arg + '_' + Math.floor(now.getUTCMinutes() / interval * multiplicator);
 		}
 		else
 		{
