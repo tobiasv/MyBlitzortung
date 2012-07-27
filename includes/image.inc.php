@@ -150,7 +150,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		else
 			@set_time_limit(10);
 		
-		if (BO_FORCE_MAP_LANG === true)
+		if (BO_FORCE_MAP_LANG)
 			bo_load_locale(BO_LOCALE);
 	}
 	
@@ -1058,7 +1058,7 @@ function bo_get_map_image_ani()
 	if (!$cfg['gif_animation_enable'])
 		bo_image_error('Animation disabled!');
 	
-	if (BO_FORCE_MAP_LANG === true)
+	if (BO_FORCE_MAP_LANG)
 		bo_load_locale(BO_LOCALE);
 
 	session_write_close();
