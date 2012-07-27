@@ -94,7 +94,7 @@ class BoData
 		$sql = "UPDATE $low_prio ".BO_DB_PREF."conf SET data=data+$add WHERE name='$name_esc'";
 		$ok = BoDb::query($sql, false);
 		
-		if ($ok === false) //!
+		if ($ok === false || $ok === 0) // false: error - 0: no rows affected
 		{
 			//update failed, try insert
 			$ok = self::set($name, $add);
