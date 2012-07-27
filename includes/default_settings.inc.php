@@ -1232,6 +1232,8 @@
 //a update is needed! 
 @define('BO_DB_COMPRESSION', false);
 
+
+
 /*******************************************************************/
 /*** Some special settings which shouldn't be changed            ***/
 
@@ -1252,6 +1254,12 @@
 
 //timeout for tile creating
 @define("BO_TILE_CREATION_TIMEOUT", 5);
+
+//multiplicator for tile interval
+@define("BO_TILE_UPDATE_MULTI", 1);
+
+//subtract minutes from tile time
+@define("BO_TILE_UPDATE_SUB", 3);
 
 //Min and max count of participants - values are only used if
 //automatic getting from participants.txt failed
