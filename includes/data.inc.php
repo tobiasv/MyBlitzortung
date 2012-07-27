@@ -144,7 +144,7 @@ function bo_db_recreate_strike_keys($quiet = false)
 	//4. Add keys if needed
 	$sql_alter = array();
 	if (!$keys['timelatlon'] && $bytes_time && $bytes_latlon)
-		$sql_alter[] = 'ADD INDEX `timelatlon_index` (`time_x`,`lat_x`,`lon_x`)';
+		$sql_alter[] = 'ADD INDEX `timelatlon_index` (`lat_x`,`lon_x`,`time_x`)';
 
 	//if (!$keys['time'] && $bytes_time)
 	//	$sql_alter[] = 'ADD INDEX `time_index` (`time_x`)';
