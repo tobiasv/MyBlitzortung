@@ -102,7 +102,7 @@ function bo_update_all2($force = false, $only = '')
 		//Assign strikes->signals
 		if (bo_exit_on_timeout()) return;
 		
-		if (BO_UP_INTVL_RAW && 
+		if ($signals_imported && 
 			BoData::get('uptime_strikes_modified') - BO_MIN_MINUTES_STRIKE_CONFIRMED*60-60 < BoData::get('uptime_raw'))
 		{
 			bo_match_strike2raw();
@@ -3322,6 +3322,10 @@ function bo_download_external($force = false)
 		$data['last_update'] = time();
 		BoData::set('uptime_ext_downloads', serialize($data));
 
+	}
+	else
+	{
+		bo_echod("No update. Last update ".(time() - $data['last_update'])." seconds ago. This is normal and no error message!");
 	}
 	
 	return;
