@@ -201,6 +201,10 @@ margin: 0 150px;
 font-weight: bold;
 }
 
+#myblitzortung #bo_copyright_extra_text:before {
+content: ' / ';
+}
+
 #myblitzortung #bo_copyright_extra a {
 text-decoration: none;
 font-weight: bold;
