@@ -218,6 +218,8 @@
 //2: early
 @define('BO_SESSION_CLOSE', 2);
 
+//Starts session only if there's a special GET parameter
+@define('BO_SESSION_GET_PARAM', false);
 
 
 

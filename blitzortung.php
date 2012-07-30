@@ -24,7 +24,7 @@
 if (!defined("BO_VER"))
 {
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.7.7-dev4');
+	define("BO_VER", '0.7.7-dev5');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -95,6 +95,10 @@ if (!defined("BO_VER"))
 	
 	//User init (session, cookie, etc...)
 	bo_user_init();
+	
+	//Cookie login
+	bo_user_cookie_login();
+
 
 
 	//creating tiles should be very fast, other include files not needed
@@ -259,7 +263,7 @@ if (!defined("BO_VER"))
 	
 	if (BO_SEND_CACHE_HEADER_HTML > 0 && !headers_sent())
 	{
-		if (intval($_COOKIE['bo_select_stationid']) || bo_user_get_level())
+		if (intval($_COOKIE['bo_select_stationid']) || bo_user_get_level() || bo_sess_parms_set())
 		{
 			$bo_max_age = 5;
 			header("Cache-Control: private, max-age=".$bo_max_age);

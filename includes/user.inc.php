@@ -108,7 +108,7 @@ function bo_show_login_form($fail = false)
 	if ($fail)
 		echo '<div class="bo_info_fail">'._BL('Login fail!').'</div>';
 
-	echo '<form action="'.bo_insert_url('bo_logout').'" method="POST" class="bo_login_form">';
+	echo '<form action="'.bo_insert_url('bo_logout').bo_add_sess_parms(true).'" method="POST" class="bo_login_form">';
 
 	echo '<fieldset class="bo_login_fieldset">';
 	echo '<legend>'._BL('login_legend').'</legend>';
@@ -216,6 +216,8 @@ function bo_user_do_logout()
 
 function bo_user_set_session($id, $level, $cookie, $pass='')
 {
+	bo_user_init(true);
+	
 	$_SESSION['bo_user'] = $id;
 	$_SESSION['bo_user_level'] = $level;
 	$_SESSION['bo_logged_out'] = false;
@@ -1008,7 +1010,7 @@ function bo_get_conf_user($name, $id=0)
 
 
 
-function bo_user_init()
+function bo_user_init($force = false)
 {
 	global $_BO;
 	
@@ -1019,26 +1021,49 @@ function bo_user_init()
 		return;
 	}
 	
-	session_set_cookie_params(BO_SESSION_COOKIE_LIFETIME, BO_SESSION_COOKIE_PATH);
+	$init = true;
 	
-	if (BO_SESSION_NAME)
-		session_id(BO_SESSION_NAME);
+	//don't init if GET parameter option is set and no parameter present
+	if (BO_SESSION_GET_PARAM !== false && !bo_sess_parms_set() && !$force)
+	{
+		$init = false;
+	}
 	
-	//Session handling
-	@session_start();
+	if ($init)
+	{
+		session_set_cookie_params(BO_SESSION_COOKIE_LIFETIME, BO_SESSION_COOKIE_PATH);
+		
+		if (BO_SESSION_NAME)
+			session_id(BO_SESSION_NAME);
+		
+		//Session handling
+		@session_start();
 
-	//Set user_id
-	if (!isset($_SESSION['bo_user']))
-		$_SESSION['bo_user'] = 0;
-
-	//Cookie login
-	bo_user_cookie_login();
+		//Set user_id
+		if (!isset($_SESSION['bo_user']))
+			$_SESSION['bo_user'] = 0;
+	}
+	
 
 
 	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
 }
 
+function bo_sess_parms_set()
+{
+	return BO_SESSION_GET_PARAM !== false 
+		&& (isset($_GET[BO_SESSION_GET_PARAM]) || strpos($_SERVER['HTTP_REFERER'], BO_SESSION_GET_PARAM) !== false);
+}
 
+function bo_add_sess_parms($force = false)
+{
+	if (bo_sess_parms_set() || (BO_SESSION_GET_PARAM !== false && $force))
+	{
+		return '&'.BO_SESSION_GET_PARAM;
+	}
+
+	return '';
+}
 
 function bo_user_cookie_login()
 {

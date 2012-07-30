@@ -356,7 +356,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'._BN($strikesh_own, 0);
 		
 		if (bo_user_get_level() & BO_PERM_ARCHIVE)
-			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=strikes&bo_station_id='.$station_id.'&bo_datetime_start='.urlencode(date('Y-m-d H:i', time() - 4000)).'">'._BL('List').'</a>)';
+			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_show=strikes&bo_station_id='.$station_id.'&bo_datetime_start='.urlencode(date('Y-m-d H:i', time() - 4000)).'">'._BL('List').'</a>)';
 
 		echo '</span>';
 		echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'._BN($signalsh_own, 0).'</span>';
@@ -368,7 +368,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo $strikesh ? _BN($strikesh_own / $strikesh * 100, 1).'%' : '-';
 
 		if ($dens_stations[$station_id])
-			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.'&bo_show=density&bo_station_id='.$station_id.'&bo_ratio=1">'._BL('Map').'</a>)';
+			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_show=density&bo_station_id='.$station_id.'&bo_ratio=1">'._BL('Map').'</a>)';
 
 		echo '</span></li>';
 
@@ -1077,7 +1077,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		echo '<td class="bo_text">';
 
 		if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
-			echo '<a href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">'.$pos.'</a>';
+			echo '<a href="'.bo_insert_url('bo_*').'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">'.$pos.'</a>';
 		else
 			echo $pos;
 
