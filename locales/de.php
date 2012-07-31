@@ -1133,6 +1133,7 @@ $_BL['de']['Strikes per'] = 'Blitze pro';
 $_BL['de']['Latvia'] = 'Lettland';
 $_BL['de']['Ukraine'] = 'Ukraine';
 $_BL['de']['Croatia'] = 'Kroatien';
+$_BL['de']['Baltic States'] = 'Baltikum';
 
 
 $_BL['de']['lang_en'] = 'Englisch';

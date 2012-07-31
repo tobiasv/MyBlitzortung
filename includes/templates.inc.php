@@ -228,6 +228,21 @@ $_BO['tpl_imgmap']['europe_west_central']['cities'][6] = $_BO['points']['whitere
 
 /* ============================= Germany ============================= */
 
+$_BO['tpl_imgmap']['germany'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['germany']['name'] = 'Germany';
+$_BO['tpl_imgmap']['germany']['file'] = 'maps_europe/map_germany2.png';
+$_BO['tpl_imgmap']['germany']['borders'] = array('maps_europe/map_germany2_borders.png', 70);
+$_BO['tpl_imgmap']['germany']['coord'] = array(55.5, 18, 45.325, 2); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['germany']['cities'][1] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['germany']['cities'][2] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['germany']['cities'][5] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['germany']['cities'][6] = $_BO['points']['whitered1'];
+
+$_BO['tpl_imgmap']['germany_big'] = $_BO['tpl_imgmap']['germany'];
+$_BO['tpl_imgmap']['germany_big']['name'] = 'Germany (Big)';
+$_BO['tpl_imgmap']['germany_big']['file'] = 'maps_europe/map_germany2_big.png';
+$_BO['tpl_imgmap']['germany_big']['borders'] = array('maps_europe/map_germany2_big_borders.png', 70);
+
 //Germany (Landkreise) no exact merator projection!
 $_BO['tpl_imgmap']['germany_lkr'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['germany_lkr']['name'] = 'Germany';
@@ -253,7 +268,16 @@ $_BO['tpl_imgmap']['germany_lkr_gdz']['coord'] = array(55.22, 15.64, 47.05, 5.21
 $_BO['tpl_imgmap']['germany_lkr_gdz']['footer'] = '© Bundesamt für Kartographie und Geodäsie, Frankfurt am Main, 2011<br>
 	Vervielfältigung, Verbreitung und öffentliche Zugänglichmachung, auch auszugsweise, mit Quellenangabe gestattet.';
 
-	
+
+//Former Wetterpool.de (R.I.P.) Maps	
+$_BO['tpl_imgmap']['germany_wetterpool'] = $_BO['tpl_imgmap']['germany_lkr'];
+$_BO['tpl_imgmap']['germany_wetterpool']['file'] = 'maps_europe/map_germany_wetterpool_superhigh.gif';
+$_BO['tpl_imgmap']['germany_wetterpool']['borders'] = array('maps_europe/map_germany_wetterpool_borders_white.gif', 10);
+$_BO['tpl_imgmap']['germany_wetterpool']['coord'] = array(55.0716, 15.1256, 47.2269, 5.8082); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['germany_wetterpool']['footer'] = 'Karte des ehemaligen Projekts <a href="http://www.wetterpool.de" target="_blank">Wetterpool.de</a> (R.I.P.)';
+$_BO['tpl_imgmap']['germany_wetterpool']['proj'] = 'plate';
+
+
 //Germany (Bavaria) * don't know wether mercator, but border overlap really good in google earth
 $_BO['tpl_imgmap']['germany_bavaria'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['germany_bavaria']['name'] = 'Bavaria';
@@ -343,7 +367,7 @@ $_BO['tpl_imgmap']['switzerland']['cities'][2] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['poland'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['poland']['name'] = 'Poland';
 $_BO['tpl_imgmap']['poland']['file'] = 'maps_europe/map_poland.png';
-//$_BO['tpl_imgmap']['poland']['borders'] = array('maps_europe/map_poland_borders.png', 70);
+$_BO['tpl_imgmap']['poland']['borders'] = array('maps_europe/map_poland_borders.png', 70);
 $_BO['tpl_imgmap']['poland']['coord'] = array(56, 25.51, 48.295, 12.7); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['poland']['cities'][1] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['poland']['cities'][2] = $_BO['points']['whitered1'];
@@ -352,7 +376,7 @@ $_BO['tpl_imgmap']['poland']['cities'][6] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['poland_big'] = $_BO['tpl_imgmap']['poland'];
 $_BO['tpl_imgmap']['poland_big']['name'] = 'Poland (Big)';
 $_BO['tpl_imgmap']['poland_big']['file'] = 'maps_europe/map_poland_big.png';
-
+$_BO['tpl_imgmap']['poland_big']['borders'] = array('maps_europe/map_poland_big_borders.png', 70);
 
 
 
@@ -361,7 +385,7 @@ $_BO['tpl_imgmap']['poland_big']['file'] = 'maps_europe/map_poland_big.png';
 $_BO['tpl_imgmap']['baltic'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['baltic']['name'] = 'Baltic States';
 $_BO['tpl_imgmap']['baltic']['file'] = 'maps_europe/map_baltic.png';
-//$_BO['tpl_imgmap']['poland']['borders'] = array('maps_europe/map_baltic_borders.png', 70);
+$_BO['tpl_imgmap']['baltic']['borders'] = array('maps_europe/map_baltic_borders.png', 70);
 $_BO['tpl_imgmap']['baltic']['coord'] = array(60.2, 31, 53.3, 18); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['baltic']['cities'][1] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['baltic']['cities'][2] = $_BO['points']['whitered1'];
@@ -372,6 +396,45 @@ $_BO['tpl_imgmap']['baltic']['cities'][6] = $_BO['points']['whitered1'];
 $_BO['tpl_imgmap']['baltic_big'] = $_BO['tpl_imgmap']['baltic'];
 $_BO['tpl_imgmap']['baltic_big']['name'] = 'Baltic States (Big)';
 $_BO['tpl_imgmap']['baltic_big']['file'] = 'maps_europe/map_baltic_big.png';
+$_BO['tpl_imgmap']['baltic_big']['borders'] = array('maps_europe/map_baltic_big_borders.png', 70);
+
+
+
+/* ============================= BENELUX ============================= */
+
+$_BO['tpl_imgmap']['benelux'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['benelux']['name'] = 'Benelux';
+$_BO['tpl_imgmap']['benelux']['file'] = 'maps_europe/map_benelux.png';
+$_BO['tpl_imgmap']['benelux']['borders'] = array('maps_europe/map_benelux_borders.png', 70);
+$_BO['tpl_imgmap']['benelux']['coord'] = array(54.3, 9.5, 48.7, 0.3); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['benelux']['cities'][1] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['benelux']['cities'][2] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['benelux']['cities'][5] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['benelux']['cities'][6] = $_BO['points']['whitered1'];
+
+$_BO['tpl_imgmap']['benelux_big'] = $_BO['tpl_imgmap']['benelux'];
+$_BO['tpl_imgmap']['benelux_big']['name'] = 'Benelux (Big)';
+$_BO['tpl_imgmap']['benelux_big']['file'] = 'maps_europe/map_benelux_big.png';
+$_BO['tpl_imgmap']['benelux_big']['borders'] = array('maps_europe/map_benelux_big_borders.png', 70);
+
+
+
+/* ============================= UK ============================= */
+
+$_BO['tpl_imgmap']['uk'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['uk']['name'] = 'United Kingdom';
+$_BO['tpl_imgmap']['uk']['file'] = 'maps_europe/map_uk.png';
+$_BO['tpl_imgmap']['uk']['borders'] = array('maps_europe/map_uk_borders.png', 70);
+$_BO['tpl_imgmap']['uk']['coord'] = array(60, 4.8, 48.5, -13.5); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['uk']['cities'][1] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['uk']['cities'][2] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['uk']['cities'][5] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['uk']['cities'][6] = $_BO['points']['whitered1'];
+
+$_BO['tpl_imgmap']['uk_big'] = $_BO['tpl_imgmap']['uk'];
+$_BO['tpl_imgmap']['uk_big']['name'] = 'United Kingdom (Big)';
+$_BO['tpl_imgmap']['uk_big']['file'] = 'maps_europe/map_uk_big.png';
+$_BO['tpl_imgmap']['uk_big']['borders'] = array('maps_europe/map_uk_big_borders.png', 70);
 
 
 

@@ -841,8 +841,8 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		if ($d['country'] && !isset($countries[$d['country']]))
 			$countries[$d['country']] = _BL($d['country']);
 
-		$D[$id]['country'] = _BL($d['country']);
-		$D[$id]['city'] = $d['city'];
+		$D[$id]['country'] = $d['country'] ? _BL($d['country']) : '?';
+		$D[$id]['city'] = $d['city'] ? $d['city'] : '?';
 		$D[$id]['user'] = $d['user'];
 		$D[$id]['tracker'] = $d['tracker'];
 
