@@ -1252,7 +1252,7 @@
 @define("BO_TILE_SIZE", 512);
 
 //Tile dimensions for strike counter
-@define("BO_TILE_SIZE_COUNT", 256);
+@define("BO_TILE_SIZE_COUNT", 512);
 
 //timeout for tile creating
 @define("BO_TILE_CREATION_TIMEOUT", 5);

@@ -292,9 +292,8 @@ function bo_tile()
 	//Display only strike count
 	if ($show_count) 
 	{
-		$strike_count = 0;
-		$whole_strike_count = 0;
-		
+		$tile_sub_size = 256;
+	
 		//Build ugly SQL Query
 		$sql_join  = '';
 		$sql_where = ' ( 0';
@@ -327,6 +326,28 @@ function bo_tile()
 			$sql_participated = " 0 ";
 		}
 		
+	
+		//divide bigger tile
+		$sub_tiles = bo_tile_get_subcoordinates($x, $y, $zoom, $tile_size, $tile_sub_size);
+		
+		if (count($sub_tiles) > 1)
+		{
+			$sql_sub_tiles = ' CASE ';
+			
+			foreach($sub_tiles as $i => $d)
+			{
+				$sql_sub_tiles .= " WHEN (s.lat BETWEEN '".$d[2]."' AND '".$d[4]."' AND s.lon BETWEEN '".$d[3]."' AND '".$d[5]."') ";
+				$sql_sub_tiles .= " THEN $i ";
+			}
+			
+			$sql_sub_tiles .= ' END ';
+		}
+		else
+		{
+			$sql_sub_tiles = '0';
+		}
+		
+	
 		//get count of all other stations
 		if ($_GET['stat'] == 2)
 		{
@@ -336,25 +357,25 @@ function bo_tile()
 			if ($station_info_id)
 				$stations_count[$station_info_id] = 0;
 			
-			$sql = "SELECT ss.station_id sid, COUNT(s.time) cnt 
+			$sql = "SELECT ss.station_id sid, COUNT(s.time) cnt, $sql_sub_tiles tile_no
 					FROM ".BO_DB_PREF."stations_strikes ss 
 					JOIN ".BO_DB_PREF."strikes s $index_sql ON s.id=ss.strike_id
 					$sql_join2
 					WHERE $sql_where $sql_where2
-					GROUP BY sid
+					GROUP BY tile_no, sid
 					";
 			$erg = BoDb::query($sql);
 			while ($row = $erg->fetch_assoc())
 			{
-				$stations_count[$row['sid']] = $row['cnt'];
+				$stations_count[$row['tile_no']][$row['sid']] = $row['cnt'];
 			}
 		}
 		
 		//all strike count and participated count
-	 	$sql = "SELECT COUNT(s.time) cnt, $sql_participated participated 
+	 	$sql = "SELECT COUNT(s.time) cnt, $sql_participated participated, $sql_sub_tiles tile_no
 				FROM ".BO_DB_PREF."strikes s $index_sql $sql_join1
 				WHERE $sql_where 
-				GROUP BY participated
+				GROUP BY tile_no, participated
 				";
 		$erg = BoDb::query($sql);
 		while ($row = $erg->fetch_assoc())
@@ -362,14 +383,14 @@ function bo_tile()
 			if ($station_id)
 			{
 				if ($row['participated'])
-					$strike_count += $row['cnt'];
+					$strike_count[$row['tile_no']] += $row['cnt'];
 				
-				$whole_strike_count += $row['cnt'];
+				$whole_strike_count[$row['tile_no']] += $row['cnt'];
 			}
 			else
-				$strike_count += $row['cnt'];
+				$strike_count[$row['tile_no']] += $row['cnt'];
 		}
-		
+
 		BoDb::close();
 		bo_session_close(true);
 		
@@ -383,74 +404,80 @@ function bo_tile()
 		$blank = imagecolorallocatealpha($I, 255, 255, 255, 127);
 		imagefilledrectangle($I, 0, 0, $tile_size, $tile_size, $blank);
 	
-	
-		//border
-		$col = imagecolorallocatealpha($I, 100,100,100,50);
-		imagerectangle( $I, 0, 0, $tile_size-1, $tile_size-1, $col);
-		
 		//number
 		$textsize = BO_MAP_COUNT_FONTSIZE;
 		$bold = BO_MAP_COUNT_FONTBOLD;
-		
-		$text = $strike_count;
-		if ($station_id > 0 && intval($whole_strike_count))
-		{
-			$ratio = $strike_count / $whole_strike_count * 100;
-			$text .= ' / '._BN($ratio, 1).'%';
-		}
-		
-		$twidth = bo_imagetextwidth($textsize, $bold, $text)+3;
-		$theight = bo_imagetextheight($textsize, $bold, $text)+2;
+
+		//border
+		$col1 = imagecolorallocatealpha($I, 100,100,100,50);
+		$col2 = imagecolorallocatealpha($I, 255,220,170,0);
 		$white = imagecolorallocatealpha($I, 255,255,255,0);
-		$color2   = imagecolorallocatealpha($I, 255,220,170,0);
-		imagefilledrectangle( $I, 0, 0, $twidth, $theight, $col);
-		bo_imagestring($I, $textsize, 2, 2, $text, $white, $bold);
 		
-		
-		//Stations
-		if ($_GET['stat'] == 2)
+
+		foreach($sub_tiles as $tile_id => $tile_data)
 		{
-			if ($strike_count > 0)
+			$dx = $tile_data[0] * $tile_sub_size;
+			$dy = $tile_data[1] * $tile_sub_size;
+			
+			$text = intval($strike_count[$tile_id]);
+			if ($station_id > 0 && intval($whole_strike_count[$tile_id]))
 			{
-				arsort($stations_count);
-				$theight-=1;
-				$selected_station_displayed = $station_info_id ? false : true;
-				
-				$i = 0;
-				$j = 0;
-				foreach($stations_count as $sid => $cnt)
+				$ratio = $strike_count[$tile_id] / intval($whole_strike_count[$tile_id]) * 100;
+				$text .= ' / '._BN($ratio, 1).'%';
+			}
+			
+			$twidth = bo_imagetextwidth($textsize, $bold, $text)+3;
+			$theight = bo_imagetextheight($textsize, $bold, $text)+2;
+			imagerectangle( $I, $dx, $dy, $dx+$tile_sub_size-1, $dy+$tile_sub_size-1, $col1);
+			imagefilledrectangle( $I, $dx, $dy, $dx+$twidth, $dy+$theight, $col1);
+			bo_imagestring($I, $textsize, $dx+2, $dy+2, $text, $white, $bold);
+			
+			
+			//Stations
+			if ($_GET['stat'] == 2)
+			{
+				if ($strike_count[$tile_id] > 0)
 				{
-					$j++;
-
-					if ($j > BO_MAP_COUNT_STATIONS)
+					arsort($stations_count[$tile_id]);
+					$theight-=1;
+					$selected_station_displayed = $station_info_id ? false : true;
+					
+					$i = 0;
+					$j = 0;
+					foreach($stations_count[$tile_id] as $sid => $cnt)
 					{
-						if ($selected_station_displayed)
-							break;
-						elseif ($station_info_id == $sid)
-							$selected_station_displayed = true;
-						else
-							continue;
-					}
-					
-					$i++;
-					
-					$text = round($cnt / $strike_count * 100).'% ';
-					$text .= trim($stations[$sid]['city']);
-					
-					if ($sid == $station_info_id)
-						$text .= " ($cnt)";
-					
-					$twidth = bo_imagetextwidth($textsize-1, $bold, $text);
-					
-					imagefilledrectangle($I, 0, $theight*$i, $twidth+10, $theight*($i+1), $col);
-					bo_imagestring($I, $textsize-1, 2, $theight*$i+3, $text, $sid == $station_info_id ? $color2 : $white, false);
-					
+						$j++;
 
-					
+						if ($j > BO_MAP_COUNT_STATIONS)
+						{
+							if ($selected_station_displayed)
+								break;
+							elseif ($station_info_id == $sid)
+								$selected_station_displayed = true;
+							else
+								continue;
+						}
+						
+						$i++;
+						
+						$text = round($cnt / $strike_count[$tile_id] * 100).'% ';
+						$text .= trim($stations[$sid]['city']);
+						
+						if ($sid == $station_info_id)
+							$text .= " ($cnt)";
+						
+						$twidth = bo_imagetextwidth($textsize-1, $bold, $text);
+						
+						imagefilledrectangle($I, $dx, $dy + $theight*$i, $dx+$twidth+10, $dy+$theight*($i+1), $col1);
+						bo_imagestring($I, $textsize-1, $dx, $dy + $theight*$i+3, $text, $sid == $station_info_id ? $col2 : $white, false);
+						
+
+						
+					}
 				}
 			}
 		}
-		
+
 		bo_tile_output($file, $caching, $I);
 		
 		exit;
@@ -1125,6 +1152,8 @@ function bo_get_tile_dim($x,$y,$zoom, $size=BO_TILE_SIZE)
 
 	//echo " $lat / $lat2 --- $lon / ".($lon+$lonW)." "; exit;
 	
+	$lon = fmod($lon, 360);
+	
 	return array($lat, $lon, $lat2, $lon+$lonW);
 }
 
@@ -1257,6 +1286,34 @@ function bo_tile_check_na_positions($radius, $x, $y, $zoom, $tile_size, $lat1, $
 	
 	
 	return $na_positions;
+}
+
+
+function bo_tile_get_subcoordinates($x, $y, $zoom, $tile_size_from, $tile_size_to)
+{
+	$count = $tile_size_from / $tile_size_to;
+	
+	if ($count <= 1)
+	{
+		return array(0 => array(0, 0));
+	}
+	
+	
+	for ($i=0; $i< $count; $i++)
+	{
+		$sub_x = $x * $count;
+		$sub_y = $y * $count + $i;
+		
+		list($lat1, $lon1, $lat2, $lon2) = bo_get_tile_dim($sub_x, $sub_y, $zoom, $tile_size_to);
+		
+		for ($j=0; $j< $count; $j++)
+		{
+			$dlon = ($lon2-$lon1);
+			$sub_tiles[$i*$count + $j] = array($j, $i, $lat1, $lon1 + $dlon*$j, $lat2, $lon1 + $dlon*($j+1));
+		}
+	}
+	
+	return $sub_tiles;
 }
 
 ?>
