@@ -749,7 +749,7 @@
 @define('BO_DB_EXTRA_KEYS_TIME_BYTES', 2);
 
 //time key starts at given date
-@define('BO_DB_EXTRA_KEYS_TIME_START', '2011-01-01');
+@define('BO_DB_EXTRA_KEYS_TIME_START', '2011-01-01 00:00:00 UTC');
 
 //divisor for time -> count value every x minutes
 // -> 2bytes and 30min lasts for 3.7years
