@@ -103,21 +103,17 @@ class BoData
 		return $ok;
 	}
 
-	public static function update_if($name, $value, $if)
+	public static function update_if_bigger($name, $value)
 	{
-		//unset cache, as we cannot be sure about the value after update
-		unset(self::$cache['data'][$name]);
-	
-		$name_esc = BoDb::esc($name);
-		$low_prio = BO_DB_UPDATE_LOW_PRIORITY ? "LOW_PRIORITY" : "";
-		$sql = "UPDATE $low_prio ".BO_DB_PREF."conf SET data='$value' WHERE name='$name_esc' AND data $if";
-		$ok = BoDb::query($sql, false);
+		if (!$value)
+			return true;
+			
+		$data = self::get($name);
 		
-		if ($ok === false) //!
-		{
-			//update failed, try insert
-			$ok = self::set($name, $value);
-		}
+		if ($data < $value)
+			$ret = self::set($name, $value);
+		else
+			$ret = false;
 		
 		return $ok;
 	}

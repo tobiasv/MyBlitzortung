@@ -1919,20 +1919,14 @@ function bo_update_stations($force = false)
 			}
 
 			//max signals/h (own)
-			if ($StData[$stId]['sig'])
-			{
-				$new = BoData::update_if('longtime_max_signalsh_own'.$add, $StData[$stId]['sig'], '< '.intval($StData[$stId]['sig']));
-				if ($new > 0)
-					BoData::set('longtime_max_signalsh_own_time'.$add, $time);
-			}
+			$new = BoData::update_if_bigger('longtime_max_signalsh_own'.$add, $StData[$stId]['sig']);
+			if ($new > 0)
+				BoData::set('longtime_max_signalsh_own_time'.$add, $time);
 
 			//max strikes/h (own)
-			if ($StData[$stId]['strikes'])
-			{
-				$new = BoData::update_if('longtime_max_strikesh_own'.$add, $StData[$stId]['strikes'], '< '.intval($StData[$stId]['strikes']));
-				if ($new > 0)
-					BoData::set('longtime_max_strikesh_own_time'.$add, $time);
-			}
+			$new = BoData::update_if_bigger('longtime_max_strikesh_own'.$add, $StData[$stId]['strikes']);
+			if ($new > 0)
+				BoData::set('longtime_max_strikesh_own_time'.$add, $time);
 				
 			//Activity/inactivity counter
 			$time_interval = $last ? $time - $last : 0;
