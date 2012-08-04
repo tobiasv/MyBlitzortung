@@ -3,13 +3,17 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.7 (2012-??-??)
+Version 0.7.7 (2012-08-04)
 -------------------------------
+- new: more maps
+   * green myblitzortung style: germany, baltic, benelux, poland, uk
+   * template for wetterpool (RIP) maps; the files have to be downloaded separately
+- new: support for big tiles with strike counts (less server load!)
 - new: full UTF8 support
-- new: send header to cache html
+- new: send cache headers to enable caching (for experts only!)
 - improved: caching methods
 - improved: faster due to file inclusion changes
-- other improvements and fixes
+- a lot of other improvements and fixes
 
 
 Version 0.7.6 (2012-05-31)
