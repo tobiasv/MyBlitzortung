@@ -159,7 +159,7 @@
 @define('BO_LOCALE2', '');
 
 //available locales
-@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl');
+@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv');
 
 //show links in the footer
 @define('BO_SHOW_LANGUAGES', true);
@@ -554,7 +554,7 @@
 @define('BO_MAP_LEGEND_WIDTH', 80);
 @define('BO_MAP_LEGEND_HEIGHT', 10); //only colorbar
 @define('BO_MAP_LEGEND_FONTSIZE', 2); //no TTF!
-@define('BO_MAP_NA_FONTSIZE', 3); //no TTF!
+@define('BO_MAP_NA_FONTSIZE', 9); 
 @define('BO_MAP_COUNT_FONTSIZE', 8);
 @define('BO_MAP_COUNT_FONTBOLD', true);
 @define('BO_MAP_COUNT_STATIONS', 15);

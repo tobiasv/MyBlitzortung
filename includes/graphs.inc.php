@@ -257,7 +257,7 @@ function bo_graph_statistics()
 	if ($channel)
 	{
 		$sql_part = ' ( (s.part&'.(1<<$channel).')>0 AND s.part>0  ) ';
-		$add_title .= ' ('._BL('Channel', true).' '.($channel).')';
+		$add_title .= ' ('._BL('Channel').' '.($channel).')';
 	}
 	else
 	{
@@ -1793,7 +1793,7 @@ function bo_graph_statistics()
 
 	if (!$title_no_hours)
 	{
-		$add_title .= ' '._BL('of the last', true).' ';
+		$add_title .= ' '._BL('of the last').' ';
 		
 		if ($align_day)
 			$add_title .= floor($hours_back / 24).' '._BL('days');
@@ -1803,14 +1803,14 @@ function bo_graph_statistics()
 
 	if ($show_country)
 	{
-		$add_title .= ' ('._BL($country, true).')';
+		$add_title .= ' ('._BL($country).')';
 	}
 	
 	$stInfo = bo_station_info($station_id);
 	$city = $stInfo['city'];
 	if (!$no_title_station && $station_id)
 	{
-		$add_title .= ' '._BL('for_station', true).': '.$city;
+		$add_title .= ' '._BL('for_station').': '.$city;
 		bo_station_city(0, $stInfo['city']);
 	}
 
@@ -1822,7 +1822,7 @@ function bo_graph_statistics()
 			($type == 'ratio_bearing'  || $type == 'ratio_bearing_longtime')
 		)
 	{
-		$title = _BL('graph_stat_title_ratio_bearing', true).$add_title;
+		$title = _BL('graph_stat_title_ratio_bearing').$add_title;
 		$size = BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE;
 
 		$D = array();

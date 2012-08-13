@@ -82,14 +82,14 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 			$years[$y] = $y;
 
 		if ($y == $year)
-			$months[$m] = _BL(date('M', strtotime("$y-$m-01")));
+			$months[$m] = _BL(date('M', strtotime("$y-$m-01")).'_short');
 	}
 
 	//Add current month
 	if (!$year || $year == date('Y'))
 	{
 		$years[(int)date('Y')] = date('Y');
-		$months[(int)date('m')] = _BL(date('M'));
+		$months[(int)date('m')] = _BL(date('M').'_short');
 	}
 
 	if (!$years[(int)$year])

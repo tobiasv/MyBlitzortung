@@ -73,18 +73,18 @@ $_BL['it']['unit_strikesperminute'] = 'Fulmini/min';
 $_BL['it']['unit_strikesperminute_one'] = 'Fulmini/min';
 
 
-$_BL['it']['Jan'] = 'Gen';
-$_BL['it']['Feb'] = 'Feb';
-$_BL['it']['Mar'] = 'Mar';
-$_BL['it']['Apr'] = 'Apr';
-$_BL['it']['May'] = 'Mag';
-$_BL['it']['Jun'] = 'Giu';
-$_BL['it']['Jul'] = 'Lug';
-$_BL['it']['Aug'] = 'Ago';
-$_BL['it']['Sep'] = 'Sett';
-$_BL['it']['Oct'] = 'Ott';
-$_BL['it']['Nov'] = 'Nov';
-$_BL['it']['Dec'] = 'Dic';
+$_BL['it']['Jan_short'] ='Gen';
+$_BL['it']['Feb_short'] ='Feb';
+$_BL['it']['Mar_short'] ='Mar';
+$_BL['it']['Apr_short'] ='Apr';
+$_BL['it']['May_short'] ='Mag';
+$_BL['it']['Jun_short'] ='Giu';
+$_BL['it']['Jul_short'] ='Lug';
+$_BL['it']['Aug_short'] ='Ago';
+$_BL['it']['Sep_short'] ='Sett';
+$_BL['it']['Oct_short'] ='Ott';
+$_BL['it']['Nov_short'] ='Nov';
+$_BL['it']['Dec_short'] ='Dic';
 
 
 $_BL['it']['January'] = 'Gennaio';

@@ -69,24 +69,25 @@ $_BL['de']['unit_strikesperminute'] = ' Blitze pro Minute';
 $_BL['de']['unit_strikesperminute_one'] = ' Blitz pro Minute';
 
 
-$_BL['de']['Jan'] = 'Jan';
-$_BL['de']['Feb'] = 'Feb';
-$_BL['de']['Mar'] = 'Mär';
-$_BL['de']['Apr'] = 'Apr';
-$_BL['de']['May'] = 'Mai';
-$_BL['de']['Jun'] = 'Jun';
-$_BL['de']['Jul'] = 'Jul';
-$_BL['de']['Aug'] = 'Aug';
-$_BL['de']['Sep'] = 'Sep';
-$_BL['de']['Oct'] = 'Okt';
-$_BL['de']['Nov'] = 'Nov';
-$_BL['de']['Dec'] = 'Dez';
+$_BL['de']['Jan_short'] = 'Jan';
+$_BL['de']['Feb_short'] = 'Feb';
+$_BL['de']['Mar_short'] = 'Mär';
+$_BL['de']['Apr_short'] = 'Apr';
+$_BL['de']['May_short'] = 'Mai';
+$_BL['de']['Jun_short'] = 'Jun';
+$_BL['de']['Jul_short'] = 'Jul';
+$_BL['de']['Aug_short'] = 'Aug';
+$_BL['de']['Sep_short'] = 'Sep';
+$_BL['de']['Oct_short'] = 'Okt';
+$_BL['de']['Nov_short'] = 'Nov';
+$_BL['de']['Dec_short'] = 'Dez';
 
 
 $_BL['de']['January'] = 'Januar';
 $_BL['de']['February'] = 'Februar';
 $_BL['de']['March'] = 'März';
 $_BL['de']['April'] = 'April';
+$_BL['de']['May'] = 'Mai';
 $_BL['de']['June'] = 'Juni';
 $_BL['de']['July'] = 'Juli';
 $_BL['de']['August'] = 'August';

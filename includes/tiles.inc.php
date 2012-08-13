@@ -242,6 +242,12 @@ function bo_tile()
 		$time_min        = count($times_min) ? min($times_min) : 0;
 		$time_max        = count($times_max) ? max($times_max) : 0;
 	}
+	elseif ($time_manual_from)
+	{
+		$c = $cfg['col'];
+		$time_min = $time_manual_from;
+		$time_max = $time_manual_to;
+	}
 	else 
 	{
 		//normal strike display
@@ -917,6 +923,13 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 	BoDb::close();
 	bo_session_close(true);
 	
+	if ($caching && _BL())
+	{
+		//add language string when locale has been loaded
+		//as tiles may contain text from "bo_tile_message"
+		$file = dirname($file).'/'._BL().(BO_CACHE_SUBDIRS === true ? '/' : '_').basename($file);
+	}
+	
 	if ($caching && BO_CACHE_SUBDIRS === true)
 	{
 		$dir = dirname($file);
@@ -1006,21 +1019,17 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 
 function bo_tile_insert_text($I, $text, $tile_size = BO_TILE_SIZE, $replace = array(), $positions = false)
 {
+	require_once 'functions_image.inc.php';
 	bo_load_locale();
 	
 	if ($positions === false)
 		$positions = bo_tile_positions_all($tile_size);
 		
-	$text = strtr(_BL($text, true), $replace);
+	$text = strtr(_BL($text), $replace);
 	$text = strtr($text, array('\n' => "\n"));
-	$lines = explode("\n", $text);
-	$height = (count($lines));
-	$width = 0;
-	foreach($lines as $line)
-		$width = max(strlen($line), $width);
 	
-	$fwidth   = imagefontwidth(BO_MAP_NA_FONTSIZE);
-	$fheight  = imagefontheight(BO_MAP_NA_FONTSIZE);
+	$width   = bo_imagetextwidth(BO_MAP_NA_FONTSIZE, false, $text);
+	$height  = bo_imagetextheight(BO_MAP_NA_FONTSIZE, false, $text);
 	$textcol  = imagecolorallocate($I, 70, 70, 70);
 	$box_bg   = imagecolorallocate($I, 210, 210, 255);
 	$box_line = imagecolorallocate($I, 255, 255, 255);
@@ -1035,11 +1044,9 @@ function bo_tile_insert_text($I, $text, $tile_size = BO_TILE_SIZE, $replace = ar
 			//draw text if position is set
 			if ( (1<<$pos) & $positions)
 			{
-				imagefilledrectangle( $I, 25+$x, 115+$y, 35+$width*$fwidth+$x, 127+$height*$fheight+$y, $box_bg  );
-				imagerectangle(       $I, 25+$x, 115+$y, 35+$width*$fwidth+$x, 127+$height*$fheight+$y, $box_line);
-
-				foreach($lines as $i=>$line)
-					imagestring($I, BO_MAP_NA_FONTSIZE, 30+$x, 120+$i*$fheight+$y, $line, $textcol);
+				imagefilledrectangle( $I, 25+$x, 114+$y, 34+$width+$x, 119+$height+$y, $box_bg  );
+				imagerectangle(       $I, 25+$x, 114+$y, 34+$width+$x, 119+$height+$y, $box_line);
+				bo_imagestring($I, BO_MAP_NA_FONTSIZE, 30+$x, 120+$y, $text, $textcol);
 			}
 			
 			$pos++;

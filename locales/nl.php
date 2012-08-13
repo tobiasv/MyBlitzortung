@@ -65,24 +65,25 @@ $_BL['nl']['CET'] = 'MET';
 $_BL['nl']['unit_strikesperminute'] = ' bliksems per minuut';
 $_BL['nl']['unit_strikesperminute_one'] = ' bliksem per minuut';
 
-$_BL['nl']['Jan'] = 'jan';
-$_BL['nl']['Feb'] = 'feb';
-$_BL['nl']['Mar'] = 'maa';
-$_BL['nl']['Apr'] = 'apr';
-$_BL['nl']['May'] = 'mei';
-$_BL['nl']['Jun'] = 'jun';
-$_BL['nl']['Jul'] = 'jul';
-$_BL['nl']['Aug'] = 'aug';
-$_BL['nl']['Sep'] = 'sep';
-$_BL['nl']['Oct'] = 'okt';
-$_BL['nl']['Nov'] = 'nov';
-$_BL['nl']['Dec'] = 'dec';
+$_BL['nl']['Jan_short'] ='jan';
+$_BL['nl']['Feb_short'] ='feb';
+$_BL['nl']['Mar_short'] ='maa';
+$_BL['nl']['Apr_short'] ='apr';
+$_BL['nl']['May_short'] ='mei';
+$_BL['nl']['Jun_short'] ='jun';
+$_BL['nl']['Jul_short'] ='jul';
+$_BL['nl']['Aug_short'] ='aug';
+$_BL['nl']['Sep_short'] ='sep';
+$_BL['nl']['Oct_short'] ='okt';
+$_BL['nl']['Nov_short'] ='nov';
+$_BL['nl']['Dec_short'] ='dec';
 
 
 $_BL['nl']['January'] = 'januari';
 $_BL['nl']['February'] = 'februari';
 $_BL['nl']['March'] = 'maart';
 $_BL['nl']['April'] = 'april';
+$_BL['nl']['May'] ='mei';
 $_BL['nl']['June'] = 'juni';
 $_BL['nl']['July'] = 'juli';
 $_BL['nl']['August'] = 'augustus';
@@ -290,7 +291,7 @@ $_BL['nl']['main_menu_login'] = 'Leden';
 /*************************************************************/
 $_BL['nl']['map_options'] = 'Opties';
 $_BL['nl']['only own strikes'] = 'Enkel bliksem waargenomen door station {STATION}';
-$_BL['nl']['tile not available'] = 'Enkel voor geregistreerde gebruikers';
+$_BL['nl']['tile not available'] = 'Enkel voor geregistreerde\ngebruikers';
 $_BL['nl']['update map'] = 'Vernieuwen';
 $_BL['nl']['Click to set the map to Home'] = 'Klik om de kaart terug te brengen.';
 $_BL['nl']['Dynamic map'] = 'Dynamische kaart';

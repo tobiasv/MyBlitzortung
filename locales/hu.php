@@ -71,24 +71,25 @@ $_BL['hu']['unit_strikesperminute'] = ' Villámlás percenként';
 $_BL['hu']['unit_strikesperminute_one'] = ' villámlás percenként';
 
 
-$_BL['hu']['Jan'] = 'Jan';
-$_BL['hu']['Feb'] = 'Febr';
-$_BL['hu']['Mar'] = 'Márc';
-$_BL['hu']['Apr'] = 'Ápr';
-$_BL['hu']['May'] = 'Május';
-$_BL['hu']['Jun'] = 'Jun';
-$_BL['hu']['Jul'] = 'Júl';
-$_BL['hu']['Aug'] = 'Aug';
-$_BL['hu']['Sep'] = 'Szept';
-$_BL['hu']['Oct'] = 'Okt';
-$_BL['hu']['Nov'] = 'Nov';
-$_BL['hu']['Dec'] = 'Dec';
+$_BL['hu']['Jan_short'] ='Jan';
+$_BL['hu']['Feb_short'] ='Febr';
+$_BL['hu']['Mar_short'] ='Márc';
+$_BL['hu']['Apr_short'] ='Ápr';
+$_BL['hu']['May_short'] ='Május';
+$_BL['hu']['Jun_short'] ='Jun';
+$_BL['hu']['Jul_short'] ='Júl';
+$_BL['hu']['Aug_short'] ='Aug';
+$_BL['hu']['Sep_short'] ='Szept';
+$_BL['hu']['Oct_short'] ='Okt';
+$_BL['hu']['Nov_short'] ='Nov';
+$_BL['hu']['Dec_short'] ='Dec';
 
 
 $_BL['hu']['January'] = 'Január';
 $_BL['hu']['February'] = 'Február';
 $_BL['hu']['March'] = 'Március';
 $_BL['hu']['April'] = 'Április';
+$_BL['hu']['May'] = 'Május';
 $_BL['hu']['June'] = 'Június';
 $_BL['hu']['July'] = 'Július';
 $_BL['hu']['August'] = 'Augusztus';

@@ -942,7 +942,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if ($show_banners)
 	{
 		if (!$blank)
-			$extra_text = _BL('Strikes', true).': '.array_sum($count);
+			$extra_text = _BL('Strikes').': '.array_sum($count);
 
 		bo_image_banner_top($I, $w, $h, $cfg, $time_string, $extra_text);
 		bo_image_banner_bottom($I, $w, $h, $cfg, $cw);

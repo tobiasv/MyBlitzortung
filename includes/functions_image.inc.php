@@ -8,7 +8,7 @@ function bo_image_error($text, $w=400, $h=300, $size=2)
 	$I = imagecreate($w, $h);
 	imagefill($I, 0, 0, imagecolorallocate($I, 255, 150, 150));
 	$black = imagecolorallocate($I, 0, 0, 0);
-	bo_imagestring($I, $size, 10, $h/2-25, $text, $black, $w-20);
+	bo_imagestring_max($I, $size, 10, $h/2-25, $text, $black, $w-20);
 	imagerectangle($I, 0,0,$w-1,$h-1,$black);
 
 	$expire = time() + 30;
@@ -24,9 +24,6 @@ function bo_image_cache_error($w=400, $h=300)
 {
 	bo_image_error('Creating image failed! Please check if your cache-dirs are writeable!', $w, $h, 3);
 }
-
-
-
 
 function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = false, $angle = 0, $bordercolor = false, $px = 0)
 {
@@ -56,8 +53,6 @@ function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = fals
 	{
 		$h = $angle ? 0 : $size;
 		$w = $angle ? $size : 0;
-
-		//$text = utf8_encode($text);
 
 		return bo_imagettftextborder($I, $size, $angle, $x+$w, $y+$h, $color, $font, $text, $bordercolor, $px);
 	}
