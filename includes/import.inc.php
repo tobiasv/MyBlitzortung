@@ -692,7 +692,7 @@ function bo_update_strikes($force = false)
 		else if ($last_strike <= 0 || !$last_strike)
 			$last_strike = strtotime('2000-01-01');
 		
-		$time_update = $last_strike - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60 + 60;
+		$time_update = $last_strike - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60;
 		
 
 		/***** PARTIAL DOWNLOAD OF STRIKEDATA *****/
