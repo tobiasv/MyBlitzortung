@@ -3,11 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.8 (???)
+Version 0.7.8 (2012-10-02)
 -------------------------------
-- added latvian translation
+- added Latvian translation (thx to Edgars)
+- added Finnish translation (thx to Timo)
 - fixed: selecting time range in main map didn't work
 - fixed: UTF8 bugs in maps/graphs
+- fixed: only one alert per user possible
 - other fixes...
 
 

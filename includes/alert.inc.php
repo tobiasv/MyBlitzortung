@@ -236,10 +236,12 @@ function bo_alert_settings_form()
 			}
 			else
 			{
-				$row = BoData::get_all('alert\_".$user_id."\_%', 1);
-				preg_match('/alert_([0-9]+)_([0-9]+)/', $row['name'], $r);
-				$alert_id = intval($r[2]) + 1;
-
+				while($row = BoData::get_all('alert\_'.$user_id.'\_%'))
+				{
+					preg_match('/alert_([0-9]+)_([0-9]+)/', $row['name'], $r);
+					$alert_id = max($alert_id, intval($r[2]) + 1);
+				}
+				
 				BoData::set('alert_'.$user_id.'_'.$alert_id, serialize($A));
 				
 			}
