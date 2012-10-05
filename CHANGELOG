@@ -3,10 +3,16 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.8a (2012-10-05)
+-------------------------------
+- installation fixes
+
+
 Version 0.7.8 (2012-10-02)
 -------------------------------
 - added Latvian translation (thx to Edgars)
 - added Finnish translation (thx to Timo)
+- database bulk inserts -> faster importing
 - fixed: selecting time range in main map didn't work
 - fixed: UTF8 bugs in maps/graphs
 - fixed: only one alert per user possible

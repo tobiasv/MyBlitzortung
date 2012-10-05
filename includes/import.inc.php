@@ -1044,11 +1044,14 @@ function bo_update_strikes($force = false)
 				foreach($participants as $user)
 				{
 					$stId = $user2id[$user];
-					$last_strikes[$stId] = array($utime, $time_ns, $id);
-					
-					$sql_data['strike_id'] = $id;
-					$sql_data['station_id'] = $stId;
-					BoDb::bulk_insert('stations_strikes', $sql_data);
+					if ($stId)
+					{
+						$last_strikes[$stId] = array($utime, $time_ns, $id);
+						
+						$sql_data['strike_id'] = $id;
+						$sql_data['station_id'] = $stId;
+						BoDb::bulk_insert('stations_strikes', $sql_data);
+					}
 				}
 			}
 

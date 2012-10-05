@@ -316,7 +316,9 @@ switch($step)
 
 		echo '<div style="font-family: Courier; font-size: 0.8em; border: 1px solid #999; padding: 10px; ">';
 		echo '<pre>';
-		bo_update_all(true);
+		bo_update_stations(true);
+		bo_update_strikes(true);
+		//bo_update_all(true);
 		echo '</pre>';
 		echo '</div>';
 
