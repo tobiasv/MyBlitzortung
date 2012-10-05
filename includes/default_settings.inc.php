@@ -809,7 +809,7 @@
 @define('BO_EMAIL_SMTP_PORT',   25); //or use 587
 @define('BO_EMAIL_SMTP_USERNAME', '');
 @define('BO_EMAIL_SMTP_PASSWORD', '');
-
+@define('BO_EMAIL_SMTP_SECURE', ''); // set to 'tls' or 'ssl' for secure connections
 
 
 

@@ -1757,6 +1757,7 @@ function bo_mail($mail, $subject = '', $text = '', $headers = '', $from = '')
 		if (BO_EMAIL_SMTP_USERNAME && BO_EMAIL_SMTP_PASSWORD)
 		{
 			$PHPMailer->SMTPAuth   = true;
+			$PHPMailer->SMTPSecure = BO_EMAIL_SMTP_SECURE;
 			$PHPMailer->Username   = BO_EMAIL_SMTP_USERNAME;
 			$PHPMailer->Password   = BO_EMAIL_SMTP_PASSWORD;
 		}
