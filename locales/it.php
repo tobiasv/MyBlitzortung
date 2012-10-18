@@ -2,9 +2,10 @@
 
 /* ATTENZIONE !!!
  * Traduzione italiana a cura di Stefano Cirilli (www.meteo.units.it)
- * Versione traduzione: Rc2
+ * Versione traduzione: Rc3  -   10/10/2012  
  * Nel caso di utilizzo di questa traduzione è fatto obbligo di inserire il copyright di Universtà di Trieste - www.meteo.units.it
  */
+
 
 
 $_BL['locale'] = 'it';
@@ -73,18 +74,18 @@ $_BL['it']['unit_strikesperminute'] = 'Fulmini/min';
 $_BL['it']['unit_strikesperminute_one'] = 'Fulmini/min';
 
 
-$_BL['it']['Jan_short'] ='Gen';
-$_BL['it']['Feb_short'] ='Feb';
-$_BL['it']['Mar_short'] ='Mar';
-$_BL['it']['Apr_short'] ='Apr';
-$_BL['it']['May_short'] ='Mag';
-$_BL['it']['Jun_short'] ='Giu';
-$_BL['it']['Jul_short'] ='Lug';
-$_BL['it']['Aug_short'] ='Ago';
-$_BL['it']['Sep_short'] ='Sett';
-$_BL['it']['Oct_short'] ='Ott';
-$_BL['it']['Nov_short'] ='Nov';
-$_BL['it']['Dec_short'] ='Dic';
+$_BL['it']['Jan'] = 'Gen';
+$_BL['it']['Feb'] = 'Feb';
+$_BL['it']['Mar'] = 'Mar';
+$_BL['it']['Apr'] = 'Apr';
+$_BL['it']['May'] = 'Mag';
+$_BL['it']['Jun'] = 'Giu';
+$_BL['it']['Jul'] = 'Lug';
+$_BL['it']['Aug'] = 'Ago';
+$_BL['it']['Sep'] = 'Sett';
+$_BL['it']['Oct'] = 'Ott';
+$_BL['it']['Nov'] = 'Nov';
+$_BL['it']['Dec'] = 'Dic';
 
 
 $_BL['it']['January'] = 'Gennaio';
@@ -429,7 +430,7 @@ $_BL['it']['lightning_info'] = 'Informazioni sul fulmine';
 $_BL['it']['strikedetected'] = 'Fulmine identificato';
 $_BL['it']['button_search'] = 'Cerca';
 $_BL['it']['h3_arch_search'] = 'Ricerca fulmini per zona';
-$_BL['it']['h3_arch_last_signals'] = 'Ultimo segnale ricevuto';
+$_BL['it']['h3_arch_last_signals'] = 'Ultimi segnali ricevuti';
 $_BL['it']['You have to place the pointer inside the red circle!'] = 'Posiziona il puntatore dentro il cerchio rosso !!';
 $_BL['it']['archive_legend'] = 'Opzioni ricerca';
 $_BL['it']['No strikes found!'] = 'Nessun fulmine trovato !';
@@ -440,7 +441,7 @@ $_BL['it']['Strike density'] = 'Densità fulmini ';
 $_BL['it']['arch_navi_density'] = 'Densità fulmini';
 $_BL['it']['h3_arch_density'] = 'Densità fulmini';
 $_BL['it']['legend_arch_densities'] = 'Opzioni';
-$_BL['it']['arch_select_dates_between'] = 'Dati disponibili dal {START} al {END} !';
+$_BL['it']['arch_select_dates_between'] = 'Dati disponibili dal {START} al {END}!';
 $_BL['it']['Max strikes density'] = 'Max. densità fulmini';
 $_BL['it']['check_all_strikes_network'] = 'Tutti i fulmini rilevate dalla rete';
 $_BL['it']['Calculation basis are elements with area'] = 'Calcolo basato su elementi di un area di';
@@ -554,7 +555,7 @@ $_BL['it']['legend_stat_amplitudes'] = 'Opzioni';
 $_BL['it']['legend_stat_advanced_options'] = 'Opzioni';
 $_BL['it']['legend_stat_participants_time'] = 'Opzioni';
 $_BL['it']['legend_stat_deviations_time'] = 'Opzioni';
-
+$_BL['it']['legend_stat_active_stations'] = 'Opzioni';
 
 /*************************************************************/
 /* User                                                     */
@@ -680,6 +681,8 @@ Blitzortung è una rete di stazioni di rilevamento delle fulminazioni.
 Ogni singola stazione capta e campiona il segnale eletromagnetico creato dal fulmine. Al segnale viene unito il timestamp e la posizione ricavati da un gps.
 Attraverso il metodo denominato TOA (time of arrival method) viene calcolata la posizione.
 ';
+
+
 $_BL['it']['info_accuracy_text'] = '
 Grazie alla alta densità spaziale
 delle stazioni di rilevamento, la precisone nella localizzazione è molto buona ed è confrontabile con quella dei servizi commerciali.
@@ -700,7 +703,7 @@ $_BL['it']['info_myblitzortung_text'] = '
 La visualizzazione di queste pagine è possibile anche grazie ad un software chiamato MyBlitzortung.
 Non è garantito che questo software dia sempre informazioni corrette!
 Puoi trovare maggiori informazioni su:
-<a href="http://www.myblitzortung.org" target="_blank">myblitzortung.org</a>.
+<a href="http://www.myblitzortung.de" target="_blank">myblitzortung.de</a>.
 ';
 
 
@@ -726,7 +729,7 @@ La stazione di {STATION_CITY} riceve i segnali elettromagnetici emessi dalle sca
 <br>I segnali, dopo essere stati elaborati, vengono immessi in rete e, con l\'aiuto di altre stazioni, viene calcolata la posizione e l\'ora esatta dell\'evento.
 Affinchè una scarica sia validata la stessa deve essere stata registrata da almeno {MIN_PARTICIPANTS} stazioni.
 I dati riferiti alla singola stazione di {STATION_CITY} sono quindi stati registrati almeno da altre {MIN_PARTICIPANTS} stazioni.
-<br>Tutti i dati seguenti sono relativi alla sola stazione di {STATION_CITY}:';
+<br>Tutti i dati seguenti sono riferiti all\'intervallo temporale dei 60 minuti precedenti l\'ultimo aggiornamento e sono relativi alla sola stazione di {STATION_CITY}:';
 $_BL['it']['bo_graph_descr_radi'] = 'Percentuale di localizzazione in rapporto alla distanza dalla stazione.
 <br>Viene riportato anche il totale delle fulminazioni, sempre rapportato alla distanza.';
 $_BL['it']['bo_graph_descr_strikes'] = 'Il grafico riporta il totale delle fulminazioni per ora dell\'intera rete, e della stazione di {STATION_CITY}.
@@ -826,7 +829,7 @@ $_BL['it']['alert_sms'] = 'SMS';
 $_BL['it']['Number'] = 'Numero';
 $_BL['it']['alert_url'] = 'URL';
 $_BL['it']['URL'] = 'URL';
-$_BL['it']['alert_settings_legend2'] = 'Versand auslösen';
+$_BL['it']['alert_settings_legend2'] = 'Attivazione invio';
 $_BL['it']['alert_lat'] = 'Latitudine';
 $_BL['it']['alert_lon'] = 'Longitudine';
 $_BL['it']['alert_distance'] = 'Max. distanza (km)';
@@ -932,6 +935,10 @@ Queste funzioni sono operative solo se la stazione ha mandato almeno un segnale 
 
 
 
+
+
+
+
 /*************************************************************/
 /* Update                                                    */
 /*************************************************************/
@@ -953,9 +960,11 @@ $_BL['it']['No data available!'] = 'Dati non disponibili!';
 
 /*************************************************************/
 /* Translations for templates                                */
-/*************************************************************/
+/************************************************************/
 
-//Countries
+/*** EUROPE ***/
+
+//Europe: Countries
 $_BL['it']['Germany'] = 'Germania';
 $_BL['it']['France'] = 'Francia';
 $_BL['it']['Austria'] = 'Austria';
@@ -975,6 +984,7 @@ $_BL['it']['Poland'] = 'Polonia';
 $_BL['it']['Spain'] = 'Spagna';
 $_BL['it']['Sweden'] = 'Svezia';
 $_BL['it']['The Netherlands'] = 'Olanda';
+$_BL['it']['Netherlands'] = 'Olanda';
 $_BL['it']['United Kingdom'] = 'Inghilterra';
 $_BL['it']['Bulgaria'] = 'Bulgaria';
 $_BL['it']['Albania'] = 'Albania';
@@ -982,16 +992,38 @@ $_BL['it']['Russia'] = 'Russia';
 $_BL['it']['Romania'] = 'Romania';
 $_BL['it']['Rome'] = 'Roma';
 $_BL['it']['Lithuania'] = 'Lituania';
+$_BL['it']['Slovenia'] = 'Slovenia';
 
-//Europe
+//Europe: Regions
 $_BL['it']['Europe'] = 'Europa';
 $_BL['it']['Western Europe'] = 'Europa ovest';
 
-//German states
+//Europe: German states
 $_BL['it']['Bavaria'] = 'Baviera';
 $_BL['it']['NRW'] = 'NRW';
 
-//Others
+//Europe: Italy
+$_BL['it']['Sardinia'] = 'Sardegna';
+
+
+
+//*** OCEANIA ***/
+$_BL['it']['New Zealand'] = 'Nuova Zelanda';
+$_BL['it']['Oceania'] = 'Oceania';
+
+
+//*** USA/America ***/
+$_BL['it']['America'] = 'America';
+
+
+
+//*** OTHER REGIONS ***/
+$_BL['it']['Asia'] = 'Asia';
+$_BL['it']['Africa'] = 'Africa';
+
+
+//*** OTHER TEMPLATE NAMES***/
+
 $_BL['it']['Meteox rain radar'] = 'meteox.com radar';
 
 
@@ -1007,6 +1039,7 @@ $_BL['it']['Specials'] = 'Extra';
 $_BL['it']['Importing data...'] = 'Sto importando i dati.....';
 $_BL['it']['since'] = 'dal';
 $_BL['it']['Period'] = 'Periodo';
+$_BL['it']['bo_stat_network_descr'] = false;
 
 $_BL['it']['ani_play'] = 'Azione';
 $_BL['it']['ani_pause'] = 'Pausa';
@@ -1015,17 +1048,48 @@ $_BL['it']['ani_prev'] = 'Indietro';
 $_BL['it']['no GPS signal'] = 'Nessun segnale GPS';
 $_BL['it']['no reception'] = 'ricezione nulla';
 $_BL['it']['Loading...'] = 'Sto caricando...';
+$_BL['it']['search_outside_radius'] = 'Non è possibile la ricerca al di fuori di questo raggio';
+
+$_BL['it']['Links'] = 'Link';
+$_BL['it']['Login string is'] = 'Login';
+$_BL['it']['Auth ID is'] = 'ID';
+$_BL['it']['Logging out from Blitzortung.org'] = 'Logout';
+$_BL['it']['Already DONE BEFORE'] = 'Già eseguito!';
+$_BL['it']['Update database keys'] = 'Aggiornamento chiavi DataBase';
+$_BL['it']['without GPS'] = 'senza segnale GPS';
+$_BL['it']['Record longtime data since'] = 'Inizio acquisizione';
+$_BL['it']['Show all signals'] = 'Mostra tutti i segnali';
 
 
 
+/*******************************/
+/*  New translations           */
+/*******************************/
 
-/********************/
-/*  NOT TRANSLATED  */
-/********************/
+$_BL['it']['Residual time'] = 'Tempo residuo';
+$_BL['it']['graph_stat_title_residual_time'] = 'Grafico del tempo residuo';
+$_BL['it']['h4_graph_residual_time'] = 'Grafico del tempo residuo';
+$_BL['it']['bo_graph_descr_strikes_station_residual_time'] = false;
+$_BL['it']['no_lightning_data'] = 'Dati fulminazioni non disponibili!';
+$_BL['it']['Mean coordinates'] = 'Coordinate medie';
+$_BL['it']['h4_stat_station_area'] = 'Nei pressi della stazione:';
+$_BL['it']['Last position'] = 'Ultima posizione';
+$_BL['it']['Select station'] = 'Scelta della stazione';
+$_BL['it']['List'] = 'Lista';
+$_BL['it']['outside of'] = 'oltre';
+$_BL['it']['to station'] = 'stazione:';
+$_BL['it']['Show only region'] = 'Mostra solo la regione:';
+$_BL['it']['Exclude region'] = 'Escludi la regione:';
+$_BL['it']['Only station'] = 'Solo la stazione:';
+$_BL['it']['City names'] = 'Nomi delle città';
+$_BL['it']['Only strikes of selected station'] = 'Solo i fulmini delle stazioni selezionate:';
+$_BL['it']['map_autoupdate_stalled_msg'] = 'Aggiornamento automatico disabilitato per attività nulla!';
+$_BL['it']['tile_zoom_not_allowed'] = 'Questo livello di zoom non è consentito!';
+$_BL['it']['tile_station_not_allowed'] = 'Non consentito!';
+$_BL['it']['Last time without GPS'] = 'Perdita segnale GPS ore:';
+$_BL['it']['h4_stat_station_general'] = 'Statistiche generali ultima ora';
 
 
-//en: ''
-$_BL['it']['bo_stat_network_descr'] = '';
 
 
 ?>

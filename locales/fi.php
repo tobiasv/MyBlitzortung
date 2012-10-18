@@ -19,7 +19,7 @@ $_BL['fi']['is_utf8'] = false;
 
 
 //Translated name of MyBlitzortung with html tags
-$_BL['fi']['MyBlitzortung'] = 'MyBlitzortung';
+$_BL['fi']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">LightningDetection</span>';
 
 //Translated name of MyBlitzortung without html tags
 $_BL['fi']['MyBlitzortung_notags'] = 'MyLightningDetection';
@@ -208,7 +208,7 @@ $_BL['fi']['Usage'] = 'K‰yttˆ';
 $_BL['fi']['Last signal'] = 'Viimeisin signaali';
 $_BL['fi']['Never before'] = 'Ei koskaan aikaisemmin';
 $_BL['fi']['no_strike_yet'] = 'Ei mit‰‰n';
-$_BL['fi']['Current strike rate'] = 'T‰m‰nhetkinen salamanoiden iskutiheys';
+$_BL['fi']['Current strike rate'] = 'Salamoiden iskutiheys juuri nyt';
 $_BL['fi']['Last detected strike'] = 'Viimeisin havaittu salamanisku';
 $_BL['fi']['Not yet'] = 'Ei viel‰';
 $_BL['fi']['Evaluated'] = 'Arvioitu';
@@ -332,7 +332,7 @@ $_BL['fi']['graph_stat_title_ratio_distance'] = 'Salamaniskujen suhde et‰isyytee
 $_BL['fi']['graph_stat_title_ratio_bearing'] = 'Salamaniskujen suhde suuntaan';
 $_BL['fi']['graph_stat_title_distance'] = 'Keskim‰‰r‰inen salamaniskun et‰isyys';
 $_BL['fi']['graph_stat_title_strikes_time'] = 'Salamaniskua';
-$_BL['fi']['graph_stat_title_participants'] = 'Paikannukset suhteessa osallistuneiden m‰‰r‰‰n';
+$_BL['fi']['graph_stat_title_participants'] = 'Paikannukset suhteessa osallistujien m‰‰r‰‰n';
 $_BL['fi']['graph_stat_title_strikes_participants'] = 'Salamaniskut {PARTICIPANTS} osallistujilta';
 $_BL['fi']['graph_stat_title_strikes_deviations'] = 'Salamaniskut {DEVIATIONS} poikkeamilla';
 $_BL['fi']['graph_stat_title_strikes_now'] = 'Salamoinnin iskutiheys';
@@ -342,7 +342,7 @@ $_BL['fi']['graph_stat_title_amplitudes_time_average'] = 'Voimakkuuden keskiarvo
 $_BL['fi']['graph_stat_title_frequencies_time_average'] = 'Huipputaajuuksien keskiarvo';
 $_BL['fi']['graph_stat_title_spectrum'] = 'Taajuusalueen spektri';
 $_BL['fi']['graph_stat_title_deviations'] = 'Havaintoja / Poikkeama';
-$_BL['fi']['graph_stat_title_strikes_participants_avg'] = 'Osallistuneiden keskiarvo';
+$_BL['fi']['graph_stat_title_strikes_participants_avg'] = 'Osallistujien keskiarvo';
 $_BL['fi']['graph_stat_title_strikes_deviations_avg'] = 'Keskim‰‰r‰inen Poikkeama';
 $_BL['fi']['graph_stat_title_amplitude'] = 'Voimakkuudet';
 $_BL['fi']['graph_stat_title_all_signals'] = 'Kaikkien asemien signaalit';
@@ -387,7 +387,7 @@ $_BL['fi']['graph_legend_evaluated_signals_part_all_ratio'] = 'T‰ydent‰v‰n osoit
 $_BL['fi']['graph_legend_deviations_own'] = '{STATION} Poikkeama';
 $_BL['fi']['graph_legend_deviations_all'] = 'Poikkeama';
 $_BL['fi']['graph_legend_deviations_ratio'] = '{STATION} osuus';
-$_BL['fi']['graph_legend_participants_time_avg_all'] = 'Osallistuneiden keskiarvo';
+$_BL['fi']['graph_legend_participants_time_avg_all'] = 'Osallistujien keskiarvo';
 $_BL['fi']['graph_legend_participants_time_avg_own'] = '{STATION} osallistumisien keskiarvo';
 $_BL['fi']['graph_legend_deviatinons_time_avg_all'] = 'Keskim‰‰r‰inen Poikkeama';
 $_BL['fi']['graph_legend_deviations_time_avg_own'] = '{STATION} keskim‰‰r‰inen Poikkeama';
@@ -404,7 +404,7 @@ $_BL['fi']['h4_graph_stations'] = 'Aktiivisten asemien m‰‰r‰';
 $_BL['fi']['h4_graph_ratio_distance_longtime'] = 'Salamaniskujen suhde et‰isyyteen n‰hden';
 $_BL['fi']['h4_graph_ratio_bearing_longtime'] = 'Salamaniskujen suhde suuntaan n‰hden';
 $_BL['fi']['h4_graph_participants'] = 'Osallistujat';
-$_BL['fi']['h4_graph_participants_time'] = 'Osallistuneiden m‰‰r‰n kehitys';
+$_BL['fi']['h4_graph_participants_time'] = 'Osallistujien m‰‰r‰n kehitys';
 $_BL['fi']['h4_graph_strikes_time'] = 'Kaikki salamaniskut';
 $_BL['fi']['h4_graph_strikes_time_radius'] = '{STATION} l‰hialueen todennetut salamaniskut';
 $_BL['fi']['h4_graph_frequencies_time'] = 'Valinnat';
@@ -459,7 +459,7 @@ $_BL['fi']['Distances between stations used for locating'] = 'Paikannuksessa k‰y
 $_BL['fi']['check_show_hyps'] = 'N‰yt‰ hyberboliset k‰yr‰t';
 $_BL['fi']['Strike is not confirmed'] = 'Salamaniskua ei vahvistettu';
 $_BL['fi']['map_options_static'] = 'Kartta';
-$_BL['fi']['Mean participants'] = 'Osallistuneiden keskiarvo';
+$_BL['fi']['Mean participants'] = 'Osallistujien keskiarvo';
 $_BL['fi']['Total density'] = 'Kokonaistiheys';
 $_BL['fi']['Station density'] = 'Aseman tiheys';
 $_BL['fi']['Station ratio'] = 'Aseman suhde';
@@ -500,17 +500,17 @@ $_BL['fi']['since begin of data logging'] = 'Tietojenker‰‰misen alusta';
 $_BL['fi']['update every'] = 'P‰ivittyy joka';
 $_BL['fi']['Direction antenna 1'] = 'Antennin 1 suuntaus';
 $_BL['fi']['Direction antenna 2'] = 'Antennin 2 suuntaus';
-$_BL['fi']['Max participants per strike'] = 'Maks. osallistuneiden m‰‰r‰ salamaniskua kohden';
-$_BL['fi']['Mean participants per strike'] = 'Osallistuneiden keskiarvo salamaniskua kohden';
+$_BL['fi']['Max participants per strike'] = 'Maksimi asemia / salamanisku';
+$_BL['fi']['Mean participants per strike'] = 'Keskim. asemia / salamanisku';
 $_BL['fi']['Mean locating ratio'] = 'Paikannussuhteen keskiarvo';
 $_BL['fi']['Mean strike ratio'] = 'Osuus kaikista salamaniskuista';
 $_BL['fi']['Active'] = 'Asema k‰ytˆss‰';
 $_BL['fi']['Inactive'] = 'Asema ei k‰ytˆss‰';
 $_BL['fi']['Min dist'] = 'Pienin et‰isyys';
 $_BL['fi']['Max dist'] = 'Suurin et‰isyys';
-$_BL['fi']['Max strikes per hour'] = 'Suurin salamaniskujen m‰‰r‰ tunnissa';
-$_BL['fi']['Max strikes per day'] = 'Suurin salamaniskujen m‰‰r‰ p‰iv‰ss‰';
-$_BL['fi']['Max signals per hour'] = 'Suurin signaalien m‰‰r‰ tunnissa';
+$_BL['fi']['Max strikes per hour'] = 'Suurin salamaniskujen m‰‰r‰/tunti';
+$_BL['fi']['Max strikes per day'] = 'Suurin salamaniskujen m‰‰r‰/p‰iv‰';
+$_BL['fi']['Max signals per hour'] = 'Suurin signaalien m‰‰r‰/tunti';
 $_BL['fi']['Max active stations'] = 'Aktiivisten asemien maksimi';
 $_BL['fi']['Max active stations (sending signals)'] = 'Aktiivisten asemien maksimi (l‰hett‰‰ signaaleja)';
 $_BL['fi']['First data'] = 'Datan keruun alusta';
@@ -518,8 +518,8 @@ $_BL['fi']['Memory usage'] = 'Muistin kulutus';
 $_BL['fi']['for keys'] = 'Avaimet';
 $_BL['fi']['Entries (all data)'] = 'Rivi‰ (kaikki data)';
 $_BL['fi']['Station active'] = 'Asema aktiivinen';
-$_BL['fi']['Last update strikes'] = 'Salamaniskudatan viimeisin p‰ivitys';
-$_BL['fi']['Last update stations'] = 'Aseman viimeisin datan p‰ivitys';
+$_BL['fi']['Last update strikes'] = 'Viimeisin salamadatan p‰ivitys';
+$_BL['fi']['Last update stations'] = 'Vimeisin asemadatan p‰ivitys';
 $_BL['fi']['Last update signals'] = 'Viimeisin signaalidatan p‰ivitys';
 $_BL['fi']['Active Stations'] = 'Aktiiviset asemat';
 $_BL['fi']['Sum of Signals'] = 'Signaalien m‰‰r‰';
@@ -531,7 +531,7 @@ $_BL['fi']['stat_navi_strikes'] = 'Salamointi';
 $_BL['fi']['total strikes'] = 'Salamaniskuja yhteens‰';
 $_BL['fi']['total strikes station'] = '{STATION} salamaniskujen kokonaism‰‰r‰';
 $_BL['fi']['Strikes station'] = '{STATION} salamaniskujen m‰‰r‰';
-$_BL['fi']['_in_radius'] = ' (maksimi {RADIUS}km)';
+$_BL['fi']['_in_radius'] = ' (max. {RADIUS}km)';
 $_BL['fi']['available_of'] = '';
 $_BL['fi']['available_stations'] = 'Saatavilla olevat asemat';
 $_BL['fi']['time_from'] = 'Ajanhetkest‰';
@@ -668,9 +668,9 @@ $_BL['fi']['stat_navi_advanced'] = 'Edistyneempi tilastointi';
 /*************************************************************/
 /* Info                                                     */
 /*************************************************************/
-$_BL['fi']['h3_info_general'] = 'Yleinen';
+$_BL['fi']['h3_info_general'] = 'Yleist‰';
 $_BL['fi']['h4_info_accuracy'] = 'Tarkkuus';
-$_BL['fi']['h4_info_participate'] = 'Osallistua';
+$_BL['fi']['h4_info_participate'] = 'Osallistuminen';
 $_BL['fi']['h3_info_usage'] = 'Datan k‰yttˆ';
 $_BL['fi']['h3_info_hint'] = 'T‰rke‰ tiedote';
 
@@ -687,10 +687,14 @@ $_BL['fi']['info_accuracy_text'] = 'Tarkkuus on suhteelisen hyv‰ ja usein alle 1
 
 $_BL['fi']['info_participate_text'] = 'Voit halutessasi rakentaa oman paikantimen (kustannukset noin 150e).
 N‰in voit osallistua salamapaikanninverkon toimintaan ja saat p‰‰syn myˆs kattavampaan dataan.
+<p>
 Lis‰tietoja t‰‰lt‰:
 <a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>
+<br>
 Katso myˆs:
 <a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a> foorumi.
+<br>
+Suomenkielinen foorumi lˆytyy <a href="http://oh6ac.net/foorumi/viewforum.php?f=21">Lapuan Radiokerho Ry:n</a> sivuilta. 
 ';
 
 $_BL['fi']['info_usage_text'] = 'T‰m‰n sivuston ja Blitzortung.org sivuston tiedot on tarkoitetu ainoastaan yksityiseen tai viihteelliseen k‰yttˆˆn.
@@ -718,7 +722,7 @@ Isku- ja paikannussuhteet ovat t‰rkeit‰ parametreja aseman s‰‰tˆjen korjaamiseks
 <br>slamaniskujen suhde = (havaitut salamaniskut asemalta) / (paikannusverkon salamaniskujen m‰‰r‰)
 ';
 
-$_BL['fi']['bo_stat_network_descr_lasth'] = 'Kaikki tieto perustuu aikajaksoon 60 minuuttia ennen viimeist‰ p‰ivityst‰';
+$_BL['fi']['bo_stat_network_descr_lasth'] = 'Statistiikka perustuu 60 minuutin ajanjaksoon ennen viimeist‰ p‰ivityst‰';
 $_BL['fi']['bo_stat_network_descr_table'] = 'T‰‰lt‰ n‰et kaikki salamapaikannusverkon aktiiviiviset asemat. Voit listata taulukkoa painamalla linkkej‰ ensimm‰isell‰ rivill‰.';
 $_BL['fi']['bo_graph_descr_bear'] = 'Oma paikannussuhde verrattuna maantieteelliseen suuntimaan. Vertailun vuoksi myˆs kaikki salamaniskut ovat n‰kyvill‰.';
 $_BL['fi']['bo_stat_longtime_descr'] = 'Tiedot tallennettu hetkest‰ jolloin {MYBO} otettu asemalla k‰yttˆˆn. Et‰isyydet viittaavat aseman {STATION_CITY} sijaintiin.';
@@ -748,7 +752,7 @@ $_BL['fi']['bo_graph_deviations'] = 'Kaikkien salamaniskujen poikkema on laskett
 $_BL['fi']['bo_graph_evaluated_signals'] = '{STATION} signaalit joita ei ole lakettu salamaniskuiksi Bliztortung.org j‰rjestelm‰n mukaan on uudelleentarkistettu {MYBO} j‰rjestelm‰ss‰. Jossain tapauksissa salamanisku uudelleenm‰‰ritell‰‰n signaaliksi. Mit‰ enemm‰n t‰t‰ tapahtuu, sen suuremmalla todenn‰kˆisyydell‰ aseman vastaanotossa on liikaa h‰iriˆit‰.';
 $_BL['fi']['bo_graph_deviations_time'] = 'Keskiarvopoikkeman kehitys tai valitun poikkeaman kehitys.';
 $_BL['fi']['bo_graph_distance'] = 'Keskiarvoet‰isyyden kehitys asemalla {STATION}. Voit vertailla asemien herkkyytt‰ vertailemalla n‰it‰ kahta k‰yr‰‰.';
-$_BL['fi']['bo_descr_strikes_now'] = 'Salamadata on ladattu {UPDATE_INTERVAL} Blitortung.org j‰rjestelm‰st‰. Salamatiheyden laskennan v‰li on {RATE_INTERVAL} {';
+$_BL['fi']['bo_descr_strikes_now'] = 'Salamadata on ladattu {UPDATE_INTERVAL} Blitortung.org j‰rjestelm‰st‰. Salamatiheyden laskennan v‰li on {RATE_INTERVAL}.';
 $_BL['fi']['bo_stat_advanced_info'] = 'Edistyneempi tilastointi aseman yll‰pit‰j‰lle.';
 $_BL['fi']['bo_stat_other_station_info'] = 'Vihje: aseman {STATION_CITY} tilastoja n‰ytet‰‰n.';
 $_BL['fi']['bo_stat_other_station_info_back'] = 'Takaisin asemalle {STATION}';
@@ -758,7 +762,7 @@ $_BL['fi']['bo_stat_other_station_info_back'] = 'Takaisin asemalle {STATION}';
 /* Archives descriptions                                     */
 /*************************************************************/
 
-$_BL['fi']['archive_search_info'] = 'T‰‰ll‰ voit etsi‰ viimeist‰ {COUNT} salamaniskua alueella. Valitaksesi alueen, siirr‰ hiirt‰ keskelt‰ karttaa. Salamaniskut n‰ytet‰‰n v‰rillisin‰ pistein‰ kartall. Voit klikata pisteit‰ saadaksesi lis‰tietoja kyseisest‰ salamaniskusta. Voit etsi‰ iskuja vain punaisella merkityn alueen sis‰puolelta asenan ymp‰rilt‰.';
+$_BL['fi']['archive_search_info'] = 'T‰‰ll‰ voit n‰hd‰ viimeiset {COUNT} salamaniskua aseman l‰hialueelta. Siirr‰ karttaa liikuttamalla hiirt‰ hiiren vasen nappi pohjassa. Salamaniskut n‰ytet‰‰n v‰rillisin‰ pistein‰ kartalla. Voit klikata pisteit‰ saadaksesi lis‰tietoja kyseisest‰ salamaniskusta. Voit etsi‰ iskuja vain punaisella merkityn alueen sis‰puolelta aseman ymp‰rilt‰.';
 
 $_BL['fi']['archive_map_info'] = 'T‰‰ll‰ voit katsoa salamoinnin kehityst‰ p‰ivitt‰in.
 Voit myˆs katsoa animaatioita, mutta huomioithan ett‰ animaation lataaminen saattaa kest‰‰ jonkin aikaa.
@@ -812,7 +816,7 @@ $_BL['fi']['Strike alert'] = 'H‰lytykset';
 $_BL['fi']['New alert'] = 'Uusi h‰lytys';
 $_BL['fi']['Alert settings for user '] = 'H‰lytyksen asetukset k‰ytt‰j‰lle';
 $_BL['fi']['alert_settings_legend1'] = 'Yleistiedot';
-$_BL['fi']['alert_name'] = 'Nimi / Kuvaus';
+$_BL['fi']['alert_name'] = 'Nimi / Kuvaus (ei ‰‰kkˆsi‰!)';
 $_BL['fi']['alert_type'] = 'Tyyppi';
 $_BL['fi']['alert_mail'] = 'E-mail';
 $_BL['fi']['alert_sms'] = 'SMS';
@@ -973,6 +977,9 @@ $_BL['fi']['Croatia'] = 'Kroatia';
 $_BL['fi']['Europe'] = 'Eurooppa';
 $_BL['fi']['Western Europe'] = 'L‰nsi-Eurooppa';
 $_BL['fi']['Baltic States'] = 'Baltian maat';
+$_BL['fi']['Southern-Finland'] = 'Etel‰-Suomi';
+$_BL['fi']['Northern-Finland'] = 'Pohjois-Suomi';
+$_BL['fi']['Scandinavia'] = 'Skandinavia';
 
 //Europe: German states
 $_BL['fi']['Bavaria'] = 'Baijeri';
@@ -1002,7 +1009,7 @@ $_BL['fi']['Specials'] = 'Erikoisuudet';
 $_BL['fi']['Importing data...'] = 'Tuodaan dataa...';
 $_BL['fi']['since'] = 'l‰htien';
 $_BL['fi']['Period'] = 'Aikajakso';
-$_BL['fi']['bo_stat_network_descr'] = '';
+$_BL['fi']['bo_stat_network_descr'] = false;
 
 $_BL['fi']['ani_play'] = 'K‰ynnist‰';
 $_BL['fi']['ani_pause'] = 'Keskeyt‰';
