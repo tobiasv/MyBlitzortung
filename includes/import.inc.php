@@ -1802,7 +1802,7 @@ function bo_update_stations($force = false)
 			}
 		}
 
-exit;
+
 		//Update Statistics
 		$datetime      = gmdate('Y-m-d H:i:s', $time);
 		$datetime_back = gmdate('Y-m-d H:i:s', $time - 3600);
