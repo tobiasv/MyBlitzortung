@@ -3,6 +3,12 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.8b (2012-10-19)
+-------------------------------
+- fix: names in station.txt not escaped correctly (IMPORTANT!)
+- improved fi/it translations
+
+
 Version 0.7.8a (2012-10-05)
 -------------------------------
 - installation fixes

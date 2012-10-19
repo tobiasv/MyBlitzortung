@@ -1660,6 +1660,17 @@ function bo_update_stations($force = false)
 				$stTracker = utf8_encode($stTracker);
 			}
 
+			
+			
+			$stCity    = strtr($stCity, array('\null' => ''));
+			$stCountry = strtr($stCountry, array('\null' => ''));
+			$stTracker = strtr($stTracker, array('\null' => ''));
+			
+			$stCity    = BoDb::esc(stripslashes($stCity));
+			$stCountry = BoDb::esc(stripslashes($stCountry));
+			$stTracker = BoDb::esc(stripslashes($stTracker));
+	
+			
 			//station has been active by user (~ a year ago)
 			if (time() - $stTimeU < 3600 * 24 * 366)
 				$activebyuser[$stUser] = array('id' => $stId, 'sig' => $stSignals, 'lat' => $stLat, 'lon' => $stLon);
@@ -1693,7 +1704,7 @@ function bo_update_stations($force = false)
 						tracker='$stTracker'
 						";
 
-			$sql = strtr($sql, array('\null' => ''));
+			
 
 			//user rename ==> station owner/city changed ==> new station ==> delete old data
 			if (isset($all_stations[$stId])
@@ -1791,7 +1802,7 @@ function bo_update_stations($force = false)
 			}
 		}
 
-
+exit;
 		//Update Statistics
 		$datetime      = gmdate('Y-m-d H:i:s', $time);
 		$datetime_back = gmdate('Y-m-d H:i:s', $time - 3600);
