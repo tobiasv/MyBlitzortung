@@ -878,6 +878,10 @@
 @define('BO_GRAPH_RAW_W2', 350);
 @define('BO_GRAPH_RAW_H2', 160);
 
+//width, height when displaying single big graph
+@define('BO_GRAPH_RAW_W_BIG', 1000);
+@define('BO_GRAPH_RAW_H_BIG', 500);
+
 //max. time in µs for displaying all graphs to a stroke
 @define('BO_GRAPH_RAW_MAX_TIME2', 350);
 

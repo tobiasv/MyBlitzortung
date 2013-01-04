@@ -3,6 +3,12 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.9dev
+-------------------------------
+- new: bigger signal graphs
+- fix: url-encode alerts with http-url
+
+
 Version 0.7.8b (2012-10-19)
 -------------------------------
 - fix: names in station.txt not escaped correctly (IMPORTANT!)

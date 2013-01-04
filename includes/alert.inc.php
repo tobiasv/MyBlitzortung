@@ -565,8 +565,11 @@ function bo_alert_send()
 									$text = strtr($text, $replace);
 									$log[$alert_dbname]['text']   = $text;
 									
-									$url = BO_SMS_GATEWAY_URL;
-									$url = strtr($url, array('{text}' => urlencode($text), '{tel}' => $d['address'], '{userid}' => $user_id));
+									$url = strtr(BO_SMS_GATEWAY_URL, array(
+										'{text}' 	=> urlencode($text), 
+										'{tel}' 	=> urlencode($d['address']), 
+										'{userid}' 	=> urlencode($user_id))
+										);
 									
 									$ret = bo_get_file($url);
 								}
@@ -574,6 +577,9 @@ function bo_alert_send()
 								break;
 								
 							case 3: //URL
+								
+								foreach ($replace as $key => $val)
+									$replace[$key] = urlencode($val);
 								
 								$url = strtr($d['address'], $replace);
 								$ret = bo_get_file($url);

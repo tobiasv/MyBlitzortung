@@ -22,6 +22,8 @@ function bo_graph_raw()
 
 	if ($size == 2)
 		$graph = new BoSignalGraph(BO_GRAPH_RAW_W2, BO_GRAPH_RAW_H2);
+	else if ($size == 3)
+		$graph = new BoSignalGraph(BO_GRAPH_RAW_W_BIG, BO_GRAPH_RAW_H_BIG);
 	else
 		$graph = new BoSignalGraph(BO_GRAPH_RAW_W, BO_GRAPH_RAW_H);
 		

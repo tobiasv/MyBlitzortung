@@ -569,7 +569,9 @@ function bo_show_archive_search()
 			if ($row['raw_id'] && BO_UP_INTVL_RAW > 0)
 			{
 				$alt = _BL('Signals');
+				$description .= '<a href=\''.bo_bofile_url().'?bo_graph='.$row['raw_id'].bo_lang_arg('graph').'&bo_size=3\' target=\'_blank\'>';
 				$description .= '<img src=\''.bo_bofile_url().'?bo_graph='.$row['raw_id'].bo_lang_arg('graph').'\' style=\'width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px\' class=\'bo_archiv_map_signal\' alt=\''.htmlspecialchars($alt).'\'>';
+				$description .= '</a>';
 			}
 
 			$description .= '</div>';
@@ -1367,8 +1369,9 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			echo '<td rowspan="2" class="bo_sig_table_graph"  style="width:'.BO_GRAPH_RAW_W.'px;">';
 			if ($row['raw_id'] || !$own_station)
 			{
-				
+				echo '<a href="'.$url.'&bo_size=3" target="_blank">';
 				echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.$alt.'" id="bo_graph_sig_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$url.'\'">';
+				echo '</a>';
 			}
 			else if ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
 			{
@@ -1386,7 +1389,10 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			if ($row['raw_id'] || !$own_station)
 			{
 				$spec_url = $url.'&bo_spectrum';
+				 
+				echo '<a href="'.$spec_url.'&bo_size=3" target="_blank">';
 				echo '<img src="'.$spec_url.'" style="width:'.BO_GRAPH_RAW_W.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.$alt.'" id="bo_graph_spec_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$spec_url.'\'">';
+				echo '</a>';
 			}
 			elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
 			{
@@ -1404,7 +1410,9 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			if ($row['raw_id'] || !$own_station)
 			{
 				$xy_url = $url.'&bo_xy';
+				echo '<a href="'.$xy_url.'&bo_size=3" target="_blank">';
 				echo '<img src="'.$xy_url.'" style="width:'.BO_GRAPH_RAW_H.'px;height:'.BO_GRAPH_RAW_H.'px" alt="'.$alt.'" id="bo_graph_xy_'.$row['raw_id'].'" onmouseover="this.src+=\'&full\'" onmouseout="this.src=\''.$xy_url.'\'">';
+				echo '</a>';
 			}
 			elseif ($row['strike_id'] && !$row['raw_id'] && $row['part'] > 0)
 			{
@@ -1681,12 +1689,13 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 				if ($show_other_graphs)
 				{
 					$url = bo_signal_url($sid, null, $stime, $row['stimens'], $dist);
-					$url .= '&bo_size=2';
 					
 					echo ' +'._BK(round($dist/1000)).' / ';
 					echo round($s_bears[0][$sid]).'&deg;';
 					echo '</a>';
-					echo '<img src="'.$url.'" style="width:'.BO_GRAPH_RAW_W2.'px;height:'.BO_GRAPH_RAW_H2.'px"  class="bo_graph_sig_other" onmouseover="this.src+=\'&bo_spectrum&full\'" onmouseout="this.src=\''.$url.'\'">';
+					echo '<a href="'.$url.'&bo_size=3" target="_blank">';
+					echo '<img src="'.$url.'&bo_size=2" style="width:'.BO_GRAPH_RAW_W2.'px;height:'.BO_GRAPH_RAW_H2.'px"  class="bo_graph_sig_other" onmouseover="this.src+=\'&bo_spectrum&full\'" onmouseout="this.src=\''.$url.'&bo_size=2\'">';
+					echo '</a>';
 				}
 				else
 					echo '</a>';
