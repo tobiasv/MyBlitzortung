@@ -85,6 +85,9 @@ switch(BO_REGION)
 
 		if (!isset($_BO['mapimg']['new_zealand']))
 			$_BO['mapimg']['new_zealand'] = $_BO['tpl_imgmap']['new_zealand'];
+
+		if (!isset($_BO['mapimg']['oceania_mini']))
+			$_BO['mapimg']['oceania_mini'] = $_BO['tpl_imgmap']['oceania_mini'];			
 			
 		if (!isset($_BO['mapimg']['stations_mini']))
 			$_BO['mapimg']['stations_mini'] = $_BO['tpl_imgmap']['oceania_mini_stations'];

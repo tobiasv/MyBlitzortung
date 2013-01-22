@@ -659,6 +659,11 @@ $_BO['tpl_imgmap']['new_zealand']['borders'] = array('maps_oceania/map_new_zeala
 $_BO['tpl_imgmap']['new_zealand']['coord'] = array(-33, 180, -48.15, 160); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['new_zealand']['point_style'] = array(2, 2, 'f008', 0);
 
+//Oceania (mini)
+$_BO['tpl_imgmap']['oceania_mini'] = $_BO['tpl_imgmap_mini'];
+$_BO['tpl_imgmap']['oceania_mini']['name'] = 'Oceania (mini)';
+$_BO['tpl_imgmap']['oceania_mini']['file'] = 'maps_oceania/map_oceania_mini.png';
+$_BO['tpl_imgmap']['oceania_mini']['coord'] = array(20, 180, -51.6, 105); //North, East, South, West (Degrees)
 
 //Oceania (mini) - with stations
 $_BO['tpl_imgmap']['oceania_mini_stations'] = $_BO['tpl_imgmap_stations_mini'];

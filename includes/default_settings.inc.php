@@ -1308,7 +1308,7 @@
 @define('BO_DELETED_STATION_MIN_ID', 50000);
 
 //delete station from database if it isn't in stations.txt any more last_data was more than given days before
-@define('BO_DELETE_STATION_DAYS', 365);
+@define('BO_DELETE_STATION_DAYS', 7);
 
 //draws nicer circles
 //0: off

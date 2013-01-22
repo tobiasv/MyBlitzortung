@@ -6,6 +6,8 @@
 Version 0.7.9dev
 -------------------------------
 - new: bigger signal graphs
+- new: example cities.txt included (utf-8 encoded!)
+- new: mini map of oceania
 - fix: url-encode alerts with http-url
 
 

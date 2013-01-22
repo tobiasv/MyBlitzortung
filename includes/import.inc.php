@@ -1620,11 +1620,10 @@ function bo_update_stations($force = false)
 
 			if (!$l || !$stId)
 			{
-				$file_truncated = true;
 				continue;
 			}
 
-			if (!$stId || count($cols) < 10)
+			if (count($cols) < 10)
 			{
 				$file_truncated = true;
 				bo_echod("Wrong line format: \"$l\"");
