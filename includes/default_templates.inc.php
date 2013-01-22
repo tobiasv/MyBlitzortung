@@ -91,7 +91,15 @@ switch(BO_REGION)
 			
 		if (!isset($_BO['mapimg']['stations_mini']))
 			$_BO['mapimg']['stations_mini'] = $_BO['tpl_imgmap']['oceania_mini_stations'];
-		
+
+			
+		/*** Densities ***/
+		if (!isset($_BO['density'][0]))
+			$_BO['density'][0] = $_BO['tpl_density']['oceania'];
+
+		if (!isset($_BO['density'][1]))
+			$_BO['density'][1] = $_BO['tpl_density']['new_zealand'];
+			
 		break;
 	
 	

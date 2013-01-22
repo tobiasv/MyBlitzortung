@@ -674,6 +674,26 @@ $_BO['tpl_imgmap']['oceania_mini_stations']['coord'] = array(10, 180, -51.6, 110
 
 
 
+/**************************************/
+/* Calculation settings for density   */
+/**************************************/
+
+
+//Oceania
+$_BO['tpl_density']['oceania']['name'] 	= 'Oceania';
+$_BO['tpl_density']['oceania']['coord'] 	= array(15, 180, -55, 100); //North, East, South, West (Degrees)
+$_BO['tpl_density']['oceania']['length']	= 20; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
+$_BO['tpl_density']['oceania']['bps'] 	    = 3; // bytes per area 
+
+
+//New Zealand
+$_BO['tpl_density']['new_zealand']['name'] 	    = 'New Zealand';
+$_BO['tpl_density']['new_zealand']['coord'] 	= array(-30, 180, -50, 158); //North, East, South, West (Degrees)
+$_BO['tpl_density']['new_zealand']['length']	= 5; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
+$_BO['tpl_density']['new_zealand']['bps'] 	    = 2; // bytes per area 
+
+
+
 
 
 /* ========================================================================= */
