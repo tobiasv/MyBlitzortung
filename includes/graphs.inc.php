@@ -132,7 +132,7 @@ function bo_graph_raw()
 			$bdata = bo_hex2bin($raw_data);
 			$graph->SetMaxTime(BO_GRAPH_RAW_MAX_TIME2);
 			$graph->SetData($type, $bdata, $channels, $ntime);
-			$graph->AddText(date('H:i:s', $last_time).'.'.$nsec.'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs');
+			$graph->AddText(date('H:i:s', $last_time).'.'.sprintf('%09d', $nsec).'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs');
 		}
 		else
 			$graph->DisplayEmpty(true);

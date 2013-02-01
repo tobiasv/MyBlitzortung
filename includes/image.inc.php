@@ -696,7 +696,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	switch ($image_type)
 	{
 		case 'single_strike':
-			$time_string = _BDT($time_min, false).'.'.substr($row['time_ns'], 0, 6)._BZ($time_min);	
+			$time_string = _BDT($time_min, false).'.'.substr(sprintf('%09d', $row['time_ns']), 0, 6)._BZ($time_min);	
 			break;
 			
 		case 'by_date';
