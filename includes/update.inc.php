@@ -22,6 +22,7 @@ function bo_check_for_update()
 						'0.7.5a',
 						'0.7.5b',
 						'0.7.6',
+						'0.7.9a'
 						);
 
 	$max_update_num = bo_version2number($updates[count($updates)-1]);
@@ -460,6 +461,29 @@ function bo_check_for_update()
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				flush();
 
+			case '0.7.9a':
+			
+			
+			$sql = "ALTER TABLE `".BO_DB_PREF."strikes` ADD INDEX `timelatlon` (`time`,`lat`,`lon`)";
+
+
+				$sql = 'ALTER TABLE '.BO_DB_PREF.'densities ADD INDEX status_station (status, station_id)';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'Already exists.').'</b></li>';
+				flush();
+
+				$sql = 'ALTER TABLE '.BO_DB_PREF.'densities ADD INDEX date_station_position (date_start, date_end , station_id, lat_min, lon_min, lat_max, lon_max)';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'Already exists.').'</b></li>';
+				flush();
+
+				$sql = 'ALTER TABLE '.BO_DB_PREF.'densities ADD INDEX date_end (date_end)';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'Already exists.').'</b></li>';
+				flush();
+
+				
+				$ok = true; //doesn't matter too much if this fails ;-)
 				
 			default:
 				$ok = true;

@@ -117,7 +117,10 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}densities` (
   UNIQUE KEY `unique_dataset` (`date_start`,`date_end`,`station_id`,`type`),
   KEY `date_start` (`date_start`,`date_end`),
   KEY `status` (`status`),
-  KEY `type` (`type`)
+  KEY `type` (`type`),
+  KEY `status_station` (`status`,`station_id`),
+  KEY `date_station_position` (`date_start`, `date_end`, `station_id`, `lat_min`, `lon_min`, `lat_max`, `lon_max`),
+  KEY `date_end` (`date_end`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}cities` (

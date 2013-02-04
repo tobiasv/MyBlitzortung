@@ -1675,7 +1675,10 @@ function bo_graph_statistics()
 		else
 		{
 			$sql_where[0] = " station_id  = 0 "; // first!
-			$sql_where[1] = " station_id  = '$stId' ";
+			
+			if ($stId > 0)
+				$sql_where[1] = " station_id  = '$stId' ";
+			
 			$sql_where[2] = " station_id != 0 ";
 		}
 

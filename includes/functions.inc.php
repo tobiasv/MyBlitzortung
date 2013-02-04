@@ -1913,11 +1913,17 @@ function bo_participants_locating_max()
 
 function bo_echod($text = '')
 {
+	static $start = 0;
+	
+	if (!$start)
+	{
+		$start = microtime(true);
+	}
+	
 	if (!isset($_GET['quiet']))
 	{
-		echo date('Y-m-d H:i:s | ');
-		echo $text;
-		echo "\n";
+		echo date('Y-m-d H:i:s', $start);
+		printf(" +%5dms | %s\n", (microtime(true)-$start)*1000, $text);
 		flush();
 	}
 }

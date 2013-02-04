@@ -3,7 +3,14 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 0.7.9dev
+Version 0.7.9a
+-------------------------------
+- fix: cannot delete alerts
+- more database indexes for densities
+- smaller fixes
+
+
+Version 0.7.9
 -------------------------------
 - new: bigger signal graphs
 - new: example cities.txt included (utf-8 encoded!)
