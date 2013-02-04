@@ -126,6 +126,7 @@ function bo_alert_settings()
 function bo_alert_settings_form()
 {
 	$level = bo_user_get_level();
+	$alert_id = -1;
 	
 	if ( !($level&BO_PERM_ALERT))
 	{
@@ -192,7 +193,7 @@ function bo_alert_settings_form()
 		
 		if ($_POST['delete'])
 		{
-			if ($alert_id)
+			if ($alert_id >= 0)
 				BoData::set('alert_'.$user_id.'_'.$alert_id, null);
 				
 			return true;
@@ -229,19 +230,20 @@ function bo_alert_settings_form()
 			$d['no_checking'] = false;
 			$A['last_check'] = 0;
 
-			if ($alert_id)
+			if ($alert_id >= 0)
 			{
 				BoData::set('alert_'.$user_id.'_'.$alert_id, serialize($A));
 			}
 			else
 			{
+				$alert_id_new = 0;
 				while($row = BoData::get_all('alert\_'.$user_id.'\_%'))
 				{
 					preg_match('/alert_([0-9]+)_([0-9]+)/', $row['name'], $r);
-					$alert_id = max($alert_id, intval($r[2]) + 1);
+					$alert_id_new = max($alert_id_new, intval($r[2]) + 1);
 				}
 				
-				BoData::set('alert_'.$user_id.'_'.$alert_id, serialize($A));
+				BoData::set('alert_'.$user_id.'_'.$alert_id_new, serialize($A));
 				
 			}
 			
@@ -258,7 +260,7 @@ function bo_alert_settings_form()
 		
 	echo '<div id="bo_alert_settings_form">';
 	
-	if ($alert_id)
+	if ($alert_id >= 0)
 		echo '<h3>'._BL('Change settings').'</h3>';
 	else
 		echo '<h3>'._BL('New alert').'</h3>';
@@ -334,7 +336,7 @@ function bo_alert_settings_form()
 	echo '<input type="submit" name="ok" value="'._BL('Ok').'" id="bo_alert_ok" class="bo_form_submit">';
 	echo '<input type="submit" name="cancel" value="'._BL('Cancel').'" id="bo_alert_cancel" class="bo_form_submit">';
 	
-	if ($alert_id)
+	if ($alert_id >= 0)
 		echo '<input type="submit" name="delete" value="'._BL('Delete').'" id="bo_alert_delete" class="bo_form_submit bo_form_delete">';
 	
 	echo '</form>';
