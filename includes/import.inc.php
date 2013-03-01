@@ -2716,7 +2716,7 @@ function bo_update_tracks($force = false)
 				bo_echod($line);
 		}
 
-		BoData::set('strike_cells', gzdeflate(serialize($data)));
+		BoData::set('strike_cells', serialize($data));
 	}
 	else
 	{

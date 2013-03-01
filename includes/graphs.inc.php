@@ -973,7 +973,7 @@ function bo_graph_statistics()
 					break;
 
 				case 'deviations':
-					$tickLabels[$i] = _BM($i/10, 1);
+					$tickLabels[$i] = _BK($i/10, 1);
 					$X[$i] = $i/10;
 					break;
 			}

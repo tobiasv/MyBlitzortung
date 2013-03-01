@@ -46,7 +46,7 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 	if (!$region && intval(BO_TRACKS_SCANTIME))
 	{
 		$num_cells = -1;
-		$cells_data = unserialize(gzinflate(BoData::get('strike_cells')));
+		$cells_data = unserialize(BoData::get('strike_cells'));
 		if (is_array($cells_data['cells']))
 		{
 			$num_cells = count($cells_data['cells'][BO_TRACKS_DIVISOR-1]);
