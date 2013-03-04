@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}densities` (
   `date_start` date default NULL,
   `date_end` date default NULL,
   `status` tinyint(4) NOT NULL,
-  `station_id` smallint(5) NOT NULL,
+  `station_id` int NOT NULL,
   `length` decimal(4,1) NOT NULL,
   `lat_min` decimal(5,2) NOT NULL,
   `lon_min` decimal(5,2) NOT NULL,
