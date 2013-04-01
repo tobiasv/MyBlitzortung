@@ -681,14 +681,16 @@ function bo_update_strikes($force = false)
 
 
 		/***** PREPARATIONS BEFORE READING *****/
-		$res = BoDb::query("SELECT MAX(time) mtime, MAX(id) max_id FROM ".BO_DB_PREF."strikes");
+		$res = BoDb::query("SELECT MAX(time) mtime, MAX(id) max_id 
+					FROM ".BO_DB_PREF."strikes 
+					WHERE time<='".gmdate("Y-m-d H:i:s")."'");
 		$row = $res->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
 		$last_modified = BoData::get('uptime_strikes_modified');
 		$max_id = $row['max_id'];
 
 		if ($last_strike > time())
-			$last_strike = time() - 3600 * 24;
+			$last_strike = time() - 3600 * 2;
 		else if ($last_strike <= 0 || !$last_strike)
 			$last_strike = strtotime('2000-01-01');
 		
@@ -875,7 +877,17 @@ function bo_update_strikes($force = false)
 					$old_data[$id]['loc'] = array($row['lat'], $row['lon']);
 					$old_data[$id]['users'] = $row['users'];
 					$old_data[$id]['part'] = $row['part'];
+					
+					$date_max = $old_data[$id]['t'];
 				}
+				
+				
+				if ($last_strike < $date_max && $date_max)
+				{
+					$last_strike = $date_max;
+					bo_echod("Updating only strikes before ".date('Y-m-d H:i:s', $last_strike));
+				}
+				
 			}
 
 
