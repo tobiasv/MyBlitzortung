@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}raw` (
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (
   `id` smallint(5) unsigned NOT NULL,
-  `user` varchar(8) NOT NULL,
+  `user` varchar(30) NOT NULL,
   `city` varchar(50) NOT NULL,
   `country` varchar(50) NOT NULL,
   `lat` decimal(9,6) NOT NULL,

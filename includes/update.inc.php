@@ -23,7 +23,8 @@ function bo_check_for_update()
 						'0.7.5b',
 						'0.7.6',
 						'0.7.9a',
-						'0.7.9b'
+						'0.7.9b',
+						'0.7.9c'
 						);
 
 	$max_update_num = bo_version2number($updates[count($updates)-1]);
@@ -487,6 +488,13 @@ function bo_check_for_update()
 			
 				BoDb::query('DELETE FROM '.BO_DB_PREF.'densities WHERE station_id=32767', false);
 				$sql = 'ALTER TABLE '.BO_DB_PREF.'densities CHANGE `station_id` `station_id` INT NOT NULL';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				break;
+
+			case '0.7.9c':
+				BoDb::query('DELETE FROM '.BO_DB_PREF.'stations WHERE user="28002900"', false);
+				$sql = 'ALTER TABLE '.BO_DB_PREF.'stations CHANGE `user` `user` VARCHAR(30) NOT NULL';
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				break;
