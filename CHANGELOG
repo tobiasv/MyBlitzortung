@@ -3,13 +3,20 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.9d
+-------------------------------
+- bugfix for too long queries on update
+
+
 Version 0.7.9c
 -------------------------------
 - bugfix for long station usernames
 
+
 Version 0.7.9b
 -------------------------------
 - bugfixes
+
 
 Version 0.7.9a
 -------------------------------

@@ -3128,7 +3128,7 @@ function bo_delete_station($id = 0)
 		$station_info = bo_station_info($id);
 		if ($station_info['id'] != $id)
 			return false;
-
+		
 		//find new ID
 		$row = BoDb::query("SELECT MAX(id) id FROM ".BO_DB_PREF."stations WHERE id >= ".intval(BO_DELETED_STATION_MIN_ID))->fetch_assoc();
 		$new_id = $row['id']+1;
@@ -3136,10 +3136,7 @@ function bo_delete_station($id = 0)
 			$new_id = intval(BO_DELETED_STATION_MIN_ID);
 
 		//save old data in extra variable
-		$deleted_stations = unserialize(BoData::get('stations_deleted'));
-		$deleted_stations[] = $station_info;
-		BoData::set('stations_deleted', serialize($deleted_stations));
-
+		BoData::set('stations_deleted_'.$new_id.'_'.$id, serialize($station_info));
 		
 		//delete data from "new_id" -> otherwise update would not work it sth did wrong before
 		BoData::delete_all("%#".$new_id."#%");
