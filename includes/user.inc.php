@@ -39,6 +39,14 @@ function bo_user_show_admin()
 			echo '</div></pre>';
 			break;
 
+		case 'purge_deleted_stations':
+			echo '<h4>'._BL('Purging deleted/old stations...').'</h4>';
+			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
+			purge_deleted_stations();
+			echo '</div></pre>';
+			break;
+
+			
 		case 'cities':
 			bo_import_cities();
 			break;
@@ -67,6 +75,7 @@ function bo_user_show_admin()
 			echo '<li><a href="'.$url.'update&bo_only=purge">'._BL('Force data purge only').'</a></li>';
 			echo '<li><a href="'.$url.'update&bo_only=alerts">'._BL('Check alerts only').'</a></li>';
 			echo '<li><a href="'.$url.'strike_keys">'._BL('Update database keys').'</a></li>';
+			echo '<li><a href="'.$url.'purge_deleted_stations">'._BL('Purge deleted (old) stations').'</a></li>';
 			echo '</ul>';
 
 			echo '<h5>'._BL('Specials').'</h5>';
@@ -1081,6 +1090,50 @@ function bo_user_cookie_login()
 		}
 
 	}
+}
+
+
+
+function purge_deleted_stations()
+{
+	$min_id = intval(BO_DELETED_STATION_MIN_ID);
+	
+	bo_echod(" ");
+	bo_echod("=== Purging Deleted Stations ===");
+	
+	if ($min_id <= 1000) //to be sure
+	{
+		bo_echod("Minimum ID to low!");
+		return;
+	}
+	
+	
+	$row = BoDb::query("SELECT MAX(id) max_id FROM ".BO_DB_PREF."stations WHERE id >= '$min_id'")->fetch_assoc();
+	$max_id = $row['max_id'];
+	
+	if ($max_id)
+		bo_echod("Deleting from ID $min_id to $max_id!");
+	else 
+		bo_echod("Deleting stations with ID >= $min_id");
+	
+	
+	//delete the data
+	BoDb::query("DELETE FROM ".BO_DB_PREF."conf SET name=REPLACE(name, '#".$id."#', '#".$new_id."#') WHERE name LIKE '%#".$id."#%'", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."stations_stat    WHERE station_id >= '$min_id'", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE station_id >= '$min_id'", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."densities        WHERE station_id >= '$min_id'", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."stations        WHERE id >= '$min_id'", false);
+
+	$d=0;
+	for ($i=$min_id; $i<=$max_id; $i++)
+	{
+		BoData::delete_all("%#".$i."#%");
+		$d++;
+	}
+	
+	bo_echod("Purged Data of ".$d." stations!");
+	
+	return;
 }
 
 ?>

@@ -3,6 +3,11 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.9e
+-------------------------------
+- bugfix: too much old stations in db
+
+
 Version 0.7.9d
 -------------------------------
 - bugfix for too long queries on update
