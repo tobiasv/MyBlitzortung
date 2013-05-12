@@ -138,7 +138,7 @@ function bo_alert_settings_form()
 
 	$tmp = explode(',', $_GET['bo_action2']);
 
-	if (count($tmp) >= 2)
+	if (count($tmp) > 2)
 	{
 		$user_id = intval($tmp[1]);
 		$alert_id = intval($tmp[2]);
