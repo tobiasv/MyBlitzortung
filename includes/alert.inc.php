@@ -146,12 +146,23 @@ function bo_alert_settings_form()
 	}
 	else
 	{
+		$user_id = intval($tmp[1]);
+		
 		$A = array();
 		$A['interval'] = BO_UP_INTVL_STRIKES;
 		$A['address'] = bo_user_get_mail($user_id);
 		$A['type'] = $A['address'] ? 1 : 0;
+		
 	}
-
+	
+	if (!$user_id)
+	{
+		echo '<div class="bo_info_fail">';
+		echo _BL('ERROR: No user id!');
+		echo '</div>';
+		return true;
+	}
+	
 	if (!$A['lat'] || !$A['lon'])
 	{
 		$A['lat'] = BO_LAT;
@@ -242,7 +253,7 @@ function bo_alert_settings_form()
 					preg_match('/alert_([0-9]+)_([0-9]+)/', $row['name'], $r);
 					$alert_id_new = max($alert_id_new, intval($r[2]) + 1);
 				}
-				
+
 				BoData::set('alert_'.$user_id.'_'.$alert_id_new, serialize($A));
 				
 			}

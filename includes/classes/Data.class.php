@@ -44,6 +44,7 @@ class BoData
 		if (!$row || empty($row))
 		{
 			$query = false;
+			self::$query = null;
 			return false;
 		}
 		

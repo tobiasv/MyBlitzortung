@@ -709,7 +709,7 @@ function bo_update_strikes($force = false)
 		$res = BoDb::query($sql);
 		$row = $res->fetch_assoc();
 		$calc_range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
-		//$calc_range = $calc_range * 0.98; //some margin to be sure
+		$calc_range = $calc_range * 0.98; //some margin to be sure
 
 		$range = $calc_range;
 
@@ -1820,14 +1820,20 @@ function bo_update_stations($force = false)
 
 		$only_own = false;
 		if ((defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true))
-			 $only_own = bo_station_id();
-
-
-		$sql = "SELECT a.station_id sid, COUNT(a.station_id) cnt
-				FROM ".BO_DB_PREF."stations_strikes a, ".BO_DB_PREF."strikes b
-				WHERE a.strike_id=b.id AND b.time > '$datetime_back'
-					".($only_own ? " AND a.station_id='".$only_own."'" : "")."
-				GROUP BY a.station_id";
+		{
+			$only_own = bo_station_id();
+			$sql = "SELECT $only_own sid, COUNT(*) cnt
+					FROM ".BO_DB_PREF."strikes
+					WHERE time > '$datetime_back' AND part > 0";
+		}
+		else
+		{
+			$sql = "SELECT a.station_id sid, COUNT(a.station_id) cnt
+					FROM ".BO_DB_PREF."stations_strikes a, ".BO_DB_PREF."strikes b
+					WHERE a.strike_id=b.id AND b.time > '$datetime_back'
+					GROUP BY a.station_id";		
+		}
+		
 		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
 			$StData[intval($row['sid'])]['strikes'] = $row['cnt'];

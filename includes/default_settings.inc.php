@@ -137,7 +137,7 @@
 /*** Update intervals (Minutes!)                                 ***/
 
 //strikes update interval
-@define('BO_UP_INTVL_STRIKES', 5);
+@define('BO_UP_INTVL_STRIKES', 1);
 
 //stations update interval
 @define('BO_UP_INTVL_STATIONS', 15);
@@ -230,10 +230,10 @@
 @define('BO_TRACKER_WARN_ENABLED', true);
 
 //Warn after given when no signals were send (plus 60 minutes due to stations.txt statistics)
-@define('BO_TRACKER_WARN_AFTER_HOURS', 0);
+@define('BO_TRACKER_WARN_AFTER_HOURS', 1);
 
 //resent warning after given hours if problem persists
-@define('BO_TRACKER_WARN_RESEND_HOURS', 6);
+@define('BO_TRACKER_WARN_RESEND_HOURS', 12);
 
 
 
@@ -379,7 +379,7 @@
 
 
 // Disable station statistics (for slow servers)
-@define('BO_STATION_STAT_DISABLE', false);
+@define('BO_STATION_STAT_DISABLE', true);
 
 
 // Mark stations offline after specified time with no activity
@@ -1283,7 +1283,7 @@
 
 //data in participants.txt can change for strikes younger
 //than given minutes
-@define('BO_MIN_MINUTES_STRIKE_CONFIRMED', 5);
+@define('BO_MIN_MINUTES_STRIKE_CONFIRMED', 0);
 
 //needed for auto linking stations
 @define('BO_LINK_HOST', 'www.myblitzortung.org');
