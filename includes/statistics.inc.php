@@ -790,7 +790,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		$D[$row['station_id']]['strikesh'] += $row['strikesh_sum'] / $count;
 		$D[$row['station_id']]['signalsh'] += $row['signalsh_sum'] / $count;
 	}
-	$active_stations = count($D);
+	//$active_stations = count($D);
 	
 
 	// currently available stations
@@ -883,6 +883,9 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 		$whole_sig_count += $D[$id]['signalsh'];
 
+		if (time() - strtotime($D['last_time'].' UTC') < 3600)
+			$active_stations++;
+		
 		if (!$sort)
 			$sort = BO_STATISTICS_STATIONS_SORT;
 
@@ -981,11 +984,21 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo '<li><span class="bo_descr">'._BL('Mean locating ratio').': </span><span class="bo_value">';
 	echo $whole_sig_ratio ? _BN($whole_sig_ratio * 100, 1).'%' : '-';
 	echo '</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Mean strike ratio').': </span><span class="bo_value">';
-	echo $whole_strike_ratio ? _BN($whole_strike_ratio * 100, 1).'%' : '-';
-	echo '</span></li>';
+	
+	if (BO_STATION_STAT_DISABLE !== true)
+	{
+		echo '<li><span class="bo_descr">'._BL('Mean strike ratio').': </span><span class="bo_value">';
+		echo $whole_strike_ratio ? _BN($whole_strike_ratio * 100, 1).'%' : '-';
+		echo '</span></li>';
+	}
+	
 	echo '<li><span class="bo_descr">'._BL('Sum of Signals').': </span><span class="bo_value">'._BN($whole_sig_count, 0).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'._BN($active_stations, 0).' ('._BN($stations_nogps, 0).' '._BL('w/o GPS-signal').')</span></li>';
+	echo '<li><span class="bo_descr">'._BL('Active Stations').': </span><span class="bo_value">'._BN($active_stations, 0);
+	
+	if (BO_STATION_STAT_DISABLE !== true)
+		echo ' ('._BN($stations_nogps, 0).' '._BL('w/o GPS-signal').')';
+		
+	echo '</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'._BN($available, 0).'</span></li>';
 
 	if (intval(BO_STATISTICS_SHOW_STATIONS_UNDER_CONSTR))
@@ -1010,152 +1023,154 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	echo '</ul>';
 
-	echo '<a name="table_network"></a>';
-	echo '<h4>'._BL('h4_table_network').'</h4>';
-
-	echo '<p class="bo_stat_description" id="bo_stat_network_descr_table">';
-	echo _BL('bo_stat_network_descr_table');
-	echo '</p>';
-
-	echo '<div id="bo_network_stations_container">';
-	echo '<table id="bo_network_stations">';
-	echo '<tr>
-			<th rowspan="2">'._BL('Pos.').'</th>';
-
-	if ((bo_user_get_level() & BO_PERM_SETTINGS))
+	if (BO_STATION_STAT_DISABLE !== true)
 	{
-		echo '
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'id').'#table_network" rel="nofollow">'._BL('Id').'</a></th>
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'user').'#table_network" rel="nofollow">'._BL('User').'</a></th>';
-	}
+		echo '<a name="table_network"></a>';
+		echo '<h4>'._BL('h4_table_network').'</h4>';
 
-	if (isset($_GET['tracker']))
-	{
-		echo '<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'tracker').'#table_network" rel="nofollow">'._BL('Tracker').'</a></th>';
-	}
-	
-	echo '
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'country').'#table_network" rel="nofollow">'._BL('Country').'</a></th>
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'city').'#table_network" rel="nofollow">'._BL('City').'</a></th>
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'distance').'#table_network" rel="nofollow">'._BL('Distance').'</a></th>
-			<th colspan="2">'._BL('Strikes').'/'.($range > 1 ? $range : '').'h</th>
-			<th colspan="2">'._BL('Signals').'/'.($range > 1 ? $range : '').'h</th>
-			<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'efficiency').'#table_network" rel="nofollow">'._BL('Efficiency').'</a></th>
-			</tr>
-			<tr>
-				<th><a href="'.bo_insert_url('bo_sort', 'strikes').'#table_network" rel="nofollow">'._BL('Count').'</a></th>
-				<th><a href="'.bo_insert_url('bo_sort', 'strikes').'#table_network" rel="nofollow">'._BL('Ratio').'</a></th>
-				<th><a href="'.bo_insert_url('bo_sort', 'signals').'#table_network" rel="nofollow">'._BL('Count').'</a></th>
-				<th><a href="'.bo_insert_url('bo_sort', 'signals_ratio').'#table_network" rel="nofollow">'._BL('Ratio').'</a></th>
-			</tr>
-			';
+		echo '<p class="bo_stat_description" id="bo_stat_network_descr_table">';
+		echo _BL('bo_stat_network_descr_table');
+		echo '</p>';
 
-
-	// Stations table
-	switch($sort)
-	{
-		case 'city': case 'country': case 'distance': case 'user': case 'id':
-			asort($S);
-			break;
-		default:
-			arsort($S);
-			break;
-	}
-
-	$urls = unserialize(BoData::get('mybo_stations'));
-
-	$pos = 1;
-	foreach($S as $id => $d)
-	{
-		$d = $D[$id];
-
-		if ($station_id == $id)
-			echo '<tr class="bo_highlight">';
-		else
-			echo '<tr>';
-
-		echo '<td class="bo_text">';
-
-		if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
-			echo '<a href="'.bo_insert_url('bo_*').'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">'.$pos.'</a>';
-		else
-			echo $pos;
-
-		echo '</td>';
+		echo '<div id="bo_network_stations_container">';
+		echo '<table id="bo_network_stations">';
+		echo '<tr>
+				<th rowspan="2">'._BL('Pos.').'</th>';
 
 		if ((bo_user_get_level() & BO_PERM_SETTINGS))
 		{
-			echo '<td class="bo_text '.($sort == 'id' ? 'bo_marked' : '').'">';
-			echo $id;
-			echo '</td>';
-
-			echo '<td class="bo_text '.($sort == 'user' ? 'bo_marked' : '').'">';
-			echo $d['user'];
-			echo '</td>';
+			echo '
+				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'id').'#table_network" rel="nofollow">'._BL('Id').'</a></th>
+				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'user').'#table_network" rel="nofollow">'._BL('User').'</a></th>';
 		}
 
 		if (isset($_GET['tracker']))
 		{
-			echo '<td class="bo_text '.($sort == 'tracker' ? 'bo_marked' : '').'">';
-			echo $d['tracker'];
-			echo '</td>';
+			echo '<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'tracker').'#table_network" rel="nofollow">'._BL('Tracker').'</a></th>';
+		}
+		
+		echo '
+				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'country').'#table_network" rel="nofollow">'._BL('Country').'</a></th>
+				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'city').'#table_network" rel="nofollow">'._BL('City').'</a></th>
+				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'distance').'#table_network" rel="nofollow">'._BL('Distance').'</a></th>
+				<th colspan="2">'._BL('Strikes').'/'.($range > 1 ? $range : '').'h</th>
+				<th colspan="2">'._BL('Signals').'/'.($range > 1 ? $range : '').'h</th>
+				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'efficiency').'#table_network" rel="nofollow">'._BL('Efficiency').'</a></th>
+				</tr>
+				<tr>
+					<th><a href="'.bo_insert_url('bo_sort', 'strikes').'#table_network" rel="nofollow">'._BL('Count').'</a></th>
+					<th><a href="'.bo_insert_url('bo_sort', 'strikes').'#table_network" rel="nofollow">'._BL('Ratio').'</a></th>
+					<th><a href="'.bo_insert_url('bo_sort', 'signals').'#table_network" rel="nofollow">'._BL('Count').'</a></th>
+					<th><a href="'.bo_insert_url('bo_sort', 'signals_ratio').'#table_network" rel="nofollow">'._BL('Ratio').'</a></th>
+				</tr>
+				';
+
+
+		// Stations table
+		switch($sort)
+		{
+			case 'city': case 'country': case 'distance': case 'user': case 'id':
+				asort($S);
+				break;
+			default:
+				arsort($S);
+				break;
 		}
 
-		echo '<td class="bo_text '.($sort == 'country' ? 'bo_marked' : '').'">';
-		echo $d['country'];
-		echo '</td>';
+		$urls = unserialize(BoData::get('mybo_stations'));
 
-		echo '<td class="bo_text '.($sort == 'city' ? 'bo_marked' : '').'">';
-		if (isset($urls[$id]))
-			echo '<a href="'.$urls[$id].'" target="_blank">'._BC($d['city']).'</a>';
-		else
-			echo _BC($d['city']);
-		echo '</td>';
+		$pos = 1;
+		foreach($S as $id => $d)
+		{
+			$d = $D[$id];
 
-		echo '<td class="bo_numbers '.($sort == 'distance' ? 'bo_marked' : '').'">';
-		
-		if ($own_station || $station_id > 0)
-			echo _BK($d['distance'] / 1000, 0);
-		else
-			echo '-';
+			if ($station_id == $id)
+				echo '<tr class="bo_highlight">';
+			else
+				echo '<tr>';
+
+			echo '<td class="bo_text">';
+
+			if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
+				echo '<a href="'.bo_insert_url('bo_*').'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">'.$pos.'</a>';
+			else
+				echo $pos;
+
+			echo '</td>';
+
+			if ((bo_user_get_level() & BO_PERM_SETTINGS))
+			{
+				echo '<td class="bo_text '.($sort == 'id' ? 'bo_marked' : '').'">';
+				echo $id;
+				echo '</td>';
+
+				echo '<td class="bo_text '.($sort == 'user' ? 'bo_marked' : '').'">';
+				echo $d['user'];
+				echo '</td>';
+			}
+
+			if (isset($_GET['tracker']))
+			{
+				echo '<td class="bo_text '.($sort == 'tracker' ? 'bo_marked' : '').'">';
+				echo $d['tracker'];
+				echo '</td>';
+			}
+
+			echo '<td class="bo_text '.($sort == 'country' ? 'bo_marked' : '').'">';
+			echo $d['country'];
+			echo '</td>';
+
+			echo '<td class="bo_text '.($sort == 'city' ? 'bo_marked' : '').'">';
+			if (isset($urls[$id]))
+				echo '<a href="'.$urls[$id].'" target="_blank">'._BC($d['city']).'</a>';
+			else
+				echo _BC($d['city']);
+			echo '</td>';
+
+			echo '<td class="bo_numbers '.($sort == 'distance' ? 'bo_marked' : '').'">';
 			
-		echo '</td>';
+			if ($own_station || $station_id > 0)
+				echo _BK($d['distance'] / 1000, 0);
+			else
+				echo '-';
+				
+			echo '</td>';
 
-		echo '<td class="bo_numbers '.($sort == 'strikes' ? 'bo_marked' : '').'">';
-		echo round($d['strikesh']);
-		echo '</td>';
+			echo '<td class="bo_numbers '.($sort == 'strikes' ? 'bo_marked' : '').'">';
+			echo round($d['strikesh']);
+			echo '</td>';
 
-		echo '<td class="bo_numbers '.($sort == 'strikes' ? 'bo_marked' : '').'">';
-		echo _BN($d['strikesh_ratio'] * 100, 1).'%';
-		echo '</td>';
+			echo '<td class="bo_numbers '.($sort == 'strikes' ? 'bo_marked' : '').'">';
+			echo _BN($d['strikesh_ratio'] * 100, 1).'%';
+			echo '</td>';
 
-		echo '<td class="bo_numbers '.($sort == 'signals' ? 'bo_marked' : '').'">';
-		echo round($d['signalsh']);
-		echo '</td>';
+			echo '<td class="bo_numbers '.($sort == 'signals' ? 'bo_marked' : '').'">';
+			echo round($d['signalsh']);
+			echo '</td>';
 
-		echo '<td class="bo_numbers '.($sort == 'signals_ratio' ? 'bo_marked' : '').'">';
-		echo _BN($d['signalsh_ratio'] * 100, 1).'%';
-		echo '</td>';
+			echo '<td class="bo_numbers '.($sort == 'signals_ratio' ? 'bo_marked' : '').'">';
+			echo _BN($d['signalsh_ratio'] * 100, 1).'%';
+			echo '</td>';
 
-		echo '<td class="bo_numbers '.($sort == 'efficiency' ? 'bo_marked' : '').'">';
+			echo '<td class="bo_numbers '.($sort == 'efficiency' ? 'bo_marked' : '').'">';
 
-		if ($d['efficiency'] <= -10)
-			echo '< -'._BN(999, 0).'%';
-		else
-			echo _BN($d['efficiency'] * 100, 1).'%';
+			if ($d['efficiency'] <= -10)
+				echo '< -'._BN(999, 0).'%';
+			else
+				echo _BN($d['efficiency'] * 100, 1).'%';
 
-		echo '</td>';
+			echo '</td>';
 
-		echo '</tr>';
+			echo '</tr>';
 
-		$pos++;
+			$pos++;
+		}
+
+		echo '</table>';
+
+		echo '</div>';
+
 	}
-
-	echo '</table>';
-
-	echo '</div>';
-
-	
 
 	/*** New Stations ***/
 	
@@ -1214,35 +1229,38 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	}
 
-	/*** Active Stations ***/
-	echo '<a name="graph_stations"></a>';
-	echo '<h4>'._BL('h4_graph_stations').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_stations">';
-	echo strtr(_BL('bo_graph_stations'), array('{STATION_CITY}' => $city));
-	echo '</p>';
-	
-	echo '<fieldset>';
-	echo '<legend>'._BL('legend_stat_active_stations').'</legend>';
-	echo '<span class="bo_form_group">';
-	echo '<span class="bo_form_descr">'._BL('Country').': </span>';
-	echo '<select name="bo_country" onchange="bo_change_value(this.value, \'stations\', \'bo_country\');" id="bo_stat_stations_country">';
-	echo '<option value="">'._BL('All').'</option>';
-
-	asort($countries);
-	foreach($countries as $country => $name)
+	if (BO_STATION_STAT_DISABLE !== true)
 	{
-		echo '<option value="'._BC($country).'">'.$name.'</option>';
+		/*** Active Stations ***/
+		echo '<a name="graph_stations"></a>';
+		echo '<h4>'._BL('h4_graph_stations').'</h4>';
+		echo '<p class="bo_graph_description" id="bo_graph_stations">';
+		echo strtr(_BL('bo_graph_stations'), array('{STATION_CITY}' => $city));
+		echo '</p>';
+		
+		echo '<fieldset>';
+		echo '<legend>'._BL('legend_stat_active_stations').'</legend>';
+		echo '<span class="bo_form_group">';
+		echo '<span class="bo_form_descr">'._BL('Country').': </span>';
+		echo '<select name="bo_country" onchange="bo_change_value(this.value, \'stations\', \'bo_country\');" id="bo_stat_stations_country">';
+		echo '<option value="">'._BL('All').'</option>';
+
+		asort($countries);
+		foreach($countries as $country => $name)
+		{
+			echo '<option value="'._BC($country).'">'.$name.'</option>';
+		}
+		echo '</select> ';
+		echo '</fieldset>';
+		
+		bo_show_graph('stations', $add_graph, 1);
+
+		/*** Signals ***/
+		echo '<a name="graph_signals_all"></a>';
+		echo '<h4>'._BL('h4_graph_signals_all').'</h4>';
+		bo_show_graph('signals_all', $add_graph, 1);
 	}
-	echo '</select> ';
-	echo '</fieldset>';
 	
-	bo_show_graph('stations', $add_graph, 1);
-
-	/*** Signals ***/
-	echo '<a name="graph_signals_all"></a>';
-	echo '<h4>'._BL('h4_graph_signals_all').'</h4>';
-	bo_show_graph('signals_all', $add_graph, 1);
-
 
 	// stations under construction
 	if ((bo_user_get_level() & BO_PERM_SETTINGS))

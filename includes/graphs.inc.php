@@ -2084,14 +2084,17 @@ function bo_graph_statistics()
 			$plot->SetLegend(_BL('graph_legend_strikes_sum'));
 			$graph->Add($plot);
 
-			$plot=new LinePlot($Y[2]['astr'], $X);
-			$plot->SetColor(BO_GRAPH_STAT_STR_COLOR_L3);
-			if (BO_GRAPH_STAT_STR_COLOR_F3)
-				$plot->SetFillColor(BO_GRAPH_STAT_STR_COLOR_F3);
-			$plot->SetWeight(BO_GRAPH_STAT_STR_WIDTH_3);
-			$plot->SetLegend(_BL('graph_legend_strikes_avg_all'));
-			$graph->Add($plot);
-
+			if (BO_STATION_STAT_DISABLE !== true)
+			{
+				$plot=new LinePlot($Y[2]['astr'], $X);
+				$plot->SetColor(BO_GRAPH_STAT_STR_COLOR_L3);
+				if (BO_GRAPH_STAT_STR_COLOR_F3)
+					$plot->SetFillColor(BO_GRAPH_STAT_STR_COLOR_F3);
+				$plot->SetWeight(BO_GRAPH_STAT_STR_WIDTH_3);
+				$plot->SetLegend(_BL('graph_legend_strikes_avg_all'));
+				$graph->Add($plot);
+			}
+			
 			$plot=new LinePlot($Y[1]['astr'], $X);
 			$plot->SetColor(BO_GRAPH_STAT_STR_COLOR_L2);
 			if (BO_GRAPH_STAT_STR_COLOR_F2)
@@ -2108,14 +2111,17 @@ function bo_graph_statistics()
 		case 'signals':
 			$graph->title->Set(_BL('graph_stat_title_signals').$add_title);
 
-			$plot=new LinePlot($Y[2]['sig'], $X);
-			$plot->SetColor(BO_GRAPH_STAT_SIG_COLOR_L1);
-			if (BO_GRAPH_STAT_SIG_COLOR_F1)
-				$plot->SetFillColor(BO_GRAPH_STAT_SIG_COLOR_F1);
-			$plot->SetWeight(BO_GRAPH_STAT_SIG_WIDTH_1);
-			$plot->SetLegend(_BL('graph_legend_signals_avg_all'));
-			$graph->Add($plot);
-
+			if (BO_STATION_STAT_DISABLE !== true)
+			{
+				$plot=new LinePlot($Y[2]['sig'], $X);
+				$plot->SetColor(BO_GRAPH_STAT_SIG_COLOR_L1);
+				if (BO_GRAPH_STAT_SIG_COLOR_F1)
+					$plot->SetFillColor(BO_GRAPH_STAT_SIG_COLOR_F1);
+				$plot->SetWeight(BO_GRAPH_STAT_SIG_WIDTH_1);
+				$plot->SetLegend(_BL('graph_legend_signals_avg_all'));
+				$graph->Add($plot);
+			}
+			
 			$plot=new LinePlot($Y[1]['sig'], $X);
 			$plot->SetColor(BO_GRAPH_STAT_SIG_COLOR_L2);
 			if (BO_GRAPH_STAT_SIG_COLOR_F2)
@@ -2148,14 +2154,17 @@ function bo_graph_statistics()
 		case 'ratio':
 			$graph->title->Set(_BL('graph_stat_title_ratio').$add_title);
 
-			$plot=new LinePlot($Y[2]['sig_ratio'], $X);
-			$plot->SetColor(BO_GRAPH_STAT_RAT_COLOR_L1);
-			if (BO_GRAPH_STAT_RAT_COLOR_F1)
-				$plot->SetFillColor(BO_GRAPH_STAT_RAT_COLOR_F1);
-			$plot->SetWeight(BO_GRAPH_STAT_RAT_WIDTH_1);
-			$plot->SetLegend(_BL('graph_legend_ratio_sig_all'));
-			$graph->Add($plot);
-
+			if (BO_STATION_STAT_DISABLE !== true)
+			{
+				$plot=new LinePlot($Y[2]['sig_ratio'], $X);
+				$plot->SetColor(BO_GRAPH_STAT_RAT_COLOR_L1);
+				if (BO_GRAPH_STAT_RAT_COLOR_F1)
+					$plot->SetFillColor(BO_GRAPH_STAT_RAT_COLOR_F1);
+				$plot->SetWeight(BO_GRAPH_STAT_RAT_WIDTH_1);
+				$plot->SetLegend(_BL('graph_legend_ratio_sig_all'));
+				$graph->Add($plot);
+			}
+			
 			$plot=new LinePlot($Y[1]['sig_ratio'], $X);
 			$plot->SetColor(BO_GRAPH_STAT_RAT_COLOR_L2);
 			if (BO_GRAPH_STAT_RAT_COLOR_F2)
@@ -2164,14 +2173,17 @@ function bo_graph_statistics()
 			$plot->SetLegend(_BL('graph_legend_ratio_sig_own'));
 			$graph->Add($plot);
 
-			$plot=new LinePlot($Y[2]['str_ratio'], $X);
-			$plot->SetColor(BO_GRAPH_STAT_RAT_COLOR_L3);
-			if (BO_GRAPH_STAT_RAT_COLOR_F3)
-				$plot->SetFillColor(BO_GRAPH_STAT_RAT_COLOR_F3);
-			$plot->SetWeight(BO_GRAPH_STAT_RAT_WIDTH_3);
-			$plot->SetLegend(_BL('graph_legend_ratio_str_all'));
-			$graph->Add($plot);
-
+			if (BO_STATION_STAT_DISABLE !== true)
+			{
+				$plot=new LinePlot($Y[2]['str_ratio'], $X);
+				$plot->SetColor(BO_GRAPH_STAT_RAT_COLOR_L3);
+				if (BO_GRAPH_STAT_RAT_COLOR_F3)
+					$plot->SetFillColor(BO_GRAPH_STAT_RAT_COLOR_F3);
+				$plot->SetWeight(BO_GRAPH_STAT_RAT_WIDTH_3);
+				$plot->SetLegend(_BL('graph_legend_ratio_str_all'));
+				$graph->Add($plot);
+			}
+			
 			$plot=new LinePlot($Y[1]['str_ratio'], $X);
 			$plot->SetColor(BO_GRAPH_STAT_RAT_COLOR_L4);
 			if (BO_GRAPH_STAT_RAT_COLOR_F4)

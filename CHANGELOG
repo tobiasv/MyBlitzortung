@@ -3,6 +3,19 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 0.7.9f
+-------------------------------
+- bugfix: alerts
+- other small stuff
+
+NOTE:
+Network statistics now disabled by default, because they can cause 
+some load on your server. Insert the following line into config.php
+to enable old behaviour:
+
+define('BO_STATION_STAT_DISABLE', false);
+
+
 Version 0.7.9e
 -------------------------------
 - bugfix: too much old stations in db

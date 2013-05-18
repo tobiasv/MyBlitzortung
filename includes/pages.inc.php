@@ -140,9 +140,7 @@ function bo_show_statistics()
 
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').$add_stid.'" class="bo_navi'.($show == 'strikes' ? '_active' : '').'">'._BL('stat_navi_strikes').'</a></li>';
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'station').$add_stid.'" class="bo_navi'.($show == 'station' ? '_active' : '').'">'._BL('stat_navi_station').'</a></li>';
-	
-	if (BO_STATION_STAT_DISABLE !== true)
-		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'network').$add_stid.'" class="bo_navi'.($show == 'network' ? '_active' : '').'">'._BL('stat_navi_network').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'network').$add_stid.'" class="bo_navi'.($show == 'network' ? '_active' : '').'">'._BL('stat_navi_network').'</a></li>';
 
 	if ($station_id == bo_station_id() || BO_ENABLE_LONGTIME_ALL === true)
 		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'longtime').$add_stid.'" class="bo_navi'.($show == 'longtime' ? '_active' : '').'">'._BL('stat_navi_longtime').'</a></li>';

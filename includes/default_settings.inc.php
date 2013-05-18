@@ -378,7 +378,7 @@
 @define('BO_STATISTICS_GPS_MAP_ZOOM', 17);
 
 
-// Disable station statistics (for slow servers)
+// Disable station statistics (needs database and cpu power!)
 @define('BO_STATION_STAT_DISABLE', true);
 
 
