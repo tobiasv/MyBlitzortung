@@ -1605,7 +1605,7 @@ function bo_update_stations($force = false)
 		$all_stations = bo_stations();
 
 		//check if sth went wrong
-		if ($lines < count($all_stations) * BO_UP_STATION_DIFFER)
+		if (count($lines) < count($all_stations) * BO_UP_STATION_DIFFER)
 		{
 			bo_update_error('stationcount', 'Station count differs too much: '.count($all_stations).'Database / '.$lines.' stations.txt');
 			BoData::set('uptime_stations', time());
