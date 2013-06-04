@@ -683,7 +683,8 @@ function bo_update_strikes($force = false)
 		/***** PREPARATIONS BEFORE READING *****/
 		$res = BoDb::query("SELECT MAX(time) mtime, MAX(id) max_id 
 					FROM ".BO_DB_PREF."strikes 
-					WHERE time<='".gmdate("Y-m-d H:i:s")."'");
+					-- WHERE time<='".gmdate("Y-m-d H:i:s")."'
+					");
 		$row = $res->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
 		$last_modified = BoData::get('uptime_strikes_modified');
