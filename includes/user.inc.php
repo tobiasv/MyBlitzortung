@@ -15,10 +15,6 @@ function bo_user_show_admin()
 			bo_show_calibrate_antennas();
 			break;
 
-		case 'mybo_station_update':
-			bo_my_station_update_form();
-			break;
-
 		case 'update':
 			require_once 'import.inc.php';
 			echo '<h4>'._BL('Importing data...').'</h4>';
@@ -56,7 +52,6 @@ function bo_user_show_admin()
 			echo '<h4>'._BL('Admin tools').'</h4>';
 
 			echo '<ul>';
-			echo '<li><a href="'.$url.'mybo_station_update">'._BL('Update MyBlitzortung Stations').'</a></li>';
 			echo '<li><a href="'.$url.'cache_info">'._BL('File cache info').'</a></li>';
 			echo '<li><a href="'.$url.'cities">'._BL('Read cities.txt').'</a></li>';
 			echo '<li><a href="'.$url.'calibrate" class="bo_navi'.($show == 'calibrate' ? '_active' : '').'">'._BL('Calibrate Antennas').'</a>';
@@ -91,16 +86,6 @@ function bo_user_show_admin()
 			echo '<li><a href="http://www.faq-blitzortung.org/index.php?sid=267611&lang=de&action=show&cat=18" target="_blank">FAQ</a></li>';
 			echo '</ul>';
 
-			echo '<h5>'._BL('Links').'</h5>';
-			echo '<ul>';
-
-/*
-			$bo_login_id = BoData::get('bo_login_id');
-			if ($bo_login_id)
-				echo '<li><a href="http://www.blitzortung.org/Webpages/index.php?page=3&login_string='.$bo_login_id.'" target="_blank">Blitzortung.org</a> (with your Login-String)</li>';
-*/
-
-			echo '</ul>';
 
 			break;
 	}

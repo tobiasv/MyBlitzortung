@@ -270,30 +270,6 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		
 		$st_cities[$row['id']] = $row['city'].($row['status'] != 'A' ? ' (Offline)' : '');
 	}
-	
-	//Get MyBo Stations
-	$mybo_info = unserialize(BoData::get('mybo_stations_info'));
-	$js_mybo_stations = '';
-	if (is_array($mybo_info) && count($mybo_info) > 1)
-	{
-		$mybo_urls = unserialize(BoData::get('mybo_stations'));
-		
-		foreach($mybo_info['lats'] as $id => $dummy)
-		{
-			if ($id == $sid || !trim($st_cities[$id]))
-				continue;
-			
-			if ($mybo_info['lats'][$id] && $mybo_info['lons'][$id])
-			{
-				$rad = $mybo_info['rads'][$id] ? $mybo_info['rads'][$id] : BO_RADIUS;
-				
-				$js_mybo_stations .= $js_mybo_stations ? ",\n" : '';
-				$js_mybo_stations .= '{';
-				$js_mybo_stations .= 'lat:'.$mybo_info['lats'][$id].', lon:'.$mybo_info['lons'][$id].', rad:'.$rad.', url:"'.$mybo_urls[$id].'", city:"'._BC($st_cities[$id]).'"';
-				$js_mybo_stations .= '}';
-			}
-		}
-	}
 
 
 	//Static maps for admin (for testing)
