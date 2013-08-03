@@ -269,12 +269,12 @@ $_BO['tpl_imgmap']['germany_lkr_gdz']['footer'] = '© Bundesamt für Kartographie 
 	Vervielfältigung, Verbreitung und öffentliche Zugänglichmachung, auch auszugsweise, mit Quellenangabe gestattet.';
 
 
-//Former Wetterpool.de (R.I.P.) Maps	
+//Former Wetterpool.de Maps	
 $_BO['tpl_imgmap']['germany_wetterpool'] = $_BO['tpl_imgmap']['germany_lkr'];
 $_BO['tpl_imgmap']['germany_wetterpool']['file'] = 'maps_europe/map_germany_wetterpool_superhigh.gif';
 $_BO['tpl_imgmap']['germany_wetterpool']['borders'] = array('maps_europe/map_germany_wetterpool_borders_white.gif', 10);
 $_BO['tpl_imgmap']['germany_wetterpool']['coord'] = array(55.0716, 15.1256, 47.2269, 5.8082); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['germany_wetterpool']['footer'] = 'Karte des ehemaligen Projekts <a href="http://www.wetterpool.de" target="_blank">Wetterpool.de</a> (R.I.P.)';
+$_BO['tpl_imgmap']['germany_wetterpool']['footer'] = 'Karte des Projekts <a href="http://www.wetterpool.de" target="_blank">Wetterpool.de</a>';
 $_BO['tpl_imgmap']['germany_wetterpool']['proj'] = 'plate';
 
 
@@ -506,7 +506,7 @@ $_BO['tpl_imgmap']['europe_kml_24h']['name'] = '24h';
 // - for images with 1h interval
 // - you have to add a 'file' and 'name' parameter
 $_BO['tpl_imgmap']['meteosat_europe_central'] = $_BO['tpl_imgmap_default'];
-$_BO['tpl_imgmap']['meteosat_europe_central']['coord'] = array(55, 30, 30, -10, 159, 874, 712, 2); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8)
+$_BO['tpl_imgmap']['meteosat_europe_central']['coord'] = array(55, 30, 30, -10, 159, 874, 712, 2, 0); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8)
 $_BO['tpl_imgmap']['meteosat_europe_central']['proj'] = 'geos';
 $_BO['tpl_imgmap']['meteosat_europe_central']['trange'] = 1; //hours!
 $_BO['tpl_imgmap']['meteosat_europe_central']['maxrange'] = 1; //hours!
@@ -550,7 +550,7 @@ $_BO['tpl_imgmap']['meteosat_europe_central_15min']['file_time_search'] = array(
 
 //EUMETSAT: Segment 15
 $_BO['tpl_imgmap']['meteosat_segment15'] = $_BO['tpl_imgmap']['meteosat_europe_central'];
-$_BO['tpl_imgmap']['meteosat_segment15']['coord'] = array(55.29, 26.8, 46.137, 5.96, 33, 1140, 483, 66, 57, 28, 46, 4); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8) AND rough bounds to filter strikes
+$_BO['tpl_imgmap']['meteosat_segment15']['coord'] = array(55.29, 26.8, 46.137, 5.96, 33, 1140, 483, 66, 0, 57, 28, 46, 4); //North, East, South, West (pos 1-4) AND the according pixel coordinates (pos 5-8) AND rough bounds to filter strikes
 $_BO['tpl_imgmap']['meteosat_segment15']['file'] = 'maps_europe/map_eumetsat_segm15_blank.jpg';
 
 

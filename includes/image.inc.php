@@ -397,6 +397,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			{
 				$file = bo_insert_date_string($cfg['file_time'], $stime);
 
+				//echo "$file ";
 				if (file_exists(BO_DIR.'images/'.$file))
 				{
 					$found = true;
@@ -1024,7 +1025,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				@mkdir($dir, 0777, true);
 		}
 
-		$ok = bo_imageout($I, $extension, $cache_file);
+		$ok = bo_imageout($I, $extension, $cache_file, null, $cfg['quality']);
 
 		if (!$ok)
 			bo_image_cache_error($w, $h);
@@ -1033,7 +1034,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	else
 	{
-		bo_imageout($I, $extension);
+		bo_imageout($I, $extension, null, null, $cfg['quality']);
 	}
 
 	exit;

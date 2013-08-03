@@ -351,7 +351,7 @@ function bo_show_archive_map()
 			//use transparency?
 			if ($ani_cfg['transparent'] === false)
 			{
-				$img_file = bo_bofile_url().'?image=bt'; //blank "tile"
+				$img_file = null;
 				$bo_file_url = bo_bofile_url().'?map='.$map.bo_lang_arg('map').'&date=';
 			}
 			else

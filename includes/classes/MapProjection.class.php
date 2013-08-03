@@ -12,6 +12,7 @@ class BoMapProjection
 	var $ImageOffsetX;
 	var $ImageOffsetY;
 	var $ImageCoor;
+	var $SatLon;
 	var $StrikeBounds = array();
 	
 	public $UseSql = false;
@@ -28,10 +29,13 @@ class BoMapProjection
 		$cE = isset($coord[5]) ? $coord[5] : $this->ImageWidth;
 		$cS = isset($coord[6]) ? $coord[6] : $this->ImageHeight;
 		$cW = isset($coord[7]) ? $coord[7] : 0;
+
+		if (isset($coord[8]))
+			$this->SatLon = $coord[8];
 		
 		list($x1, $y1) = $this->Calculate($coord[2], $coord[3]); //South, West
 		list($x2, $y2) = $this->Calculate($coord[0], $coord[1]); //North, East
-		
+	
 		$this->ImageCalibrationX = ($cE - $cW) / ($x2 - $x1);
 		$this->ImageCalibrationY = ($cS - $cN) / ($y2 - $y1);
 		
@@ -40,12 +44,12 @@ class BoMapProjection
 		
 		
 		//Strike bounds
-		if (isset($coord[8]) && isset($coord[9]) && isset($coord[10]) && isset($coord[11]))
+		if (isset($coord[9]) && isset($coord[10]) && isset($coord[11]) && isset($coord[12]))
 		{
-			$this->StrikeBounds[0] = $coord[8];
-			$this->StrikeBounds[1] = $coord[9];
-			$this->StrikeBounds[2] = $coord[10];
-			$this->StrikeBounds[3] = $coord[11];
+			$this->StrikeBounds[0] = $coord[9];
+			$this->StrikeBounds[1] = $coord[10];
+			$this->StrikeBounds[2] = $coord[11];
+			$this->StrikeBounds[3] = $coord[12];
 		}
 		
 	}
@@ -108,7 +112,7 @@ class BoMapProjection
 			//Normalized Geostationary Projection
 			//by EUMETSAT
 			case 'geos':
-				return bo_latlon2geos($lat, $lon);
+				return bo_latlon2geos($lat, $lon, $this->SatLon);
 		}
 	}
 	

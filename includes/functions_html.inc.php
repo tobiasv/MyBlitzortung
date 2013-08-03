@@ -91,8 +91,14 @@ function bo_archive_get_dim_css($map, $addx=0)
 
 
 
-function bo_insert_animation_js($images, $bo_file_url, $img_file, $ani_delay=BO_ANIMATIONS_WAITTIME, $ani_delay_end=BO_ANIMATIONS_WAITTIME_END, $img_dim='', $alt="")
+function bo_insert_animation_js($images, $bo_file_url, $img_file=null, $ani_delay=BO_ANIMATIONS_WAITTIME, $ani_delay_end=BO_ANIMATIONS_WAITTIME_END, $img_dim='', $alt="")
 {
+	if ($img_file == null)
+	{
+		$img_file = bo_bofile_url().'?image=bt'; //blank "tile"
+		$buffer = true;
+	}
+
 	echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'" alt="'.htmlspecialchars($alt).'">';
 	echo '<img style="position:absolute;top:1px;left:1px;" '.$img_dim.' id="bo_arch_map_img_ani" src="'.$bo_file_url.$images[0].'" alt="'.htmlspecialchars($alt).'">';
 
@@ -116,6 +122,7 @@ var bo_maps_img    = new Array();
 var bo_maps_loaded = 0;
 var bo_maps_playing = false;
 var bo_maps_position = 0;
+var buffer = <?php echo $buffer ? 'true' : 'false' ?>;
 
 function bo_maps_animation(nr)
 {
@@ -125,6 +132,10 @@ function bo_maps_animation(nr)
 		var timeout = <?php echo intval($ani_delay); ?>;
 		if (nr >= bo_maps_pics.length-1) { nr=-1; timeout += <?php echo intval($ani_delay_end); ?>; }
 		window.setTimeout("bo_maps_animation("+(nr+1)+");",timeout);
+		
+		if (buffer)
+			document.getElementById('bo_arch_map_img').src=bo_maps_img[nr+1].src;
+			
 		bo_maps_position=nr;
 	}
 }
@@ -158,7 +169,8 @@ function bo_maps_animation_start()
 	{
 		if (bo_maps_pics.length > 0)
 			document.getElementById('bo_ani_loading_text_percent').innerHTML="<?php echo _BL('Loading...') ?> " + Math.round(bo_maps_loaded / bo_maps_pics.length * 100) + "%";
-		
+		if (buffer)
+			document.getElementById('bo_arch_map_img').src=document.getElementById('bo_arch_map_img_ani').src;
 		document.getElementById('bo_arch_map_img_ani').src = bo_maps_img[bo_maps_loaded-1].src;
 	}
 }
@@ -191,6 +203,8 @@ function bo_animation_next()
 		
 		if (++bo_maps_position >= bo_maps_img.length) bo_maps_position=0;
 		
+		if (buffer)
+			document.getElementById('bo_arch_map_img').src=document.getElementById('bo_arch_map_img_ani').src;
 		document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[bo_maps_position].src;
 		
 	}
@@ -204,8 +218,10 @@ function bo_animation_prev()
 			bo_animation_pause();
 		
 		if (--bo_maps_position < 0) bo_maps_position=bo_maps_img.length-1;
+
+		if (buffer)
+			document.getElementById('bo_arch_map_img').src=document.getElementById('bo_arch_map_img_ani').src;
 		document.getElementById('bo_arch_map_img_ani').src=bo_maps_img[bo_maps_position].src;
-		
 		
 	}
 }

@@ -486,12 +486,13 @@ function bo_alert_send()
 
 				
 				//Position is near Staion ==> use faster query
-				if (BO_LAT - 0.001 < $d['lat'] && $d['lat'] < BO_LAT + 0.001 &&
+				if (0 && BO_LAT - 0.001 < $d['lat'] && $d['lat'] < BO_LAT + 0.001 &&
 					BO_LON - 0.001 < $d['lon'] && $d['lon'] < BO_LON + 0.001 	)
 				{
 					$sql_where = "	AND distance < ".($d['dist'] * 1000)."
 									AND time >= '$search_date'
 								";
+					$index_sql = '';
 				}
 				else
 				{
@@ -499,16 +500,19 @@ function bo_alert_send()
 					
 					list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 225, $d['lat'], $d['lon']);
 					list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 45,  $d['lat'], $d['lon']);
-					$sql_where = "	AND NOT (lat < $str_lat_min OR lat > $str_lat_max OR lon < $str_lon_min OR lon > $str_lon_max)
-									AND time >= '$search_date'
-									";
+					
+					$sql_where .= ' AND '.bo_strikes_sqlkey($index_sql, $search_time, time(), $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
 				}
+				
+				
+				
+
 				
 				if ($d['count'] <= 2) // only confirmed strikes should count when min strike count is very low
 					$sql_where .= " AND status > 0 ";
 				
 				$sql = "SELECT COUNT(id) cnt, MAX(time) maxtime, MIN(time) mintime
-						FROM ".BO_DB_PREF."strikes
+						FROM ".BO_DB_PREF."strikes s $index_sql
 						WHERE 1	
 							$sql_where";
 				$res2 = BoDb::query($sql);

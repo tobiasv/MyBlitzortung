@@ -710,7 +710,7 @@ function bo_update_strikes($force = false)
 		$res = BoDb::query($sql);
 		$row = $res->fetch_assoc();
 		$calc_range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
-		$calc_range = $calc_range * 0.98; //some margin to be sure
+		$calc_range *= 0.999; //some margin to be sure
 
 		$range = $calc_range;
 
