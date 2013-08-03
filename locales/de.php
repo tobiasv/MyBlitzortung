@@ -1027,7 +1027,7 @@ $_BL['de']['Romania'] = 'Rumänien';
 $_BL['de']['Rome'] = 'Rom';
 $_BL['de']['Lithuania'] = 'Litauen';
 $_BL['de']['Slovenia'] = 'Slovenien';
-$_BL['en']['Ireland'] = 'Irland';
+$_BL['de']['Ireland'] = 'Irland';
 
 //Europe: Regions
 $_BL['de']['Europe'] = 'Europa';

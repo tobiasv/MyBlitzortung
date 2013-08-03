@@ -317,7 +317,7 @@ function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 	if ( (BO_LOCALE != _BL() || BO_LANG_REDIRECT) && array_search(BO_LANG_ARGUMENT, $exclude) === false)
 		$query .=  BO_LANG_ARGUMENT.'='._BL().'&';
 	
-	$query = strtr($query, array('&&' => '&'));	
+	
 	$url = $_SERVER['REQUEST_URI'];
 	
 	if ($absolute)
@@ -333,6 +333,10 @@ function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 		$url = $r[1].'?'.$query;
 	}
 	
+	$url = strtr($url, array('&&' => '&', '?&' => '?'));
+	$url = preg_replace('/&$/', '', $url);
+	$url = preg_replace('/\?$/', '', $url);
+
 	return $url;
 }
 
@@ -588,7 +592,7 @@ function bo_latlon2mercator($lat, $lon)
 }
 
 
-function bo_latlon2geos($lat, $lon)
+function bo_latlon2geos($lat, $lon, $sub_lon = 0)
 {
 
 	//  REFERENCE:                                            
@@ -599,9 +603,9 @@ function bo_latlon2geos($lat, $lon)
 	if ($lon > 180)
 		$lon -= 360;
 
-	$SUB_LON     = 0.0;        /* longitude of sub-satellite point in radiant */
+	$SUB_LON     = $sub_lon;   /* longitude of sub-satellite point in radiant */
 	$R_POL       = 6356.5838;  /* radius from Earth centre to pol             */
-	$R_EQ        =  6378.169;  /* radius from Earth centre to equator         */
+	$R_EQ        = 6378.169;   /* radius from Earth centre to equator         */
 	$SAT_HEIGHT  = 42164.0;    /* distance from Earth centre to satellite     */
 		
 	$lat = deg2rad($lat);
@@ -2505,6 +2509,9 @@ function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quali
 		header("Content-Type: ".extension2mime($extension));
 	}
 	
+	if (!$quality)
+		$quality = BO_IMAGE_JPEG_QUALITY;
+	
 	//there seems to be an error in very rare cases
 	//we retry to save the image if it didn't work
 	$i=0;
@@ -2538,6 +2545,9 @@ function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quali
 		{
 			touch($file, $mtime);
 		}
+		
+		if (BO_OPTIPNG_LEVEL > 0 && $extension == 'png')
+			exec("/usr/bin/optipng -o ".BO_OPTIPNG_LEVEL." '$file'");
 	}
 	
 	return $ret;

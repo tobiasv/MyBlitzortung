@@ -683,7 +683,7 @@ function bo_update_strikes($force = false)
 		/***** PREPARATIONS BEFORE READING *****/
 		$res = BoDb::query("SELECT MAX(time) mtime, MAX(id) max_id 
 					FROM ".BO_DB_PREF."strikes 
-					WHERE time<='".gmdate("Y-m-d H:i:s")."'");
+					-- WHERE time<='".gmdate("Y-m-d H:i:s")."'");
 		$row = $res->fetch_assoc();
 		$last_strike = strtotime($row['mtime'].' UTC');
 		$last_modified = BoData::get('uptime_strikes_modified');
@@ -709,7 +709,7 @@ function bo_update_strikes($force = false)
 		$res = BoDb::query($sql);
 		$row = $res->fetch_assoc();
 		$calc_range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
-		$calc_range = $calc_range * 0.98; //some margin to be sure
+		$calc_range *= 0.999; //some margin to be sure
 
 		$range = $calc_range;
 
