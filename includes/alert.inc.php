@@ -501,7 +501,7 @@ function bo_alert_send()
 					list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 225, $d['lat'], $d['lon']);
 					list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 45,  $d['lat'], $d['lon']);
 					
-					$sql_where .= ' AND '.bo_strikes_sqlkey($index_sql, $search_time, time(), $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
+					$sql_where = ' AND '.bo_strikes_sqlkey($index_sql, $search_time, time(), $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
 				}
 				
 				
@@ -524,7 +524,7 @@ function bo_alert_send()
 					{
 						//only use the poition of the last strike in the interval to avoid to much calculating
 						$sql = "SELECT lat, lon
-								FROM ".BO_DB_PREF."strikes
+								FROM ".BO_DB_PREF."strikes s $index_sql
 								WHERE 1	
 									$sql_where 
 								ORDER BY time DESC
