@@ -3,3 +3,8 @@ config.php
 .htaccess
 own.css
 cities.txt
+cache/graphs/*
+cache/icons/*
+cache/maps/*
+cache/tiles/*
+locales/own.php

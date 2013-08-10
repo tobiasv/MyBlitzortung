@@ -93,7 +93,9 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				$update_interval = $cfg['upd_intv'][0] * 60;
 			else
 				$update_interval = $cfg['upd_intv'][$period_id] * 60;
-					
+			
+			if (!$update_interval)
+				$update_interval = 300;
 
 			$archive_maps_enabled = (defined('BO_ENABLE_ARCHIVE_MAPS') && BO_ENABLE_ARCHIVE_MAPS) || bo_user_get_level();		
 			$url = bo_bofile_url().'?map='.$static_map_id.($period_id ? '&period='.$period : '').bo_lang_arg('map');
@@ -201,7 +203,7 @@ function bo_map_reload_static(manual)
 	if (bo_autoupdate_running || manual)
 	{
 		var now = new Date();
-		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&bo_t=' + Math.floor(now.getTime() / <?php echo 1000 * $update_interval; ?>);
+		document.getElementById('bo_arch_map_img').src='<?php echo $url ?>&bo_t=' + Math.floor(now.getTime() / <?php echo 1+(1000 * $update_interval); ?>);
 	}
 	
 	if (!manual)
