@@ -672,7 +672,7 @@ function bo_update_db_compression()
 
 function bo_upgrade_to_red()
 {
-	require_once 'includes/import.inc.php';
+	require_once 'import.inc.php';
 
 	$file = bo_get_file('http://'.trim(BO_USER).':'.trim(BO_PASS).'@blitzortung.net/Data_1/Protected/stations_map.php');
 	$lines = explode("\n", $file);

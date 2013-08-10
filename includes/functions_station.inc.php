@@ -140,6 +140,9 @@ function bo_get_station_list(&$style_class = array())
 			$style_class[$id] .= '_offline';
 		elseif (bo_status($d['status'], STATUS_BAD_GPS))
 			$style_class[$id] .= '_nogps';
+			
+		if ((int)$d['controller_pcb'] >= 10)
+			$style_class[$id] .= ' bo_station_red';
 	}
 
 	asort($opts);

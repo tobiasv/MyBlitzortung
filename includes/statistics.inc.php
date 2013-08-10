@@ -1161,14 +1161,13 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 	if ($new = intval(BO_STATISTICS_SHOW_NEW_STATIONS))
 	{
-		$data = unserialize(BoData::get('stations_new_date'));
 		$new_stations = array();
 
 		$sql = "SELECT id, country, city, first_seen
 				FROM ".BO_DB_PREF."stations
 				WHERE status >= ".((int)STATUS_OFFLINE)." 
 					AND id < ".intval(BO_DELETED_STATION_MIN_ID)."
-					AND first_seen > (SELECT MIN(first_seen) FROM ".BO_DB_PREF."stations) + INTERVAL 1 DAY
+					AND first_seen > (SELECT MIN(first_seen) FROM ".BO_DB_PREF."stations) 
 				ORDER BY first_seen DESC
 				LIMIT $new";
 		$res = BoDb::query($sql);

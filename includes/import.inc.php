@@ -702,7 +702,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			}
 			
 			//Position
-			if (preg_match('/pos;([0-9\.]+);([0-9\.]+);([0-9\.]+)/', $l, $r))
+			if (preg_match('/pos;([-0-9\.]+);([-0-9\.]+);([-0-9\.]+)/', $l, $r))
 			{
 				$D['lat'] = $r[1];
 				$D['lon'] = $r[2];
@@ -785,7 +785,12 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				
 				foreach($part_stations as $bo_station_id)
 				{
+						
 					$stId = $bo2id[$bo_station_id];
+
+					if (672 == $bo_station_id)
+						echo 'OK '.$stId;
+
 					if ($stId)
 					{
 						$last_strikes[$stId] = array($utime, $D['time_ns'], $id);
@@ -1409,15 +1414,15 @@ function bo_update_stations($force = false)
 				$D['show_mybo'] = $r[1];
 
 			//City
-			if (preg_match('/city;"?([^" ]+)"?/', $l, $r))
+			if (preg_match('/city;"([^"]+)"/', $l, $r))
 				$D['city'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
 
 			//Country
-			if (preg_match('/country;"?([^" ]+)"?/', $l, $r))
+			if (preg_match('/country;"([^"]+)"/', $l, $r))
 				$D['country'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
 			
 			//Position
-			if (preg_match('/pos;([0-9\.]+);([0-9\.]+);([0-9\.]+)/', $l, $r))
+			if (preg_match('/pos;([-0-9\.]+);([-0-9\.]+);([-0-9\.]+)/', $l, $r))
 			{
 				$D['lat'] = $r[1];
 				$D['lon'] = $r[2];

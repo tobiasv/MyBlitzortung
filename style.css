@@ -911,3 +911,7 @@ color: #e90;
 #myblitzortung .bo_select_station_offline {
 color: red;
 }
+
+#myblitzortung select .bo_station_red {
+background-color: #fee;
+}
