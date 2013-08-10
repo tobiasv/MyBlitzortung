@@ -533,6 +533,7 @@ function bo_check_for_update()
 							ADD INDEX ( `show_mybo` )';
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
 				
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` 
 							CHANGE `tracker` `firmware` varchar(50) NOT NULL,
@@ -559,27 +560,18 @@ function bo_check_for_update()
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` CHANGE `tmp_id` `id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT';
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				flush();
 				
 				//strikes table
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` 
 						CHANGE `polarity` `type` tinyint(1) NOT NULL,
-						CHANGE `users` `stations` smallint(5) NOT NULL';
+						CHANGE `users` `stations` smallint(5) NOT NULL,
+						ADD `stations_calc` smallint(5) NOT NULL AFTER `stations`,
+						ADD `part_pos` tinyint(5) NOT NULL AFTER `part`,
+						ADD `alt` decimal(5,1) NOT NULL AFTER `lon`';
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 
-				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `stations_calc` smallint(5) NOT NULL AFTER `stations`';
-				$ok = BoDb::query($sql, false);
-				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
-
-				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `part_pos` tinyint(5) NOT NULL AFTER `part`';
-				$ok = BoDb::query($sql, false);
-				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
-				
-				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `alt` decimal(5,1) NOT NULL AFTER `lon`';
-				$ok = BoDb::query($sql, false);
-				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
-			
-				
 				echo '</ul>';
 				flush();
 				
