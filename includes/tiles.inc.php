@@ -545,7 +545,7 @@ function bo_tile()
 	//get the data!
 	$points = array();
 	$deviation = array();
-	$sql = "SELECT s.id id, s.deviation deviation, s.polarity polarity,
+	$sql = "SELECT s.id id, s.deviation deviation, s.type type,
 				$sql_select	
 			FROM ".BO_DB_PREF."strikes s $index_sql $sql_join
 			WHERE $sql_where
@@ -649,7 +649,7 @@ function bo_tile()
 				break;
 
 			case 2:
-				if (!$row['polarity']) //plot circle (no polarity known)
+				if (!$row['type']) //plot circle (no type known)
 				{
 					imagesetthickness($I, 1);
 					
@@ -665,7 +665,7 @@ function bo_tile()
 					$t = $s1 - 2;
 					imagesetthickness($I, 2);
 					imageline($I, $px-$t, $py, $px+$t-1, $py, $col);
-					if ($row['polarity'] > 0)
+					if ($row['type'] > 0)
 						imageline($I, $px, $py-$t, $px, $py+$t-1, $col);
 				}
 
@@ -679,11 +679,11 @@ function bo_tile()
 				else
 					imagefilledellipse($I, $px, $py, $s, $s, $col);
 
-				if ($row['polarity'] && BO_EXPERIMENTAL_POLARITY_CHECK == true)
+				if ($row['type'] && BO_EXPERIMENTAL_POLARITY_CHECK == true)
 				{
 					$t = intval($s / 2);
 					imageline($I, $px-$t+1, $py, $px+$t-1, $py, $white);
-					if ($row['polarity'] > 0)
+					if ($row['type'] > 0)
 						imageline($I, $px, $py-$t+1, $px, $py+$t-1, $white);
 				}
 

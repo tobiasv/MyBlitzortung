@@ -143,7 +143,7 @@
 @define('BO_UP_INTVL_STATIONS', 15);
 
 //signal update interval
-@define('BO_UP_INTVL_RAW', 10);
+@define('BO_UP_INTVL_RAW', 0);
 
 //min interval of external downloads
 @define('BO_UP_INTVL_DOWNLOADS', 5);
@@ -388,10 +388,6 @@
 
 // Show new stations
 @define('BO_STATISTICS_SHOW_NEW_STATIONS', 0);
-
-
-// Show stations under construction
-@define('BO_STATISTICS_SHOW_STATIONS_UNDER_CONSTR', 1);
 
 
 // Statistics for all station
@@ -828,20 +824,9 @@
 
 
 /*******************************************************************/
-/*** Experimental Polarity                                       ***/
+/*** Polarity on Dynamic map                                     ***/
 
-//enable the experiment ;-)
-//be sure to "calibrate" your antennas in the user area
-//the electrical orientation is important!
-@define('BO_EXPERIMENTAL_POLARITY_CHECK', false);
-
-//maximum distance in kilometers from your station where polarities
-//should be not too far, as polarity of the wave changes
-//after some hundrets of kilometers
-@define('BO_EXPERIMENTAL_POLARITY_MAX_DIST', 300);
-
-//polarity is displayed beginning from given zoom-level
-@define('BO_EXPERIMENTAL_POLARITY_ZOOM', 8);
+/*** NOT WORKING! ***/
 
 //size of the +/- symbol in strike on map
 @define('BO_MAP_STRIKE_POLARITY_SIZE', 5);
@@ -1244,13 +1229,15 @@
 /*** Some special settings which shouldn't be changed            ***/
 
 //Import server settings
-//Todo: more flexible
 @define("BO_IMPORT_SERVER", 'blitzortung.net');
 @define("BO_IMPORT_PATH", 'Data_%d/Protected/');
-@define("BO_IMPORT_PATH_PARTICIPANTS", 'participants.txt');
-@define("BO_IMPORT_PATH_STRIKES", 'strikes.txt');
-@define("BO_IMPORT_PATH_STATIONS", 'stations.txt');
-@define("BO_IMPORT_PATH_RAW", 'raw_data/');
+@define("BO_IMPORT_PATH_STROKES", 'Strokes');
+@define("BO_IMPORT_PATH_STATIONS", 'stations.txt.gz');
+
+//Special server for signals
+@define("BO_IMPORT_SERVER_SIGNALS", 'blitzortung.net');
+@define("BO_IMPORT_PATH_SIGNALS", 'Data_%d/Protected/');
+
 
 //Tile dimensions (pixels)
 @define("BO_TILE_SIZE", 512);
@@ -1280,10 +1267,6 @@
 
 //search interval for strike -> signal matching for foreign stations
 @define('BO_STR2SIG_INTERVAL_OTHERS', 4000); //µs
-
-//data in participants.txt can change for strikes younger
-//than given minutes
-@define('BO_MIN_MINUTES_STRIKE_CONFIRMED', 0);
 
 //needed for auto linking stations
 @define('BO_LINK_HOST', 'www.myblitzortung.org');

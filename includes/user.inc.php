@@ -35,13 +35,14 @@ function bo_user_show_admin()
 			echo '</div></pre>';
 			break;
 
+		/*
 		case 'purge_deleted_stations':
 			echo '<h4>'._BL('Purging deleted/old stations...').'</h4>';
 			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
-			purge_deleted_stations();
+			bo_purge_deleted_stations();
 			echo '</div></pre>';
 			break;
-
+		*/
 			
 		case 'cities':
 			bo_import_cities();
@@ -54,7 +55,7 @@ function bo_user_show_admin()
 			echo '<ul>';
 			echo '<li><a href="'.$url.'cache_info">'._BL('File cache info').'</a></li>';
 			echo '<li><a href="'.$url.'cities">'._BL('Read cities.txt').'</a></li>';
-			echo '<li><a href="'.$url.'calibrate" class="bo_navi'.($show == 'calibrate' ? '_active' : '').'">'._BL('Calibrate Antennas').'</a>';
+			//echo '<li><a href="'.$url.'calibrate" class="bo_navi'.($show == 'calibrate' ? '_active' : '').'">'._BL('Calibrate Antennas').'</a>';
 			echo '</ul>';
 
 			echo '<h5>'._BL('Import/update data').'</h5>';
@@ -81,6 +82,7 @@ function bo_user_show_admin()
 			echo '<h5>'._BL('Documentation').'</h5>';
 			echo '<ul>';
 			echo '<li><a href="'.dirname(BO_FILE).'/README" target="_blank">README</a></li>';
+			echo '<li><a href="http://forum.blitzortung.org" target="_blank">Blitzortung.org user forum</a></li>';
 			echo '<li><a href="http://www.myblitzortung.org" target="_blank">www.myblitzortung.org</a></li>';
 			echo '<li><a href="http://www.wetter-board.de/index.php?page=Board&boardID=381" target="_blank">Board</a></li>';
 			echo '<li><a href="http://www.faq-blitzortung.org/index.php?sid=267611&lang=de&action=show&cat=18" target="_blank">FAQ</a></li>';
@@ -541,12 +543,6 @@ function bo_show_calibrate_antennas()
 
 			if (strlen(trim($_POST['bo_antenna2_bearing'])))
 				BoData::set('antenna2_bearing', (double)$_POST['bo_antenna2_bearing']);
-
-			if (strlen(trim($_POST['bo_antenna1_bearing_elec'])))
-				BoData::set('antenna1_bearing_elec', (double)$_POST['bo_antenna1_bearing_elec']);
-
-			if (strlen(trim($_POST['bo_antenna2_bearing_elec'])))
-				BoData::set('antenna2_bearing_elec', (double)$_POST['bo_antenna2_bearing_elec']);
 		}
 
 		echo '<h3>'._BL('Manual antenna calibration').'</h3>';
@@ -560,12 +556,6 @@ function bo_show_calibrate_antennas()
 		echo '<input type="text" name="bo_antenna1_bearing" value="'.(double)BoData::get('antenna1_bearing').'" id="bo_antenna1_bearing_id" class="bo_form_text bo_form_input">';
 		echo '<span class="bo_form_descr">'._BL('Antenna 2 bearing').' (0-180&deg;):</span>';
 		echo '<input type="text" name="bo_antenna2_bearing" value="'.(double)BoData::get('antenna2_bearing').'" id="bo_antenna2_bearing_id" class="bo_form_text bo_form_input">';
-
-		echo '<span class="bo_form_descr">'._BL('Antenna 1 electrical bearing').' (0-360&deg;):</span>';
-		echo '<input type="text" name="bo_antenna1_bearing_elec" value="'.(double)BoData::get('antenna1_bearing_elec').'" id="bo_antenna1_elec_bearing_id" class="bo_form_text bo_form_input">';
-		echo '<span class="bo_form_descr">'._BL('Antenna 2 electrical bearing').' (0-360&deg;):</span>';
-		echo '<input type="text" name="bo_antenna2_bearing_elec" value="'.(double)BoData::get('antenna2_bearing_elec').'" id="bo_antenna2_elec_bearing_id" class="bo_form_text bo_form_input">';
-
 
 		echo '<input type="submit" name="bo_calibrate_manual" value="'._BL('Ok').'" id="bo_admin_submit" class="bo_form_submit">';
 
@@ -712,92 +702,6 @@ function bo_show_calibrate_antennas()
 			echo '<li>'._BL('Difference').': '.abs($alpha[1]-$alpha[0]).'&deg;</li>';
 
 			echo '</ul>';
-
-
-
-
-			//find polarity (+/-) from statistics (suppose: more negative lightning than positve)
-			echo '<h4>'._BL('Polarity').' ('._BL('Very experimental').')</h4>';
-
-			for ($i=0;$i<2;$i++)
-			{
-				echo '<h6>'._BL('Antenna').' '.($i+1)." (".$alpha[$i]."&deg;)</h6>";
-				echo '<ul>';
-
-
-				$deltas = array(90, 270);
-				$arc = 45;
-
-				$c = 0;
-				foreach($deltas as $delta)
-				{
-
-					//count positive/negative lighning in a arc verticaly to the antenna
-					$beta1 = ($alpha[$i] + $delta + $arc/2) % 360;
-					$beta2 = ($alpha[$i] + $delta - $arc/2) % 360;
-
-					if ($beta1 > $beta2)
-					{
-						$tmp = $beta2;
-						$beta2 = $beta1;
-						$beta1 = $tmp;
-					}
-
-					$neg = 0;
-					$pos = 0;
-
-					$j = 0;
-					for ($a=$beta1;$a<$beta2;$a++)
-					{
-						$neg += $sign[$i][$a][-1];
-						$pos += $sign[$i][$a][1];
-
-						$cur_neg += count($current[$i][$a][-1]) ? array_sum($current[$i][$a][-1]) / count($current[$i][$a][-1]) : 0;
-						$cur_pos += count($current[$i][$a][1]) ? array_sum($current[$i][$a][1]) / count($current[$i][$a][1]) : 0;
-
-						$j++;
-					}
-
-					$cur_neg /= $j;
-					$cur_pos /= $j;
-
-					if ($neg)
-						$pol_ratio[$c] = $pos / $neg;
-
-					$c++;
-
-					echo '<li>'.round($beta1).'&deg; to '.round($beta2).'&deg; :';
-					echo ' '._BL('Positive').": $pos / "._BL('Negative').": $neg ";
-					//echo " (Current: ".round($cur_pos,1)." / ".round($cur_neg,1)." kA/perStrike) ";
-					echo '</li>';
-				}
-
-				if ($pol_ratio[0] > 1 && $pol_ratio[1] < 1)
-					$pos_dir[$i] = ($alpha[$i] + $deltas[1]) % 360;
-				else if ($pol_ratio[0] < 1 && $pol_ratio[1] > 1)
-					$pos_dir[$i] = ($alpha[$i] + $deltas[0]) % 360;
-				else
-					$pos_dir[$i] = null;
-
-				echo '<li>'._BL('Positive electrical direction').': ';
-
-				if ($pos_dir[$i] === null)
-				{
-					echo _BL('Not definite').' :-(';
-				}
-				else
-				{
-					echo $pos_dir[$i].'&deg';
-
-					if ((bo_user_get_level() & BO_PERM_ADMIN))
-						echo '<input type="text" name="bo_antenna'.($i+1).'_bearing_elec" value="'.$pos_dir[$i].'" id="bo_antenna'.($i+1).'_elec_bearing_id" class="bo_form_text bo_form_input">';
-				}
-
-				echo '</li>';
-
-				echo '</ul>';
-
-			}
 
 			echo '<input type="submit" name="bo_calibrate_manual" value="'._BL('Ok').'" id="bo_admin_submit" class="bo_form_submit">';
 
@@ -1079,7 +983,7 @@ function bo_user_cookie_login()
 
 
 
-function purge_deleted_stations()
+function bo_purge_deleted_stations()
 {
 	$min_id = intval(BO_DELETED_STATION_MIN_ID);
 	

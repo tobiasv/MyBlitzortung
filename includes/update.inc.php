@@ -25,7 +25,8 @@ function bo_check_for_update()
 						'0.7.9a',
 						'0.7.9b',
 						'0.7.9c',
-						'0.7.9e'
+						'0.7.9e',
+						'0.8.1'
 						);
 
 	$max_update_num = bo_version2number($updates[count($updates)-1]);
@@ -502,10 +503,106 @@ function bo_check_for_update()
 				
 				
 			case '0.7.9e':
-				purge_deleted_stations();
+				bo_purge_deleted_stations();
 				$ok = true;
 				break;
+			
+			case '0.8.1':
 				
+				bo_purge_deleted_stations(); //delete all old stations
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` 
+							ADD `show_mybo` varchar(3) NOT NULL AFTER `tracker`,
+							ADD `bo_station_id` SMALLINT UNSIGNED NOT NULL AFTER `id`,
+							ADD `bo_user_id` SMALLINT UNSIGNED NOT NULL AFTER `bo_station_id`,
+							ADD `alt` decimal(5,1) NOT NULL AFTER `lon`,
+							ADD `controller_pcb` VARCHAR(30) NOT NULL AFTER `status`,
+							ADD `amp_gains` VARCHAR(40) NOT NULL AFTER `status`,
+							ADD `amp_antennas` VARCHAR(30) NOT NULL AFTER `amp_gains`,
+							ADD `amp_firmwares` VARCHAR(100) NOT NULL AFTER `amp_antennas`,
+							ADD `url` VARCHAR(200) NOT NULL AFTER `show_mybo`';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` 
+							ADD INDEX ( `bo_station_id` ),
+							ADD INDEX ( `bo_user_id` ),
+							ADD INDEX ( `country` ),
+							ADD INDEX ( `first_seen` ),
+							ADD INDEX ( `status` ),
+							ADD INDEX ( `show_mybo` )';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` 
+							CHANGE `tracker` `firmware` varchar(50) NOT NULL,
+							CHANGE `status` `status` varchar(3) NOT NULL';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` ADD `tmp_id` SMALLINT UNSIGNED NOT NULL AFTER `id`';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
+				$sql = 'UPDATE `'.BO_DB_PREF.'stations` SET tmp_id=id, status=0';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` DROP `id`';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` ADD PRIMARY KEY(`tmp_id`)';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` CHANGE `tmp_id` `id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				
+				//strikes table
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` 
+						CHANGE `polarity` `type` tinyint(1) NOT NULL,
+						CHANGE `users` `stations` smallint(5) NOT NULL';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `stations_calc` smallint(5) NOT NULL AFTER `stations`';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `part_pos` tinyint(5) NOT NULL AFTER `part`';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` ADD `alt` decimal(5,1) NOT NULL AFTER `lon`';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+			
+				
+				echo '</ul>';
+				flush();
+				
+				echo '<h4>Upgrading station data to new format</h4>';
+				echo '<ul>';		
+				
+				//upgrade data
+				bo_upgrade_to_red();
+
+				$sql = 'SELECT bo_station_id FROM `'.BO_DB_PREF.'stations` WHERE user="'.BO_USER.'"';
+				$row = BoDb::query($sql, false)->fetch_assoc();
+				
+				if ($row['bo_station_id'])
+					BoData::set('bo_station_id', $row['bo_station_id']);
+				
+				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` DROP `user`';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				
+				
+				break;
+			
 			default:
 				$ok = true;
 				break;
@@ -557,16 +654,7 @@ function bo_check_for_update()
 
 }
 
-function bo_version2number($version)
-{
-	preg_match('/([0-9]+)(\.([0-9]+)(\.([0-9]+))?)?([a-z])?/', $version, $r);
-	$num = $r[1] * 10000 + $r[3] * 100 + $r[5];
-	
-	if ($r[6])
-		$num += (abs(ord($r[6]) - ord('a')) + 1) * 0.01;
-	
-	return $num;
-}
+
 
 
 function bo_update_db_compression()
@@ -588,6 +676,47 @@ function bo_update_db_compression()
 			flush();
 		}
 	}
+}
+
+function bo_upgrade_to_red()
+{
+	require_once 'includes/import.inc.php';
+
+	$file = bo_get_file('http://'.trim(BO_USER).':'.trim(BO_PASS).'@blitzortung.net/Data_1/Protected/stations_map.php');
+	$lines = explode("\n", $file);
+	
+	echo "<li>Fetching map table";
+	
+	if (count($lines) < 300)
+	{
+		echo ' FAILURE!</li>';
+		return 0;
+	}
+	
+	$i=0;
+	foreach($lines as $line)
+	{
+		list($id, $user) = explode(" ", $line);
+		
+		if (!trim($user))
+			continue;
+		
+		$sql = "UPDATE ".BO_DB_PREF."stations SET bo_station_id='".$id."' WHERE user='".BoDb::esc($user)."' AND bo_station_id=0 LIMIT 1";
+		
+		if (!BoDb::query($sql, false))
+			echo ", $user not found";
+		else	
+			$i++;
+	}
+	
+	echo ', '.(count($lines)-1).' lines, '.$i.' stations OK</li>';
+	
+	echo '<li>Depending on your region the user not found messages are no problem!</li>';
+	
+	flush();
+
+	
+	return 1;
 }
 
 

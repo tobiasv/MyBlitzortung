@@ -421,6 +421,108 @@ function bo_drawpoint($I, $x, $y, &$style, $color = null, $use_alpha = true, $st
 
 
 
+function bo_imageout($I, $extension = 'png', $file = null, $mtime = null, $quality = BO_IMAGE_JPEG_QUALITY)
+{
+	$extension = strtr($extension, array('.' => ''));
+
+	if (!headers_sent() && $file === null)
+	{
+		header("Content-Type: ".extension2mime($extension));
+	}
+	
+	if (!$quality)
+		$quality = BO_IMAGE_JPEG_QUALITY;
+	
+	//there seems to be an error in very rare cases
+	//we retry to save the image if it didn't work
+	$i=0;
+		
+	do
+	{
+		if ($i)
+			usleep(100000);
+
+		if ($extension == 'png')
+			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
+		else if ($extension == 'gif')
+			$ret = imagegif($I, $file);
+		else if ($extension == 'jpeg')
+			$ret = imagejpeg($I, $file, $quality);
+		else if (imageistruecolor($I) === false)
+			$ret = imagepng($I, $file, BO_IMAGE_PNG_COMPRESSION, BO_IMAGE_PNG_FILTERS);
+		else
+			$ret = imagejpeg($I, $file, $quality);
+	}
+	while ($i++ < 3 && !$ret && imagesx($I));
+
+	
+	if ($file)
+	{
+		if (filesize($file) == 0)
+		{
+			unlink($file);
+		}
+		else if ($mtime !== null)
+		{
+			touch($file, $mtime);
+		}
+		
+		if (BO_OPTIPNG_LEVEL > 0 && $extension == 'png')
+			exec("/usr/bin/optipng -o ".BO_OPTIPNG_LEVEL." '$file'");
+	}
+	
+	return $ret;
+}
+
+
+
+function bo_hex2color(&$I, $str, $use_alpha = true)
+{
+	$rgb = bo_hex2rgb($str);
+
+	if (count($rgb) == 4 && imageistruecolor($I) && $use_alpha)
+		return imagecolorallocatealpha($I, $rgb[0], $rgb[1], $rgb[2], $rgb[3]);
+	else
+	{
+		$col = imagecolorexact($I, $rgb[0], $rgb[1], $rgb[2]);
+
+		if ($col === -1)
+			return imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
+		else
+			return $col;
+	}
+}
+
+function bo_hex2rgb($str)
+{
+    $hexStr = preg_replace("/[^0-9A-Fa-f]/", '', $str);
+    $rgb = array();
+
+	if (strlen($hexStr) == 3 || strlen($hexStr) == 4)
+	{
+        $rgb[0] = hexdec(str_repeat(substr($hexStr, 0, 1), 2));
+        $rgb[1] = hexdec(str_repeat(substr($hexStr, 1, 1), 2));
+        $rgb[2] = hexdec(str_repeat(substr($hexStr, 2, 1), 2));
+
+		if (strlen($hexStr) == 4)
+			$rgb[3] = hexdec(str_repeat(substr($hexStr, 3, 1), 2)) / 2;
+		else
+			$rgb[3] = 0;
+    }
+	elseif (strlen($hexStr) == 6 || strlen($hexStr) == 8)
+	{
+        $rgb[0] = hexdec(substr($hexStr, 0, 2));
+        $rgb[1] = hexdec(substr($hexStr, 2, 2));
+        $rgb[2] = hexdec(substr($hexStr, 4, 2));
+
+		if (strlen($hexStr) == 8)
+			$rgb[3] = hexdec(substr($hexStr, 6, 2)) / 2;
+		else
+			$rgb[3] = 0;
+    }
+
+    return $rgb;
+}
 
 
 ?>

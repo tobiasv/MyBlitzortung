@@ -1,5 +1,6 @@
 <?php
 
+require_once 'classes/FilesDownload.class.php'; 
 
 
 function bo_update_all($force = false, $only = '')
@@ -239,11 +240,20 @@ function bo_update_raw_signals($force = false)
 {
 	bo_echod(" ");
 	bo_echod("=== Raw-Data ===");
-			
+	bo_echod("Not implemented!");
+	
+	return;
+	
 	if (!defined('BO_UP_INTVL_RAW') || !BO_UP_INTVL_RAW)
 	{
 		bo_echod("Disabled!");
 		return true;
+	}
+	
+	if (bo_version() < 801)
+	{
+		bo_echod("Database version too old. Need update...");
+		return;
 	}
 
 	list($last_update, $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified) = @unserialize(BoData::get('uptime_raw_data'));
@@ -551,7 +561,7 @@ function bo_update_raw_signals($force = false)
 }
 
 // Get new strikes from blitzortung.org
-function bo_update_strikes($force = false)
+function bo_update_strikes($force = false, $time_start_import = null)
 {
 	global $_BO;
 
@@ -559,6 +569,12 @@ function bo_update_strikes($force = false)
 
 	bo_echod(" ");
 	bo_echod("=== Strikes ===");
+	
+	if (bo_version() < 801)
+	{
+		bo_echod("Database version too old. Need update...");
+		return;
+	}
 
 	if (time() - $last > BO_UP_INTVL_STRIKES * 60 - 30 || $force || time() < $last)
 	{
@@ -568,7 +584,6 @@ function bo_update_strikes($force = false)
 		$stations = bo_stations();
 		$own_id = bo_station_id();
 
-		$count_updated = 0;
 		$count_inserted = 0;
 		$count_exists = 0;
 		$old_data = null;
@@ -577,19 +592,19 @@ function bo_update_strikes($force = false)
 		$dist_data_own = array();
 		$bear_data_own = array();
 		$strikesperstation = array();
-		$min_participants = 1000;
-		$max_participants = 0;
+		$min_stations_calc = 1000;
+		$max_stations_calc = 0;
 		$timeout = false;
 		$longtime_stations[$own_id] = $own_id;
 		$max_dist_all[$own_id] = 0;
 		$min_dist_all[$own_id] = 9E12;
 		$max_dist_own[$own_id] = 0;
 		$min_dist_own[$own_id] = 9E12;
-		$user2id = array();
+		$bo2id = array();
 
 		foreach($stations as $stId => $sdata)
 		{
-			$user2id[$sdata['user']] = $stId;
+			$bo2id[$sdata['bo_station_id']] = $stId;
 
 			if (BO_ENABLE_LONGTIME_ALL === true)
 			{
@@ -624,144 +639,18 @@ function bo_update_strikes($force = false)
 
 
 		/***** PREPARATIONS BEFORE READING *****/
-		$res = BoDb::query("SELECT MAX(time) mtime, MAX(id) max_id 
-					FROM ".BO_DB_PREF."strikes 
-					-- WHERE time<='".gmdate("Y-m-d H:i:s")."'
-					");
+		$res = BoDb::query("SELECT time, time_ns, id max_id FROM ".BO_DB_PREF."strikes WHERE id=(SELECT MAX(id) FROM ".BO_DB_PREF."strikes)");
 		$row = $res->fetch_assoc();
-		$last_strike = strtotime($row['mtime'].' UTC');
-		$last_modified = BoData::get('uptime_strikes_modified');
-		$max_id = $row['max_id'];
-
-		if ($last_strike > time())
-			$last_strike = time() - 3600 * 2;
-		else if ($last_strike <= 0 || !$last_strike)
-			$last_strike = strtotime('2000-01-01');
+		$strike_last_time = strtotime($row['time'].' UTC');
+		$strike_last_time_ns = $row['time_ns'];
+		$strike_last_id = $row['max_id'];
 		
-		$time_update = $last_strike - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60;
-		
+		if ($strike_last_time > time() || $strike_last_time <= 0)
+			$strike_last_time = 0;
 
-		/***** PARTIAL DOWNLOAD OF STRIKEDATA *****/
-		//estimate the size of the participants.txt before none-imported strikes
-		$date_file_begins = strtotime('now -2 hours');
-		$sql = "SELECT COUNT(*) cnt_lines, SUM(users) sum_users
-				FROM ".BO_DB_PREF."strikes
-				WHERE 1
-					AND time BETWEEN '".gmdate('Y-m-d H:i:s', $date_file_begins)."' AND '".gmdate('Y-m-d H:i:s', $time_update)."'
-					AND status>0
-				";
-		$res = BoDb::query($sql);
-		$row = $res->fetch_assoc();
-		$calc_range = $row['cnt_lines'] * 69 + $row['sum_users'] * 9;
-		$calc_range *= 0.999; //some margin to be sure
-
-		$range = $calc_range;
-
-		//adjust range
-		$tmp = unserialize(BoData::get('import_strike_filelength'));
-
-		// use old file size if range got wrong the last time
-		if (is_array($tmp) && !empty($tmp))
-		{
-			list($oldsize, $oldtime, $oldrange) = $tmp;
-			$time_diff = (time() - $oldtime) / 60;
-
-			if ( $time_diff < 11 && $range > $oldsize && ($oldrange > $oldsize * 0.98 || !$oldrange) )
-			{
-				bo_echod("Calculated range was $calc_range bytes");
-				$range = $oldsize * 0.90;
-			}
-		}
-
-		if ($range < 5000)
-			$range = 0;
-
-		$sent_range = $range;
-
-		//send a last modified header
-		$modified = $last_modified; //!!
-
-		//get the file
-		$file = bo_get_file(bo_access_url().BO_IMPORT_PATH_PARTICIPANTS, $code, 'strikes', $range, $modified, true);
-
-		//check the date of the 2nd line (1st may be truncated!)
-		if ($file === false)
-		{
-			if ($code == 304) //wasn't modified
-			{
-				if ($last_modified > 0 && time() - $last_modified > 3600 * 2)
-				{
-					bo_echod("Last modified time too old (Blitzortung.org down?). Setting modified to now!");
-					BoData::set('uptime_strikes_modified', time());
-				}
-				
-				BoData::set('uptime_strikes', time());
-				bo_echod("File not changed since last download (".date('r', $modified).")");
-				return false;
-			}
-
-			$first_strike_file = 0;
-		}
-		elseif (!empty($range))
-		{
-			//range request was successful...
-			unset($file[0]); //1st line is always chunked
-			$first_strike_file = strtotime(substr($file[1],0,19).' UTC');
-		}
-
-
-
-		if ($file !== false && empty($range))
-		{
-			$filesize = strlen(implode('', $file));
-			bo_echod("Partial download didn't work, got whole file instead (sent range $sent_range got $filesize bytes)");
-			BoData::set('import_strike_filelength', serialize(array($filesize, time(), 0)));
-		}
-		else if ($file === false || $first_strike_file > $last_strike)
-		{
-			/***** COMPLETE DOWNLOAD OF STRIKEDATA *****/
-			$modified = $last_modified; //!!
-			$drange = 0;
-			$file = bo_get_file(bo_access_url().BO_IMPORT_PATH_PARTICIPANTS, $code, 'strikes', $drange, $modified, true);
-
-			if ($file === false)
-			{
-				bo_echod("Partial download AND fallback to normal download didn't work!");
-				return false;
-			}
-
-			$filesize = strlen(implode('', $file));
-			bo_echod("Using partial download FAILED (Range $sent_range)! Fallback to normal download ($filesize bytes).");
-
-			if ($code == 304) //wasn't modified
-			{
-				BoData::set('uptime_strikes', time());
-				bo_echod("File not changed since last download (".date('r', $modified).")");
-				return false;
-			}
-
-
-			if ($first_strike_file > 0)
-				bo_echod("Problem: Partial file begins with strike ".date('Y-m-d H:i:s', $first_strike_file)." which is newer than last strike from database (size: ".($range[1]-$range[0]+1).").");
-			elseif ($code)
-				bo_echod("Errorcode: $code");
-
-			if ($file === false)
-			{
-				bo_update_error('strikedata', 'Download of strike data failed. '.$code);
-				bo_echod("ERROR: Couldn't get file for strikes! Code: $code");
-				return false;
-			}
-		}
-		else
-		{
-			bo_echod("Using partial download! Beginning with strike ".date('Y-m-d H:i:s', $first_strike_file).". Bytes read ".$range[0]."-".$range[1]." (".($range[1]-$range[0]+1).") from ".$range[2].". ".(intval($range[2]) ? "This saved ".round($range[0] / $range[2] * 100)."% traffic." : ""));
-			BoData::set('import_strike_filelength', serialize(array($range[2], time(), $calc_range)));
-		}
-
-		//set the modified header
-		if (intval($modified) <= 0)
-			$modified = time() - 180;
+			
+		$Files = new FilesDownload('strikes', 10, bo_access_url().BO_IMPORT_PATH_STROKES, $strike_last_time);
+	
 
 
 		/***** SOME MORE PREPARATIONS BEFORE READING *****/
@@ -769,227 +658,124 @@ function bo_update_strikes($force = false)
 		$loadcount = BoData::get('upcount_strikes');
 		BoData::set('upcount_strikes', $loadcount+1);
 		$last_strikes = unserialize(BoData::get('last_strikes_stations'));
-		bo_echod('Last strike: '.date('Y-m-d H:i:s', $last_strike).
-				' *** Importing only strikes newer than: '.date('Y-m-d H:i:s', $time_update).
+		bo_echod('Last strike: '.date('Y-m-d H:i:s', $strike_last_time).
+				' *** Loading '.$Files->FoundFiles.' files from '.gmdate('Y-m-d H:i:s', $Files->TimeStart).' to '.gmdate('Y-m-d H:i:s', $Files->TimeEnd).
 				' *** This is update #'.$loadcount);
 
-
-		foreach($file as $l)
+		while ( ($l = $Files->GetNextLine()) !== false )
 		{
-			if (!$l)
+			if ($Files->LastMessage)
+			{
+				bo_echod("  ".$Files->LastMessage);
+				$Files->LastMessage = '';
+			}
+		
+			$l = trim($l);
+			$D = array();
+			$part_stations = array();
+			$error = 0;
+			$utime = 0;
+			
+			if (!$l) //empty line
 				continue;
 
-			if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9\.]+)k?A?.* ([0-9]+)m? ([0-9]+) (.*)/', $l, $r))
+			$D['time'] = substr($l, 0, 19);
+			$utime = strtotime($D['time'].' UTC');
+			
+			if (!$utime)
 			{
-				bo_echod("Wrong line format: \"$l\"");
+				$error++;
 				continue;
 			}
-
-			$date = $r[1];
-			$time = $r[2];
-
-			$utime = strtotime("$date $time UTC");
-
-			// update strike-data only some seconds *before* the *last strike in Database*
-			if ($utime < $time_update)
+			
+			$D['time_ns'] = substr($l, 20, 9);
+			
+			//check if strike is already imported
+			if ($utime == $strike_last_time && $D['time_ns'] == $strike_last_time_ns)
 			{
-				$count_exists++;
+				bo_echod("Found latest strike from last import");
 				continue;
 			}
-
-			//get older strike data to avoid duplicates
-			if ($old_data === null)
+			else if ($utime < $strike_last_time || ($utime == $strike_last_time && $D['time_ns'] <= $strike_last_time_ns))
 			{
-				$old_data = array();
+				continue;
+			}
+			
+			//Position
+			if (preg_match('/pos;([0-9\.]+);([0-9\.]+);([0-9\.]+)/', $l, $r))
+			{
+				$D['lat'] = $r[1];
+				$D['lon'] = $r[2];
+				$D['alt'] = $r[3];
+			}
+			else
+				$error++;
+			
+			//Current
+			if (preg_match('/str;([0-9\.]+)/', $l, $r))
+				$D['current'] = $r[1];
+			else
+				$error++;
 
-				//get the range out of the time of the first line
-				$date_start = gmdate('Y-m-d H:i:s', $time_update - 10); //a small margin to be sure
-				$date_end = gmdate('Y-m-d H:i:s', $utime + 3600 * 3); //3h to the future to be sure
-
-				//Searching for old Strikes (to avoid duplicates)
-				//ToDo: fuzzy search for lat/lon AND time
-				$sql = "SELECT id, part, time, time_ns, lat, lon, users
-						FROM ".BO_DB_PREF."strikes
-						WHERE time BETWEEN '$date_start' AND '$date_end'
-						ORDER BY time";
-				$res = BoDb::query($sql);
-				while ($row = $res->fetch_assoc())
-				{
-					$id = $row['id'];
-					$old_data[$id]['t'] = strtotime($row['time'].' UTC');
-					$old_data[$id]['n'] = $row['time_ns'];
-					$old_data[$id]['loc'] = array($row['lat'], $row['lon']);
-					$old_data[$id]['users'] = $row['users'];
-					$old_data[$id]['part'] = $row['part'];
-					
-					$date_max = $old_data[$id]['t'];
-				}
+			//Type
+			if (preg_match('/typ;([0-9\.]+)/', $l, $r))
+				$D['type'] = $r[1];
+			else
+				$error++;
 				
-				
-				if ($last_strike < $date_max && $date_max)
-				{
-					$last_strike = $date_max;
-					bo_echod("Updating only strikes before ".date('Y-m-d H:i:s', $last_strike));
-				}
-				
-			}
+			//Deviation
+			if (preg_match('/dev;([0-9\.]+)/', $l, $r))
+				$D['deviation'] = $r[1];
+			else
+				$error++;
 
-
-			//The data for the strike
-			$time_ns = intval($r[3]);
-			$lat = $r[4];
-			$lon = $r[5];
-			$cur = $r[6];
-			$deviation = $r[7];
-			$participants_calc = $r[8];
-			$participants = explode(' ', $r[9]);
-			$users = count($participants);
-			$part = strpos($r[9], BO_USER) !== false ? 1 : 0;
-			$dist = bo_latlon2dist($lat, $lon);
-			$bear = bo_latlon2bearing($lat, $lon);
-
-
-			//sometimes two strikes with same time one after another --> ignore 2nd one
-			if ("$time.$time_ns" === $time_last_strike)
-				continue;
-
-			$time_last_strike = "$time.$time_ns";
-
-			//search for older entries of the same strike
-			$id = false;
-			$ids_found = array();
-			$nreftime = 0;
-
-			if ($utime < $last_strike + 2)
+			//Stations
+			if (preg_match('/sta;([0-9]+);([0-9]+);([^ ]+)/', $l, $r))
 			{
-				$search_from  = $utime;
-				$search_to    = $utime;
-				$nsearch_from = ($time_ns - BO_UP_STRIKES_FUZZY_NSEC) * 1E-9;
-				$nsearch_to   = ($time_ns + BO_UP_STRIKES_FUZZY_NSEC) * 1E-9;
-
-				if ($nsearch_from < 0) { $nsearch_from++; $search_from--; }
-				else if ($nsearch_from > 1) { $nsearch_from--; $search_from++; }
-
-				if ($nsearch_to < 0) { $nsearch_to++; $search_to--; }
-				else if ($nsearch_to > 1) { $nsearch_to--; $search_to++; }
-
-
-				foreach($old_data as $oldid => $d)
+				$D['stations_calc'] = $r[1];
+				$D['stations'] = $r[2];
+				
+				$part_stations = explode(',', $r[3]);
+				
+				if ( ($pos = array_search(BO_STATION_ID, $part_stations)) !== false)
 				{
-					//remove entries, which are too old
-					if ($utime - $d['t'] >= 2)
-					{
-						unset($old_data[$i]);
-						continue;
-					}
-
-					//couldn't find any previous strikes to update
-					else if ($d['t'] - $utime >= 2)
-					{
-						break;
-					}
-
-					//found exactly the same strike
-					elseif ($d['t'] == $utime && $d['n'] == $time_ns)
-					{
-						unset($old_data[$i]); //remove it from the search array!
-						unset($ids_found); //only update the strike with the same time
-						$ids_found[] = $oldid;
-						break; //end search!
-					}
-
-					//FUZZY-SEARCH -> found seconds match
-					else if ($search_from <= $d['t'] && $d['t'] <= $search_to)
-					{
-						$nreftime = $d['n'] * 1E-9;
-						$is_old_strike = false;
-
-						//search for nseconds match
-						if ($nsearch_from > $nsearch_to && ($nsearch_from <= $nreftime || $nreftime <= $nsearch_to) )
-						{
-							$is_old_strike = true;
-						}
-						elseif ($nsearch_from <= $nsearch_to && $nsearch_from <= $nreftime && $nreftime <= $nsearch_to)
-						{
-							$is_old_strike = true;
-						}
-
-						if ($is_old_strike)
-						{
-							//was strike in the same area?
-							$old_dist = bo_latlon2dist($lat, $lon, $d['loc'][0], $d['loc'][1]);
-
-							//could be a new one if participant count differs too much
-							if ($old_dist < BO_UP_STRIKES_FUZZY_KM * 1000) // && $users * 0.9 <= $d['users'] && $d['users'] <= $users * 1.5)
-							{
-								$ids_found[] = $oldid;
-								unset($old_data[$i]);
-							}
-						}
-
-					}
-
+					$D['part'] = 1;
+					$D['part_pos'] = $pos+1;
 				}
-
-				if (!empty($ids_found))
+				else
 				{
-					$id = $ids_found[0];
+					$D['part'] = 0;
+					$D['part_pos'] = 0;
 				}
 			}
+			else
+				$error++;
+			
+			$D['status'] = 2; 			//always 2
+			$D['distance'] = bo_latlon2dist($D['lat'], $D['lon']);
+			$D['bearing'] = bo_latlon2bearing($D['lat'], $D['lon']);
 
-			$sql_data=array();
-			$sql_data['time']="$date $time";
-			$sql_data['time_ns']=$time_ns;
-			$sql_data['lat']=$lat;
-			$sql_data['lon']=$lon;
-			$sql_data['distance']=$dist;
-			$sql_data['bearing']=$bear;
-			$sql_data['deviation']=$deviation;
-			$sql_data['current']=$cur;
-			$sql_data['users']=$users;
-			$sql_data['part']=$part;
-			$sql_data['raw_id']=NULL;
+
 
 			if ($key_bytes_time)
 			{
-				$sql_data['time_x'] = array('(FLOOR(('.($utime-$key_time_start).')/60/'.$key_time_div.')%'.$key_time_vals.')');
+				$D['time_x'] = array('(FLOOR(('.($utime-$key_time_start).')/60/'.$key_time_div.')%'.$key_time_vals.')');
 			}
-
 
 			if ($key_bytes_latlon)
 			{
-				$sql_data['lat_x'] = array('FLOOR((('.(90+$lat).')%'.$key_lat_div.')/'.$key_lat_div.'*'.$key_latlon_vals.')');
-				$sql_data['lon_x'] = array('FLOOR((('.(180+$lon).')%'.$key_lon_div.')/'.$key_lon_div.'*'.$key_latlon_vals.')');
+				$D['lat_x'] = array('FLOOR((('.(90+$D['lat']).')%'.$key_lat_div.')/'.$key_lat_div.'*'.$key_latlon_vals.')');
+				$D['lon_x'] = array('FLOOR((('.(180+$D['lon']).')%'.$key_lon_div.')/'.$key_lon_div.'*'.$key_latlon_vals.')');
 			}
 
 
-			if (!$id) //new strike
-			{
-				//auto_increment!!
-				$max_id++;
-				$sql_data['id'] = $max_id;
-				
-				if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
-					$sql_data['status']=2;
-				else
-					$sql_data['status']=0;
-
-				BoDb::bulk_insert('strikes', $sql_data);
-				$count_inserted++;
-				$id = $max_id;
-				$new_strike = true;
-			}
-			else //update
-			{
-				if ($modified - $utime > BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)
-					$sql_data['status']=2;
-				else
-					$sql_data['status']=1;
-
-				BoDb::update_data('strikes', $sql_data, "id='$id'");
-				$count_updated++;
-				$new_strike = false;
-			}
+			//auto_increment!!
+			$strike_last_id++;
+			$D['id'] = $strike_last_id;
+			BoDb::bulk_insert('strikes', $D);
+			$count_inserted++;
+			$id = $strike_last_id;
+			$new_strike = true;
 
 
 			//Update Strike <-> All Participated Stations
@@ -997,12 +783,12 @@ function bo_update_strikes($force = false)
 			{
 				$sql_data = array();
 				
-				foreach($participants as $user)
+				foreach($part_stations as $bo_station_id)
 				{
-					$stId = $user2id[$user];
+					$stId = $bo2id[$bo_station_id];
 					if ($stId)
 					{
-						$last_strikes[$stId] = array($utime, $time_ns, $id);
+						$last_strikes[$stId] = array($utime, $D['time_ns'], $id);
 						
 						$sql_data['strike_id'] = $id;
 						$sql_data['station_id'] = $stId;
@@ -1013,71 +799,70 @@ function bo_update_strikes($force = false)
 
 
 			//general statistics
-			$min_participants = min($participants_calc, $min_participants);
-			$max_participants = max($participants_calc, $max_participants);
-			$max_users = max($max_users, $users);
+			$min_stations_calc = min($D['stations_calc'], $min_stations_calc);
+			$max_stations_calc = max($D['stations_calc'], $max_stations_calc);
+			$max_stations = max($max_stations, $D['stations']);
 
+			
+			/********* Statistics **********/
+			
+			// *** Own station *** //
+			$bear_id      = intval($D['bearing']);
+			$dist_id      = intval($D['distance'] / 10 / 1000);
 
-			//statistics relative to station(s)
-			if ($new_strike)
+			//All strikes
+			$max_dist_all[$own_id] = max($D['distance'], $max_dist_all[$own_id]);
+			$min_dist_all[$own_id] = min($D['distance'], $min_dist_all[$own_id]);
+
+			//Long-Time Statistics (all strikes relative to own station)
+			$bear_data[$own_id][$bear_id]++;
+			$dist_data[$own_id][$dist_id]++;
+
+			//Own Long-Time Statistics for self-detected strike
+			if ($part)
 			{
-				// *** Own station *** //
-				$bear_id      = intval($bear);
-				$dist_id      = intval($dist / 10 / 1000);
+				$bear_data_own[$own_id][$bear_id]++;
+				$dist_data_own[$own_id][$dist_id]++;
+				$max_dist_own[$own_id] = max($D['distance'], $max_dist_own[$own_id]);
+				$min_dist_own[$own_id] = min($D['distance'], $min_dist_own[$own_id]);
+				$last_strikes[$own_id] = array($utime, $D['time_ns'], $id);
+				$strikesperstation[$own_id]++;
+			}
 
-				//All strikes
-				$max_dist_all[$own_id] = max($dist, $max_dist_all[$own_id]);
-				$min_dist_all[$own_id] = min($dist, $min_dist_all[$own_id]);
 
-				//Long-Time Statistics (all strikes relative to own station)
-				$bear_data[$own_id][$bear_id]++;
-				$dist_data[$own_id][$dist_id]++;
-
-				//Own Long-Time Statistics for self-detected strike
-				if ($part)
+			// *** other stations *** //
+			if (BO_ENABLE_LONGTIME_ALL === true)
+			{
+				foreach($stations as $stId => $sdata)
 				{
-					$bear_data_own[$own_id][$bear_id]++;
-					$dist_data_own[$own_id][$dist_id]++;
-					$max_dist_own[$own_id] = max($dist, $max_dist_own[$own_id]);
-					$min_dist_own[$own_id] = min($dist, $min_dist_own[$own_id]);
-					$last_strikes[$own_id] = array($utime, $time_ns, $id);
-					$strikesperstation[$own_id]++;
-				}
+					$stLat = $sdata['lat'];
+					$stLon = $sdata['lon'];
+
+					if ($stLat == 0.0 && $stLon == 0.0) //station has no position yet
+						continue;
+
+					$dist_other    = bo_latlon2dist($D['lat'], $D['lon'], $stLat, $stLon);
+					$bear_other    = bo_latlon2bearing($D['lat'], $D['lon'], $stLat, $stLon);
+					$bear_id_other = intval($bear_other);
+					$dist_id_other = intval($dist_other / 10 / 1000);
+					$max_dist_all[$stId] = max($dist_other, $max_dist_all[$stId]);
+					$min_dist_all[$stId] = min($dist_other, $min_dist_all[$stId]);
+					$bear_data[$stId][$bear_id_other]++;
+					$dist_data[$stId][$dist_id_other]++;
 
 
-				// *** other stations *** //
-				if (BO_ENABLE_LONGTIME_ALL === true)
-				{
-					foreach($stations as $stId => $sdata)
+					//strike detected by station
+					if (array_search($sdata['bo_station_id'], $part_stations) !== false)
 					{
-						$stLat = $sdata['lat'];
-						$stLon = $sdata['lon'];
-
-						if ($stLat == 0.0 && $stLon == 0.0) //station has no position yet
-							continue;
-
-						$dist_other    = bo_latlon2dist($lat, $lon, $stLat, $stLon);
-						$bear_other    = bo_latlon2bearing($lat, $lon, $stLat, $stLon);
-						$bear_id_other = intval($bear_other);
-						$dist_id_other = intval($dist_other / 10 / 1000);
-						$max_dist_all[$stId] = max($dist_other, $max_dist_all[$stId]);
-						$min_dist_all[$stId] = min($dist_other, $min_dist_all[$stId]);
-						$bear_data[$stId][$bear_id_other]++;
-						$dist_data[$stId][$dist_id_other]++;
-
-
-						//strike detected by station
-						if (array_search($sdata['user'], $participants) !== false)
-						{
-							$bear_data_own[$stId][$bear_id_other]++;
-							$dist_data_own[$stId][$dist_id_other]++;
-							$max_dist_own[$stId] = max($dist_other, $max_dist_own[$stId]);
-							$min_dist_own[$stId] = min($dist_other, $min_dist_own[$stId]);
-							$strikesperstation[$stId]++;
-						}
+						$bear_data_own[$stId][$bear_id_other]++;
+						$dist_data_own[$stId][$dist_id_other]++;
+						$max_dist_own[$stId] = max($dist_other, $max_dist_own[$stId]);
+						$min_dist_own[$stId] = min($dist_other, $min_dist_own[$stId]);
+						$strikesperstation[$stId]++;
 					}
-
 				}
+
+
 
 			}
 
@@ -1089,21 +874,28 @@ function bo_update_strikes($force = false)
 				break;
 			}
 		}
+	
+		if ($Files->LastMessage)
+			bo_echod("  ".$Files->LastMessage);
 
+		bo_echod("Lines: ".$Files->NumLines." *** Size: ".round($Files->NumBytes/1024)."kB *** New Strikes: $count_inserted");
+
+		$modified = $Files->NewModified;
+		$Files->Close();		
+		
 		//Insert rest of data
 		BoDb::bulk_insert('strikes');
 		BoDb::bulk_insert('stations_strikes');
-		
-		
-		bo_echod("Lines: ".count($file)." *** New Strikes: $count_inserted *** Updated: $count_updated *** Already read: $count_exists");
+			
+
 
 
 		//General
 		BoData::set('last_strikes_stations', serialize($last_strikes));
 		$count = BoData::get('longtime_max_participants');
-		if ($count < $max_users)
+		if ($count < $max_stations)
 		{
-			BoData::set('longtime_max_participants', $max_users);
+			BoData::set('longtime_max_participants', $max_stations);
 			BoData::set('longtime_max_participants_time', time());
 		}
 
@@ -1169,7 +961,7 @@ function bo_update_strikes($force = false)
 		foreach($longtime_stations as $stId)
 		{
 			//update only if station is active or got some strikes during the update
-			if ($stations[$stId]['status'] == 'A' || $strikesperstation[$stId])
+			if (bo_status($stations[$stId]['status'], STATUS_RUNNING) || $strikesperstation[$stId])
 			{
 				$add = $stId == $own_id ? '' : '#'.$stId.'#';
 
@@ -1231,11 +1023,11 @@ function bo_update_strikes($force = false)
 				$min_hours        = BO_FIND_MIN_PARTICIPANTS_HOURS;
 				$see_same         = BO_FIND_MIN_PARTICIPANTS_COUNT;
 				$tmp              = unserialize(BoData::get('bo_participants_locating_min'));
-				$min_participants = $tmp['value'];
+				$min_stations_calc = $tmp['value'];
 
 				if (time() - $tmp['time'] > 3600 * BO_FIND_MIN_PARTICIPANTS_HOURS)
 				{
-					$row = BoDb::query("SELECT MIN(users) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*$min_hours)."'")->fetch_assoc();
+					$row = BoDb::query("SELECT MIN(stations) minusers FROM ".BO_DB_PREF."strikes WHERE time>'".gmdate('Y-m-d H:i:s', time() - 3600*$min_hours)."'")->fetch_assoc();
 
 					if ($row['minusers'] >= 3)
 					{
@@ -1260,11 +1052,11 @@ function bo_update_strikes($force = false)
 			}
 
 			//Maximum Participants
-			if (intval(BO_FIND_MAX_PARTICIPANTS_HOURS) && $max_participants >= 3)
+			if (intval(BO_FIND_MAX_PARTICIPANTS_HOURS) && $max_stations_calc >= 3)
 			{
 				$tmp = unserialize(BoData::get('bo_participants_locating_max'));
-				$tmp['value_last'] = max($tmp['value_last'], $max_participants);
-				if (time() - $tmp['time'] > 3600 * BO_FIND_MAX_PARTICIPANTS_HOURS && $max_participants >= $min_participants)
+				$tmp['value_last'] = max($tmp['value_last'], $max_stations_calc);
+				if (time() - $tmp['time'] > 3600 * BO_FIND_MAX_PARTICIPANTS_HOURS && $max_stations_calc >= $min_stations_calc)
 				{
 					$tmp['time'] = time();
 					$tmp['value'] = $tmp['value_last'];
@@ -1418,19 +1210,6 @@ function bo_match_strike2raw()
 				else
 					$own_found++;
 
-				//experimental polarity checking
-				if (BO_EXPERIMENTAL_POLARITY_CHECK === true
-					&& ( !intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST)
-                          || intval(BO_EXPERIMENTAL_POLARITY_MAX_DIST) * 1000 > $row['distance']
-					   )
-					)
-				{
-					$polarity[$row['id']] = bo_strike2polarity($row2['data'], $row['bearing']);
-
-					if ($polarity[$row['id']] === null)
-						$polarity[$row['id']] = "NULL";
-				}
-
 				break;
 
 		}
@@ -1494,9 +1273,17 @@ function bo_update_stations($force = false)
 	{
 		bo_echod("Disabled!");
 	}
+	
+	
+	if (bo_version() < 801)
+	{
+		bo_echod("Database version too old. Need update...");
+		return;
+	}
 
 	$count_inserted = 0;
 	$count_updated = 0;
+	$count_noupdate = 0;
 
 	if (time() - $last > BO_UP_INTVL_STATIONS * 60 - 30 || $force)
 	{
@@ -1507,8 +1294,12 @@ function bo_update_stations($force = false)
 		$time = time();
 
 		//send a last modified header
-		$last_modified = BoData::get('uptime_stations_modified');
-		$modified = $last_modified;
+		if (!$force)
+		{
+			$last_modified = BoData::get('uptime_stations_modified');
+			$modified = $last_modified;
+		}
+		
 		$range = 0;
 		$file = bo_get_file(bo_access_url().BO_IMPORT_PATH_STATIONS, $code, 'stations', $range, $modified);
 
@@ -1542,14 +1333,36 @@ function bo_update_stations($force = false)
 			return false;
 		}
 
-
+		$cache_file  = BO_DIR.BO_CACHE_DIR.'/stations.txt.gz';
+		
+		if (!file_put_contents($cache_file, $file))
+		{
+			bo_update_error('stationdata', 'Cannot write cache file');
+			bo_echod("ERROR: Cannot write cache file");
+			return false;
+		}
+		
+		$tmp = gzfile($cache_file);
+		$file = implode('', $tmp);
+		$tmp = array();
+		
+		if (!$file)
+		{
+			bo_update_error('stationdata', 'Could not uncompress station data. '.$code);
+			bo_echod("ERROR: Could not uncompress station data.");
+			return false;
+		}
+		
 		$lines = explode("\n", $file);
 
 		//we need the current station data for later usage
-		$all_stations = bo_stations();
+		$all_stations = bo_stations('bo_station_id');
+
+		foreach($all_stations as $boid => $d)
+			$id2bo[$d['id']] = $boid;
 
 		//check if sth went wrong
-		if (count($lines) < count($all_stations) * BO_UP_STATION_DIFFER)
+		if (count($lines) < 3 || (count($lines) < count($all_stations) * BO_UP_STATION_DIFFER))
 		{
 			bo_update_error('stationcount', 'Station count differs too much: '.count($all_stations).'Database / '.$lines.' stations.txt');
 			BoData::set('uptime_stations', time());
@@ -1571,191 +1384,174 @@ function bo_update_stations($force = false)
 
 		foreach($lines as $l)
 		{
-			$cols = explode(" ", $l);
-			$stId = intval($cols[0]);
-
-			if (!$l || !$stId)
-			{
+			$D = array();
+			$error = 0;
+			$l = trim($l);
+			$utime = 0;
+			
+			if (!$l)
 				continue;
+			
+			//Station-Id
+			if (preg_match('/station;([0-9]+)/', $l, $r))
+				$D['bo_station_id'] = $r[1];
+			else
+				$error++;
+
+			//User-Id
+			if (preg_match('/user;([0-9]+)/', $l, $r))
+				$D['bo_user_id'] = $r[1];
+			else
+				$error++;
+
+			//MyBlitzortung Status
+			if (preg_match('/myblitz;"?([^" ]+)"?/', $l, $r))
+				$D['show_mybo'] = $r[1];
+
+			//City
+			if (preg_match('/city;"?([^" ]+)"?/', $l, $r))
+				$D['city'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
+
+			//Country
+			if (preg_match('/country;"?([^" ]+)"?/', $l, $r))
+				$D['country'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
+			
+			//Position
+			if (preg_match('/pos;([0-9\.]+);([0-9\.]+);([0-9\.]+)/', $l, $r))
+			{
+				$D['lat'] = $r[1];
+				$D['lon'] = $r[2];
+				$D['alt'] = $r[3];
+			}
+			else
+				$error++;
+			
+			//PCB
+			if (preg_match('/board;([^ ]+)/', $l, $r))
+				$D['controller_pcb'] = strtr($r[1], array('"' =>''));
+			
+			//Status
+			if (preg_match('/status;([^ ]+)/', $l, $r))
+				$D['status'] = $r[1];
+			
+			//Firmware
+			if (preg_match('/firmware;"?([^" ]+)"?/', $l, $r))
+				$D['firmware'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
+			
+			//Signals
+			if (preg_match('/signals;([^;]+);([^ ;]+)/', $l, $r))
+			{
+				$times  = explode(',', $r[1]);
+				$values = explode(',', $r[2]);
+				
+				foreach($times as $i => $t)
+					$D['signals'][$t] = $values[$i];
 			}
 
-			if (count($cols) < 10)
+			//Last Signal
+			if (preg_match('/last_signal_date;([^;]+);([^ ;\.]+)\.([0-9]+)/', $l, $r))
 			{
-				$file_truncated = true;
-				bo_echod("Wrong line format: \"$l\"");
-				continue;
+				$D['last_time'] = $r[1].' '.$r[2];
+				$D['last_time_ns'] = $r[3];
+				$utime = strtotime($D['last_time'].' UTC');
 			}
 			
+			
+			//Amp Gains
+			if (preg_match('/input_gain;([^ ]+)/', $l, $r))
+				$D['amp_gains'] = $r[1];
+
+			if (preg_match('/input_antenna;([^ ]+)/', $l, $r))
+				$D['amp_antennas'] = $r[1];
+
+			if (preg_match('/input_firmware;([^ ]+)/', $l, $r))
+				$D['amp_firmwares'] = strtr($r[1], array('"' =>'')); //qick&dirty :-/
+				
+				
+				
+			if (empty($D) || $error)
+			{
+				continue;
+			}
+
+			$id = $D['bo_station_id'];
 			
 			$file_truncated = false;
-
-			$stUser 	= $cols[1];
-			$stCity 	= strtr(html_entity_decode($cols[3]), array(chr(160) => ' '));
-			$stCountry 	= strtr(html_entity_decode($cols[4]), array(chr(160) => ' '));
-			$stLat	 	= $cols[5];
-			$stLon 		= $cols[6];
-			$stTime 	= substr($cols[7], 0, 10).' '.substr($cols[7], 16, 8);
-			$stTimeMs 	= substr($cols[7], 25);
-			$stStatus 	= $cols[8];
-			$stDist 	= bo_latlon2dist($stLat, $stLon);
-			$stTracker	= strtr(html_entity_decode($cols[9]), array(chr(160) => ' '));
-			$stSignals	= (int)$cols[10];
-			$stTimeU    = strtotime($stTime.' UTC');
-
+			$D['distance'] = round(bo_latlon2dist($D['lat'], $D['lon']) / 100) * 100;
+			
 			if (function_exists('iconv'))
 			{
-				$stCity    = iconv("Windows-1250", "UTF-8", $stCity);
-				$stCountry = iconv("Windows-1250", "UTF-8", $stCountry);
-				$stTracker = iconv("Windows-1250", "UTF-8", $stTracker);
+				$D['city']    = iconv("Windows-1250", "UTF-8", $D['city']);
+				$D['country'] = iconv("Windows-1250", "UTF-8", $D['country']);
+				$D['firmware'] = iconv("Windows-1250", "UTF-8", $D['firmware']);
 			}
 			else
 			{
-				$stCity    = utf8_encode($stCity);
-				$stCountry = utf8_encode($stCountry);
-				$stTracker = utf8_encode($stTracker);
+				$D['city']    = utf8_encode($D['city']);
+				$D['country'] = utf8_encode($D['country']);
+				$D['firmware'] = utf8_encode($D['firmware']);
 			}
 
+			$D['city']    = strtr($D['city'], array('\null' => ''));
+			$D['country'] = strtr($D['country'], array('\null' => ''));
+			$D['firmware'] = strtr($D['firmware'], array('\null' => ''));
 			
 			
-			$stCity    = strtr($stCity, array('\null' => ''));
-			$stCountry = strtr($stCountry, array('\null' => ''));
-			$stTracker = strtr($stTracker, array('\null' => ''));
+			if (time()-$utime < 1800 && $D['status']==0)
+				$D['status'] = STATUS_RUNNING*10;
 			
-			$stCity    = BoDb::esc(stripslashes($stCity));
-			$stCountry = BoDb::esc(stripslashes($stCountry));
-			$stTracker = BoDb::esc(stripslashes($stTracker));
-	
 			
-			//station has been active by user (~ a year ago)
-			if (time() - $stTimeU < 3600 * 24 * 366)
-				$activebyuser[$stUser] = array('id' => $stId, 'sig' => $stSignals, 'lat' => $stLat, 'lon' => $stLon);
-
-			//mark Offline?
-			if ($stStatus != '-' && 
-					(  
-						   time() - $stTimeU > (double)BO_STATION_OFFLINE_MINUTES * 60
-						|| $stTimeU - time() > 3600 * 24
-					)
-				)
-			{
-				$stStatus = 'O';  //Special offline status
-			}
-
 			//Data for statistics
-			$StData[$stId] = array('time' => $stTimeU, 'lat' => $stLat, 'lon' => $stLon);
-			$StData[$stId]['sig'] = $stSignals;
-			$StData[$stId]['status'] = $stStatus;
+			$StData[$id] = array(
+				'time' => $utime, 
+				'lat' => $D['lat'], 
+				'lon' => $D['lon'],
+				'sig' => $D['signals'][60],
+				'status' => $D['status']);
 
-			$sql = " 	id='$stId',
-						user='$stUser',
-						city='$stCity',
-						country='$stCountry',
-						lat='$stLat',
-						lon='$stLon',
-						distance='$stDist',
-						last_time='$stTime',
-						last_time_ns='$stTimeMs',
-						status='$stStatus',
-						tracker='$stTracker'
-						";
-
+		
+			//build query
+			$sql = '';
+			foreach($D as $name => $val)
+			{
+				if (is_array($val)) //array ==> statistics
+					continue;
+					
+				$val = stripslashes($val);
+					
+				if ($val != $all_stations[$id][$name])
+					$sql .= ($sql ? ',' : '').' '.$name."='".BoDb::esc($val)."' ";
+			}
 			
-
-			//user rename ==> station owner/city changed ==> new station ==> delete old data
-			if (isset($all_stations[$stId])
-					&& $all_stations[$stId]['user'] != $stUser
-					&& trim($all_stations[$stId]['user'])
-					&& trim($stUser)
-				)
+			if ($sql)
 			{
-				if (bo_delete_station($stId))
-					unset($all_stations[$stId]);
-			}
-
-			if (isset($all_stations[$stId]))
-			{
-				BoDb::query("UPDATE ".BO_DB_PREF."stations SET $sql WHERE id='$stId'");
-				$count_updated++;
-			}
-			else
-			{
-				$sql .= " , first_seen='".gmdate('Y-m-d H:i:s')."'";
-				BoDb::query("INSERT INTO ".BO_DB_PREF."stations SET $sql", false);
-				$count_inserted++;
-			}
-
-			$signal_count += $StData[$stId]['sig'];
-
-		}
-
-		bo_echod("Stations: ".(count($lines)-2)." *** New Stations: $count_inserted *** Updated: $count_updated");
-
-		//Check whether stations still exists
-		foreach($all_stations as $id => $d)
-		{
-			//station was deleted in stations.txt :(
-			//we also check the last activity -> delete only if too long ago
-			//this doesn't touch change in username (handled above) and is a workaround 
-			//for problems when downloading stations.txt
-			if (!isset($StData[$id]) && !$file_truncated
-				&& time() - strtotime($d['last_time'])  > 24*3600*BO_DELETE_STATION_DAYS
-				&& time() - strtotime($d['first_seen']) > 24*3600*BO_DELETE_STATION_DAYS
-				)
-			{
-				bo_delete_station($id);
-				
-				//only one station per update
-				break;
-			}
-		}
-
-
-		//New stations (by user name)
-		$data = unserialize(BoData::get('stations_new_date'));
-		if (!$data) //first call!
-		{
-			foreach($activebyuser as $user => $d)
-				$data[$user] = false; // mark as not new
-
-			BoData::set('stations_new_date', serialize($data));
-		}
-		else
-		{
-			$new = false;
-			$cdata_tmp = array();
-
-			foreach($activebyuser as $user => $d)
-			{
-				if (!isset($data[$user]) && $d['sig'] && $d['lat'] && $d['lon']) //no old entry but new signals and gps fixed
+				if (isset($all_stations[$id]))
 				{
-					// mark as NEW STATION
-					$data[$user] = time();
+					$sql = "UPDATE ".BO_DB_PREF."stations SET $sql WHERE bo_station_id='".$D['bo_station_id']."'";
+					
+					BoDb::query($sql);
+					$count_updated++;
+				}
+				else
+				{ 
+				
+					//find new ID
+					$row = BoDb::query("SELECT MAX(id) id FROM ".BO_DB_PREF."stations WHERE id < ".intval(BO_DELETED_STATION_MIN_ID))->fetch_assoc();
+					$new_id = $row['id']+1;
 
-					//construction time if mybo installation is not too new ;-)
-					$changed = strtotime($all_stations[$d['id']]['changed']);
-					if ($changed - BoData::get('first_update_time') > 3600 * 24);
-						$cdata_tmp[$user] = $time - $changed;
-
-					$new = true;
-
-					bo_echod("Found NEW station: $user *** Construction time: ".round($cdata_tmp[$user]/3600/24)."days");
+					$sql .= " , id='$new_id', first_seen='".gmdate('Y-m-d H:i:s')."'";
+					BoDb::query("INSERT INTO ".BO_DB_PREF."stations SET $sql", false);
+					$count_inserted++;
 				}
 			}
+			else
+				$count_noupdate++;
+			
+			$signal_count += $D['signals'][60];
 
-			if ($new)
-			{
-				BoData::set('stations_new_date', serialize($data));
-
-				//extra data
-				$cdata = unserialize(BoData::get('stations_new_data'));
-				if (!is_array($cdata))
-					$cdata = $cdata_tmp;
-				else
-					$cdata = array_merge($cdata, $cdata_tmp);
-
-				BoData::set('stations_new_data', serialize($cdata));
-			}
 		}
+
+		bo_echod("Stations: ".(count($lines)-2)." *** New Stations: $count_inserted *** Updated: $count_updated *** No Update: $count_noupdate");
 
 
 		//Update Statistics
@@ -1780,7 +1576,10 @@ function bo_update_stations($force = false)
 		
 		$res = BoDb::query($sql);
 		while ($row = $res->fetch_assoc())
-			$StData[intval($row['sid'])]['strikes'] = $row['cnt'];
+		{
+			$boid = $id2bo[intval($row['sid'])];
+			$StData[$boid]['strikes'] = $row['cnt'];
+		}
 
 		$active_stations = 0;
 		$active_sig_stations = 0;
@@ -1788,8 +1587,10 @@ function bo_update_stations($force = false)
 		$active_nogps = 0;
 		$sql_data = array();
 		
-		foreach($StData as $id => $data)
+		foreach($StData as $boid => $data)
 		{
+			$id = $all_stations[$boid]['id'];
+			
 			if ($only_own && $only_own != $id)
 				continue;
 
@@ -1802,13 +1603,13 @@ function bo_update_stations($force = false)
 				BoDb::bulk_insert('stations_stat', $sql_data);
 			}
 
-			if ($data['status'] == 'A') //GPS is/was active
+			if (bo_status($data['status'], STATUS_RUNNING))
 				$active_stations++;
 
-			if ($data['status'] != '-') //Station is available (no dummy entry, has sent some data some time ago)
+			if (!bo_status($data['status'], STATUS_OFFLINE)) //Station is available (no dummy entry, has sent some data some time ago)
 				$active_avail_stations++;
 
-			if ($data['status'] == 'V') //GPS is unavailable right now
+			if (bo_status($data['status'], STATUS_OFFLINE)) //GPS is unavailable right now
 				$active_nogps++;
 
 			if ($data['sig']) //Station is sending (really active)
@@ -1879,33 +1680,35 @@ function bo_update_stations($force = false)
 		$longtime_stations = array();
 
 		if (BO_ENABLE_LONGTIME_ALL === true)
-			$longtime_stations = $all_stations;
+		{
+			$longtime_stations = $id2bo;
+		}
 		else
-			$longtime_stations[$own_id] = $own_id;
+			$longtime_stations[$own_id] = $id2bo[$own_id];
 
-		foreach($longtime_stations as $stId => $dummy)
+		foreach($longtime_stations as $stId => $boid)
 		{
 			$add = $stId == $own_id ? '' : '#'.$stId.'#';
 
 			//whole signals count (not exact)
-			if ($last > 0 && $StData[$stId]['sig'])
+			if ($last > 0 && $StData[$boid]['sig'])
 			{
-				BoData::update_add('count_raw_signals2'.$add, $StData[$stId]['sig']*($time-$last)/3600);
+				BoData::update_add('count_raw_signals2'.$add, $StData[$boid]['sig']*($time-$last)/3600);
 			}
 
 			//max signals/h (own)
-			$new = BoData::update_if_bigger('longtime_max_signalsh_own'.$add, $StData[$stId]['sig']);
+			$new = BoData::update_if_bigger('longtime_max_signalsh_own'.$add, $StData[$boid]['sig']);
 			if ($new > 0)
 				BoData::set('longtime_max_signalsh_own_time'.$add, $time);
 
 			//max strikes/h (own)
-			$new = BoData::update_if_bigger('longtime_max_strikesh_own'.$add, $StData[$stId]['strikes']);
+			$new = BoData::update_if_bigger('longtime_max_strikesh_own'.$add, $StData[$boid]['strikes']);
 			if ($new > 0)
 				BoData::set('longtime_max_strikesh_own_time'.$add, $time);
 				
 			//Activity/inactivity counter
 			$time_interval = $last ? $time - $last : 0;
-			if ($StData[$stId]['status'] == 'A')
+			if (bo_status($data['status'], STATUS_RUNNING))
 			{
 				//save first data-time
 				if ($stId != $own_id)
@@ -1934,7 +1737,7 @@ function bo_update_stations($force = false)
 
 			//Activity/inactivity counter (GPS V-state)
 			$time_interval = $last ? $time - $last : 0;
-			if ($StData[$stId]['status'] == 'V')
+			if ($StData[$boid]['status'] == 'V')
 			{
 				BoData::set('station_last_nogps'.$add, $time);
 				BoData::update_add('longtime_station_nogps_time'.$add, $time_interval);
@@ -1943,25 +1746,13 @@ function bo_update_stations($force = false)
 
 			
 			//Station positions for last 24h, every station-update interval (15min)
-			if (time() - $StData[$stId]['time'] < 3600 * 2)
+			if (time() - $StData[$boid]['time'] < 3600 * 2)
 			{
 				$data = unserialize(BoData::get('station_data24h'.$add));
-				if ($data['time'] != $StData[$stId]['time'])
+				if ($data['time'] != $StData[$boid]['time'])
 				{
-					//add height to own station
-					if ($stId == $own_id)
-					{
-						$sql = "SELECT height
-								FROM ".BO_DB_PREF."raw
-								WHERE time=(SELECT MAX(time) FROM ".BO_DB_PREF."raw)
-								LIMIT 1";
-						$row = BoDb::query($sql)->fetch_assoc();
-						if (isset($row['height']))
-							$StData[$stId]['height'] = $row['height'];
-					}
-					
-					$time_floor = floor(date('Hi', $StData[$stId]['time']) / BO_UP_INTVL_STATIONS);
-					$data[$time_floor] = $StData[$stId];
+					$time_floor = floor(date('Hi', $StData[$boid]['time']) / BO_UP_INTVL_STATIONS);
+					$data[$time_floor] = $StData[$boid];
 					BoData::set('station_data24h'.$add, serialize($data));
 				}
 			}
@@ -1973,11 +1764,12 @@ function bo_update_stations($force = false)
 
 
 		//send mail to owner if no signals
-		if (BO_TRACKER_WARN_ENABLED === true && $own_id > 0)
+		if (0 && BO_TRACKER_WARN_ENABLED === true && $own_id > 0)
 		{
 			$data = unserialize(BoData::get('warn_tracker_offline'));
-
-			if ($StData[$own_id]['sig'] == 0)
+			$owndata = $StData[ bo_station_id(true) ];
+			
+			if ($owndata['sig'] == 0)
 			{
 				if (!isset($data['offline_since']))
 					$data['offline_since'] = time();
@@ -1995,7 +1787,7 @@ function bo_update_stations($force = false)
 			else if ($data['last_msg']) //reset
 			{
 				$data = array();
-				bo_owner_mail('Station ONLINE', "Your station/tracker is online again! ".$StData[$own_id]['sig']." signals in the last 60 minutes.");
+				bo_owner_mail('Station ONLINE', "Your station/tracker is online again! ".$owndata['sig']." signals in the last 60 minutes.");
 			}
 
 			BoData::set('warn_tracker_offline', serialize($data));
@@ -2021,6 +1813,12 @@ function bo_update_daily_stat($time = false, $force_renew = false)
 
 	$ret = false;
 
+	if (bo_version() < 801)
+	{
+		//bo_echod("Database version too old. Need update...");
+		return;
+	}
+	
 	//default yesterday
 	if (!$time) 
 	{
@@ -2118,7 +1916,7 @@ function bo_update_daily_stat($time = false, $force_renew = false)
 			$stations['available'] = $row->cnt;
 
 			// active stations
-			$row = BoDb::query("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status = 'A'")->fetch_assoc();
+			$row = BoDb::query("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status = '".STATUS_RUNNING."'")->fetch_assoc();
 			$stations['active'] = $row->cnt;
 
 			$data[10] = $stations;
@@ -2923,55 +2721,6 @@ function bo_update_get_timeout()
 
 
 
-function bo_delete_station($id = 0)
-{
-	$id = intval($id);
-
-	if ($id > 0)
-	{
-		//get station info
-		$station_info = bo_station_info($id);
-		if ($station_info['id'] != $id)
-			return false;
-		
-		//find new ID
-		$row = BoDb::query("SELECT MAX(id) id FROM ".BO_DB_PREF."stations WHERE id >= ".intval(BO_DELETED_STATION_MIN_ID))->fetch_assoc();
-		$new_id = $row['id']+1;
-		if ($new_id < intval(BO_DELETED_STATION_MIN_ID))
-			$new_id = intval(BO_DELETED_STATION_MIN_ID);
-
-		//save old data in extra variable
-		BoData::set('stations_deleted_'.$new_id.'_'.$id, serialize($station_info));
-		
-		//delete data from "new_id" -> otherwise update would not work it sth did wrong before
-		BoData::delete_all("%#".$new_id."#%");
-		BoDb::query("DELETE FROM ".BO_DB_PREF."stations_stat    WHERE station_id='$new_id'");
-		BoDb::query("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE station_id='$new_id'");
-		BoDb::query("DELETE FROM ".BO_DB_PREF."densities        WHERE station_id='$new_id'");
-		BoDb::query("DELETE FROM ".BO_DB_PREF."stations         WHERE id='$new_id'");
-
-		
-		//reassign IDs
-		BoDb::query("UPDATE ".BO_DB_PREF."conf SET name=REPLACE(name, '#".$id."#', '#".$new_id."#') WHERE name LIKE '%#".$id."#%'", false);
-		BoDb::query("UPDATE ".BO_DB_PREF."stations_stat    SET station_id='$new_id' WHERE station_id='$id'", false);
-		BoDb::query("UPDATE ".BO_DB_PREF."stations_strikes SET station_id='$new_id' WHERE station_id='$id'", false);
-		BoDb::query("UPDATE ".BO_DB_PREF."densities        SET station_id='$new_id' WHERE station_id='$id'", false);
-
-		$last_strikes = unserialize(BoData::get('last_strikes_stations'));
-		$last_strikes[$new_id] = $last_strikes[$id];
-		unset($last_strikes[$id]);
-		BoData::set('last_strikes_stations', serialize($last_strikes));
-
-		//last not least the station itself (last update, if former queries fail)
-		BoDb::query("UPDATE ".BO_DB_PREF."stations         SET id='$new_id', status='-' WHERE id='$id'");
-
-		bo_echod("Deleted old station $id, reassigned new ID $new_id");
-
-		return true;
-	}
-
-	return false;
-}
 
 function bo_download_external($force = false)
 {

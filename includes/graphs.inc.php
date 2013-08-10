@@ -30,7 +30,7 @@ function bo_graph_raw()
 	$graph->fullscale = isset($_GET['full']);
 
 	
-	if ($id) //get graph from own station
+	if (0 && $id) //get graph from own station
 	{
 		$sql = "SELECT id, time, time_ns, lat, lon, height, data, channels, ntime
 				FROM ".BO_DB_PREF."raw
@@ -50,17 +50,16 @@ function bo_graph_raw()
 	elseif ($station_id && $time) //try to get graph from other station
 	{
 		$info = bo_station_info($station_id);
-		$user = $info['user'];
 		list($date, $nsec) = explode('.', $time);
 		$tstamp = strtotime($date.' UTC') - 1;
 		
-		if (!$user || !$date || !$nsec)
+		if (!$date || !$nsec)
 			$graph->DisplayEmpty(true);
 		
 		$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 		$cache_file  = BO_DIR.BO_CACHE_DIR.'/';
 		$cache_file .= BO_CACHE_SUBDIRS === true ? 'signals/' : 'signal_';
-		$cache_file .= $user.'_'.gmdate('YmdH', $tstamp).'.log';
+		$cache_file .= $station_id.'_'.gmdate('YmdH', $tstamp).'.log';
 		
 		if ($caching && file_exists($cache_file) && filemtime($cache_file) > $tstamp)
 		{
@@ -290,7 +289,7 @@ function bo_graph_statistics()
 		//get whole data
 		$S = array();
 		$old_id = 0;
-		$sql = "SELECT s.id id, s.time time, s.users users, ss.station_id station_id
+		$sql = "SELECT s.id id, s.time time, s.stations stations, ss.station_id station_id
 				FROM ".BO_DB_PREF."strikes s
 				LEFT JOIN ".BO_DB_PREF."stations_strikes ss
 							ON s.id=ss.strike_id
@@ -309,7 +308,7 @@ function bo_graph_statistics()
 			{
 				$S[$id] = array(
 					'time'  => $time,
-					'users' => $row['users']
+					'stations' => $row['stations']
 					);
 				$Y[$index]++;
 			}
@@ -377,21 +376,21 @@ function bo_graph_statistics()
 				break;
 			
 				
-				case 'users':
+				case 'stations':
 				
-					$users_counts = $filter_opts;
+					$stations_counts = $filter_opts;
 					foreach($S as $strikeid => $d)
 					{
-						if (array_search(0, $users_counts))
+						if (array_search(0, $stations_counts))
 							$include = true;
 						else
 							$include = false;
 							
-						foreach($users_counts as $users)
+						foreach($stations_counts as $stations)
 						{
-							if ($users > 0 && $d['users'] == $users)
+							if ($stations > 0 && $d['stations'] == $stations)
 								$include = true;
-							elseif ($users < 0 && $d['users'] == abs($users))
+							elseif ($stations < 0 && $d['stations'] == abs($stations))
 								$S_exclude[$strikeid] = true;
 						}
 						
@@ -401,7 +400,7 @@ function bo_graph_statistics()
 						
 					}
 					
-					$filt_text .= '  Participants ('.implode(' ', $users_counts).')';
+					$filt_text .= '  Participants ('.implode(' ', $stations_counts).')';
 				
 				
 				break;
@@ -916,7 +915,7 @@ function bo_graph_statistics()
 		switch($type)
 		{
 			case 'participants':
-				$groupby = "s.users";
+				$groupby = "s.stations";
 				$part_min = bo_participants_locating_min();
 				$part_max = bo_participants_locating_max();
 				$xmin = $part_min;
@@ -1104,18 +1103,18 @@ function bo_graph_statistics()
 				if ($average)
 				{
 					$participants_text = '';
-					$sql_select .= ", 0 extra, SUM(s.users) extra_sum ";
+					$sql_select .= ", 0 extra, SUM(s.stations) extra_sum ";
 
 				}
 				else if ($value_max)
 				{
 					$participants_text = $value.'-'.$value_max;
-					$sql_select .= ", s.users BETWEEN '$value' AND '$value_max' extra ";
+					$sql_select .= ", s.stations BETWEEN '$value' AND '$value_max' extra ";
 				}
 				else
 				{
 					$participants_text = $value;
-					$sql_select .= ", s.users='$value' extra ";
+					$sql_select .= ", s.stations='$value' extra ";
 				}
 
 				break;
@@ -1168,9 +1167,9 @@ function bo_graph_statistics()
 			$X[$i] = $time_max + ($i * $group_minutes - $hours_back * 60) * 60;
 
 			$all_all   = (double)(@array_sum($tmp[$i][0]) + @array_sum($tmp[$i][1]));
-			$all_users = (double)($tmp[$i][0][1] + $tmp[$i][1][1]);
+			$all_stations = (double)($tmp[$i][0][1] + $tmp[$i][1][1]);
 			$own_all   = (double)(@array_sum($tmp[$i][1]));
-			$own_users = (double)$tmp[$i][1][1];
+			$own_stations = (double)$tmp[$i][1][1];
 
 			$count_own += $own_all;
 			$count_all += $all_all;
@@ -1182,8 +1181,8 @@ function bo_graph_statistics()
 			}
 			else
 			{
-				$Y[$i]  = $all_all ? $all_users / $all_all * 100 : 0;
-				$Y2[$i] = $own_all ? $own_users / $own_all * 100 : 0;
+				$Y[$i]  = $all_all ? $all_stations / $all_all * 100 : 0;
+				$Y2[$i] = $own_all ? $own_stations / $own_all * 100 : 0;
 			}
 
 			$Y3[$i] = $all_all;

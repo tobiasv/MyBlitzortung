@@ -533,8 +533,8 @@ function bo_show_archive_search()
 			$sql_where .= " AND ". bo_sql_latlon2dist($lat, $lon, 's.lat', 's.lon').' <= '.$delta_dist.' ';
 		}
 		
-		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.users users,
-						s.current current, s.deviation deviation, s.current current, s.polarity polarity, s.part part, s.raw_id raw_id
+		$sql = "SELECT  s.id id, s.distance distance, s.lat lat, s.lon lon, s.time time, s.time_ns time_ns, s.stations stations,
+						s.current current, s.deviation deviation, s.type type, s.part part, s.raw_id raw_id
 				FROM ".BO_DB_PREF."strikes s $index_sql
 				WHERE 1
 					$sql_where
@@ -556,10 +556,9 @@ function bo_show_archive_search()
 			$description .= '<ul class=\'bo_archiv_map_infowindow_list\'>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Time').':</span><span class=\'bo_value\'> '._BDT($time, false).'.'.$row['time_ns']._BZ($time).'</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Deviation').':</span><span class=\'bo_value\'> '._BK($row['deviation'] / 1000, 1).'</span></li>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Current').':</span><span class=\'bo_value\'> '._BN($row['current'], 1).'kA ('._BL('experimental').')</span></li>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Polarity').':</span><span class=\'bo_value\'> '.($row['polarity'] === null ? '?' : ($row['polarity'] < 0 ? _BL('negative') : _BL('positive'))).' ('._BL('experimental').')</span></li>';
+			//$description .= '<li><span class=\'bo_descr\'>'._BL('Current').':</span><span class=\'bo_value\'> '._BN($row['current'], 1).'kA ('._BL('experimental').')</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participated').':</span><span class=\'bo_value\'> '.($row['part'] > 0 ? _BL('yes') : _BL('no')).'</span></li>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Participants').':</span><span class=\'bo_value\'> '.intval($row['users']).'</span></li>';
+			$description .= '<li><span class=\'bo_descr\'>'._BL('Participants').':</span><span class=\'bo_value\'> '.intval($row['stations']).'</span></li>';
 
 			if ($perm)
 				$description .= '<li><span class=\'bo_value\'><a href=\''.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'&bo_strike_id='.$row['id'].'\' target=\'_blank\'>'._BL('more').'<a></span></li>';
@@ -1000,7 +999,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			$sql = "SELECT MAX(time) time 
 					FROM ".BO_DB_PREF."strikes 
 					WHERE raw_id IS NOT NULL 
-					AND time > NOW() - INTERVAL ".max(30, BO_MIN_MINUTES_STRIKE_CONFIRMED, BO_UP_INTVL_RAW)." MINUTE";
+					AND time > NOW() - INTERVAL ".max(30, BO_UP_INTVL_RAW)." MINUTE";
 			$row = BoDb::query($sql)->fetch_assoc();
 			if ($row['time'])
 				$time_end = strtotime($row['time'].' UTC');
@@ -1026,7 +1025,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	{
 		$table = 's';
 		
-		if ($station_id > 0 && !$own_station)
+		if ($station_id > 0 && !$own_station && !$strike_id)
 		{
 			$sql_join = BO_DB_PREF."strikes s 
 						JOIN ".BO_DB_PREF."stations_strikes ss
@@ -1080,8 +1079,8 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 
 	$count = 0;
 	$sql = "SELECT  s.id strike_id, s.distance distance, s.lat lat, s.lon lon,
-					s.deviation deviation, s.current current, s.polarity polarity,
-					s.time stime, s.time_ns stimens, s.users users, s.part part,
+					s.deviation deviation, s.current current, s.type type,
+					s.time stime, s.time_ns stimens, s.stations stations, s.part part,
 					s.status status 
 					$sql_raw
 			FROM $sql_join
@@ -1344,7 +1343,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		if (!$strike_id && $perm && $row['strike_id'])
 		{
 			echo '<a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'&bo_station_id='.$station_id.'&bo_strike_id='.$row['strike_id'].'" target="_blank" ';
-			echo ' title="Confirmed: '.$row['status'].'" ';
+			//echo ' title="Confirmed: '.$row['status'].'" ';
 			echo '>'.$ttime.'</a>';
 		}
 		else
@@ -1481,7 +1480,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			echo _BK($row['deviation'] / 1000, 1);
 			echo '</span>';
 			echo '</li>';
-			
+/*			
 			echo '<li>';
 			echo '<span class="bo_descr">';
 			echo _BL('Current').': ';
@@ -1490,31 +1489,13 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			echo _BN($row['current'], 1).'kA';
 			echo '</span>';
 			echo '</li>';
-
-			if (BO_EXPERIMENTAL_POLARITY_CHECK === true)
-			{
-				echo '<li>';
-				echo '<span class="bo_descr">';
-				echo _BL('Polarity').': ';
-				echo '</span>';
-				echo '<span class="bo_value">';
-
-				if (!$row['polarity'])
-					echo '?';
-				elseif ($row['polarity'] > 0)
-					echo _BL('positive');
-				elseif ($row['polarity'] < 0)
-					echo _BL('negative');
-				echo '</span>';
-				echo '</li>';
-			}
-			
+*/
 			echo '<li>';
 			echo '<span class="bo_descr">';
 			echo _BL('Participants').': ';
 			echo '</span>';
 			echo '<span class="bo_value">';
-			echo _BN($row['users'], 0);
+			echo _BN($row['stations'], 0);
 			echo '</span>';
 			echo '</li>';
 
@@ -1595,15 +1576,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		}
 
 		
-		if ($row['strike_id'] && $row['status'] == 0)
-		{
-			echo '<li>';
-			echo '<span class="bo_value bo_strike_not_confirmed">';
-			echo _BL('Strike is not confirmed');
-			echo '</span>';
-			echo '</li>';
-		}
-		
+	
 		if ($row['strike_id'] && $perm)
 		{
 			echo '<li>';
@@ -1629,7 +1602,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		echo '</tr>';
 
 		
-		if ( $perm && count($participated_stations) && ($strike_id || ($row['strike_id'] && $show_details)) )
+		if ($perm && count($participated_stations) && ($strike_id || ($row['strike_id'] && $show_details)) )
 		{
 				
 			$i = 0;
@@ -1651,7 +1624,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 				echo '<a ';
 				echo ' href="'.BO_STATISTICS_URL.'&bo_show=station&bo_station_id='.$sid.'" ';
 				echo ' title="';
-				echo htmlentities($participated_stations[$sid]['city']).': ';
+				echo htmlentities($participated_stations[$sid]['city'], ENT_COMPAT | ENT_HTML401, 'UTF-8').': ';
 				echo _BK(round($dist/1000)).' / ';
 				echo round($s_bears[0][$sid]).'&deg; '.bo_bearing2direction($s_bears[0][$sid]);
 				
@@ -1672,19 +1645,8 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 				else
 					echo 'color:inherit;';
 				
-				if (!$show_cities && (bo_user_get_level() & BO_PERM_SETTINGS))
-				{
-					echo $show_other_graphs ? 'width:200px; ' : 'width:80px; ';
-					echo '">';
-					echo $participated_stations[$sid]['user'];
-				}
-				else
-				{
-					echo 'width:280px;">';
-					echo _BC($participated_stations[$sid]['city']);
-				}
-					
-				
+				echo 'width:280px;">';
+				echo _BC($participated_stations[$sid]['city']);
 				
 				if ($show_other_graphs)
 				{

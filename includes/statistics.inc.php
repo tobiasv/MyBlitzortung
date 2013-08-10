@@ -211,12 +211,15 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 	$strikesh_own = 0;
 	$signalsh_own = 0;
-	$own_station_info = bo_station_info();
 	$stInfo = bo_station_info($station_id);
 	$city = _BC($stInfo['city']);
 
-	if ($stInfo['country'] != $own_station_info['country'])
-		$city .= ' ('._BL($stInfo['country']).')';
+	if ($own_station)
+	{
+		$own_station_info = bo_station_info();
+		if ($stInfo['country'] != $own_station_info['country'])
+			$city .= ' ('._BL($stInfo['country']).')';
+	}
 
 	//Last overall stroke count and time
 	$row = BoDb::query("SELECT strikesh, time FROM ".BO_DB_PREF."stations_stat WHERE station_id='0' AND time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
@@ -235,7 +238,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."strikes
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $stations_time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $stations_time)."'
-						AND part>0 AND users='".bo_participants_locating_min()."'";
+						AND part>0 AND stations='".bo_participants_locating_min()."'";
 		$row = BoDb::query($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
 	}
@@ -247,7 +250,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 				JOIN ".BO_DB_PREF."stations_strikes ss
 				ON s.id=ss.strike_id AND ss.station_id='$station_id'
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $stations_time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $stations_time)."'
-						AND users='".bo_participants_locating_min()."'";
+						AND stations='".bo_participants_locating_min()."'";
 		$row = BoDb::query($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
 	}
@@ -277,7 +280,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	$tmp = @unserialize(BoData::get('last_strikes_stations'));
 	$last_strike = $tmp[$station_id][0];
 	$last_signal = strtotime($stInfo['last_time'].' UTC');
-	$active = $stInfo['status'] == 'A' || $stInfo['status'] == 'V';
+	$active = $stInfo['status'] >= STATUS_RUNNING*10;
 
 
 	if (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES)
@@ -307,7 +310,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 	if ($active)
 	{
-		if ($stInfo['status'] == 'V')
+		if (bo_status($stInfo['status'], STATUS_BAD_GPS))
 		{
 			echo ' / ';
 			echo '<span class="bo_err_text">';
@@ -393,7 +396,23 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo '<li><span class="bo_descr">'._BL('Last signal').': </span><span class="bo_value">'._BDT($last_signal).'</span>';
 	}
 
-	echo '<li><span class="bo_descr">'._BL('Tracker').': </span><span class="bo_value">'._BC($stInfo['tracker']).'</span>';
+	if ($stInfo['firmware'])
+	{
+		if (preg_match('/[A-Z]/i', $stInfo['firmware']))
+			$name = 'Tracker';
+		else
+			$name = 'Firmware';
+			
+		echo '<li><span class="bo_descr">'._BL($name).': </span><span class="bo_value">'._BC($stInfo['firmware']).'</span>';
+	}
+
+	list($pcb) = explode(';', $stInfo['controller_pcb']);
+	
+	if ($pcb)
+	{
+		echo '<li><span class="bo_descr">'._BL("Controller").': </span><span class="bo_value">'.$pcb.'</span>';
+	}
+	
 	
 	echo '</ul>';
 
@@ -727,7 +746,6 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	$whole_strike_ratio 	= 0;
 	$whole_strike_ratio_cnt = 0;
 	$active_stations        = 0;
-	$under_construction     = array();
 
 	if (intval(BO_STATISTICS_NETWORK_RANGES))
 		$ranges = explode(',', BO_STATISTICS_NETWORK_RANGES);
@@ -747,11 +765,11 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 
 	//participants
-	$row = BoDb::query("SELECT MAX(users) max_users, AVG(users) avg_users
+	$row = BoDb::query("SELECT MAX(stations) max_stations, AVG(stations) avg_stations
 					FROM ".BO_DB_PREF."strikes
 					WHERE time BETWEEN '$strikes_time_start' AND '$table_time_end'")->fetch_assoc();
-	$max_part = $row['max_users'];
-	$avg_part = $row['avg_users'];
+	$max_part = $row['max_stations'];
+	$avg_part = $row['avg_stations'];
 
 
 	//Strikes in timerange
@@ -796,46 +814,26 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	// currently available stations
 	$sql = "SELECT COUNT(*) cnt
 			FROM ".BO_DB_PREF."stations
-			WHERE status != '-' AND id < ".intval(BO_DELETED_STATION_MIN_ID)."";
+			WHERE 
+				id < ".intval(BO_DELETED_STATION_MIN_ID)."
+				-- AND status >= ".((int)STATUS_OFFLINE)."";
+				
 	$res = BoDb::query($sql);
 	$row = $res->fetch_assoc();
 	$available = $row['cnt'];
 
 
-	// stations under construction
-	$sql = "SELECT COUNT(*) cnt,
-					CASE
-						WHEN TO_DAYS(first_seen) - TO_DAYS('".gmdate('Y-m-d H:i:s', $mybo_first_update)."') <= 7 THEN -1
-						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 7 THEN 7
-						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 30 THEN 30
-						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 30*3 THEN 30*3
-						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 30*6 THEN 30*6
-						WHEN TO_DAYS(NOW()) - TO_DAYS(first_seen) <= 365  THEN 365
-						ELSE 0
-					END type
-			FROM ".BO_DB_PREF."stations
-			WHERE last_time = '1970-01-01 00:00:00' AND id < ".intval(BO_DELETED_STATION_MIN_ID)."
-			GROUP BY type";
-	$res = BoDb::query($sql);
-	while($row = $res->fetch_assoc())
-	{
-		$under_construction[$row['type']] = $row['cnt'];
-	}
-	krsort($under_construction);
-
-
 	if (!$own_station)
 		$sinfo = bo_station_info($station_id);
 
-	//Stations by user
-	$user_stations = bo_stations('user');
+	$stations = bo_stations();
 	$countries = array();
 
-	foreach($user_stations as $d)
+	foreach($stations as $d)
 	{
 		$id = $d['id'];
 		
-		if ($d['status'] != 'A' && $d['status'] != 'V' && $station_id != $id)
+		if ($d['status'] <= STATUS_IDLE*10 && $station_id != $id)
 			continue;
 
 		if ($d['country'] && !isset($countries[$d['country']]))
@@ -843,8 +841,12 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 		$D[$id]['country'] = $d['country'] ? _BL($d['country']) : '?';
 		$D[$id]['city'] = $d['city'] ? $d['city'] : '?';
-		$D[$id]['user'] = $d['user'];
-		$D[$id]['tracker'] = $d['tracker'];
+		$D[$id]['bo_id'] = $d['bo_station_id'];
+		$D[$id]['firmware'] = $d['firmware'];
+		list($D[$id]['pcb']) = explode(';', $d['controller_pcb']);
+		
+		if ($D[$id]['pcb'] == 'unknown')
+			$D[$id]['pcb'] = '?';
 
 		if (!$own_station)
 			$D[$id]['distance'] = bo_latlon2dist($d['lat'], $d['lon'], $sinfo['lat'], $sinfo['lon']);
@@ -908,12 +910,8 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				$S[$id] = $D[$id]['distance'];
 				break;
 
-			case 'user':
-				$S[$id] = $D[$id]['user'];
-				break;
-
-			case 'id':
-				$S[$id] = $id;
+			case 'bo_id':
+				$S[$id] = $D[$id]['bo_id'];
 				break;
 
 			case 'signals':
@@ -928,9 +926,14 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				$S[$id] = $D[$id]['efficiency'];
 				break;
 				
-			case 'tracker':
-				$S[$id] = $D[$id]['tracker'];
+			case 'firmware':
+				$S[$id] = $D[$id]['firmware'];
 				break;
+
+			case 'pcb':
+				$S[$id] = $D[$id]['pcb'];
+				break;
+
 		}
 
 	}
@@ -1001,26 +1004,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo '</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Available stations').': </span><span class="bo_value">'._BN($available, 0).'</span></li>';
 
-	if (intval(BO_STATISTICS_SHOW_STATIONS_UNDER_CONSTR))
-	{
-		echo '<li><span class="bo_descr">'._BL('Stations under construction').': </span>';
-		echo '<span class="bo_value" title="';
-		foreach($under_construction as $days => $cnt)
-		{
-			if ($days == -1)
-				echo _BL('Unknown or longer').': ';
-			else if ($days == 0)
-				echo _BL('More').': ';
-			else
-				echo _BL('Up to').' '.$days.' '._BL('days').': ';
-			echo $cnt;
-			echo ' &bull; ';
-		}
-		echo '">';
-		echo _BN(array_sum($under_construction), 0);
-		echo '</span></li>';
-	}
-
+	
 	echo '</ul>';
 
 	if (BO_STATION_STAT_DISABLE !== true)
@@ -1040,16 +1024,16 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		if ((bo_user_get_level() & BO_PERM_SETTINGS))
 		{
 			echo '
-				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'id').'#table_network" rel="nofollow">'._BL('Id').'</a></th>
-				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'user').'#table_network" rel="nofollow">'._BL('User').'</a></th>';
+				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'bo_id').'#table_network" rel="nofollow">'._BL('Id').'</a></th>';
 		}
 
-		if (isset($_GET['tracker']))
+		if (isset($_GET['firmware']))
 		{
-			echo '<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'tracker').'#table_network" rel="nofollow">'._BL('Tracker').'</a></th>';
+			echo '<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'firmware').'#table_network" rel="nofollow">'._BL('Ver.').'</a></th>';
 		}
 		
 		echo '
+				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'pcb').'#table_network" rel="nofollow">'._BL('PCB').'</a></th>
 				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'country').'#table_network" rel="nofollow">'._BL('Country').'</a></th>
 				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'city').'#table_network" rel="nofollow">'._BL('City').'</a></th>
 				<th rowspan="2"><a href="'.bo_insert_url('bo_sort', 'distance').'#table_network" rel="nofollow">'._BL('Distance').'</a></th>
@@ -1069,7 +1053,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		// Stations table
 		switch($sort)
 		{
-			case 'city': case 'country': case 'distance': case 'user': case 'id':
+			case 'city': case 'country': case 'distance': case 'id':
 				asort($S);
 				break;
 			default:
@@ -1101,21 +1085,22 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			if ((bo_user_get_level() & BO_PERM_SETTINGS))
 			{
 				echo '<td class="bo_text '.($sort == 'id' ? 'bo_marked' : '').'">';
-				echo $id;
+				echo $d['bo_id'];
 				echo '</td>';
 
-				echo '<td class="bo_text '.($sort == 'user' ? 'bo_marked' : '').'">';
-				echo $d['user'];
-				echo '</td>';
 			}
 
-			if (isset($_GET['tracker']))
+			if (isset($_GET['firmware']))
 			{
-				echo '<td class="bo_text '.($sort == 'tracker' ? 'bo_marked' : '').'">';
-				echo $d['tracker'];
+				echo '<td class="bo_text '.($sort == 'firmware' ? 'bo_marked' : '').'">';
+				echo $d['firmware'];
 				echo '</td>';
 			}
 
+			echo '<td class="bo_text '.($sort == 'pcb' ? 'bo_marked' : '').'">';
+			echo $d['pcb'];
+			echo '</td>';
+			
 			echo '<td class="bo_text '.($sort == 'country' ? 'bo_marked' : '').'">';
 			echo $d['country'];
 			echo '</td>';
@@ -1173,24 +1158,27 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	}
 
 	/*** New Stations ***/
-	
-	if (intval(BO_STATISTICS_SHOW_NEW_STATIONS))
+
+	if ($new = intval(BO_STATISTICS_SHOW_NEW_STATIONS))
 	{
 		$data = unserialize(BoData::get('stations_new_date'));
 		$new_stations = array();
 
-		foreach($data as $user => $time)
+		$sql = "SELECT id, country, city, first_seen
+				FROM ".BO_DB_PREF."stations
+				WHERE status >= ".((int)STATUS_OFFLINE)." 
+					AND id < ".intval(BO_DELETED_STATION_MIN_ID)."
+					AND first_seen > (SELECT MIN(first_seen) FROM ".BO_DB_PREF."stations) + INTERVAL 1 DAY
+				ORDER BY first_seen DESC
+				LIMIT $new";
+		$res = BoDb::query($sql);
+		while ($row = $res->fetch_assoc())
 		{
-			if ($time && isset($user_stations[$user]))
-			{
-				$id = $user_stations[$user]['id'];
-				
-				if ($user_stations[$user]['city'] && $user_stations[$user]['country'])
-					$new_stations[$id] = array($time, $user_stations[$user]['city'], $user_stations[$user]['country']);
-			}
+			$new_stations[$row['id']] = array(
+				strtotime($row['first_seen'].' UTC'), 
+				$row['city'], $row['country']
+				);
 		}
-
-		arsort($new_stations);
 
 		if (count($new_stations))
 		{
@@ -1206,7 +1194,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 				if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
 				{
-					echo '<a href="'.bo_insert_url('bo_*').'bo_show=station&bo_station_id='.$id.'" rel="nofollow">';
+					echo '<a href="'.bo_insert_url('bo_*').'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">';
 					echo bo_str_max(_BC($d[1])).' ('._BL($d[2]).')';
 					echo '</a>';
 				}
@@ -1248,6 +1236,9 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		asort($countries);
 		foreach($countries as $country => $name)
 		{
+			if ($country == '-' || !trim($country))
+				continue;
+				
 			echo '<option value="'._BC($country).'">'.$name.'</option>';
 		}
 		echo '</select> ';
@@ -1261,57 +1252,6 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		bo_show_graph('signals_all', $add_graph, 1);
 	}
 	
-
-	// stations under construction
-	if ((bo_user_get_level() & BO_PERM_SETTINGS))
-	{
-		$station_under_constr = array();
-		$sql = "SELECT user, id
-				FROM ".BO_DB_PREF."stations
-				WHERE last_time = '1970-01-01 00:00:00' AND id < ".intval(BO_DELETED_STATION_MIN_ID)."
-				ORDER BY first_seen DESC";
-		$res = BoDb::query($sql);
-		while($row = $res->fetch_assoc())
-			$station_under_constr[$row['id']] = $user_stations[$row['user']];
-
-		if (count($station_under_constr) > 0)
-		{
-			echo '<a name="bo_stations_under_construction"></a>';
-			echo '<h4>'._BL('h4_stations_under_construction').'</h4>';
-			echo '<ul class="bo_stat_overview" id="bo_stations_under_constr">';
-
-			$i = 0;
-			foreach($station_under_constr as $id => $d)
-			{
-				echo '<li><span class="bo_descr">';
-				echo $d['user'];
-				
-				if ($d['country'] && $d['city'])
-					echo ' <span title="'.htmlentities(_BL($d['country'])).'">('._BC($d['city']).')</span>';
-				elseif ($d['city'])
-					echo ' ('._BC($d['city']).')';
-				elseif ($d['country'])
-					echo ' ( ? / '._BC($d['country']).')';
-					
-				echo '</span>';
-
-				$first_seen = strtotime($d['first_seen']);
-
-				echo '<span class="bo_value">';
-				if ($first_seen - $mybo_first_update < 48 * 3600 * 7)
-					echo '?';
-				else
-					echo _BD($first_seen);
-				echo '</span>';
-
-				$i++;
-			}
-
-			echo '</ul>';
-		}
-
-	}
-
 	echo '</div>';
 
 }
@@ -1387,6 +1327,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 			$kb_per_day[$type] = $d['traffic']  / 1024 / (time() - $d['time_first']) * 3600 * 24;
 		}
 	}
+	
 
 	//set date to 0 if count is zero
 	//compatibility for older entries
@@ -1533,7 +1474,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 function bo_show_statistics_other($station_id = 0, $own_station = true, $add_graph = '')
 {
 	$D = array();
-	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'user', 'densities', 'cities');
+	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'station', 'densities', 'cities');
 
 	$res = BoDb::query("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
 	while($row = $res->fetch_assoc())
@@ -1648,10 +1589,13 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 	}
 	else
 	{
-		$show_options[] = 'strike_ratios';
+		
 		if (BO_UP_INTVL_RAW > 0)
+		{
+			$show_options[] = 'strike_ratios';
 			$show_options[] = 'signals';
-
+		}
+		
 		if ($channel)
 			$add_graph .= '&channel='.$channel;
 	}
@@ -1676,15 +1620,19 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 	echo '<legend>'._BL('legend_stat_advanced_options').'</legend>';
 
 	echo '<span class="bo_form_group">';
-	echo '<span class="bo_form_descr">'._BL('Show').': </span>';
-	echo '<select name="bo_show2" onchange="submit();" id="bo_stat_advanced_select_show" '.($own_station ? '' : 'disabled').'>';
-	foreach($show_options as $opt_name)
+	
+	if (count($show_options) > 1)
 	{
-		echo '<option value="'.$opt_name.'" '.($show == $opt_name ? 'selected' : '').'>'._BL('stat_advanced_show_'.$opt_name).'</option>';
+		echo '<span class="bo_form_descr">'._BL('Show').': </span>';
+		echo '<select name="bo_show2" onchange="submit();" id="bo_stat_advanced_select_show" '.($own_station ? '' : 'disabled').'>';
+		foreach($show_options as $opt_name)
+		{
+			echo '<option value="'.$opt_name.'" '.($show == $opt_name ? 'selected' : '').'>'._BL('stat_advanced_show_'.$opt_name).'</option>';
+		}
+		echo '</select> ';
+		echo '</span>&nbsp;';
 	}
-	echo '</select> ';
-	echo '</span>&nbsp;';
-
+	
 	$region_select = bo_get_select_region($region, $station_id);
 	
 	if ($region_select)
@@ -1716,7 +1664,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 		default: //Strikes
 
 			//Residual
-			if ($own_station)
+			if ($own_station && BO_UP_INTVL_RAW > 0)
 			{
 				echo '<h4>'._BL('h4_graph_residual_time').'</h4>';
 				echo '<p class="bo_graph_description" id="bo_graph_descr_strikes_station_residual_time">';

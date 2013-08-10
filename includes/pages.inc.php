@@ -312,6 +312,19 @@ function bo_show_login()
 				$lastlogin = bo_get_conf_user('lastlogin');
 				$sessiontime = time() - $_SESSION['bo_login_time'];
 
+				
+				if (BO_PERM_ADMIN & $level)
+				{
+					if (bo_station_id() == -1 && BO_NO_DEFAULT_STATION !== true)
+					{
+						echo '<p style="color:red; font-weight: bold; font-size: 14px;">Please set the Station Id (BO_STATION_ID) in your config.php! <br></p>';
+					}
+					
+					if (file_exists(BO_DIR.'settings.php'))
+						echo '<p style="color:red;"><strong>Warning: File <u>settings.php</u> found!</strong><br>Since version 0.3.1 standard values and settings are saved internally. For individual setting edit config.php and enter your individual settings there. Delete settings.php to hide this message.</p>';
+				}
+
+
 				echo '<h3>'._BL('Welcome to MyBlitzortung user area').'!</h3>';
 				echo '<ul class="bo_login_info">';
 				echo '<li>'._BL('user_welcome_text').': <strong>'._BC(bo_user_get_name()).'</strong></li>';
@@ -321,12 +334,6 @@ function bo_show_login()
 
 				echo '<li>'._BL('user_sessiontime_text').': <strong>'._BN($sessiontime / 60, 1).' '._BL('unit_minutes').'</strong></li>';
 				echo '</ul>';
-
-				if (BO_PERM_ADMIN & $level)
-				{
-					if (file_exists(BO_DIR.'settings.php'))
-						echo '<p style="color:red"><strong>Warning: File <u>settings.php</u> found!</strong><br>Since version 0.3.1 standard values and settings are saved internally. For individual setting edit config.php and enter your individual settings there. Delete settings.php to hide this message.</p>';
-				}
 
 				echo '<h4>'._BL('Version information').'</h4>';
 				echo '<ul>';
@@ -363,6 +370,61 @@ function bo_show_info()
 {
 	require_once 'info.inc.php';
 	bo_show_info_page1();
+}
+
+
+
+function bo_show_all()
+{
+	$page = $_GET['bo_page'] ? $_GET['bo_page'] : 'map';
+
+	switch($page)
+	{
+		default:
+		case 'map': 		bo_show_map(); break;
+		case 'archive': 	bo_show_archive(); break;
+		case 'statistics': 	bo_show_statistics(); break;
+		case 'info': 		bo_show_info(); break;
+		case 'login': 		bo_show_login(); break;
+	}
+
+}
+
+function bo_show_menu()
+{
+	$page = $_GET['bo_page'] ? $_GET['bo_page'] : 'map';
+
+	echo '<ul id="bo_mainmenu">';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'map').'"        id="bo_mainmenu_map"  class="bo_mainmenu'.($page == 'map' ? '_active' : '').'">'._BL('main_menu_map').'</a></li>';
+
+	if (BO_DISABLE_ARCHIVE !== true)
+		echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'archive').'"    id="bo_mainmenu_arch" class="bo_mainmenu'.($page == 'archive' ? '_active' : '').'">'._BL('main_menu_archive').'</a></li>';
+
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'statistics').'" id="bo_mainmenu_stat" class="bo_mainmenu'.($page == 'statistics' ? '_active' : '').'">'._BL('main_menu_statistics').'</a></li>';
+	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'info').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'info' ? '_active' : '').'">'._BL('main_menu_info').'</a></li>';
+
+	if (bo_user_get_id())
+		echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'login').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'login' ? '_active' : '').'">'._BL('main_menu_login').'</a></li>';
+
+	echo '</ul>';
+
+}
+
+function bo_get_title()
+{
+	$page = $_GET['bo_page'] ? $_GET['bo_page'] : 'map';
+
+	switch($page)
+	{
+		default:
+		case 'map': $title = _BL('main_title_map'); break;
+		case 'archive': $title = _BL('main_title_archive'); break;
+		case 'statistics': $title = _BL('main_title_statistics'); break;
+		case 'info': $title = _BL('main_title_info'); break;
+		case 'login': $title = _BL('main_title_login'); break;
+	}
+
+	return $title;
 }
 
 ?>

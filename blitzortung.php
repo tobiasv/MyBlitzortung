@@ -24,7 +24,7 @@
 if (!defined("BO_VER"))
 {
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '0.8.0-dev');
+	define("BO_VER", '0.9-dev');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -50,6 +50,7 @@ if (!defined("BO_VER"))
 		die('Missing config.php! Please run installation first!');
 
 	//Load Config
+	require_once 'includes/const.inc.php';
 	require_once 'includes/templates_gmap.inc.php';
 	require_once 'includes/templates.inc.php';
 	require_once 'config.php';
@@ -58,6 +59,11 @@ if (!defined("BO_VER"))
 
 	//includes #1
 	require_once 'includes/functions.inc.php';
+	require_once 'includes/functions_image.inc.php';
+	require_once 'includes/functions_station.inc.php';
+	require_once 'includes/functions_lang.inc.php';
+	require_once 'includes/functions_geo.inc.php';
+	require_once 'includes/functions_sql.inc.php';
 	require_once 'includes/data.inc.php';
 	require_once 'includes/user.inc.php';
 	
@@ -126,6 +132,7 @@ if (!defined("BO_VER"))
 
 	// includes #2
 	require_once 'includes/pages.inc.php';
+	
 	
 
 	//Save info wether headers where sent

@@ -9,15 +9,15 @@ function bo_icon($icon)
 	
 	$square = isset($_GET['square']);
 	$c = intval($_GET['size']) < 20 ? intval($_GET['size']) : 0;
-	$c = $c > 0 ? $c : 3;
+	$c = $c > 0 ? $c : 6;
 	
 	$dir = BO_DIR.BO_CACHE_DIR."/icons/";
 	$file = $dir.$icon.'_'.$c.'.png';
 
 	if (BO_CACHE_DISABLE === true || !file_exists($file) || time() - filemtime($file) > $max_age)
 	{
-		$width = $c*2+1;
-		$height = $c*2+1;
+		$width = $c;
+		$height = $c;
 		$I = imagecreate($width, $height);
 		$bg = imagecolorallocate($I, 255, 255, 255);
 		$trans = imagecolortransparent($I, $bg);
@@ -26,17 +26,15 @@ function bo_icon($icon)
 		$col = imagecolorallocate ($I, hexdec(substr($icon,0,2)), hexdec(substr($icon,2,2)), hexdec(substr($icon,4,2)));
 		
 		if ($square)
-			imagefilledrectangle($I, 0, 0, $width, $height, $col);
+			imagefilledrectangle($I, 0, 0, $width-1, $height-1, $col);
 		else
-			bo_circle($I, $c, $c, $c+2, $col, true);
+			bo_circle($I, $c/2, $c/2, $c/2+2, $col, true);
 
 		$tag = intval(substr($icon,6,1));
-		if (0 && $tag >= 1)
+		if ($square && $tag >= 1 && $c > 5)
 		{
-			$s=$c-5;
 			$col = imagecolorallocate ($I, 255,255,255);
-			imageline($I, $c-$s-1, $c, $c+$s+1, $c, $col);
-			imageline($I, $c, $c-$s-1, $c, $c+$s+1, $col);
+			imagerectangle($I, 0, 0, $width-1, $height-1, $col);
 		}
 		
 		imagepng($I, $file);
@@ -328,7 +326,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		case 'live':
 
 			//the normal "live" image
-			$sql_where_id .= " AND (status>0 OR time > '".gmdate('Y-m-d H:i:s', $last_update - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60)."') ";
+			$sql_where_id .= " AND (status>0 OR time > '".gmdate('Y-m-d H:i:s', $last_update)."') ";
 			
 			$expire = $last_update + $update_interval + 10;
 			
@@ -1359,9 +1357,11 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 	$part=0;
 	foreach($stations as $id => $d)
 	{
-		$type = $d['status'];
 		$lon = $d['lon'];
 		$lat = $d['lat'];
+
+		//Backward compat.
+		$type = bo_get_old_status($d['status']);
 		
 		if ( !isset($cfg['stations'][$type]) && !isset($cfg['stations'][0]) )
 			continue;

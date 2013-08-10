@@ -121,7 +121,7 @@ $_BO['points']['stations_offline']['point']  = array(10, 5, 'c04', 1, 'c04e');
 $_BO['points']['stations_nogps']['point']    = array(10, 5, '04f', 1, '04fe'); 
 
 $_BO['points']['stations_dots_active']['point']   = array(1, 1, '0f4', 0, '0f4e'); 
-$_BO['points']['stations_dots_inactive']['point'] = array(1, 1, 'f94', 0, 'c64e'); 
+$_BO['points']['stations_dots_inactive']['point'] = array(1, 1, 'aaa', 0, 'c64e'); 
 $_BO['points']['stations_dots_offline']['point']  = array(1, 1, 'f00', 0, 'c04e'); 
 $_BO['points']['stations_dots_nogps']['point']    = array(1, 1, '77f', 0, '04fe'); 
 

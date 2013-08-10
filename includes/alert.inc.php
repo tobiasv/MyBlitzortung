@@ -324,16 +324,16 @@ function bo_alert_settings_form()
 	echo '<fieldset class="bo_alert_settings_fieldset">';
 	echo '<legend>'._BL('alert_settings_legend2').'</legend>';
 
-	echo '<div id="bo_gmap" class="bo_map_alert" style="width: 300px; height: 250px;float: left;"></div>';
+	echo '<div id="bo_gmap" class="bo_map_alert" style="width: 300px; height: 350px;"></div>';
 
 	echo '<span class="bo_form_descr">'._BL('alert_lat').':</span>';
-	echo '<input type="text" name="bo_alert_lat" value="'.htmlentities($A['lat']).'" id="bo_alert_lat_input" class="bo_form_text bo_alert_input" '.$disabled.'>';
+	echo '<input type="text" name="bo_alert_lat" value="'.htmlentities($A['lat']).'" id="bo_alert_lat_input" class="bo_form_text bo_alert_input" '.$disabled.'  onchange="bo_alert_update();">';
 
 	echo '<span class="bo_form_descr">'._BL('alert_lon').':</span>';
-	echo '<input type="text" name="bo_alert_lon" value="'.htmlentities($A['lon']).'" id="bo_alert_lon_input" class="bo_form_text bo_alert_input" '.$disabled.'>';
+	echo '<input type="text" name="bo_alert_lon" value="'.htmlentities($A['lon']).'" id="bo_alert_lon_input" class="bo_form_text bo_alert_input" '.$disabled.'  onchange="bo_alert_update();">';
 	
 	echo '<span class="bo_form_descr">'._BL('alert_distance').':</span>';
-	echo '<input type="text" name="bo_alert_distance" value="'.htmlentities($A['dist']).'" id="bo_alert_distance_input" class="bo_form_text bo_alert_input">';
+	echo '<input type="text" name="bo_alert_distance" value="'.htmlentities($A['dist']).'" id="bo_alert_distance_input" class="bo_form_text bo_alert_input" onchange="bo_alert_update();">';
 
 	echo '<span class="bo_form_descr">'._BL('alert_count').':</span>';
 	echo '<input type="text" name="bo_alert_count" value="'.htmlentities($A['count']).'" id="bo_alert_count_input" class="bo_form_text bo_alert_input">';
@@ -379,25 +379,36 @@ function bo_alert_settings_form()
 	<script type="text/javascript">
 
 		var centerMarker;
+		var distCircle;
+		
+		function bo_alert_update()
+		{
+			var ll = new google.maps.LatLng(
+							document.getElementById('bo_alert_lat_input').value,
+							document.getElementById('bo_alert_lon_input').value);
+			var dist = document.getElementById('bo_alert_distance_input').value;
+			
+			if (!dist)
+				dist = document.getElementById('bo_alert_distance_input').value = 10;
+			
+			centerMarker.setPosition(ll);
+			distCircle.setCenter(ll);
+			distCircle.setRadius(dist*1000);
+		
+		}
+		
 		function bo_gmap_init2()
 		{
 		
-			var myLatlng = new google.maps.LatLng(<?php echo "$lat,$lon" ?>);
+
 			centerMarker = new google.maps.Marker({
-				position: myLatlng,
+				position: new google.maps.LatLng(<?php echo BO_LAT.','.BO_LON ?>),
 				draggable: true,
 				map: bo_map,
 				icon: 'http://maps.google.com/mapfiles/ms/micons/blue-dot.png'
 			});
 
-			google.maps.event.addListener(centerMarker, 'dragend', function() {
-				document.getElementById('bo_alert_lat_input').value=this.getPosition().lat();
-				document.getElementById('bo_alert_lon_input').value=this.getPosition().lng();
-			});
-
-			<?php if ($A['dist']) { ?>
-
-			var boDistCircle = {
+			distCircle = new google.maps.Circle({
 				clickable: false,
 				strokeColor: "#5555ff",
 				strokeOpacity: 0.5,
@@ -405,14 +416,24 @@ function bo_alert_settings_form()
 				fillColor: "#5555ff",
 				fillOpacity: 0.1,
 				map: bo_map,
-				center: new google.maps.LatLng(<?php echo "$lat,$lon" ?>),
+				center: new google.maps.LatLng(<?php echo BO_LAT.','.BO_LON ?>),
 				radius: <?php echo $A['dist']*1000 ?>
-			};
+			});
+			
+			bo_alert_update();
 
-			new google.maps.Circle(boDistCircle);
+			google.maps.event.addListener(centerMarker, 'dragend', function() {
+				document.getElementById('bo_alert_lat_input').value=Math.round(this.getPosition().lat()*100000)/100000;
+				document.getElementById('bo_alert_lon_input').value=Math.round(this.getPosition().lng()*100000)/100000;
+				bo_alert_update();
+			});
 
-			<?php } ?>
-
+			google.maps.event.addListener(bo_map, 'click', function(event) {
+				document.getElementById('bo_alert_lat_input').value=Math.round(event.latLng.lat()*100000)/100000;
+				document.getElementById('bo_alert_lon_input').value=Math.round(event.latLng.lng()*100000)/100000;
+				bo_alert_update();
+			});
+			
 			
 		}
 
@@ -496,12 +517,11 @@ function bo_alert_send()
 				}
 				else
 				{
-					//this calculation does search the strikes in a square, not in a circle but it is much faster for the database!
-					
 					list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 225, $d['lat'], $d['lon']);
 					list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 45,  $d['lat'], $d['lon']);
 					
 					$sql_where = ' AND '.bo_strikes_sqlkey($index_sql, $search_time, time(), $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
+					$sql_where .= ' AND '.bo_sql_latlon2dist($d['lat'], $d['lon']).' < '.($d['dist'] * 1000);
 				}
 				
 				

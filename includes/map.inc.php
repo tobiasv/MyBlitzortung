@@ -59,7 +59,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			foreach($menu as $menu_id => $d)
 			{
 				echo '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), $d[2]);
-				echo count($_BO['mapimg'][$d[2]]['trange']) > 1 ? 'bo_period='.$period : '';
+				echo count($_BO['mapimg'][$d[2]]['trange']) > 1 ? '&bo_period='.$period : '';
 				echo '" ';
 				echo ' class="bo_navi'.($d[0] ? '_active' : '').'">'._BL($d[1], false, BO_CONFIG_IS_UTF8).'</a></li>';
 			}
@@ -248,6 +248,8 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 					WHERE id != '$sid'");
 	while($row = $res->fetch_assoc())
 	{
+		$row['status'] = bo_get_old_status($row['status']);
+		
 		if ($row['status'] != '-' && $row['lat'] && $row['lon'])
 		{
 			$round = (bo_user_get_level() & BO_PERM_SETTINGS) ? 8 : 1;
@@ -963,47 +965,50 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		{
 			if (bo_station_markers.length == 0)
 			{
-				var color;
-				for (i in bo_stations)
+				for (i in bo_station_markers)
+					bo_station_markers[i].setMap(null);
+				
+				bo_station_markers = [];
+			}
+			
+			var color;
+			for (i in bo_stations)
+			{
+				switch (bo_stations[i].status)
 				{
-					switch (bo_stations[i].status)
-					{
-						case 'A': color = '00cc00'; break;
-						case 'O': color = 'cc0000'; break;
-						case 'V': color = 'cc8800'; break;
-						default:  color = '888888'; break;
-					}
-					
-					bo_station_markers[i] = new google.maps.Marker({
-					  position: new google.maps.LatLng(bo_stations[i].lat,bo_stations[i].lon), 
-					  map: bo_map, 
-					  title:bo_stations[i].city + bo_stations[i].text,
-					  icon: new google.maps.MarkerImage(
-								'<?php echo bo_bofile_url() ?>?bo_icon='+color+'&size=2&square',
-								new google.maps.Size(9,9),
-								new google.maps.Point(0,0),
-								new google.maps.Point(4,4)
-							),
-					  stid: bo_stations[i].stid
-					});  
+					case 'A': color = '00cc001'; break;
+					case 'O': color = 'cc0000'; break;
+					case 'V': color = 'cc8800'; break;
+					default:  color = '888888'; break;
+				}
+				
+				var size = Math.floor(2+bo_map.getZoom()/2);
+				
+				bo_station_markers[i] = new google.maps.Marker({
+				  position: new google.maps.LatLng(bo_stations[i].lat,bo_stations[i].lon), 
+				  map: bo_map, 
+				  title:bo_stations[i].city + bo_stations[i].text,
+				  icon: new google.maps.MarkerImage(
+							'<?php echo bo_bofile_url() ?>?bo_icon='+color+'&size='+size+'&square',
+							new google.maps.Size(size+1,size+1),
+							new google.maps.Point(0,0),
+							new google.maps.Point(size/2,size/2)
+						),
+				  stid: bo_stations[i].stid
+				});  
 
-					
+				
 <?php if (BO_STATISTICS_ALL_STATIONS == 2 || ((bo_user_get_level() & BO_PERM_NOLIMIT))) { ?>
-					
-					google.maps.event.addListener(bo_station_markers[i], 'click', function() {
-						window.open('<?php echo BO_STATISTICS_URL ?>&bo_show=station&bo_station_id=' + this.stid, '_blank');
-					}); 
+				
+				google.maps.event.addListener(bo_station_markers[i], 'click', function() {
+					window.open('<?php echo BO_STATISTICS_URL ?>&bo_show=station&bo_station_id=' + this.stid, '_blank');
+				}); 
 
 <?php } ?>
 
-					
-				}
+				
 			}
-			else
-			{
-				for (i in bo_station_markers)
-					bo_station_markers[i].setMap(bo_map);
-			}
+
 		}
 		else if (display == 3)
 		{

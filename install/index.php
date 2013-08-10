@@ -36,11 +36,12 @@ define("BO_DB_HOST", "localhost"); // should work in most cases
 define("BO_DB_PREF", "mybo_"); // you can change this individually
 
 
-/*** blitzortung.org Login ***/
+/*** Blitzortung.org Login ***/
 
-define("BO_USER", "###Your Blitzortung.org Login###");
-define("BO_PASS", "###Your Blitzortung.org Password###");
-define("BO_REGION", 1);
+define("BO_USER",       "###Blitzortung.org Login###");
+define("BO_PASS",       "###Blitzortung.org Password###");
+define("BO_REGION",     "###Blitzortung.org Region###");
+define("BO_STATION_ID", "###Blitzortung.org Station-Id###");
 
 /*** Station info ***/
 
@@ -63,7 +64,7 @@ define("BO_LOCALE", "en");
 
 /*** Time Zone setting ***/
 
-define("BO_TIMEZONE", "Europe/Berlin");
+define("BO_TIMEZONE", "UTC");
 
 
 ?>';

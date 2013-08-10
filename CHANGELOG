@@ -3,6 +3,13 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 1.0 (2013-08-xx)
+------------------------
+- switched to the new data format
+- removed myblitzortung station connect (will be replaced)
+- removed polarity stuff
+- renamed strike -> stroke
+
 Version 0.7.10
 -------------------------------
 - fixes
