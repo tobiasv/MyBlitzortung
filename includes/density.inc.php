@@ -228,7 +228,7 @@ function bo_update_densities($force = false)
 
 					if (intval($b['station_id']) == -1) //select mean of participants
 					{
-						$sql_select = ' SUM(users) ';
+						$sql_select = ' SUM(stations) ';
 						$cbps = $bps + 1;
 					}					
 					elseif (intval($b['station_id']) && $b['station_id'] == bo_station_id())
