@@ -127,6 +127,9 @@ function bo_get_station_list(&$style_class = array())
 		if (!$d['country'] || !$d['city']) // || bo_status($d['status'], STATUS_BAD_GPS))
 			continue;
 
+		if ($d['lat'] == 0.0 && $d['lon'] == 0.0 && time() - strtotime($d['last_time'].' UTC') > 1800)
+			continue;
+
 		if ($d['country'] == '-')
 			$d['country'] = 'Unknown';
 			
@@ -180,5 +183,19 @@ function bo_status($status, $const)
 	return $status == $const;
 }
 
+
+function bo_station_init()
+{
+	$id = (int)$_GET['bo_sid'];
+	
+	if ($id)
+	{
+		$tmp = bo_stations('bo_station_id', $id);
+		
+		//quick&dirty solution :-/
+		$_GET['bo_station_id'] = $tmp[$id]['id'];
+	}
+
+}
 
 ?>

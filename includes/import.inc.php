@@ -785,11 +785,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				
 				foreach($part_stations as $bo_station_id)
 				{
-						
 					$stId = $bo2id[$bo_station_id];
-
-					if (672 == $bo_station_id)
-						echo 'OK '.$stId;
 
 					if ($stId)
 					{

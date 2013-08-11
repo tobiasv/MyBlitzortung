@@ -836,6 +836,9 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		if ($d['status'] <= STATUS_IDLE*10 && $station_id != $id)
 			continue;
 
+		if ($d['lat'] == 0.0 && $d['lon'] == 0.0)
+			continue;
+			
 		if ($d['country'] && !isset($countries[$d['country']]))
 			$countries[$d['country']] = _BL($d['country']);
 

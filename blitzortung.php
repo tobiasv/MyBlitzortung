@@ -105,7 +105,9 @@ if (!defined("BO_VER"))
 	//Cookie login
 	bo_user_cookie_login();
 
-
+	//Station init
+	bo_station_init();
+	
 
 	//creating tiles should be very fast, other include files not needed
 	if (isset($_GET['tile']))

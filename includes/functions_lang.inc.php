@@ -298,7 +298,10 @@ function bo_add_locale_msgid($locale, $msgid)
 
 function _BDT($time, $show_tz = true)
 {
-	return date(_BL('_datetime'), $time).($show_tz ? _BZ($time) : '');
+	if ($time && $time > 0)
+		return date(_BL('_datetime'), $time).($show_tz ? _BZ($time) : '');
+	else
+		return '-';
 }
 
 function _BD($time)
