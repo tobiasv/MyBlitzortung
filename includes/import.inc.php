@@ -666,12 +666,12 @@ function bo_update_strikes($force = false, $time_start_import = null)
 		/***** PREPARATIONS BEFORE READING *****/
 		$res = BoDb::query("SELECT time, time_ns, id max_id FROM ".BO_DB_PREF."strikes WHERE id=(SELECT MAX(id) FROM ".BO_DB_PREF."strikes)");
 		$row = $res->fetch_assoc();
-		$strike_last_time = strtotime($row['time'].' UTC');
+		$strike_last_time = $row['time'] ? strtotime($row['time'].' UTC') : 1;
 		$strike_last_time_ns = $row['time_ns'];
 		$strike_last_id = $row['max_id'];
 		
-		if ($strike_last_time > time() || $strike_last_time <= 0)
-			$strike_last_time = 0;
+		if ($strike_last_time >= time() || $strike_last_time <= 0)
+			$strike_last_time = 1;
 
 			
 		$Files = new FilesDownload('strikes', 10, bo_access_url().BO_IMPORT_PATH_STROKES, $strike_last_time);

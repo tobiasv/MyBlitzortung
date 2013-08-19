@@ -307,7 +307,8 @@ switch($step)
 
 		require_once $path.'blitzortung.php';
 		require_once $path.'includes/import.inc.php';
-		bo_set_conf('version', BO_VER);
+		
+		/*
 		
 		echo '<h2>Testing data collection</h2>';
 
@@ -324,15 +325,19 @@ switch($step)
 		echo '</div>';
 
 		echo '<p><a href="?step=4">Finish installation &gt;</a></p>';
-
-		bo_set_conf('install_show_secret', time());
 		
 		break;
+		*/
+		
+		BoData::set('version', BO_VER);
+		BoData::set('install_show_secret', time());
 
 	case 4:
 	
 		require_once '../blitzortung.php';
-
+		
+		$dirs = array('cache','cache/tiles','cache/signals','cache/maps','cache/icons','cache/graphs','cache/densitymap');
+		
 		echo '<h2>Almost finished!</h2>';
 
 		$file = BO_FILE;
@@ -354,17 +359,22 @@ switch($step)
 
 		
 		
-		echo '<h3>Make sure, the following directories are writeable for the web-server:</h3>
-				<ul>';
-				
-		echo '<li><em>cache</em>: <span style="color:';
-		if (is_writeable('../cache/')) echo 'green;">OK.'; else echo 'red;">Not writeable! Please correct.';
-		echo '</span></li><li><em>cache/icons</em>: <span style="color:';
-		if (is_writeable('../cache/icons')) echo 'green;">OK.'; else echo 'red;">Not writeable! Please correct.';
-		echo '</span></li><li><em>cache/maps</em>: <span style="color:';
-		if (is_writeable('../cache/maps')) echo 'green;">OK.'; else echo 'red;">Not writeable! Please correct.';
-		echo '</span></li><li><em>cache/tiles</em>: <span style="color:';
-		if (is_writeable('../cache/tiles')) echo 'green;">OK.'; else echo 'red;">Not writeable! Please correct.';
+		echo '<h3>Make sure, the following directories exist and are writeable for the web-server:</h3><ul>';
+		
+		foreach($dirs as $dir)
+		{
+			mkdir('../'.$dir, 0777, true);
+			
+			echo '<li><em>'.$dir.'</em>: <span style="color:';
+			
+			if (is_writeable('../'.$dir)) 
+				echo 'green;">OK.'; 
+			else 
+				echo 'red;">Not writeable! Please correct.';
+			
+			echo '</span></li>';
+		}
+		
 		echo '</span></li>
 				</ul>
 				<p>

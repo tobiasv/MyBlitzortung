@@ -12,9 +12,9 @@
 
 
 //Database
-define("BO_DB_USER", "");
-define("BO_DB_PASS", "");
-define("BO_DB_NAME", "");
+define("BO_DB_USER", "blitzortung");
+define("BO_DB_PASS", "atYu9jMBaSGsnys4");
+define("BO_DB_NAME", "blitzortung");
 define("BO_DB_HOST", "localhost");
 define("BO_DB_PREF", "bo_");
 
@@ -29,13 +29,15 @@ define("BO_LON", 0.000);
 define("BO_STATION_NAME", "");
 
 
-//blitzortung.org Login
+//Blitzortung.org Stuff
 define("BO_USER", "");
 define("BO_PASS", "");
+define("BO_REGION", 1);
+define("BO_STATION_ID", "");
 
 
 //Your timezone
-define("BO_TIMEZONE", "Europe/Berlin");
+define("BO_TIMEZONE", "UTC");
 
 
 //To see error messages, enable this (set to true)
