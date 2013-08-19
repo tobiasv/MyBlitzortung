@@ -3,12 +3,30 @@
    MyBlitzortung Changelog
 *****************************
 
+
 Version 1.0 (2013-08-xx)
 ------------------------
+
+NOTE: If you are updating from a previous version, then the upgrade process needs maps the old format to the new format. This might not work when the old format has been disabled! The upgrade process can take VERY LONG - maybe hours on slow servers with lots of archived strokes. If the update fails due to a timeout, try it again and ignore all errors. If you have problems, consider deleting unneeded strokes or do a fresh install. 
+
 - switched to the new data format
-- removed myblitzortung station connect (will be replaced)
+- removed myblitzortung station connect (will be replaced later)
+- removed signal import (to much traffic, will be loaded when needed)
 - removed polarity stuff
+- removed graphs which depend on signals data
 - renamed strike -> stroke
+- other fixes
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------
+These old versions will not work after old data format has been disabled in October!
+v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v v 
+
 
 Version 0.7.10
 -------------------------------
