@@ -30,6 +30,9 @@ class FilesDownload
 	public $LastLineLen = '';
 	public $LastMessage = '';
 	
+	private $Cache = false;
+	private $MaxAge = 0;
+	
 	public function __construct($type, $min_step, $url, $last_time = 0, $time_format = '/%Y/%m/%d/%H/%i.log', $default_range = 120)
 	{
 		$this->Type = $type;
@@ -72,6 +75,12 @@ class FilesDownload
 		$this->Close();
 	}
 
+	public function CacheEnable($max_age = 60)
+	{
+		$this->Cache = true;
+		$this->MaxAge = $max_age;
+	}
+	
 	public function Close()
 	{
 		if (!$this->Type)

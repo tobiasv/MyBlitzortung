@@ -252,7 +252,8 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 			$out =  "GET ".$path."?".$query." HTTP/".$http_ver."\r\n";
 			$out .= "Host: ".$host."\r\n";
 			$out .= "User-Agent: MyBlitzortung ".BO_VER."\r\n";
-
+			$out .= "Cache-Control: max-age=0\r\n";
+			
 			if ($user && $pass)
 				$out .= "Authorization: Basic ".base64_encode($user.':'.$pass)."\r\n";
 
@@ -328,7 +329,10 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 					$content_size += strlen($line);
 
 					if ($as_array)
+					{
+						$line = strtr($line, array("\r" => '', "\n" => ''));
 						$content[] = $line;
+					}
 					else
 						$content  .= $line;
 				}
@@ -504,106 +508,70 @@ function bo_time2freq($d, &$phase=array())
 	return $amp;
 }
 
-//Raw hexadecimal signal to array
-function bo_raw2array($raw = false, $calc_spec = false, $channels = -1, $ntime = -1)
+
+function bo_signal_parse(&$signal = false, $calc_spec = false)
 {
-	static $std_channels = -1, $std_bpv = -1, $std_values = -1, $std_ntime = -1;
 
-	//load default values
-	if ($std_channels == -1 && $std_bpv == -1 && $std_ntime == -1 && $std_values == -1)
+	if ($signal === false)
+		return;
+
+	$bpv = 8; //ony 8bit support
+	
+	//each channel signal string to array	
+	foreach($signal['channel'] as $ch => $d)
 	{
-		$std_channels = BoData::get('raw_channels');
-		$std_bpv      = BoData::get('raw_bitspervalue');
-		$std_ntime    = BoData::get('raw_ntime');
-		$std_values   = BoData::get('raw_values');
-	}
+		$ymax = pow(2,$bpv-1);
+		$utime = $d['conv_gap']/1000;
+		$values = $d['values'];
 
-	$channels =  $channels > 0 ? $channels : $std_channels;
-	$bpv      =  $bpv > 0      ? $bpv      : $std_bpv;
-	$utime    = ($ntime > 0	  ? $ntime    : $std_ntime) / 1000;
-
-	if (!$bpv)
-		$bpv = 8;
+		$max_volt = (int)$d['pcb'] >= 10 ? BO_MAX_VOLTAGE_RED : BO_MAX_VOLTAGE;
 		
-	if ($channels <= 0 || $bpv <= 0 || $utime <= 0)
-		return false;
-
-
-	if ($raw === false)
-	{
-		//dummy signal when returning an empty array out of standard value count
-		$calc_spec = true;
-		$values = $std_values;
-		$raw = str_repeat(chr(0), $std_values * $channels);
-	}
-	else
-	{
-		//calculate count of values out of current raw-data
-		// -> no need to save this variable
-		$values = strlen($raw) / $channels;
-	}
-
-
-	$data = array();
-	$data['signal_raw'] = array();
-	$data['signal'] = array();
-	$data['spec'] = array();
-	$data['spec'][0] = array();
-	$data['spec_freq'] = array();
-
-
-	//fill array with zeros
-	for ($i=0;$i<$values;$i++)
-	{
-		$data['signal_time'][$i] = $i * $utime;
-
-		$data['signal'][0][$i] = 0;
-		$data['signal'][1][$i] = 0;
-
-		$data['signal_raw'][0][$i] = 128;
-		$data['signal_raw'][1][$i] = 128;
-	}
-
-
-	//channel select
-	if ($channels == 1)
-	{
-		//last byte even ==> channel 1 (A)
-		//last byte odd  ==> channel 2 (B)
-		$ch = ord(substr($raw,-1)) % 2;
-	}
-
-
-	//signal string to array
-	$ymax = pow(2,$bpv-1);
-	for ($i=0;$i<strlen($raw);$i++)
-	{
-		$byte = ord(substr($raw,$i,1));
-		$pos  = floor($i / $channels);
-
-		if ($channels == 2)
-			$ch = $i%$channels;
-
-		$data['signal_raw'][$ch][$pos] = $byte;
-		$data['signal'][$ch][$pos] = ($byte - $ymax) / $ymax * BO_MAX_VOLTAGE;
-	}
-
-
-	//spectrum for each channel
-	if ($calc_spec)
-	{
-		foreach($data['signal'] as $channel => $d)
+		if (isset($d['shift']))
+			$max_volt /= pow(2, $d['shift']);
+			
+		$signal['max_volt'] = max($signal['max_volt'], $max_volt);
+		$signal['max_values'] = max($signal['max_values'], $values);
+		
+		$d['hexdata'] = trim($d['hexdata']);
+		
+		if ((int)$d['pcb'] < 10 && strlen($d['hexdata']) == 256)
+			$d['hexdata'] = substr($d['hexdata'], 0, -2);
+		
+		//copy signal to array
+		$j = 0;
+		for ($i=0;$i<strlen($d['hexdata']);$i+=2)
 		{
-			$data['spec'][$channel] = bo_time2freq($d);
+			$value = hexdec((substr($d['hexdata'],$i,2)));
+
+			$signal['channel'][$ch]['data_raw'][$j] = $value;
+			$signal['channel'][$ch]['data_volt'][$j] = round(($value - $ymax) / $ymax * $max_volt, 3);
+			$signal['signal_time'][$j] = ($i/2 - $d['start']) * $utime;
+			$j++;
 		}
 
-		foreach ($data['spec'][0] as $i => $dummy)
+		//Dummies
+		if (!strlen($d['hexdata']))
 		{
-			$data['spec_freq'][$i] = round($i / ($values * $utime) * 1000);
+			$signal['channel'][$ch]['data_raw'][0] = 1;
+			$signal['channel'][$ch]['data_volt'][0] = 0.001;
+			$signal['signal_time'][0] = 0;
+		}
+
+
+		//spectrum for each channel
+		if ($calc_spec)
+		{
+			$signal['channel'][$ch]['spec'] = bo_time2freq($signal['channel'][$ch]['data_volt']);
+
+			//frequencies for each spectrum entry
+			foreach ($signal['channel'][$ch]['spec'] as $i => $dummy)
+			{
+				$signal['spec_freq'][$i] = round($i / ($values * $utime) * 1000);
+			}
 		}
 	}
-
-	return $data;
+	
+	return true;
 }
 
 
@@ -1388,10 +1356,10 @@ function bo_get_latest_strike_calc_time()
 }
 
 
-function bo_access_url()
+function bo_access_url($server = BO_IMPORT_SERVER, $path = BO_IMPORT_PATH)
 {
-	$path = sprintf(BO_IMPORT_PATH, trim(BO_REGION));
-	return sprintf('http://%s:%s@%s/%s', trim(BO_USER), trim(BO_PASS), trim(BO_IMPORT_SERVER), $path);
+	$path = sprintf($path, trim(BO_REGION));
+	return sprintf('http://%s:%s@%s/%s', trim(BO_USER), trim(BO_PASS), trim($server), $path);
 }
 
 function bo_hours($h)

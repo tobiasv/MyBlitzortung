@@ -1,6 +1,6 @@
 <?php
 
-function bo_times2sql($time_min = 0, $time_max = 0, $table='s')
+function bo_times2sql($time_min = 0, $time_max = 0, $table='s', &$auto_reduce=false)
 {
 
 	$time_min = intval($time_min);
@@ -21,7 +21,26 @@ function bo_times2sql($time_min = 0, $time_max = 0, $table='s')
 	$date_max = gmdate('Y-m-d H:i:s', $time_max);
 	$sql = " ( $table.time BETWEEN '$date_min' AND '$date_max' ) ";
 
-
+	
+	//find max and min strike id
+	//useful for joins (i.e. station_strikes, especially when partitioned)
+	if ($time_min && $time_max)
+	{
+		$row = BoDb::query("SELECT MAX(id) maxid, MIN(id) minid, COUNT(*) cnt FROM ".BO_DB_PREF."strikes s WHERE $sql")->fetch_assoc();
+		
+		if (isset($row['maxid']) && isset($row['minid']))
+		{
+			$sql .= " AND ($table.id BETWEEN ".$row['minid']." AND ".$row['maxid']." ) ";
+		}
+		
+		if ($auto_reduce > 0 && $row['cnt'] > $auto_reduce)
+		{
+			$div = ceil($row['cnt']/$auto_reduce);
+			$sql .= " AND (MOD($table.id,".$div.")=0) ";
+			$auto_reduce = array('divisor' => $div, 'count' => $row['cnt']);
+		}
+	}
+	
 	//Extra keys for faster search
 	$keys_enabled   = (BO_DB_EXTRA_KEYS === true);
 	$key_bytes_time = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_TIME_BYTES)   : 0;
@@ -50,14 +69,31 @@ function bo_times2sql($time_min = 0, $time_max = 0, $table='s')
 	return $sql;
 }
 
-function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2=false, $lon1=false, $lon2=false)
+function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2=false, $lon1=false, $lon2=false, &$auto_reduce=false)
 {
 	$sql  = " (";
 	$sql .= bo_latlon2sql($lat1, $lat2, $lon1, $lon2);
 	$sql .= " AND ";
-	$sql .= bo_times2sql($time_min, $time_max);
+	$sql .= bo_times2sql($time_min, $time_max, 's');
 	$sql .= ") ";
 
+	if ($auto_reduce > 0)
+	{
+		$row = BoDb::query("SELECT MAX(id) maxid, MIN(id) minid, COUNT(*) cnt FROM ".BO_DB_PREF."strikes s WHERE $sql")->fetch_assoc();
+		
+		if (isset($row['maxid']) && isset($row['minid']))
+		{
+			$sql .= " AND (s.id BETWEEN ".$row['minid']." AND ".$row['maxid']." ) ";
+		}
+		
+		if ($row['cnt'] > $auto_reduce)
+		{
+			$div = ceil($row['cnt']/$auto_reduce);
+			$sql .= " AND (MOD(s.id,".$div.")=0) ";
+			$auto_reduce = array('divisor' => $div, 'count' => $row['cnt']);
+		}
+	}
+	
 	return $sql;
 }
 

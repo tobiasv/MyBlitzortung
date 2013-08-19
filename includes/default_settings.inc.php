@@ -773,6 +773,9 @@
 //completely enable/disable
 @define('BO_ALERTS', true);
 
+//maximum search period for strikes
+@define('BO_ALERT_MAX_SEARCH_PERIOD', 60);
+
 //check every given minutes
 @define('BO_ALERT_CHECK_INTERVAL', 15);
 
@@ -851,8 +854,8 @@
 /*** Raw Data Graphs ***/
 
 //width, height
-@define('BO_GRAPH_RAW_W', 200);
-@define('BO_GRAPH_RAW_H', 100);
+@define('BO_GRAPH_RAW_W', 300);
+@define('BO_GRAPH_RAW_H', 150);
 
 //spectrum settings
 @define('BO_GRAPH_RAW_SPEC_WIDTH', 1);
@@ -860,7 +863,7 @@
 @define('BO_GRAPH_RAW_SPEC_MAX_Y', 7);
 
 //width, height when displaying all graphs to a stroke
-@define('BO_GRAPH_RAW_W2', 350);
+@define('BO_GRAPH_RAW_W2', 450);
 @define('BO_GRAPH_RAW_H2', 160);
 
 //width, height when displaying single big graph
@@ -873,8 +876,13 @@
 //Colors
 @define('BO_GRAPH_RAW_COLOR1', '#f00@0.5');
 @define('BO_GRAPH_RAW_COLOR2', '#0f0@0.5');
-@define('BO_GRAPH_RAW_COLOR3', '#800@0.6');
-@define('BO_GRAPH_RAW_COLOR_XY', '#00f@0.6');
+@define('BO_GRAPH_RAW_COLOR3', '#ff0@0.5');
+@define('BO_GRAPH_RAW_COLOR4', '#f0d@0.4');
+@define('BO_GRAPH_RAW_COLOR5', '#0dd@0.4');
+@define('BO_GRAPH_RAW_COLOR6', '#f80@0.4');
+@define('BO_GRAPH_RAW_COLOR_LINES', '#555@0.7');
+@define('BO_GRAPH_RAW_COLOR_XY1', '#00f@0.6');
+@define('BO_GRAPH_RAW_COLOR_XY2', '#f00@0.6');
 @define('BO_GRAPH_RAW_COLOR_BOX', '#d0d0d0');
 @define('BO_GRAPH_RAW_COLOR_BACK', '#fff');
 @define('BO_GRAPH_RAW_COLOR_MARGIN','#fff');
@@ -1229,14 +1237,14 @@
 /*** Some special settings which shouldn't be changed            ***/
 
 //Import server settings
-@define("BO_IMPORT_SERVER", 'blitzortung.net');
+@define("BO_IMPORT_SERVER", 'data.blitzortung.org');
 @define("BO_IMPORT_PATH", 'Data_%d/Protected/');
 @define("BO_IMPORT_PATH_STROKES", 'Strokes');
 @define("BO_IMPORT_PATH_STATIONS", 'stations.txt.gz');
 
 //Special server for signals
-@define("BO_IMPORT_SERVER_SIGNALS", 'blitzortung.net');
-@define("BO_IMPORT_PATH_SIGNALS", 'Data_%d/Protected/');
+@define("BO_IMPORT_SERVER_SIGNALS", 'signals.lightningmaps.org');
+@define("BO_IMPORT_PATH_SIGNALS", 'Data_%d/');
 
 
 //Tile dimensions (pixels)
@@ -1261,12 +1269,13 @@
 
 //max. signal level
 @define('BO_MAX_VOLTAGE', 2.5);
+@define('BO_MAX_VOLTAGE_RED', 1.5);
 
 //trigger voltage
 @define('BO_TRIGGER_VOLTAGE', 0.45);
 
 //search interval for strike -> signal matching for foreign stations
-@define('BO_STR2SIG_INTERVAL_OTHERS', 4000); //µs
+@define('BO_STR2SIG_INTERVAL_OTHERS', 8000); //µs
 
 //needed for auto linking stations
 @define('BO_LINK_HOST', 'www.myblitzortung.org');

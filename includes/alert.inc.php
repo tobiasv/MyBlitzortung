@@ -235,6 +235,10 @@ function bo_alert_settings_form()
 		{
 			echo '<div class="bo_info_fail">'._BL('You have to stay in the area around the station!').'</div>';
 		}
+		else if ($A['interval'] > BO_ALERT_MAX_SEARCH_PERIOD)
+		{
+			echo '<div class="bo_info_fail">'._BL('Max search period is '.BO_ALERT_MAX_SEARCH_PERIOD.' minutes!').'</div>';
+		}
 		else
 		{
 			$A['disarmed'] = false;
@@ -502,6 +506,9 @@ function bo_alert_send()
 				$user_id = $r[1];
 				$alert_cnt = $r[2];
 				
+				if ($d['interval'] > BO_ALERT_MAX_SEARCH_PERIOD)
+					$d['interval'] = BO_ALERT_MAX_SEARCH_PERIOD;
+				
 				$search_time = $max_time - 60 * $d['interval'] - 60;
 				$search_date = gmdate('Y-m-d H:i:s', $search_time);
 
@@ -523,13 +530,6 @@ function bo_alert_send()
 					$sql_where = ' AND '.bo_strikes_sqlkey($index_sql, $search_time, time(), $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
 					$sql_where .= ' AND '.bo_sql_latlon2dist($d['lat'], $d['lon']).' < '.($d['dist'] * 1000);
 				}
-				
-				
-				
-
-				
-				if ($d['count'] <= 2) // only confirmed strikes should count when min strike count is very low
-					$sql_where .= " AND status > 0 ";
 				
 				$sql = "SELECT COUNT(id) cnt, MAX(time) maxtime, MIN(time) mintime
 						FROM ".BO_DB_PREF."strikes s $index_sql

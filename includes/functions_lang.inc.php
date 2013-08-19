@@ -148,14 +148,14 @@ function bo_lang_arg($type = false)
 
 
 // translate text
-function _BL($msgid='', $noutf = false, $utf_in = false)
+function _BL($msgid=null, $noutf = false, $utf_in = false)
 {
 	global $_BL;
 
 	$locale  = $_BL['locale'];
 	$utf_out = BO_UTF8 && !$noutf;
 	
-	if ($msgid === '')
+	if ($msgid === null)
 		return $locale;
 
 	if (isset($_BL[$locale][$msgid]))

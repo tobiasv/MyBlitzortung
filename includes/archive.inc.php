@@ -905,8 +905,8 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		$latN = $lat + $fuzzy;
 		$lonW = $lon - $fuzzy;
 		$lonE = $lon + $fuzzy;
-
-		$sql_where .= " AND NOT (s.lat < '$latS' OR s.lat > '$latN' OR s.lon < '$lonW' OR s.lon > '$lonE') ";
+		
+		$sql_where .= "AND ".bo_latlon2sql($latS, $latN, $lonW, $lonE); //" AND NOT (s.lat < '$latS' OR s.lat > '$latN' OR s.lon < '$lonW' OR s.lon > '$lonE') ";
 		$show_strike_list = true;
 
 		$hours_back = 24 * 50;
@@ -1678,7 +1678,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			}
 			
 			$img_dim = bo_archive_get_dim_html($map);
-			$img_file = bo_bofile_url().'?map='.$map.'&strike_id='.$row['strike_id'].'&hyps'.bo_lang_arg('map');
+			$img_file = bo_bofile_url().'?map='.$map.'&strike_id='.$row['strike_id'].bo_lang_arg('map');
 			echo '<img style="position:relative;background-image:url(\''.bo_bofile_url().'?image=wait\');" '.$img_dim.' id="bo_arch_map_img" src="'.$img_file.'">';
 			
 			$start = 1; //$s_dists[0] == $s_dists[1] ? 1 : 0;

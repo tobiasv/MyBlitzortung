@@ -455,6 +455,10 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			ksort($tmp);
 			foreach($tmp as $t => $d)
 			{
+				
+				if ($d['lat'] == 0.0 && $d['lon'] == 0.0)
+					continue;
+				
 				$lat[] = $d['lat'];
 				$lon[] = $d['lon'];
 				$pos_text[] = _BDT($t).' '.
@@ -833,7 +837,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	{
 		$id = $d['id'];
 		
-		if ($d['status'] <= STATUS_IDLE*10 && $station_id != $id)
+		if ($d['status'] <= STATUS_IDLE*10 && $station_id != $id && !$D[$id]['strikesh'] && !$D[$id]['signalsh'])
 			continue;
 
 		if ($d['lat'] == 0.0 && $d['lon'] == 0.0)
@@ -1192,16 +1196,22 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			$i = 0;
 			foreach($new_stations as $id => $d)
 			{
+				if (!trim($d[1]))
+					continue;
+					
+				$text = bo_str_max(_BC($d[1]));
+				$text .= $d[2] ? ' ('._BL($d[2]).')' : '';
+				
 				echo '<li><span class="bo_descr">';
 
 				if ( (bo_user_get_level() & BO_PERM_NOLIMIT) || (BO_STATISTICS_ALL_STATIONS == 2) )
 				{
 					echo '<a href="'.bo_insert_url('bo_*').'&bo_show=station&bo_station_id='.$id.'" rel="nofollow">';
-					echo bo_str_max(_BC($d[1])).' ('._BL($d[2]).')';
+					echo $text;
 					echo '</a>';
 				}
 				else
-					echo bo_str_max(_BC($d[1])).' ('._BL($d[2]).')';
+					echo $text;
 
 				echo '</span>';
 				echo '<span class="bo_value">';
@@ -1261,6 +1271,12 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 //show longtime statistics
 function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_graph = '')
 {
+	if ($station_id == -1)
+	{
+		$station_id = 0;
+		$own_station = false;
+	}
+		
 	$own_station_info = bo_station_info();
 	$stInfo = bo_station_info($station_id);
 	$city = _BC($stInfo['city']);
@@ -1366,47 +1382,50 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 
 	echo '<div id="bo_stat_longtime">';
 
-	echo '<p class="bo_stat_description" id="bo_stat_longtime_descr">';
-	echo strtr(_BL('bo_stat_longtime_descr'), array('{STATION_CITY}' => $city));
-	echo '</p>';
-
-	echo '<a name="longtime_station"></a>';
-	echo '<h4>'.strtr(_BL('h4_stat_longtime_station'), array('{STATION_CITY}' => $city)).'</h4>';
-
-	echo '<ul class="bo_stat_overview">';
-
-	if (!$own_station && $first_update_station)
-		echo '<li><span class="bo_descr">'._BL('Record longtime data since').': </span><span class="bo_value">'._BDT($first_update_station).'</span>';
-
-	echo '<li><span class="bo_descr">'._BL('Strikes detected').': </span><span class="bo_value">'._BN($str_own, 0).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Active').': </span><span class="bo_value">'._BN($active_days, 1).' '._BL('days').'</span>';
-	echo '<li><span class="bo_descr">'._BL('Inactive').': </span><span class="bo_value">';
-	echo _BN($inactive_days, 1).' '._BL('days');
-	echo $nogps_whole_time > 360 ? ' ('._BN($nogps_whole_time / 3600, 1).' '._BL('hours').' '._BL('without GPS').')' : '';
-	echo '</span>';
-	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'._BN($max_str_own, 0).'</span>';
-
-	if ($own_station)
+	if ($station_id)
 	{
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'._BN($max_str_day_own[0], 0).($max_str_day_own[1] > 0 ? ' ('._BD($max_str_day_own[1]).')' : '' ).'</span>';
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '._BK(BO_RADIUS_STAT).') : </span><span class="bo_value">'._BN($max_str_dayrad_own[0], 0).($max_str_dayrad_own[1] ? ' ('._BD($max_str_dayrad_own[1]).')' : '').'</span>';
+		echo '<p class="bo_stat_description" id="bo_stat_longtime_descr">';
+		echo strtr(_BL('bo_stat_longtime_descr'), array('{STATION_CITY}' => $city));
+		echo '</p>';
+
+		echo '<a name="longtime_station"></a>';
+		echo '<h4>'.strtr(_BL('h4_stat_longtime_station'), array('{STATION_CITY}' => $city)).'</h4>';
+
+		echo '<ul class="bo_stat_overview">';
+
+		if (!$own_station && $first_update_station)
+			echo '<li><span class="bo_descr">'._BL('Record longtime data since').': </span><span class="bo_value">'._BDT($first_update_station).'</span>';
+
+		echo '<li><span class="bo_descr">'._BL('Strikes detected').': </span><span class="bo_value">'._BN($str_own, 0).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Active').': </span><span class="bo_value">'._BN($active_days, 1).' '._BL('days').'</span>';
+		echo '<li><span class="bo_descr">'._BL('Inactive').': </span><span class="bo_value">';
+		echo _BN($inactive_days, 1).' '._BL('days');
+		echo $nogps_whole_time > 360 ? ' ('._BN($nogps_whole_time / 3600, 1).' '._BL('hours').' '._BL('without GPS').')' : '';
+		echo '</span>';
+		echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'._BN($max_str_own, 0).'</span>';
+
+		if ($own_station)
+		{
+			echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'._BN($max_str_day_own[0], 0).($max_str_day_own[1] > 0 ? ' ('._BD($max_str_day_own[1]).')' : '' ).'</span>';
+			echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '._BK(BO_RADIUS_STAT).') : </span><span class="bo_value">'._BN($max_str_dayrad_own[0], 0).($max_str_dayrad_own[1] ? ' ('._BD($max_str_dayrad_own[1]).')' : '').'</span>';
+		}
+
+		echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_own, 1).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_own, 1).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Signals detected').': </span><span class="bo_value">'._BN($signals, 0).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Strike ratio').': </span><span class="bo_value">'.$strike_ratio.'</span>';
+		echo '<li><span class="bo_descr">'._BL('Signal ratio').': </span><span class="bo_value">'.$signal_ratio.'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'._BN($max_sig_own, 0).'</span>';
+		echo '</ul>';
 	}
-
-	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_own, 1).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_own, 1).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Signals detected').': </span><span class="bo_value">'._BN($signals, 0).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Strike ratio').': </span><span class="bo_value">'.$strike_ratio.'</span>';
-	echo '<li><span class="bo_descr">'._BL('Signal ratio').': </span><span class="bo_value">'.$signal_ratio.'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'._BN($max_sig_own, 0).'</span>';
-	echo '</ul>';
-
+	
 	echo '<a name="longtime_network"></a>';
 	echo '<h4>'._BL('h4_stat_longtime_network').'</h4>';
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'._BN($max_str_all, 0).'</span>';
 
-	if ($own_station)
+	if ($own_station || (!$own_station && $station_id))
 	{
 		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'._BN($max_str_day_all[0], 0).($max_str_day_all[1] ? ' ('._BD($max_str_day_all[1]).')' : '').'</span>';
 		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '._BK(BO_RADIUS_STAT).') : </span><span class="bo_value">'._BN($max_str_dayrad_all[0], 0).($max_str_dayrad_all[1] ? ' ('._BD($max_str_dayrad_all[1]).')' : '').'</span>';
@@ -1448,24 +1467,29 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 
 	echo '</ul>';
 
-	echo '<a name="graph_ratio_distance"></a>';
-	echo '<h4>'._BL('h4_graph_ratio_distance_longtime').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_descr_radi_longtime">';
-	echo _BL('bo_graph_descr_radi_longtime');
-	echo '</p>';
-	bo_show_graph('ratio_distance_longtime', $add_graph);
+	
+	if ($station_id)
+	{
+		echo '<a name="graph_ratio_distance"></a>';
+		echo '<h4>'._BL('h4_graph_ratio_distance_longtime').'</h4>';
+		echo '<p class="bo_graph_description" id="bo_graph_descr_radi_longtime">';
+		echo _BL('bo_graph_descr_radi_longtime');
+		echo '</p>';
+		bo_show_graph('ratio_distance_longtime', $add_graph);
 
-	echo '<a name="graph_ratio_bearing"></a>';
-	echo '<h4>'._BL('h4_graph_ratio_bearing_longtime').'</h4>';
-	echo '<p class="bo_graph_description" id="bo_graph_descr_bear_longtime">';
-	echo _BL('bo_graph_descr_bear_longtime');
-	echo '</p>';
-
+		echo '<a name="graph_ratio_bearing"></a>';
+		echo '<h4>'._BL('h4_graph_ratio_bearing_longtime').'</h4>';
+		echo '<p class="bo_graph_description" id="bo_graph_descr_bear_longtime">';
+		echo _BL('bo_graph_descr_bear_longtime');
+		echo '</p>';
+	
 
 	if (BO_GRAPH_STAT_RATIO_BEAR_WINDROSE === true)
 		bo_show_graph('ratio_bearing_longtime', $add_graph, false, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE, BO_GRAPH_STAT_RATIO_BEAR_WINDROSE_SIZE);
 	else
 		bo_show_graph('ratio_bearing_longtime', $add_graph);
+
+	}
 
 	echo '</div>';
 
@@ -1475,22 +1499,9 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 //show own other statistics
 function bo_show_statistics_other($station_id = 0, $own_station = true, $add_graph = '')
 {
-	$D = array();
-	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'station', 'densities', 'cities');
-
-	$res = BoDb::query("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
-	while($row = $res->fetch_assoc())
-	{
-		$name = substr($row['Name'], strlen(BO_DB_PREF));
-
-		if (array_search($name, $tables) !== false)
-		{
-			$D['rows'][$name] = $row['Rows'];
-			$D['data'][$name] = $row['Data_length'];
-			$D['keys'][$name] = $row['Index_length'];
-		}
-	}
-
+	
+	$D = @unserialize(BoData::get('db_table_status'));
+	
 	$last_str = BoData::get('uptime_strikes');
 	$last_net = BoData::get('uptime_stations');
 	$last_sig = BoData::get('uptime_raw');

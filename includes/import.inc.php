@@ -167,6 +167,31 @@ function bo_update_all2($force = false, $only = '')
 	if (!$only || $only == 'cache')
 		bo_purge_cache($force);
 
+	
+	/*** TABLE STATUS (takes long time with InnoDB) ***/
+	if (bo_exit_on_timeout()) return;
+	$D = @unserialize(BoData::get('db_table_status'));
+	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'station', 'densities', 'cities');
+	
+	if (time() - $D['last'] > 3600)
+	{
+		$res = BoDb::query("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
+		while($row = $res->fetch_assoc())
+		{
+			$name = substr($row['Name'], strlen(BO_DB_PREF));
+
+			if (array_search($name, $tables) !== false)
+			{
+				$D['rows'][$name] = $row['Rows'];
+				$D['data'][$name] = $row['Data_length'];
+				$D['keys'][$name] = $row['Index_length'];
+			}
+		}
+		
+		$D['last'] = time();
+		BoData::set('db_table_status', serialize($D));
+	}
+		
 		
 	return;
 }
@@ -725,7 +750,9 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				
 			//Deviation
 			if (preg_match('/dev;([0-9\.]+)/', $l, $r))
-				$D['deviation'] = $r[1];
+			{
+				$D['deviation'] = ($r[1]/1E9) * BO_C;
+			}
 			else
 				$error++;
 
@@ -1363,9 +1390,10 @@ function bo_update_stations($force = false)
 			$id2bo[$d['id']] = $boid;
 
 		//check if sth went wrong
-		if (count($lines) < 3 || (count($lines) < count($all_stations) * BO_UP_STATION_DIFFER))
+		if (count($lines) < 3 || (count($lines) < (count($all_stations)-10) * BO_UP_STATION_DIFFER))
 		{
-			bo_update_error('stationcount', 'Station count differs too much: '.count($all_stations).'Database / '.$lines.' stations.txt');
+		
+			bo_update_error('stationcount', 'Station count differs too much: '.count($all_stations).' in Database / '.count($lines).' lines in stations.txt');
 			BoData::set('uptime_stations', time());
 
 			return;
@@ -1440,20 +1468,27 @@ function bo_update_stations($force = false)
 				$D['firmware'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
 			
 			//Signals
-			if (preg_match('/signals;([^;]+);([^ ;]+)/', $l, $r))
+			if (preg_match('/signals;(([^ ;]+);)?([^ ;]+)/', $l, $r))
 			{
-				$times  = explode(',', $r[1]);
-				$values = explode(',', $r[2]);
-				
-				foreach($times as $i => $t)
-					$D['signals'][$t] = $values[$i];
+				if (!trim($r[2]))
+				{
+					$D['signals'][60] = $r[3];
+				}
+				else
+				{
+					$times  = explode(',', $r[2]);
+					$values = explode(',', $r[3]);
+					
+					foreach($times as $i => $t)
+						$D['signals'][$t] = $values[$i];
+				}
 			}
 
 			//Last Signal
-			if (preg_match('/last_signal_date;([^;]+);([^ ;\.]+)\.([0-9]+)/', $l, $r))
+			if (preg_match('/last_signal;([-: 0-9]+) ?/', $l, $r))
 			{
-				$D['last_time'] = $r[1].' '.$r[2];
-				$D['last_time_ns'] = $r[3];
+				$D['last_time'] = $r[1];
+				//$D['last_time_ns'] = $r[3];
 				$utime = strtotime($D['last_time'].' UTC');
 			}
 			
@@ -2376,6 +2411,8 @@ function bo_update_error($type, $extra = null)
 		bo_owner_mail(_BL('MyBlitzortung_notags').' - '._BL('Error').': '.$type, $text);
 	}
 
+	bo_echod("UPDATE ERROR: [$type] $extra");
+	
 	//Write
 	BoData::set('uperror_'.$type, serialize($data));
 }

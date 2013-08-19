@@ -29,116 +29,123 @@ function bo_graph_raw()
 		
 	$graph->fullscale = isset($_GET['full']);
 
+	list($date, $nsec) = explode('.', $time);
+	$tstamp = strtotime($date.' UTC') - 1;
+	$file_time = intval($tstamp/600)*600;
 	
-	if (0 && $id) //get graph from own station
-	{
-		$sql = "SELECT id, time, time_ns, lat, lon, height, data, channels, ntime
-				FROM ".BO_DB_PREF."raw
-				WHERE id='$id'";
-		$erg = BoDb::query($sql);
+	if (!$date || !$nsec)
+		$graph->DisplayEmpty(true);
 		
-		if (!$erg->num_rows)
-		{
-			$graph->DisplayEmpty();
-			exit;
-		}
+	$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
+	$cache_file  = BO_DIR.BO_CACHE_DIR.'/';
+	$cache_file .= BO_CACHE_SUBDIRS === true ? 'signals/' : 'signal_';
+	$cache_file .= $station_id.'_'.gmdate('YmdHi', $tstamp).'.log';
+	
 
-		$row = $erg->fetch_assoc();
-		BoDb::close();
-		$graph->SetData($type, $row['data'], $row['channels'], $row['ntime']);
-	}
-	elseif ($station_id && $time) //try to get graph from other station
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) > $tstamp + 60)
 	{
-		$info = bo_station_info($station_id);
-		list($date, $nsec) = explode('.', $time);
-		$tstamp = strtotime($date.' UTC') - 1;
+		$lines = file($cache_file);
+	}
+	else
+	{
+		$boid = bo_station2boid($station_id);
 		
-		if (!$date || !$nsec)
-			$graph->DisplayEmpty(true);
-		
-		$caching = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
-		$cache_file  = BO_DIR.BO_CACHE_DIR.'/';
-		$cache_file .= BO_CACHE_SUBDIRS === true ? 'signals/' : 'signal_';
-		$cache_file .= $station_id.'_'.gmdate('YmdH', $tstamp).'.log';
-		
-		if ($caching && file_exists($cache_file) && filemtime($cache_file) > $tstamp)
+		//avoid simultaneous downloads
+		clearstatcache();
+		$dfile = $cache_file.'.download';
+		while (file_exists($dfile) && time() - filemtime($dfile) <= 2)
 		{
-			$lines = file($cache_file);
-		}
-		else
-		{
-			//avoid simultaneous downloads
+			usleep(400000);
 			clearstatcache();
-			$dfile = $cache_file.'.download';
-			while (file_exists($dfile) && time() - filemtime($dfile) <= 2)
-			{
-				usleep(400000);
-				clearstatcache;
-			}
-			
-			touch($dfile);
-			
-			$url = bo_access_url().BO_IMPORT_PATH_RAW.$user.'/'.gmdate('H', $tstamp).'.log';
-			$lines = bo_get_file($url, $code, 'raw_data_other'.$station_id, $dummy1, $dummy2, true);
-			
-			if ($caching)
-			{
-				$dir = dirname($cache_file);
-				if (!file_exists($dir))
-					mkdir($dir, 0777, true);
-
-				file_put_contents($cache_file, $lines);
-			}
-			
-			@unlink($dfile);
 		}
 		
-		if (!$lines || (is_array($lines) && empty($lines)))
-			$graph->DisplayEmpty(true);
+		touch($dfile);
 		
-		$search_time = new Timestamp($tstamp, $nsec);
-		$raw_time    = new Timestamp();
-		$last_dt = 1E12;
-		$max_tolerance = BO_STR2SIG_INTERVAL_OTHERS;
-		
-		//search for signal
-		foreach($lines as $line)
+		$url = bo_access_url(BO_IMPORT_SERVER_SIGNALS, BO_IMPORT_PATH_SIGNALS);
+		$url .= $boid.'/'.gmdate('Y/m/d/H/i', floor($tstamp/600)*600).'.log';
+		$lines = bo_get_file($url, $code, 'raw_data_other'.$station_id, $dummy1, $dummy2, true);
+
+		if ($caching)
 		{
-			$data = explode(' ', $line);
-			list($data_time, $data_time_ns) = explode('.', $data[1]);
-			$data_time    = strtotime($data[0].' '.$data_time.' UTC');
+			$dir = dirname($cache_file);
+			if (!file_exists($dir))
+				mkdir($dir, 0777, true);
 
-            $raw_time->Set($data_time, $data_time_ns);
-            $dt = $raw_time->usDifference($search_time);
-			
-			if ($dt > 1E8)
-				break;
-			
-			if (abs($dt) < $max_tolerance && abs($last_dt) > abs($dt))
-			{
-				$channels = $data[5];
-				$values = $data[6];
-				$ntime = $data[8];
-				$raw_data = trim($data[9]);
-				$last_time = $data_time;
-				$last_nsec = $data_time_ns;
-				$last_dt = $dt;
-			}
+			file_put_contents($cache_file, implode("\n", $lines));
 		}
-
-		if (strlen($raw_data) > 10 && abs($last_dt) < $max_tolerance)
-		{
-			$bdata = bo_hex2bin($raw_data);
-			$graph->SetMaxTime(BO_GRAPH_RAW_MAX_TIME2);
-			$graph->SetData($type, $bdata, $channels, $ntime);
-			$graph->AddText(date('H:i:s', $last_time).'.'.sprintf('%09d', $nsec).'    '.($last_dt > 0 ? '+' : '').round($last_dt).'탎');
-		}
-		else
-			$graph->DisplayEmpty(true);
 		
-		bo_session_close(true);
+		@unlink($dfile);
+	}
+	
+	if (!$lines || (is_array($lines) && empty($lines)))
+		$graph->DisplayEmpty(true, 'Signal file not found or empty');
+	
+	$search_time = new Timestamp($tstamp, $nsec);
+	$raw_time    = new Timestamp();
+	$last_dt = 1E12;
+	$min_dt =  1E12;
+	$max_tolerance = BO_STR2SIG_INTERVAL_OTHERS;
+
+	$signal = array();
+	
+	//search for signal
+	foreach($lines as $line)
+	{
+		$data = explode(' ', $line);
+		list($data_time, $data_time_ns) = explode('.', $data[1]);
+		$data_time    = strtotime($data[0].' '.$data_time.' UTC');
+		$raw_time->Set($data_time, $data_time_ns);
+		$dt = $raw_time->usDifference($search_time);
+
+		if ($dt > 1E8)
+			break;
+
+		if (abs($dt) < $max_tolerance && abs($last_dt) > abs($dt))
+		{
+			$signal['time'] = $data_time;
+			$signal['time_ns'] = $data_time_ns;
+			$signal['lat'] = $data[2];
+			$signal['lon'] = $data[3];
+			$signal['alt'] = $data[4];
+			
+			$i=5;
+			while ( isset($data[$i]))
+			{
+				$ch = $data[$i++];
+				
+				$signal['channel'][$ch]['pcb'] = $data[$i++];
+				$signal['channel'][$ch]['?'] = $data[$i++];
+				$signal['channel'][$ch]['gain'] = $data[$i++];
+				$signal['channel'][$ch]['values'] = $data[$i++];
+				$signal['channel'][$ch]['start'] = $data[$i++];
+				$signal['channel'][$ch]['bits'] = $data[$i++];
+				$signal['channel'][$ch]['shift'] = $data[$i++];
+				$signal['channel'][$ch]['conv_time'] = $data[$i++];
+				$signal['channel'][$ch]['conv_gap'] = $data[$i++];
+				$signal['channel'][$ch]['hexdata'] = $data[$i++];
+			}
+
+			$last_time = $data_time;
+			$last_ns = $data_time_ns;
+			$last_dt = $dt;
+		}
+		
+		$min_dt = min ($min_dt, round(abs($dt)));
 		
 	}
+
+	if (abs($last_dt) < $max_tolerance)
+	{
+		$graph->SetMaxTime(BO_GRAPH_RAW_MAX_TIME2);
+		$graph->SetData($type, $signal);
+		$graph->AddText(date('H:i:s', $last_time).'.'.sprintf('%09d', $last_ns).'    '.($last_dt > 0 ? '+' : '').round($last_dt).'탎');
+	}
+	else
+	{
+		$graph->DisplayEmpty(true, "Signal not found! Tolerance of ".$min_dt."탎 bigger than allowed ".$max_tolerance."탎");
+	}
+	
+	bo_session_close(true);
 	
 	$graph->Display();
 

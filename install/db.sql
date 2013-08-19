@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (
   `lon` decimal(9,6) NOT NULL,
   `alt` decimal(5,1) NOT NULL,
   `distance` mediumint(8) unsigned NOT NULL,
-  `last_time` datetime NOT NULL,
+  `last_time` TIMESTAMP NULL DEFAULT NULL,
   `last_time_ns` int(11) NOT NULL,
   `status` varchar(3) NOT NULL,
   `controller_pcb` VARCHAR(30) NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (
   `firmware` varchar(50) NOT NULL,
   `url` varchar(200) NOT NULL,
   `show_mybo` varchar(3) NOT NULL,
-  `first_seen` datetime NOT NULL,
+  `first_seen` TIMESTAMP NULL DEFAULT NULL,
   `changed` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   KEY `bo_station_id` (`bo_station_id`),
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations_stat` (
   `station_id` smallint(11) unsigned NOT NULL,
-  `time` datetime NOT NULL,
+  `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `signalsh` mediumint(11) unsigned NOT NULL default '0',
   `strikesh` mediumint(11) unsigned NOT NULL default '0',
   KEY `time` (`time`),
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations_strikes` (
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}strikes` (
   `id` int(11) unsigned NOT NULL auto_increment,
-  `time` datetime NOT NULL,
+  `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `time_ns` int(11) NOT NULL,
   `lat` decimal(9,6) NOT NULL,
   `lon` decimal(9,6) NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}strikes` (
   `part_pos` tinyint(4) NOT NULL,
   `raw_id` int(11) unsigned default NULL,
   `status` tinyint(4) NOT NULL,
-  PRIMARY KEY  (`id`),
+  PRIMARY KEY  (`id`, `time`),
   KEY `part` (`part`),
   KEY `raw_id` (`raw_id`),
   KEY `time` (`time`)

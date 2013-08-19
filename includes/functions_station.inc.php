@@ -124,14 +124,20 @@ function bo_get_station_list(&$style_class = array())
 	$opts = array();
 	foreach($stations as $id => $d)
 	{
-		if (!$d['country'] || !$d['city']) // || bo_status($d['status'], STATUS_BAD_GPS))
-			continue;
-
 		if ($d['lat'] == 0.0 && $d['lon'] == 0.0 && time() - strtotime($d['last_time'].' UTC') > 1800)
 			continue;
 
 		if ($d['country'] == '-')
-			$d['country'] = 'Unknown';
+			$d['country'] = '';
+			
+		if (!$d['country'] && !trim($d['city'])) // || bo_status($d['status'], STATUS_BAD_GPS))
+		{
+			$d['city'] = 'Station '.$d['bo_station_id'];
+		}
+
+			
+		if ($d['country'] == '')
+			$d['country'] = ' Unknown';
 			
 		$opts[$id] = _BL($d['country']).': '._BC($d['city']);
 		
@@ -196,6 +202,12 @@ function bo_station_init()
 		$_GET['bo_station_id'] = $tmp[$id]['id'];
 	}
 
+}
+
+function bo_station2boid($station_id)
+{
+	$info = bo_station_info($station_id);
+	return $info['bo_station_id'];
 }
 
 ?>

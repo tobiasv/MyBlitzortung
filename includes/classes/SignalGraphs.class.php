@@ -28,10 +28,8 @@ class BoSignalGraph
 		$this->MaxTime = $max_time;
 	}
 	
-	public function SetData($type, $data, $channels, $ntime)
+	public function SetData($type, $data)
 	{
-		$data = bo_raw2array($data, true, $channels, $ntime);
-		
 		$tickLabels = array();
 		$tickMajPositions = array();
 		$tickPositions = array();	
@@ -63,31 +61,97 @@ class BoSignalGraph
 
 		$this->graph->SetMargin(24,1,1,1);
 
+		
+		bo_signal_parse($data, true);
+	
+	
 		if ($type == 'spectrum')
 		{
-			$step = 5;
-
+			//set labels
+			$max_i = 0;
 			foreach ($data['spec_freq'] as $i => $khz)
 			{
+				if ($khz > BO_GRAPH_RAW_SPEC_MAX_X)
+				{
+					$max_i = $i;
+					break;
+				}
+				
 				$tickLabels[$i] = (round($khz / 5) * 5).'kHz';
 			}
 
-			$values   = count($data['signal'][0]);
+			$max_ch = array();
+			//parse data for each channel
+			foreach($data['channel'] as $ch => $d)
+			{
 
-			$this->graph->SetScale("textlin", 0, $this->fullscale ? null : BO_GRAPH_RAW_SPEC_MAX_Y, 0, BO_GRAPH_RAW_SPEC_MAX_X * $values * $ntime * 1e-6);
+				
+				foreach($d['spec'] as $i => $v)
+				{
+					if ($max_i && $i > $max_i)
+						break;
+						
+					$D[$ch][$i] = $v;
+				}
 
-			$plot1=new BarPlot($data['spec'][0]);
-			$plot1->SetFillColor(BO_GRAPH_RAW_COLOR1);
-			$plot1->SetColor('#fff@1');
-			$plot1->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
+				$tmp = $D[$ch];
+				rsort($tmp);
+				$max_ch[$ch] = $tmp[2]; //the third highest maximum
+			}
+			
+			$this->graph->SetScale("textlin", 0, max($max_ch), 0, BO_GRAPH_RAW_SPEC_MAX_X * $data['max_values'] * $ntime * 1e-6);
 
-			$plot2=new BarPlot($data['spec'][1]);
-			$plot2->SetFillColor(BO_GRAPH_RAW_COLOR2);
-			$plot2->SetColor('#fff@1');
-			$plot2->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
+			if (isset($data['channel'][0]['spec']))
+			{
+				$plots[0]=new BarPlot($D[0]);
+				$plots[0]->SetFillColor(BO_GRAPH_RAW_COLOR1);
+			}
 
-			$plot = new GroupBarPlot(array($plot1, $plot2));
-			$this->graph->Add($plot);
+			if (isset($data['channel'][1]['spec']))
+			{
+				$plots[1]=new BarPlot($D[1]);
+				$plots[1]->SetFillColor(BO_GRAPH_RAW_COLOR2);
+			}
+
+			if (isset($data['channel'][2]['spec']))
+			{
+				$plots[2]=new BarPlot($D[2]);
+				$plots[2]->SetFillColor(BO_GRAPH_RAW_COLOR3);
+			}
+
+			if (isset($data['channel'][3]['spec']))
+			{
+				$plots[3]=new BarPlot($D[3]);
+				$plots[3]->SetFillColor(BO_GRAPH_RAW_COLOR4);
+			}
+
+			if (isset($data['channel'][4]['spec']))
+			{
+				$plots[4]=new BarPlot($D[4]);
+				$plots[4]->SetFillColor(BO_GRAPH_RAW_COLOR5);
+			}
+
+			if (isset($data['channel'][5]['spec']))
+			{
+				$plots[5]=new BarPlot($D[5]);
+				$plots[5]->SetFillColor(BO_GRAPH_RAW_COLOR6);
+			}
+			
+			foreach($plots as $p)
+			{
+				$p->SetColor('#fff@1');
+				$p->SetAbsWidth(BO_GRAPH_RAW_SPEC_WIDTH / 2);
+				
+				if (count($plots) == 1)
+					$this->graph->Add($p);
+			}
+
+			if (count($plots) > 1)
+			{
+				sort($plots);
+				$plot = new GroupBarPlot($plots);
+				$this->graph->Add($plot);
+			}
 
 
 			if (BO_GRAPH_RAW_COLOR_XGRID)
@@ -113,32 +177,46 @@ class BoSignalGraph
 			$this->graph->yaxis->HideLabels();
 
 			$this->graph->xaxis->SetTickLabels($tickLabels);
-			$this->graph->xaxis->SetTextLabelInterval(2);
-			$this->graph->xaxis->SetTextTickInterval(2);
+			$this->graph->xaxis->SetTextLabelInterval(3);
+			$this->graph->xaxis->SetTextTickInterval(20);
 
 		}
 		elseif ($type == 'xy')
 		{
+			$c = $data['channel'];
+			
 			if ($this->fullscale)
 			{
-				$max = max(max($data['signal'][0]), max($data['signal'][1]), abs(min($data['signal'][0])), abs(min($data['signal'][1])));
+				$max = 0;
+				$max = max($max, max($c[0]['data_volt']), max($c[1]['data_volt']), abs(min($c[0]['data_volt'])), abs(min($c[1]['data_volt'])));
+				$max = max($max, max($c[3]['data_volt']), max($c[4]['data_volt']), abs(min($c[3]['data_volt'])), abs(min($c[4]['data_volt'])));
+
 				$xmax = $ymax = $max;
 				$xmin = $ymin = -$max;
 			}
 			else
 			{
-				$xmin = -BO_MAX_VOLTAGE;
-				$xmax = BO_MAX_VOLTAGE;
-				$ymin = -BO_MAX_VOLTAGE;
-				$ymax = BO_MAX_VOLTAGE;
+				$xmin = -$data['max_volt'];
+				$xmax = $data['max_volt'];
+				$ymin = -$data['max_volt'];
+				$ymax = $data['max_volt'];
 			}
-			
+
 			$this->graph->SetScale("linlin",$ymin,$ymax,$xmin,$xmax);
 
+			if (isset($c[0]) && isset($c[1]))
+			{
+				$plot=new LinePlot($c[0]['data_volt'], $c[1]['data_volt']);
+				$plot->SetColor(BO_GRAPH_RAW_COLOR_XY1);
+				$this->graph->Add($plot);
+			}
 			
-			$plot=new LinePlot($data['signal'][0], $data['signal'][1]);
-			$plot->SetColor(BO_GRAPH_RAW_COLOR_XY);
-			$this->graph->Add($plot);
+			if (isset($c[3]) && isset($c[4]))
+			{
+				$plot=new LinePlot($c[3]['data_volt'], $c[4]['data_volt']);
+				$plot->SetColor(BO_GRAPH_RAW_COLOR_XY2);
+				$this->graph->Add($plot);
+			}
 
 			$this->graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
 			$this->graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
@@ -146,16 +224,8 @@ class BoSignalGraph
 			$this->graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
 			$this->graph->yaxis->SetTextTickInterval(0.5);
 			
-			if ($xmax >= 1)
-			{
-				$this->graph->xaxis->SetTickPositions(array(-2,-1,0,1,2), array(-1.5,-0.5,0.5,1.5));
-				$this->graph->yaxis->SetTickPositions(array(-2,-1,0,1,2), array(-1.5,-0.5,0.5,1.5));
-			}
-			else
-			{
-				$this->graph->xaxis->SetTickPositions(array(-$xmax,$xmax), array(-$xmax/2,$xmax/2));
-				$this->graph->yaxis->SetTickPositions(array(-$xmax,$xmax), array(-$xmax/2,$xmax/2));
-			}
+			$this->graph->xaxis->SetTickPositions(array(-$xmax,$xmax), array(-$xmax/2,$xmax/2));
+			$this->graph->yaxis->SetTickPositions(array(-$xmax,$xmax), array(-$xmax/2,$xmax/2));
 			
 			$this->graph->xaxis->HideLabels();
 			$this->graph->yaxis->HideLabels();
@@ -167,7 +237,7 @@ class BoSignalGraph
 		{
 			$ustepdisplay = 50;
 			$data_tmp = array();
-			
+
 			foreach ($data['signal_time'] as $i => $time_us)
 			{
 				$data_tmp[$i] = $time_us;
@@ -185,8 +255,10 @@ class BoSignalGraph
 					break;
 				
 				$datax[] = $i;
-				$datay[0][] = $data['signal'][0][$i];
-				$datay[1][] = $data['signal'][1][$i];
+				
+				foreach($data['channel'] as $ch => $d)
+					$datay[$ch][] = $d['data_volt'][$i];
+				
 				$tickLabels[] = round($time_us / $ustepdisplay, 1) * $ustepdisplay.'µs';
 				
 				if (!($i%12))
@@ -214,29 +286,56 @@ class BoSignalGraph
 			}
 			else
 			{
-				$ymin = -BO_MAX_VOLTAGE;
-				$ymax = BO_MAX_VOLTAGE;
+				$ymin = -$data['max_volt'];
+				$ymax = $data['max_volt'];
 			}
 
 			$this->graph->SetScale("linlin",$ymin,$ymax,$xmin,$xmax);
 
+			$plot = array();
+			
 			if (max($datay[0]) || min($datay[0]))
 			{
-				$plot=new LinePlot($datay[0], $datax);
-				$plot->SetColor(BO_GRAPH_RAW_COLOR1);
-				$this->graph->Add($plot);
+				$plot[0]=new LinePlot($datay[0], $datax);
+				$plot[0]->SetColor(BO_GRAPH_RAW_COLOR1);
 			}
 
 			if (max($datay[1]) || min($datay[1]))
 			{
-				$plot=new LinePlot($datay[1], $datax);
-				$plot->SetColor(BO_GRAPH_RAW_COLOR2);
-				$this->graph->Add($plot);
+				$plot[1]=new LinePlot($datay[1], $datax);
+				$plot[1]->SetColor(BO_GRAPH_RAW_COLOR2);
 			}
 
+			if (max($datay[2]) || min($datay[2]))
+			{
+				$plot[2]=new LinePlot($datay[2], $datax);
+				$plot[2]->SetColor(BO_GRAPH_RAW_COLOR3);
+			}
+
+			if (max($datay[3]) || min($datay[3]))
+			{
+				$plot[3]=new LinePlot($datay[3], $datax);
+				$plot[3]->SetColor(BO_GRAPH_RAW_COLOR4);
+			}
+
+			if (max($datay[4]) || min($datay[4]))
+			{
+				$plot[4]=new LinePlot($datay[4], $datax);
+				$plot[4]->SetColor(BO_GRAPH_RAW_COLOR5);
+			}
+
+			if (max($datay[5]) || min($datay[5]))
+			{
+				$plot[5]=new LinePlot($datay[5], $datax);
+				$plot[5]->SetColor(BO_GRAPH_RAW_COLOR6);
+			}
+			
+			foreach ($plot as $p)
+				$this->graph->Add($p);
+			
 			$this->graph->xaxis->SetPos('min');
 			$this->graph->xaxis->SetTickLabels($tickLabels);
-			$this->graph->xaxis->scale->ticks->Set(28);
+			//$this->graph->xaxis->scale->ticks->Set(28);
 			$this->graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
 			$this->graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
 
@@ -256,39 +355,30 @@ class BoSignalGraph
 			else
 				$this->graph->ygrid->Show(false,false);
 
-			if (!$this->fullscale)
-			{
-				$this->graph->yaxis->SetTextTickInterval(0.5);
 
-				for($i=-BO_MAX_VOLTAGE;$i<=BO_MAX_VOLTAGE;$i+=0.5)
-				{
-					if (abs($i) != 0.5)
-						$yt[] = $i;
-				}
-
-				$this->graph->yaxis->SetTickPositions(array(-2,-1,0,1,2),$yt,array('-2V','-1V','0V','1V','2V'));
-			}
-
-			$sline  = new PlotLine(HORIZONTAL,  BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR3, 1);
+			$sline  = new PlotLine(HORIZONTAL,  0, BO_GRAPH_RAW_COLOR_LINES, 1);
 			$this->graph->AddLine($sline);
 
-			$sline  = new PlotLine(HORIZONTAL, -BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR3, 1);
+			$sline  = new PlotLine(HORIZONTAL,  BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR_LINES, 1);
+			$this->graph->AddLine($sline);
+
+			$sline  = new PlotLine(HORIZONTAL, -BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR_LINES, 1);
 			$this->graph->AddLine($sline);
 
 			$this->graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			$this->graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			
-			$this->graph->SetMargin(28,4,2,3);
+			$this->graph->SetMargin(32,4,4,3);
 		}
 	
 	}
 	
 	public function AddText($text)
 	{
-			$caption = new Text($text,35,3);
-			$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
-			$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
-			$this->graph->AddText($caption);
+		$caption = new Text($text,35,3);
+		$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
+		$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
+		$this->graph->AddText($caption);
 	}
 	
 	public function Display()
@@ -312,12 +402,16 @@ class BoSignalGraph
 		}
 	}
 	
-	public function DisplayEmpty($do_exit = false)
+	public function DisplayEmpty($do_exit = false, $text = '')
 	{
 		$I = imagecreate(BO_GRAPH_RAW_W,BO_GRAPH_RAW_H);
 		$color = imagecolorallocate($I, 255, 150, 150);
 		imagefill($I, 0, 0, $color);
 		imagecolortransparent($I, $color);
+		
+		bo_imagestring_max($I, 8, 5, 5, $text, BO_GRAPH_STAT_COLOR_CAPTION, BO_GRAPH_RAW_W);
+		
+		
 		Header("Content-type: image/png");
 		Imagepng($I);
 		

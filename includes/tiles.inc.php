@@ -280,6 +280,8 @@ function bo_tile()
 	/*** Start of calculations *********************************/
 	/***********************************************************/
 
+	$tilespertile = $tile_size / 256;
+	$max_strikes_tile = BO_MAP_MAX_STRIKES_PER_TILE * pow(2, $tilespertile);
 	
 	//Radius
 	$sql_where_radius = '';
@@ -300,6 +302,11 @@ function bo_tile()
 	{
 		$tile_sub_size = 256;
 	
+		if ($_GET['stat'] == 2)
+			$max = $max_strikes_tile / 10;
+		else
+			$max = 0;
+	
 		//Build ugly SQL Query
 		$sql_join  = '';
 		$sql_where = ' ( 0';
@@ -311,8 +318,13 @@ function bo_tile()
 			$sql_where .= " OR s.time BETWEEN '$date_min' AND '$date_max' ";
 		}
 		$sql_where .= ') ';
-		$sql_where .= ' AND '.bo_strikes_sqlkey($index_sql, min($times_min), max($times_max), $lat1, $lat2, $lon1, $lon2);
+		$sql_where .= ' AND '.bo_strikes_sqlkey($index_sql, min($times_min), max($times_max), $lat1, $lat2, $lon1, $lon2, $max);
 		$sql_where .= $sql_where_radius;
+		
+		if (is_array($max) && $max['divisor'])
+			$multiplicator = $max['divisor'];
+		else
+			$multiplicator = 1;
 		
 		if ($station_id && $station_id == bo_station_id())
 		{
@@ -370,9 +382,11 @@ function bo_tile()
 					WHERE $sql_where $sql_where2
 					GROUP BY tile_no, sid
 					";
+
 			$erg = BoDb::query($sql);
 			while ($row = $erg->fetch_assoc())
 			{
+				$row['cnt'] *= $multiplicator;
 				$stations_count[$row['tile_no']][$row['sid']] = $row['cnt'];
 			}
 		}
@@ -383,9 +397,13 @@ function bo_tile()
 				WHERE $sql_where 
 				GROUP BY tile_no, participated
 				";
+				
+				
 		$erg = BoDb::query($sql);
 		while ($row = $erg->fetch_assoc())
 		{
+			$row['cnt'] *= $multiplicator;
+			
 			if ($station_id)
 			{
 				if ($row['participated'])
@@ -425,7 +443,12 @@ function bo_tile()
 			$dx = $tile_data[0] * $tile_sub_size;
 			$dy = $tile_data[1] * $tile_sub_size;
 			
-			$text = intval($strike_count[$tile_id]);
+			$text = '';
+			
+			if ($multiplicator > 1 && $strike_count[$tile_id])
+				$text .= '~';
+			
+			$text .= intval($strike_count[$tile_id]);
 			if ($station_id > 0 && intval($whole_strike_count[$tile_id]))
 			{
 				$ratio = $strike_count[$tile_id] / intval($whole_strike_count[$tile_id]) * 100;
@@ -512,7 +535,7 @@ function bo_tile()
 	$sql_join = "";
 	
 	/* WHERE */
-	$sql_where  = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat1, $lat2, $lon1, $lon2);
+	$sql_where  = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $lat1, $lat2, $lon1, $lon2, $max_strikes_tile);
 	$sql_where .= $sql_where_radius;
 	
 	/* Station Filter */
@@ -553,9 +576,7 @@ function bo_tile()
 			ORDER BY mtime ASC";
 	$erg = BoDb::query($sql);
 	
-	//Max. strikes per tile
 	$num = $erg->num_rows;
-	$max = intval(BO_MAP_MAX_STRIKES_PER_TILE);
 	
 	
 	//no points --> blank tile
@@ -595,15 +616,6 @@ function bo_tile()
 	// get the data and paint tile
 	while ($row = $erg->fetch_assoc())
 	{
-		//Max. strikes per tile handling
-		//This random thing is quick&easy 
-		//but needs no further strike calculation (position/time/color)
-		//Problem: tile borders
-		if ($max && $num > $max)
-		{
-			if (rand(0, $num) > $max)
-				continue;
-		}
 
 		if ($grouping)
 		{

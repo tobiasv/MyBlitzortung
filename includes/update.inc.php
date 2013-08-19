@@ -537,7 +537,9 @@ function bo_check_for_update()
 				
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` 
 							CHANGE `tracker` `firmware` varchar(50) NOT NULL,
-							CHANGE `status` `status` varchar(3) NOT NULL';
+							CHANGE `status` `status` varchar(3) NOT NULL,
+							CHANGE `last_time` `last_time` TIMESTAMP NULL DEFAULT NULL,
+							CHANGE `first_seen` `first_seen` TIMESTAMP NULL DEFAULT NULL';
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				
@@ -566,6 +568,7 @@ function bo_check_for_update()
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'strikes` 
 						CHANGE `polarity` `type` tinyint(1) NOT NULL,
 						CHANGE `users` `stations` smallint(5) NOT NULL,
+						CHANGE `time` `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 						ADD `stations_calc` smallint(5) NOT NULL AFTER `stations`,
 						ADD `part_pos` tinyint(5) NOT NULL AFTER `part`,
 						ADD `alt` decimal(5,1) NOT NULL AFTER `lon`';
@@ -592,6 +595,10 @@ function bo_check_for_update()
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations_stat` 
+					CHANGE `time` `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				
 				break;
 			

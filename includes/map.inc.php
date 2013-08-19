@@ -723,7 +723,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			if (document.getElementById('bo_only_station_id') != null)
 				document.getElementById('bo_only_station_id').value = c > 0 ? c : 0;
 			
-			if (c > 0) bo_map_show_more();
+			//if (c > 0) bo_map_show_more();
 		}
 
 		<?php if (!$show_station_select) { ?>
@@ -800,6 +800,14 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			bo_map_user_activity();
 		});
 
+		google.maps.event.addListener(bo_map, 'center_changed', function() {
+			bo_setcookie('bo_map_lat', bo_map.getCenter().lat());
+			bo_setcookie('bo_map_lon', bo_map.getCenter().lng());
+			bo_setcookie('bo_map_zoom', bo_map.getZoom());
+			bo_map_user_activity();
+		});		
+		
+
 		google.maps.event.addListener(bo_map, 'zoom_changed', function() {
 			if (this.getZoom() < <?php echo $min_zoom ?>)
 				 this.setZoom(<?php echo $min_zoom ?>);
@@ -831,7 +839,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			map_lon  = <?php echo BO_LON ?>;
 		}
 		
-		if (map_lat > 0 && map_lon > 0 && <?php echo $cookie_load_defaults ? 'true' : 'false' ?>)
+		if (map_lat != 0 && map_lon != 0 && <?php echo $cookie_load_defaults ? 'true' : 'false' ?>)
 			bo_map.setOptions({ center: new google.maps.LatLng(map_lat,map_lon) });
 		
 		if (map_zoom > 0 && <?php echo $cookie_load_defaults ? 'true' : 'false' ?>)
