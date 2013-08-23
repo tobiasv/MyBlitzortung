@@ -1923,7 +1923,7 @@ function bo_update_daily_stat($time = false, $force_renew = true)
 			$D = unserialize(BoData::get('longtime_max_strikes_day_own_rad'));
 			if ($D[0] < $row_own_rad['cnt'])
 				BoData::set('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $time)));
-						print_r($data); exit;
+
 			$data['status'] = 1;
 		}
 		else if ($data['status'] == 1 )

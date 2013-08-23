@@ -820,7 +820,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			FROM ".BO_DB_PREF."stations
 			WHERE 
 				id < ".intval(BO_DELETED_STATION_MIN_ID)."
-				-- AND status >= ".((int)STATUS_OFFLINE)."";
+				AND status >= ".((int)STATUS_OFFLINE)."";
 				
 	$res = BoDb::query($sql);
 	$row = $res->fetch_assoc();
@@ -991,12 +991,13 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	echo '<li><span class="bo_descr">'._BL('Sum of Strikes').': </span><span class="bo_value">'._BN($strikes_range, 0).'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'._BN($max_part, 0).'</span></li>';
 	echo '<li><span class="bo_descr">'._BL('Mean participants per strike').': </span><span class="bo_value">'._BN($avg_part, 1).'</span></li>';
-	echo '<li><span class="bo_descr">'._BL('Mean locating ratio').': </span><span class="bo_value">';
-	echo $whole_sig_ratio ? _BN($whole_sig_ratio * 100, 1).'%' : '-';
-	echo '</span></li>';
 	
 	if (BO_STATION_STAT_DISABLE !== true)
 	{
+		echo '<li><span class="bo_descr">'._BL('Mean locating ratio').': </span><span class="bo_value">';
+		echo $whole_sig_ratio ? _BN($whole_sig_ratio * 100, 1).'%' : '-';
+		echo '</span></li>';
+
 		echo '<li><span class="bo_descr">'._BL('Mean strike ratio').': </span><span class="bo_value">';
 		echo $whole_strike_ratio ? _BN($whole_strike_ratio * 100, 1).'%' : '-';
 		echo '</span></li>';
