@@ -504,10 +504,13 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
 		echo '</span>';
 		
-		echo '<span class="bo_form_checkbox_text">';
-		echo '<input type="radio" name="bo_map_counter" value="2" onclick="bo_map_toggle_count(this.value);" id="bo_map_opt_count2"> ';
-		echo '<label for="bo_map_opt_count2">'._BL("show strike counter").' ('._BL('stations').')</label> &nbsp; ';
-		echo '</span>';
+		if (BO_STATION_STAT_DISABLE !== true)
+		{
+			echo '<span class="bo_form_checkbox_text">';
+			echo '<input type="radio" name="bo_map_counter" value="2" onclick="bo_map_toggle_count(this.value);" id="bo_map_opt_count2"> ';
+			echo '<label for="bo_map_opt_count2">'._BL("show strike counter").' ('._BL('stations').')</label> &nbsp; ';
+			echo '</span>';
+		}
 		
 		echo '</div>';
 	}

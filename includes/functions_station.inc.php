@@ -25,24 +25,29 @@ function bo_stations($index = 'id', $only = '', $under_constr = true)
 //returns your station_id
 function bo_station_id($ret_bo = false)
 {
-	static $id = -1;
+	static $id = -1, $bo_id = -1;
 	
-	if ($id != -1)
+	if (!$ret_bo && $id != -1)
 		return $id;
+	else if ($ret_bo && $bo_id != -1)
+		return $bo_id;
 	
 	if (BO_NO_DEFAULT_STATION === true)
 		return -1; // -1 ==> does not interfer with station statistic table (0 = all stations)
 
-	if (BO_STATION_ID > 0)
-		$bo_id = (int)BO_STATION_ID;
-	else if (BoData::get('bo_station_id'))
-		$bo_id = BoData::get('bo_station_id');
+	if ($bo_id == -1)
+	{
+		if (BO_STATION_ID > 0)
+			$bo_id = (int)BO_STATION_ID;
+		else if (BoData::get('bo_station_id'))
+			$bo_id = BoData::get('bo_station_id');
+	}	
 	
-	if ($bo_id)
+	if ($bo_id > 0)
 	{
 		if ($ret_bo)
 			return $ret_bo;
-			
+		
 		$sql = "SELECT id FROM ".BO_DB_PREF."stations WHERE bo_station_id='$bo_id'";
 		$row = BoDb::query($sql)->fetch_assoc();
 		

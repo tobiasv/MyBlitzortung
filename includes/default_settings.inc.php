@@ -1249,7 +1249,7 @@
 @define("BO_IMPORT_PATH_STATIONS", 'stations.txt.gz');
 
 //Special server for signals
-@define("BO_IMPORT_SERVER_SIGNALS", 'signals.lightningmaps.org');
+@define("BO_IMPORT_SERVER_SIGNALS", 'signals.blitzortung.org');
 @define("BO_IMPORT_PATH_SIGNALS", 'Data_%d/');
 
 

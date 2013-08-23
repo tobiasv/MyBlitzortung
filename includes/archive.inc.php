@@ -958,7 +958,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			$own_station = true;
 	}
 	
-	
+	$show_strike_list = true;
 	if ($datetime_start)
 	{
 		$time_start = $datetime_start;
@@ -967,30 +967,8 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	}
 	else if ($show_strike_list) // display strikes
 	{
-		$last_signal_received_time = 0;
-		if (!isset($_GET['bo_datetime_start']) && !$date && $station_id > 0 && $station_id == bo_station_id())
-		{
-			$sql = "SELECT MAX(time) time FROM ".BO_DB_PREF."strikes 
-					WHERE raw_id > 0 AND time > NOW() - INTERVAL $hours_back HOUR";
-			$row = BoDb::query($sql)->fetch_assoc();
-			$last_signal_received_time = strtotime($row['time'].' UTC');
-		}
-		
-		//default: display strikes older than last signal for the first call
-		if ($last_signal_received_time && time() - $last_signal_received_time < 1800)
-		{
-			$time_end = $last_signal_received_time;
-			$time_start = $last_signal_received_time - 3600 * $hours_back;
-			$date = date('Y-m-d H:i', $time_start);
-			$_GET['bo_datetime_start'] = $date; //workaround for page nav.
-		}
-		else
-		{
-			$time_end = time();
-			$time_start = $time_end - 3600 * $hours_back;
-		}
-		
-		$sort = 'DESC';
+		$time_end = time();
+		$time_start = $time_end - 3600 * $hours_back;
 	}
 	else //display signals
 	{
@@ -1025,6 +1003,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	if ($show_strike_list) // all strikes, maybe with own sigs
 	{
 		$table = 's';
+		$sort = 'DESC';
 		
 		if ($station_id > 0 && !$own_station && !$strike_id)
 		{
@@ -1034,12 +1013,18 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		}
 		elseif ($own_station)
 		{
-			$sql_join = BO_DB_PREF."strikes s 
-						LEFT OUTER JOIN ".BO_DB_PREF."raw r 
-						ON s.raw_id=r.id ";
+			//$sql_join = BO_DB_PREF."strikes s 
+			//			LEFT OUTER JOIN ".BO_DB_PREF."raw r 
+			//			ON s.raw_id=r.id ";
 
-			if ($only_participated)
-				$sql_where .= " AND s.part>0 ";
+			$sql_join = BO_DB_PREF."strikes s ";
+			$sql_where .= " AND s.part>0";
+			
+			//if ($only_participated)
+			//	$sql_where .= " AND s.part>0 ";
+				
+			$own_station = false;
+			$station_id = bo_station_id();
 		}
 		else
 		{
@@ -1073,7 +1058,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	$show_spectrum = $show_signal && BO_ARCHIVE_SHOW_SPECTRUM;
 	$show_xy_graph = $show_signal && (!$own_station || $channels > 1) && BO_ARCHIVE_SHOW_XY;
 	
-	if ($own_station)
+	if (0 && $own_station)
 		$sql_raw = ",	r.id raw_id, r.time rtime, r.time_ns rtimens, r.data data,
 						r.amp1 amp1, r.amp2 amp2, r.amp1_max amp1_max, r.amp2_max amp2_max";
 
@@ -1160,7 +1145,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		
 		if ($perm)
 		{
-			if ($show_strike_list || $only_strikes)
+			if (($show_strike_list || $only_strikes) && BO_STATION_STAT_DISABLE !== true)
 			{
 				echo '<input type="checkbox" name="bo_show_details" value="1" '.($show_details ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_show_details">';
 				echo '<label for="check_show_details"> '._BL('Details').'</label> &nbsp; ';
@@ -1340,10 +1325,9 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		else
 			$ttime = _BDT($rtime, false).'.'.sprintf('%09d', $row['rtimens']).' '._BZ($stime);
 
-		if (!$strike_id && $perm && $row['strike_id'])
+		if (!$strike_id && $perm && $row['strike_id'] && BO_STATION_STAT_DISABLE !== true)
 		{
 			echo '<a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'strikes').'&bo_station_id='.$station_id.'&bo_strike_id='.$row['strike_id'].'" target="_blank" ';
-			//echo ' title="Confirmed: '.$row['status'].'" ';
 			echo '>'.$ttime.'</a>';
 		}
 		else
