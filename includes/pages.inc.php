@@ -137,6 +137,7 @@ function bo_show_statistics()
 	if (!($station_id == bo_station_id() || BO_ENABLE_LONGTIME_ALL === true) && $show == 'longtime')
 		$show = 'station';
 
+	
 	echo '<div id="bo_statistics">';
 
 	echo '<ul id="bo_menu">';
@@ -318,7 +319,7 @@ function bo_show_login()
 				
 				if (BO_PERM_ADMIN & $level)
 				{
-					if (bo_station_id() == -1 && BO_NO_DEFAULT_STATION !== true)
+					if (bo_station_id() == -1 && BO_NO_DEFAULT_STATION !== true && !defined('BO_STATION_ID'))
 					{
 						echo '<p style="color:red; font-weight: bold; font-size: 14px;">Please set the Station Id (BO_STATION_ID) in your config.php! <br></p>';
 					}

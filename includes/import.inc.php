@@ -1746,7 +1746,7 @@ function bo_update_stations($force = false)
 				
 			//Activity/inactivity counter
 			$time_interval = $last ? $time - $last : 0;
-			if (bo_status($data['status'], STATUS_RUNNING))
+			if (bo_status($StData[$boid]['status'], STATUS_RUNNING))
 			{
 				//save first data-time
 				if ($stId != $own_id)
@@ -1775,7 +1775,7 @@ function bo_update_stations($force = false)
 
 			//Activity/inactivity counter (GPS V-state)
 			$time_interval = $last ? $time - $last : 0;
-			if ($StData[$boid]['status'] == 'V')
+			if (bo_status($StData[$boid]['status'], STATUS_BAD_GPS))
 			{
 				BoData::set('station_last_nogps'.$add, $time);
 				BoData::update_add('longtime_station_nogps_time'.$add, $time_interval);
@@ -1845,7 +1845,7 @@ function bo_update_stations($force = false)
 }
 
 // Daily and longtime strike counts
-function bo_update_daily_stat($time = false, $force_renew = false)
+function bo_update_daily_stat($time = false, $force_renew = true)
 {
 	global $_BO;
 
@@ -1853,7 +1853,7 @@ function bo_update_daily_stat($time = false, $force_renew = false)
 
 	if (bo_version() < 801)
 	{
-		//bo_echod("Database version too old. Need update...");
+		bo_echod("Database version too old. Need update...");
 		return;
 	}
 	
@@ -1908,6 +1908,7 @@ function bo_update_daily_stat($time = false, $force_renew = false)
 						
 			/*** Longtime statistics ***/
 			$D = unserialize(BoData::get('longtime_max_strikes_day_all'));
+			echo $D[0];
 			if ($D[0] < $row_all['cnt'])
 				BoData::set('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $time)));
 
@@ -1922,7 +1923,7 @@ function bo_update_daily_stat($time = false, $force_renew = false)
 			$D = unserialize(BoData::get('longtime_max_strikes_day_own_rad'));
 			if ($D[0] < $row_own_rad['cnt'])
 				BoData::set('longtime_max_strikes_day_own_rad', serialize(array($row_own_rad['cnt'], $time)));
-						
+						print_r($data); exit;
 			$data['status'] = 1;
 		}
 		else if ($data['status'] == 1 )
@@ -1949,6 +1950,7 @@ function bo_update_daily_stat($time = false, $force_renew = false)
 		{
 			/*** Stations ***/
 			$stations = array();
+			
 			// available stations
 			$row = BoDb::query("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."stations WHERE status != '-'")->fetch_assoc();
 			$stations['available'] = $row->cnt;
@@ -1959,136 +1961,7 @@ function bo_update_daily_stat($time = false, $force_renew = false)
 
 			$data[10] = $stations;
 			$data['status'] = 3;
-		}
-		else if ($data['status'] == 3 && $raw_ok)
-		{
-
-			/*** Signals ***/
-			//own exact value
-			$signals_exact = BoDb::query("SELECT COUNT(id) cnt FROM ".BO_DB_PREF."raw WHERE time BETWEEN '$day_start' AND '$day_end'")->fetch_assoc();
-
-			//all from station statistics
-			$sql = "SELECT SUM(signalsh) cnt, COUNT(DISTINCT time) entries, station_id=".bo_station_id()." own
-							FROM ".BO_DB_PREF."stations_stat
-							WHERE time BETWEEN '$day_start' AND '$day_end' AND station_id != 0
-							GROUP BY own, HOUR(time)";
-			$res = BoDb::query($sql);
-			while ($row = $res->fetch_assoc())
-			{
-				if (intval($row['entries']))
-					$signals[(int)$row['own']] += $row['cnt'] / $row['entries'];
-			}
-
-			$data[4] = $signals_exact['cnt'];
-			$data[5] = round($signals[0]);
-			$data[6] = round($signals[1]);
-
-			
-			/*** Longtime statistics ***/
-			$D = unserialize(BoData::get('longtime_max_signals_day_own'));
-			if ($D[0] < $signals_exact['cnt'])
-				BoData::set('longtime_max_signals_day_own', serialize(array($signals_exact['cnt'], $time)));
-
-				
-			$data['status'] = 4;
-		}
-		else if ($data['status'] == 4 && $raw_ok)
-		{
-			$max_lines = 2000;
-			$limit = intval($data['raw_limit']);
-
-			bo_echod("Analyzing signals: Start at $limit");
-
-			if (!$limit) //first call
-			{
-				$amps  = array();
-				$freqs = array();
-			}
-			else
-			{
-				$amps = $data[8];
-				$freqs = $data[9];
-			}
-
-			$rows = 0;
-			$sql ="SELECT data, amp1, amp2, amp1_max, amp2_max,
-							freq1, freq2, freq1_amp, freq2_amp,
-							channels, ntime
-					FROM ".BO_DB_PREF."raw
-					WHERE time BETWEEN '$day_start' AND '$day_end'
-					LIMIT $limit,$max_lines";
-			$res = BoDb::query($sql);
-			while ($row = $res->fetch_assoc())
-			{
-				if (bo_exit_on_timeout()) break;
-
-				$d = bo_raw2array($row['data'], true, $row['channels'], $row['ntime']);
-
-				if ($row['amp1_max'])
-				{
-					//count of first amplitudes
-					$amps['count'][round($row['amp1'] / 10)][0]++;
-
-					//count of max amplitudes
-					$amps['count_max'][round($row['amp1_max'] / 10)][0]++;
-
-					$freq1_index = round($row['freq1'] / 10);
-
-					//count of main frequency
-					$freqs['count'][$freq1_index][0]++;
-
-					//amp sum of main frequency
-					$freqs['sum_main'][$freq1_index][0] += $row['freq1_amp'];
-				}
-
-				if ($row['amp2_max'])
-				{
-					//count of first amplitudes
-					$amps['count'][round($row['amp2'] / 10)][1]++;
-
-					//count of max amplitudes
-					$amps['count_max'][round($row['amp2_max'] / 10)][1]++;
-
-					$freq2_index = round($row['freq2'] / 10);
-
-					//count of main frequency
-					$freqs['count'][$freq2_index][1]++;
-
-					//amp sum of main frequency
-					$freqs['sum_main'][$freq2_index][1] += $row['freq2_amp'];
-				}
-
-				//spectrum analyzation
-				for ($i=0;$i<2;$i++)
-				{
-					foreach($d['spec_freq'] as $freq_id => $freq)
-					{
-						$freq_amp = $d['spec'][$i][$freq_id];
-
-						//sum of spectrum
-						$freqs['spec_sum'][$freq][$i] += round($freq_amp,3);
-
-						//count of specific freq amplitudes
-						$freqs['spec_cnt'][$freq][$i][round($freq_amp * 2) / 2]++;
-					}
-				}
-
-				$rows++;
-			}
-
-			$data[8] = $amps;
-			$data[9] = $freqs;
-
-			if ($rows < $max_lines) //Done!
-			{
-				unset($data['raw_limit']);
-				$data['done'] = true;
-			}
-			else
-			{
-				$data['raw_limit'] = $limit + $rows;
-			}
-
+			$data['done'] = true;
 		}
 
 		$sdata = serialize($data);
@@ -2539,13 +2412,17 @@ function bo_readline(&$text = null, $searchlen = 1000)
 function bo_purge_olddata($force = false)
 {
 
-	if (BO_PURGE_ENABLE === true)
+	$last = BoData::get('purge_time');
+	
+	if ($force || (defined('BO_PURGE_MAIN_INTVL') && BO_PURGE_MAIN_INTVL && time() - $last > 3600 * BO_PURGE_MAIN_INTVL))
 	{
 		bo_echod(" ");
 		bo_echod("=== Purging data ===");
-		$last = BoData::get('purge_time');
-
-		if ($force || (defined('BO_PURGE_MAIN_INTVL') && BO_PURGE_MAIN_INTVL && time() - $last > 3600 * BO_PURGE_MAIN_INTVL))
+		
+		//silently purge faulty entries
+		BoDb::query("DELETE FROM ".BO_DB_PREF."strikes WHERE time < '2000-01-01 00:00:00'");
+		
+		if (BO_PURGE_ENABLE === true)	
 		{
 			BoData::set('purge_time', time());
 
@@ -2675,14 +2552,11 @@ function bo_purge_olddata($force = false)
 		}
 		else
 		{
-			bo_echod('Purged nothing.');
+			bo_echod("Purging disabled.");
 		}
 
 	}
-	else
-	{
-		//bo_echod("Purging disabled.");
-	}
+
 }
 
 

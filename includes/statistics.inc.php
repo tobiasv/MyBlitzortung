@@ -1277,7 +1277,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 		$station_id = 0;
 		$own_station = false;
 	}
-		
+
 	$own_station_info = bo_station_info();
 	$stInfo = bo_station_info($station_id);
 	$city = _BC($stInfo['city']);
@@ -1285,6 +1285,8 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	if ($stInfo['country'] != $own_station_info['country'])
 		$city .= ' ('._BL($stInfo['country']).')';
 
+	$max_str_day_all	= unserialize(BoData::get('longtime_max_strikes_day_all'));
+		
 	if (!$own_station)
 	{
 		$add .= '#'.$station_id.'#';
@@ -1302,7 +1304,6 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 		$max_str_dayrad_own	= unserialize(BoData::get('longtime_max_strikes_day_own_rad'));
 
 		//Daily longtime: All
-		$max_str_day_all	= unserialize(BoData::get('longtime_max_strikes_day_all'));
 		$max_str_dayrad_all	= unserialize(BoData::get('longtime_max_strikes_day_all_rad'));
 	}
 
@@ -1425,10 +1426,10 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Max strikes per hour').': </span><span class="bo_value">'._BN($max_str_all, 0).'</span>';
-
-	if ($own_station || (!$own_station && $station_id))
+	echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'._BN($max_str_day_all[0], 0).($max_str_day_all[1] ? ' ('._BD($max_str_day_all[1]).')' : '').'</span>';
+	
+	if ($own_station)
 	{
-		echo '<li><span class="bo_descr">'._BL('Max strikes per day').': </span><span class="bo_value">'._BN($max_str_day_all[0], 0).($max_str_day_all[1] ? ' ('._BD($max_str_day_all[1]).')' : '').'</span>';
 		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '._BK(BO_RADIUS_STAT).') : </span><span class="bo_value">'._BN($max_str_dayrad_all[0], 0).($max_str_dayrad_all[1] ? ' ('._BD($max_str_dayrad_all[1]).')' : '').'</span>';
 	}
 
@@ -1456,12 +1457,16 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 		foreach($traffic_show as $type => $name)
 		{
 			$kb_per_day_single = $kb_per_day[$type];
+
+			if (!$kb_per_day_single)
+				continue;
+				
 			unset($kb_per_day[$type]);
 
 			echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL($name).': </span><span class="bo_value">'._BN($kb_per_day_single, 0).' kB/'._BL('day').'</span>';
 		}
 
-		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Other').': </span><span class="bo_value">'._BN(array_sum($kb_per_day), 0).' kB/'._BL('day').'</span>';
+		//echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Other').': </span><span class="bo_value">'._BN(array_sum($kb_per_day), 0).' kB/'._BL('day').'</span>';
 		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Total').': </span><span class="bo_value">'._BN($kb_traffic, 0).' kB</span>';
 
 	}
@@ -1554,7 +1559,10 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'._BN($D['rows']['strikes'], 0).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'._BN($D['rows']['raw'], 0).'</span>';
+	
+	if ($D['rows']['raw'])
+		echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'._BN($D['rows']['raw'], 0).'</span>';
+		
 	echo '<li><span class="bo_descr">'._BL('Entries (all data)').': </span><span class="bo_value">'._BN($entries_all, 0).'</span>';
 	echo '<li>
 			<span class="bo_descr">'._BL('Memory usage').':
@@ -1567,6 +1575,9 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	{
 		foreach($D['rows'] as $type => $rows)
 		{
+			if (!$D['rows'][$type])
+				continue;
+				
 			echo '<li><span class="bo_descr">'._BL('Usage').' "'.$type.'": </span><span class="bo_value">';
 			echo _BN($D['rows'][$type], 0).' rows / ';
 			echo _BN( ($D['data'][$type]+$D['keys'][$type])  / 1024 / 1024, 1).' MB / ';
