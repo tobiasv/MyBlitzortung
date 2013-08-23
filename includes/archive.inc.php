@@ -153,7 +153,7 @@ function bo_show_archive_map()
 	
 	//min/max strike-time
 	$row = BoDb::query("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
-	$strikes_available = $row['mintime'] > 0;
+	$strikes_available = $row['mintime'] > 0 || $row['maxtime'] > 0;
 	$start_time = strtotime($row['mintime'].' UTC');
 	$end_time = strtotime($row['maxtime'].' UTC');
 
@@ -557,7 +557,9 @@ function bo_show_archive_search()
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Time').':</span><span class=\'bo_value\'> '._BDT($time, false).'.'.$row['time_ns']._BZ($time).'</span></li>';
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Deviation').':</span><span class=\'bo_value\'> '._BK($row['deviation'] / 1000, 1).'</span></li>';
 			//$description .= '<li><span class=\'bo_descr\'>'._BL('Current').':</span><span class=\'bo_value\'> '._BN($row['current'], 1).'kA ('._BL('experimental').')</span></li>';
-			$description .= '<li><span class=\'bo_descr\'>'._BL('Participated').':</span><span class=\'bo_value\'> '.($row['part'] > 0 ? _BL('yes') : _BL('no')).'</span></li>';
+			if (bo_station_id() > 0)
+				$description .= '<li><span class=\'bo_descr\'>'._BL('Participated').':</span><span class=\'bo_value\'> '.($row['part'] > 0 ? _BL('yes') : _BL('no')).'</span></li>';
+				
 			$description .= '<li><span class=\'bo_descr\'>'._BL('Participants').':</span><span class=\'bo_value\'> '.intval($row['stations']).'</span></li>';
 
 			if ($perm)
@@ -854,7 +856,6 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	$map = isset($_GET['bo_map']) ? $_GET['bo_map'] : 0;
 	$show_details = $_GET['bo_show_details'];
 	$show_other_graphs = isset($_GET['bo_other_graphs']) && $perm;
-	$show_cities = isset($_GET['bo_show_cities']);
 	$own_station = bo_station_id() > 0 && bo_station_id() == $station_id;
 
 	if ($perm)
@@ -1042,9 +1043,9 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		}
 		else
 		{
-			$sql_join = BO_DB_PREF."strikes s ";
+			$sql_join = BO_DB_PREF."strikes s";
+			$station_id = false;
 		}
-		
 	}
 	elseif ($only_strikes) // own raw signals, only with strikes
 	{
@@ -1068,8 +1069,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		$stations = bo_stations();
 	}
 	
-	
-	$show_signal   = (!$own_station && $station_id > 0) || ($own_station && $raw_bpv == 8 && $raw_values > 10 && BO_UP_INTVL_RAW > 0);
+	$show_signal   = BO_ARCHIVE_SHOW_FIRST_SIGNAL === true || (!$own_station && $station_id > 0) || ($own_station && $raw_bpv == 8 && $raw_values > 10 && BO_UP_INTVL_RAW > 0);
 	$show_spectrum = $show_signal && BO_ARCHIVE_SHOW_SPECTRUM;
 	$show_xy_graph = $show_signal && (!$own_station || $channels > 1) && BO_ARCHIVE_SHOW_XY;
 	
@@ -1361,7 +1361,11 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 
 		/***** Graphs *****/
 		$alt = htmlspecialchars(_BL('rawgraph'));
-		$url = bo_signal_url($station_id, $row['raw_id'], $stime, $row['stimens'], $distance);
+		$url = bo_signal_url($station_id, $row['raw_id'], $stime, $row['stimens'], $distance, 
+				array(	'id' => $row['strike_id'],
+						'lat' => $row['lat'],
+						'lon' => $row['lon']
+				));
 		
 		if ($show_signal)
 		{
@@ -1613,9 +1617,6 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			if (!$show_other_graphs && time() - $stime < 3600 * 23)
 				echo '<a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs" class="bo_show_all_signals bo_sig_table_menu">'._BL('Show all signals').'</a>';
 
-			if ((bo_user_get_level() & BO_PERM_SETTINGS) && !$show_cities)
-				echo '<a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_show_cities" class="bo_show_all_signals bo_sig_table_menu">'._BL('City names').'</a>';
-			
 			echo '<div class="bo_arch_other_participants_container">';
 			foreach ($s_dists[0] as $sid => $dist)
 			{
@@ -1774,12 +1775,31 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 
 
 					
-function bo_signal_url($station_id, $raw_id = null, $strike_time = null, $strike_time_ns = null, $dist = null)
+function bo_signal_url($station_id, $raw_id = null, $strike_time = null, $strike_time_ns = null, $dist = null, $strike = null)
 {
 	$url = bo_bofile_url().'?';
 	
 	if (!$raw_id)
 	{
+		
+		//no station id --> find first signal
+		if ($station_id === false && BO_ARCHIVE_SHOW_FIRST_SIGNAL === true && is_array($strike))
+		{
+			$sql = "SELECT s.id id, ".bo_sql_latlon2dist('s.lat', 's.lon', $strike['lat'], $strike['lon'])." dist
+						FROM ".BO_DB_PREF."stations s
+						JOIN ".BO_DB_PREF."stations_strikes ss
+							ON s.id=ss.station_id AND ss.strike_id='".$strike['id']."'
+						ORDER BY dist ASC
+						LIMIT 1";
+			$res = BoDb::query($sql);
+			if ($res->num_rows)
+			{
+				$row = $res->fetch_assoc();
+				$dist = $row['dist'];
+				$station_id = $row['id'];
+			}
+		}
+	
 		//station time to signal
 		$station_time  = $strike_time;
 		$station_ntime = $dist / BO_C + $strike_time_ns * 1E-9;

@@ -294,40 +294,13 @@ class BoSignalGraph
 
 			$plot = array();
 			
-			if (max($datay[0]) || min($datay[0]))
+			for ($i=0; $i<6; $i++)
 			{
-				$plot[0]=new LinePlot($datay[0], $datax);
-				$plot[0]->SetColor(BO_GRAPH_RAW_COLOR1);
-			}
-
-			if (max($datay[1]) || min($datay[1]))
-			{
-				$plot[1]=new LinePlot($datay[1], $datax);
-				$plot[1]->SetColor(BO_GRAPH_RAW_COLOR2);
-			}
-
-			if (max($datay[2]) || min($datay[2]))
-			{
-				$plot[2]=new LinePlot($datay[2], $datax);
-				$plot[2]->SetColor(BO_GRAPH_RAW_COLOR3);
-			}
-
-			if (max($datay[3]) || min($datay[3]))
-			{
-				$plot[3]=new LinePlot($datay[3], $datax);
-				$plot[3]->SetColor(BO_GRAPH_RAW_COLOR4);
-			}
-
-			if (max($datay[4]) || min($datay[4]))
-			{
-				$plot[4]=new LinePlot($datay[4], $datax);
-				$plot[4]->SetColor(BO_GRAPH_RAW_COLOR5);
-			}
-
-			if (max($datay[5]) || min($datay[5]))
-			{
-				$plot[5]=new LinePlot($datay[5], $datax);
-				$plot[5]->SetColor(BO_GRAPH_RAW_COLOR6);
+				if (max($datay[$i]) || min($datay[$i]))
+				{
+					$plot[$i]=new LinePlot($datay[$i], $datax);
+					$plot[$i]->SetColor($this->GetColorChannel($i));
+				}
 			}
 			
 			foreach ($plot as $p)
@@ -364,18 +337,52 @@ class BoSignalGraph
 
 			$sline  = new PlotLine(HORIZONTAL, -BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR_LINES, 1);
 			$this->graph->AddLine($sline);
+			
+			if ($data['start'])
+			{
+				$sline  = new PlotLine(VERTICAL, $data['start'], BO_GRAPH_RAW_COLOR_LINES, 1);
+				$this->graph->AddLine($sline);
+			}
 
 			$this->graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			$this->graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			
 			$this->graph->SetMargin(32,4,4,3);
+
+			$sig = null;
+			$y = $this->height-73;
+			foreach($data['channel'] as $ch => $d)
+			{
+				$sig = $d;
+				
+				if ((int)$d['gain'] <= 0)
+					continue;
+					
+				$caption = new Text($d['gain'], $this->width - 30, $y);
+				$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
+				$caption->SetColor($this->GetColorChannel($ch));
+				$this->graph->AddText($caption);
+				
+				
+				$y += 10;
+			}
+			
+			if (is_array($sig))
+			{
+				$ksps = round(1E6 / $sig['conv_gap']);
+				
+				$caption = new Text("PCB ".$sig['pcb']."\n ".$sig['values']." Values\n $ksps kSps", $this->width - 60, 5);
+				$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
+				$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
+				$this->graph->AddText($caption);
+			}
 		}
 	
 	}
 	
 	public function AddText($text)
 	{
-		$caption = new Text($text,35,3);
+		$caption = new Text($text,35,5);
 		$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
 		$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
 		$this->graph->AddText($caption);
@@ -419,6 +426,18 @@ class BoSignalGraph
 			exit;
 	}
 	
+	private function GetColorChannel($channel)
+	{
+		switch($channel)
+		{
+			case 0: return BO_GRAPH_RAW_COLOR1;
+			case 1: return BO_GRAPH_RAW_COLOR2;
+			case 2: return BO_GRAPH_RAW_COLOR3;
+			case 3: return BO_GRAPH_RAW_COLOR4;
+			case 4: return BO_GRAPH_RAW_COLOR5;
+			case 5: return BO_GRAPH_RAW_COLOR6;
+		}
+	}
 }
 
 ?>

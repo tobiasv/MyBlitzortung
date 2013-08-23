@@ -42,13 +42,15 @@ function bo_graph_raw()
 	$cache_file .= $station_id.'_'.gmdate('YmdHi', $tstamp).'.log';
 	
 
-	if ($caching && file_exists($cache_file) && filemtime($cache_file) > $tstamp + 60)
+	if ($caching && file_exists($cache_file) && filemtime($cache_file) > $tstamp + 30)
 	{
 		$lines = file($cache_file);
 	}
 	else
 	{
 		$boid = bo_station2boid($station_id);
+		
+		usleep(rand(0, 400000));
 		
 		//avoid simultaneous downloads
 		clearstatcache();
@@ -58,23 +60,31 @@ function bo_graph_raw()
 			usleep(400000);
 			clearstatcache();
 		}
-		
-		touch($dfile);
-		
-		$url = bo_access_url(BO_IMPORT_SERVER_SIGNALS, BO_IMPORT_PATH_SIGNALS);
-		$url .= $boid.'/'.gmdate('Y/m/d/H/i', floor($tstamp/600)*600).'.log';
-		$lines = bo_get_file($url, $code, 'raw_data_other'.$station_id, $dummy1, $dummy2, true);
 
-		if ($caching)
+		//Check for cached file a second time
+		if ($caching && file_exists($cache_file) && time() - filemtime($cache_file) <= 5)
 		{
-			$dir = dirname($cache_file);
-			if (!file_exists($dir))
-				mkdir($dir, 0777, true);
-
-			file_put_contents($cache_file, implode("\n", $lines));
+			$lines = file($cache_file);
 		}
-		
-		@unlink($dfile);
+		else
+		{
+			touch($dfile);
+			
+			$url = bo_access_url(BO_IMPORT_SERVER_SIGNALS, BO_IMPORT_PATH_SIGNALS);
+			$url .= $boid.'/'.gmdate('Y/m/d/H/i', floor($tstamp/600)*600).'.log';
+			$lines = bo_get_file($url, $code, 'raw_data_other'.$station_id, $dummy1, $dummy2, true);
+
+			if ($caching)
+			{
+				$dir = dirname($cache_file);
+				if (!file_exists($dir))
+					mkdir($dir, 0777, true);
+
+				file_put_contents($cache_file, implode("\n", $lines));
+			}
+			
+			@unlink($dfile);
+		}
 	}
 	
 	if (!$lines || (is_array($lines) && empty($lines)))

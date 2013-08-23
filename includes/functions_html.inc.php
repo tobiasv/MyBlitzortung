@@ -1,5 +1,104 @@
 <?php
 
+
+//displays copyright
+function bo_copyright_footer()
+{
+
+	echo '<div id="bo_footer">';
+
+	echo '<a href="http://www.blitzortung.org/" target="_blank">';
+	echo '<img src="'.bo_bofile_url().'?image=logo" id="bo_copyright_logo">';
+	echo '</a>';
+
+	if (BO_LOGIN_SHOW === true)
+	{
+		$file = BO_LOGIN_URL !== false ? BO_LOGIN_URL : BO_FILE;
+		$file .= strpos($file, '?') === false ? '?' : '';
+
+		echo '<div id="bo_login_link">';
+
+		if (bo_user_get_name())
+		{
+			echo '<a href="'.$file.'&bo_login" rel="nofollow">'._BC(bo_user_get_name()).'</a>';
+			echo ' (<a href="'.$file.'&bo_logout">'._BL('Logout').'</a>)';
+		}
+		else
+			echo '<a href="'.$file.'&bo_login" rel="nofollow">'._BL('Login').'</a>';
+
+		echo '</div>';
+
+
+	}
+
+	if (BO_SHOW_LANGUAGES === true)
+	{
+		$languages = explode(',', BO_LANGUAGES);
+
+		echo '<div id="bo_lang_links">';
+
+		echo _BL('Languages').': ';
+		foreach($languages as $lang)
+		{
+			$title = _BL('lang_'.$lang) != 'lang_'.$lang ? _BL('lang_'.$lang) : $lang;
+			
+			if (BO_SHOW_LANG_FLAGS == true && file_exists(BO_DIR.'images/flags/'.$lang.'.png'))
+				$a_lang = '<img src="'.bo_bofile_url().'?image=flag_'.$lang.'" class="bo_flag" title="'.$title.'">';
+			else
+				$a_lang = $lang;
+
+			if (trim($lang) == _BL())
+				echo ' <strong>'.trim($a_lang).'</strong> ';
+			else
+			{
+				echo ' <a href="'.bo_insert_url(BO_LANG_ARGUMENT, trim($lang)).'" title="'.$title.'">'.trim($a_lang).'</a> ';
+			}
+
+		}
+
+		echo '</div>';
+	}
+
+
+	echo '<div id="bo_copyright">';
+	echo _BL('Lightning data');
+	echo ' &copy; 2003-'.date('Y ');
+	echo '<a href="http://www.blitzortung.org/" target="_blank">';
+	echo 'www.Blitzortung.org';
+	echo '</a>';
+	echo ' &bull; ';
+	echo '<a href="http://'.BO_LINK_HOST.'/" target="_blank" id="mybo_copyright">';
+	echo _BL('copyright_footer');
+	echo '</a>';
+	echo '</div>';
+
+	echo '<div id="bo_copyright_extra">';
+	echo '<span id="bo_footer_timezone">';
+	echo _BL('timezone_is').' <strong>'.date('H:i:s').' '._BL(date('T')).'</strong>';
+	echo '</span>';
+	if (_BL('copyright_extra'))
+	{
+		echo '<span id="bo_copyright_extra_text">';
+		echo _BL('copyright_extra');
+		echo '</span>';
+	}
+	echo '</div>';
+
+	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
+	{
+		echo '<div id="bo_copyright_own">';
+		echo _BC(BO_OWN_COPYRIGHT, false, BO_CONFIG_IS_UTF8);
+		echo '</div>';
+	}
+
+
+
+	echo '</div>';
+
+}
+
+
+
 function bo_archive_select_map(&$map)
 {
 	global $_BO;

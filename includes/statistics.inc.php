@@ -1068,7 +1068,8 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 				break;
 		}
 
-		$urls = unserialize(BoData::get('mybo_stations'));
+		//disabled
+		//$urls = unserialize(BoData::get('mybo_stations'));
 
 		$pos = 1;
 		foreach($S as $id => $d)

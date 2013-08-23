@@ -1,6 +1,7 @@
 <?php
 
 
+
 // GoogleMap with Markers
 function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 {
@@ -788,10 +789,19 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		google.maps.event.addListener(bo_map, 'rightclick', function(event) {
 		if (bo_map.getZoom() > 3)
 		{
+			if (event.ctrlKey)
+				alert('X');
+				
 			window.open("<?php echo BO_ARCHIVE_URL.bo_add_sess_parms() ?>&bo_show=strikes&bo_lat="+event.latLng.lat()+"&bo_lon="+event.latLng.lng()+"&bo_zoom="+bo_map.getZoom(), '_blank');
 		}
 		});
+		
+		bo_map.setOptions({draggableCursor:'crosshair'});
+		
 <?php  } ?>
+
+
+				
 		
 		google.maps.event.addListener(bo_map, 'dragend', function() {
 			bo_setcookie('bo_map_lat', bo_map.getCenter().lat());
@@ -847,7 +857,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 
 		if (map_type.match(/[a-z]+/i))
 			bo_map.setOptions({ mapTypeId: map_type });
-
+			
 		bo_map_user_activity();
 		window.setTimeout("bo_map_timer();", 1000 * 60);
 	}	
@@ -992,7 +1002,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 					default:  color = '888888'; break;
 				}
 				
-				var size = Math.floor(2+bo_map.getZoom()/2);
+				var size = Math.floor(3+bo_map.getZoom()/2);
 				
 				bo_station_markers[i] = new google.maps.Marker({
 				  position: new google.maps.LatLng(bo_stations[i].lat,bo_stations[i].lon), 

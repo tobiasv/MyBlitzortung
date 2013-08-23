@@ -1456,19 +1456,19 @@ function bo_update_stations($force = false)
 				$error++;
 			
 			//PCB
-			if (preg_match('/board;([^ ]+)/', $l, $r))
+			if (preg_match('/board;"?([^ ]+)"?/', $l, $r))
 				$D['controller_pcb'] = strtr($r[1], array('"' =>''));
 			
 			//Status
-			if (preg_match('/status;([^ ]+)/', $l, $r))
+			if (preg_match('/status;"?([^ ]+)"?/', $l, $r))
 				$D['status'] = $r[1];
 			
 			//Firmware
-			if (preg_match('/firmware;"?([^" ]+)"?/', $l, $r))
+			if (preg_match('/firmware;"([^"]+)"/', $l, $r))
 				$D['firmware'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
 			
 			//Signals
-			if (preg_match('/signals;(([^ ;]+);)?([^ ;]+)/', $l, $r))
+			if (preg_match('/signals;"?(([^ ;]+);)?([^ ;]+)"?/', $l, $r))
 			{
 				if (!trim($r[2]))
 				{
@@ -1485,7 +1485,7 @@ function bo_update_stations($force = false)
 			}
 
 			//Last Signal
-			if (preg_match('/last_signal;([-: 0-9]+) ?/', $l, $r))
+			if (preg_match('/last_signal;"([-: 0-9]+)" ?/', $l, $r))
 			{
 				$D['last_time'] = $r[1];
 				//$D['last_time_ns'] = $r[3];
@@ -1494,13 +1494,13 @@ function bo_update_stations($force = false)
 			
 			
 			//Amp Gains
-			if (preg_match('/input_gain;([^ ]+)/', $l, $r))
+			if (preg_match('/input_gain;"?([^ ]+)"?/', $l, $r))
 				$D['amp_gains'] = $r[1];
 
-			if (preg_match('/input_antenna;([^ ]+)/', $l, $r))
+			if (preg_match('/input_antenna;"?([^ ]+)"?/', $l, $r))
 				$D['amp_antennas'] = $r[1];
 
-			if (preg_match('/input_firmware;([^ ]+)/', $l, $r))
+			if (preg_match('/input_firmware;"?([^ ]+)"?/', $l, $r))
 				$D['amp_firmwares'] = strtr($r[1], array('"' =>'')); //qick&dirty :-/
 				
 				
@@ -1532,10 +1532,12 @@ function bo_update_stations($force = false)
 			$D['country'] = strtr($D['country'], array('\null' => ''));
 			$D['firmware'] = strtr($D['firmware'], array('\null' => ''));
 			
-			
-			if (time()-$utime < 1800 && $D['status']==0)
-				$D['status'] = STATUS_RUNNING*10;
-			
+
+			if ($id <= 0)
+			{
+				bo_echod("Wrong station Id $id ".$D['country'].'/'.$D['city']);
+				continue;
+			}
 			
 			//Data for statistics
 			$StData[$id] = array(
@@ -1563,7 +1565,7 @@ function bo_update_stations($force = false)
 			{
 				if (isset($all_stations[$id]))
 				{
-					$sql = "UPDATE ".BO_DB_PREF."stations SET $sql WHERE bo_station_id='".$D['bo_station_id']."'";
+					$sql = "UPDATE ".BO_DB_PREF."stations SET $sql WHERE bo_station_id='".$id."' AND bo_station_id > 0 LIMIT 1";
 					
 					BoDb::query($sql);
 					$count_updated++;

@@ -362,6 +362,9 @@
 /*******************************************************************/
 /*** Statistics                                                  ***/
 
+//Disables statistics for guests
+@define('BO_DISABLE_STATISTICS_GUESTS', false);
+
 
 // Show GPS Info
 // You can set your BO_LAT, BO_LON to rough coordinates and
@@ -674,6 +677,9 @@
 
 //show the xy plot for each signal in table
 @define('BO_ARCHIVE_SHOW_XY', true);
+
+//try to find and show first signal to a stroke when no station selected
+@define('BO_ARCHIVE_SHOW_FIRST_SIGNAL', true);
 
 //entries in strike table per page
 @define('BO_ARCHIVE_TABLE_PER_PAGE', 10);

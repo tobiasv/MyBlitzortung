@@ -64,6 +64,8 @@ if (!defined("BO_VER"))
 	require_once 'includes/functions_lang.inc.php';
 	require_once 'includes/functions_geo.inc.php';
 	require_once 'includes/functions_sql.inc.php';
+	require_once 'includes/functions_signal.inc.php';
+	require_once 'includes/functions_strokes.inc.php';
 	require_once 'includes/data.inc.php';
 	require_once 'includes/user.inc.php';
 	

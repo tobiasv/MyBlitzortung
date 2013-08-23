@@ -106,6 +106,9 @@ function bo_show_archive()
 //show all available statistics and menu
 function bo_show_statistics()
 {
+	if (BO_DISABLE_STATISTICS_GUESTS === true && !bo_user_get_level())
+		return;
+
 	require_once 'statistics.inc.php';
 	
 	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'strikes';
@@ -400,7 +403,9 @@ function bo_show_menu()
 	if (BO_DISABLE_ARCHIVE !== true)
 		echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'archive').'"    id="bo_mainmenu_arch" class="bo_mainmenu'.($page == 'archive' ? '_active' : '').'">'._BL('main_menu_archive').'</a></li>';
 
-	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'statistics').'" id="bo_mainmenu_stat" class="bo_mainmenu'.($page == 'statistics' ? '_active' : '').'">'._BL('main_menu_statistics').'</a></li>';
+	if ( !(BO_DISABLE_STATISTICS_GUESTS === true && !bo_user_get_level()) )
+		echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'statistics').'" id="bo_mainmenu_stat" class="bo_mainmenu'.($page == 'statistics' ? '_active' : '').'">'._BL('main_menu_statistics').'</a></li>';
+	
 	echo '<li><a href="'.bo_insert_url(array('bo_page', 'bo_*'), 'info').'"       id="bo_mainmenu_info" class="bo_mainmenu'.($page == 'info' ? '_active' : '').'">'._BL('main_menu_info').'</a></li>';
 
 	if (bo_user_get_id())

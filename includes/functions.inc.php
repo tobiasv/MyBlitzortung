@@ -53,103 +53,6 @@ function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 }
 
 
-//displays copyright
-function bo_copyright_footer()
-{
-
-	echo '<div id="bo_footer">';
-
-	echo '<a href="http://www.blitzortung.org/" target="_blank">';
-	echo '<img src="'.bo_bofile_url().'?image=logo" id="bo_copyright_logo">';
-	echo '</a>';
-
-	if (BO_LOGIN_SHOW === true)
-	{
-		$file = BO_LOGIN_URL !== false ? BO_LOGIN_URL : BO_FILE;
-		$file .= strpos($file, '?') === false ? '?' : '';
-
-		echo '<div id="bo_login_link">';
-
-		if (bo_user_get_name())
-		{
-			echo '<a href="'.$file.'&bo_login" rel="nofollow">'._BC(bo_user_get_name()).'</a>';
-			echo ' (<a href="'.$file.'&bo_logout">'._BL('Logout').'</a>)';
-		}
-		else
-			echo '<a href="'.$file.'&bo_login" rel="nofollow">'._BL('Login').'</a>';
-
-		echo '</div>';
-
-
-	}
-
-	if (BO_SHOW_LANGUAGES === true)
-	{
-		$languages = explode(',', BO_LANGUAGES);
-
-		echo '<div id="bo_lang_links">';
-
-		echo _BL('Languages').': ';
-		foreach($languages as $lang)
-		{
-			$title = _BL('lang_'.$lang) != 'lang_'.$lang ? _BL('lang_'.$lang) : $lang;
-			
-			if (BO_SHOW_LANG_FLAGS == true && file_exists(BO_DIR.'images/flags/'.$lang.'.png'))
-				$a_lang = '<img src="'.bo_bofile_url().'?image=flag_'.$lang.'" class="bo_flag" title="'.$title.'">';
-			else
-				$a_lang = $lang;
-
-			if (trim($lang) == _BL())
-				echo ' <strong>'.trim($a_lang).'</strong> ';
-			else
-			{
-				echo ' <a href="'.bo_insert_url(BO_LANG_ARGUMENT, trim($lang)).'" title="'.$title.'">'.trim($a_lang).'</a> ';
-			}
-
-		}
-
-		echo '</div>';
-	}
-
-
-	echo '<div id="bo_copyright">';
-	echo _BL('Lightning data');
-	echo ' &copy; 2003-'.date('Y ');
-	echo '<a href="http://www.blitzortung.org/" target="_blank">';
-	echo 'www.Blitzortung.org';
-	echo '</a>';
-	echo ' &bull; ';
-	echo '<a href="http://'.BO_LINK_HOST.'/" target="_blank" id="mybo_copyright">';
-	echo _BL('copyright_footer');
-	echo '</a>';
-	echo '</div>';
-
-	echo '<div id="bo_copyright_extra">';
-	echo '<span id="bo_footer_timezone">';
-	echo _BL('timezone_is').' <strong>'.date('H:i:s').' '._BL(date('T')).'</strong>';
-	echo '</span>';
-	if (_BL('copyright_extra'))
-	{
-		echo '<span id="bo_copyright_extra_text">';
-		echo _BL('copyright_extra');
-		echo '</span>';
-	}
-	echo '</div>';
-
-	if (defined('BO_OWN_COPYRIGHT') && trim(BO_OWN_COPYRIGHT))
-	{
-		echo '<div id="bo_copyright_own">';
-		echo _BC(BO_OWN_COPYRIGHT, false, BO_CONFIG_IS_UTF8);
-		echo '</div>';
-	}
-
-
-
-	echo '</div>';
-
-}
-
-
 
 function bo_gpc_prepare($text)
 {
@@ -412,230 +315,6 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 	return $content;
 }
 
-
-
-
-// FFT
-// Fast Fourier Trasforn according "Numerical Recipies"
-// bo_fft($sign, $ar, $ai)
-// $sign = -1 for inverse FFT, 1 otherwise
-// $ar = array of real parts
-// $ar = array of imaginary parts
-// count($ar) must be power of 2
-function bo_fft($sign, &$ar, &$ai)
-{
-	$n = count($ar);
-
-	// n must be positive and power of 2: 2^n & (2^n-1) == 0
-	if (($n<2) or ($n & ($n-1)))
-	  return false;
-
-	$scale = sqrt(1.0/$n);
-
-	for ($i=$j=0; $i<$n; ++$i) {
-		if ($j>=$i) {
-			$tempr = $ar[$j]*$scale;
-			$tempi = $ai[$j]*$scale;
-			$ar[$j] = $ar[$i]*$scale;
-			$ai[$j] = $ai[$i]*$scale;
-			$ar[$i] = $tempr;
-			$ai[$i] = $tempi;
-		}
-		$m = $n >> 1;
-		while ($m>=1 && $j>=$m) {
-			$j -= $m;
-			$m /= 2;
-		}
-		$j += $m;
-	}
-
-	for ($mmax=1,$istep=2*$mmax; $mmax<$n; $mmax=$istep,$istep=2*$mmax)
-	{
-		$delta = $sign*pi()/$mmax;
-		for ($m=0; $m<$mmax; ++$m)
-		{
-			$w = $m*$delta;
-			$wr = cos($w);
-			$wi = sin($w);
-			for ($i=$m; $i<$n; $i+=$istep)
-			{
-				$j = $i+$mmax;
-				$tr = $wr*$ar[$j]-$wi*$ai[$j];
-				$ti = $wr*$ai[$j]+$wi*$ar[$j];
-				$ar[$j] = $ar[$i]-$tr;
-				$ai[$j] = $ai[$i]-$ti;
-				$ar[$i] += $tr;
-				$ai[$i] += $ti;
-			}
-		}
-		$mmax = $istep;
-	}
-
-	return true;
-}
-
-
-// transform from time domine to frequency domine using FFT
-function bo_time2freq($d, &$phase=array())
-{
-	$n = count($d);
-
-	// check if n is a power of 2: 2^n & (2^n-1) == 0
-	if ($n & ($n-1))
-	{
-	  // eval the minimum power of 2 >= $n
-	  $p = pow(2, ceil(log($n, 2)));
-	  $d += array_fill($n, $p-$n, 0);
-	  $n = $p;
-	}
-
-	$im = array_fill(0, $n, 0);
-
-	bo_fft(1, $d, $im);
-
-	$amp = array();
-	for ($i=0; $i<=$n/2; $i++)
-	{
-		// Calculate the modulus (as length of the hypotenuse)
-		$amp[$i] = hypot($d[$i], $im[$i]);
-
-		if (!$d[$i])
-			$phase[$i] = ($im[$i] < 0 ? -1 : 1) * M_PI / 2;
-		else
-			$phase[$i] = atan($im[$i] / $d[$i]);
-	}
-
-	return $amp;
-}
-
-
-function bo_signal_parse(&$signal = false, $calc_spec = false)
-{
-
-	if ($signal === false)
-		return;
-
-	$bpv = 8; //ony 8bit support
-	
-	//each channel signal string to array	
-	foreach($signal['channel'] as $ch => $d)
-	{
-		$ymax = pow(2,$bpv-1);
-		$utime = $d['conv_gap']/1000;
-		$values = $d['values'];
-
-		$max_volt = (int)$d['pcb'] >= 10 ? BO_MAX_VOLTAGE_RED : BO_MAX_VOLTAGE;
-		
-		if (isset($d['shift']))
-			$max_volt /= pow(2, $d['shift']);
-			
-		$signal['max_volt'] = max($signal['max_volt'], $max_volt);
-		$signal['max_values'] = max($signal['max_values'], $values);
-		
-		$d['hexdata'] = trim($d['hexdata']);
-		
-		if ((int)$d['pcb'] < 10 && strlen($d['hexdata']) == 256)
-			$d['hexdata'] = substr($d['hexdata'], 0, -2);
-		
-		//copy signal to array
-		$j = 0;
-		for ($i=0;$i<strlen($d['hexdata']);$i+=2)
-		{
-			$value = hexdec((substr($d['hexdata'],$i,2)));
-
-			$signal['channel'][$ch]['data_raw'][$j] = $value;
-			$signal['channel'][$ch]['data_volt'][$j] = round(($value - $ymax) / $ymax * $max_volt, 3);
-			$signal['signal_time'][$j] = ($i/2 - $d['start']) * $utime;
-			$j++;
-		}
-
-		//Dummies
-		if (!strlen($d['hexdata']))
-		{
-			$signal['channel'][$ch]['data_raw'][0] = 1;
-			$signal['channel'][$ch]['data_volt'][0] = 0.001;
-			$signal['signal_time'][0] = 0;
-		}
-
-
-		//spectrum for each channel
-		if ($calc_spec)
-		{
-			$signal['channel'][$ch]['spec'] = bo_time2freq($signal['channel'][$ch]['data_volt']);
-
-			//frequencies for each spectrum entry
-			foreach ($signal['channel'][$ch]['spec'] as $i => $dummy)
-			{
-				$signal['spec_freq'][$i] = round($i / ($values * $utime) * 1000);
-			}
-		}
-	}
-	
-	return true;
-}
-
-
-function bo_examine_signal($data, $channels=0, $ntime=0, &$amp = array(), &$amp_max = array(), &$freq = array(), &$freq_amp = array())
-{
-	$sig_data = bo_raw2array($data, true, $channels, $ntime);
-
-	$amp = array(0,0);
-	$amp_max = array(0,0);
-	$freq = array(0,0);
-	$freq_amp = array(0,0);
-
-	if ($sig_data)
-	{
-		foreach($sig_data['signal_raw'] as $channel => $dummy)
-		{
-			//amplitude of first value
-			$amp[$channel] = $sig_data['signal_raw'][$channel][0];
-
-			//max. amplitude
-			$max = 0;
-			foreach($sig_data['signal_raw'][$channel] as $signal)
-			{
-				$sig = abs($signal - 128);
-
-				if ($sig >= $max)
-				{
-					$max = $sig;
-					$amp_max[$channel] = $signal;
-				}
-			}
-
-			//main frequency
-			$max = 0;
-			$freq_id_max = 0;
-			foreach($sig_data['spec'][$channel] as $freq_id => $famp)
-			{
-				if ($freq_id > 0 && $max < $famp)
-				{
-					$max = $famp;
-					$freq[$channel] = $sig_data['spec_freq'][$freq_id];
-				}
-			}
-
-			$freq_amp[$channel] = $max * 100;
-		}
-	}
-
-	$freq_amp[0] = max($freq_amp[0], 0);
-	$freq_amp[0] = min($freq_amp[0], 255);
-	$freq_amp[1] = max($freq_amp[1], 0);
-	$freq_amp[1] = min($freq_amp[1], 255);
-	
-	$s['amp1']=$amp[0];
-	$s['amp2']=$amp[1];
-	$s['amp1_max']=$amp_max[0];
-	$s['amp2_max']=$amp_max[1];
-	$s['freq1']=$freq[0];
-	$s['freq2']=$freq[1];
-	$s['freq1_amp']=$freq_amp[0];
-	$s['freq2_amp']=$freq_amp[1];
-
-	return $s;
-}
 
 
 
@@ -906,26 +585,6 @@ function bo_hex2bin($data)
 	return $bdata;
 }
 
-// min/max zoom limits for dynamic map
-function bo_get_zoom_limits()
-{
-
-	//allow all zoom levels on logged in users with access rights	
-	if ((bo_user_get_level() & BO_PERM_NOLIMIT)) 
-	{
-		$max_zoom = defined('BO_MAX_ZOOM_IN_USER') ? intval(BO_MAX_ZOOM_IN_USER) : 999;
-		$min_zoom = defined('BO_MIN_ZOOM_OUT_USER') ? intval(BO_MIN_ZOOM_OUT_USER) : 0;
-	}
-	else
-	{
-		$max_zoom = defined('BO_MAX_ZOOM_IN') ? intval(BO_MAX_ZOOM_IN) : 999;
-		$min_zoom = defined('BO_MIN_ZOOM_OUT') ? intval(BO_MIN_ZOOM_OUT) : 0;
-	}
-	
-	$min_zoom = max($min_zoom, round(BO_TILE_SIZE/256)-1);
-	
-	return array($min_zoom, $max_zoom);
-}
 
 function bo_insert_date_string($text, $time = null)
 {
@@ -1390,5 +1049,29 @@ function bo_version2number($version)
 	
 	return $num;
 }
+
+// min/max zoom limits for dynamic map
+// NOTE: will be used by tiles too!
+function bo_get_zoom_limits()
+{
+
+	//allow all zoom levels on logged in users with access rights	
+	if ((bo_user_get_level() & BO_PERM_NOLIMIT)) 
+	{
+		$max_zoom = defined('BO_MAX_ZOOM_IN_USER') ? intval(BO_MAX_ZOOM_IN_USER) : 999;
+		$min_zoom = defined('BO_MIN_ZOOM_OUT_USER') ? intval(BO_MIN_ZOOM_OUT_USER) : 0;
+	}
+	else
+	{
+		$max_zoom = defined('BO_MAX_ZOOM_IN') ? intval(BO_MAX_ZOOM_IN) : 999;
+		$min_zoom = defined('BO_MIN_ZOOM_OUT') ? intval(BO_MIN_ZOOM_OUT) : 0;
+	}
+	
+	$min_zoom = max($min_zoom, round(BO_TILE_SIZE/256)-1);
+	
+	return array($min_zoom, $max_zoom);
+}
+
+
 
 ?>

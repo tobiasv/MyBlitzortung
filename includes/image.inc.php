@@ -31,7 +31,7 @@ function bo_icon($icon)
 			bo_circle($I, $c/2, $c/2, $c/2+2, $col, true);
 
 		$tag = intval(substr($icon,6,1));
-		if ($square && $tag >= 1 && $c > 5)
+		if ($square && $tag >= 1 && $c > 6)
 		{
 			$col = imagecolorallocate ($I, 255,255,255);
 			imagerectangle($I, 0, 0, $width-1, $height-1, $col);

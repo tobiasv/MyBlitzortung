@@ -137,7 +137,10 @@ function bo_get_station_list(&$style_class = array())
 
 			
 		if ($d['country'] == '')
-			$d['country'] = ' Unknown';
+		{
+			//$d['country'] = ' Unknown';
+			continue;
+		}
 			
 		$opts[$id] = _BL($d['country']).': '._BC($d['city']);
 		
@@ -208,6 +211,53 @@ function bo_station2boid($station_id)
 {
 	$info = bo_station_info($station_id);
 	return $info['bo_station_id'];
+}
+
+
+function bo_purge_deleted_stations($max_time = null)
+{
+	bo_echod(" ");
+	bo_echod("=== Deleting Stations ===");
+	
+	
+	if ($max_time === null)
+	{
+		$sql = " bo_station_id=0 ";
+	}
+	else 
+	{
+		$max_time -= 3600;
+		if ($max_time > time())
+			return;
+			
+		$sql = " changed < '".gmdate('Y-m-d H:i:s')."'";
+	}
+	
+	$del = array();
+	$res = BoDb::query("SELECT id FROM ".BO_DB_PREF."stations WHERE $sql");
+	while ($row = $res->fetch_assoc())
+		$del[] = $row['id'];
+	
+	if (count($del))
+		bo_echod("Deleting Stations ".implode(',', $del)."!");
+	else
+	{
+		bo_echod("No Station to delete!");
+		return;
+	}
+	
+	//delete the data
+	foreach($del as $id)
+		BoData::delete_all("%#".$id."#%");
+		
+	BoDb::query("DELETE FROM ".BO_DB_PREF."stations_stat    WHERE station_id IN (".implode(',', $del).")", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE station_id IN (".implode(',', $del).")", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."densities        WHERE station_id IN (".implode(',', $del).")", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."stations         WHERE         id IN (".implode(',', $del).")", false);
+
+	bo_echod("Deleted data of ".count($del)." stations!");
+	
+	return;
 }
 
 ?>
