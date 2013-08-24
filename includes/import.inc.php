@@ -764,21 +764,16 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				
 				$part_stations = explode(',', $r[3]);
 				
-		
-				
 				if ( ($pos = array_search(bo_station_id(true), $part_stations)) !== false)
 				{
 					$D['part'] = 1;
 					$D['part_pos'] = $pos+1;
-					echo 'Y';
 				}
 				else
 				{
 					$D['part'] = 0;
 					$D['part_pos'] = 0;
-					echo 'N';
 				}
-				
 				
 			}
 			else

@@ -1202,7 +1202,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 					continue;
 					
 				$text = bo_str_max(_BC($d[1]));
-				$text .= $d[2] ? ' ('._BL($d[2]).')' : '';
+				$text .= $d[2] ? ' ('.trim(_BL($d[2])).')' : '';
 				
 				echo '<li><span class="bo_descr">';
 
