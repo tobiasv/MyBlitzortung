@@ -848,7 +848,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			$dist_data[$own_id][$dist_id]++;
 
 			//Own Long-Time Statistics for self-detected strike
-			if ($part)
+			if ($D['part'])
 			{
 				$bear_data_own[$own_id][$bear_id]++;
 				$dist_data_own[$own_id][$dist_id]++;
