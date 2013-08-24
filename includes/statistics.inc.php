@@ -1690,6 +1690,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 		default: //Strikes
 
 			//Residual
+			/*
 			if ($own_station && BO_UP_INTVL_RAW > 0)
 			{
 				echo '<h4>'._BL('h4_graph_residual_time').'</h4>';
@@ -1698,6 +1699,7 @@ function bo_show_statistics_advanced($station_id = 0, $own_station = true, $add_
 				echo '</p>';
 				bo_show_graph('strikes_station_residual_time', $add_graph, true);
 			}
+			*/
 
 		
 			/*** PARTICIPANTS ***/
