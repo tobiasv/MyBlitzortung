@@ -503,14 +503,12 @@ function bo_check_for_update()
 				
 				
 			case '0.7.9e':
-				bo_purge_deleted_stations();
 				$ok = true;
 				break;
 			
 			case '0.8.1':
 				
-				bo_purge_deleted_stations(); //delete all old stations
-				
+			
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` 
 							ADD `show_mybo` varchar(3) NOT NULL AFTER `tracker`,
 							ADD `bo_station_id` SMALLINT UNSIGNED NOT NULL AFTER `id`,
