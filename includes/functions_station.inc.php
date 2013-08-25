@@ -14,7 +14,7 @@ function bo_stations($index = 'id', $only = '', $under_constr = true)
 	if (!$under_constr)
 		$sql .= " AND last_time != '1970-01-01 00:00:00' ";
 
-	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND id < ".intval(BO_DELETED_STATION_MIN_ID);
+	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND bo_station_id > 0 AND id < ".intval(BO_DELETED_STATION_MIN_ID);
 	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 		$S[$row[$index]] = $row;
@@ -132,21 +132,9 @@ function bo_get_station_list(&$style_class = array())
 		if ($d['lat'] == 0.0 && $d['lon'] == 0.0 && time() - strtotime($d['last_time'].' UTC') > 1800)
 			continue;
 
-		if ($d['country'] == '-')
-			$d['country'] = '';
-			
-		if (!$d['country'] && !trim($d['city'])) // || bo_status($d['status'], STATUS_BAD_GPS))
-		{
-			$d['city'] = 'Station '.$d['bo_station_id'];
-		}
-
-			
-		if ($d['country'] == '')
-		{
-			//$d['country'] = ' Unknown';
+		if (!bo_station_data_valid($d))
 			continue;
-		}
-			
+
 		$opts[$id] = _BL($d['country']).': '._BC($d['city']);
 		
 		$style_class[$id] = 'bo_select_station';
@@ -264,5 +252,26 @@ function bo_purge_deleted_stations($max_time = null)
 	
 	return;
 }
+
+
+function bo_station_data_valid(&$d)
+{
+	if ($d['country'] == '-')
+		$d['country'] = '';
+			
+	if (!$d['country'] && !trim($d['city'])) // || bo_status($d['status'], STATUS_BAD_GPS))
+	{
+		$d['city'] = 'Station '.$d['bo_station_id'];
+	}
+
+			
+	if ($d['country'] == '')
+	{
+		//$d['country'] = ' Unknown';
+		return false;
+	}
+	
+	return true;
+}			
 
 ?>

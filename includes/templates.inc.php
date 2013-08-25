@@ -741,6 +741,17 @@ $_BO['tpl_imgmap']['namerica_mini_stations']['coord'] = array(57, -55, 8, -135);
 
 
 
+//Middle and North America
+//MapTool URL: 
+$_BO['tpl_imgmap']['north_middle_america'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['north_middle_america']['name'] = 'North/Middle America';
+$_BO['tpl_imgmap']['north_middle_america']['file'] = 'maps_namerica/map_north_middle_america.png';
+$_BO['tpl_imgmap']['north_middle_america']['borders'] = array('maps_namerica/map_north_middle_america_borders.png', 60);
+$_BO['tpl_imgmap']['north_middle_america']['coord'] = array(65, -40, -20, -132); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['north_middle_america']['point_style'] = array(2, 2, 'f008', 0);
+
+
+
 
 /**************************************/
 /* Calculation settings for density   */

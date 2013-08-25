@@ -4,7 +4,7 @@
 *****************************
 
 
-Version 1.0 (2013-08-xx)
+Version 1.0 (2013-08-23)
 ------------------------
 
 - switched to the new data format
@@ -14,17 +14,18 @@ Version 1.0 (2013-08-xx)
 - removed graphs which depend on signals data
 - renamed strike -> stroke
 - other fixes
-
+- 1.0a: fix for update not working
+- 1.0b: fix longtime-statistics
 
 !!!!! IMPORTANT NOTES BEFORE UPGRADING !!!!!
 
-If you are updating from a previous version, then the upgrade process needs maps the old format to the new format. This might not work when the old format has been disabled in October 2013! The upgrade process can take VERY LONG - maybe hours on slow servers with lots of archived strokes. If the update fails due to a timeout, try it again and ignore all errors. If you have problems, consider deleting unneeded strokes or do a fresh install.
+1) If you are updating from a previous version, then the upgrade process needs maps the old format to the new format. This might not work when the old format has been disabled in October 2013! The upgrade process can take VERY LONG - maybe hours on slow servers with lots of archived strokes. If the update fails due to a timeout, try it again and ignore all errors. If you have problems, consider deleting unneeded strokes or do a fresh install.
 
-There's a new constant BO_STATION_ID, where you have to set your station id. If you make an update, the station id is determined automatically and stored in the database. However, setting BO_STATION_ID manually is the preferred way. 
+2) There's a new constant BO_STATION_ID, where you have to set your station id. If you make an update, the station id is determined automatically and stored in the database. However, setting BO_STATION_ID manually is the preferred way. 
 
+3) Please remove all "BO_IMPORT_..." settings from the config.php file!
 
-
-
+4) For compatibility reasons, there are now two IDs for each station. An internal Id, which is the same on as before the update. As before, it is used with "bo_station_id=xxx" in the URL. The second one is the original Blitzortung.org Id. It can be accessed with "bo_sid=xxx" in the URL. This Id is also shown in the stations table. This Id is the same one for every station on every MyBlitzortung installation, but not the other Id!
 
 
 

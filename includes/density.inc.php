@@ -1302,8 +1302,11 @@ function bo_get_density_stations()
 	{
 		if (BO_DENSITY_STATIONS == 'all')
 		{
-			foreach($station_infos as $id => $dummy)
-				$stations[$id] = $id;
+			foreach($station_infos as $id => $d)
+			{
+				if (bo_station_data_valid($d))
+					$stations[$id] = $id;
+			}
 		}
 		else
 		{

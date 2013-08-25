@@ -146,7 +146,9 @@ function bo_graph_raw()
 
 	if (abs($last_dt) < $max_tolerance)
 	{
-		$graph->SetMaxTime(BO_GRAPH_RAW_MAX_TIME2);
+		if ($size != 3)
+			$graph->SetMaxTime(BO_GRAPH_RAW_MAX_TIME2);
+			
 		$graph->SetData($type, $signal);
 		$graph->AddText(date('H:i:s', $last_time).'.'.sprintf('%09d', $last_ns).'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs');
 	}

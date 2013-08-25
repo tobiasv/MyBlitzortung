@@ -119,7 +119,7 @@ function bo_show_statistics()
 		
 		if ($station_id && $station_id != bo_station_id())
 		{
-			$add_stid = 'bo_station_id='.$station_id;
+			$add_stid = '&bo_station_id='.$station_id;
 			$add_graph = '&bo_station_id='.$station_id;
 			$own_station = false;
 			$city = trim(bo_station_city($station_id));

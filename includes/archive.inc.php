@@ -962,13 +962,14 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	if ($datetime_start)
 	{
 		$time_start = $datetime_start;
-		$time_end   = time();
+		$time_end   = $datetime_start + 3600 * $hours_back;
 		$sort = 'ASC';
 	}
 	else if ($show_strike_list) // display strikes
 	{
 		$time_end = time();
 		$time_start = $time_end - 3600 * $hours_back;
+		$sort = 'DESC';
 	}
 	else //display signals
 	{
@@ -1003,7 +1004,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	if ($show_strike_list) // all strikes, maybe with own sigs
 	{
 		$table = 's';
-		$sort = 'DESC';
+		
 		
 		if ($station_id > 0 && !$own_station && !$strike_id)
 		{

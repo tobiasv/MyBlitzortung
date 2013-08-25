@@ -1909,7 +1909,7 @@ function bo_update_daily_stat($time = false, $force_renew = true)
 						
 			/*** Longtime statistics ***/
 			$D = unserialize(BoData::get('longtime_max_strikes_day_all'));
-			echo $D[0];
+
 			if ($D[0] < $row_all['cnt'])
 				BoData::set('longtime_max_strikes_day_all', serialize(array($row_all['cnt'], $time)));
 
