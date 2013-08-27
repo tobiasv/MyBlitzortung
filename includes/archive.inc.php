@@ -272,10 +272,10 @@ function bo_show_archive_map()
 		echo '</span>';
 		
 		if (!$ani_cfg['force'])
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'&bo_map='.$map.'&bo_day_add=0#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'&bo_map='.$map.'&bo_day_add=0&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
 		
 		echo '  &nbsp;  &nbsp; &nbsp; ';
 		
@@ -284,10 +284,10 @@ function bo_show_archive_map()
 		echo '</span>';
 		
 		if (!$ani_cfg['force'])
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'&bo_map='.$map.'&bo_day_add=1#bo_arch_strikes_maps_form" >'._BL('Picture').'</a> ';
 		
 		if ($ani_div)
-			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'&bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
 			
 		echo '</div>';
 		
