@@ -26,7 +26,8 @@ function bo_check_for_update()
 						'0.7.9b',
 						'0.7.9c',
 						'0.7.9e',
-						'0.8.1'
+						'0.8.1',
+						'1.1'
 						);
 
 	$max_update_num = bo_version2number($updates[count($updates)-1]);
@@ -599,6 +600,36 @@ function bo_check_for_update()
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
 				
 				break;
+			
+			
+			case '1.1':
+				
+			
+				$sql = "ALTER TABLE `".BO_DB_PREF."stations` 
+							CHANGE `id` `id` SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT, 
+							CHANGE `bo_station_id` `bo_station_id` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0', 
+							CHANGE `bo_user_id` `bo_user_id` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0', 
+							CHANGE `city` `city` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', 
+							CHANGE `country` `country` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', 
+							CHANGE `lat` `lat` DECIMAL(9,6) NOT NULL DEFAULT '0', 
+							CHANGE `lon` `lon` DECIMAL(9,6) NOT NULL DEFAULT '0', 
+							CHANGE `alt` `alt` DECIMAL(5,1) NOT NULL DEFAULT '0', 
+							CHANGE `distance` `distance` MEDIUMINT(8) UNSIGNED NOT NULL DEFAULT '0', 
+							CHANGE `last_time` `last_time` TIMESTAMP NULL DEFAULT NULL, 
+							CHANGE `last_time_ns` `last_time_ns` INT(11) NOT NULL DEFAULT '0', 
+							CHANGE `status` `status` VARCHAR(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0', 
+							CHANGE `amp_gains` `amp_gains` VARCHAR(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', 
+							CHANGE `amp_antennas` `amp_antennas` VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', 
+							CHANGE `amp_firmwares` `amp_firmwares` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', 
+							CHANGE `controller_pcb` `controller_pcb` VARCHAR(30) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', 
+							CHANGE `changed` `changed` TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+							CHANGE `first_seen` `first_seen` TIMESTAMP NULL DEFAULT NULL, 
+							CHANGE `firmware` `firmware` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', 
+							CHANGE `show_mybo` `show_mybo` VARCHAR(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '', 
+							CHANGE `url` `url` VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''";
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
 			
 			default:
 				$ok = true;

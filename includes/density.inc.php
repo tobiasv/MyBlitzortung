@@ -796,6 +796,16 @@ function bo_get_density_image()
 		$date_start = "$year-01-01";
 		$date_end   = "$year-12-31";
 		
+		if ($ratio && $year == date('Y') && (
+				   ($station_id != bo_station_id() && BO_CALC_DENSITIES_CURRENT !== true )
+				|| BO_CALC_DENSITIES_CURRENT_ALL !== true
+				)
+			)
+		{
+			$date_end   = date('Y-m-d', mktime(0,0,0,date('m'),0,date('Y')));
+		}
+		
+		
 		$sql_status = " 1 ";
 		//$sql_status = " (status=2 OR status=4) "; //doesn't work with january (sama data exists as month-status -> unique dataset)
 		$sql_status .= " AND date_start = '$date_start'	AND date_end   <= '$date_end' ";

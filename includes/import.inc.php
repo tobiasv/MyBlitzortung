@@ -133,7 +133,7 @@ function bo_update_all2($force = false, $only = '')
 	if (bo_exit_on_timeout()) return;
 
 	/*** Update strike tracks ***/
-	if ($strikes_imported)
+	if ($strikes_imported || $force)
 	{
 		if (!$only || $only == 'tracks')
 			bo_update_tracks($force);
@@ -1034,6 +1034,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 
 		if ($timeout)
 		{
+			bo_echod("TIMEOUT: Continue next time...");
 			$updated = false;
 			BoData::set('uptime_strikes_modified', $last_strike_time);
 		}
@@ -1604,6 +1605,7 @@ function bo_update_stations($force = false)
 			$sql = "SELECT $only_own sid, COUNT(*) cnt
 					FROM ".BO_DB_PREF."strikes
 					WHERE time > '$datetime_back' AND part > 0";
+			$res = BoDb::query($sql);
 		}
 		else
 		{
@@ -1611,15 +1613,23 @@ function bo_update_stations($force = false)
 					FROM ".BO_DB_PREF."stations_strikes a, ".BO_DB_PREF."strikes b
 					WHERE a.strike_id=b.id AND b.time > '$datetime_back'
 					GROUP BY a.station_id";		
+			$res = BoDb::query($sql, false);
+			
+			if ($res === false)
+			{
+				bo_echod("ERROR on query for station count! You have to set SQL_BIG_SELECTS in your MySQL Database or set BO_STATION_STAT_DISABLE to true (recommened!");
+			}
 		}
 		
-		$res = BoDb::query($sql);
-		while ($row = $res->fetch_assoc())
+		if ($res !== false)
 		{
-			$boid = $id2bo[intval($row['sid'])];
-			$StData[$boid]['strikes'] = $row['cnt'];
+			while ($row = $res->fetch_assoc())
+			{
+				$boid = $id2bo[intval($row['sid'])];
+				$StData[$boid]['strikes'] = $row['cnt'];
+			}
 		}
-
+		
 		$active_stations = 0;
 		$active_sig_stations = 0;
 		$active_avail_stations = 0;
@@ -1729,11 +1739,10 @@ function bo_update_stations($force = false)
 		{
 			$add = $stId == $own_id ? '' : '#'.$stId.'#';
 
+	
 			//whole signals count (not exact)
 			if ($last > 0 && $StData[$boid]['sig'])
-			{
 				BoData::update_add('count_raw_signals2'.$add, $StData[$boid]['sig']*($time-$last)/3600);
-			}
 
 			//max signals/h (own)
 			$new = BoData::update_if_bigger('longtime_max_signalsh_own'.$add, $StData[$boid]['sig']);
@@ -1846,7 +1855,7 @@ function bo_update_stations($force = false)
 }
 
 // Daily and longtime strike counts
-function bo_update_daily_stat($time = false, $force_renew = true)
+function bo_update_daily_stat($time = false, $force_renew = false)
 {
 	global $_BO;
 
@@ -1860,10 +1869,9 @@ function bo_update_daily_stat($time = false, $force_renew = true)
 	
 	//default yesterday
 	if (!$time) 
-	{
 		$time = mktime(date('H')-3,0,0,date("n"),date('j')-1);
-		$day_id = gmdate('Ymd', $time);
-	}
+	
+	$day_id = gmdate('Ymd', $time);
 	
 	if (!$force_renew)
 	{
@@ -1875,14 +1883,14 @@ function bo_update_daily_stat($time = false, $force_renew = true)
 	if (!$data || !is_array($data) || !$data['done'])
 	{
 		bo_echod(" ");
-		bo_echod("=== Updating daily statistics ===");
+		bo_echod("=== Updating daily statistics ($day_id) ===");
 
 		$radius = BO_RADIUS_STAT * 1000;
 		$day_start = gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 00:00:00', $time)));
 		$day_end =   gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 23:59:59', $time)));
 
 		$stat_ok = BoData::get('uptime_stations') > $day_end + 60;
-		$raw_ok  = BoData::get('uptime_raw') > $day_end + 60;
+		//$raw_ok  = BoData::get('uptime_raw') > $day_end + 60;
 
 		// Strikes SQL template
 		$sql_template = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes s WHERE {where} time BETWEEN '$day_start' AND '$day_end'";
@@ -1967,7 +1975,7 @@ function bo_update_daily_stat($time = false, $force_renew = true)
 
 		$sdata = serialize($data);
 		BoData::set('strikes_'.$day_id, $sdata);
-		bo_echod("Datasets: ".count($data)." Length: ".strlen($sdata));
+		bo_echod("Datasets: ".count($data)." Length: ".strlen($sdata)." Status: ".$data['status']);
 		$ret = true;
 		
 		
@@ -2027,8 +2035,10 @@ function bo_update_tracks($force = false)
 	$cellsize  = intval(BO_TRACKS_RADIUS_SEARCH_STRIKES);
 	$cellsize2 = intval(BO_TRACKS_RADIUS_SEARCH_NGBR_CELLS);
 	$cellsize3 = intval(BO_TRACKS_RADIUS_SEARCH_OLD_CELLS);
-	$MinStrikeCount = 3;
+	$MinStrikeCount = 15;
 
+	$MaxStrikes = 10000;
+	
 	if (!$scantime || !$divisor)
 		return;
 
@@ -2055,6 +2065,7 @@ function bo_update_tracks($force = false)
 
 		for ($i = 0; $i < count($stime)-1; $i++)
 		{
+			$max = $MaxStrikes;
 			$cells[$i] = array();
 
 			$date_start = gmdate('Y-m-d H:i:s', $stime[$i]);
@@ -2063,9 +2074,15 @@ function bo_update_tracks($force = false)
 			$cells_time[$i] = array('start' => $stime[$i], 'end' => $stime[$i+1]);
 
 			$sql = "SELECT id, time, lat, lon
-					FROM ".BO_DB_PREF."strikes
-					WHERE time BETWEEN '$date_start' AND '$date_end'
-					";
+					FROM ".BO_DB_PREF."strikes s
+					WHERE ".bo_times2sql($stime[$i], $stime[$i+2], 's', $max);
+			
+			if (is_array($max) && $max['divisor'])
+				$multiplicator = $max['divisor'];
+			else
+				$multiplicator = 1;
+					
+					
 			$res = BoDb::query($sql);
 			while($row = $res->fetch_assoc())
 			{
@@ -2139,7 +2156,7 @@ function bo_update_tracks($force = false)
 
 					//dimensions - ToDo: (cell "borders") missing
 					$realcells[$i][] = array( 'lat'     => $lat, 'lon' => $lon,
-					                          'count'   => count($cell['strikes']),
+					                          'count'   => count($cell['strikes']) * $multiplicator,
 											  'strikes' => $cell['strikes']);
 				}
 			}
@@ -2564,20 +2581,34 @@ function bo_purge_olddata($force = false)
 function bo_getset_timeout($set_max_time = 60)
 {
 	static $max_time = 0, $start_time = 0;
-
+	static $last_time = 0;
+	
 	if (!$start_time)
 		$start_time = time();
-
+	
+	
+	
 	if ($set_max_time && !$max_time)
 	{
 		$max_time = $set_max_time;
 		return false;
 	}
 
-	if ($max_time > 0 && time() - $start_time > $max_time)
-		return true;
+	//check duration between last calls and substract it from max allowed time
+	if ($last_time)
+		$duration = time() - $last_time;
 	else
+		$duration = 0;
+		
+	if ($max_time > 0 && time() - $start_time > $max_time - $duration)
+	{
+		return true;
+	}
+	else
+	{
+		$last_time = time();
 		return false;
+	}
 }
 
 function bo_exit_on_timeout()

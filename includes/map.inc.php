@@ -1328,6 +1328,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	
 	function bo_get_tile_tracks(zoom, coord, tile_size)
 	{
+	
 		c = new bo_tile_coord(zoom, coord, tile_size);
 		if (!c.ok) return c.failimg;
 
@@ -1336,7 +1337,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 
 		var add = bo_get_time_arg(<?php echo intval(BO_UP_INTVL_TRACKS) ?>);
 		
-		return "<?php echo bo_bofile_url() ?>?tile&tracks&zoom="+zoom+"&x="+c.x+"&y="+c.y+"<?php bo_lang_arg('tile'); ?>"+"&bo_t="+add;
+		return "<?php echo bo_bofile_url() ?>?tile&tracks&zoom="+zoom+"&x="+c.x+"&y="+c.y+"<?php bo_lang_arg('tile'); ?>"+add;
 	}
 	
 	function bo_reload_mapinfo() 

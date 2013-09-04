@@ -624,7 +624,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 						});
 					gpsPath.setMap(bo_map);
 
-					var bo_gps_image = new google.maps.MarkerImage("<?php echo  bo_bofile_url() ?>?size=1&bo_icon=0000ff");
+					var bo_gps_image = new google.maps.MarkerImage("<?php echo  bo_bofile_url() ?>?size=2&bo_icon=0000ff");
 									
 					for (var i = 0; i < coordinates.length; i++) 
 					{

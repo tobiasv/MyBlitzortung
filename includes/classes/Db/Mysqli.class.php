@@ -87,13 +87,13 @@ class BoDbMain
 		return self::$dbh->insert_id;
 	}
 
-	public function do_query($sql)
+	public static function do_query($sql)
 	{
 		self::connect();
 		return self::$dbh->query($sql);
 	}
 
-	public function esc($val)
+	public static function esc($val)
 	{
 		self::connect();
 		return self::$dbh->real_escape_string($val);

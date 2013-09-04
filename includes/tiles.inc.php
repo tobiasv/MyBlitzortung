@@ -609,7 +609,11 @@ function bo_tile()
 	else
 	{
 		$s = BO_MAP_STRIKE_SIZE;
-		$style = 1;
+		
+		if ($zoom < 6)
+			$style = 3;
+		else
+			$style = 1;
 	}
 	
 
@@ -660,6 +664,14 @@ function bo_tile()
 				imageline($I, $px, $py-$s, $px, $py+$s-1, $col);
 				break;
 
+			case 3: // plot a "+"
+				
+				imagesetthickness($I, 1);
+				imageline($I, $px-$s+1, $py, $px+$s-1, $py, $col);
+				imageline($I, $px, $py-$s+1, $px, $py+$s-1, $col);
+				break;
+
+				
 			case 2:
 				if (!$row['type']) //plot circle (no type known)
 				{
@@ -775,7 +787,10 @@ function bo_tile_tracks()
 
 	if ($zoom >= BO_TRACKS_MAP_ZOOM_MIN && $zoom <= BO_TRACKS_MAP_ZOOM_MAX)
 	{
-		$data = unserialize(gzinflate(BoData::get('strike_cells')));
+		if ( ($data = gzinflate(BoData::get('strike_cells'))) === false )
+			$data = BoData::get('strike_cells');
+			
+		$data = unserialize($data);
 		
 		if (is_array($data['cells']))
 		{

@@ -747,8 +747,9 @@ $_BO['tpl_imgmap']['north_middle_america'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['north_middle_america']['name'] = 'North/Middle America';
 $_BO['tpl_imgmap']['north_middle_america']['file'] = 'maps_namerica/map_north_middle_america.png';
 $_BO['tpl_imgmap']['north_middle_america']['borders'] = array('maps_namerica/map_north_middle_america_borders.png', 60);
-$_BO['tpl_imgmap']['north_middle_america']['coord'] = array(65, -40, -20, -132); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['north_middle_america']['coord'] = array(62.3, -40, -20, -132); //North, East, South, West (Degrees)
 $_BO['tpl_imgmap']['north_middle_america']['point_style'] = array(2, 2, 'f008', 0);
+$_BO['tpl_imgmap']['north_middle_america']['density_blocksize'] = 2;
 
 
 
@@ -764,6 +765,11 @@ $_BO['tpl_density']['namerica']['coord'] 	= array(75, -35, 6, -170); //North, Ea
 $_BO['tpl_density']['namerica']['length']	= 20; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
 $_BO['tpl_density']['namerica']['bps'] 	    = 3; // bytes per area 
 
+//North/Middle America HD
+$_BO['tpl_density']['north_middle_america_hd']['name'] 		= 'North/Middle America';
+$_BO['tpl_density']['north_middle_america_hd']['coord'] 	= array(70, -30, -30, -150); //North, East, South, West (Degrees)
+$_BO['tpl_density']['north_middle_america_hd']['length']	= 5; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
+$_BO['tpl_density']['north_middle_america_hd']['bps'] 	    = 2; // bytes per area 
 
 //USA
 $_BO['tpl_density']['usa']['name'] 	    = 'USA';
