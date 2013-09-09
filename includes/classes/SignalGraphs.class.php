@@ -296,10 +296,13 @@ class BoSignalGraph
 			
 			for ($i=0; $i<6; $i++)
 			{
-				if (max($datay[$i]) || min($datay[$i]))
+				if (is_array($datay[$i]))
 				{
-					$plot[$i]=new LinePlot($datay[$i], $datax);
-					$plot[$i]->SetColor($this->GetColorChannel($i));
+					if (max($datay[$i]) || min($datay[$i]))
+					{
+						$plot[$i]=new LinePlot($datay[$i], $datax);
+						$plot[$i]->SetColor($this->GetColorChannel($i));
+					}
 				}
 			}
 			

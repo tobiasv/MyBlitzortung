@@ -810,13 +810,15 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			if ($id && !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true) )
 			{
 				$sql_data = array();
+				$st_check = array();
 				
 				foreach($part_stations as $bo_station_id)
 				{
 					$stId = $bo2id[$bo_station_id];
 
-					if ($stId)
+					if ($stId && !isset($st_check[$stId]))
 					{
+						$st_check[$stId] = true; //don't add same station more than 1 time!
 						$last_strikes[$stId] = array($utime, $D['time_ns'], $id);
 						
 						$sql_data['strike_id'] = $id;
@@ -1640,16 +1642,21 @@ function bo_update_stations($force = false)
 		{
 			$id = $all_stations[$boid]['id'];
 			
+			if (!$id)
+				continue;
+				
 			if ($only_own && $only_own != $id)
 				continue;
 
-			if ($id && ($data['sig'] || $data['strikes']))
+			if ($data['sig'] || $data['strikes'])
 			{
 				$sql_data['station_id'] = $id;
 				$sql_data['time'] = $datetime;
 				$sql_data['signalsh'] = intval($data['sig']);
 				$sql_data['strikesh'] = intval($data['strikes']);
 				BoDb::bulk_insert('stations_stat', $sql_data);
+				
+				$active_sig_stations++;
 			}
 
 			if (bo_status($data['status'], STATUS_RUNNING))
@@ -1658,11 +1665,9 @@ function bo_update_stations($force = false)
 			if (!bo_status($data['status'], STATUS_OFFLINE)) //Station is available (no dummy entry, has sent some data some time ago)
 				$active_avail_stations++;
 
-			if (bo_status($data['status'], STATUS_OFFLINE)) //GPS is unavailable right now
+			if (bo_status($data['status'], STATUS_BAD_GPS)) //GPS is unavailable right now
 				$active_nogps++;
 
-			if ($data['sig']) //Station is sending (really active)
-				$active_sig_stations++;
 		}
 
 		//Update whole strike count for dummy station "0"
@@ -2035,11 +2040,11 @@ function bo_update_tracks($force = false)
 	$cellsize  = intval(BO_TRACKS_RADIUS_SEARCH_STRIKES);
 	$cellsize2 = intval(BO_TRACKS_RADIUS_SEARCH_NGBR_CELLS);
 	$cellsize3 = intval(BO_TRACKS_RADIUS_SEARCH_OLD_CELLS);
-	$MinStrikeCount = 15;
+	$MinStrikeCount = intval(BO_TRACKS_MIN_STRIKE_COUNT);
+	$MaxStrikes = intval(BO_TRACKS_MAX_STRIKE_COUNT);
 
-	$MaxStrikes = 10000;
 	
-	if (!$scantime || !$divisor)
+	if (!$scantime || !$divisor || !$MaxStrikes)
 		return;
 
 	$start_time = time();

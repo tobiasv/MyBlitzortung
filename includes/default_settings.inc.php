@@ -159,7 +159,7 @@
 @define('BO_LOCALE2', '');
 
 //available locales
-@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv');
+@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv,pl');
 
 //show links in the footer
 @define('BO_SHOW_LANGUAGES', true);
@@ -628,6 +628,9 @@
 @define('BO_TRACKS_MAP_MIN_STRIKES_DISPLAY', 10);
 @define('BO_TRACKS_SHOW_UNTRACKED', false);
 
+//Min/max strokes
+@define('BO_TRACKS_MIN_STRIKE_COUNT', 15);
+@define('BO_TRACKS_MAX_STRIKE_COUNT', 1000);
 
 
 
