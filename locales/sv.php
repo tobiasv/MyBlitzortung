@@ -121,7 +121,7 @@ $_BL['sv']['yes'] = 'ja';
 $_BL['sv']['distance'] = 'Distans';
 $_BL['sv']['Bearing'] = 'Riktning';
 $_BL['sv']['Deviation'] = 'Avvikelse';
-$_BL['sv']['for_station'] = 'för station';
+$_BL['sv']['for_station'] = 'från station';
 $_BL['sv']['Entries'] = 'Poster';
 
 $_BL['sv']['Advanced'] = 'Avancerad';
@@ -164,7 +164,7 @@ $_BL['sv']['more'] = 'Mer';
 $_BL['sv']['stations'] = 'stationer';
 $_BL['sv']['Result'] = 'Resultat';
 $_BL['sv']['Time'] = 'Tid';
-$_BL['sv']['Current'] = 'Nuvarande';
+$_BL['sv']['Current'] = 'Strömstyrka';
 $_BL['sv']['Polarity'] = 'Polaritet';
 $_BL['sv']['Strike'] = 'Blixt';
 $_BL['sv']['experimental'] = 'exprimentell';
@@ -185,7 +185,7 @@ $_BL['sv']['Pos.'] = 'Pos.';
 $_BL['sv']['Stations'] = 'Stationer';
 $_BL['sv']['Search Options'] = 'Sök alternativ';
 $_BL['sv']['no strike detected'] = 'Inga blixtar registrerade';
-$_BL['sv']['Runtime'] = 'Runtime';
+$_BL['sv']['Runtime'] = 'Tidsdifferens';
 $_BL['sv']['unit_millisec'] = 'ms';
 $_BL['sv']['Older'] = 'Äldre';
 $_BL['sv']['Newer'] = 'Yngre';
@@ -326,8 +326,8 @@ $_BL['sv']['tile_maximum_time_range_err'] = 'Tidsområdet för stort!\nMax är {HOU
 /* Graphs                                                    */
 /*************************************************************/
 
-$_BL['sv']['graph_stat_title_strikes'] = 'Blixt statistik';
-$_BL['sv']['graph_stat_title_signals'] = 'Signal statistik';
+$_BL['sv']['graph_stat_title_strikes'] = 'Blixtstatistik';
+$_BL['sv']['graph_stat_title_signals'] = 'Signalstatistik';
 $_BL['sv']['graph_stat_title_ratio'] = 'Lokaliserings- och blixtandel';
 $_BL['sv']['graph_stat_title_stations'] = 'Antal stationer';
 $_BL['sv']['graph_stat_title_ratio_distance'] = 'Urladdningarnas förhållande till avståndet';
@@ -337,7 +337,7 @@ $_BL['sv']['graph_stat_title_strikes_time'] = 'Blixtar';
 $_BL['sv']['graph_stat_title_participants'] = 'Antal detektioner per deltagande';
 $_BL['sv']['graph_stat_title_strikes_participants'] = 'Blixtar från {PARTICIPANTS} deltagare';
 $_BL['sv']['graph_stat_title_strikes_deviations'] = 'Blixtar med {DEVIATIONS} avvikelse';
-$_BL['sv']['graph_stat_title_strikes_now'] = 'Blixthastighet';
+$_BL['sv']['graph_stat_title_strikes_now'] = 'Blixtintensitet';
 $_BL['sv']['graph_stat_title_amplitudes_time'] = 'Utveckling av signalernas amplituder';
 $_BL['sv']['graph_stat_title_frequencies_time'] = 'Utveckling av topfrekvenser';
 $_BL['sv']['graph_stat_title_amplitudes_time_average'] = 'Medel för amplituder';
@@ -562,8 +562,8 @@ $_BL['sv']['legend_stat_active_stations'] = 'Alternativ';
 /*************************************************************/
 /* User                                                     */
 /*************************************************************/
-$_BL['sv']['Login'] = 'Logga in';
-$_BL['sv']['Password'] = 'Lösenord';
+$_BL['sv']['Login'] = 'Inloggning';
+$_BL['sv']['Password'] = 'L&ouml;senord';
 $_BL['sv']['Login fail!'] = 'Inloggning misslyckades!';
 $_BL['sv']['Logout'] = 'Logga ut';
 $_BL['sv']['Login not allowed'] = 'Inloggning inte tillåten!';
@@ -726,77 +726,76 @@ $_BL['sv']['bo_graph_descr_ratio'] = 'Blixt och lokaliseringsandelen är viktiga 
 
 $_BL['sv']['bo_stat_network_descr_lasth'] = 'All information tillämpas från ett tidsspan på 60 minuter före senaste uppdateringen.';
 $_BL['sv']['bo_stat_network_descr_table'] = 'Här hittar man alla aktiva stationer på detta blixtspårningsnätverk. Sortera tabellen genom att klicka på längarna i första raden.';
-$_BL['sv']['bo_graph_descr_bear'] = 'Egen lokaliseringsandel fördelat på den geografiska riktningen. Fär bättre jämförelse visas även det totala antalet blixtar.';
+$_BL['sv']['bo_graph_descr_bear'] = 'Egen lokaliseringsandel fördelat på den geografiska riktningen. För bättre jämförelse visas även det totala antalet blixtar.';
 $_BL['sv']['bo_stat_longtime_descr'] = 'All information här är uppdaterad sedan det började att samla in data till {MYBO}. Avståndet avses till/från stationen {STATION_CITY}.';
 $_BL['sv']['bo_stat_other_database_descr'] = 'All blixt-, signal- och stationsdata sparas i en lokal databas på denna sida:';
 $_BL['sv']['bo_stat_other_updates_descr'] = 'Ny data samlas in från blitzortung.org i definierade tidsintervall:';
 $_BL['sv']['bo_stat_other_gps_descr'] = 'Lite information om GPS mottagaren, som används för att ta emot exakt tid och plats. Om det är känt visas även antennriktningarna (röd, grön).';
 $_BL['sv']['bo_stat_station_descr_lasth'] = 'Här hittar man lite statistik för TOA blixtspårningsstation {STATION_CITY}.';
 $_BL['sv']['bo_graph_descr_radi'] = 'Översikt om den egna lokaliseringsandelen genom avståndet från stationen. Även totalt blixtantal genom åvståndet visas.';
-$_BL['sv']['bo_graph_descr_strikes'] = 'Here you can see the whole strike count per hours detected by the lightning network, the count of detected strikes/h of the station {STATION_CITY} and the mean strike count for all stations';
-$_BL['sv']['bo_graph_descr_signals'] = 'The count of received signals per hour of the station {STATION_CITY} and also mean value of all stations.';
-$_BL['sv']['bo_stat_other_antennas_descr'] = 'The bearing of the antennas can be detected automatically by {MYBO}. This is useful for determining the polarity of a strike (very experimental!).';
-$_BL['sv']['bo_graph_descr_radi_longtime'] = 'This graph shows the strike ratio over distance since start of data collecting.';
-$_BL['sv']['bo_graph_descr_bear_longtime'] = 'This graph shows the strike ratio over geographic direction since start of data collecting.';
-$_BL['sv']['bo_graph_descr_strikes_time'] = 'Graph of strike count of the lightning detection network respectively of the station {STATION}';
-$_BL['sv']['bo_graph_descr_strikes_time_radius'] = 'Same as above, but only strikes within a range around {RADIUS}km of the station {STATION} are counted.';
-$_BL['sv']['bo_graph_stations'] = 'Active stations are sending signales and participate actively in the lightning detection network. Available stations are currently offline, because of technical difficulties and so on.';
-$_BL['sv']['bo_graph_participants'] = 'For detecting and locating a strike, a minimum of {MIN_PARTICIPANTS} stations have to receive a signal.';
-$_BL['sv']['bo_graph_log_warn'] = 'Hint: The scale is logarithmic!';
-$_BL['sv']['bo_graph_participants_time'] = 'Count of participants. You can view the development per participation count value or the mean participation count.';
-$_BL['sv']['bo_graph_descr_radi_adv'] = 'The same as strike ratios in the station statistics, but here you can select the channel.';
-$_BL['sv']['bo_graph_descr_bear_adv'] = 'The same as strike ratios in the station statistics, but here you can select the channel.';
-$_BL['sv']['bo_graph_spectrum'] = 'In each single spectrum of a singnal is a frequency with a maximum peak. The sum of the amplitudes of these peaks for each frequency are displayed here.';
-$_BL['sv']['bo_graph_amplitudes'] = 'Amplitudes of Signals. You can change between the amplitude of the first sample or the maximum amplitude.';
-$_BL['sv']['bo_graph_amplitudes_time'] = 'The development of the amplitudes of the signals. You can choose between the maximum amplitude of the signal or the amplitude of the first sample.';
-$_BL['sv']['bo_graph_frequencies_time'] = 'The development of the frequency peaks by time.';
-$_BL['sv']['bo_graph_deviations'] = 'For every strike a deviation is calculated';
-$_BL['sv']['bo_graph_evaluated_signals'] = 'Signals of the station {STATION} that could not be assigned to a strike by Blitzortung.org are rescanned by {MYBO}. In some cases a strike could be reassigned to a signal. The more this happens the higher is the probability that there is a problem with the station.';
-$_BL['sv']['bo_graph_deviations_time'] = 'Development by time of mean deviation or development of a specific deviation';
-$_BL['sv']['bo_graph_distance'] = 'Development of the mean distance to the station {STATION}. You can estimate the stations sensitivity by comparing the two lines.';
-$_BL['sv']['bo_descr_strikes_now'] = 'Lightning data is downloaded {UPDATE_INTERVAL} from Blitzortung.org servers. The interval for the calculation of the strike rate is {RATE_INTERVAL}. ';
-$_BL['sv']['bo_stat_advanced_info'] = 'Advanced statistics, mainly for the station operator.';
-$_BL['sv']['bo_stat_other_station_info'] = 'Hint: Statistics of station {STATION_CITY} are displayed.';
-$_BL['sv']['bo_stat_other_station_info_back'] = 'Back to station {STATION}';
+$_BL['sv']['bo_graph_descr_strikes'] = 'Här visas det totala antalet urladdningar per timma som identifierats av blixtspårningsnätverket samt antalet identifierade urladdningar per timme från stationen {STATION_CITY} tillsammans med medelantalet för alla stationer.';
+$_BL['sv']['bo_graph_descr_signals'] = 'Antalet mottagna signaler per timme från stationen {STATION_CITY} tillsammans med medelvärdet för alla stationer.';
+$_BL['sv']['bo_stat_other_antennas_descr'] = 'Antennernas riktning kan identifieras automatiskt av {MYBO}. Detta är användbart för att bestämma polariteten av en urladdning (beta).';
+$_BL['sv']['bo_graph_descr_radi_longtime'] = 'Grafen visar andelen blixtar genom avståndet sedan starten av datainsamlingen.';
+$_BL['sv']['bo_graph_descr_bear_longtime'] = 'Grafen visar andelen blixtar genom den geografiska riktningen sedan starten av datainsamlingen.';
+$_BL['sv']['bo_graph_descr_strikes_time'] = 'Graph över antalet blixtar från blixtspårningsnätverket respektive från station {STATION}';
+$_BL['sv']['bo_graph_descr_strikes_time_radius'] = 'Samma som oven men endast blixtar inom {RADIUS}km från stationen {STATION} är inräknade.';
+$_BL['sv']['bo_graph_stations'] = 'Aktiva stationer skickar in sina signaler och deltar aktivt i blixtspårningsnätverket. Tillgängliga stationer är de som för tillfället offline på grund av en eller annan teknikalitet.';
+$_BL['sv']['bo_graph_participants'] = 'För att identifiera och positionera en blixt måste minst {MIN_PARTICIPANTS} deltagande stationer mottagit signalen.';
+$_BL['sv']['bo_graph_log_warn'] = 'Tips: Skalan är logaritmisk!';
+$_BL['sv']['bo_graph_participants_time'] = 'Välj antingen att visa utvecklingen av det totala antalet deltagare eller deltagarantalets medelvärde.';
+$_BL['sv']['bo_graph_descr_radi_adv'] = 'Samma som andelen blixtar under stationsstatistiken men här kan man välja kanal.';
+$_BL['sv']['bo_graph_descr_bear_adv'] = 'Samma som andelen blixtar under stationsstatistiken men här kan man välja kanal.';
+$_BL['sv']['bo_graph_spectrum'] = 'I varje enskilt signalspektrum finns en frekvens med maximal topp. Summan dessa toppars amplituder för varje frekvens visas här.';
+$_BL['sv']['bo_graph_amplitudes'] = 'Signalernas amplituder. Välj mellan amplituden av det först urvalet eller den maximala amplituden.';
+$_BL['sv']['bo_graph_amplitudes_time'] = 'Utvecklingen av signalernas amplituder. Välj mellan den maximala amplituden av signalen eller amplituden på det första urvalet.';
+$_BL['sv']['bo_graph_frequencies_time'] = 'Utvecklingen av frekvenstoppar över tid.';
+$_BL['sv']['bo_graph_deviations'] = 'Standardavvikelsen beräknas för varje blixt';
+$_BL['sv']['bo_graph_evaluated_signals'] = 'Signalerna från stationen {STATION} som inte kan tilldelade en blixt av Blitzortung.org analyseras på nytt av {MYBO}. I vissa fall kan en blixt då tilldelas en signal. Desto oftare detta inträffar desto högre är sannolikhet för att det är något fel med stationen.';
+$_BL['sv']['bo_graph_deviations_time'] = 'Utvecklingen över tiden för medelavvikelsen eller utvecklingen för en specifik avvikelse';
+$_BL['sv']['bo_graph_distance'] = 'Utvecklingen av medelavståndet till {STATION}. Stationens känslighet kan uppskattas genom att jämföra de två linjerna.';
+$_BL['sv']['bo_descr_strikes_now'] = 'Blixtdata laddas ner {UPDATE_INTERVAL} från Blitzortung.org servrarna. Intervallet för beräkning av blixtar är {RATE_INTERVAL}. ';
+$_BL['sv']['bo_stat_advanced_info'] = 'Avancerad statistik, huvudsakligen för stationsoperatören.';
+$_BL['sv']['bo_stat_other_station_info'] = 'Tips: Statistik för stationen {STATION_CITY} visas.';
+$_BL['sv']['bo_stat_other_station_info_back'] = 'Tillbaka till stationen {STATION}';
 
 
 /*************************************************************/
 /* Archives descriptions                                     */
 /*************************************************************/
 
-$_BL['sv']['archive_search_info'] = 'Here you search for the last {COUNT} strikes in an area. To define that area, move the marker on the map and enter a radius to search within. Strikes will be visualized as colored dots on the map. You can click on it to see more information about that strike. You can only search for strikes in the red colored area around the station.';
+$_BL['sv']['archive_search_info'] = 'Här kan man söka på de {COUNT} senaste blixtarna inom ett område. Flytta markören på kartan och ange en radie för att definiera detta sökområde. Blixtarna visualiseras med färgade prickar/kryss på kartan. Klicka på dessa för att erhålla mer information som en speciell blixt. Man kan bara söka efter blixtar i den rödfärgade området runt stationen.';
 
-$_BL['sv']['archive_map_info'] = 'Here you can display the lightning strikes for each day on different maps.
- It is also possible to view animated maps, but consider that it will take some time to load them.
- Lightning data is available from {DATE_START} to {DATE_END}. There\'s no guarantee for completeness.
+$_BL['sv']['archive_map_info'] = 'Här visas olika blixturladdningar för varje dag på olika kartor.
+ Det är också möjligt att visa animerade kartor. Tänk dock på att dessa kan ta lång tid att ladda in.
+ Blixtdata är tillgängligt från {DATE_START} ttill {DATE_END}. Det finns dock ingen garanti på att denna data är fullständig.
  ';
 
 $_BL['sv']['archive_density_info'] = '
- Here you can display lightning densities for different regions. This data is saved independently from
- the other strike data.
+ Här visas blixtarnas densitet för olika regioner. Denna data sparas oberoende från övrig blixtdata.
  <br>
  <br>
- Some hints: The data displayed here is not standardized,
- so the results can not be compared over longer time ranges or bigger regions!
- This is due to different station coverage and improved lightning detection.
- You can switch to a detection station and select between different views.
+ Några tips: Datan som visar här är inte standardiserad vilket betyder att resultatet
+ inte kan jämföras över längre tidsintervaller eller större områden!
+ Detta beror på täckningen från stationerna ändrats samt att blixtidentifieringen har förbättrats.
+ Välj station och dit för att visa olika vyer.
  ';
 
 $_BL['sv']['archive_signaltable_info'] = '
- Ever lightning detection stations of the Blitzortung.org network receives signal from strikes and also
- more or less noise. Here you can see some of the signals, that where received from the station {STATION}
- during the last minutes.
- If other stations receives the same signal during a very short time range then maybe a lightning can be
- located out of the correspondending times (time of arrival method - TOA).
- In this case additional information about the lightning strike will be displayed here.
+ Alla stationer i nätverket Blitzortung.org tar emot signaler från blixtar samt mer eller mindre brus.
+ Här visas några av de signaler som tagits emot från stationen {STATION} 
+ under de senaste minutrarna.
+ Om andra stationer tar emot samma signal under ett mycket, mycket kort tidsintervall kan denna urladdning eventuellt positioneras
+ på grund av att tiden överensstämmer (time of arrival method - TOA).
+ Är så fallet kommer utförligare information om denna blixt visas här.
  ';
 
-$_BL['sv']['archive_striketable_info'] = 'Here you can see the same information as on the site "signals" but also
- strikes where no signal was detected by you station. To stay in common with the Blitzortung.org rules,
- this page can only be accessed with an user account.
+$_BL['sv']['archive_striketable_info'] = 'Här visas samma information som under rubriken Signaler men även
+ blixtar vars signaler inte upptäcktes av din station. För att hålla sig till reglerna för Blitzortung.org
+ är denna sida endast åtkomlig från ett registrerat användarkonto.
  <br><br>
- Hint: The hyperbolic curves displayed in the map are only informative and don\'t represent the actual
- calculation ({MYBO_ORIG} doesn\'t actually know the times of the other stations).
+ Tips: De hyperboliska kurvorna som visas i kartan är endast informativa och representerar inte de verkliga beräkningarna
+ ({MYBO_ORIG} känner inte till tiderna från de andra stationerna).
  ';
 
 $_BL['sv']['archive_signaltable_info_bottom'] = '
@@ -804,16 +803,16 @@ $_BL['sv']['archive_signaltable_info_bottom'] = '
  If a lightning strike was detected, some additional information correspondending to the station {STATION} will be displayed.
  </p>
  <ul>
- <li><span class="bo_descr">Runtime:</span> Difference between time of strike and reception</li>
- <li><span class="bo_descr">Distance:</span> Distance strike to station {STATION} calculated from runtime (1ms = 300km)</li>
- <li><span class="bo_descr">Direction:</span> Approximate direction (exact value won\' be displayed due to usage limitations)</li>
- <li><span class="bo_descr">Deviation:</span> The smaller, the better the locating</li>
- <li><span class="bo_descr">Current:</span> Current of the strike. Very experimental! Currently almost no informative value!</li>
- <li><span class="bo_descr">Polarity:</span> Positive/negative lightning. Is determined out of signal. Very experimental, only suitable for near lightning!</li>
- <li><span class="bo_descr">Participants:</span> Number of stations that received the lightning strike. The more, the better.</li>
- <li><span class="bo_descr">Participanted:</span> Did the station {STATION} participate? If "no" is colored, then a signal has been received but it wasn\'t used for the calculation</li>
- <li><span class="bo_descr">Locating angle:</span> Max. angle of participated station around lightning position (in parenthesis: stations that weren\'t used for calculation). A value of 270° would be ideal, but a good locating is also possible on much smaller values.
- <li><span class="bo_descr">Channel:</span> Recorded channel in the graph (if station operates in "Best Channel Mode")
+ <li><span class="bo_descr">Tidsdifferens:</span> Tidsskillnaden mellan blixten och mottagningen</li>
+ <li><span class="bo_descr">Avstånd:</span> Avståndet till stationen {STATION} beräknat på tidsdifferensen (1ms = 300km)</li>
+ <li><span class="bo_descr">Riktning:</span> Ungefärlig riktning (exakt värde visas inte på grund av användningsbegränsningar)</li>
+ <li><span class="bo_descr">Avvikelse:</span> Mindre värde innebär en bättre positionering</li>
+ <li><span class="bo_descr">Strömstyrka:</span> Blixtens strömstyrka. Mycket experimentellt! För närvarande nästan inget informativt värde!</li>
+ <li><span class="bo_descr">Polaritet:</span> Positiv eller negativ urladdning som bestäms av signalen. Mycket experimentellt och endast tillämpbart för närliggande blixtar!</li>
+ <li><span class="bo_descr">Deltagare:</span> Antal stationer som tog emot blixtsignalen. Flera stationer innebär bättre information.</li>
+ <li><span class="bo_descr">Deltog:</span> Deltog stationen {STATION}? Om "Nej" är markerat har signalen tagit emot men inte använts för beräkningen av blixten</li>
+ <li><span class="bo_descr">Identifierad vinkel:</span> Maximal vinkel från deltagande station till blixtens position (inom parantes: stationer som inte var med i beräkningen). Ideallt värde är runt 270° men det går att få bra beräkningar med mycket mindre värden.</li>
+ <li><span class="bo_descr">Kanal:</span> Identifierande kanal i grafen (om stationen if station körs i "Best Channel Mode")</li>
  </ul>
  ';
 
@@ -862,7 +861,7 @@ $_BL['sv']['alert_mail_first_strike'] = 'Första blixt ';
 $_BL['sv']['alert_sms_last_strike'] = 'Senaste blixt';
 $_BL['sv']['alert_sms_distance'] = 'Avstånd';
 $_BL['sv']['alert_sms_description'] = '{MYBO_NOTAGS} station {STATION}';
-$_BL['sv']['No alerts available. Create one yourself!'] = 'Inga varningar tillgängliga. Skapa en här!';
+$_BL['sv']['No alerts available. Create one yourself!'] = 'Inga varningar tillgängliga. Skapa en ny här!';
 $_BL['sv']['You must fill all fields!'] = 'Du måste fylla i alla fält!';
 $_BL['sv']['Wrong format of E-Mail address'] = 'Fel format på e-mailaddres';
 $_BL['sv']['Wrong format of telephone number'] = 'Fel format på telefonnummer';
@@ -925,6 +924,8 @@ $_BL['sv']['mybo_station_update_info'] = '
   Ditt id kommer inte att sparas! Lösenorden kommer inte heller att skickas till andra webbplatser än till blitzortung.org!
   Dina stationer måste ha skickat minst en signal under de senaste 2 timmarna för att autentiseringen skall fungera.
   </ p> ';
+
+
 
 
 

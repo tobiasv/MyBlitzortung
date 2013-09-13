@@ -160,7 +160,7 @@ function bo_show_statistics()
 		echo '<fieldset>';
 		echo '<form>';
 		echo _BL('Select station').': ';
-		echo bo_insert_html_hidden(array('bo_station_id'));
+		echo bo_insert_html_hidden(array('bo_station_id', 'bo_sid'));
 		echo bo_get_stations_html_select($station_id);
 		echo '</form>';
 		echo '</fieldset>';
