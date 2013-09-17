@@ -45,16 +45,16 @@ $_BL['pl']['Lightning data from Blitzortung.org'] = 'Lightning data from Blitzor
 
 $_BL['pl']['.'] = '.';
 $_BL['pl'][','] = ',';
-$_BL['pl']['_date'] = 'R-m-d';
+$_BL['pl']['_date'] = 'Y-m-d';
 $_BL['pl']['_dateshort'] = 'm/d';
-$_BL['pl']['_datetime'] = 'R-m-d G:m:s';
+$_BL['pl']['_datetime'] = 'Y-m-d G:m:s';
 
-
+$_BL['pl']['_before'] = false;
 $_BL['pl']['_minutes_ago'] = 'minut temu';
 $_BL['pl']['_minute_ago'] = 'minuta temu';
 $_BL['pl']['unit_meters'] = 'm';
-$_BL['pl']['unit_minutes'] = 'minuty';
-$_BL['pl']['unit_hours'] = 'godziny';
+$_BL['pl']['unit_minutes'] = 'minut';
+$_BL['pl']['unit_hours'] = 'godzin';
 $_BL['pl']['unit_us_short'] = 'µs';
 $_BL['pl']['unit_ksps'] = 'Kilopróbek na sekundę';
 $_BL['pl']['unit_days'] = 'dni';
@@ -141,21 +141,21 @@ $_BL['pl']['Lightning map'] = 'Mapa wyładowań';
 $_BL['pl']['Signals'] = 'Sygnały';
 
 $_BL['pl']['N'] = 'Pn.';
-$_BL['pl']['NNE'] = 'Pn.-pn.-wsch.';
-$_BL['pl']['NE'] = 'Pn.-wsch.';
-$_BL['pl']['ENE'] = 'Wsch.-pn.-wsch.';
-$_BL['pl']['E'] = 'Wsch.';
-$_BL['pl']['ESE'] = 'Wsch.-pd.-wsch.';
-$_BL['pl']['SE'] = 'Pd.-wsch.';
-$_BL['pl']['SSE'] = 'Pd.-pd.-wsch.';
+$_BL['pl']['NNE'] = 'Pn.-pn.-ws.';
+$_BL['pl']['NE'] = 'Pn.-ws.';
+$_BL['pl']['ENE'] = 'Ws.-pn.-ws.';
+$_BL['pl']['E'] = 'Ws.';
+$_BL['pl']['ESE'] = 'Ws.-pd.-ws.';
+$_BL['pl']['SE'] = 'Pd.-ws.';
+$_BL['pl']['SSE'] = 'Pd.-pd.-ws.';
 $_BL['pl']['S'] = 'Pd.';
 $_BL['pl']['SSW'] = 'Pd.-pd.-zach.';
 $_BL['pl']['SW'] = 'Pd.-zach.';
-$_BL['pl']['WSW'] = 'Zach.-pd.-zach.';
-$_BL['pl']['W'] = 'Zach.';
-$_BL['pl']['WNW'] = 'Zach.-pn.-zach.';
-$_BL['pl']['NW'] = 'Pn.-zach.';
-$_BL['pl']['NNW'] = 'Pn.-pn.-zach.';
+$_BL['pl']['WSW'] = 'Za.-pd.-za.';
+$_BL['pl']['W'] = 'Za.';
+$_BL['pl']['WNW'] = 'Za.-pn.-za.';
+$_BL['pl']['NW'] = 'Pn.-za.';
+$_BL['pl']['NNW'] = 'Pn.-pn.-za.';
 
 $_BL['pl']['Station'] = 'Stacja';
 $_BL['pl']['Year'] = 'Rok';
@@ -291,7 +291,7 @@ $_BL['pl']['main_title_map'] = 'Mapa wyładowań';
 $_BL['pl']['main_title_statistics'] = 'Statystyka';
 $_BL['pl']['main_title_info'] = 'Informacja';
 $_BL['pl']['main_title_archive'] = 'Archiwa';
-$_BL['pl']['main_title_login'] = 'Strefa urzytkownika';
+$_BL['pl']['main_title_login'] = 'Strefa użytkownika';
 
 $_BL['pl']['main_menu_map'] = 'Mapa wyładowań na żywo';
 $_BL['pl']['main_menu_archive'] = 'Archiwa';
@@ -306,13 +306,13 @@ $_BL['pl']['main_menu_login'] = 'Strefa użytkownika';
 $_BL['pl']['map_options'] = 'Opcje';
 $_BL['pl']['only own strikes'] = 'Tylko uderzenia wykryte przez stację {STATION}';
 $_BL['pl']['tile not available'] = 'Dane o wyładowaiach dostępne tylko dla zalogowanych użytkowników';
-$_BL['pl']['update map'] = 'Uaktualnij';
+$_BL['pl']['update map'] = 'Aktualizuj';
 $_BL['pl']['Click to set the map to Home'] = 'Kliknij aby określić lokalizację mapy';
 $_BL['pl']['Dynamic map'] = 'Mapa dynamiczna';
 $_BL['pl']['Show Stations'] = 'Pokaż stacje';
 $_BL['pl']['None'] = 'Brak';
 $_BL['pl']['Active stations'] = 'Aktywne stacje';
-$_BL['pl']['auto update'] = 'Auto uaktualnienie';
+$_BL['pl']['auto update'] = 'Auto aktualizacja';
 $_BL['pl']['show tracks'] = 'Pokaż ślady (ekperymentalne!)';
 $_BL['pl']['Own maps'] = 'Własne mapy';
 $_BL['pl']['Extra overlays'] = 'Nakładki ekstra';
@@ -328,10 +328,10 @@ $_BL['pl']['tile_maximum_time_range_err'] = 'Zakres czasu za duży!\nMaksimum wy
 
 $_BL['pl']['graph_stat_title_strikes'] = 'Statystyka uderzeń';
 $_BL['pl']['graph_stat_title_signals'] = 'Statystyka sygnałów';
-$_BL['pl']['graph_stat_title_ratio'] = 'Wskażniki uderzeń i lokalizacji';
+$_BL['pl']['graph_stat_title_ratio'] = 'Wskaźniki uderzeń i lokalizacji';
 $_BL['pl']['graph_stat_title_stations'] = 'Liczba stacji';
-$_BL['pl']['graph_stat_title_ratio_distance'] = 'Wskażnik uderzeń na odległość';
-$_BL['pl']['graph_stat_title_ratio_bearing'] = 'Wskażnik uderzeń na kierunek';
+$_BL['pl']['graph_stat_title_ratio_distance'] = 'Wskaźnik uderzeń na odległość';
+$_BL['pl']['graph_stat_title_ratio_bearing'] = 'Wskaźnik uderzeń na kierunek';
 $_BL['pl']['graph_stat_title_distance'] = 'Średnia odeległość uderzenia';
 $_BL['pl']['graph_stat_title_strikes_time'] = 'Uderzenia';
 $_BL['pl']['graph_stat_title_participants'] = 'Wykrycia na liczbę uczestników';
@@ -357,12 +357,12 @@ $_BL['pl']['graph_legend_signals_avg_all'] = 'Średnia sygnałów na stację';
 $_BL['pl']['graph_legend_signals_own'] = 'Sygnały stacji {STATION}';
 $_BL['pl']['graph_legend_ratio_sig_all'] = 'Całkowity wskaźnik lokalizacji';
 $_BL['pl']['graph_legend_ratio_sig_own'] = 'Wskaźnik lokalizacji stacji {STATION}';
-$_BL['pl']['graph_legend_ratio_str_all'] = 'Całkowity wskażnik uderzeń';
+$_BL['pl']['graph_legend_ratio_str_all'] = 'Całkowity wskaźnik uderzeń';
 $_BL['pl']['graph_legend_ratio_str_own'] = 'Wskaźnik uderzeń stacji {STATION}';
 $_BL['pl']['graph_legend_stations_active'] = 'Aktywne stacje';
 $_BL['pl']['graph_legend_stations_active_signals'] = 'Stacje z sygnałami';
 $_BL['pl']['graph_legend_stations_max_active_signal'] = 'najwyższa liczba aktywnych stacji kiedykolwiek';
-$_BL['pl']['graph_legend_ratio_distance'] = 'Wskażnik uderzeńs tacji {STATION}';
+$_BL['pl']['graph_legend_ratio_distance'] = 'wskaźnik uderzeńs tacji {STATION}';
 $_BL['pl']['graph_legend_stations_max_active'] = 'Najwyższa liczba stacji kiedykolwiek';
 $_BL['pl']['graph_legend_count_distance'] = 'Całkowita liczba uderzeń';
 $_BL['pl']['graph_legend_ratio_bearing'] = 'Wskaźnik lokalizacji stacji {STATION}';
@@ -385,7 +385,7 @@ $_BL['pl']['graph_legend_participants_time_own'] = 'procentowo stacja {STATION}'
 $_BL['pl']['graph_legend_deviatinons_time_all'] = 'Względna liczba';
 $_BL['pl']['graph_legend_deviations_time_own'] = 'Względna liczba stacji {STATION}';
 $_BL['pl']['graph_legend_evaluated_signals_part_ratio'] = 'Wskaźnik uderzeń';
-$_BL['pl']['graph_legend_evaluated_signals_part_all_ratio'] = 'Wskażnik uderzeń z dodatkowym przyporządkowaniem';
+$_BL['pl']['graph_legend_evaluated_signals_part_all_ratio'] = 'Wskaźnik uderzeń z dodatkowym przyporządkowaniem';
 $_BL['pl']['graph_legend_deviations_own'] = 'Odchylenie stacji {STATION}';
 $_BL['pl']['graph_legend_deviations_all'] = 'Odchylenie';
 $_BL['pl']['graph_legend_deviations_ratio'] = 'procentowo stacja {STATION}';
@@ -399,12 +399,12 @@ $_BL['pl']['graph_legend_all_signals'] = 'Sygnały';
 $_BL['pl']['h3_graphs'] = 'Wykresy';
 $_BL['pl']['h4_graph_strikes'] = 'Liczba uderzeń';
 $_BL['pl']['h4_graph_signals'] = 'Liczba sygnałów';
-$_BL['pl']['h4_graph_ratio'] = 'Wskażniki';
+$_BL['pl']['h4_graph_ratio'] = 'Wskaźniki';
 $_BL['pl']['h4_graph_ratio_distance'] = 'Wskaźnik uderzeń na odległość';
 $_BL['pl']['h4_graph_ratio_bearing'] = 'Wskaźnik uderzeń na kierunku';
 $_BL['pl']['h4_graph_stations'] = 'Liczba aktywnych stacji';
-$_BL['pl']['h4_graph_ratio_distance_longtime'] = 'Wskażnik uderzeń na odległość';
-$_BL['pl']['h4_graph_ratio_bearing_longtime'] = 'Wskażnik uderzeń na kierunek';
+$_BL['pl']['h4_graph_ratio_distance_longtime'] = 'Wskaźnik uderzeń na odległość';
+$_BL['pl']['h4_graph_ratio_bearing_longtime'] = 'Wskaźnik uderzeń na kierunku';
 $_BL['pl']['h4_graph_participants'] = 'Uczestnicy';
 $_BL['pl']['h4_graph_participants_time'] = 'Rozwój liczby uczestników';
 $_BL['pl']['h4_graph_strikes_time'] = 'Wszystkie uderzenia';
@@ -453,7 +453,7 @@ $_BL['pl']['densities_strikes_station'] = 'uderzenia stacja {STATION_CITY}';
 $_BL['pl']['Legend'] = 'Legenda';
 $_BL['pl']['Min time'] = 'Min. czas';
 $_BL['pl']['Max time'] = 'Maks. czas';
-$_BL['pl']['enter_time_hint'] = 'Wprowadź wartość w formacie "RRRR-MM-DD GG:MM:SS". Można pominąć mniejsze ednostki czasu, na przykład "RRRR-MM" jest także możliwe.';
+$_BL['pl']['enter_time_hint'] = 'Wprowadź wartość w formacie "RRRR-MM-DD GG:MM:SS". Można pominąć mniejsze jednostki czasu, na przykład "RRRR-MM" jest także możliwe.';
 $_BL['pl']['Time range'] = 'Zakres czasu';
 $_BL['pl']['arch_navi_strikes'] = 'Lista';
 $_BL['pl']['Distances between all stations'] = 'Odległości pomiędzy wszysykimi stacjami';
@@ -481,7 +481,7 @@ $_BL['pl']['h3_stat_other'] = 'Więcej statystyk';
 $_BL['pl']['h4_stat_longtime_network'] = 'Sieć wyładowań';
 $_BL['pl']['h4_stat_other_database'] = 'Statystyki bazy danych';
 $_BL['pl']['h4_stat_other_gps'] = 'GPS';
-$_BL['pl']['h4_stat_other_updates'] = 'Uaktualnienia';
+$_BL['pl']['h4_stat_other_updates'] = 'Aktualizacja';
 $_BL['pl']['h4_stat_longtime_station'] = 'Stacja {STATION_CITY}';
 $_BL['pl']['h4_table_network'] = 'Widok tabeli';
 $_BL['pl']['h3_stat_network'] = 'Statystyka sieci wyładowań';
@@ -499,12 +499,12 @@ $_BL['pl']['stat_advanced_show_strikes'] = 'Statystyki uderzeń';
 $_BL['pl']['stat_advanced_show_signals'] = 'Statystyki sygnałów';
 
 $_BL['pl']['since begin of data logging'] = 'Od rozpoczęcia rejestracji';
-$_BL['pl']['update every'] = 'Uaktualnij każdy';
+$_BL['pl']['update every'] = 'Aktualizuj każde';
 $_BL['pl']['Direction antenna 1'] = 'Kierunek anteny 1';
 $_BL['pl']['Direction antenna 2'] = 'Kierunek anteny 2';
-$_BL['pl']['Max participants per strike'] = 'Maksimum uczestników na uderzeńie';
+$_BL['pl']['Max participants per strike'] = 'Maksimum uczestników na uderzenie';
 $_BL['pl']['Mean participants per strike'] = 'Średnia uczestników na uderzenie';
-$_BL['pl']['Mean locating ratio'] = 'Średni wskażnik lokalizacji';
+$_BL['pl']['Mean locating ratio'] = 'Średni wskaźnik lokalizacji';
 $_BL['pl']['Mean strike ratio'] = 'średni wskaźnik uderzeń';
 $_BL['pl']['Active'] = 'Stacja aktywna';
 $_BL['pl']['Inactive'] = 'Stacja nieaktywna';
@@ -519,17 +519,17 @@ $_BL['pl']['First data'] = 'Rozpoczęcie zbierania danych';
 $_BL['pl']['Memory usage'] = 'Wykorzystanie pamięci';
 $_BL['pl']['for keys'] = 'dla kluczy';
 $_BL['pl']['Entries (all data)'] = 'Wpisy (wszystkie dane)';
-$_BL['pl']['Station active'] = 'Stacja aktyena';
-$_BL['pl']['Last update strikes'] = 'Ostatnie uaktualnienie danych o uderzeniach';
-$_BL['pl']['Last update stations'] = 'Ostatnie uaktualnienie danych o stacji';
-$_BL['pl']['Last update signals'] = 'Ostatnie uaktualnienie danych o sygnałach';
+$_BL['pl']['Station active'] = 'Stacja aktywna';
+$_BL['pl']['Last update strikes'] = 'Ostatnia aktualizacja danych o uderzeniach';
+$_BL['pl']['Last update stations'] = 'Ostatnia aktualizacja danych o stacji';
+$_BL['pl']['Last update signals'] = 'Ostatnia aktualizacja danych o sygnałach';
 $_BL['pl']['Active Stations'] = 'Aktywne stacje';
 $_BL['pl']['Sum of Signals'] = 'Suma sygnałów';
 $_BL['pl']['Sum of Strikes'] = 'Suma uderzeń';
 $_BL['pl']['Strikes detected'] = 'Uderzenia wykryte';
 $_BL['pl']['of the last'] = 'z ostatnich';
 $_BL['pl']['Currently no GPS coordinates available!'] = 'Obecnie brak koordynatów GPS';
-$_BL['pl']['stat_navi_strikes'] = 'Wyładowanie';
+$_BL['pl']['stat_navi_strikes'] = 'Wyładowania';
 $_BL['pl']['total strikes'] = 'suma uderzeń';
 $_BL['pl']['total strikes station'] = 'suma uderzeń stacja {STATION}';
 $_BL['pl']['Strikes station'] = 'Uderzenia stacja {STATION}';
@@ -541,7 +541,7 @@ $_BL['pl']['time_to'] = 'do';
 $_BL['pl']['Max available stations'] = 'Maks . dostępne stacje';
 $_BL['pl']['Last active'] = 'ostatnia aktywna';
 $_BL['pl']['Signals detected'] = 'Sygnały wykryte';
-$_BL['pl']['Signal ratio'] = 'Wskażnik lokalizacji';
+$_BL['pl']['Signal ratio'] = 'Wskaźnik lokalizacji';
 $_BL['pl']['Strikes station min participants'] = 'Uderzenia uczestników min. stacji';
 $_BL['pl']['Stations under construction'] = 'Stacje w trakcie budowy';
 $_BL['pl']['h4_stations_under_construction'] = 'Stacje w trakcie budowy';
@@ -619,7 +619,7 @@ $_BL['pl']['Change'] = 'Zmień';
 $_BL['pl']['Password changed!'] = 'Hasło zmienione!';
 $_BL['pl']['No permission!'] = 'Brak uprawnień!';
 $_BL['pl']['Password was not changed!'] = 'Hasło nie zostało zmienione!';
-$_BL['pl']['Welcome to MyBlitzortung user area'] = 'Witamy w obszarze {MYBO} urzytkownika';
+$_BL['pl']['Welcome to MyBlitzortung user area'] = 'Witamy w obszarze {MYBO} użytkownika';
 $_BL['pl']['Admin tools'] = 'Narzędzia administracyjne';
 $_BL['pl']['File cache info'] = 'Informacja o cache plików';
 $_BL['pl']['Version information'] = 'Informacja o wersji';
@@ -632,19 +632,19 @@ $_BL['pl']['Clear all files'] = 'Wyczyść wszystkie pliki';
 $_BL['pl']['stay logged in'] = 'Pozostań zalogowany';
 $_BL['pl']['Administration'] = 'Administracja';
 $_BL['pl']['Documentation'] = 'Dokumentacja';
-$_BL['pl']['Import/update data'] = 'Import/uaktualnienie danych';
+$_BL['pl']['Import/update data'] = 'Import/aktualizacja danych';
 $_BL['pl']['user_lastlogin_text'] = 'Ostatnie logowanie';
 $_BL['pl']['user_sessiontime_text'] = 'Bieżący czas sesji';
-$_BL['pl']['Update only strikes'] = 'Uaktualnij tylko uderzenia';
-$_BL['pl']['Update only stations'] = 'Uaktualnij tylko stacje';
-$_BL['pl']['Update only signals'] = 'Uaktualnij tylko sygnały';
-$_BL['pl']['Update only daily statistics'] = 'Uaktualni tylko statystyki dzienne';
-$_BL['pl']['Update only densities'] = 'Uaktualnij tylko gestości';
-$_BL['pl']['Update only tracks'] = 'Uaktualnij tylko ślady';
+$_BL['pl']['Update only strikes'] = 'Aktualizauj tylko uderzenia';
+$_BL['pl']['Update only stations'] = 'Aktualizauj tylko stacje';
+$_BL['pl']['Update only signals'] = 'Aktualizauj tylko sygnały';
+$_BL['pl']['Update only daily statistics'] = 'Aktualizuj tylko statystyki dzienne';
+$_BL['pl']['Update only densities'] = 'Aktualizauj tylko gestości';
+$_BL['pl']['Update only tracks'] = 'Aktualizuj tylko ślady';
 $_BL['pl']['Force data purge only'] = 'Wymuś wyczyszczenie tylko danych';
-$_BL['pl']['Check alerts only'] = 'Sprawdź tylko ostrzeżeia';
+$_BL['pl']['Check alerts only'] = 'Sprawdź tylko ostrzeżenia';
 
-$_BL['pl']['user_perm0'] = 'Administracja (Urzytkownicy...)';
+$_BL['pl']['user_perm0'] = 'Administracja (Użytkownicy...)';
 $_BL['pl']['user_perm1'] = 'Więcej danych stacji (GPS, Użytkownicy...)';
 $_BL['pl']['user_perm2'] = 'Bez ograniczeń';
 $_BL['pl']['user_perm3'] = 'Zarządzaj ostrzeżeniami';
@@ -676,15 +676,15 @@ $_BL['pl']['h4_info_participate'] = 'Weź udział';
 $_BL['pl']['h3_info_usage'] = 'Data użycia';
 $_BL['pl']['h3_info_hint'] = 'Ważne informacje';
 
-$_BL['pl']['info_general_warning'] = 'Nie ponosimy odpowiedzialności za dokładność kompletność, terminowość, jakość informacji na naszej stronie internetowej.Nie ponosimy odpowiedzialności za szkody, wynikające z zaufania do treści na naszej stronie lub jej stosowania.';
+$_BL['pl']['info_general_warning'] = 'Nie ponosimy odpowiedzialności za dokładność kompletność, terminowość, jakość informacji na naszej stronie internetowej. Nie ponosimy odpowiedzialności za szkody wynikające z zaufania do treści na naszej stronie lub jej stosowania.';
 $_BL['pl']['info_general_text'] = 'Blitzortung.org to prywatna sieć stacji nasłuchujących wyładowania atmosferyczne. Stacje rejestrują sygnały elektromagnetyczne uderzeń. Razem z informacją czasową sygnału oraz pozycją geograficzną obliczana jest pozycja uderzenia (metoda TOA - time of arrival).';
 
 
 $_BL['pl']['info_accuracy_text'] = 'Dokładność jest całkiem dobra i czasami mjest niższa niż kilometr. Jest to porównywalna dokładność do komercyjnych stacji wykrywających burze';
-$_BL['pl']['info_participate_text'] = 'Możesz zbudowac własny odbiornik (koszt okkoło 150 Euro). Razem z nim możesz byc czonkiem sieci i mieś dostęp do wszystkich danych o uderzeniach. Więcej informacji tutaj: Blitzortung.org > Cover your Area. Patrz także: Wetter-Board<';
+$_BL['pl']['info_participate_text'] = 'Możesz zbudowac własny odbiornik (koszt okkoło 150 Euro). Razem z nim możesz byc czonkiem sieci i mieć dostęp do wszystkich danych o uderzeniach. Więcej informacji tutaj: Blitzortung.org > Cover your Area. Patrz także: Wetter-Board<';
 
 $_BL['pl']['info_usage_text'] = 'Dane podane na niniejszej stronie oraz na Blitzortung.org są używane do celów prywatnych oraz rozrywki. Nie jesteśmy komercyjnym serwisem informacynym dla wyładowań atmosferycznych! Więcej informacji na Blitzortung.org';
-$_BL['pl']['info_myblitzortung_text'] = 'Wizualizacje na niniejszych stronach są robione przez oprogramowanie {MYBO} ({MYBO_ORIG}). Nie można zagwarantować, że to oprogramowanie pokazuje zawsze poprawne informace! Odpowiedzialność spoczywa po Twojej stronie!. {MYBO} jest darmowym programem. Więcej infomracji możesz znaleźć tutaj: www.myblitzortung.org.';
+$_BL['pl']['info_myblitzortung_text'] = 'Wizualizacje na niniejszych stronach są robione przez oprogramowanie {MYBO} ({MYBO_ORIG}). Nie można zagwarantować, że to oprogramowanie pokazuje zawsze poprawne informacje! Odpowiedzialność spoczywa po Twojej stronie!. {MYBO} jest darmowym programem. Więcej infomracji możesz znaleźć tutaj: www.myblitzortung.org.';
 
 
 /*************************************************************/
@@ -695,17 +695,17 @@ $_BL['pl']['bo_graph_descr_ratio'] = 'Wskaźniki uderzeń oraz lokalizacji są w
 wskaźnik lokalizacji = (wykryte uderzenia przez stację) / (sygnały staci)
 wskaźnik uderzeń = (wykryte uderzenia przez stację) / (liczba uderzeń w sieci)';
 
-$_BL['pl']['bo_stat_network_descr_lasth'] = 'Wszytkie informacje odnoszą się do okresu czasu 60 minut przed ostatnim uaktualniniem';
+$_BL['pl']['bo_stat_network_descr_lasth'] = 'Wszytkie informacje odnoszą się do okresu czasu 60 minut przed ostatnią aktualizacją.';
 $_BL['pl']['bo_stat_network_descr_table'] = 'Tutaj można zobaczyć wszystkie aktywne stacje z sieci detektorów wyładowań atmosferycznych. Można sortować tabelę klikając linki w pierwszym wierszu.';
 $_BL['pl']['bo_graph_descr_bear'] = 'Własny wskaźnik lokalizacji na tle kierunków geograficznych. Dla lepszego porównania dostępna jest liczba wszystkich uderzeń.';
-$_BL['pl']['bo_stat_longtime_descr'] = 'Wszystkie informacje dostępne tutaj sa od rozpoczecia rejestracji {MYBO}. Odległości odnoszą się do lokalizacji stacji {STATION_CITY}.';
+$_BL['pl']['bo_stat_longtime_descr'] = 'Wszystkie informacje dostępne tutaj są od rozpoczęcia rejestracji {MYBO}. Odległości odnoszą się do lokalizacji stacji {STATION_CITY}.';
 $_BL['pl']['bo_stat_other_database_descr'] = 'Wszystkie dane o uderzeniach, sygnałach i danych stacji są zapisywane w lokalnej bazie na niniejszej stronie:';
-$_BL['pl']['bo_stat_other_updates_descr'] = 'Nowe dane pobierane sa ze strony blitzortung.org w okreslonych odstepach czasowych:';
-$_BL['pl']['bo_stat_other_gps_descr'] = 'Niektóre informacje o lokalizatorze GPS, który jest używany do odbioru dokładnego czasu i pozycji. Jśli znane, jak kierunek anteny także są wyświetlane (czerwony, zielony).';
+$_BL['pl']['bo_stat_other_updates_descr'] = 'Nowe dane pobierane sa ze strony blitzortung.org w określonych odstępach czasowych:';
+$_BL['pl']['bo_stat_other_gps_descr'] = 'Niektóre informacje o lokalizatorze GPS, który jest używany do odbioru dokładnego czasu i pozycji. Jeśli znane, jak kierunki anteny także są wyświetlane (czerwony, zielony).';
 $_BL['pl']['bo_stat_station_descr_lasth'] = 'Tutaj można znaleźć statystyki stacji wykrywania TOA {STATION_CITY}.';
-$_BL['pl']['bo_graph_descr_radi'] = 'Przegląd własnego wkażnika lokalizacji od stacji. Całkowita liczba uderzeń od odległości także jest widoczna';
-$_BL['pl']['bo_graph_descr_strikes'] = 'Tuta mozna zmobaczyć całkowitą liczba uderzeń na godzinę wykrytą przez sieć detektorów, liczbę wykrytych uderzeń/h stacji {STATION_CITY} i śrenią liczbę uderzeń dla wszytkich stacji';
-$_BL['pl']['bo_graph_descr_signals'] = 'Liczba odebranych sygnałów na godzine ze stacji {STATION_CITY} a także śrenia ze wszystkich stacji';
+$_BL['pl']['bo_graph_descr_radi'] = 'Przegląd własnego wkaźnika lokalizacji od stacji. Całkowita liczba uderzeń od odległości także jest widoczna';
+$_BL['pl']['bo_graph_descr_strikes'] = 'Tutaj można zmobaczyć całkowitą liczbę uderzeń na godzinę wykrytą przez sieć detektorów, liczbę wykrytych uderzeń/h stacji {STATION_CITY} i śrenią liczbę uderzeń dla wszytkich stacji';
+$_BL['pl']['bo_graph_descr_signals'] = 'Liczba odebranych sygnałów na godzinę ze stacji {STATION_CITY} a także średnia ze wszystkich stacji';
 $_BL['pl']['bo_stat_other_antennas_descr'] = 'Kierunek anteny może być wyznaczony automatycznie przez {MYBO}. to jest użyteczne dla okreslenia polaryzacji wyładowania (bardzo eksperymentalne!).';
 $_BL['pl']['bo_graph_descr_radi_longtime'] = 'Ten wykres pokazuje wskaźnik uderzeń na odległości od początku zbierania danych';
 $_BL['pl']['bo_graph_descr_bear_longtime'] = 'Ten wykres pokazuje wskaźnik uderzeń na kierunkach geograficznych os poczatku zbierania danych';
@@ -721,11 +721,11 @@ $_BL['pl']['bo_graph_spectrum'] = 'W każdym pojedynczym widmie sygnału jest cz
 $_BL['pl']['bo_graph_amplitudes'] = 'Amplitudy syganłów. Można zmieniać pomiędzy amlituda pierwszej próbki a maksymalną amplitudą.';
 $_BL['pl']['bo_graph_amplitudes_time'] = 'Rozwój amplitud w sygnałach. Można wybrac pomiędzy maksymalną amplitudą sygnału lub amplitudą pierwszej próbki.';
 $_BL['pl']['bo_graph_frequencies_time'] = 'Rozwój szytów częstotliwości w czasie.';
-$_BL['pl']['bo_graph_deviations'] = 'Dla każdego uderzenia obliczane est odchylenie.';
+$_BL['pl']['bo_graph_deviations'] = 'Dla każdego uderzenia obliczane jest odchylenie.';
 $_BL['pl']['bo_graph_evaluated_signals'] = 'Sygnały stacji {STATION}, która może być przyporządkowana do uderzenia przeez Blitzortung.org są reskanowane przez {MYBO}. W niektórych przypadkach uderzenie może być przyporządkowane ponownie do sygnału. To zdarza się tym cześciej im wyższe jest prawdopodobieństwo wystąpienia problemu ze stacją.';
 $_BL['pl']['bo_graph_deviations_time'] = 'Rozwój w czasie średniego odhcylenia lub rozwój konkretnego ochylenia';
 $_BL['pl']['bo_graph_distance'] = 'Rozwój sredniej odległości do stacji {STATION}. Można oszacować czułość stacji przez porównanie dwóch linii.';
-$_BL['pl']['bo_descr_strikes_now'] = 'Dane o wyładowaniach sa pobierane {UPDATE_INTERVAL} z serwerów Blitzortung.org. Interwał dla obliczeń częstości uderzeń jest {RATE_INTERVAL}.';
+$_BL['pl']['bo_descr_strikes_now'] = 'Dane o wyładowaniach są pobierane co {UPDATE_INTERVAL} z serwerów Blitzortung.org. Interwał dla obliczeń częstości uderzeń wynosi {RATE_INTERVAL}.';
 $_BL['pl']['bo_stat_advanced_info'] = 'Zaawansowana statystyka, głównie dla operatora stacji.';
 $_BL['pl']['bo_stat_other_station_info'] = 'Podpowiedź: SWyświetlane są statystyki stacji {STATION_CITY}.';
 $_BL['pl']['bo_stat_other_station_info_back'] = 'Powrót do stacji {STATION}';
@@ -735,7 +735,7 @@ $_BL['pl']['bo_stat_other_station_info_back'] = 'Powrót do stacji {STATION}';
 /* Archives descriptions                                     */
 /*************************************************************/
 
-$_BL['pl']['archive_search_info'] = 'Tuta można wyszukać ostatnie uderzenia w obszarze. Aby okreslić obszar, przesuń marker na mapie i wprowadź promień wyszukiwania. Uderzenia będą pokazane jako kolorowe kropki na mapie. Można na nie kliknąć aby zobaczyć więcej informacji o uderzeniu. Można wyszukiwac tylko uderzenia w czerwonym obszarze wokół stacji.';
+$_BL['pl']['archive_search_info'] = 'Tutaj można wyszukać ostatnie uderzenia w obszarze. Aby okreslić obszar, przesuń marker na mapie i wprowadź promień wyszukiwania. Uderzenia będą pokazane jako kolorowe kropki na mapie. Można na nie kliknąć aby zobaczyć więcej informacji o uderzeniu. Można wyszukiwac tylko uderzenia w czerwonym obszarze wokół stacji.';
 
 $_BL['pl']['archive_map_info'] = 'Tutaj można wyświetlić wyładowania dla każdego dnia na różnych mapach. Można także przeglądać animowane mapy, nalezy wziąć pod uwage, że potrzebny jest dodatkowy czas na załadowanie map. Dane o wyładowaniach są dostępne od {DATE_START} do {DATE_END}. Nie ma gwarancji kompletności';
 
@@ -745,9 +745,9 @@ Podpowiedzi: Dane wyświetlane tutaj nie sa standaryzowane, dlatego rezultaty ni
 
 $_BL['pl']['archive_signaltable_info'] = 'Każada stacja wykrywania wyładowań w sieci Blitzortung.org odbiera sygnały oraz mniej lub bardziej szum. Tutaj można zobaczyć sygnały, które zostały odebrane przez stację {STATION} w ciągu sotatnich minut. Jeśli inne stacje odbiorą ten sam sygnał w bardzo krutkim okresie czasu to moż się okazać, że wyłądowanie może być zlokalizowane poza odpowiednimi czasami (metoda TOA). W takim przypadku dodatkowa informacja o wyładowaniu będzie tu wyświetlona.';
 
-$_BL['pl']['archive_striketable_info'] = 'Tutaj można sobaczyć takie same informacje jak na stronie "sygnały" ale także uderzenia gdzie nie było sygnału wykrytego przez twoją stację. Aby być w zgodzie z zasadami Blitzortung.org, ta strone jest dostepna tylko za kontem uzytkownika.
+$_BL['pl']['archive_striketable_info'] = 'Tutaj można zobaczyć takie same informacje jak na stronie "sygnały" ale także uderzenia gdzie nie było sygnału wykrytego przez twoją stację. Aby być w zgodzie z zasadami Blitzortung.org, ta strone jest dostepna tylko z kontem użytkownika.
 
-Podpowiedź: Krzywe hiperboliczne wyświetlone obok map są tylko informacyjne i nie obrazują aktualnych obliczeń ({MYBO_ORIG} ie zna czasów innych stacji).';
+Podpowiedź: krzywe hiperboliczne wyświetlone obok map są tylko informacyjne i nie obrazują aktualnych obliczeń ({MYBO_ORIG} nie zna czasów innych stacji).';
 
 $_BL['pl']['archive_signaltable_info_bottom'] = '
 
@@ -755,12 +755,12 @@ Jeśli wykryte zostało wyładowanie, będą wyświetlone dodatkowe informacje d
 
 Czas przebiegu: Różnica pomiędzy czasem udeżenia a odbiorem
 Odległość: Odległość uderzenia do stacji {STATION} obliczona na podstawie czasu przebiegu (1ms = 300km)
-li>Kierunek: przybliżony kierunek (dokładny nie będzie podany ze wzgledu na ograniczenia użyciali>Odchylenie: Im mniejsze tym lepsza lokalizacja
+Kierunek: przybliżony kierunek (dokładny nie będzie podany ze wzgledu na ograniczenia użyciali>Odchylenie: Im mniejsze tym lepsza lokalizacja
 Prąd: Prąd uderzenia. Bardzo eksperymentalne! Obecnie wartość prawie bez informacji!
 Uczestnicy: Liczba stacji, które odebrały wyładowanie. Im więcej tym lepiej.
 Uczestnictwo: Czy stacja {STATION} uczestniczyła? Jeśli "nie" jest kolorowa, to oznacza, że sygnał został odebrany ale nie był użyty do obliczeń
 Kąt lokalizacji: maks. kąt stacji uczestniczącej wokół pozycji uderzenia (w cudzysłowie: stacje, które nie były użyte do obliczeń. Wartość 270° byłaby idealna, ale dobrą lokalizacja jest także możliwa dla dużo mniejszych wartości.
-Kanał: Zapisany kanał na wykresie (jeśli stacja pracuje w trybie "Nalepszy Kanał")/ul>';
+Kanał: Zapisany kanał na wykresie (jeśli stacja pracuje w trybie "Nalepszy Kanał")';
 
 
 
@@ -834,9 +834,9 @@ $_BL['pl']['No log entries'] = 'Brak wpisów w log';
 $_BL['pl']['Link with the MyBlitzortung network'] = 'Link z siecią {MYBO_ORIG}';
 $_BL['pl']['URL of your website'] = 'URL twojej strony WEB';
 $_BL['pl']['Leave blank to remove your station from the list'] = 'Pozostaw puste aby usunąć twoja stację z listy';
-$_BL['pl']['Do an auto update every 24h to retrieve new stations'] = 'Wykonuj uaktualninie co każde 24h aby pobrać nowe stacje';
+$_BL['pl']['Do an auto update every 24h to retrieve new stations'] = 'Wykonaj aktualizację co każde 24h aby pobrać nowe stacje';
 $_BL['pl']['Agree and Send'] = 'Zgoda is wyślij';
-$_BL['pl']['Update MyBlitzortung Stations'] = 'uaktualnij stacje {MYBO_ORIG}';
+$_BL['pl']['Update MyBlitzortung Stations'] = 'aktualizuj stacje {MYBO_ORIG}';
 $_BL['pl']['Linking with other MyBlitzortung stations'] = 'Łączemie z innymi stacjami {MYBO_ORIG}';
 $_BL['pl']['Getting Login string'] = 'Pobieranie nazwy Login';
 $_BL['pl']['String is'] = 'Nazwa Login jest';
@@ -854,7 +854,7 @@ W tej funkcjonalności można połączyć instalację twojego {MYBO_ORIG} z inny
 1. id twojej stacji oraz adresl url strony www zostaną wysłane do {LINK_HOST}.
 2. Otrzymasz wszystkie adresy url innych stacji, które są obecnie na liście.
 
-Należy uaktualniac dane od czasu do czasu, tak aby nowe stacje pojawiały się lub można urzyć funkcji auto-update.
+Należy aktualizować dane od czasu do czasu, tak aby nowe stacje pojawiały się lub można urzyć funkcji auto-update.
 
 Aby uwierzytelnić cię jako uzytkownika blitzortung.org, należy podać login-id na blitzortung.org. Ten id zostanie prześłany do {LINK_HOST} i ponownie sprawdzony na. Id nie bęzie zapisane! Twoje hasło nigdy nie będzie przesłane do innych stron www jak tylko do blitzortung.org! Twoje stacje muszą wysłac przynajmniej jeden sygnał w ciągu ostatnich 2 godzin, w przeciwnym wypadku uwierzytelnianie nie będzie działać.
 ';
@@ -869,7 +869,7 @@ Aby uwierzytelnić cię jako uzytkownika blitzortung.org, należy podać login-i
 /*************************************************************/
 /* Update                                                    */
 /*************************************************************/
-$_BL['pl']['Updating version'] = 'Uaktualnianie wersji';
+$_BL['pl']['Updating version'] = 'Aktualizacja wersji';
 $_BL['pl']['Database version changed!'] = 'Wersja bazy danych zmieniona!';
 $_BL['pl']['FAIL'] = 'Błąd!';
 $_BL['pl']['Update done!'] = 'Aktualizacja wykonana!';
@@ -971,7 +971,7 @@ $_BL['pl']['Login string is'] = 'Łańcuch logowania';
 $_BL['pl']['Auth ID is'] = 'ID Autoryzacji to';
 $_BL['pl']['Logging out from Blitzortung.org'] = 'Wylogowanie z Blitzortung.org';
 $_BL['pl']['Already DONE BEFORE'] = 'Już zrobione wcześniej';
-$_BL['pl']['Update database keys'] = 'Uaktualnienie kluczy w bazie danych';
+$_BL['pl']['Update database keys'] = 'Aktualnizacja kluczy w bazie danych';
 $_BL['pl']['without GPS'] = 'bez GPS';
 $_BL['pl']['Record longtime data since'] = 'Zapis długookresowy od';
 $_BL['pl']['Show all signals'] = 'Pokaż wszystkie sygnały';
@@ -984,7 +984,7 @@ $_BL['pl']['Mean coordinates'] = 'Koordynaty średnie';
 $_BL['pl']['h4_stat_station_area'] = 'Obszar otaczający';
 $_BL['pl']['Last position'] = 'Ostatnia pozycja';
 $_BL['pl']['Select station'] = 'Wybierz stację';
-$_BL['pl']['List'] = 'Lsista';
+$_BL['pl']['List'] = 'Lista';
 $_BL['pl']['outside of'] = 'poza ';
 $_BL['pl']['to station'] = 'do stacji';
 $_BL['pl']['Show only region'] = 'Pokaż tylko region';
@@ -992,7 +992,7 @@ $_BL['pl']['Exclude region'] = 'Wyodrębnij region';
 $_BL['pl']['Only station'] = 'Tylko stacja';
 $_BL['pl']['City names'] = 'Nazwy miejscowości';
 $_BL['pl']['Only strikes of selected station'] = 'Tylko uderzenia wybranej staci';
-$_BL['pl']['map_autoupdate_stalled_msg'] = 'Brak aktywności urzytkownika. Aktualizacja zatrzymana.';
+$_BL['pl']['map_autoupdate_stalled_msg'] = 'Brak aktywności użytkownika. Aktualizacja zatrzymana.';
 $_BL['pl']['tile_zoom_not_allowed'] = 'Powiększenie\nniedozowlone tutaj!';
 $_BL['pl']['tile_station_not_allowed'] = 'Ścieżki komurek wyłączone';
 $_BL['pl']['Last time without GPS'] = 'Ostatni czas bez GPS';
