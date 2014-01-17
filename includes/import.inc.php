@@ -1443,11 +1443,11 @@ function bo_update_stations($force = false)
 
 			//City
 			if (preg_match('/city;"([^"]+)"/', $l, $r))
-				$D['city'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
+				$D['city'] = strtr($r[1], array(chr(160) => ' '));
 
 			//Country
 			if (preg_match('/country;"([^"]+)"/', $l, $r))
-				$D['country'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
+				$D['country'] = strtr($r[1], array(chr(160) => ' '));
 			
 			//Position
 			if (preg_match('/pos;([-0-9\.]+);([-0-9\.]+);([-0-9\.]+)/', $l, $r))
@@ -1469,8 +1469,16 @@ function bo_update_stations($force = false)
 			
 			//Firmware
 			if (preg_match('/firmware;"([^"]+)"/', $l, $r))
-				$D['firmware'] = strtr(html_entity_decode($r[1]), array(chr(160) => ' '));
-			
+				$D['firmware'] = strtr($r[1], array(chr(160) => ' '));
+
+			//Comment
+			if (preg_match('/comments;"([^"]+)"/', $l, $r))
+				$D['comment'] = strtr($r[1], array(chr(160) => ' '));
+
+			//Website
+			if (preg_match('/website;"([^"]+)"/', $l, $r))
+				$D['url'] = strtr($r[1], array(chr(160) => ' '));
+				
 			//Signals
 			if (preg_match('/signals;"?(([^ ;]+);)?([^ ;]+)"?/', $l, $r))
 			{
@@ -1519,6 +1527,7 @@ function bo_update_stations($force = false)
 			$file_truncated = false;
 			$D['distance'] = round(bo_latlon2dist($D['lat'], $D['lon']) / 100) * 100;
 			
+			/*
 			if (function_exists('iconv'))
 			{
 				$D['city']    = iconv("Windows-1250", "UTF-8", $D['city']);
@@ -1535,7 +1544,7 @@ function bo_update_stations($force = false)
 			$D['city']    = strtr($D['city'], array('\null' => ''));
 			$D['country'] = strtr($D['country'], array('\null' => ''));
 			$D['firmware'] = strtr($D['firmware'], array('\null' => ''));
-			
+			*/			
 
 			if ($id <= 0)
 			{

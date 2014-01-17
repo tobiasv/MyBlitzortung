@@ -1030,7 +1030,8 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		else
 		{
 			$sql_join = BO_DB_PREF."strikes s";
-			$station_id = false;
+			if (!$strike_id)
+				$station_id = false;
 		}
 	}
 	elseif ($only_strikes) // own raw signals, only with strikes
@@ -1600,7 +1601,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			echo '<h5>'._BL('Participated stations').'</h5>';		
 		
 			if (!$show_other_graphs && time() - $stime < 3600 * 23)
-				echo '<a href="'.bo_insert_url(array('bo_action', 'bo_show_details')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs" class="bo_show_all_signals bo_sig_table_menu">'._BL('Show all signals').'</a>';
+				echo '<a href="'.bo_insert_url(array('bo_action', 'bo_show_details', 'bo_strike_id')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs" class="bo_show_all_signals bo_sig_table_menu">'._BL('Show all signals').'</a>';
 
 			echo '<div class="bo_arch_other_participants_container">';
 			foreach ($s_dists[0] as $sid => $dist)
@@ -1770,7 +1771,7 @@ function bo_signal_url($station_id, $raw_id = null, $strike_time = null, $strike
 		//no station id --> find first signal
 		if ($station_id === false && BO_ARCHIVE_SHOW_FIRST_SIGNAL === true && is_array($strike))
 		{
-			$sql = "SELECT s.id id, ".bo_sql_latlon2dist('s.lat', 's.lon', $strike['lat'], $strike['lon'])." dist
+			$sql = "SELECT s.id id, ".bo_sql_latlon2dist($strike['lat'], $strike['lon'], 's.lat', 's.lon')." dist
 						FROM ".BO_DB_PREF."stations s
 						JOIN ".BO_DB_PREF."stations_strikes ss
 							ON s.id=ss.station_id AND ss.strike_id='".$strike['id']."'

@@ -998,21 +998,6 @@ function bo_str_max($str, $max = 35)
 }
 
 
-function bo_get_latest_strike_calc_time()
-{
-	$row = BoDb::query("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes s")->fetch_assoc();
-	$time = strtotime($row['mtime'].' UTC');
-	
-	if (time() - $time < BO_LATEST_STRIKE_TIME_CALC * 60)
-	{
-		return $time;
-	}
-	else
-	{
-		return BoData::get('uptime_strikes_modified');
-	}
-		
-}
 
 
 function bo_access_url($server = BO_IMPORT_SERVER, $path = BO_IMPORT_PATH)
@@ -1072,6 +1057,70 @@ function bo_get_zoom_limits()
 	return array($min_zoom, $max_zoom);
 }
 
+	
 
+function bo_get_latest_strike_calc_time($refresh_interval, $type = '')
+{
+	$time = 0;
+	$cache_fast = BO_CACHE_FAST && (BO_CACHE_FAST == $type || !$type);
+
+	if ($cache_fast)
+	{
+		$time = floor(time() / $refresh_interval) * $refresh_interval;
+	}
+	else
+	{
+		$row = BoDb::query("SELECT MAX(time) mtime FROM ".BO_DB_PREF."strikes s")->fetch_assoc();
+		$time = strtotime($row['mtime'].' UTC');
+		
+		if (time() - $time > BO_LATEST_STRIKE_TIME_CALC * 60)
+		{
+			$time = bo_get_last_import_time($refresh_interval, $type);
+		}
+	}
+	
+	return $time;
+}
+
+
+function bo_get_last_import_time($refresh_interval, $type = '')
+{
+	$time = 0;
+	$cache_fast = BO_CACHE_FAST && (BO_CACHE_FAST == $type || !$type);
+	
+	if (!$cache_fast)
+	{
+		$time = BoData::get('uptime_strikes_modified');
+		
+		if (time() - $time > 60 * 15) //if import is failing (i.e. no strokes)
+			$time = 0;
+	}
+	
+	if ($time == 0)
+		$time = floor(time() / $refresh_interval) * $refresh_interval - 60;
+
+	return $time;
+}
+
+
+//Source: http://floern.com/webscripting/is-utf8-auf-utf-8-pr%C3%BCfen
+function is_utf8($str)
+{
+	$strlen = strlen($str);
+	for($i=0; $i<$strlen; $i++){
+	$ord = ord($str[$i]);
+	if($ord < 0x80) continue; // 0bbbbbbb
+	elseif(($ord&0xE0)===0xC0 && $ord>0xC1) $n = 1; // 110bbbbb (exkl C0-C1)
+	elseif(($ord&0xF0)===0xE0) $n = 2; // 1110bbbb
+	elseif(($ord&0xF8)===0xF0 && $ord<0xF5) $n = 3; // 11110bbb (exkl F5-FF)
+	else return false; // ungültiges UTF-8-Zeichen
+
+	for($c=0; $c<$n; $c++) // $n Folgebytes? // 10bbbbbb
+		if(++$i===$strlen || (ord($str[$i])&0xC0)!==0x80)
+		return false; // ungültiges UTF-8-Zeichen
+	}
+
+	return true; // kein ungültiges UTF-8-Zeichen gefunden
+}
 
 ?>

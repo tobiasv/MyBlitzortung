@@ -297,6 +297,41 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	echo strtr(_BL('bo_stat_station_descr_lasth'), array('{STATION_CITY}' => $city, '{MIN_PARTICIPANTS}' => bo_participants_locating_min()));
 	echo '</p>';
 
+	echo '<ul class="bo_stat_overview">';
+	if ($stInfo['firmware'])
+	{
+		if (preg_match('/[A-Z]/i', $stInfo['firmware']))
+			$name = 'Tracker';
+		else
+			$name = 'Firmware';
+			
+		echo '<li><span class="bo_descr">'._BL($name).': </span><span class="bo_value">'._BC($stInfo['firmware']).'</span>';
+	}
+
+	list($pcb) = explode(';', $stInfo['controller_pcb']);
+	
+	if ($pcb)
+	{
+		echo '<li><span class="bo_descr">'._BL("Controller").': </span><span class="bo_value">'.$pcb.'</span>';
+	}
+	
+	
+	$url = trim($stInfo['url']);
+	if ($url)
+	{
+		if (strlen($url) > 50)
+			$url = substr($url, 0, 45).'...';
+			
+		echo '<li><span class="bo_descr">'._BL("Website").': </span><span class="bo_value"><a href="http://'.trim($stInfo['url']).'" target="_blank">'.$url.'</a></span>';
+	}
+	
+	$comment = trim($stInfo['comment']);
+	if ($comment)
+	{
+		echo '<li><span class="bo_descr">'._BL("Comment").': </span><span class="bo_value">'.$comment.'</span>';
+	}
+	
+	echo '</ul>';
 	
 	echo '<h4>'._BL('h4_stat_station_general').'</h4>';
 	echo '<ul class="bo_stat_overview">';
@@ -396,24 +431,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo '<li><span class="bo_descr">'._BL('Last signal').': </span><span class="bo_value">'._BDT($last_signal).'</span>';
 	}
 
-	if ($stInfo['firmware'])
-	{
-		if (preg_match('/[A-Z]/i', $stInfo['firmware']))
-			$name = 'Tracker';
-		else
-			$name = 'Firmware';
-			
-		echo '<li><span class="bo_descr">'._BL($name).': </span><span class="bo_value">'._BC($stInfo['firmware']).'</span>';
-	}
 
-	list($pcb) = explode(';', $stInfo['controller_pcb']);
-	
-	if ($pcb)
-	{
-		echo '<li><span class="bo_descr">'._BL("Controller").': </span><span class="bo_value">'.$pcb.'</span>';
-	}
-	
-	
 	echo '</ul>';
 
 	
@@ -850,6 +868,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		$D[$id]['city'] = $d['city'] ? $d['city'] : '?';
 		$D[$id]['bo_id'] = $d['bo_station_id'];
 		$D[$id]['firmware'] = $d['firmware'];
+		$D[$id]['url'] = $d['url'];
 		list($D[$id]['pcb']) = explode(';', $d['controller_pcb']);
 		
 		if ($D[$id]['pcb'] == 'unknown')
@@ -1115,8 +1134,8 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 			echo '</td>';
 
 			echo '<td class="bo_text '.($sort == 'city' ? 'bo_marked' : '').'">';
-			if (isset($urls[$id]))
-				echo '<a href="'.$urls[$id].'" target="_blank">'._BC($d['city']).'</a>';
+			if (trim($d['url']))
+				echo '<a href="http://'.trim($d['url']).'" target="_blank">'._BC($d['city']).'</a>';
 			else
 				echo _BC($d['city']);
 			echo '</td>';

@@ -4,6 +4,15 @@
 *****************************
 
 
+Version 1.2 (2014-01-17)
+------------------------
+
+- show comment and website of a station
+- import of UTF8 encoded station names
+- some other minor fixes 
+- improved translations
+
+
 Version 1.1 (2013-09-09)
 ------------------------
 
@@ -28,7 +37,7 @@ Version 1.0 (2013-08-23)
 
 !!!!! IMPORTANT NOTES BEFORE UPGRADING !!!!!
 
-1) If you are updating from a previous version, then the upgrade process needs maps the old format to the new format. This might not work when the old format has been disabled in October 2013! The upgrade process can take VERY LONG - maybe hours on slow servers with lots of archived strokes. If the update fails due to a timeout, try it again and ignore all errors. If you have problems, consider deleting unneeded strokes or do a fresh install.
+1) If you are updating from a previous version, then the upgrade process maps the old format to the new format. This might not work when the old format has been disabled in October 2013! The upgrade process can take VERY LONG - maybe hours on slow servers with lots of archived strokes. If the update fails due to a timeout, try it again and ignore all errors. If you have problems, consider deleting unneeded strokes or do a fresh install.
 
 2) There's a new constant BO_STATION_ID, where you have to set your station id. If you make an update, the station id is determined automatically and stored in the database. However, setting BO_STATION_ID manually is the preferred way. 
 

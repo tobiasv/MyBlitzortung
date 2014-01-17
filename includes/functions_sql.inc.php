@@ -232,6 +232,12 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 
 function bo_sql_latlon2dist($lat1, $lon1, $lat_name='lat', $lon_name='lon')
 {
+	if (!trim($lat_name) || !trim($lon_name))
+		return ' 0 ';
+	
+	if ($lat1 == 0.0 && $lon1 == 0.0)
+		return ' 0 ';
+	
 	$sql = "ACOS(SIN(RADIANS($lat1)) * SIN(RADIANS($lat_name)) + COS(RADIANS($lat1)) * COS(RADIANS($lat_name)) * COS(RADIANS($lon1 - $lon_name))) * 6371000";
 
 	return " ($sql) ";

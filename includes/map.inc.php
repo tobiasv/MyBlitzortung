@@ -248,7 +248,8 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	$js_stations = '';
 	$res = BoDb::query("SELECT id, city, lat, lon, status
 					FROM ".BO_DB_PREF."stations a
-					WHERE id != '$sid'");
+					WHERE id != '$sid'
+					ORDER BY status='A' ASC");
 	while($row = $res->fetch_assoc())
 	{
 		$row['status'] = bo_get_old_status($row['status']);

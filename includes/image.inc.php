@@ -213,11 +213,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if (preg_match('/[0-9a-z]+/i', $region) && isset($_BO['region'][$region]['rect_add']))
 		$cache_file .= 'region'.$region.'_';
 
-		
-	if (BO_CACHE_FAST)
-		$last_update = floor(time() / $update_interval) * $update_interval;
-	else
-		$last_update = BoData::get('uptime_strikes_modified');
+	$last_update = bo_get_last_import_time($update_interval);
 
 	$sql_where_id = '';
 	
@@ -1077,11 +1073,8 @@ function bo_get_map_image_ani()
 	if ($update_interval > BO_UP_INTVL_STRIKES * 60)
 		$update_interval = BO_UP_INTVL_STRIKES * 60;
 		
-	if (BO_CACHE_FAST)
-		$last_update = floor(time() / $update_interval) * $update_interval;
-	else
-		$last_update = BoData::get('uptime_strikes_modified');
-		
+	$last_update = bo_get_last_import_time($update_interval);
+	
 	$expire = time() + $update_interval / 1.5;
 	
 	//Headers
@@ -1096,9 +1089,9 @@ function bo_get_map_image_ani()
 		bo_output_cachefile_if_exists($cache_file, $last_update, $update_interval);
 	}
 
-	
-	if (BO_CACHE_FAST)
-		$last_update = BoData::get('uptime_strikes_modified');
+	//?????
+	//if (BO_CACHE_FAST)
+	//	$last_update = BoData::get('uptime_strikes_modified');
 	
 	$time_start = $last_update - $cfg_ani['minutes'] * 60;
 	$cfg_single = $cfg;
