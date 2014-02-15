@@ -231,6 +231,15 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	$row = BoDb::query("SELECT COUNT(station_id) cnt FROM ".BO_DB_PREF."stations_stat a WHERE time=(SELECT MAX(time) FROM ".BO_DB_PREF."stations_stat)")->fetch_assoc();
 	$stations = $row['cnt'] - 1;
 
+	//Other stations from same user
+	$user_stations = array();
+	$sql = "SELECT id, city, bo_station_id, comment
+			FROM ".BO_DB_PREF."stations
+			WHERE bo_user_id='".$stInfo['bo_user_id']."' AND status > 0 AND id != '".$stInfo['id']."'";
+	$res = BoDb::query($sql);
+	while ($row = $res->fetch_assoc())
+		$user_stations[$row['id']] = array('city' => $row['city'], 'bo_id' => $row['bo_station_id'], 'comment' => $row['comment']);
+		
 	//Own strokes
 	if ($own_station)
 	{
@@ -329,6 +338,26 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	if ($comment)
 	{
 		echo '<li><span class="bo_descr">'._BL("Comment").': </span><span class="bo_value">'.$comment.'</span>';
+	}
+	
+	if (count($user_stations))
+	{
+		echo '<li><span class="bo_descr">'._BL("Other Stations from this User").': </span>';
+		
+		echo '<span class="bo_value">';
+		
+		$i=0;
+		foreach($user_stations as $id => $d)
+		{
+			echo $i ? ', ' : '';
+			echo '<a href="'.bo_insert_url(array('bo_station_id', 'bo_sid')).'&bo_station_id='.$id.'" title="'._BC($d['city'].' '.$d['comment']).'">';
+			echo $d['bo_id'];
+			echo '</a>';
+			$i++;
+		}
+		
+		echo '</span>';
+	
 	}
 	
 	echo '</ul>';

@@ -12,7 +12,7 @@ function bo_stations($index = 'id', $only = '', $under_constr = true)
 		$sql .= " AND $index='".BoDb::esc($only)."' ";
 
 	if (!$under_constr)
-		$sql .= " AND last_time != '1970-01-01 00:00:00' ";
+		$sql .= " AND last_time != '1970-01-01 00:00:00' AND status != 0 ";
 
 	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND bo_station_id > 0 AND id < ".intval(BO_DELETED_STATION_MIN_ID);
 	$res = BoDb::query($sql);
@@ -125,7 +125,7 @@ function bo_get_old_status($status)
 
 function bo_get_station_list(&$style_class = array())
 {
-	$stations = bo_stations();
+	$stations = bo_stations('id', '', false);
 	$opts = array();
 	foreach($stations as $id => $d)
 	{

@@ -309,6 +309,11 @@ function _BD($time)
 	return date(_BL('_date'), $time);
 }
 
+function _BT($time)
+{
+	return date('H:i:s', $time);
+}
+
 function _BZ($time)
 {
 	return BO_SHOW_TIMEZONE === true ? ' '._BL(date('T', $time)) : '';

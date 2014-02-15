@@ -2278,7 +2278,7 @@ function bo_graph_statistics()
 			{
 				$sql_country = "SELECT COUNT(*) cnt
 					FROM ".BO_DB_PREF."stations
-					WHERE status != '-' AND country='".BoDb::esc($country)."'";
+					WHERE status > 0 AND country='".BoDb::esc($country)."'";
 			}
 			else
 			{
@@ -2293,7 +2293,7 @@ function bo_graph_statistics()
 				
 				$sql_country = "SELECT COUNT(*) cnt
 					FROM ".BO_DB_PREF."stations
-					WHERE status != '-'";
+					WHERE status > 0";
 				
 			}
 

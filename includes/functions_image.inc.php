@@ -42,12 +42,9 @@ function bo_imagestring(&$I, $size, $x, $y, $text, $tcolor = false, $bold = fals
 	else
 		$color = $tcolor;
 
-	if ($size <= 5)
+	if ($size <= 5 && $angle == 90)
 	{
-		if ($angle == 90)
-			return imagestringup($I, $size, $x, $y, $text, $color);
-		else
-			return imagestring($I, $size, $x, $y, $text, $color);
+		return imagestringup($I, $size, $x, $y, $text, $color);
 	}
 	else
 	{
@@ -163,9 +160,9 @@ function bo_imagestring_font(&$size, &$type)
 }
 
 
-function bo_imagettftextborder(&$I, $size, $angle, $x, $y, &$textcolor, $font, $text, $bordercolor = false, $px = 0)
+function bo_imagettftextborder(&$I, $size, $angle, $x, $y, $textcolor, $font, $text, $bordercolor = false, $px = 0)
 {
-	if ($px)
+	if ($px && $bordercolor !== false)
 	{
 		for($c1 = ($x-abs($px)); $c1 <= ($x+abs($px)); $c1++)
 			for($c2 = ($y-abs($px)); $c2 <= ($y+abs($px)); $c2++)
@@ -175,12 +172,14 @@ function bo_imagettftextborder(&$I, $size, $angle, $x, $y, &$textcolor, $font, $
    return bo_imagefttext($I, $size, $angle, $x, $y, $textcolor, $font, $text);
 }
 
-function bo_imagefttext(&$I, $size, $angle, $c1, $c2, $bordercolor, $font, $text)
+function bo_imagefttext(&$I, $size, $angle, $x, $y, $color, $font, $text)
 {
-	if (BO_FONT_USE_FREETYPE2)
-		return imagefttext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
+	if ($size <= 5)
+		return imagestring($I, $size, $x, $y, $text, $color);
+	else if (BO_FONT_USE_FREETYPE2)
+		return imagefttext($I, $size, $angle, $x, $y, $color, $font, $text);
 	else
-		return imagettftext($I, $size, $angle, $c1, $c2, $bordercolor, $font, $text);
+		return imagettftext($I, $size, $angle, $x, $y, $color, $font, $text);
 }
 
 

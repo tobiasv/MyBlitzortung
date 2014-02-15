@@ -58,13 +58,13 @@ class BoData
 			'changed' => $row['changed']);
 	}
 
-	public static function set($name, $data, $is_binary = false, $ignore_cache = false)
+	public static function set($name, $data, $is_utf = false, $ignore_cache = false)
 	{
 		//data hasn't changed
 		if (!$ignore_cache && isset(self::$cache['data'][$name]) && self::$cache['data'][$name] == $data)
 			return true;
 
-		$data_enc = $is_binary ? $data : utf8_encode($data);
+		$data_enc = $is_utf ? $data : utf8_encode($data);
 		self::compress($data_enc);
 		$data_esc = BoDb::esc($data_enc);
 		$name_esc = BoDb::esc($name);

@@ -544,9 +544,19 @@ function bo_tile()
 	}
 	
 	
-	//strike grouping
+	//strike grouping?
+	//no grouping when showing text
+	if ($zoom >= BO_MAP_STRIKE_SHOW_TEXT)
+	{
+		require_once 'functions_image.inc.php';
+		bo_load_locale();
+	
+		$sql_select = " s.time mtime, s.lat lat, s.lon lon, 
+						s.time_ns mtime_ns, s.stations stations, s.stations_calc stations_calc ";
+		$grouping   = false;
+	}
 	//no grouping for deviation-circle
-	if ($zoom >= $zoom_show_deviation) 
+	else if ($zoom >= $zoom_show_deviation) 
 	{
 		$sql_select = " s.time mtime, s.lat lat, s.lon lon  ";
 		$grouping   = false;
@@ -583,6 +593,7 @@ function bo_tile()
 	//create Image
 	$I = imagecreate($tile_size, $tile_size);
 	$blank = imagecolorallocate($I, 0, 0, 0);
+	$black = imagecolorallocate($I, 1, 1, 1);
 	$white = imagecolorallocate($I, 255, 255, 255);
 	imagefilledrectangle( $I, 0, 0, $tile_size, $tile_size, $blank);
 
@@ -715,6 +726,17 @@ function bo_tile()
 			imageellipse($I, $px, $py, $deviation, $deviation, $col);
 		}
 		
+		if ($zoom >= BO_MAP_STRIKE_SHOW_TEXT)
+		{
+			$text = _BD($strike_time);
+			bo_imagestring($I, 1, $px+3+$s/2, $py-15, $text, $white, false, 0, $black, 1);
+			
+			$text = _BT($strike_time, false).sprintf('.%09d', $row['mtime_ns']);
+			bo_imagestring($I, 1, $px+3+$s/2, $py-6, $text, $white, false, 0, $black, 1);
+			
+			$text = 'S: '.$row['stations_calc'].'/'.$row['stations'].'';
+			bo_imagestring($I, 1, $px+3+$s/2, $py+3, $text, $white, false, 0, $black, 1);
+		}
 	}
 	
 	if ($na_positions > 0)

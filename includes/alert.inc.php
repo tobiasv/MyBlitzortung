@@ -247,7 +247,7 @@ function bo_alert_settings_form()
 
 			if ($alert_id >= 0)
 			{
-				BoData::set('alert_'.$user_id.'_'.$alert_id, serialize($A));
+				BoData::set('alert_'.$user_id.'_'.$alert_id, serialize($A), true);
 			}
 			else
 			{
@@ -258,7 +258,7 @@ function bo_alert_settings_form()
 					$alert_id_new = max($alert_id_new, intval($r[2]) + 1);
 				}
 
-				BoData::set('alert_'.$user_id.'_'.$alert_id_new, serialize($A));
+				BoData::set('alert_'.$user_id.'_'.$alert_id_new, serialize($A), true);
 				
 			}
 			

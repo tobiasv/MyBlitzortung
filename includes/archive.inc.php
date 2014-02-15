@@ -1601,7 +1601,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			echo '<h5>'._BL('Participated stations').'</h5>';		
 		
 			if (!$show_other_graphs && time() - $stime < 3600 * 23)
-				echo '<a href="'.bo_insert_url(array('bo_action', 'bo_show_details', 'bo_strike_id')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs" class="bo_show_all_signals bo_sig_table_menu">'._BL('Show all signals').'</a>';
+				echo '<a href="'.bo_insert_url(array('bo_action', 'bo_show_details', 'bo_strike_id', 'bo_lat', 'bo_lon', 'bo_zoom')).'&bo_strike_id='.$row['strike_id'].'&bo_other_graphs" class="bo_show_all_signals bo_sig_table_menu">'._BL('Show all signals').'</a>';
 
 			echo '<div class="bo_arch_other_participants_container">';
 			foreach ($s_dists[0] as $sid => $dist)

@@ -1443,11 +1443,11 @@ function bo_update_stations($force = false)
 
 			//City
 			if (preg_match('/city;"([^"]+)"/', $l, $r))
-				$D['city'] = strtr($r[1], array(chr(160) => ' '));
+				$D['city'] = $r[1];
 
 			//Country
 			if (preg_match('/country;"([^"]+)"/', $l, $r))
-				$D['country'] = strtr($r[1], array(chr(160) => ' '));
+				$D['country'] = $r[1];
 			
 			//Position
 			if (preg_match('/pos;([-0-9\.]+);([-0-9\.]+);([-0-9\.]+)/', $l, $r))
@@ -1469,15 +1469,15 @@ function bo_update_stations($force = false)
 			
 			//Firmware
 			if (preg_match('/firmware;"([^"]+)"/', $l, $r))
-				$D['firmware'] = strtr($r[1], array(chr(160) => ' '));
+				$D['firmware'] = $r[1];
 
 			//Comment
 			if (preg_match('/comments;"([^"]+)"/', $l, $r))
-				$D['comment'] = strtr($r[1], array(chr(160) => ' '));
+				$D['comment'] = $r[1];
 
 			//Website
 			if (preg_match('/website;"([^"]+)"/', $l, $r))
-				$D['url'] = strtr($r[1], array(chr(160) => ' '));
+				$D['url'] = $r[1];
 				
 			//Signals
 			if (preg_match('/signals;"?(([^ ;]+);)?([^ ;]+)"?/', $l, $r))
@@ -1527,30 +1527,15 @@ function bo_update_stations($force = false)
 			$file_truncated = false;
 			$D['distance'] = round(bo_latlon2dist($D['lat'], $D['lon']) / 100) * 100;
 			
-			/*
-			if (function_exists('iconv'))
-			{
-				$D['city']    = iconv("Windows-1250", "UTF-8", $D['city']);
-				$D['country'] = iconv("Windows-1250", "UTF-8", $D['country']);
-				$D['firmware'] = iconv("Windows-1250", "UTF-8", $D['firmware']);
-			}
-			else
-			{
-				$D['city']    = utf8_encode($D['city']);
-				$D['country'] = utf8_encode($D['country']);
-				$D['firmware'] = utf8_encode($D['firmware']);
-			}
-
-			$D['city']    = strtr($D['city'], array('\null' => ''));
-			$D['country'] = strtr($D['country'], array('\null' => ''));
-			$D['firmware'] = strtr($D['firmware'], array('\null' => ''));
-			*/			
-
 			if ($id <= 0)
 			{
 				bo_echod("Wrong station Id $id ".$D['country'].'/'.$D['city']);
 				continue;
 			}
+			
+			//Set station inactive
+			if (time() - $utime > 3600 * 24 * BO_STATION_INACTIVE_DAYS)
+				$D['status'] = 0;
 			
 			//Data for statistics
 			$StData[$id] = array(
@@ -1605,6 +1590,12 @@ function bo_update_stations($force = false)
 		bo_echod("Stations: ".(count($lines)-2)." *** New Stations: $count_inserted *** Updated: $count_updated *** No Update: $count_noupdate");
 
 
+		//deactivate old stations which are not in file
+		$num = BoDb::query("UPDATE ".BO_DB_PREF."stations SET status=0 WHERE changed < '".gmdate('Y-m-d H:i:s', time() - 3600 * 24 * BO_STATION_INACTIVE_DAYS)."'");
+		if ($num)
+			bo_echod("Deactivated $num stations");
+		
+		
 		//Update Statistics
 		$datetime      = gmdate('Y-m-d H:i:s', $time);
 		$datetime_back = gmdate('Y-m-d H:i:s', $time - 3600);

@@ -23,8 +23,13 @@
 
 if (!defined("BO_VER"))
 {
+	//show all errors/warnings by default
+	error_reporting(E_ALL & ~E_NOTICE);
+	ini_set('display_errors', 1);
+	
+
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '1.2');
+	define("BO_VER", '1.3-dev');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);

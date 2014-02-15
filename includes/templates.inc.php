@@ -685,6 +685,11 @@ $_BO['tpl_density']['oceania']['coord'] 	= array(15, 180, -55, 100); //North, Ea
 $_BO['tpl_density']['oceania']['length']	= 20; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
 $_BO['tpl_density']['oceania']['bps'] 	    = 3; // bytes per area 
 
+//Oceania HD
+$_BO['tpl_density']['oceania_hd']['name'] 	= 'Oceania HD';
+$_BO['tpl_density']['oceania_hd']['coord'] 	= array(15, 180, -55, 100); //North, East, South, West (Degrees)
+$_BO['tpl_density']['oceania_hd']['length']	= 5; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
+$_BO['tpl_density']['oceania_hd']['bps'] 	    = 2; // bytes per area 
 
 //New Zealand
 $_BO['tpl_density']['new_zealand']['name'] 	    = 'New Zealand';
