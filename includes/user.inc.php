@@ -86,9 +86,8 @@ function bo_user_show_admin()
 			echo '<h5>'._BL('Documentation').'</h5>';
 			echo '<ul>';
 			echo '<li><a href="'.dirname(BO_FILE).'/README" target="_blank">README</a></li>';
-			echo '<li><a href="http://forum.blitzortung.org" target="_blank">Blitzortung.org user forum</a></li>';
-			echo '<li><a href="http://www.myblitzortung.org" target="_blank">www.myblitzortung.org</a></li>';
-			echo '<li><a href="http://www.wetter-board.de/index.php?page=Board&boardID=381" target="_blank">Board</a></li>';
+			echo '<li><a href="http://www.blitzortung.org/Webpages/index.php?page=6" target="_blank">Blitzortung.org forum</a></li>';
+			echo '<li><a href="http://www.lightningmaps.org/doc/intro" target="_blank">www.LightningMaps.org</a></li>';
 			echo '<li><a href="http://www.faq-blitzortung.org/index.php?sid=267611&lang=de&action=show&cat=18" target="_blank">FAQ</a></li>';
 			echo '</ul>';
 
@@ -418,69 +417,73 @@ function bo_user_show_useradmin()
 
 	echo '<div id="bo_user_admin">';
 
-	echo '<h3>'._BL('User list').'</h3>';
-	echo '<table class="bo_table" id="bo_user_table">';
-	echo '<tr>
-			<th rowspan="2">ID</th>
-			<th rowspan="2">'._BL('Login').'</th>
-			<th rowspan="2">'._BL('E-Mail').'</th>
-			<th colspan="'.BO_PERM_COUNT.'">'._BL('Level').'</th>
-			<th rowspan="2">'._BL('Delete').'</th>
-			<th rowspan="2">'._BL('Alert').'</th>
-			</tr>';
-
-	for ($i=0; $i<BO_PERM_COUNT;$i++)
+	if (!$user_id)
 	{
-		echo '<th>'.($i+1).'</th>';
-	}
-
-	$sql = "SELECT id, login, password, level, mail
-			FROM ".BO_DB_PREF_USER."user
-			ORDER BY id
-			";
-	$res = BoDb::query($sql);
-	while ($row = $res->fetch_assoc())
-	{
-		if ($row['id'] == 1)
-		{
-			$row['login'] = BO_USER;
-			$row['pass'] = BO_PASS;
-			$row['level'] = pow(2, BO_PERM_COUNT) - 1;
-		}
-
+	
+		echo '<h3>'._BL('User list').'</h3>';
+		echo '<table class="bo_table" id="bo_user_table">';
 		echo '<tr>
-			<td><a href="'.bo_insert_url(array('bo_action2', 'id')).'&id='.$row['id'].'">'.$row['id'].'</a></td>
-			<td>'._BC($row['login']).'</td>
-			<td>'._BC($row['mail']).'</td>';
+				<th rowspan="2">ID</th>
+				<th rowspan="2">'._BL('Login').'</th>
+				<th rowspan="2">'._BL('E-Mail').'</th>
+				<th colspan="'.BO_PERM_COUNT.'">'._BL('Level').'</th>
+				<th rowspan="2">'._BL('Delete').'</th>
+				<th rowspan="2">'._BL('Alert').'</th>
+				</tr>';
 
 		for ($i=0; $i<BO_PERM_COUNT;$i++)
 		{
-			$l = pow(2, $i);
-			echo '<td>'.(($row['level'] & $l) ? 'X' : '-').'</td>';
+			echo '<th>'.($i+1).'</th>';
 		}
 
-		echo '<td>';
-
-		if ($row['id'] > 1)
-			echo '<a href="'.bo_insert_url(array('bo_action2')).'&bo_action2=delete&id='.$row['id'].'" style="color:red" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
-
-		echo '</td>';
-
-		echo '<td><a href="'.bo_insert_url(array('bo_action', 'bo_action2')).'&bo_action=alert&bo_action2=alert_form%2C'.$row['id'].'">'._BL('new').'</a></td>';
-
-		echo '</tr>';
-
-		if ($user_id == $row['id'])
+		$sql = "SELECT id, login, password, level, mail
+				FROM ".BO_DB_PREF_USER."user
+				ORDER BY id
+				";
+		$res = BoDb::query($sql);
+		while ($row = $res->fetch_assoc())
 		{
-			$user_mail = $row['mail'];
-			$user_level = $row['level'];
-			$user_login = $row['login'];
+			if ($row['id'] == 1)
+			{
+				$row['login'] = BO_USER;
+				$row['pass'] = BO_PASS;
+				$row['level'] = pow(2, BO_PERM_COUNT) - 1;
+			}
+
+			echo '<tr>
+				<td><a href="'.bo_insert_url(array('bo_action2', 'id')).'&id='.$row['id'].'">'.$row['id'].'</a></td>
+				<td>'._BC($row['login']).'</td>
+				<td>'._BC($row['mail']).'</td>';
+
+			for ($i=0; $i<BO_PERM_COUNT;$i++)
+			{
+				$l = pow(2, $i);
+				echo '<td>'.(($row['level'] & $l) ? 'X' : '-').'</td>';
+			}
+
+			echo '<td>';
+
+			if ($row['id'] > 1)
+				echo '<a href="'.bo_insert_url(array('bo_action2')).'&bo_action2=delete&id='.$row['id'].'" style="color:red" onclick="return confirm(\''._BL('Sure?').'\');">X</a>';
+
+			echo '</td>';
+
+			echo '<td><a href="'.bo_insert_url(array('bo_action', 'bo_action2')).'&bo_action=alert&bo_action2=alert_form%2C'.$row['id'].'">'._BL('new').'</a></td>';
+
+			echo '</tr>';
+
+			if ($user_id == $row['id'])
+			{
+				$user_mail = $row['mail'];
+				$user_level = $row['level'];
+				$user_login = $row['login'];
+			}
+
 		}
 
+		echo '</table>';
 	}
-
-	echo '</table>';
-
+	
 	if ($user_id == 1)
 	{
 		$disabled = ' disabled="disabled"';
@@ -489,7 +492,25 @@ function bo_user_show_useradmin()
 	if ($failure)
 		echo '<div class="bo_info_fail">'._BL('Failure!').'</div>';
 
+		
+		
+	$sql = "SELECT id, login, password, level, mail
+		FROM ".BO_DB_PREF_USER."user WHERE id='$user_id'";
+	$res = BoDb::query($sql);
+	$row = $res->fetch_assoc();
 
+	if ($row['id'] == 1)
+	{
+		$row['login'] = BO_USER;
+		$row['pass'] = BO_PASS;
+		$row['level'] = pow(2, BO_PERM_COUNT) - 1;
+	}
+	
+	$user_mail = $row['mail'];
+	$user_level = $row['level'];
+	$user_login = $row['login'];
+	
+	
 	echo '<form action="'.bo_insert_url(array('bo_logout', 'id', 'bo_action2')).'" method="POST" class="bo_admin_user_form">';
 
 	echo '<fieldset class="bo_admin_user_fieldset">';
@@ -500,9 +521,6 @@ function bo_user_show_useradmin()
 
 	echo '<span class="bo_form_descr">'._BL('Password').':</span>';
 	echo '<input type="password" name="bo_user_pass" value="'._BC($user_pass).'" id="bo_user_login" class="bo_form_text bo_admin_input" '.$disabled.'>';
-
-	//echo '<span class="bo_form_descr">'._BL('Level').':</span>';
-	//echo '<input type="text" name="bo_user_level" value="'._BC($user_level).'" id="bo_user_level" class="bo_form_text bo_admin_input" '.$disabled.'>';
 
 	echo '<span class="bo_form_descr">'._BL('E-Mail').':</span>';
 	echo '<input type="text" name="bo_user_mail"  value="'._BC($user_mail).'" id="bo_user_mail" class="bo_form_text bo_login_input">';

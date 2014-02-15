@@ -129,7 +129,7 @@ class BoDb extends BoDbMain
 	}
 
 	
-	function value2sql($value)
+	public static function value2sql($value)
 	{
 		if (is_array($value))
 		{

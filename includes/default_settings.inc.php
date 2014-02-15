@@ -386,7 +386,11 @@
 
 
 // Mark stations offline after specified time with no activity
-@define('BO_STATION_OFFLINE_MINUTES', 15);
+@define('BO_STATION_OFFLINE_MINUTES', 30);
+
+
+// Mark stations as not available when no signals have been sent
+@define('BO_STATION_INACTIVE_DAYS', 30);
 
 
 // Show new stations
@@ -542,6 +546,7 @@
 //displaying of strikes
 @define('BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM', 7);
 @define('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM', 12);
+@define('BO_MAP_STRIKE_SHOW_TEXT', 16);
 @define('BO_MAP_STRIKE_SIZE', 3);
 @define('BO_MAP_STRIKE_CIRCLE_SIZE', 4);
 @define('BO_MAP_STRIKE_CIRCLE_GROW', 0.6);

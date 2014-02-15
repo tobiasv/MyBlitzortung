@@ -1,7 +1,7 @@
 <?php
 
 /*
-* Swedich translation by labbs www.lokaltvader.se
+* Swedish translation by labbs www.lokaltvader.se
 * -> feel free to correct the entries!
 */
 
@@ -59,7 +59,9 @@ $_BL['sv']['unit_us_short'] = 'µs';
 $_BL['sv']['unit_ksps'] = 'Kilosamples per sekund';
 $_BL['sv']['unit_days'] = 'dagar';
 $_BL['sv']['unit_kilometers'] = 'km';
+$_BL['sv']['unit_meters'] = 'm';
 $_BL['sv']['unit_miles'] = 'mi';
+$_BL['sv']['unit_meters'] = 'm';
 $_BL['sv']['unit_yards'] = 'yd';
 $_BL['sv']['days'] = 'dagar';
 $_BL['sv']['hours'] = 'timmar';
@@ -1062,7 +1064,8 @@ $_BL['sv']['City names'] = 'Namn på städer';
 $_BL['sv']['Only strikes of selected station'] = 'Endast blixtar från vald station';
 $_BL['sv']['map_autoupdate_stalled_msg'] = 'Ingen användaraktivitet. Autouppdatering avstannad.';
 $_BL['sv']['tile_zoom_not_allowed'] = 'Zoomnivå\ninte tillåten här!';
-$_BL['sv']['tile_station_not_allowed'] = 'Cellspårning avstängd!';
+$_BL['sv']['tile_station_not_allowed'] = 'Stationsval\nej tillåtet!';
+$_BL['sv']['tile_station_not_allowed'] = 'Spårning inaktiverat';
 $_BL['sv']['Last time without GPS'] = 'Senaste tid utan GPS';
 $_BL['sv']['h4_stat_station_general'] = 'Allmän statistik för senaste timmen';
 
@@ -1076,6 +1079,7 @@ $_BL['sv']['Latvia'] = 'Lettland';
 $_BL['sv']['Ukraine'] = 'Urkaina';
 $_BL['sv']['Croatia'] = 'Kroatioen';
 $_BL['sv']['Baltic States'] = 'Baltiska Staterna';
+$_BL['sv']['The Netherlands'] = 'Nederländerna';
 
 $_BL['sv']['lang_en'] = 'Engelska';
 $_BL['sv']['lang_de'] = 'Tyska';
@@ -1083,34 +1087,7 @@ $_BL['sv']['lang_fr'] = 'Franska';
 $_BL['sv']['lang_hu'] = 'Ungerska';
 $_BL['sv']['lang_it'] = 'Italienska';
 $_BL['sv']['lang_nl'] = 'Holländska';
-
-
-
-
-/********************/
-/*  NOT TRANSLATED  */
-/********************/
-
-
-//en: 'm'
-$_BL['sv']['unit_meters'] = 'm';
-
-//en: 'm'
-$_BL['sv']['unit_meters'] = 'm';
-
-//en: 'Netherlands'
-$_BL['sv']['The Netherlands'] = 'Nederländerna';
-
-//en: 'Cell tracks disabled!'
-$_BL['sv']['tile_station_not_allowed'] = 'Spårning inaktiverat';
-
-
-/*******************************/
-/*  NOT AVAILABLE IN ORIGINAL  */
-/*******************************/
-
 $_BL['sv']['lang_fi'] = 'Finska';
 $_BL['sv']['lang_sv'] = 'Svenska';
-
 
 ?>
