@@ -1586,15 +1586,20 @@ function bo_update_stations($force = false)
 			$signal_count += $D['signals'][60];
 
 		}
-
+		
 		bo_echod("Stations: ".(count($lines)-2)." *** New Stations: $count_inserted *** Updated: $count_updated *** No Update: $count_noupdate");
 
+		
+		
+		//set station offline if changed too long ago
+		$num = BoDb::query("UPDATE ".BO_DB_PREF."stations SET status=".(STATUS_OFFLINE*10)." WHERE status!=0 AND changed < '".gmdate('Y-m-d H:i:s', time() - 60 * BO_STATION_OFFLINE_MINUTES)."'");
+		if ($num)
+			bo_echod("Set $num stations offline");
 
 		//deactivate old stations which are not in file
-		$num = BoDb::query("UPDATE ".BO_DB_PREF."stations SET status=0 WHERE changed < '".gmdate('Y-m-d H:i:s', time() - 3600 * 24 * BO_STATION_INACTIVE_DAYS)."'");
+		$num = BoDb::query("UPDATE ".BO_DB_PREF."stations SET status=0 WHERE changed < '".gmdate('Y-m-d H:i:s', time() - 60 * BO_STATION_NOT_PRESENT_MINUTES)."'");
 		if ($num)
 			bo_echod("Deactivated $num stations");
-		
 		
 		//Update Statistics
 		$datetime      = gmdate('Y-m-d H:i:s', $time);

@@ -386,7 +386,11 @@
 
 
 // Mark stations offline after specified time with no activity
-@define('BO_STATION_OFFLINE_MINUTES', 30);
+@define('BO_STATION_OFFLINE_MINUTES', 20);
+
+
+// Minutes, after which stations marked as not available when not present in stations export file
+@define('BO_STATION_NOT_PRESENT_MINUTES', 22);
 
 
 // Mark stations as not available when no signals have been sent
