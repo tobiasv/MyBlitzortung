@@ -158,6 +158,8 @@ function _BL($msgid=null, $noutf = false, $utf_in = false)
 	if ($msgid === null)
 		return $locale;
 
+	$msgid = strtr($msgid, array(utf8_encode(chr(160)) => ' '));
+		
 	if (isset($_BL[$locale][$msgid]))
 	{
 		$msg     = $_BL[$locale][$msgid];
@@ -176,21 +178,11 @@ function _BL($msgid=null, $noutf = false, $utf_in = false)
 			bo_add_locale_msgid('en', $msgid);
 		}
 
-		if (isset($_BL['en'][$msgid]))
-		{
-			$msg    = $_BL['en'][$msgid];
-			$utf_in = $_BL['en']['is_utf8'] == true;
-		}
-		
-	}
-
-	if (!$msg)
-	{
-		$msg = $msgid;
-		
+				
 		//Try to find some known words in short strings, i.e. country names
-		if (BO_TRANSLATE_SINGLE_WORDS > 0 && strlen($msg) < 200 && strlen($msg) > BO_TRANSLATE_SINGLE_WORDS)
+		if (BO_TRANSLATE_SINGLE_WORDS > 0 && strlen($msg) < 200 && strlen($msg) < BO_TRANSLATE_SINGLE_WORDS)
 		{
+
 			$words = preg_split("@[,;:/\(\)\<\> ]@", $msg, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
 
 			if (count($words) > 1)
@@ -224,6 +216,17 @@ function _BL($msgid=null, $noutf = false, $utf_in = false)
 		}
 		
 		
+		if (isset($_BL['en'][$msgid]))
+		{
+			$msg    = $_BL['en'][$msgid];
+			$utf_in = $_BL['en']['is_utf8'] == true;
+		}
+		
+	}
+
+	if (!$msg)
+	{
+		$msg = $msgid;
 	}
 	else
 	{

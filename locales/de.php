@@ -1028,6 +1028,15 @@ $_BL['de']['Rome'] = 'Rom';
 $_BL['de']['Lithuania'] = 'Litauen';
 $_BL['de']['Slovenia'] = 'Slovenien';
 $_BL['de']['Ireland'] = 'Irland';
+$_BL['de']['Latvia'] = 'Lettland';
+$_BL['de']['Ukraine'] = 'Ukraine';
+$_BL['de']['Croatia'] = 'Kroatien';
+$_BL['de']['Baltic States'] = 'Baltikum';
+$_BL['de']['Luxembourg'] = 'Luxemburg';
+$_BL['de']['Russian Federation'] = 'Russland';
+$_BL['de']['Slovakia'] = 'Slowakei';
+$_BL['de']['Slovakia (Slovak Republic)'] = 'Slowakei (Slowakische Republik)';
+
 
 //Europe: Regions
 $_BL['de']['Europe'] = 'Europa';
@@ -1045,11 +1054,12 @@ $_BL['de']['Sardinia'] = 'Sardinien';
 /*** OCEANIA ***/
 $_BL['de']['New Zealand'] = 'Neuseeland';
 $_BL['de']['Oceania'] = 'Ozeanien';
+$_BL['de']['Australia'] = 'Australien';
 
 
 /*** USA/America ***/
 $_BL['de']['America'] = 'Amerika';
-
+$_BL['de']['Colombia'] = 'Kolumbien';
 
 
 /*** OTHER REGIONS ***/
@@ -1131,11 +1141,6 @@ $_BL['de']['strikes_station2'] = '{STATION_CITY}';
 $_BL['de']['mean ratio'] = 'Mittlere Quote';
 $_BL['de']['ratio of all strikes is'] = 'Quote alle Blitze';
 $_BL['de']['Strikes per'] = 'Blitze pro';
-$_BL['de']['Latvia'] = 'Lettland';
-$_BL['de']['Ukraine'] = 'Ukraine';
-$_BL['de']['Croatia'] = 'Kroatien';
-$_BL['de']['Baltic States'] = 'Baltikum';
-
 
 $_BL['de']['lang_en'] = 'Englisch';
 $_BL['de']['lang_de'] = 'Deutsch';
