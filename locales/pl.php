@@ -47,7 +47,7 @@ $_BL['pl']['.'] = '.';
 $_BL['pl'][','] = ',';
 $_BL['pl']['_date'] = 'Y-m-d';
 $_BL['pl']['_dateshort'] = 'm/d';
-$_BL['pl']['_datetime'] = 'Y-m-d G:m:s';
+$_BL['pl']['_datetime'] = 'Y-m-d G:i:s';
 
 $_BL['pl']['_before'] = false;
 $_BL['pl']['_minutes_ago'] = 'minut temu';
