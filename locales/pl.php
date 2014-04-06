@@ -47,7 +47,7 @@ $_BL['pl']['.'] = '.';
 $_BL['pl'][','] = ',';
 $_BL['pl']['_date'] = 'Y-m-d';
 $_BL['pl']['_dateshort'] = 'm/d';
-$_BL['pl']['_datetime'] = 'Y-m-d G:m:s';
+$_BL['pl']['_datetime'] = 'Y-m-d G:i:s';
 
 $_BL['pl']['_before'] = false;
 $_BL['pl']['_minutes_ago'] = 'minut temu';
@@ -210,7 +210,7 @@ $_BL['pl']['Usage'] = 'Wykorzystanie';
 $_BL['pl']['Last signal'] = 'ostatni sygnał';
 $_BL['pl']['Never before'] = 'Nigdy wcześniej';
 $_BL['pl']['no_strike_yet'] = 'Brak';
-$_BL['pl']['Current strike rate'] = 'Bierząca częstość uderzeń';
+$_BL['pl']['Current strike rate'] = 'Bieżąca częstość uderzeń';
 $_BL['pl']['Last detected strike'] = 'Ostatnio wykryte uderzenie';
 $_BL['pl']['Not yet'] = 'Jeszcze nie';
 $_BL['pl']['Evaluated'] = 'Przetworzone';
@@ -849,12 +849,12 @@ $_BL['pl']['Couldnt get login id'] = 'Nie można uzyskać id login';
 
 $_BL['pl']['mybo_station_update_info'] = '
 
-W tej funkcjonalności można połączyć instalację twojego {MYBO_ORIG} z innymi stacjami, które posiadają uruchomione {MYBO_ORIG}. Nastąpią poniże rzeczy po kliknięciu na link poniżej
+W tej funkcjonalności można połączyć instalację twojego {MYBO_ORIG} z innymi stacjami, które posiadają uruchomione {MYBO_ORIG}. Nastąpią poniższe rzeczy po kliknięciu na link poniżej
 :
 1. id twojej stacji oraz adresl url strony www zostaną wysłane do {LINK_HOST}.
 2. Otrzymasz wszystkie adresy url innych stacji, które są obecnie na liście.
 
-Należy aktualizować dane od czasu do czasu, tak aby nowe stacje pojawiały się lub można urzyć funkcji auto-update.
+Należy aktualizować dane od czasu do czasu, tak aby nowe stacje pojawiały się lub można użyć funkcji auto-update.
 
 Aby uwierzytelnić cię jako uzytkownika blitzortung.org, należy podać login-id na blitzortung.org. Ten id zostanie prześłany do {LINK_HOST} i ponownie sprawdzony na. Id nie bęzie zapisane! Twoje hasło nigdy nie będzie przesłane do innych stron www jak tylko do blitzortung.org! Twoje stacje muszą wysłac przynajmniej jeden sygnał w ciągu ostatnich 2 godzin, w przeciwnym wypadku uwierzytelnianie nie będzie działać.
 ';
