@@ -306,24 +306,125 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	echo strtr(_BL('bo_stat_station_descr_lasth'), array('{STATION_CITY}' => $city, '{MIN_PARTICIPANTS}' => bo_participants_locating_min()));
 	echo '</p>';
 
+	list($pcb) = explode(';', $stInfo['controller_pcb']);
+	
 	echo '<ul class="bo_stat_overview">';
 	if ($stInfo['firmware'])
 	{
-		if (preg_match('/[A-Z]/i', $stInfo['firmware']))
+		if ($pcb && (int)$pcb < 10)
 			$name = 'Tracker';
 		else
 			$name = 'Firmware';
 			
 		echo '<li><span class="bo_descr">'._BL($name).': </span><span class="bo_value">'._BC($stInfo['firmware']).'</span>';
 	}
-
-	list($pcb) = explode(';', $stInfo['controller_pcb']);
 	
 	if ($pcb)
 	{
 		echo '<li><span class="bo_descr">'._BL("Controller").': </span><span class="bo_value">'.$pcb.'</span>';
 	}
+
+	$pcb = '';
+	$amps = explode(';', $stInfo['amp_pcbs']);
 	
+	if ($amps[0] && $amps[0] != '?')
+		$pcb = $amps[0];
+
+	if ($amps[3] && $amps[3] != '?')
+		$pcb .= ($pcb ? ' / ' : '').$amps[3];
+		
+	if ($pcb)
+	{
+		echo '<li><span class="bo_descr">'._BL("Amplifier").': </span><span class="bo_value">'.$pcb.'</span>';
+	}	
+	
+	$ant_data = explode(';', $stInfo['amp_antennas']);
+	$ant_text = array();
+	
+	for ($i = 0; $i < count($ant_data)/3; $i++)
+	{
+		$text  = '';
+		$type  = $ant_data[$i*3];
+		$flags = $ant_data[$i*3+2];
+		$dim   = explode(',', $ant_data[$i*3+1]);
+		
+		if (!$type)
+			continue;
+		
+		switch($type)
+		{
+			case 'F': 
+				$text .= 'Ferrite rod';
+				break;
+
+			case 'L': 
+				$text .= 'Loop';
+				break;
+
+			case 'C': 
+				$text .= 'Coaxial loop';
+				break;
+
+			case 'E': 
+				$text .= 'Electric field';
+				break;
+
+			case 'M': 
+				$text .= 'Monopole';
+				break;
+			
+			case 'D': 
+				$text .= 'Dipole';
+				break;
+		}
+
+		switch($type)
+		{
+			case 'F': 
+
+				if ($dim[0])
+					$text .= ', length='.$dim[0].'mm';
+
+				if ($dim[1])
+					$text .= ', diameter='.$dim[1].'mm';
+
+				break;
+
+			case 'L': 
+			case 'C':
+
+				if ($dim[0])
+					$text .= ', diameter='.$dim[0].'mm';
+
+				if ($dim[1])
+					$text .= ', windings='.$dim[1].'mm';
+			
+				break;
+			
+			case 'E': 
+
+				if ($dim[0])
+					$text .= ', length='.$dim[0].'mm';
+					
+				break;
+		}
+		
+		if (strpos($flags, 'S') !== false && $text)
+			$text .= ', shielded';
+
+		if (strpos($flags, 'T') !== false && $text)
+			$text .= ', transformer';
+			
+		if ($ant_text[$text])
+			$ant_text[$text] .= '+'.($i+1);
+		else
+			$ant_text[$text] = ($i+1);
+	}
+	
+	foreach($ant_text as $text => $channels)
+	{
+		echo '<li><span class="bo_descr">'._BL("Antenna").' '.$channels.': </span><span class="bo_value">'.$text.'</span>';
+	}
 	
 	$url = trim($stInfo['url']);
 	if ($url)

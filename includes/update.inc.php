@@ -29,6 +29,7 @@ function bo_check_for_update()
 						'0.8.1',
 						'1.1',
 						'1.2',
+						'1.3'
 						);
 
 	$max_update_num = bo_version2number($updates[count($updates)-1]);
@@ -640,7 +641,17 @@ function bo_check_for_update()
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` DROP `show_mybo`';
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
+			case '1.3':
 			
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` CHANGE `amp_antennas` `amp_antennas` VARCHAR(100)';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` ADD `amp_pcbs` VARCHAR(100) NOT NULL AFTER `status`';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				
 			default:
 				$ok = true;
 				break;

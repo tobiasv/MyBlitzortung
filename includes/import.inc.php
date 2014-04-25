@@ -1505,7 +1505,10 @@ function bo_update_stations($force = false)
 			}
 			
 			
-			//Amp Gains
+			//Amplifier data
+			if (preg_match('/input_board;"?([^ ]+)"?/', $l, $r))
+				$D['amp_pcbs'] = $r[1];
+			
 			if (preg_match('/input_gain;"?([^ ]+)"?/', $l, $r))
 				$D['amp_gains'] = $r[1];
 
