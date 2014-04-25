@@ -218,24 +218,31 @@ function bo_tile()
 	if ($show_count) 
 	{
 		// display strike count
-		$time_range = 0;
-		$time_start = 0;
 		$time_min = array();
 		$time_max = array();
-			
-		foreach($count_types as $i)
+
+		if ($time_manual_from)
 		{
-			$ccfg = $time_manual_from ? $cfg : $_BO['mapcfg'][$i];
-			
-			if (!is_array($ccfg) || !$ccfg['upd_intv'])
-				continue;
-			
-			$times_min[$i] = ceil(($last_update_time - 60*$ccfg['tstart']) / $ccfg['upd_intv'] / 60) * $ccfg['upd_intv'] * 60;
-			$times_max[$i] = $times_min[$i] + 60 * $ccfg['trange'];
+			$times_min[-1] = $time_manual_from;
+			$times_max[-1] = $time_manual_to;
+		}
+		else
+		{
+			foreach($count_types as $i)
+			{
+				$ccfg = $time_manual_from ? $cfg : $_BO['mapcfg'][$i];
+				
+				if (!is_array($ccfg) || !$ccfg['upd_intv'])
+					continue;
+				
+				$times_min[$i] = ceil(($last_update_time - 60*$ccfg['tstart']) / $ccfg['upd_intv'] / 60) * $ccfg['upd_intv'] * 60;
+				$times_max[$i] = $times_min[$i] + 60 * $ccfg['trange'];
+			}
 		}
 		
 		$time_min        = count($times_min) ? min($times_min) : 0;
 		$time_max        = count($times_max) ? max($times_max) : 0;
+		
 	}
 	elseif ($time_manual_from)
 	{
@@ -275,8 +282,7 @@ function bo_tile()
 	/*** Start of calculations *********************************/
 	/***********************************************************/
 
-	$tilespertile = $tile_size / 256;
-	$max_strikes_tile = BO_MAP_MAX_STRIKES_PER_TILE * pow(2, $tilespertile);
+	$max_strikes_tile = BO_MAP_MAX_STRIKES_PER_TILE * pow(2, $tile_size/256);
 	
 	//Radius
 	$sql_where_radius = '';
