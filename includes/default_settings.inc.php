@@ -892,12 +892,12 @@
 @define('BO_GRAPH_RAW_MAX_TIME2', 350);
 
 //Colors
-@define('BO_GRAPH_RAW_COLOR1', '#f00@0.5');
-@define('BO_GRAPH_RAW_COLOR2', '#0f0@0.5');
-@define('BO_GRAPH_RAW_COLOR3', '#ff0@0.5');
-@define('BO_GRAPH_RAW_COLOR4', '#f0d@0.4');
-@define('BO_GRAPH_RAW_COLOR5', '#0dd@0.4');
-@define('BO_GRAPH_RAW_COLOR6', '#f80@0.4');
+@define('BO_GRAPH_RAW_COLOR1', '#f00@0');
+@define('BO_GRAPH_RAW_COLOR2', '#0f0@0');
+@define('BO_GRAPH_RAW_COLOR3', '#ff0@0');
+@define('BO_GRAPH_RAW_COLOR4', '#f0d@0');
+@define('BO_GRAPH_RAW_COLOR5', '#0dd@0');
+@define('BO_GRAPH_RAW_COLOR6', '#f80@0');
 @define('BO_GRAPH_RAW_COLOR_LINES', '#555@0.7');
 @define('BO_GRAPH_RAW_COLOR_XY1', '#00f@0.6');
 @define('BO_GRAPH_RAW_COLOR_XY2', '#f00@0.6');
@@ -909,6 +909,16 @@
 @define('BO_GRAPH_RAW_COLOR_YGRID', '#eee');
 @define('BO_GRAPH_RAW_COLOR_XAXIS', '#666');
 @define('BO_GRAPH_RAW_COLOR_YAXIS', '#666');
+
+@define('BO_GRAPH_RAW_COLOR_LINES_BIG', '#fff@0.7');
+@define('BO_GRAPH_RAW_COLOR_BOX_BIG', '#333');
+@define('BO_GRAPH_RAW_COLOR_BACK_BIG', '#000');
+@define('BO_GRAPH_RAW_COLOR_MARGIN_BIG','#000');
+@define('BO_GRAPH_RAW_COLOR_FRAME_BIG', '#000');
+@define('BO_GRAPH_RAW_COLOR_XGRID_BIG', '#666');
+@define('BO_GRAPH_RAW_COLOR_YGRID_BIG', '#666');
+@define('BO_GRAPH_RAW_COLOR_XAXIS_BIG', '#ccc');
+@define('BO_GRAPH_RAW_COLOR_YAXIS_BIG', '#ccc');
 
 
 /************************/
@@ -947,6 +957,7 @@
 @define('BO_GRAPH_STAT_COLOR_BOX', '#d0d0d0');
 @define('BO_GRAPH_STAT_COLOR_BACK', '#fff');
 @define('BO_GRAPH_STAT_COLOR_CAPTION', '#666');
+@define('BO_GRAPH_STAT_COLOR_CAPTION_BIG', '#ccc');
 @define('BO_GRAPH_STAT_COLOR_MARGIN','#fff');
 @define('BO_GRAPH_STAT_COLOR_FRAME', '#fff');
 @define('BO_GRAPH_STAT_COLOR_XGRID', '#eee');

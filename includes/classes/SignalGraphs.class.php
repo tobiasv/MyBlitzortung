@@ -7,8 +7,9 @@ class BoSignalGraph
 	var $MaxTime = null;
 	var $width  = 0;
 	var $height = 0;
+	var $big = false;
 	
-	function __construct($w, $h)
+	function __construct($w, $h, $big=false)
 	{
 		if (!file_exists(BO_DIR.'includes/jpgraph/jpgraph.php'))
 			bo_graph_error($w, $h);
@@ -20,6 +21,7 @@ class BoSignalGraph
 		
 		$this->width = $w;
 		$this->height = $h;
+		$this->big = $big;
 	}
 	
 	
@@ -43,27 +45,45 @@ class BoSignalGraph
 		if (defined("BO_GRAPH_ANTIALIAS") && BO_GRAPH_ANTIALIAS)
 			$this->graph->img->SetAntiAliasing();
 
-		if (BO_GRAPH_RAW_COLOR_BACK)
-			$this->graph->SetColor(BO_GRAPH_RAW_COLOR_BACK);
+		if ($this->big)
+		{
+			if (BO_GRAPH_RAW_COLOR_BACK_BIG)
+				$this->graph->SetColor(BO_GRAPH_RAW_COLOR_BACK_BIG);
+				
+			if (BO_GRAPH_RAW_COLOR_MARGIN_BIG)
+				$this->graph->SetMarginColor(BO_GRAPH_RAW_COLOR_MARGIN_BIG);
+				
+			if (BO_GRAPH_RAW_COLOR_FRAME_BIG)
+				$this->graph->SetFrame(true, BO_GRAPH_RAW_COLOR_FRAME_BIG);
+			else
+				$this->graph->SetFrame(false);
 
-		if (BO_GRAPH_RAW_COLOR_BACK)
-			$this->graph->SetMarginColor(BO_GRAPH_RAW_COLOR_MARGIN);
+			if (BO_GRAPH_RAW_COLOR_BOX_BIG)
+				$this->graph->SetBox(true, BO_GRAPH_RAW_COLOR_BOX_BIG);
+			else
+				$this->graph->SetBox(false);
+		}
+		else 
+		{
+			if (BO_GRAPH_RAW_COLOR_BACK)
+				$this->graph->SetColor(BO_GRAPH_RAW_COLOR_BACK);
 
-		if (BO_GRAPH_RAW_COLOR_FRAME)
-			$this->graph->SetFrame(true, BO_GRAPH_RAW_COLOR_FRAME);
-		else
-			$this->graph->SetFrame(false);
+			if (BO_GRAPH_RAW_COLOR_MARGIN)
+				$this->graph->SetMarginColor(BO_GRAPH_RAW_COLOR_MARGIN);
 
-		if (BO_GRAPH_RAW_COLOR_BOX)
-			$this->graph->SetBox(true, BO_GRAPH_RAW_COLOR_BOX);
-		else
-			$this->graph->SetBox(false);
+			if (BO_GRAPH_RAW_COLOR_FRAME)
+				$this->graph->SetFrame(true, BO_GRAPH_RAW_COLOR_FRAME);
+			else
+				$this->graph->SetFrame(false);
 
-		$this->graph->SetMargin(24,1,1,1);
-
+			if (BO_GRAPH_RAW_COLOR_BOX)
+				$this->graph->SetBox(true, BO_GRAPH_RAW_COLOR_BOX);
+			else
+				$this->graph->SetBox(false);
+		}
 		
+		$this->graph->SetMargin(24,1,1,1);
 		bo_signal_parse($data, true);
-	
 	
 		if ($type == 'spectrum')
 		{
@@ -154,24 +174,29 @@ class BoSignalGraph
 			}
 
 
-			if (BO_GRAPH_RAW_COLOR_XGRID)
+			$grid = $this->big ? BO_GRAPH_RAW_COLOR_XGRID_BIG : BO_GRAPH_RAW_COLOR_XGRID;
+			
+			if ($grid)
 			{
-				$this->graph->xgrid->SetColor(BO_GRAPH_RAW_COLOR_XGRID);
+				$this->graph->xgrid->SetColor($grid);
 				$this->graph->xgrid->Show(true,true);
 			}
 			else
 				$this->graph->xgrid->Show(false);
 
-			if (BO_GRAPH_RAW_COLOR_YGRID)
+				
+			$grid = $this->big ? BO_GRAPH_RAW_COLOR_YGRID_BIG : BO_GRAPH_RAW_COLOR_YGRID;
+				
+			if ($grid)
 			{
-				$this->graph->ygrid->SetColor(BO_GRAPH_RAW_COLOR_YGRID);
+				$this->graph->ygrid->SetColor($grid);
 				$this->graph->ygrid->Show(true,true);
 			}
 			else
 				$this->graph->ygrid->Show(false,false);
 
-			$this->graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
-			$this->graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
+			$this->graph->xaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_XAXIS_BIG : BO_GRAPH_RAW_COLOR_XAXIS);
+			$this->graph->yaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_YAXIS_BIG : BO_GRAPH_RAW_COLOR_YAXIS);
 			$this->graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			$this->graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			$this->graph->yaxis->HideLabels();
@@ -218,8 +243,8 @@ class BoSignalGraph
 				$this->graph->Add($plot);
 			}
 
-			$this->graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
-			$this->graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
+			$this->graph->xaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_XAXIS_BIG : BO_GRAPH_RAW_COLOR_XAXIS);
+			$this->graph->yaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_YAXIS_BIG : BO_GRAPH_RAW_COLOR_YAXIS);
 			$this->graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
 			$this->graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
 			$this->graph->yaxis->SetTextTickInterval(0.5);
@@ -312,38 +337,47 @@ class BoSignalGraph
 			$this->graph->xaxis->SetPos('min');
 			$this->graph->xaxis->SetTickLabels($tickLabels);
 			//$this->graph->xaxis->scale->ticks->Set(28);
-			$this->graph->xaxis->SetColor(BO_GRAPH_RAW_COLOR_XAXIS);
-			$this->graph->yaxis->SetColor(BO_GRAPH_RAW_COLOR_YAXIS);
+			$this->graph->xaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_XAXIS_BIG : BO_GRAPH_RAW_COLOR_XAXIS);
+			$this->graph->yaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_YAXIS_BIG : BO_GRAPH_RAW_COLOR_YAXIS);
 
-			if (BO_GRAPH_RAW_COLOR_XGRID)
+			
+			
+			$grid = $this->big ? BO_GRAPH_RAW_COLOR_XGRID_BIG : BO_GRAPH_RAW_COLOR_XGRID;
+			
+			if ($grid)
 			{
-				$this->graph->xgrid->SetColor(BO_GRAPH_RAW_COLOR_XGRID);
+				$this->graph->xgrid->SetColor($grid);
 				$this->graph->xgrid->Show(true,true);
 			}
 			else
 				$this->graph->xgrid->Show(false);
 
-			if (BO_GRAPH_RAW_COLOR_YGRID)
+				
+			$grid = $this->big ? BO_GRAPH_RAW_COLOR_YGRID_BIG : BO_GRAPH_RAW_COLOR_YGRID;
+				
+			if ($grid)
 			{
-				$this->graph->ygrid->SetColor(BO_GRAPH_RAW_COLOR_YGRID);
+				$this->graph->ygrid->SetColor($grid);
 				$this->graph->ygrid->Show(true,true);
 			}
 			else
 				$this->graph->ygrid->Show(false,false);
 
+			
+			$cline = $this->big ? BO_GRAPH_RAW_COLOR_LINES_BIG : BO_GRAPH_RAW_COLOR_LINES;
 
-			$sline  = new PlotLine(HORIZONTAL,  0, BO_GRAPH_RAW_COLOR_LINES, 1);
+			$sline  = new PlotLine(HORIZONTAL,  0, $cline, 1);
 			$this->graph->AddLine($sline);
 
-			$sline  = new PlotLine(HORIZONTAL,  BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR_LINES, 1);
+			$sline  = new PlotLine(HORIZONTAL,  BO_TRIGGER_VOLTAGE, $cline, 1);
 			$this->graph->AddLine($sline);
 
-			$sline  = new PlotLine(HORIZONTAL, -BO_TRIGGER_VOLTAGE, BO_GRAPH_RAW_COLOR_LINES, 1);
+			$sline  = new PlotLine(HORIZONTAL, -BO_TRIGGER_VOLTAGE, $cline, 1);
 			$this->graph->AddLine($sline);
 			
 			if ($data['start'])
 			{
-				$sline  = new PlotLine(VERTICAL, $data['start'], BO_GRAPH_RAW_COLOR_LINES, 1);
+				$sline  = new PlotLine(VERTICAL, $data['start'], $cline, 1);
 				$this->graph->AddLine($sline);
 			}
 
@@ -376,7 +410,7 @@ class BoSignalGraph
 				
 				$caption = new Text("PCB ".$sig['pcb']."\n ".$sig['values']." Values\n $ksps kSps", $this->width - 60, 5);
 				$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
-				$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
+				$caption->SetColor($this->big ? BO_GRAPH_STAT_COLOR_CAPTION_BIG : BO_GRAPH_STAT_COLOR_CAPTION);
 				$this->graph->AddText($caption);
 			}
 		}
@@ -387,7 +421,7 @@ class BoSignalGraph
 	{
 		$caption = new Text($text,35,5);
 		$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
-		$caption->SetColor(BO_GRAPH_STAT_COLOR_CAPTION);
+		$caption->SetColor($this->big ? BO_GRAPH_STAT_COLOR_CAPTION_BIG : BO_GRAPH_STAT_COLOR_CAPTION);
 		$this->graph->AddText($caption);
 	}
 	
