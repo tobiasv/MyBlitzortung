@@ -63,7 +63,6 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 		bo_map = new google.maps.Map(document.getElementById("bo_gmap"), mapOptions);
 
-
 <?php if (($show_station & 1)) { ?>
 
 		var myLatlng = new google.maps.LatLng(<?php echo "$station_lat,$station_lon" ?>);

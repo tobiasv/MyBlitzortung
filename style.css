@@ -917,7 +917,7 @@ background-color: #fee;
 }
 
 
-.bo_gmap_controls  {
+#myblitzortung .bo_gmap_controls  {
 margin-top: 16px;
 border: 1px solid #fff;
 border-radius: 2px;
@@ -928,7 +928,7 @@ outline: none;
 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-#bo_gmap_search {
+#myblitzortung #bo_gmap_search {
 background-color: #fff;
 padding: 0 9px 0 11px;
 width: 300px;
@@ -938,11 +938,13 @@ text-overflow: ellipsis;
 display: none;
 }
 
-#bo_gmap_search:focus {
+#myblitzortung #bo_gmap_search:focus {
 border-color: #4d90fe;
 }
 
-#gmap_infotext, .bo_gmap_info, .bo_gmap_button {
+#myblitzortung #gmap_infotext, 
+#myblitzortung .bo_gmap_info,
+#myblitzortung .bo_gmap_button {
 margin: 6px 0px 0px 4px;
 background:white;
 border-width:0px;
@@ -956,22 +958,22 @@ font-weight:bold;
 font-weight:500;
 }
 
-#gmap_infotext {
+#myblitzortung #gmap_infotext {
 font-size:10px;
 text-align: center;
 margin: 15px 0px 0px 0px;
 }
 
-.bo_gmap_info {
+#myblitzortung .bo_gmap_info {
 margin: 6px 6px 0px 4px;
 width: 70px;
 text-align:right;
 }
 
-#bo_gmap_coord {
+#myblitzortung #bo_gmap_coord {
 margin-top: 20px;
 }
 
-#bo_gmap_home {
+#myblitzortung #bo_gmap_home {
 text-align: center;
 }
