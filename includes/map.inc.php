@@ -1480,6 +1480,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	function bo_draw_clouds(map)
 	{
 		var div = document.createElement('div');
+		div.id = 'bo_gmap_clouds';
 		div.className = 'bo_gmap_button';
 		div.index = 2;
 		div.innerHTML = '<?php echo _BL("Clouds"); ?>';

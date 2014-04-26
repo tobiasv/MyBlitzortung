@@ -1172,11 +1172,11 @@ function bo_tile_headers($update_interval, $last_update_time, $caching)
 	if (headers_sent())
 		return;
 		
-	$exp_time    = $last_update_time + 60 * $update_interval + 59;
+	$exp_time    = floor( ($last_update_time + 60 * $update_interval) / 60) * 60;
 
 	if ($exp_time - time() < 10)
-        $exp_time = time() + 60;	
-	
+        $exp_time = ceil((time()+1) / 60) * 60;	
+		
 	//Headers
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update_time)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
