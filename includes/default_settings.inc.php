@@ -579,7 +579,7 @@
 @define('BO_MAP_MYBO_ICON', 'http://labs.google.com/ridefinder/images/mm_20_blue.png');
 
 //Version of Google Maps API
-@define('BO_GMAP_API_VERSION', '3.8');
+@define('BO_GMAP_API_VERSION', '3.15');
 
 //Google Maps additional parameters
 // - API Key: &key={key}
@@ -588,6 +588,16 @@
 
 //Allow selection of stations
 @define('BO_MAP_STATION_SELECT', false);
+
+//Show clouds
+@define('BO_MAP_SHOW_CLOUDS', false);
+
+//Show mouse coordinates
+@define('BO_MAP_SHOW_COORD', false);
+
+//Show search field
+@define('BO_MAP_SHOW_SEARCH', false);
+
 
 //reloads whole map page when user didn't make any activities
 //and is active again after defined interval (minutes)

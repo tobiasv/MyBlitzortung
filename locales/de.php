@@ -1149,5 +1149,6 @@ $_BL['de']['lang_hu'] = 'Ungarisch';
 $_BL['de']['lang_it'] = 'Italienisch';
 $_BL['de']['lang_nl'] = 'Niederländisch';
 
+$_BL['en']['Search...'] = 'Suche...';
 
 ?>

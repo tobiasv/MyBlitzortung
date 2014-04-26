@@ -45,6 +45,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	var bo_infobox;
 	var bo_loggedin = <?php echo intval(bo_user_get_level()) ?>;
 	var boDistCircle;
+	var bo_place_markers = [];
 	
 	function bo_gmap_init() 
 	{ 
@@ -229,6 +230,60 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 
 		bo_gmap_init2();
+		
+		<?php if (BO_MAP_SHOW_SEARCH === true) { ?>
+		// Create the search box and link it to the UI element.
+		var input = document.getElementById('bo_gmap_search');
+		
+		if (input != null)
+		{
+			bo_map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+			var searchBox = new google.maps.places.SearchBox(input);
+			input.style.display = 'block';
+			
+			// Listen for the event fired when the user selects an item from the
+			// pick list. Retrieve the matching places for that item.
+			google.maps.event.addListener(searchBox, 'places_changed', function() 
+			{
+				var places = searchBox.getPlaces();
+
+				for (var i = 0, marker; marker = bo_place_markers[i]; i++) 
+				{
+					marker.setMap(null);
+				}
+
+				// For each place, get the icon, place name, and location.
+				bo_place_markers = [];
+				var bounds = new google.maps.LatLngBounds();
+				for (var i = 0, place; place = places[i]; i++) 
+				{
+					var image = {
+						url: place.icon,
+						size: new google.maps.Size(71, 71),
+						origin: new google.maps.Point(0, 0),
+						anchor: new google.maps.Point(17, 34),
+						scaledSize: new google.maps.Size(25, 25)
+					};
+
+					// Create a marker for each place.
+					var marker = new google.maps.Marker({
+						map: bo_map,
+						icon: image,
+						title: place.name,
+						position: place.geometry.location
+					});
+
+					bo_place_markers.push(marker);
+
+					bounds.extend(place.geometry.location);
+				}
+
+				bo_map.fitBounds(bounds);
+			});
+		}
+
+		<?php } ?>
+		
 	}
 	
 	function bo_setcookie(name, value)
@@ -299,7 +354,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 	</script>
 
-    <script type="text/javascript" id="bo_script_google" src="http://maps.googleapis.com/maps/api/js?callback=bo_gmap_init&v=<?php echo BO_GMAP_API_VERSION.'&'.BO_GMAP_PARAM ?>">
+    <script type="text/javascript" id="bo_script_google" src="http://maps.googleapis.com/maps/api/js?callback=bo_gmap_init&libraries=places,weather&v=<?php echo BO_GMAP_API_VERSION.'&'.BO_GMAP_PARAM ?>">
     </script>
 
 

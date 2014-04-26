@@ -611,6 +611,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	echo '</div>';
 	echo '</fieldset>';
 
+	echo '<input id="bo_gmap_search" class="bo_gmap_controls" type="text" placeholder="'._BL('Search...').'">';
 	echo '<div id="bo_gmap" class="bo_map" style="width:500px; height:400px;"></div>';
 
 	?>
@@ -641,6 +642,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	var bo_reload_mapinfo_next = false;
 	var bo_start_time_local = new Date();
 	var bo_start_time_server = <?php echo time() * 1000 ?>;
+
 
 	function bo_gmap_init2()
 	{ 
@@ -779,9 +781,14 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 				if (c != -1) bo_map_show_more();
 			}
 		}
+
+		<?php if (BO_MAP_SHOW_CLOUDS === true) echo 'bo_draw_clouds(bo_map);' ?>
+		<?php if (BO_MAP_SHOW_COORD === true) echo 'bo_draw_coord(bo_map);' ?>
+		bo_draw_home(bo_map);
+		
 		
 		bo_infobox = document.createElement('DIV');
-		bo_infobox.index = 1;
+		bo_infobox.index = 3;
 		bo_map.controls[google.maps.ControlPosition.RIGHT_TOP].push(bo_infobox);
 		
 		bo_map_reload_overlays();  
@@ -840,7 +847,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			bo_map_user_activity();
 		});
 		
-				
+		
 		var map_lat = bo_getcookie('bo_map_lat');
 		var map_lon = bo_getcookie('bo_map_lon');
 		var map_zoom = bo_getcookie('bo_map_zoom');
@@ -864,6 +871,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			
 		bo_map_user_activity();
 		window.setTimeout("bo_map_timer();", 1000 * 60);
+		
 	}	
 	
 	function bo_map_timer()
@@ -1346,30 +1354,13 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		bo_infobox.innerHTML = '';
 		
 
-		var infoUI = document.createElement('DIV');
-		infoUI.style.backgroundColor = '#f9f9f9';
-		infoUI.style.borderStyle = 'solid';
-		infoUI.style.borderWidth = '1px';
-		infoUI.style.borderColor = '#bbe';
-		infoUI.style.cursor = 'pointer';
-		infoUI.style.textAlign = 'center';
-		infoUI.style.width = '79px';
-		infoUI.style.margin = '0 0 15px 0';
-		infoUI.title = '<?php echo _BL('Click to set the map to Home') ?>';
 
-		var infoText = document.createElement('DIV');
-		infoText.style.fontFamily = 'Arial,sans-serif';
-		infoText.style.fontSize = '12px';
-		infoText.style.paddingLeft = '7px';
-		infoText.style.paddingRight = '7px';
-		infoText.innerHTML = '<?php echo _BL('Home') ?>';
-		infoUI.appendChild(infoText);
 		
 		bo_infobox.style.width = '80px';
 		bo_infobox.style.marginTop = '20px';
 		bo_infobox.style.padding = '5px';
 		bo_infobox.style.textAlign = 'right';
-		bo_infobox.appendChild(infoUI);
+		
 		
 		for (i in bo_OverlayMaps)
 		{
@@ -1391,26 +1382,9 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		}
 		
 		var infoText = document.createElement('DIV');
-		infoText.style.fontFamily = 'Arial,sans-serif';
-		infoText.style.fontSize = '10px';
-		infoText.style.padding = '1px 1px';
-		infoText.style.background = '#ddd';
-		infoText.style.margin = '20px 0 0 0';
-		infoText.style.textAlign = 'center';
-		infoText.style.lineHeight = '12px';
-		infoText.style.opacity = 0.9;
-
-		infoText.innerHTML = '<?php echo _BL('lightning data') ?>:<br>&copy;&nbsp;Blitzortung.org';
+		infoText.id = 'gmap_infotext';
+		infoText.innerHTML = '<?php echo _BL('lightning data') ?>:<br><a href="http://www.blitzortung.org" target="_blank">Blitzortung.org</a>';
 		bo_infobox.appendChild(infoText);
-
-		google.maps.event.addDomListener(infoUI, 'click', function() {
-			var mapOptions = {
-			  zoom: bo_home_zoom,
-			  center: bo_home
-			}
-			bo_map.setOptions(mapOptions);
-		});
-
 	}
 	
 	function bo_get_time_man(i)
@@ -1500,6 +1474,70 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		
 		document.getElementById('bo_check_autoupdate').disabled = enable;
 		bo_map_reload_overlays();
+	}
+	
+	
+	function bo_draw_clouds(map)
+	{
+		var div = document.createElement('div');
+		div.className = 'bo_gmap_button';
+		div.index = 2;
+		div.innerHTML = '<?php echo _BL("Clouds"); ?>';
+
+		var cloudsLayer = new google.maps.weather.CloudLayer();
+		var visible= 0;
+
+		google.maps.event.addDomListener(div, 'click', function() 
+		{
+			if (visible == 0) 
+			{
+				div.style.color= 'black';
+				cloudsLayer.setMap(map);
+				visible= 1; 
+			}
+			else 
+			{
+				div.style.color= '#7F7F7F';
+				cloudsLayer.setMap(null);
+				visible= 0; 
+			}
+		});
+
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(div);
+	}
+
+	function bo_draw_home(map)
+	{
+		var home = document.createElement('DIV');
+		home.id = 'bo_gmap_home';
+		home.className = 'bo_gmap_info';
+		home.innerHTML = '<?php echo _BL('Home') ?>';
+		home.index = 2;
+		home.title = '<?php echo _BL('Click to set the map to Home') ?>';
+		
+		map.controls[google.maps.ControlPosition.RIGHT_TOP].push(home);
+
+		google.maps.event.addDomListener(home, 'click', function() {
+			var mapOptions = {
+			  zoom: bo_home_zoom,
+			  center: bo_home
+			}
+			bo_map.setOptions(mapOptions);
+		});
+	}
+	
+	function bo_draw_coord(map)
+	{
+		var div = document.createElement('div');
+		div.className = 'bo_gmap_info';
+		div.id = 'bo_gmap_coord';
+		div.index = 1;
+		div.innerHTML = '0.000000&deg;<br>0.000000&deg;';
+
+		google.maps.event.addListener(map, 'mousemove', function(event) {
+		div.innerHTML = (event.latLng.lat()).toFixed(6) + '&deg;<br>' + (event.latLng.lng()).toFixed(6) + '&deg;'; });
+
+		map.controls[google.maps.ControlPosition.RIGHT_TOP].push(div);
 	}
 	
 		

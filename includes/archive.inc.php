@@ -444,6 +444,8 @@ function bo_show_archive_search()
 	echo strtr(_BL('archive_search_info'), array('{COUNT}' => $perm ? '' : $max_count));
 	echo '</p>';
 	echo '<h4>'._BL('Map').'</h4>';
+	
+	echo '<input id="bo_gmap_search" class="bo_gmap_controls" type="text" placeholder="'._BL('Search...').'">';
 	echo '<div id="bo_gmap" class="bo_map_archive"></div>';
 
 	
@@ -713,13 +715,13 @@ function bo_show_archive_search()
 				document.getElementById('bo_archive_lat').value=this.getPosition().lat();
 				document.getElementById('bo_archive_lon').value=this.getPosition().lng();
 			});
-/*
+
 			google.maps.event.addListener(bo_map, 'click', function(event) {
 				centerMarker.setPosition(event.latLng);
 				document.getElementById('bo_archive_lat').value=event.latLng.lat();
 				document.getElementById('bo_archive_lon').value=event.latLng.lng();
 			});
-*/
+
 			google.maps.event.addListener(bo_map, 'dragend', function() {bo_gmap_map2form();});
 			google.maps.event.addListener(bo_map, 'zoom_changed', function() {bo_gmap_map2form();});
 			<?php } ?>
