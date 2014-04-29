@@ -840,18 +840,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		}); 
 
 		google.maps.event.addListener(bo_map, 'maptypeid_changed', function() {
-			bo_setcookie('bo_map_type', bo_map.getMapTypeId());
-			bo_map_user_activity();
-			
-			var styles;
-			
-			if (bo_map.getMapTypeId() == 'hybrid')
-				styles = [ { "featureType": "road", "stylers": [ { "visibility": "off" } ] } ];
-			else
-				styles = null;
-			
-			bo_map.setOptions({styles: styles});
-
+			bo_map_set();
 		});
 		
 		
@@ -876,7 +865,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		if (map_type.match(/[a-z]+/i))
 			bo_map.setOptions({ mapTypeId: map_type });
 			
-		bo_map_user_activity();
+		bo_map_set();
 		window.setTimeout("bo_map_timer();", 1000 * 60);
 		
 	}	
@@ -1547,8 +1536,21 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 
 		map.controls[google.maps.ControlPosition.RIGHT_TOP].push(div);
 	}
-	
+
+	function bo_map_set()
+	{
+		bo_setcookie('bo_map_type', bo_map.getMapTypeId());
+		bo_map_user_activity();
 		
+		var styles;
+		
+		if (bo_map.getMapTypeId() == 'hybrid')
+			styles = [ { "featureType": "road", "stylers": [ { "visibility": "off" } ] } ];
+		else
+			styles = null;
+		
+		bo_map.setOptions({styles: styles});
+	}		
 	</script>
 	
 	<?php
