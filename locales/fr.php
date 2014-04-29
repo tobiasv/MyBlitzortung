@@ -86,6 +86,17 @@ $_BL['fr']['Oct_short'] ='Oct';
 $_BL['fr']['Nov_short'] ='Nov';
 $_BL['fr']['Dec_short'] ='Dec';
 
+$_BL['fr']['Jan'] = 'Jan';
+$_BL['fr']['Feb'] = 'Fév';
+$_BL['fr']['Mar'] = 'Mar';
+$_BL['fr']['Apr'] = 'Avr';
+$_BL['fr']['Jun'] = 'Jui';
+$_BL['fr']['Jul'] = 'Jul';
+$_BL['fr']['Aug'] = 'Aou';
+$_BL['fr']['Sep'] = 'Sep';
+$_BL['fr']['Oct'] = 'Oct';
+$_BL['fr']['Nov'] = 'Nov';
+$_BL['fr']['Dec'] = 'Dec';
 
 $_BL['fr']['January'] = 'Janvier';
 $_BL['fr']['February'] = 'Février';
@@ -468,7 +479,7 @@ $_BL['fr']['View'] = 'Vue';
 $_BL['fr']['Avg. participants per strike locating'] = 'Moyenne des participants par foudre localisée';
 $_BL['fr']['Maximum mean participants'] = 'Moyenne max participants';
 $_BL['fr']['Additional information'] = 'Informations additionnelles';
-
+$_BL['fr']['Search...'] = 'Recherche....';
 
 /*************************************************************/
 /* Statistics                                                */
@@ -545,6 +556,16 @@ $_BL['fr']['Strikes station min participants'] = 'Min. de stations pour la foudr
 $_BL['fr']['Stations under construction'] = 'Station à venir';
 $_BL['fr']['h4_stations_under_construction'] = 'Liste des stations à venir';
 $_BL['fr']['w/o GPS-signal'] = 'sans signal GPS';
+
+$_BL['fr']['Firmware'] = 'Firmware';
+$_BL['fr']['Controller'] = 'Controleur';
+$_BL['fr']['Amplifier'] = 'Ampli';
+$_BL['fr']['Website'] = 'Site web';
+$_BL['fr']['Comment'] = 'Commentaire';
+$_BL['fr']['Last time without GPS'] = 'Dernière perte réception GPS';
+$_BL['fr']['-'] = '-';
+$_BL['fr']['PCB'] = 'PCB';
+$_BL['fr']['No GPS'] = 'Pas de GPS';
 
 $_BL['fr']['legend_stat_strikes_now'] = 'Région';
 $_BL['fr']['legend_stat_amplitudes_time'] = 'Options';
@@ -975,7 +996,11 @@ $_BL['fr']['Russia'] = 'Russie';
 $_BL['fr']['Romania'] = 'Roumanie';
 $_BL['fr']['Rome'] = 'Rome';
 $_BL['fr']['Lithuania'] = 'Lithuanie';
-
+$_BL['fr']['Russian Federation'] = 'Russie';
+$_BL['fr']['Ireland'] = 'Ireland';
+$_BL['fr']['Croatia'] = 'Croatie';
+$_BL['fr']['Portugal'] = 'Portugal';
+$_BL['fr']['Malta'] = 'Malte'; 
 //Europe: Regions
 $_BL['fr']['Europe'] = 'Europe';
 $_BL['fr']['Western Europe'] = 'Europe de l\'Ouest';
