@@ -480,18 +480,32 @@ function bo_show_archive_density()
 		echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$i.'</option>';
 	echo '</select>';
 
-	echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
-	echo '<select name="bo_station_id" id="bo_arch_dens_select_station" onchange="submit();">';
-	echo '<option></option>';
-		
-	foreach ($stations_text as $id => $text)
+	
+	if (count($stations_text) == 1)
 	{
-		echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>';
-		echo $text;
-		echo '</option>';
+		list($id, $text) = each($stations_text);
+		
+		echo '<span class="bo_form_descr">'._BL('Station').' '._BC($station_infos[$id]['city']).': ';
+		echo '<input type="checkbox" name="bo_station_id" value="'.$id.'" id="bo_arch_dens_select_station" onchange="submit();" '.($id == $station_id ? 'checked' : '').'>';
+		echo '</span>';
 	}
-
+	else if (count($stations_text) > 1)
+	{
+		echo '<span class="bo_form_descr">'._BL('Station').':</span> ';
+		echo '<select name="bo_station_id" id="bo_arch_dens_select_station" onchange="submit();">';
+		echo '<option></option>';
+			
+		foreach ($stations_text as $id => $text)
+		{
+			echo '<option value="'.$id.'" '.($id == $station_id ? 'selected' : '').'>';
+			echo $text;
+			echo '</option>';
+		}
+	}
+	
 	echo '</select>';
+	
+	
 	echo '<input type="submit" value="'._BL('Ok').'" id="bo_archive_density_submit" class="bo_form_submit">';
 	
 	if ($year > 0 && $end_time > 0)
