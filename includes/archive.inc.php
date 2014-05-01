@@ -25,7 +25,7 @@ function bo_show_archive_map()
 	$minute_from = fmod($_GET['bo_hour_from'], 1)  * 60;
 	$hour_range = (float)($_GET['bo_hour_range']);
 	$map_changed = isset($_GET['bo_oldmap']) && $map != $_GET['bo_oldmap'];
-	$ani_changed = !isset($_GET['bo_oldani']) || $ani != $_GET['bo_oldani'] || $map_changed;
+	$ani_changed = !isset($_GET['bo_oldani']) || $ani != $_GET['bo_oldani']; // || $map_changed;
 	
 	//Map
 	$select_map = bo_archive_select_map($map);
@@ -96,7 +96,7 @@ function bo_show_archive_map()
 	{
 		if ($ani_changed)
 		{
-			//now is default for maps with chaning backgrounds
+			//now is default for maps with changing backgrounds
 			if (!$ani_preset && isset($cfg['file_time']))
 				$ani_preset = 'now';
 
@@ -126,11 +126,20 @@ function bo_show_archive_map()
 		
 		$max_range = $ani_max_range;
 	}
-	elseif (!$ani && $ani_changed)
+	elseif (!$ani)
 	{
-		$hour_from = 0;
-		$hour_range = $max_range < 24 || $cfg['trange'] < 24 ? min($cfg['trange'], $max_range) : 24;
+		if ($ani_changed)
+		{		
+			$hour_from = 0;
+			
+		}
+		
+		if ($map_changed || $ani_changed)
+		{
+			$hour_range = $max_range < 24 || $cfg['trange'] < 24 ? min($cfg['trange'], $hour_range) : 24;
+		}
 	}
+	
 
 	if ($_GET['bo_prev_hour'])
 		$hour_from -= $hours_interval;
@@ -389,7 +398,9 @@ function bo_show_archive_map()
 				$uday       = gmdate('d', $time);
 				$uhour_from = gmdate('H', $time);
 				$date_arg = sprintf('%04d%02d%02d', $uyear, $umonth, $uday);
-				$date_arg .= sprintf('%02d', $uhour_from).'00-'.($hour_range*60);
+				
+				if ($hour_range)
+					$date_arg .= sprintf('%02d', $uhour_from).'00-'.($hour_range*60);
 			}
 		
 			$alt = _BL('Lightning map').' '.$mapname.' '._BD($time);

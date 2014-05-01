@@ -12,6 +12,8 @@ function bo_tile()
 	/***********************************************************/
 
 	
+
+	
 	$x            = intval($_GET['x']);
 	$y            = intval($_GET['y']);
 	$zoom         = intval($_GET['zoom']);

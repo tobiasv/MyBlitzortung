@@ -280,9 +280,16 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			}
 			else
 			{
-				$time_min = strtotime("$year-$month-$day 00:00:00");
-				$time_max = strtotime("$year-$month-$day 23:59:59");
-				$duration = 24 * 60;
+		
+				if ($cfg['maxrange'])
+					$duration = $cfg['maxrange'] * 60;
+				else if (intval(BO_SMAP_MAX_RANGE))
+					$duration = BO_SMAP_MAX_RANGE * 60;
+				else
+					$duration = 24 * 60;
+					
+				$time_min = strtotime("$year-$month-$day $hour:$minute:00");
+				$time_max = strtotime("$year-$month-$day $hour:$minute:00 +$duration minutes");
 			}
 
 			if (!bo_user_get_level() && $duration != $cfg['animation']['range'])
@@ -674,7 +681,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	/*** External Overlays *************************************/
 	/***********************************************************/
 
-	if (isset($cfg['overlays']) && is_array($cfg['overlays']))
+	if (isset($cfg['overlays']) && is_array($cfg['overlays']) && !$blank)
 	{
 		foreach($cfg['overlays'] as $ovl_id => $ovl)
 		{

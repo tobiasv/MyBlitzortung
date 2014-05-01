@@ -62,7 +62,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				echo '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), $d[2]);
 				echo count($_BO['mapimg'][$d[2]]['trange']) > 1 ? '&bo_period='.$period : '';
 				echo '" ';
-				echo ' class="bo_navi'.($d[0] ? '_active' : '').'">'._BL($d[1], false, BO_CONFIG_IS_UTF8).'</a></li>';
+				echo ' class="bo_navi'.($d[0] ? '_active' : '').'">'._BS($d[1], false, BO_CONFIG_IS_UTF8).'</a></li>';
 			}
 			
 			echo '</ul>';
@@ -117,7 +117,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				foreach($map_groups[$cfg['group']] as $map_id => $map_name)
 				{
 					echo '<option value="'.$map_id.'" '.($map_id == $static_map_id ? 'selected' : '').'>';
-					echo _BL($map_name, false, BO_CONFIG_IS_UTF8);
+					echo _BS($map_name, false, BO_CONFIG_IS_UTF8);
 					echo '</option>';
 				}
 				echo '</select> &bull; ';
@@ -165,10 +165,15 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			
 			echo '<div style="display:inline-block;" id="bo_arch_maplinks_container">';
 			
-			if ($archive_maps_enabled && intval(BO_ANIMATIONS_INTERVAL) && $cfg['archive'])
+			if ($archive_maps_enabled && $cfg['archive'])
 			{
 				echo '<div class="bo_arch_map_links">';
-				echo '<a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_map='.$static_map_id.'&bo_animation=now" >'._BL('Animation').'</a> ';
+				
+				echo ' <a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_map='.$static_map_id.'" >'._BL('Archive').'</a> ';
+				
+				if (intval(BO_ANIMATIONS_INTERVAL))
+					echo ' <a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_map='.$static_map_id.'&bo_animation=now" >'._BL('Animation').'</a> ';
+					
 				echo '</div>';
 			}
 
@@ -368,7 +373,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	if (intval(BO_MAP_AUTOUPDATE))
 	{
 		echo '<span class="bo_form_checkbox_text">';
-		echo '<input type="checkbox" onclick="bo_map_toggle_autoupdate(this.checked);" id="bo_check_autoupdate"> ';
+		echo '<input type="checkbox" onclick="bo_map_toggle_autoupdate(this.checked);" id="bo_check_autoupdate" '.(BO_MAP_AUTOUPDATE_DEFAULT_ON === true ? ' checked' : '').'> ';
 		echo '<label for="bo_check_autoupdate">'._BL('auto update').'</label> ';
 		echo '</span>';
 	}
@@ -457,37 +462,41 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	$show_adv_counter    = (bo_user_get_level() & BO_PERM_NOLIMIT);
 	$show_station_select = (bo_user_get_level() & BO_PERM_NOLIMIT) && BO_MAP_STATION_SELECT === true; 
 	
-	if (!$show_adv_counter || intval(BO_TRACKS_SCANTIME) || bo_station_id() > 0)
-	{
-		echo '<div class="bo_input_container" id="bo_map_advanced_options">';
-		echo '<span class="bo_form_descr">'._BL('Advanced').':</span> ';
-		
-		if (intval(BO_TRACKS_SCANTIME))
-		{
-			echo '<span class="bo_form_checkbox_text">';
-			echo '<input type="checkbox" onclick="bo_map_toggle_tracks(this.checked);" id="bo_map_opt_tracks"> ';
-			echo '<label for="bo_map_opt_tracks">'._BL("show tracks").'</label> &nbsp; ';
-			echo '</span>';
-		}
-		
-		if (!$show_station_select && bo_station_id() > 0)
-		{
-			echo '<span class="bo_form_checkbox_text">';
-			echo '<input type="checkbox" onclick="bo_map_toggle_stationid_display(this.checked);" id="bo_map_opt_own"> ';
-			echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label> &nbsp; ';
-			echo '</span>';
-		}
-		
-		if (!$show_adv_counter)
-		{
-			echo '<span class="bo_form_checkbox_text">';
-			echo '<input type="checkbox" onclick="bo_map_toggle_count(this.checked);" id="bo_map_opt_count"> ';
-			echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
-			echo '</span>';
-		}
 
-		echo '</div>';
+	echo '<div class="bo_input_container" id="bo_map_advanced_options">';
+	echo '<span class="bo_form_descr">'._BL('Advanced').':</span> ';
+	
+	echo '<span class="bo_form_checkbox_text">';
+	echo '<input type="checkbox" onclick="bo_map_toggle_stations(this.checked ? 2 : 1);" name="bo_map_station" id="bo_map_station1">';
+	echo '<label for="bo_map_station1">'._BL('Stations').'</label> &nbsp; ';
+	echo '</span>';
+
+	
+	if (intval(BO_TRACKS_SCANTIME))
+	{
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="checkbox" onclick="bo_map_toggle_tracks(this.checked);" id="bo_map_opt_tracks"> ';
+		echo '<label for="bo_map_opt_tracks">'._BL("show tracks").'</label> &nbsp; ';
+		echo '</span>';
 	}
+	
+	if (!$show_station_select && bo_station_id() > 0)
+	{
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="checkbox" onclick="bo_map_toggle_stationid_display(this.checked);" id="bo_map_opt_own"> ';
+		echo '<label for="bo_map_opt_own">'._BL("only own strikes").'</label> &nbsp; ';
+		echo '</span>';
+	}
+	
+	if (!$show_adv_counter)
+	{
+		echo '<span class="bo_form_checkbox_text">';
+		echo '<input type="checkbox" onclick="bo_map_toggle_count(this.checked);" id="bo_map_opt_count"> ';
+		echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
+		echo '</span>';
+	}
+
+	echo '</div>';
 	
 	if ($show_adv_counter)
 	{
@@ -544,28 +553,16 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		echo '</div>';
 
 	}
-	
+
+	/* Moved 
 	echo '<div class="bo_input_container" id="bo_map_stations_options">';
 	echo '<span class="bo_form_descr">'._BL('Show Stations').':</span> ';
-	echo '<span class="bo_form_checkbox_text">';
-	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="1" name="bo_map_station" id="bo_map_station0" checked>';
-	echo '<label for="bo_map_station0">'._BL('None').'</label> &nbsp; ';
-	echo '</span>';
-
 	echo '<span class="bo_form_checkbox_text">';
 	echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="2" name="bo_map_station" id="bo_map_station1">';
 	echo '<label for="bo_map_station1">'._BL('Stations').'</label> &nbsp; ';
 	echo '</span>';
-
-	if (count($mybo_info) > 1)
-	{
-		echo '<span class="bo_form_checkbox_text">';
-		echo '<input type="radio" onclick="bo_map_toggle_stations(this.value);" value="3" name="bo_map_station" id="bo_map_station2">';
-		echo '<label for="bo_map_station2">'._BL('MyBlitzortung').' '._BL('stations').'</label> &nbsp; ';
-		echo '</span>';
-	}
-	
 	echo '</div>';
+	*/
 	
 	if (count($Overlays))
 	{
@@ -843,7 +840,6 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			bo_map_set();
 		});
 		
-		
 		var map_lat = bo_getcookie('bo_map_lat');
 		var map_lon = bo_getcookie('bo_map_lon');
 		var map_zoom = bo_getcookie('bo_map_zoom');
@@ -866,8 +862,11 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			bo_map.setOptions({ mapTypeId: map_type });
 			
 		bo_map_set();
+
+		if (document.getElementById("bo_check_autoupdate").checked)
+			bo_map_toggle_autoupdate(true);
+
 		window.setTimeout("bo_map_timer();", 1000 * 60);
-		
 	}	
 	
 	function bo_map_timer()
@@ -878,7 +877,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		if (bo_autoupdate && time-bo_user_last_activity > <?php echo intval(BO_MAP_AUTOUPDATE)*60 ?>)
 		{
 			bo_map_toggle_autoupdate(false);
-			document.getElementById("bo_check_autoupdate").checked=false;
+			document.getElementById("bo_check_autoupdate").checked = false;
 			
 			<?php if (BO_MAP_AUTOUPDATE_STALL_MSG === true) { 
 			echo 'alert("'.strtr(_BL(map_autoupdate_stalled_msg), array('"' => '\"')).'");';

@@ -258,6 +258,44 @@ function _BL($msgid=null, $noutf = false, $utf_in = false)
 	return $msg;
 }
 
+function _BS($msgid=null, $noutf = false, $utf_in = false)
+{
+	$ret = _BL($msgid, $noutf, $utf_in);
+
+	if ($ret == $msgid)
+	{
+		$part1 = $msgid;
+		$part2 = '';
+		$delis = array(' ', ':', '/');
+		
+		$i = 0;
+		while ($ret == $msgid && $i < 5)
+		{
+			$i++;
+			
+			foreach($delis as $deli)
+			{
+				$pos = strrpos($part1, $deli);
+				
+				if ($pos === false)
+					continue 1;
+				
+				$part1 = substr($msgid, 0, $pos);
+				$part2 = substr($msgid, $pos+1);
+			
+				$ret = _BS($part1, $noutf, $utf_in).$deli._BS($part2, $noutf, $utf_in);
+				
+				if ($ret != $msgid)
+					break 2;
+			}
+		}
+	}	
+	
+	return $ret;
+
+}
+
+
 function _BLN($number, $unit = 'minute')
 {
 

@@ -49,6 +49,9 @@ function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 	$url = preg_replace('/&$/', '', $url);
 	$url = preg_replace('/\?$/', '', $url);
 
+	if (!trim($url))
+		$url = "?";
+	
 	return $url;
 }
 
@@ -618,8 +621,8 @@ function bo_get_regions($bo_station_id = false)
 		{
 			if ($d['visible'] && isset($d['rect_add']))
 			{
-				$regions[0][$reg_id] = _BL($d['name'], false, BO_CONFIG_IS_UTF8);
-				$regions[1]['-'.$reg_id] = _BL('outside of').' '._BL($d['name'], false, BO_CONFIG_IS_UTF8);
+				$regions[0][$reg_id] = _BS($d['name'], false, BO_CONFIG_IS_UTF8);
+				$regions[1]['-'.$reg_id] = _BL('outside of').' '._BS($d['name'], false, BO_CONFIG_IS_UTF8);
 			}
 		}
 

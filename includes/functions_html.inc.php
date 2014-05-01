@@ -106,8 +106,7 @@ function bo_archive_select_map(&$map)
 	$map_ok = false;
 	$map_default = false;
 	
-	$ret = '<span class="bo_form_descr">'._BL('Map').':';
-	$ret .= ' <select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
+	$options = array();
 	foreach($_BO['mapimg'] as $id => $d)
 	{
 		if (!$d['name'] || !$d['archive'])
@@ -115,15 +114,47 @@ function bo_archive_select_map(&$map)
 		
 		if ($map_default === false)
 			$map_default = $id;
-			
-		$ret .= '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BL($d['name'], false, BO_CONFIG_IS_UTF8).'</option>';
 		
 		if ($map < 0)
 			$map = $id;
 		
 		if ((string)$id === (string)$map)
 			$map_ok = true;
+			
+		$options[ $d['group'] ][ $d['name'].$d['id'] ] = '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BS($d['name'], false, BO_CONFIG_IS_UTF8).'</option>';
 	}
+
+
+	$ret = '<span class="bo_form_descr">'._BL('Map').':';
+	$ret .= ' <select name="bo_map" id="bo_arch_strikes_select_map" onchange="submit();">';
+	$group_prev = '';
+	foreach($options as $group => $group_data)
+	{
+		
+		//sort maps when in a group
+		if ($group)
+		{
+			ksort($group_data);
+			
+			if ($group_prev != $group)
+			{
+				if ($group_prev)
+					$ret .= '</optgroup>';
+				
+				$ret .= '<optgroup label="'._BS($group).'">';
+			}
+				
+			$group_prev = $group;
+		}
+			
+		foreach($group_data as $map_text)
+			$ret .= $map_text;
+		
+	}
+	
+	if ($group_prev)
+		$ret .= '</optgroup>';
+	
 	$ret .= '</select></span> ';
 	
 	$map = $map_ok ? $map : $map_default;

@@ -610,6 +610,9 @@
 //set to a very high value like 99999999 to "disable" auto-end
 @define('BO_MAP_AUTOUPDATE', 99999999);
 
+//set to true, to enable autoupdate by default
+@define('BO_MAP_AUTOUPDATE_DEFAULT_ON', false);
+
 //displays message if autoupdate ends due to timeout
 @define('BO_MAP_AUTOUPDATE_STALL_MSG', true);
 

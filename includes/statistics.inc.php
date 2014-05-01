@@ -1583,8 +1583,12 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 		echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '._BK(BO_RADIUS_STAT).') : </span><span class="bo_value">'._BN($max_str_dayrad_all[0], 0).($max_str_dayrad_all[1] ? ' ('._BD($max_str_dayrad_all[1]).')' : '').'</span>';
 	}
 
-	echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_all, 1).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_all, 1).'</span>';
+	if ($station_id)
+	{
+		echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_all, 1).'</span>';
+		echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_all, 1).'</span>';
+	}
+		
 	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'._BN($max_sig_all, 0).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max participants per strike').': </span><span class="bo_value">'._BN($max_part, 0).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Max active stations').': </span><span class="bo_value">'._BN($max_active_sig, 0).'</span>';
