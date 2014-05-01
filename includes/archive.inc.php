@@ -489,12 +489,18 @@ function bo_show_archive_search()
 				$time_to = '';
 				
 		}
-		elseif (!$perm && bo_latlon2dist($lat, $lon, BO_LAT, BO_LON) > $radius)
+		//lat,lon is limited to a region
+		elseif (!$perm && bo_latlon2dist($lat, $lon, BO_LAT, BO_LON) > $radius && $radius)
 		{
 			//marker is too far away from home
 			$getit = false;
 			
 			echo '<p>'._BL('search_outside_radius').'</p>';
+		}
+		//circle radius is limited
+		elseif (!$perm && $delta_dist > BO_ARCHIVE_SEARCH_RADIUS_MAX * 1000)
+		{
+			$delta_dist = BO_ARCHIVE_SEARCH_RADIUS_MAX * 1000;
 		}
 	}
 	elseif ($perm && $_GET['bo_strike_id'])

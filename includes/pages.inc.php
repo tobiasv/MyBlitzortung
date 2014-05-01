@@ -61,7 +61,7 @@ function bo_show_archive()
 
 	echo '</ul>';
 
-	
+	bo_title(_BL('arch_navi_'.$show));
 	
 	switch($show)
 	{
@@ -154,6 +154,8 @@ function bo_show_statistics()
 
 	echo '</ul>';
 
+	bo_title(_BL('stat_navi_'.$show));
+	
 	if (bo_station_id() < 0)
 	{
 		echo '<div id="bo_stat_station_select">';
@@ -414,6 +416,9 @@ function bo_show_menu()
 
 	echo '</ul>';
 
+	bo_title(_BL('main_menu_'.$page));
+
+	
 }
 
 function bo_get_title()

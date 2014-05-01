@@ -458,8 +458,14 @@ function bo_show_archive_density()
 	{
 		if (!$d['name'] || !$d['density'])
 			continue;
+
+		$name = _BS($d['name'], false, BO_CONFIG_IS_UTF8);
+		$selected = (string)$id === (string)$map;
+		
+		if ($selected)
+			bo_title($name);
 			
-		echo '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BL($d['name'], false, BO_CONFIG_IS_UTF8).'</option>';
+		echo '<option value="'.$id.'" '.($selected ? 'selected' : '').'>'.$name.'</option>';
 		
 		if ($map == -1)
 			$map = $id;

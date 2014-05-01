@@ -29,7 +29,7 @@ if (!defined("BO_VER"))
 	
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '1.3');
+	define("BO_VER", '1.4-dev');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -39,7 +39,8 @@ if (!defined("BO_VER"))
 	define("BO_PERM_ALERT_SMS",		32);
 	define("BO_PERM_ALERT_URL",		64);
 	define("BO_PERM_ARCHIVE", 		128);
-	define("BO_PERM_COUNT",	        8);
+	define("BO_PERM_ALERT_TWITTER",	256);
+	define("BO_PERM_COUNT",	        9);
 
 
 

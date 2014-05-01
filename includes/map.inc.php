@@ -59,10 +59,15 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			
 			foreach($menu as $menu_id => $d)
 			{
+				$name = _BS($d[1], false, BO_CONFIG_IS_UTF8);
+				
 				echo '<li><a href="'.bo_insert_url(array('bo_showmap', 'bo_*'), $d[2]);
 				echo count($_BO['mapimg'][$d[2]]['trange']) > 1 ? '&bo_period='.$period : '';
 				echo '" ';
-				echo ' class="bo_navi'.($d[0] ? '_active' : '').'">'._BS($d[1], false, BO_CONFIG_IS_UTF8).'</a></li>';
+				echo ' class="bo_navi'.($d[0] ? '_active' : '').'">'.$name.'</a></li>';
+				
+				if ($d[0])
+					bo_title($name);
 			}
 			
 			echo '</ul>';
@@ -116,9 +121,14 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 				echo '<select name="bo_showmap" onchange="submit();">';
 				foreach($map_groups[$cfg['group']] as $map_id => $map_name)
 				{
+					$name = _BS($map_name, false, BO_CONFIG_IS_UTF8);
+					
 					echo '<option value="'.$map_id.'" '.($map_id == $static_map_id ? 'selected' : '').'>';
-					echo _BS($map_name, false, BO_CONFIG_IS_UTF8);
+					echo $name;
 					echo '</option>';
+					
+					if ($map_id == $static_map_id)
+						bo_title($name);
 				}
 				echo '</select> &bull; ';
 			}
@@ -1208,7 +1218,6 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		//this is a quick&dirty workaround due to googlemaps limitations (causes warnings in console!)
 		if (bo_add_transparent_layer)
 		{
-			
 			var tmp = [];
 			bo_map.overlayMapTypes.push(tmp);
 		}
@@ -1302,8 +1311,6 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		}
 		else
 		{
-			add = bo_get_time_arg(interval);
-			
 			for (i in bo_OverlayMaps)
 			{
 				if (bo_OverlayMaps[i].bo_show)
@@ -1314,6 +1321,8 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 						interval = bo_OverlayMaps[i].bo_interval;
 				}
 			}
+			
+			add = bo_get_time_arg(interval) + (bo_loggedin ? '_1' : '');
 		}
 		
 		var url="<?php echo bo_bofile_url() ?>?tile&count="+types+"&stat="+bo_show_count+"&zoom="+zoom+"&x="+c.x+"&y="+c.y+"&<?php bo_lang_arg('tile'); ?>";

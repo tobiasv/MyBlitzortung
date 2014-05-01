@@ -24,6 +24,7 @@ function bo_alert_settings()
 		$like = 'alert\_'.bo_user_get_id().'\_%';
 	
 	$Alerts = array();
+	$Names  = array();
 	
 	while ($row = BoData::get_all($like))
 	{
@@ -34,9 +35,14 @@ function bo_alert_settings()
 			$user_id = $r[1];
 			$alert_cnt = $r[2];
 			$Alerts[$user_id][$alert_cnt] = $data;
+			
+			if (!isset($Names[$user_id]))
+				$Names[$user_id] = bo_user_get_name($user_id);
 		}
 	
 	}
+	
+	asort($Names, SORT_LOCALE_STRING);
 	
 	echo '<div id="bo_alert_settings">';
 	
@@ -67,12 +73,12 @@ function bo_alert_settings()
 				<th>'._BL('Alert count').'</th>
 				</tr>';
 		
-		foreach($Alerts as $user_id => $user_alerts)
+		foreach($Names as $user_id => $user_name)
 		{
-			foreach($user_alerts as $alert_id => $d)
+			foreach($Alerts[$user_id] as $alert_id => $d)
 			{
 				echo '<tr>';
-				echo '<td>'.bo_user_get_name($user_id).'</td>';
+				echo '<td>'.$user_name.'</td>';
 				echo '<td>';
 				echo '<a href="'.bo_insert_url('bo_action2', 'alert_form,'.$user_id.','.$alert_id).'">';
 				echo _BC($d['name']);
@@ -87,7 +93,7 @@ function bo_alert_settings()
 					case 1: echo _BL('E-Mail'); break;
 					case 2: echo _BL('SMS'); break;
 					case 3: echo _BL('URL'); break;
-				
+					case 4: echo _BL('Twitter'); break;
 				}
 				
 				echo ': ';
@@ -152,7 +158,8 @@ function bo_alert_settings_form()
 		$A['interval'] = BO_UP_INTVL_STRIKES;
 		$A['address'] = bo_user_get_mail($user_id);
 		$A['type'] = $A['address'] ? 1 : 0;
-		
+		$A['interval'] = max(5, BO_UP_INTVL_STRIKES);
+		$A['count'] = 5;
 	}
 	
 	if (!$user_id)
@@ -190,9 +197,9 @@ function bo_alert_settings_form()
 			$A['lon'] = substr((double)$_POST['bo_alert_lon'],0,10);
 		}
 
-		
 		if ($A['interval'] < BO_UP_INTVL_STRIKES)
 			$A['interval'] = BO_UP_INTVL_STRIKES;
+
 		
 		if (!($level & BO_PERM_ADMIN) && $A['user_id'] != bo_user_get_id())
 		{
@@ -314,6 +321,13 @@ function bo_alert_settings_form()
 		echo '<label for="bo_alert_type_url">'._BL('alert_url').'</label>';
 		$adress_text .= ' / '._BL('URL');
 	}
+
+	if (($level&BO_PERM_ALERT_TWITTER) && BO_TWITTER_ENABLED === true)
+	{
+		echo '<input type="radio" name="bo_alert_type" value="4" '.($A['type'] == 4 ? 'checked="checked' : '').' id="bo_alert_type_twitter" class="bo_form_radio bo_alert_input">';
+		echo '<label for="bo_alert_type_twitter">'._BL('alert_twitter').'</label>';
+		$adress_text .= ' / '._BL('Twitter');
+	}
 	
 	echo '</div>';
 	
@@ -356,20 +370,30 @@ function bo_alert_settings_form()
 	
 	echo '</form>';
 
-	if (($level&BO_PERM_ALERT_URL))	
+	if (($level&BO_PERM_ALERT_URL) || ($level&BO_PERM_ALERT_TWITTER))	
 	{
 		echo '<div id="bo_alert_form_descr">';
 		
-		echo '<p>'._BL('For usage with "URL"').':</p>';
+		if ($level&BO_PERM_ALERT_TWITTER)
+		{
+			echo '<h5>'._BL('Instructions for Twitter').':</h5>';
+			echo '<p>'.strtr(_BL('twitter_instructions'), array('{TWITTER}'=>BO_TWITTER_NAME)).'</p>';
+		}
 		
-		echo '<ul id="bo_alert_form_descr_ul">
-				<li><span class="bo_descr">{name}:</span> <span class="bo_value">'._BL('Name of your alert').'</span></li>
-				<li><span class="bo_descr">{strikes}:</span> <span class="bo_value">'._BL('Strike count').'</span></li>
-				<li><span class="bo_descr">{time}:</span> <span class="bo_value">'._BL('Time of last strike').'</span></li>
-				<li><span class="bo_descr">{first}:</span> <span class="bo_value">'._BL('Time of first strike in time range').'</span></li>
-				<li><span class="bo_descr">{dist}:</span> <span class="bo_value">'._BL('Distance of last strike to selected position').'</span></li>
-				<li><span class="bo_descr">{bear}:</span> <span class="bo_value">'._BL('Bearing of last strike to selected position').'</span></li>
-				</ul>';
+		if ($level&BO_PERM_ALERT_URL)
+		{
+			echo '<h5>'._BL('For usage with "URL"').':</h5>';
+			
+			echo '<ul id="bo_alert_form_descr_ul">
+					<li><span class="bo_descr">{name}:</span> <span class="bo_value">'._BL('Name of your alert').'</span></li>
+					<li><span class="bo_descr">{strikes}:</span> <span class="bo_value">'._BL('Strike count').'</span></li>
+					<li><span class="bo_descr">{time}:</span> <span class="bo_value">'._BL('Time of last strike').'</span></li>
+					<li><span class="bo_descr">{first}:</span> <span class="bo_value">'._BL('Time of first strike in time range').'</span></li>
+					<li><span class="bo_descr">{dist}:</span> <span class="bo_value">'._BL('Distance of last strike to selected position').'</span></li>
+					<li><span class="bo_descr">{bear}:</span> <span class="bo_value">'._BL('Bearing of last strike to selected position').'</span></li>
+					</ul>';
+		}
+		
 		echo '</div>';
 	}
 	
@@ -438,7 +462,7 @@ function bo_alert_settings_form()
 				bo_alert_update();
 			});
 			
-			
+			bo_map.setOptions({scrollwheel: true});
 		}
 
 	</script>
@@ -566,7 +590,7 @@ function bo_alert_send()
 										);
 						
 						$log[$alert_dbname] = array();
-
+						
 						switch($d['type'])
 						{
 							case 1: //E-Mail
@@ -580,11 +604,14 @@ function bo_alert_send()
 								
 								$text = preg_replace("#(?<!\r)\n#si", "\r\n", $text); 								
 								
+								
+								
 								$ret = bo_mail($d['address'], 
 											_BL('Strikes detected', true).' ('.$d['name'].')', 
 											$text);
 								
 								$log[$alert_dbname]['text']   = $text;
+								
 								
 								break;
 							
@@ -622,6 +649,25 @@ function bo_alert_send()
 								$log[$alert_dbname]['text'] = $url;
 								
 								break;
+								
+							case 4: //Twitter
+								
+								if (BO_TWITTER_ENABLED === true)
+								{
+									$text = "*** ({name}) ***\n".
+											"{strikes} "._BL('Strikes detected', true)."\n".
+											_BL('alert_sms_last_strike', true).": {time}\n".
+											_BL('alert_sms_distance', true).": {dist}km (".$bear.")\n".
+											_BL('alert_sms_description', true);
+									
+									$text = strtr($text, $replace);
+									$log[$alert_dbname]['text']   = $text;
+									
+									include_once 'functions_twitter.php';
+									bo_twitter_send_direct_msg($text, $d['address']);
+								}
+								
+								break;
 						}
 						
 						$log[$alert_dbname]['type']   = $d['type'];
@@ -632,6 +678,8 @@ function bo_alert_send()
 						$d['last_send'] = time();
 						$d['send_count']++;
 						$d['disarmed'] = true; //after sending!
+						
+						bo_echod(" Sending alert ".$d['address'].", Type ".$d['type'].", Return ".$ret." ");
 					}
 					
 					$d['last_check'] = $max_time;

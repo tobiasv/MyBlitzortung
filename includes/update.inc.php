@@ -29,7 +29,8 @@ function bo_check_for_update()
 						'0.8.1',
 						'1.1',
 						'1.2',
-						'1.3'
+						'1.3',
+						'1.4'
 						);
 
 	$max_update_num = bo_version2number($updates[count($updates)-1]);
@@ -631,7 +632,9 @@ function bo_check_for_update()
 							CHANGE `url` `url` VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''";
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
-
+				
+				break;
+				
 			case '1.2':
 			
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` ADD `comment` varchar(128) NOT NULL AFTER `country`';
@@ -641,6 +644,8 @@ function bo_check_for_update()
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` DROP `show_mybo`';
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				
+				break;
 
 			case '1.3':
 			
@@ -651,6 +656,16 @@ function bo_check_for_update()
 				$sql = 'ALTER TABLE `'.BO_DB_PREF.'stations` ADD `amp_pcbs` VARCHAR(100) NOT NULL AFTER `status`';
 				$ok = BoDb::query($sql, false);
 				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				
+				break;
+
+			case '1.4':
+			
+				$sql = 'ALTER TABLE `'.BO_DB_PREF.'user` CHANGE `level` `level` SMALLINT';
+				$ok = BoDb::query($sql, false);
+				echo '<li><em>'.$sql.'</em>: <b>'._BL($ok ? 'OK' : 'FAIL').'</b></li>';
+				
+				break;
 				
 			default:
 				$ok = true;

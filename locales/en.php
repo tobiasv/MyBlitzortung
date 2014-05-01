@@ -654,6 +654,7 @@ $_BL['en']['user_perm4'] = 'Alerts: everywhere';
 $_BL['en']['user_perm5'] = 'Alerts: SMS';
 $_BL['en']['user_perm6'] = 'Alerts: URL';
 $_BL['en']['user_perm7'] = 'Archive';
+$_BL['en']['user_perm8'] = 'Alerts: Twitter';
 
 
 /*************************************************************/
@@ -775,10 +776,7 @@ Lightning data is available from {DATE_START} to {DATE_END}. There\'s no guarant
 
 $_BL['en']['archive_density_info'] = '
 Here you can display lightning densities for different regions. This data is saved independently from
-the other stroke data.
-<br>
-<br>
-Some hints: The data displayed here is not standardized,
+the other stroke data. Some hints: The data displayed here is not standardized,
 so the results can not be compared over longer time ranges or bigger regions!
 This is due to different station coverage and improved lightning detection.
 You can switch to a detection station and select between different views.
@@ -832,6 +830,7 @@ $_BL['en']['alert_name'] = 'Name / Description';
 $_BL['en']['alert_type'] = 'Type';
 $_BL['en']['alert_mail'] = 'E-Mail';
 $_BL['en']['alert_sms'] = 'SMS';
+$_BL['en']['alert_twitter'] = 'Twitter';
 $_BL['en']['Number'] = 'Number';
 $_BL['en']['alert_url'] = 'URL';
 $_BL['en']['URL'] = 'URL';
@@ -1090,5 +1089,7 @@ $_BL['en']['lang_nl'] = 'Dutch';
 
 $_BL['en']['Search...'] = 'Search...';
 $_BL['en']['Archives'] = 'Archives';
+
+$_BL['en']['twitter_instructions'] = 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow <em><a href="https://twitter.com/{TWITTER}" target="_blank">{TWITTER}</a></em>!';
 
 ?>

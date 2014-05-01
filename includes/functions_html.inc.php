@@ -118,10 +118,16 @@ function bo_archive_select_map(&$map)
 		if ($map < 0)
 			$map = $id;
 		
-		if ((string)$id === (string)$map)
+		$selected = (string)$id === (string)$map;
+		$name = _BS($d['name'], false, BO_CONFIG_IS_UTF8);
+		
+		if ($selected)
+		{
 			$map_ok = true;
-			
-		$options[ $d['group'] ][ $d['name'].$d['id'] ] = '<option value="'.$id.'" '.((string)$id === (string)$map ? 'selected' : '').'>'._BS($d['name'], false, BO_CONFIG_IS_UTF8).'</option>';
+			bo_title($name);
+		}
+		
+		$options[ $d['group'] ][ $d['name'].$d['id'] ] = '<option value="'.$id.'" '.($selected ? 'selected' : '').'>'.$name.'</option>';
 	}
 
 
@@ -430,6 +436,22 @@ function bo_insert_html_hidden($exclude = array())
 	}
 	if (BO_LOCALE != _BL())
 		echo "\n".'<input type="hidden" name="'.BO_LANG_ARGUMENT.'" value="'._BL().'">';
+}
+
+function bo_title($add = '')
+{
+	static $text = '';
+	static $set = array();
+	
+	if ($add && !$set[$add])
+	{
+		$text .= ($text ? ' :: ' : '').$add;
+		$set[$add] = true;
+	}
+	
+	
+	
+	return $text;
 }
 
 

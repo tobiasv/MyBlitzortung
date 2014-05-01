@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}user` (
   `id` smallint(11) unsigned NOT NULL auto_increment,
   `login` varchar(30) NOT NULL,
   `password` varchar(60) NOT NULL,
-  `level` tinyint(4) unsigned NOT NULL default '0',
+  `level` smallint unsigned NOT NULL default '0',
   `mail` varchar(100) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `login` (`login`)

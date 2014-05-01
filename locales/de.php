@@ -782,8 +782,7 @@ $_BL['de']['bo_stat_other_station_info_back'] = 'Zurück zur Station {STATION}';
 $_BL['de']['archive_search_info'] = 'Hier können die letzten {COUNT} Blitze für einen bestimmten Bereich
 auf der Karte abgefragt werden. Dazu den Marker an die gewünschte Stelle ziehen um die Koordinaten zu setzen,
 einen Radius angeben und auf Suchen klicken. Die Blitze werden anschließend in der Karte als farbige Punkte
-angezeigt. Durch Klick auf einen Punkt lassen sich weitere Informationen abrufen. Die Suche ist nur innerhalb
-des rot markierten Kreises um die Station möglich!';
+angezeigt. Durch Klick auf einen Punkt lassen sich weitere Informationen abrufen.';
 
 $_BL['de']['archive_map_info'] = 'Hier können Blitze tagweise auf verschiedenen Karten dargestellt werden.
 Alternativ stehen auch Animationen zur Verfügung. Beachten Sie hierbei entsprechend längere Ladezeiten.

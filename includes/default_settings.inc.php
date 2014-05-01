@@ -697,6 +697,9 @@
 //default radius for strike search in kilometers
 @define('BO_ARCHIVE_SEARCH_RADIUS_DEFAULT', 10);
 
+//max radius for strike search in kilometers
+@define('BO_ARCHIVE_SEARCH_RADIUS_MAX', 50);
+
 //show the spectrum for each signal in table
 @define('BO_ARCHIVE_SHOW_SPECTRUM', true);
 
@@ -854,6 +857,16 @@
 /*    - http://www.innosend.de/gateway/sms.php?id=USER&pw=PASS&absender=MyBO&empfaenger={tel}&text={text}&type=4                 */
 @define('BO_SMS_GATEWAY_URL', ''); //do not edit here, put it in config.php file!!!
 
+
+/*******************************************************************/
+/*** Twitter settings                                            ***/
+
+@define("BO_TWITTER_ENABLED",		false);
+@define("BO_TWITTER_NAME", 			'');
+@define("BO_TWITTER_API_KEY", 		'');
+@define("BO_TWITTER_API_SECRET", 	'');
+@define("BO_TWITTER_ACCESS_TOKEN", 	'');
+@define("BO_TWITTER_ACCESS_SECRET",	'');
 
 
 
