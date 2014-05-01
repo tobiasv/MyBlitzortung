@@ -169,7 +169,7 @@ function bo_show_lightning_map($show_gmap=null, $show_static_maps=null)
 			{
 				echo '<div class="bo_arch_map_links">';
 				
-				echo ' <a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_map='.$static_map_id.'" >'._BL('Archive').'</a> ';
+				echo ' <a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_map='.$static_map_id.'" >'._BL('Archives').'</a> ';
 				
 				if (intval(BO_ANIMATIONS_INTERVAL))
 					echo ' <a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_map='.$static_map_id.'&bo_animation=now" >'._BL('Animation').'</a> ';

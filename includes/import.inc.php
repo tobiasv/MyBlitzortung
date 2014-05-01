@@ -1558,7 +1558,7 @@ function bo_update_stations($force = false)
 					
 				$val = stripslashes($val);
 					
-				if ($val != $all_stations[$id][$name])
+				if ($val != $all_stations[$id][$name] || $force)
 					$sql .= ($sql ? ',' : '').' '.$name."='".BoDb::esc($val)."' ";
 			}
 			
