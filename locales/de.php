@@ -1150,6 +1150,9 @@ $_BL['de']['lang_nl'] = 'Niederländisch';
 
 $_BL['de']['Search...'] = 'Suche...';
 $_BL['de']['United States'] = 'USA';
+$_BL['de']['Indonesia'] = 'Indonesien';
 $_BL['de']['Archives'] = 'Archiv';
+$_BL['de']['Big'] = 'Groß';
+$_BL['de']['(Big)'] = '(Groß)';
 
 ?>

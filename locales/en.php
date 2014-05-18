@@ -1089,6 +1089,7 @@ $_BL['en']['lang_nl'] = 'Dutch';
 
 $_BL['en']['Search...'] = 'Search...';
 $_BL['en']['Archives'] = 'Archives';
+$_BL['en']['Indonesia'] = 'Indonesia';
 
 $_BL['en']['twitter_instructions'] = 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow <em><a href="https://twitter.com/{TWITTER}" target="_blank">{TWITTER}</a></em>!';
 

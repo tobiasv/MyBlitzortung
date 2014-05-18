@@ -664,7 +664,7 @@ function bo_alert_send()
 									$log[$alert_dbname]['text']   = $text;
 									
 									include_once 'functions_twitter.php';
-									bo_twitter_send_direct_msg($text, $d['address']);
+									$ret = bo_twitter_send_direct_msg($text, $d['address']);
 								}
 								
 								break;
@@ -794,6 +794,7 @@ function bo_alert_log($all = false)
 				case 1: echo _BL('E-Mail'); break;
 				case 2: echo _BL('SMS'); break;
 				case 3: echo _BL('URL'); break;
+				case 4: echo _BL('Twitter'); break;
 			}
 			echo '</td>';
 			echo '<td>'.($d['type'] != 3 ? htmlentities($d['address']) : '').'</td>';

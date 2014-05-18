@@ -146,7 +146,6 @@ $_BO['tpl_imgmap_default']['bottom_font'] = array(8, false, array('ffffff', 1, '
 $_BO['tpl_imgmap_default']['bottom_style'] = array(0, 1, '9999ff66', 1, 'ccf8');
 $_BO['tpl_imgmap_default']['legend'] = array(5, 80, 40, 4, 4, 1);
 $_BO['tpl_imgmap_default']['legend_font'] = array(7, true, array('3330', 0, 'aaa0'),0,2);
-
 $_BO['tpl_imgmap_default']['menu'] = true;
 $_BO['tpl_imgmap_default']['archive'] = true;
 $_BO['tpl_imgmap_default']['trange'] = array(2); //hours!
@@ -159,6 +158,9 @@ $_BO['tpl_imgmap_default']['density_blocksize'] = 4;
 $_BO['tpl_imgmap_default']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap_default']['density_darken'] = array(80, 230);
 
+//smaller points for overview maps
+$_BO['tpl_imgmap_default2'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap_default2']['point_style'][1] = 2;
 
 //an animation template
 $_BO['tpl_gif_animation_mini']['minutes'] = 60 * 3;
@@ -203,18 +205,23 @@ $_BO['tpl_imgmap_stations_mini']['stations']['V'] = $_BO['points']['stations_dot
 /* Image Maps                         */
 /**************************************/
 
-
-//MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=71.3&map_generator_west=-22&map_generator_east=52&map_generator_south=24.3&map_generator_min_area=50&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.01p%2F80%2F80%2F80+3%2F0.01p%2F80%2F80%2F80+4%2F0.01p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500+++90+150++80+1000++90+150++80%0D%0A1000+100+150++80+1500+100+150++80%0D%0A1500+105+140++60+2000+105+140++60%0D%0A2000+110+135++40+2500+110+135++40%0D%0A2500+110+130++30+3000+110+130++30%0D%0A3000+115+125++20+6000+115+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.01
-$_BO['tpl_imgmap']['europe'] = $_BO['tpl_imgmap_default'];
+//Europe
+$_BO['tpl_imgmap']['europe'] = $_BO['tpl_imgmap_default2'];
 $_BO['tpl_imgmap']['europe']['name'] = 'Europe';
 $_BO['tpl_imgmap']['europe']['file'] = 'maps_europe/map_europe.png';
 $_BO['tpl_imgmap']['europe']['borders'] = array('maps_europe/map_europe_borders.png', 60);
 $_BO['tpl_imgmap']['europe']['coord'] = array(71.3, 52, 24.3, -22); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['europe']['point_style'] = array(2, 2, 'f008', 0);
+
+//Europe
+$_BO['tpl_imgmap']['europe_full_big'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['europe_full_big']['name'] = 'Europe';
+$_BO['tpl_imgmap']['europe_full_big']['proj'] = 'miller';
+$_BO['tpl_imgmap']['europe_full_big']['file'] = 'maps_europe/map_europe_full_big.png';
+$_BO['tpl_imgmap']['europe_full_big']['borders'] = array('maps_europe/map_europe_full_big_borders.png', 60);
+$_BO['tpl_imgmap']['europe_full_big']['coord'] = array(72, 70, 25, -18); //North, East, South, West (Degrees)
 
 
 //Europe: Western / Central
-//MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=57&map_generator_west=-5&map_generator_east=18&map_generator_south=42.2&map_generator_min_area=20&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.1p%2F80%2F80%2F80+3%2F0.1p%2F80%2F80%2F80+4%2F0.1p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500++110+155++80+1000+110+155++80%0D%0A1000+150+150++80+1500+150+150++80%0D%0A1500+160+140++60+2000+160+140++60%0D%0A2000+170+135++40+2500+170+135++40%0D%0A2500+180+130++30+3000+180+130++30%0D%0A3000+185+125++20+6000+185+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.1
 $_BO['tpl_imgmap']['europe_west_central'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['europe_west_central']['name'] = 'Western Europe';
 $_BO['tpl_imgmap']['europe_west_central']['file'] = 'maps_europe/map_europe_west_central.png';
@@ -253,10 +260,6 @@ $_BO['tpl_imgmap']['germany_lkr']['coord'] = array(55.065, 15.11, 47.380, 5.85);
 $_BO['tpl_imgmap']['germany_lkr']['show_station'] = array(5, 125,120,215, 9,true, 2,-12);
 $_BO['tpl_imgmap']['germany_lkr']['density_darken'] = array(10, 0);
 $_BO['tpl_imgmap']['germany_lkr']['density_blocksize'] = 5;
-//$_BO['tpl_imgmap']['germany_lkr']['stations']['A'] = $_BO['points']['stations_active'];
-//$_BO['tpl_imgmap']['germany_lkr']['stations']['-'] = $_BO['points']['stations_inactive'];
-//$_BO['tpl_imgmap']['germany_lkr']['stations']['O'] = $_BO['points']['stations_offline'];
-//$_BO['tpl_imgmap']['germany_lkr']['stations']['V'] = $_BO['points']['stations_nogps'];
 
 
 //Germany (Landkreise) Geodatenzentrum
@@ -300,7 +303,6 @@ $_BO['tpl_imgmap']['germany_bavaria_dark']['show_station'] = array(5, 255,100,10
 $_BO['tpl_imgmap']['germany_bavaria_dark']['density_darken'] = array(50,0);
 
 
-
 //Germany NRW: not exact, maximum deviation about 2km
 $_BO['tpl_imgmap']['germany_nrw'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['germany_nrw']['name'] = 'NRW';
@@ -325,7 +327,7 @@ $_BO['tpl_imgmap']['germany_nrw_dark']['file'] = 'maps_europe/map_germany_nrw_da
 
 /* ============================= FRANCE ============================= */
 
-//http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=51.8&map_generator_west=-6&map_generator_east=9&map_generator_south=41.51&map_generator_min_area=20&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.1p%2F80%2F80%2F80+3%2F0.1p%2F80%2F80%2F80+4%2F0.1p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500++110+155++80+1000+110+155++80%0D%0A1000+150+150++80+1500+150+150++80%0D%0A1500+160+140++60+2000+160+140++60%0D%0A2000+170+135++40+2500+170+135++40%0D%0A2500+180+130++30+3000+180+130++30%0D%0A3000+185+125++20+6000+185+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.1
+//France
 $_BO['tpl_imgmap']['france'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['france']['name'] = 'France';
 $_BO['tpl_imgmap']['france']['file'] = 'maps_europe/map_france.png';
@@ -640,24 +642,21 @@ $_BO['tpl_density']['germany']['bps'] 		= 2; // bytes per area
 /* Image Maps                         */
 /**************************************/
 
-
-//MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=10&map_generator_west=110&map_generator_east=180&map_generator_south=-51.6%2B&map_generator_projection=M&map_generator_resolution=i&map_generator_scaling=103&map_generator_min_area=5&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.1p%2F80%2F80%2F80+3%2F0.1p%2F80%2F80%2F80+4%2F0.1p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500++110+155++80+1000+110+155++80%0D%0A1000+150+150++80+1500+150+150++80%0D%0A1500+160+140++60+2000+160+140++60%0D%0A2000+170+135++40+2500+170+135++40%0D%0A2500+180+130++30+3000+180+130++30%0D%0A3000+185+125++20+6000+185+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.1
-$_BO['tpl_imgmap']['oceania'] = $_BO['tpl_imgmap_default'];
+//Oceania
+$_BO['tpl_imgmap']['oceania'] = $_BO['tpl_imgmap_default2'];
 $_BO['tpl_imgmap']['oceania']['name'] = 'Oceania';
 $_BO['tpl_imgmap']['oceania']['file'] = 'maps_oceania/map_oceania.png';
 $_BO['tpl_imgmap']['oceania']['borders'] = array('maps_oceania/map_oceania_borders.png', 60);
 $_BO['tpl_imgmap']['oceania']['coord'] = array(10, 180, -51.6, 110); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['oceania']['point_style'] = array(2, 2, 'f008', 0);
+$_BO['tpl_imgmap']['oceania']['cities'][0] = $_BO['points']['whitered1'];
 
-
-//New Zealand
-//MapTool URL: http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=-33&map_generator_west=160&map_generator_east=180&map_generator_south=-48.15&map_generator_projection=M&map_generator_resolution=i&map_generator_scaling=103&map_generator_min_area=20&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.1p%2F80%2F80%2F80+3%2F0.1p%2F80%2F80%2F80+4%2F0.1p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500++110+155++80+1000+110+155++80%0D%0A1000+150+150++80+1500+150+150++80%0D%0A1500+160+140++60+2000+160+140++60%0D%0A2000+170+135++40+2500+170+135++40%0D%0A2500+180+130++30+3000+180+130++30%0D%0A3000+185+125++20+6000+185+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.1
-$_BO['tpl_imgmap']['new_zealand'] = $_BO['tpl_imgmap_default'];
-$_BO['tpl_imgmap']['new_zealand']['name'] = 'New Zealand';
-$_BO['tpl_imgmap']['new_zealand']['file'] = 'maps_oceania/map_new_zealand.png';
-$_BO['tpl_imgmap']['new_zealand']['borders'] = array('maps_oceania/map_new_zealand_borders.png', 60);
-$_BO['tpl_imgmap']['new_zealand']['coord'] = array(-33, 180, -48.15, 160); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['new_zealand']['point_style'] = array(2, 2, 'f008', 0);
+//Oceania (big)
+$_BO['tpl_imgmap']['oceania_big'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['oceania_big']['name'] = 'Oceania (Big)';
+$_BO['tpl_imgmap']['oceania_big']['file'] = 'maps_oceania/map_oceania_big.png';
+$_BO['tpl_imgmap']['oceania_big']['borders'] = array('maps_oceania/map_oceania_big_borders.png', 60);
+$_BO['tpl_imgmap']['oceania_big']['coord'] = array(10, 180, -51.6, 110); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['oceania_big']['cities'][0] = $_BO['points']['whitered1'];
 
 //Oceania (mini)
 $_BO['tpl_imgmap']['oceania_mini'] = $_BO['tpl_imgmap_mini'];
@@ -670,6 +669,58 @@ $_BO['tpl_imgmap']['oceania_mini_stations'] = $_BO['tpl_imgmap_stations_mini'];
 $_BO['tpl_imgmap']['oceania_mini_stations']['name'] = 'Oceania stations (mini)';
 $_BO['tpl_imgmap']['oceania_mini_stations']['file'] = 'maps_oceania/map_oceania_mini_dark.png';
 $_BO['tpl_imgmap']['oceania_mini_stations']['coord'] = array(10, 180, -51.6, 110); //North, East, South, West (Degrees)
+
+//New Zealand
+$_BO['tpl_imgmap']['new_zealand'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['new_zealand']['name'] = 'New Zealand';
+$_BO['tpl_imgmap']['new_zealand']['file'] = 'maps_oceania/map_new_zealand.png';
+$_BO['tpl_imgmap']['new_zealand']['borders'] = array('maps_oceania/map_new_zealand_borders.png', 60);
+$_BO['tpl_imgmap']['new_zealand']['coord'] = array(-33, 180, -48.15, 160); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['new_zealand']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['new_zealand']['cities'][1] = $_BO['points']['whitered1'];
+
+//New Zealand (big)
+$_BO['tpl_imgmap']['new_zealand_big'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['new_zealand_big']['name'] = 'New Zealand (Big)';
+$_BO['tpl_imgmap']['new_zealand_big']['file'] = 'maps_oceania/map_new_zealand_big.png';
+$_BO['tpl_imgmap']['new_zealand_big']['borders'] = array('maps_oceania/map_new_zealand_big_borders.png', 60);
+$_BO['tpl_imgmap']['new_zealand_big']['coord'] = array(-33, 180, -48.15, 160); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['new_zealand_big']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['new_zealand_big']['cities'][1] = $_BO['points']['whitered1'];
+
+//Australia
+$_BO['tpl_imgmap']['australia'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['australia']['name'] = 'Australia';
+$_BO['tpl_imgmap']['australia']['file'] = 'maps_oceania/map_australia.png';
+$_BO['tpl_imgmap']['australia']['borders'] = array('maps_oceania/map_australia_borders.png', 60);
+$_BO['tpl_imgmap']['australia']['coord'] = array(-8, 159, -45, 109); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['australia']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['australia']['cities'][1] = $_BO['points']['whitered1'];
+
+//Australia (Big)
+$_BO['tpl_imgmap']['australia_big'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['australia_big']['name'] = 'Australia (Big)';
+$_BO['tpl_imgmap']['australia_big']['file'] = 'maps_oceania/map_australia_big.png';
+$_BO['tpl_imgmap']['australia_big']['borders'] = array('maps_oceania/map_australia_big_borders.png', 60);
+$_BO['tpl_imgmap']['australia_big']['coord'] = array(-8, 159, -45, 109); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['australia_big']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['australia_big']['cities'][1] = $_BO['points']['whitered1'];
+
+//Indonesia
+$_BO['tpl_imgmap']['indonesia'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['indonesia']['name'] = 'Indonesia';
+$_BO['tpl_imgmap']['indonesia']['file'] = 'maps_oceania/map_indonesia.png';
+$_BO['tpl_imgmap']['indonesia']['borders'] = array('maps_oceania/map_indonesia_borders.png', 60);
+$_BO['tpl_imgmap']['indonesia']['coord'] = array(16, 142, -19, 95); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['indonesia']['cities'][1] = $_BO['points']['whitered1'];
+
+//Indonesia
+$_BO['tpl_imgmap']['indonesia_big'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['indonesia_big']['name'] = 'Indonesia (Big)';
+$_BO['tpl_imgmap']['indonesia_big']['file'] = 'maps_oceania/map_indonesia_big.png';
+$_BO['tpl_imgmap']['indonesia_big']['borders'] = array('maps_oceania/map_indonesia_big_borders.png', 60);
+$_BO['tpl_imgmap']['indonesia_big']['coord'] = array(16, 142, -19, 95); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['indonesia_big']['cities'][1] = $_BO['points']['whitered1'];
 
 
 
@@ -712,24 +763,18 @@ $_BO['tpl_density']['new_zealand']['bps'] 	    = 2; // bytes per area
 
 
 //USA
-//MapTool URL:http://www.blitzortung.org/Webpages/index.php?lang=de&page=3&subpage_3=4&update=1&map_generator_north=55&map_generator_west=-129&map_generator_east=-62&map_generator_south=16&map_generator_projection=M&map_generator_projection=-&map_generator_resolution=l&map_generator_scaling=103&map_generator_min_area=2000&map_generator_shorelines=1%2F0.1p%2F64%2F64%2F64+2%2F0.1p%2F80%2F80%2F80+3%2F0.1p%2F80%2F80%2F80+4%2F0.1p%2F80%2F80%2F80&map_generator_boundaries=a%2F0.1p%2F64%2F64%2F64&map_generator_rivers=-&map_generator_lakes=-&map_generator_dry_area=-&map_generator_wet_area=0%2F128%2F200&map_generator_color_map=-2000+50+150++51+100+++50+150++50%0D%0A100+++60+150++61+200+++60+150++60%0D%0A200+++80+160++80+500+++80+160++80%0D%0A500++110+155++80+1000+110+155++80%0D%0A1000+150+150++80+1500+150+150++80%0D%0A1500+160+140++60+2000+160+140++60%0D%0A2000+170+135++40+2500+170+135++40%0D%0A2500+180+130++30+3000+180+130++30%0D%0A3000+185+125++20+6000+185+125++20%0D%0A&map_generator_azimuth=315&map_generator_normalization=e0.1
-
-$_BO['tpl_imgmap']['usa'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['usa'] = $_BO['tpl_imgmap_default2'];
 $_BO['tpl_imgmap']['usa']['name'] = 'USA';
 $_BO['tpl_imgmap']['usa']['file'] = 'maps_namerica/map_usa.png';
 $_BO['tpl_imgmap']['usa']['borders'] = array('maps_namerica/map_usa_borders.png', 60);
 $_BO['tpl_imgmap']['usa']['coord'] = array(55, -62, 16, -129); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['usa']['point_style'] = array(2, 2, 'f008', 0);
 
 //USA Big
-//MapTool URL: Same as above, with scaling 149
-$_BO['tpl_imgmap']['usa_big'] = $_BO['tpl_imgmap_default'];
-$_BO['tpl_imgmap']['usa_big']['name'] = 'USA';
+$_BO['tpl_imgmap']['usa_big'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['usa_big']['name'] = 'USA (Big)';
 $_BO['tpl_imgmap']['usa_big']['file'] = 'maps_namerica/map_usa_big.png';
 $_BO['tpl_imgmap']['usa_big']['borders'] = array('maps_namerica/map_usa_big_borders.png', 60);
 $_BO['tpl_imgmap']['usa_big']['coord'] = array(55, -62, 16, -129); //North, East, South, West (Degrees)
-$_BO['tpl_imgmap']['usa_big']['point_style'] = array(2, 2, 'f008', 0);
-
 
 //USA (Mini)
 $_BO['tpl_imgmap']['usa_mini'] = $_BO['tpl_imgmap_mini'];
@@ -737,17 +782,13 @@ $_BO['tpl_imgmap']['usa_mini']['name'] = 'USA (mini)';
 $_BO['tpl_imgmap']['usa_mini']['file'] = 'maps_namerica/map_usa_mini.png';
 $_BO['tpl_imgmap']['usa_mini']['coord'] = array(58, -62, 12, -130); //North, East, South, West (Degrees)
 
-
 //North America (black-mini) - with stations
 $_BO['tpl_imgmap']['namerica_mini_stations'] = $_BO['tpl_imgmap_stations_mini'];
 $_BO['tpl_imgmap']['namerica_mini_stations']['name'] = 'North America stations (mini)';
 $_BO['tpl_imgmap']['namerica_mini_stations']['file'] = 'maps_namerica/map_namerica_mini_dark.png';
 $_BO['tpl_imgmap']['namerica_mini_stations']['coord'] = array(57, -55, 8, -135); //North, East, South, West (Degrees)
 
-
-
 //Middle and North America
-//MapTool URL: 
 $_BO['tpl_imgmap']['north_middle_america'] = $_BO['tpl_imgmap_default'];
 $_BO['tpl_imgmap']['north_middle_america']['name'] = 'North/Middle America';
 $_BO['tpl_imgmap']['north_middle_america']['file'] = 'maps_namerica/map_north_middle_america.png';
@@ -756,7 +797,59 @@ $_BO['tpl_imgmap']['north_middle_america']['coord'] = array(62.3, -40, -20, -132
 $_BO['tpl_imgmap']['north_middle_america']['point_style'] = array(2, 2, 'f008', 0);
 $_BO['tpl_imgmap']['north_middle_america']['density_blocksize'] = 2;
 
+//Florida
+$_BO['tpl_imgmap']['florida'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['florida']['name'] = 'Florida';
+$_BO['tpl_imgmap']['florida']['file'] = 'maps_namerica/map_florida.png';
+$_BO['tpl_imgmap']['florida']['borders'] = array('maps_namerica/map_florida_borders.png', 60);
+$_BO['tpl_imgmap']['florida']['coord'] = array(31.5,-79,24.3,-87.8); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['florida']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['florida']['cities'][1] = $_BO['points']['whitered1'];
 
+//Florida Big
+$_BO['tpl_imgmap']['florida_big'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['florida_big']['name'] = 'Florida (Big)';
+$_BO['tpl_imgmap']['florida_big']['file'] = 'maps_namerica/map_florida_big.png';
+$_BO['tpl_imgmap']['florida_big']['borders'] = array('maps_namerica/map_florida_big_borders.png', 60);
+$_BO['tpl_imgmap']['florida_big']['coord'] = array(31.5,-79,24.3,-87.8); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['florida_big']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['florida_big']['cities'][1] = $_BO['points']['whitered1'];
+
+//Texas
+$_BO['tpl_imgmap']['texas'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['texas']['name'] = 'Texas';
+$_BO['tpl_imgmap']['texas']['file'] = 'maps_namerica/map_texas.png';
+$_BO['tpl_imgmap']['texas']['borders'] = array('maps_namerica/map_texas_borders.png', 60);
+$_BO['tpl_imgmap']['texas']['coord'] = array(38,-91,25,-108); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['texas']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['texas']['cities'][1] = $_BO['points']['whitered1'];
+
+//Texas Big
+$_BO['tpl_imgmap']['texas_big'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['texas_big']['name'] = 'Texas (Big)';
+$_BO['tpl_imgmap']['texas_big']['file'] = 'maps_namerica/map_texas_big.png';
+$_BO['tpl_imgmap']['texas_big']['borders'] = array('maps_namerica/map_texas_big_borders.png', 60);
+$_BO['tpl_imgmap']['texas_big']['coord'] = array(38,-91,25,-108); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['texas_big']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['texas_big']['cities'][1] = $_BO['points']['whitered1'];
+
+//Oklahoma, Kansas
+$_BO['tpl_imgmap']['oklahoma_kansas'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['oklahoma_kansas']['name'] = 'Oklahoma & Kansas';
+$_BO['tpl_imgmap']['oklahoma_kansas']['file'] = 'maps_namerica/map_oklahoma_kansas.png';
+$_BO['tpl_imgmap']['oklahoma_kansas']['borders'] = array('maps_namerica/map_oklahoma_kansas_borders.png', 60);
+$_BO['tpl_imgmap']['oklahoma_kansas']['coord'] = array(41,-93.5,33,-103.5); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['oklahoma_kansas']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['oklahoma_kansas']['cities'][1] = $_BO['points']['whitered1'];
+
+//Oklahoma, Kansas - Big
+$_BO['tpl_imgmap']['oklahoma_kansas_big'] = $_BO['tpl_imgmap_default'];
+$_BO['tpl_imgmap']['oklahoma_kansas_big']['name'] = 'Oklahoma & Kansas (big)';
+$_BO['tpl_imgmap']['oklahoma_kansas_big']['file'] = 'maps_namerica/map_oklahoma_kansas_big.png';
+$_BO['tpl_imgmap']['oklahoma_kansas_big']['borders'] = array('maps_namerica/map_oklahoma_kansas_borders_big.png', 60);
+$_BO['tpl_imgmap']['oklahoma_kansas_big']['coord'] = array(41,-93.5,33,-103.5); //North, East, South, West (Degrees)
+$_BO['tpl_imgmap']['oklahoma_kansas_big']['cities'][0] = $_BO['points']['whitered1'];
+$_BO['tpl_imgmap']['oklahoma_kansas_big']['cities'][1] = $_BO['points']['whitered1'];
 
 
 /**************************************/
@@ -782,6 +875,34 @@ $_BO['tpl_density']['usa']['coord'] 	= array(57, -60, 14, -131); //North, East, 
 $_BO['tpl_density']['usa']['length']	= 10; // minimum width (W<->E) AND height (N<->S) of the box (kilometers)
 $_BO['tpl_density']['usa']['bps'] 	    = 2; // bytes per area 
 
+
+
+
+/* ========================================================================= */
+/* ============================= SOUTH AMERICA ============================= */
+/* ========================================================================= */
+
+
+/**************************************/
+/* Image Maps                         */
+/**************************************/
+
+
+//South America
+$_BO['tpl_imgmap']['samerica'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['samerica']['name'] = 'South America';
+$_BO['tpl_imgmap']['samerica']['file'] = 'maps_samerica/map_south_america.png';
+$_BO['tpl_imgmap']['samerica']['borders'] = array('maps_namerica/map_south_america_borders.png', 60);
+$_BO['tpl_imgmap']['samerica']['proj'] = 'miller';
+$_BO['tpl_imgmap']['samerica']['coord'] = array(22, -17, -61, -105); //North, East, South, West (Degrees)
+
+//South America (Big)
+$_BO['tpl_imgmap']['samerica_big'] = $_BO['tpl_imgmap_default2'];
+$_BO['tpl_imgmap']['samerica_big']['name'] = 'South America';
+$_BO['tpl_imgmap']['samerica_big']['file'] = 'maps_samerica/map_south_america_big.png';
+$_BO['tpl_imgmap']['samerica_big']['borders'] = array('maps_namerica/map_south_america_big_borders.png', 60);
+$_BO['tpl_imgmap']['samerica_big']['proj'] = 'miller';
+$_BO['tpl_imgmap']['samerica_big']['coord'] = array(22, -17, -61, -105); //North, East, South, West (Degrees)
 
 
 ?>

@@ -104,10 +104,11 @@ class BoMapProjection
 			default:
 				return bo_latlon2mercator($lat, $lon);
 
+			case 'miller':
+				return bo_latlon2miller($lat, $lon);
 				
 			case 'plate':
 				return array($lon, $lat);
-			
 			
 			//Normalized Geostationary Projection
 			//by EUMETSAT

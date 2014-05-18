@@ -609,7 +609,7 @@ function bo_tile()
 	foreach($c as $i => $rgb)
 		$color[$i] = imagecolorallocate($I, $rgb[0], $rgb[1], $rgb[2]);
 
-	if ($zoom >= BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM) //circle (grows with zoom)
+	if ($zoom >= BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM || $cfg['type'] == 1) //circle (grows with zoom)
 	{
 		$s = BO_MAP_STRIKE_CIRCLE_SIZE + round(pow(2,($zoom-BO_MAP_STRIKE_SHOW_CIRCLE_ZOOM)*BO_MAP_STRIKE_CIRCLE_GROW));
 		$style = 0;

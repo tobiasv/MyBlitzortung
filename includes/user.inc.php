@@ -29,13 +29,23 @@ function bo_user_show_admin()
 			break;
 
 		case 'strike_keys':
+			bo_session_close();
 			echo '<h4>'._BL('Updating database keys...').'</h4>';
 			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
 			bo_db_recreate_strike_keys();
 			echo '</div></pre>';
 			break;
 
+		case 'delete_stations':
+			bo_session_close();
+			echo '<h4>'._BL('Deleting Stations...').'</h4>';
+			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
+			delete_stations(explode(',', $_GET['ids']));
+			echo '</div></pre>';
+			break;
+			
 		case 'delete_old_stations':
+			bo_session_close();
 			echo '<h4>'._BL('Purging deleted/old stations...').'</h4>';
 			echo '<div style="border: 1px solid #999; padding: 10px; font-size:8pt;"><pre>';
 			bo_purge_deleted_stations();
@@ -43,6 +53,7 @@ function bo_user_show_admin()
 			break;
 		
 		case 'delete_duplicates':
+			bo_session_close();
 			echo '<h4>'._BL('Deleting duplicate strokes...').'</h4>';
 			bo_strikes_delete_duplicate();
 			echo '<p>'.$num.' '._BL('strokes deleted').'!</p>';

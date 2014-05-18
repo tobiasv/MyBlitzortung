@@ -317,6 +317,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	{
 		if ( (!(bo_user_get_level() & BO_PERM_NOLIMIT) && $data['only_loggedin'])
 		     || empty($data)
+			 || $data['hidden']
 			)
 			continue;
 		

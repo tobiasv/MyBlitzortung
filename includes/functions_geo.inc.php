@@ -156,6 +156,13 @@ function bo_latlon2mercator($lat, $lon)
 }
 
 
+function bo_latlon2miller($lat, $lon)
+{
+	$lon /= 360;
+	$lat = (5/4)*log(tan(M_PI/4 + 2/5*deg2rad($lat)))/M_PI/2;
+	return array($lon, $lat);
+}
+
 function bo_latlon2geos($lat, $lon, $sub_lon = 0)
 {
 

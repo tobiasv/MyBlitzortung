@@ -167,7 +167,7 @@ function bo_get_current_stationid()
 		//Redirect, so that URL matches to content (for caching!)
 		if (empty($_POST) && !headers_sent())
 		{
-			$url = bo_insert_url('bo_station_id', $station_id, true);
+			$url = bo_insert_url(array('bo_station_id', 'bo_sid'), $station_id, true);
 			header("Location: http://".$_SERVER['HTTP_HOST'].$url);
 			exit;
 		}
@@ -195,7 +195,10 @@ function bo_station_init()
 		$tmp = bo_stations('bo_station_id', $id);
 		
 		//quick&dirty solution :-/
-		$_GET['bo_station_id'] = $tmp[$id]['id'];
+		if ($tmp[$id]['id'])
+			$_GET['bo_station_id'] = $tmp[$id]['id'];
+		else
+			unset($_GET['bo_station_id']);
 	}
 
 }
@@ -204,6 +207,21 @@ function bo_station2boid($station_id)
 {
 	$info = bo_station_info($station_id);
 	return $info['bo_station_id'];
+}
+
+	
+function delete_stations($del = array())
+{
+	//delete the data
+	foreach($del as $id)
+		BoData::delete_all("%#".$id."#%");
+		
+	BoDb::query("DELETE FROM ".BO_DB_PREF."stations_stat    WHERE station_id IN (".implode(',', $del).")", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE station_id IN (".implode(',', $del).")", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."densities        WHERE station_id IN (".implode(',', $del).")", false);
+	BoDb::query("DELETE FROM ".BO_DB_PREF."stations         WHERE         id IN (".implode(',', $del).")", false);
+
+	return count($del);
 }
 
 
@@ -239,16 +257,8 @@ function bo_purge_deleted_stations($max_time = null)
 		return;
 	}
 	
-	//delete the data
-	foreach($del as $id)
-		BoData::delete_all("%#".$id."#%");
-		
-	BoDb::query("DELETE FROM ".BO_DB_PREF."stations_stat    WHERE station_id IN (".implode(',', $del).")", false);
-	BoDb::query("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE station_id IN (".implode(',', $del).")", false);
-	BoDb::query("DELETE FROM ".BO_DB_PREF."densities        WHERE station_id IN (".implode(',', $del).")", false);
-	BoDb::query("DELETE FROM ".BO_DB_PREF."stations         WHERE         id IN (".implode(',', $del).")", false);
-
-	bo_echod("Deleted data of ".count($del)." stations!");
+	$c = delete_stations($del);
+	bo_echod("Deleted data of ".$c." stations!");
 	
 	return;
 }
@@ -273,5 +283,18 @@ function bo_station_data_valid(&$d)
 	
 	return true;
 }			
+
+function bo_stations_json()
+{
+	$S = array();
+	$sql = "SELECT bo_station_id id, lat, lon FROM ".BO_DB_PREF."stations WHERE bo_station_id > 0 AND status > 0 AND lat AND lon AND id < ".intval(BO_DELETED_STATION_MIN_ID);
+	$res = BoDb::query($sql);
+	while($row = $res->fetch_assoc())
+	{
+		$S[$row['id']] = array(round($row['lat'],1), round($row['lon'],1));
+	}
+
+	return json_encode($S);
+}
 
 ?>

@@ -29,7 +29,7 @@ if (!defined("BO_VER"))
 	
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '1.4-dev');
+	define("BO_VER", '1.4-dev2');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -270,11 +270,15 @@ if (!defined("BO_VER"))
 
 		$_BO['mapimg'] = $bo_tmp;
 	}
-
 	
 	if (isset($_GET['kml']))
 	{
 		bo_output_kml();
+		exit;
+	}
+	else if (isset($_GET['stations_json']))
+	{
+		echo bo_stations_json();
 		exit;
 	}
 	

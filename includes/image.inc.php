@@ -280,13 +280,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			}
 			else
 			{
-		
-				if ($cfg['maxrange'])
+				
+				if ($cfg['maxrange'] && $cfg['maxrange'] < 24)
 					$duration = $cfg['maxrange'] * 60;
-				else if (intval(BO_SMAP_MAX_RANGE))
-					$duration = BO_SMAP_MAX_RANGE * 60;
 				else
-					$duration = 24 * 60;
+					$duration = 24 * 60; //1 day is default
 					
 				$time_min = strtotime("$year-$month-$day $hour:$minute:00");
 				$time_max = strtotime("$year-$month-$day $hour:$minute:00 +$duration minutes");

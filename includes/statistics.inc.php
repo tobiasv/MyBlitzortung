@@ -397,7 +397,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 					$text .= ', diameter='.$dim[0].'mm';
 
 				if ($dim[1])
-					$text .= ', windings='.$dim[1].'mm';
+					$text .= ', windings='.$dim[1];
 			
 				break;
 			

@@ -718,6 +718,8 @@ function bo_show_archive_search()
 			var infowindow;
 			var bounds = new google.maps.LatLngBounds();
 			
+			bo_map.setOptions({scrollwheel: true});
+			
 			<?php if ($lat !== false && $lon !== false) { ?>
 			var myLatlng = new google.maps.LatLng(<?php echo  "$lat,$lon" ?>);
 
