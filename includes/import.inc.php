@@ -2527,7 +2527,7 @@ function bo_purge_olddata($force = false)
 			if (defined('BO_PURGE_STRSTA_ALL') && BO_PURGE_STRSTA_ALL)
 			{
 				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_STRSTA_ALL * 3600);
-				$row = BoDb::query("SELECT MAX(id) id FROM ".BO_DB_PREF."strikes WHERE time < '$dtime'")->fetch_assoc();
+				$row = BoDb::query("SELECT id FROM ".BO_DB_PREF."strikes WHERE time=(SELECT MAX(time) id FROM ".BO_DB_PREF."strikes WHERE time < '$dtime')")->fetch_assoc();
 				$strId = $row['id'];
 				$num = BoDb::query("DELETE FROM ".BO_DB_PREF."stations_strikes WHERE strike_id < '$strId'");
 				$num_stastr += $num;
