@@ -72,7 +72,7 @@ function bo_graph_raw()
 			
 			$url = bo_access_url(BO_IMPORT_SERVER_SIGNALS, BO_IMPORT_PATH_SIGNALS);
 			$url .= $boid.'/'.gmdate('Y/m/d/H/i', floor($tstamp/600)*600).'.log';
-			$lines = bo_get_file($url, $code, 'raw_data_other'.$station_id, $dummy1, $dummy2, true);
+			$lines = bo_get_file($url, $code, 'raw_data_other', $dummy1, $dummy2, true);
 
 			if ($caching)
 			{

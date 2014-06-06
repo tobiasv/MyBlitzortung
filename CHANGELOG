@@ -3,11 +3,14 @@
    MyBlitzortung Changelog
 *****************************
 
-Version 1.4-dev (2014-05-01)
-----------------------------
+Version 1.4-dev2 (2014-06-06)
+-----------------------------
 
 - added Twitter alerts
-
+- miller projections
+- several new maps
+- more than one station can be added by defining "BO_SHOW_STATIONS" with a comma sep. list of station-ids
+- fixes
 
 Version 1.3 (2014-05-01)
 ------------------------

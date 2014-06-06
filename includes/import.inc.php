@@ -608,7 +608,8 @@ function bo_update_strikes($force = false, $time_start_import = null)
 		$start_time = time();
 		$stations = bo_stations();
 		$own_id = bo_station_id();
-
+		$own_ids = bo_stations_own();
+		
 		$count_inserted = 0;
 		$count_exists = 0;
 		$old_data = null;
@@ -620,27 +621,22 @@ function bo_update_strikes($force = false, $time_start_import = null)
 		$min_stations_calc = 1000;
 		$max_stations_calc = 0;
 		$timeout = false;
-		$longtime_stations[$own_id] = $own_id;
-		$max_dist_all[$own_id] = 0;
-		$min_dist_all[$own_id] = 9E12;
-		$max_dist_own[$own_id] = 0;
-		$min_dist_own[$own_id] = 9E12;
 		$bo2id = array();
 
 		foreach($stations as $stId => $sdata)
 		{
 			$bo2id[$sdata['bo_station_id']] = $stId;
 
-			if (BO_ENABLE_LONGTIME_ALL === true)
+			if (BO_ENABLE_LONGTIME_ALL === true || isset($own_ids[$sdata['bo_station_id']]))
 			{
-				$longtime_stations[$stId] = $stId;
+				$statistic_stations[$stId] = $stId;
 				$max_dist_all[$stId] = 0;
 				$min_dist_all[$stId] = 9E12;
 				$max_dist_own[$stId] = 0;
 				$min_dist_own[$stId] = 9E12;
 			}
 		}
-
+		
 		//Extra keys for database
 		$keys_enabled = (BO_DB_EXTRA_KEYS === true);
 		$key_bytes_time   = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_TIME_BYTES)   : 0;
@@ -779,11 +775,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			else
 				$error++;
 			
-			$D['status'] = 2; 			//always 2
-			$D['distance'] = bo_latlon2dist($D['lat'], $D['lon']);
-			$D['bearing'] = bo_latlon2bearing($D['lat'], $D['lon']);
-
-
+			$D['status'] = 2; //always 2
 
 			if ($key_bytes_time)
 			{
@@ -795,7 +787,44 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				$D['lat_x'] = array('FLOOR((('.(90+$D['lat']).')%'.$key_lat_div.')/'.$key_lat_div.'*'.$key_latlon_vals.')');
 				$D['lon_x'] = array('FLOOR((('.(180+$D['lon']).')%'.$key_lon_div.')/'.$key_lon_div.'*'.$key_latlon_vals.')');
 			}
+			
+			/********* Statistics **********/
+			foreach($statistic_stations as $stId)
+			{
+				$stLat = $stations[$stId]['lat'];
+				$stLon = $stations[$stId]['lon'];
 
+				if ($stLat == 0.0 && $stLon == 0.0) //station has no position yet
+					continue;
+
+				$dist    = bo_latlon2dist($D['lat'], $D['lon'], $stLat, $stLon);
+				$bear    = bo_latlon2bearing($D['lat'], $D['lon'], $stLat, $stLon);
+				$bear_id = intval($bear);
+				$dist_id = intval($dist / 10 / 1000);
+				$max_dist_all[$stId] = max($dist, $max_dist_all[$stId]);
+				$min_dist_all[$stId] = min($dist, $min_dist_all[$stId]);
+				$bear_data[$stId][$bear_id]++;
+				$dist_data[$stId][$dist_id]++;
+
+				//strike detected by station
+				if (array_search($stations[$stId]['bo_station_id'], $part_stations) !== false)
+				{
+					$bear_data_own[$stId][$bear_id]++;
+					$dist_data_own[$stId][$dist_id]++;
+					$max_dist_own[$stId] = max($dist, $max_dist_own[$stId]);
+					$min_dist_own[$stId] = min($dist, $min_dist_own[$stId]);
+					$strikesperstation[$stId]++;
+				}
+				
+				if ($stId == $own_id)
+				{
+					$D['distance'] = $dist;
+					$D['bearing'] = $bear;
+				}
+
+			}
+
+			
 
 			//auto_increment!!
 			$strike_last_id++;
@@ -805,15 +834,19 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			$id = $strike_last_id;
 			$new_strike = true;
 
-
+			$all_stats = !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true);
+			
 			//Update Strike <-> All Participated Stations
-			if ($id && !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true) )
+			if ($id && ( count($own_ids) > 1 || $all_stats ) )
 			{
 				$sql_data = array();
 				$st_check = array();
 				
 				foreach($part_stations as $bo_station_id)
 				{
+					if (!$all_stats && !$own_ids[$bo_station_id])
+						continue;
+						
 					$stId = $bo2id[$bo_station_id];
 
 					if ($stId && !isset($st_check[$stId]))
@@ -833,69 +866,6 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			$min_stations_calc = min($D['stations_calc'], $min_stations_calc);
 			$max_stations_calc = max($D['stations_calc'], $max_stations_calc);
 			$max_stations = max($max_stations, $D['stations']);
-
-			
-			/********* Statistics **********/
-			
-			// *** Own station *** //
-			$bear_id      = intval($D['bearing']);
-			$dist_id      = intval($D['distance'] / 10 / 1000);
-
-			//All strikes
-			$max_dist_all[$own_id] = max($D['distance'], $max_dist_all[$own_id]);
-			$min_dist_all[$own_id] = min($D['distance'], $min_dist_all[$own_id]);
-
-			//Long-Time Statistics (all strikes relative to own station)
-			$bear_data[$own_id][$bear_id]++;
-			$dist_data[$own_id][$dist_id]++;
-
-			//Own Long-Time Statistics for self-detected strike
-			if ($D['part'])
-			{
-				$bear_data_own[$own_id][$bear_id]++;
-				$dist_data_own[$own_id][$dist_id]++;
-				$max_dist_own[$own_id] = max($D['distance'], $max_dist_own[$own_id]);
-				$min_dist_own[$own_id] = min($D['distance'], $min_dist_own[$own_id]);
-				$last_strikes[$own_id] = array($utime, $D['time_ns'], $id);
-				$strikesperstation[$own_id]++;
-			}
-
-
-			// *** other stations *** //
-			if (BO_ENABLE_LONGTIME_ALL === true)
-			{
-				foreach($stations as $stId => $sdata)
-				{
-					$stLat = $sdata['lat'];
-					$stLon = $sdata['lon'];
-
-					if ($stLat == 0.0 && $stLon == 0.0) //station has no position yet
-						continue;
-
-					$dist_other    = bo_latlon2dist($D['lat'], $D['lon'], $stLat, $stLon);
-					$bear_other    = bo_latlon2bearing($D['lat'], $D['lon'], $stLat, $stLon);
-					$bear_id_other = intval($bear_other);
-					$dist_id_other = intval($dist_other / 10 / 1000);
-					$max_dist_all[$stId] = max($dist_other, $max_dist_all[$stId]);
-					$min_dist_all[$stId] = min($dist_other, $min_dist_all[$stId]);
-					$bear_data[$stId][$bear_id_other]++;
-					$dist_data[$stId][$dist_id_other]++;
-
-
-					//strike detected by station
-					if (array_search($sdata['bo_station_id'], $part_stations) !== false)
-					{
-						$bear_data_own[$stId][$bear_id_other]++;
-						$dist_data_own[$stId][$dist_id_other]++;
-						$max_dist_own[$stId] = max($dist_other, $max_dist_own[$stId]);
-						$min_dist_own[$stId] = min($dist_other, $min_dist_own[$stId]);
-						$strikesperstation[$stId]++;
-					}
-				}
-
-
-
-			}
 
 			//Timeout
 			if (bo_exit_on_timeout())
@@ -917,8 +887,6 @@ function bo_update_strikes($force = false, $time_start_import = null)
 		//Insert rest of data
 		BoDb::bulk_insert('strikes');
 		BoDb::bulk_insert('stations_strikes');
-			
-
 
 
 		//General
@@ -984,12 +952,11 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				BoData::set('longtime_min_dist_own'.$add, $min_dist_own[$stId]);
 				BoData::set('longtime_min_dist_own_time'.$add, time());
 			}
-
 		}
-
+		
 
 		//Update Longtime statistics per station for all strikes
-		foreach($longtime_stations as $stId)
+		foreach($statistic_stations as $stId)
 		{
 			//update only if station is active or got some strikes during the update
 			if (bo_status($stations[$stId]['status'], STATUS_RUNNING) || $strikesperstation[$stId])
@@ -1609,7 +1576,10 @@ function bo_update_stations($force = false)
 		$datetime_back = gmdate('Y-m-d H:i:s', $time - 3600);
 
 		$only_own = false;
-		if ((defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true))
+		$own_stations = bo_stations_own();
+		$from_all_stations = !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true);
+		
+		if ($from_all_stations && count($own_stations) <= 1)
 		{
 			$only_own = bo_station_id();
 			$sql = "SELECT $only_own sid, COUNT(*) cnt
@@ -1627,7 +1597,7 @@ function bo_update_stations($force = false)
 			
 			if ($res === false)
 			{
-				bo_echod("ERROR on query for station count! You have to set SQL_BIG_SELECTS in your MySQL Database or set BO_STATION_STAT_DISABLE to true (recommened!");
+				bo_echod("ERROR on query for station count! You have to set SQL_BIG_SELECTS in your MySQL Database or set BO_STATION_STAT_DISABLE to true (recommended)!");
 			}
 		}
 		
@@ -1652,10 +1622,12 @@ function bo_update_stations($force = false)
 			
 			if (!$id)
 				continue;
-				
-			if ($only_own && $only_own != $id)
+			else if ($only_own && $only_own != $id)
 				continue;
-
+			else if (!$from_all_stations && !$own_stations[$boid])
+				continue;
+				
+			
 			if ($data['sig'] || $data['strikes'])
 			{
 				$sql_data['station_id'] = $id;
@@ -1745,14 +1717,15 @@ function bo_update_stations($force = false)
 		{
 			$longtime_stations = $id2bo;
 		}
-		else
-			$longtime_stations[$own_id] = $id2bo[$own_id];
-
+		else 
+		{
+			$longtime_stations = array_flip($own_stations);
+		}
+		
 		foreach($longtime_stations as $stId => $boid)
 		{
 			$add = $stId == $own_id ? '' : '#'.$stId.'#';
 
-	
 			//whole signals count (not exact)
 			if ($last > 0 && $StData[$boid]['sig'])
 				BoData::update_add('count_raw_signals2'.$add, $StData[$boid]['sig']*($time-$last)/3600);

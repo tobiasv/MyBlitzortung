@@ -400,7 +400,10 @@ function bo_signal_info_list()
 
 function bo_get_stations_html_select($station_id)
 {
-	$opts = bo_get_station_list($style_class);
+	if (count(bo_stations_own()) > 1)
+		$only_own = true;
+		
+	$opts = bo_get_station_list($style_class, $only_own);
 	
 	$text = '<select name="bo_station_id" onchange="document.cookie=\'bo_select_stationid=\'+this.value+\';\';submit();">';
 	$text .= '<option></option>';

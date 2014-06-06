@@ -134,7 +134,7 @@ function bo_show_statistics()
 		$add_stid = '';
 	}
 
-	if (!($station_id == bo_station_id() || BO_ENABLE_LONGTIME_ALL === true) && $show == 'longtime')
+	if (!($station_id == bo_station_id() || BO_ENABLE_LONGTIME_ALL === true || (defined('BO_SHOW_STATIONS') && BO_SHOW_STATIONS)) && $show == 'longtime')
 		$show = 'station';
 
 	
@@ -146,7 +146,7 @@ function bo_show_statistics()
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'station').$add_stid.'" class="bo_navi'.($show == 'station' ? '_active' : '').'">'._BL('stat_navi_station').'</a></li>';
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'network').$add_stid.'" class="bo_navi'.($show == 'network' ? '_active' : '').'">'._BL('stat_navi_network').'</a></li>';
 
-	if ($station_id == bo_station_id() || BO_ENABLE_LONGTIME_ALL === true)
+	if ($station_id == bo_station_id() || BO_ENABLE_LONGTIME_ALL === true || (defined('BO_SHOW_STATIONS') && BO_SHOW_STATIONS))
 		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'longtime').$add_stid.'" class="bo_navi'.($show == 'longtime' ? '_active' : '').'">'._BL('stat_navi_longtime').'</a></li>';
 
 	echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'other').$add_stid.'" class="bo_navi'.($show == 'other' ? '_active' : '').'">'._BL('stat_navi_other').'</a></li>';
@@ -156,7 +156,7 @@ function bo_show_statistics()
 
 	bo_title(_BL('stat_navi_'.$show));
 	
-	if (bo_station_id() < 0)
+	if (bo_station_id() < 0 && $show != 'other')
 	{
 		echo '<div id="bo_stat_station_select">';
 		echo '<fieldset>';

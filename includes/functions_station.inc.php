@@ -2,7 +2,7 @@
 
 
 // returns array of all stations with index from database column
-function bo_stations($index = 'id', $only = '', $under_constr = true)
+function bo_stations($index = 'id', $only = '', $only_own = false)
 {
 	$S = array();
 
@@ -11,10 +11,13 @@ function bo_stations($index = 'id', $only = '', $under_constr = true)
 	if ($only)
 		$sql .= " AND $index='".BoDb::esc($only)."' ";
 
-	if (!$under_constr)
-		$sql .= " AND last_time != '1970-01-01 00:00:00' AND status != 0 ";
-
-	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND bo_station_id > 0 AND id < ".intval(BO_DELETED_STATION_MIN_ID);
+	if ($only_own)
+	{
+		$sql .= " AND id IN ( ".implode(',', bo_stations_own())." ) ";
+	}
+		
+	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND bo_station_id > 0 
+			AND id < ".intval(BO_DELETED_STATION_MIN_ID);
 	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 		$S[$row[$index]] = $row;
@@ -56,6 +59,26 @@ function bo_station_id($ret_bo = false)
 	}	
 	
 	return $id;
+}
+
+//return stations to show
+function bo_stations_own()
+{
+	static $ids = null;
+	
+	if (is_array($ids))
+		return $ids;
+	
+	$ids = array();
+	$res = BoDb::query("SELECT id, bo_station_id FROM ".BO_DB_PREF."stations WHERE bo_station_id IN (".BO_SHOW_STATIONS.")");
+	
+	while ($row = $res->fetch_assoc())
+		$ids[ $row['bo_station_id'] ] = $row['id'];
+	
+	if (!count($ids))
+		$ids[] = bo_station_id();
+	
+	return $ids;
 }
 
 //returns your station name
@@ -123,9 +146,9 @@ function bo_get_old_status($status)
 		return '-';
 }
 
-function bo_get_station_list(&$style_class = array())
+function bo_get_station_list(&$style_class = array(), $only_own = false)
 {
-	$stations = bo_stations('id', '', false);
+	$stations = bo_stations('id', '', $only_own);
 	$opts = array();
 	foreach($stations as $id => $d)
 	{

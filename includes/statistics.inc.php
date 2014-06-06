@@ -1664,7 +1664,7 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	
 	$last_str = BoData::get('uptime_strikes');
 	$last_net = BoData::get('uptime_stations');
-	$last_sig = BoData::get('uptime_raw');
+	//$last_sig = BoData::get('uptime_raw');
 
 	$mem_all = (array_sum($D['data']) + array_sum($D['keys'])) / 1024 / 1024;
 	$mem_keys = array_sum($D['keys']) / (array_sum($D['data']) + array_sum($D['keys'])) * 100;
@@ -1692,6 +1692,7 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 					.' ('._BL('update every').' '.intval(BO_UP_INTVL_STATIONS).' '._BL('unit_minutes').')'
 				.'</span>';
 
+	/*
 	if (BO_UP_INTVL_RAW > 0)
 	{
 		echo '<li><span class="bo_descr">'
@@ -1700,8 +1701,9 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 						.' ('._BL('update every').' '.intval(BO_UP_INTVL_RAW).' '._BL('unit_minutes').')'
 						.'</span>';
 	}
+	*/
 
-	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'._BN($kb_today, 0).' kB ('._BL('Today').')</span>';
+	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'._BN($kb_today/1024, 1).' MB ('._BL('Today').')</span>';
 
 	echo '</ul>';
 

@@ -1261,15 +1261,17 @@
 //causes a LOT OF more load during importing
 @define('BO_ENABLE_LONGTIME_ALL', false);
 
-//don't use a default (your) station
-//makes sense when you use another region than yours
+//don't use your station as default station
 //you may set the following settings
 //  BO_LAT/BO_LON to a custom location
-//  BO_UP_INTVL_RAW -> 0
 //  BO_ENABLE_LONGTIME_ALL -> true
 //  BO_MAX_ZOOM_IN -> 8
 //  BO_RADIUS -> 0
 @define('BO_NO_DEFAULT_STATION', false);
+
+//if you want to show more than one station, then you can enter 
+//a comma separated list here, i.e. '1,2,3'
+@define('BO_SHOW_STATIONS', '');
 
 //argument that specifies language
 @define('BO_LANG_ARGUMENT', 'bo_lang');

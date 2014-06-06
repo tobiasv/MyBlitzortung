@@ -425,7 +425,7 @@ function bo_show_archive_density()
 	$row = BoDb::query("SELECT COUNT(*) cnt FROM ".BO_DB_PREF."densities WHERE status=5")->fetch_assoc();
 	$show_whole_timerange = $row['cnt'] ? true : false;
 	
-	$station_infos = bo_stations('id', '', false);
+	$station_infos = bo_stations('id');
 	$station_infos[0]['city'] = _BL('All', false);
 
 	$stations = bo_get_density_stations();
@@ -1322,7 +1322,7 @@ function bo_get_density_image()
 
 function bo_get_density_stations()
 {
-	$station_infos = bo_stations('id', '', false);
+	$station_infos = bo_stations('id');
 	$stations = array();
 	$stations[0] = 0;
 	$stations[-1] = -1;
