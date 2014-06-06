@@ -213,8 +213,8 @@ class BoSignalGraph
 			if ($this->fullscale)
 			{
 				$max = 0;
-				$max = max($max, max($c[0]['data_volt']), max($c[1]['data_volt']), abs(min($c[0]['data_volt'])), abs(min($c[1]['data_volt'])));
-				$max = max($max, max($c[3]['data_volt']), max($c[4]['data_volt']), abs(min($c[3]['data_volt'])), abs(min($c[4]['data_volt'])));
+				$max = max($max, @max($c[0]['data_volt']), @max($c[1]['data_volt']), abs(@min($c[0]['data_volt'])), abs(@min($c[1]['data_volt'])));
+				$max = max($max, @max($c[3]['data_volt']), @max($c[4]['data_volt']), abs(@min($c[3]['data_volt'])), abs(@min($c[4]['data_volt'])));
 
 				$xmax = $ymax = $max;
 				$xmin = $ymin = -$max;

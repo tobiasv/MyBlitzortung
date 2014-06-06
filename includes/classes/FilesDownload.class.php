@@ -48,9 +48,9 @@ class FilesDownload
 
 		if ($this->LastTime > time() || $this->LastTime <= 0)
 			$this->LastTime = time() - $default_range*60;
-		
+
 		//time of data is newer than filetime? --> use time of data
-		if (floor($last_time/60/$min_step)*60*$min_step > floor($this->LastTime/60/$min_step)*60*$min_step)
+		if (floor($last_time/60/$min_step) > floor($this->LastTime/60/$min_step))
 		{
 			$this->LastTime = $last_time;
 		}

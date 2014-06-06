@@ -1579,7 +1579,7 @@ function bo_update_stations($force = false)
 		$own_stations = bo_stations_own();
 		$from_all_stations = !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true);
 		
-		if ($from_all_stations && count($own_stations) <= 1)
+		if ($from_all_stations && count($own_stations) == 1)
 		{
 			$only_own = bo_station_id();
 			$sql = "SELECT $only_own sid, COUNT(*) cnt
@@ -2627,10 +2627,10 @@ function bo_update_get_timeout()
 	$exec_timeout = intval(ini_get('max_execution_time'));
 	$max_time = $exec_timeout - 10;
 
-	if ($debug)
+	if ($debug || !$exec_timeout)
 		$max_time = 300;
 	else if ($max_time < 20)  //give it a try
-		$max_time = 50;
+		$max_time = 45;
 	else
 		$max_time = $overall_timeout;
 
@@ -2705,6 +2705,9 @@ function bo_download_external($force = false)
 
 			}
 			clearstatcache();
+			
+			if (!$d['time_floor'])
+				$d['time_floor'] = 1;
 			
 			//Replace date/time modifiers of the remote url/file
 			$d['url'] = bo_insert_date_string($d['url'], floor((time()+$d['time_add_remote']*60)/$d['time_floor']/60) * $d['time_floor']*60);

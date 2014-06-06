@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}conf` (
   `data` longtext NOT NULL,
   `changed` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}raw` (
   `id` int(11) unsigned NOT NULL auto_increment,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}raw` (
   PRIMARY KEY  (`id`),
   KEY `strike_id` (`strike_id`),
   KEY `time` (`time`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+)  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (
   `id` smallint(5) unsigned NOT NULL auto_increment,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations` (
   KEY `first_seen` (`first_seen`),
   KEY `status` (`status`),
   KEY `show_mybo` (`show_mybo`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations_stat` (
   `station_id` smallint(11) unsigned NOT NULL,
@@ -71,14 +71,14 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations_stat` (
   KEY `time` (`time`),
   KEY `station_id` (`station_id`),
   KEY `stations_time` (`station_id`, `time`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}stations_strikes` (
   `strike_id` int(11) unsigned NOT NULL,
   `station_id` smallint(9) unsigned NOT NULL,
   UNIQUE KEY `strike_id_3` (`strike_id`,`station_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}strikes` (
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}strikes` (
   KEY `part` (`part`),
   KEY `raw_id` (`raw_id`),
   KEY `time` (`time`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+)  DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}user` (
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}user` (
   `mail` varchar(100) NOT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `login` (`login`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+)  DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}densities` (
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}densities` (
   KEY `status_station` (`status`,`station_id`),
   KEY `date_station_position` (`date_start`, `date_end`, `station_id`, `lat_min`, `lon_min`, `lat_max`, `lon_max`),
   KEY `date_end` (`date_end`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+)  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}cities` (
   `id` int(11) unsigned NOT NULL auto_increment,
@@ -150,4 +150,4 @@ CREATE TABLE IF NOT EXISTS `{BO_DB_PREF}cities` (
   `type` tinyint(4) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `latlon` (`lat`,`lon`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+)  DEFAULT CHARSET=utf8;

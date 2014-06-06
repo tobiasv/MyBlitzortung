@@ -13,7 +13,10 @@ function bo_stations($index = 'id', $only = '', $only_own = false)
 
 	if ($only_own)
 	{
-		$sql .= " AND id IN ( ".implode(',', bo_stations_own())." ) ";
+		$own = bo_stations_own();
+		
+		if (!empty($own))
+			$sql .= " AND id IN (".implode(',', $own)." ) ";
 	}
 		
 	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND bo_station_id > 0 
@@ -65,6 +68,9 @@ function bo_station_id($ret_bo = false)
 function bo_stations_own()
 {
 	static $ids = null;
+
+	if (!defined("BO_SHOW_STATIONS") || !(int)BO_SHOW_STATIONS)
+		return array();
 	
 	if (is_array($ids))
 		return $ids;

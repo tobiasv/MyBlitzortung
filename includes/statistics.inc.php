@@ -1486,12 +1486,11 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	$download_stat      = unserialize(BoData::get('download_statistics'));
 
 	$kb_per_day = array();
-	$kb_today = 0;
 	$kb_traffic = 0;
 	foreach($download_stat as $type => $d)
 	{
 		$kb_traffic += $d['traffic'] / 1024;
-		$kb_today += $d['traffic_today']  / 1024;
+		
 		if ($d['time_first'])
 		{
 			$kb_per_day[$type] = $d['traffic']  / 1024 / (time() - $d['time_first']) * 3600 * 24;
@@ -1601,7 +1600,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	echo '<ul class="bo_stat_overview">';
 	echo '<li><span class="bo_descr">'._BL('First data').': </span><span class="bo_value">'._BDT($first_update).'</span>';
 	echo '<li><span class="bo_descr">'._BL('Lightning data imports').': </span><span class="bo_value">'._BN($download_count, 0).'</span>';
-	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'._BN(array_sum($kb_per_day), 0).' kB/'._BL('day').'</span>';
+	echo '<li><span class="bo_descr">'._BL('Traffic to Blitzortung.org').': </span><span class="bo_value">'._BN(array_sum($kb_per_day)/1024, 1).' MB/'._BL('day').'</span>';
 
 	//print detailed stat
 	if (bo_user_get_level() & BO_PERM_NOLIMIT)
@@ -1617,11 +1616,11 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 				
 			unset($kb_per_day[$type]);
 
-			echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL($name).': </span><span class="bo_value">'._BN($kb_per_day_single, 0).' kB/'._BL('day').'</span>';
+			echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL($name).': </span><span class="bo_value">'._BN($kb_per_day_single/1024, 1).' MB/'._BL('day').'</span>';
 		}
 
 		//echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Other').': </span><span class="bo_value">'._BN(array_sum($kb_per_day), 0).' kB/'._BL('day').'</span>';
-		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Total').': </span><span class="bo_value">'._BN($kb_traffic, 0).' kB</span>';
+		echo '<li><span class="bo_descr">'._BL('Traffic').' - '._BL('Total').': </span><span class="bo_value">'._BN($kb_traffic/1024, 0).' MB</span>';
 
 	}
 
@@ -1673,8 +1672,11 @@ function bo_show_statistics_other($station_id = 0, $own_station = true, $add_gra
 	$download_stat      = unserialize(BoData::get('download_statistics'));
 	$kb_today = 0;
 	foreach($download_stat as $type => $d)
-		$kb_today += $d['traffic_today']  / 1024;
-
+	{
+		if ($d['traffic_today_date'] == date('Ymd'))
+			$kb_today += $d['traffic_today']  / 1024;
+	}
+	
 	echo '<h4>'._BL('h4_stat_other_updates').'</h4>';
 	echo '<p class="bo_stat_description" id="bo_stat_other_descr_updates">';
 	echo _BL('bo_stat_other_updates_descr');

@@ -733,7 +733,8 @@ function bo_error_handler($errno, $errstr, $errfile, $errline)
 	//$text .= "[$errno]\t";
 	$text .= " *** $errstr *** \t";
 	$text .= "MB: ".BO_VER."\t";
-	$text .= "PHP ".PHP_VERSION." (".PHP_OS.")";
+	$text .= "PHP ".PHP_VERSION." (".PHP_OS.")\t";
+	$text .= "URL: ".$_SERVER['REQUEST_URI'];
 	$text .= "\n";
 	
 	$date = gmdate('Y-m-d H:i:s');

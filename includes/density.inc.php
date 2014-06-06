@@ -1359,7 +1359,7 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 	 *  -3 => 4 = Current year
 	 *  -4 => 5 = Whole time range
 	 */
-	 
+	
 	 
 	//Min/Max strike times
 	$row = BoDb::query("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
@@ -1367,6 +1367,9 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 	$max_strike_time = strtotime($row['maxtime'].' UTC');
 	
 	$ranges = array();
+	
+	if (!$min_strike_time)
+		return array();
 	
 	if ($year || $month) //create individual ranges
 	{
@@ -1473,11 +1476,15 @@ function bo_get_new_density_ranges($year = 0, $month = 0)
 				if ($cnt)
 					bo_echod("Deleted $cnt density entries from database!");
 			}
+			
+			//delete old intermediate yearly data, when it's not end of the year
+			//start: xxxx-01-01 
+			//end: from xxxx-02 to xxxx-11
 
 		}
 	}
 	
-	//when end-date is bigger that max_strike time
+	//when end-date is bigger than max_strike time
 	foreach($ranges as $id => $r)
 	{
 		if ($r[1] > $max_strike_time || $r[1] < $min_strike_time || $r[1] - $r[2] < 3600 * 22) 
