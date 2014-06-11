@@ -894,8 +894,8 @@ $_BL['fr']['Start'] = 'Accueil';
 $_BL['fr']['No log entries'] = 'Pas de log';
 $_BL['fr']['alert_twitter'] = 'Alerte Twitter';
 $_BL['fr']['Twitter'] = 'Twitter';
-$_BL['fr']['Instructions for Twitter'] = 'Instruction pour Twitter';
-$_BL['fr']['twitter_instructions'] = 'Entrez votre nom d\'utilisateur Twitter,les alertes seront envoyées comme des messages,les applications smartphones vous enverrons une notification push.Remarques:Vous devez suivre <em> <a href="https://twitter.com/{TWITTER}" target="_blank"> {TWITTER} </ a> </ em>!';
+$_BL['fr']['Instructions for Twitter'] = 'Instructions pour Twitter';
+$_BL['fr']['twitter_instructions'] = 'Entrez votre nom d\'utilisateur Twitter,les alertes seront envoyées comme des messages,les applications smartphones vous enverront une notification push.Remarques:vous devez suivre <em> <a href="https://twitter.com/{TWITTER}" target="_blank"> {TWITTER} </ a> </ em>!';
 
 
 /*************************************************************/
