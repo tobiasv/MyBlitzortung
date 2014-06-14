@@ -175,6 +175,9 @@
 //otherwise an extra map for each language will be generated and saved in cache!
 @define('BO_FORCE_MAP_LANG', true);
 
+//same as above for graphs
+@define('BO_FORCE_GRAPH_LANG', false);
+
 //translate single words that which are longer than given length
 @define('BO_TRANSLATE_SINGLE_WORDS', 0);
 

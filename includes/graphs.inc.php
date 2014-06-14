@@ -9,6 +9,10 @@ function bo_graph_raw()
 
 	bo_session_close();
 
+	if (BO_FORCE_GRAPH_LANG)
+		bo_load_locale(BO_LOCALE);
+
+	
 	$type = null;
 	if (isset($_GET['bo_spectrum']))
 		$type = 'spectrum';
@@ -235,7 +239,7 @@ function bo_graph_statistics()
 
 	$date_end = gmdate('Y-m-d H:i:s', BoData::get('uptime_stations'));
 	$time_end = strtotime($date_end." UTC");
-	$date_start = gmdate('Y-m-d H:i:s', time() - 3600 * $hours_back);
+	$date_start = gmdate('Y-m-d H:i:s', floor((time() - 3600 * $hours_back)/120)*120);
 	$time_start = strtotime($date_start." UTC");
 
 	//Station ($station_id == 0 --> Own station)
