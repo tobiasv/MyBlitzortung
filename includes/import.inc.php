@@ -609,7 +609,6 @@ function bo_update_strikes($force = false, $time_start_import = null)
 		$stations = bo_stations();
 		$own_id = bo_station_id();
 		$own_ids = bo_stations_own();
-		
 		$count_inserted = 0;
 		$count_exists = 0;
 		$old_data = null;

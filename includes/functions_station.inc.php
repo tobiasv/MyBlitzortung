@@ -70,7 +70,7 @@ function bo_stations_own()
 	static $ids = null;
 
 	if (!defined("BO_SHOW_STATIONS") || !(int)BO_SHOW_STATIONS)
-		return array(bo_station_id());
+		return array(bo_station_id(true) => bo_station_id());
 	
 	if (is_array($ids))
 		return $ids;
@@ -82,7 +82,7 @@ function bo_stations_own()
 		$ids[ $row['bo_station_id'] ] = $row['id'];
 	
 	if (!count($ids))
-		$ids[] = bo_station_id();
+		$ids[bo_station_id(true)] = bo_station_id();
 	
 	return $ids;
 }
