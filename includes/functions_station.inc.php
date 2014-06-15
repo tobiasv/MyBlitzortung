@@ -70,7 +70,7 @@ function bo_stations_own()
 	static $ids = null;
 
 	if (!defined("BO_SHOW_STATIONS") || !(int)BO_SHOW_STATIONS)
-		return array();
+		return array(bo_station_id());
 	
 	if (is_array($ids))
 		return $ids;

@@ -29,7 +29,7 @@ if (!defined("BO_VER"))
 	
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '1.4-dev2');
+	define("BO_VER", '1.4-dev3');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -308,6 +308,7 @@ if (!defined("BO_VER"))
 	if ($bo_redir_lang)
 	{
 		$url = bo_insert_url(BO_LANG_ARGUMENT, $bo_redir_lang, true);
+		header("X-Accel-Expires: 0");
 		header("Location: http://".$_SERVER['HTTP_HOST'].$url);
 		exit;
 	}
