@@ -662,6 +662,7 @@ $_BL['fr']['Update only densities'] = 'Maj des densités';
 $_BL['fr']['Update only tracks'] = 'Maj uniquement pour les pistes';
 $_BL['fr']['Force data purge only'] = 'Forcer la purge des données';
 $_BL['fr']['Check alerts only'] = 'Vérifier les alertes';
+$_BL['fr']['Delete old stations'] = 'Effacer les stations anciennes';
 
 $_BL['fr']['user_perm0'] = 'Administration';
 $_BL['fr']['user_perm1'] = 'Autres réglages';
@@ -891,6 +892,10 @@ $_BL['fr']['For usage with "URL"'] = 'À utiliser avec "URL"';
 $_BL['fr']['To'] = 'Délivré à';
 $_BL['fr']['Start'] = 'Accueil';
 $_BL['fr']['No log entries'] = 'Pas de log';
+$_BL['fr']['alert_twitter'] = 'Alerte Twitter';
+$_BL['fr']['Twitter'] = 'Twitter';
+$_BL['fr']['Instructions for Twitter'] = 'Instructions pour Twitter';
+$_BL['fr']['twitter_instructions'] = 'Entrez votre nom d\'utilisateur Twitter,les alertes seront envoyées comme des messages,les applications smartphones vous enverront une notification push.Remarques:vous devez suivre <em> <a href="https://twitter.com/{TWITTER}" target="_blank"> {TWITTER} </ a> </ em>!';
 
 
 /*************************************************************/
