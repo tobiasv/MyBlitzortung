@@ -609,6 +609,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 		$stations = bo_stations();
 		$own_id = bo_station_id();
 		$own_ids = bo_stations_own();
+		
 		$count_inserted = 0;
 		$count_exists = 0;
 		$old_data = null;
@@ -1581,7 +1582,7 @@ function bo_update_stations($force = false)
 		if ($from_all_stations && count($own_stations) == 1)
 		{
 			$only_own = bo_station_id();
-			echo $sql = "SELECT $only_own sid, COUNT(*) cnt
+			$sql = "SELECT $only_own sid, COUNT(*) cnt
 					FROM ".BO_DB_PREF."strikes
 					WHERE time > '$datetime_back' AND part > 0";
 			$res = BoDb::query($sql);
