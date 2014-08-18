@@ -728,9 +728,19 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				$D['lat'] = $r[1];
 				$D['lon'] = $r[2];
 				$D['alt'] = $r[3];
+				
+				if ($D['lat'] == 0 && $D['lon'] == 0)
+				{
+					bo_echod("  Text: \"$l\" --> Error: lat/lon = 0.0 not allowed!");
+					continue;
+				}
 			}
 			else
+			{
+				bo_echod("  Text: \"$l\" --> Error: No position found. Continue...");
 				$error++;
+				continue;
+			}
 			
 			//Current
 			if (preg_match('/str;([0-9\.]+)/', $l, $r))
@@ -879,7 +889,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 		if ($Files->LastMessage)
 			bo_echod("  ".$Files->LastMessage);
 
-		bo_echod("Lines: ".$Files->NumLines." *** Size: ".round($Files->NumBytes/1024)."kB *** New Strikes: $count_inserted");
+		bo_echod("Lines: ".$Files->NumLines." *** Size: ".round($Files->NumBytes/1024)."kB *** New Strikes: $count_inserted *** Errors: $error");
 
 		$modified = $Files->NewModified;
 		$Files->Close();		
@@ -2627,7 +2637,7 @@ function bo_update_get_timeout()
 	$exec_timeout = intval(ini_get('max_execution_time'));
 	$max_time = $exec_timeout - 10;
 
-	if ($debug || !$exec_timeout)
+	if (!$exec_timeout)
 		$max_time = 300;
 	else if ($max_time < 20)  //give it a try
 		$max_time = 45;

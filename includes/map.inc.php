@@ -271,10 +271,12 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		
 		if ($row['status'] != '-' && $row['lat'] && $row['lon'])
 		{
-			$round = (bo_user_get_level() & BO_PERM_SETTINGS) ? 8 : 1;
+			
+			$pos = bo_round_station_pos($row['lat'], $row['lon']);
+			
 			$js_stations .= $js_stations ? ",\n" : '';
 			$js_stations .= '{';
-			$js_stations .= 'stid:'.$row['id'].', lat:'.round($row['lat'],$round).', lon:'.round($row['lon'], $round).', city:"'._BC($row['city']).'"';
+			$js_stations .= 'stid:'.$row['id'].', lat:'.$pos[0].', lon:'.$pos[1].', city:"'._BC($row['city']).'"';
 			$js_stations .= ', status:"'.$row['status'].'"';
 			$js_stations .= ', text:"';
 			
@@ -1564,7 +1566,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 	
 	<?php
 
-	bo_insert_map(3, $lat, $lon, $zoom);
+	bo_insert_map(3, $lat, $lon, $zoom, BO_DEFAULT_MAP, true);
 }
 
 

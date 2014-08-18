@@ -602,9 +602,9 @@ function bo_alert_send()
 										_BL('alert_mail_first_strike', true).': '.date('H:i:s', strtotime($row2['mintime'].' UTC'))."\n".
 										_BL('alert_mail_last_strike', true).': '.date('H:i:s', strtotime($row2['maxtime'].' UTC'))."\n\n";
 								
+								$text .= "\n\n--\n".$d['name']." / ".$d['address']."/ $user_id";
+								
 								$text = preg_replace("#(?<!\r)\n#si", "\r\n", $text); 								
-								
-								
 								
 								$ret = bo_mail($d['address'], 
 											_BL('Strikes detected', true).' ('.$d['name'].')', 
@@ -629,9 +629,9 @@ function bo_alert_send()
 									$log[$alert_dbname]['text']   = $text;
 									
 									$url = strtr(BO_SMS_GATEWAY_URL, array(
-										'{text}' 	=> urlencode($text), 
-										'{tel}' 	=> urlencode($d['address']), 
-										'{userid}' 	=> urlencode($user_id))
+										'{text}' 	=> rawurlencode($text), 
+										'{tel}' 	=> rawurlencode($d['address']), 
+										'{userid}' 	=> rawurlencode($user_id))
 										);
 									
 									$ret = bo_get_file($url);
@@ -642,7 +642,7 @@ function bo_alert_send()
 							case 3: //URL
 								
 								foreach ($replace as $key => $val)
-									$replace[$key] = urlencode($val);
+									$replace[$key] = rawurlencode($val);
 								
 								$url = strtr($d['address'], $replace);
 								$ret = bo_get_file($url);

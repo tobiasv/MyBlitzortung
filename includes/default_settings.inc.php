@@ -146,7 +146,7 @@
 @define('BO_UP_INTVL_RAW', 0);
 
 //min interval of external downloads
-@define('BO_UP_INTVL_DOWNLOADS', 5);
+@define('BO_UP_INTVL_DOWNLOADS', 1);
 
 
 /*******************************************************************/
@@ -397,7 +397,7 @@
 
 
 // Mark stations as not available when no signals have been sent
-@define('BO_STATION_INACTIVE_DAYS', 30);
+@define('BO_STATION_INACTIVE_DAYS', 7);
 
 
 // Show new stations

@@ -146,6 +146,10 @@ function bo_lang_arg($type = false)
 	return '&'.BO_LANG_ARGUMENT.'='._BL();
 }
 
+function _BL8($msgid=null)
+{
+	return _BL($msgid, false, true);
+}
 
 // translate text
 function _BL($msgid=null, $noutf = false, $utf_in = false)

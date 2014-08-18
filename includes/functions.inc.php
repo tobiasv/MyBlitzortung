@@ -19,6 +19,9 @@ function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 			|| $name == BO_LANG_ARGUMENT)
 			continue;
 
+		if ($name == 'bo_page' && !$val)
+			continue;
+			
 		$query .= urlencode($name).(strlen($val) ? '='.urlencode($val) : '').'&';
 	}
 
