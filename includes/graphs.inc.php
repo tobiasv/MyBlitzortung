@@ -23,7 +23,8 @@ function bo_graph_raw()
 	$station_id = intval($_GET['bo_station_id']);
 	$time = $_GET['bo_time'];
 	$size = $_GET['bo_size'];
-
+	$dist = $_GET['bo_dist'];
+	
 	if ($size == 2)
 		$graph = new BoSignalGraph(BO_GRAPH_RAW_W2, BO_GRAPH_RAW_H2);
 	else if ($size == 3)
@@ -54,14 +55,14 @@ function bo_graph_raw()
 	{
 		$boid = bo_station2boid($station_id);
 		
-		usleep(rand(0, 400000));
+		usleep(rand(0, 200000));
 		
 		//avoid simultaneous downloads
 		clearstatcache();
 		$dfile = $cache_file.'.download';
 		while (file_exists($dfile) && time() - filemtime($dfile) <= 2)
 		{
-			usleep(400000);
+			usleep(100000);
 			clearstatcache();
 		}
 
@@ -78,6 +79,9 @@ function bo_graph_raw()
 			$url .= $boid.'/'.gmdate('Y/m/d/H/i', floor($tstamp/600)*600).'.log';
 			$lines = bo_get_file($url, $code, 'raw_data_other', $dummy1, $dummy2, true);
 
+			if (!$lines)
+				$lines = array();
+			
 			if ($caching)
 			{
 				$dir = dirname($cache_file);
@@ -154,7 +158,7 @@ function bo_graph_raw()
 			$graph->SetMaxTime(BO_GRAPH_RAW_MAX_TIME2);
 			
 		$graph->SetData($type, $signal);
-		$graph->AddText(date('H:i:s', $last_time).'.'.sprintf('%09d', $last_ns).'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs');
+		$graph->AddText(date('H:i:s', $last_time).'.'.sprintf('%09d', $last_ns).'    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs      Dist:'.($dist ? round($dist/1000).'km' : ''));
 	}
 	else
 	{

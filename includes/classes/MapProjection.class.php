@@ -65,6 +65,14 @@ class BoMapProjection
 				$sql = " $lat_y $as_y, $lon_x $as_x ";
 				break;
 			
+			case 'miller';
+				$this->UseSql = true;
+				$lon_x = " ROUND( $lon_name / 360 * $this->ImageCalibrationX - $this->ImageOffsetX ) ";
+				$lat_y = " ROUND( -5/4*LOG(TAN( PI()/4 + RADIANS($lat_name)*2/5 )) / PI() / 2 * $this->ImageCalibrationY + $this->ImageOffsetY ) ";
+				$sql = " $lat_y $as_y, $lon_x $as_x ";
+				break;
+
+
 			case 'plate':
 			case 'geos':
 				$sql = " $lat_name, $lon_name";
@@ -75,9 +83,9 @@ class BoMapProjection
 	}
 	
 	
-	function LatLon2Image($lat, $lon)
+	function LatLon2Image($lat, $lon, $no_sql = false)
 	{
-		$result = $this->Calculate($lat, $lon);
+		$result = $this->Calculate($lat, $lon, $no_sql);
 		
 		if ($result === false)
 		{
@@ -91,9 +99,9 @@ class BoMapProjection
 	}
 
 	
-	function Calculate($lat, $lon)
+	function Calculate($lat, $lon, $no_sql = false)
 	{
-		if ($UseSqlSelect)
+		if ($this->UseSql && !$no_sql)
 		{
 			return array($lon, $lat);
 		}

@@ -6,7 +6,7 @@ function bo_stations($index = 'id', $only = '', $only_own = false)
 {
 	$S = array();
 
-	$sql .= '';
+	$sql = '';
 
 	if ($only)
 		$sql .= " AND $index='".BoDb::esc($only)."' ";
@@ -163,13 +163,23 @@ function bo_get_station_list(&$style_class = array(), $only_own = false)
 	$opts = array();
 	foreach($stations as $id => $d)
 	{
-		if ($d['lat'] == 0.0 && $d['lon'] == 0.0 && time() - strtotime($d['last_time'].' UTC') > 1800)
+		$age = time() - strtotime($d['last_time'].' UTC');
+		
+		if ($d['lat'] == 0.0 && $d['lon'] == 0.0 && $age > 1800)
 			continue;
 
+		if ($age > 3600 * 24 * BO_STATION_INACTIVE_DAYS)
+			continue;
+			
 		if (!bo_station_data_valid($d))
 			continue;
 
-		$opts[$id] = _BL($d['country'], false, true).': '._BC($d['city']);
+		$opts[$id] = _BL($d['country'], false, true).': ';
+		
+		if (!trim(_BC($d['city'])))
+			$opts[$id] .= "#".$d['bo_station_id'];
+		else
+			$opts[$id] .= _BC($d['city']);
 		
 		$style_class[$id] = 'bo_select_station';
 		
@@ -318,6 +328,12 @@ function bo_station_data_valid(&$d)
 	return true;
 }			
 
+function bo_round_station_pos($lat, $lon)
+{
+	$round = (bo_user_get_level() & BO_PERM_SETTINGS) ? 10000000 : 50;
+	return array(round($lat*$round)/$round, round($lon*$round)/$round);
+}
+
 function bo_stations_json()
 {
 	$S = array();
@@ -325,7 +341,7 @@ function bo_stations_json()
 	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 	{
-		$S[$row['id']] = array(round($row['lat'],1), round($row['lon'],1));
+		$S[$row['id']] = bo_round_station_pos($row['lat'], $row['lon']);
 	}
 
 	return json_encode($S);

@@ -24,7 +24,7 @@ function bo_times2sql($time_min = 0, $time_max = 0, $table='s', &$auto_reduce=fa
 	
 	//find max and min strike id
 	//useful for joins (i.e. station_strikes, especially when partitioned)
-	if ($time_min && $time_max)
+	if ($time_min && $time_max && $time_min > strtotime('2010-01-01'))
 	{
 		$row = BoDb::query("SELECT MAX(id) maxid, MIN(id) minid, COUNT(*) cnt FROM ".BO_DB_PREF."strikes s WHERE $sql")->fetch_assoc();
 		

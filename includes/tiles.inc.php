@@ -16,20 +16,25 @@ function bo_tile()
 	
 	$x            = intval($_GET['x']);
 	$y            = intval($_GET['y']);
-	$zoom         = intval($_GET['zoom']);
+	$zoom         = intval(isset($_GET['zoom']) ? $_GET['zoom'] : $_GET['z']);
+	$tile_size	  = intval($_GET['s']);
 	$station_info_id = intval($_GET['sid']);
 	$only_station = isset($_GET['os']);
 	$only_info    = isset($_GET['info']);
 	$show_count   = isset($_GET['count']);
-	$type         = intval($_GET['type']);
+	$type         = intval(isset($_GET['type']) ? $_GET['type'] : $_GET['t']);
 	$caching      = !(defined('BO_CACHE_DISABLE') && BO_CACHE_DISABLE === true);
 	$cfg          = $_BO['mapcfg'][$type];
 	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
 	$restricted   = false;
 	$user_nolimit = (bo_user_get_level() & BO_PERM_NOLIMIT);
 	
-	
-	if ($show_count)
+	if ($tile_size)
+	{
+		if (($tile_size%256) || $tile_size > BO_TILE_SIZE)
+			bo_tile_message('tile_wrong_size', 'wrong_size', $caching, array(), BO_TILE_SIZE);
+	}
+	else if ($show_count)
 		$tile_size = BO_TILE_SIZE_COUNT;
 	else
 		$tile_size = BO_TILE_SIZE;
@@ -68,6 +73,12 @@ function bo_tile()
 		$restricted = true;
 	}
 
+	//correct x parameter
+	if ( ($x_max=pow(2,$zoom)/($tile_size/256)) && $x )
+	{
+		$x     = $x%$x_max;
+		$x    += $x<0 ? $x_max : 0;
+	}
 	
 	/***********************************************************/
 	/*** Time periods ******************************************/
@@ -113,7 +124,6 @@ function bo_tile()
 		$time_manual_from = false;
 	}
 
-	
 	/***********************************************************/
 	/*** Update intervals **************************************/
 	/***********************************************************/
@@ -148,8 +158,6 @@ function bo_tile()
 	}
 	
 	
-	
-	
 	/***********************************************************/
 	/*** Early caching *****************************************/
 	/***********************************************************/
@@ -164,8 +172,8 @@ function bo_tile()
 	if ($caching && !$only_info)
 	{
 		$dir = BO_DIR.BO_CACHE_DIR.'/tiles/';
-		$filename = $type.'_'.$zoom.'_'.($station_id ? $station_id.'_' : '').$x.'x'.$y.'-'.($restricted ? 1 : 0).'.png';
-		
+		$filename = $type.'_'.$zoom.'_'.($station_id ? $station_id.'_' : '').$x.'x'.$y.'x'.$tile_size.'-'.($restricted ? 1 : 0).'.png';
+
 		if (BO_CACHE_SUBDIRS === true)
 			$filename = strtr($filename, array('_' => '/'));
 
@@ -174,6 +182,7 @@ function bo_tile()
 		bo_output_cachefile_if_exists($file, $last_update_time, $update_interval * 60);
 	}
 	
+
 	
 	
 	/***********************************************************/
@@ -1183,7 +1192,9 @@ function bo_tile_headers($update_interval, $last_update_time, $caching)
 
 	if ($exp_time - time() < 10)
         $exp_time = ceil((time()+1) / 60) * 60;	
-		
+	
+	$exp_time += mt_rand(-10, 10);
+	
 	//Headers
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update_time)." GMT");
 	header("Expires: ".gmdate("D, d M Y H:i:s", $exp_time)." GMT");
@@ -1214,8 +1225,6 @@ function bo_get_tile_dim($x,$y,$zoom, $size=BO_TILE_SIZE)
 	$lat  = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * $MbottomLat))))) - (M_PI / 2));
 	$lat2 = (180 / M_PI) * ((2 * atan(exp(M_PI * (1 - (2 * $MtopLat)))))    - (M_PI / 2));
 
-	//echo " $lat / $lat2 --- $lon / ".($lon+$lonW)." "; exit;
-	
 	$lon = fmod($lon, 360);
 	
 	return array($lat, $lon, $lat2, $lon+$lonW);

@@ -216,7 +216,7 @@ $_BO['tpl_overlay']['wwlln_eu_africa']['layer'] = 1;
 
 //WWLLN America
 $_BO['tpl_overlay']['wwlln_america']['img'] = 'http://webflash.ess.washington.edu/AmericaL_plot_weather_map.jpg';
-$_BO['tpl_overlay']['wwlln_america']['coord'] = array(70.7, -9.4, -54.4, -137.8);  //North, East, South, West (Degrees)
+$_BO['tpl_overlay']['wwlln_america']['coord'] = array(70.6, -9.4, -54.4, -137.8);  //North, East, South, West (Degrees)
 $_BO['tpl_overlay']['wwlln_america']['default_show'] = false;
 $_BO['tpl_overlay']['wwlln_america']['sel_name'] = '</label><a href="http://wwlln.net" target="blank">WWLLN.net America</a> (&copy; by University of Washington, Seattle, WA, USA)<label>';
 $_BO['tpl_overlay']['wwlln_america']['only_loggedin'] = false;

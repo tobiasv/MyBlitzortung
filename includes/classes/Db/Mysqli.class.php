@@ -26,7 +26,7 @@ class BoDbMain
 		self::$dbh = new mysqli(BO_DB_HOST, BO_DB_USER, BO_DB_PASS, "", $port);
 
 		if (mysqli_connect_error())
-			die('Database: Connect ERROR (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
+			trigger_error('Database: Connect ERROR (' . mysqli_connect_errno() . ') ' . mysqli_connect_error(), E_USER_ERROR);
 
 		if ($prepare_all)
 		{
@@ -54,7 +54,7 @@ class BoDbMain
 		$ok = self::$dbh->select_db(BO_DB_NAME);
 		
 		if (!$ok && $die_on_error)
-			die ("Database not found! (".mysqli_connect_errno().")");
+			trigger_error("Database not found! (".mysqli_connect_errno().")", E_USER_ERROR);
 		
 		return $ok;
 	}
@@ -67,7 +67,7 @@ class BoDbMain
 		$ok = self::$dbh->set_charset($charset);
 		
 		if (!$ok && $die_on_error)
-			die('Database: Charset ERROR ('.mysqli_connect_errno().")");
+			trigger_error('Database: Charset ERROR ('.mysqli_connect_errno().")", E_USER_ERROR);
 		
 		return $ok;
 	}

@@ -91,7 +91,8 @@ if (!defined("BO_VER"))
 	{
 		error_reporting(E_ALL & ~E_NOTICE);
 		ini_set('display_errors', 0);
-		set_error_handler("bo_error_handler");
+		
+		define('BO_PHP_ERROR_LOG', BO_DIR.BO_CACHE_DIR.'/error.log');
 	}
 	elseif (BO_DEBUG === "silent")
 	{
@@ -103,6 +104,7 @@ if (!defined("BO_VER"))
 		ini_set('display_errors', 0);
 	}
 
+	set_error_handler("bo_error_handler");
 
 	//timezone
 	date_default_timezone_set(BO_TIMEZONE);

@@ -524,7 +524,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		echo '<li><span class="bo_descr">'._BL('Strikes').': </span><span class="bo_value">'._BN($strikesh_own, 0);
 		
 		if (bo_user_get_level() & BO_PERM_ARCHIVE)
-			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_show=strikes&bo_station_id='.$station_id.'&bo_datetime_start='.urlencode(date('Y-m-d H:i', time() - 4000)).'">'._BL('List').'</a>)';
+			echo '&nbsp;(<a href="'.BO_ARCHIVE_URL.bo_add_sess_parms().'&bo_show=strikes&bo_station_id='.$station_id.'&bo_datetime_start='.urlencode(date('Y-m-d H:i', time() - 1200)).'">'._BL('List').'</a>)';
 
 		echo '</span>';
 		echo '<li><span class="bo_descr">'._BL('Signals').': </span><span class="bo_value">'._BN($signalsh_own, 0).'</span>';

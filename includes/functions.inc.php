@@ -19,6 +19,9 @@ function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 			|| $name == BO_LANG_ARGUMENT)
 			continue;
 
+		if ($name == 'bo_page' && !$val)
+			continue;
+			
 		$query .= urlencode($name).(strlen($val) ? '='.urlencode($val) : '').'&';
 	}
 
@@ -330,6 +333,9 @@ function bo_owner_mail($subject, $text)
 		$ret = bo_mail($mail, $subject, $text);
 	}
 
+	if (!$ret)
+		bo_echod("ERROR: Could not send mail to '$mail'!");
+	
 	return $ret;
 }
 
@@ -353,8 +359,6 @@ function bo_mail($mail, $subject = '', $text = '', $headers = '', $from = '')
 	$headers = trim($headers);
 	$mail    = trim($mail);
 	
-	bo_echod("Sending email to \"$mail\" from \"$from\" with subject \"$subject\"");
-		
 	if (BO_EMAIL_SMTP !== true)
 	{
 		if ($headers && $from)
@@ -402,11 +406,6 @@ function bo_mail($mail, $subject = '', $text = '', $headers = '', $from = '')
 		$ok = $PHPMailer->Send();
 
 	}
-	
-	if ($ok)
-		bo_echod("Mail successfully sent.");
-	else
-		bo_echod("ERROR sending mail!");
 	
 	return $ok;
 }
@@ -696,8 +695,6 @@ function bo_region2name($region, $bo_station_id = false)
 function bo_error_handler($errno, $errstr, $errfile, $errline)
 {
 	
-	$logfile = BO_DIR.BO_CACHE_DIR.'/error.log';
-
 	// This error code is not included in error_reporting
     if (!(error_reporting() & $errno)) 
         return;
@@ -737,20 +734,25 @@ function bo_error_handler($errno, $errstr, $errfile, $errline)
 	$text .= "URL: ".$_SERVER['REQUEST_URI'];
 	$text .= "\n";
 	
-	$date = gmdate('Y-m-d H:i:s');
-	
-	$ok = @file_put_contents($logfile, $date." | ".$text, FILE_APPEND);
+	if (defined('BO_PHP_ERROR_LOG') && BO_PHP_ERROR_LOG)
+	{
+		$date = gmdate('Y-m-d H:i:s');
+		$ok = @file_put_contents(BO_PHP_ERROR_LOG, $date." | ".$text, FILE_APPEND);
+	}
 	
 	if ($exit)
 	{
-		echo $text;
-		echo "Aborting...<br />\n";
+		@header('HTTP/1.1 500 Internal Server Error');
+		
+		if (BO_DEBUG === true)
+			echo $text;
+			
+		echo "<p>Oops! An error occured. Please try again later.<br />\n";
 		exit();
 	}
 	
 	// Don't execute PHP internal error handler
     return true;
-	
 }
 
 function bo_cache_log($text, $end = false)

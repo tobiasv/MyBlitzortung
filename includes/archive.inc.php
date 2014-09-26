@@ -22,7 +22,7 @@ function bo_show_archive_map()
 	$ani = isset($_GET['bo_animation']) && $_GET['bo_animation'] !== '0' ? 1 : 0;
 	$ani_preset = trim($_GET['bo_animation']);
 	$hour_from = (int)($_GET['bo_hour_from']);
-	$minute_from = fmod($_GET['bo_hour_from'], 1)  * 60;
+	$minute_from = fmod($_GET['bo_hour_from'], 1) * 60;
 	$hour_range = (float)($_GET['bo_hour_range']);
 	$map_changed = isset($_GET['bo_oldmap']) && $map != $_GET['bo_oldmap'];
 	$ani_changed = !isset($_GET['bo_oldani']) || $ani != $_GET['bo_oldani']; // || $map_changed;
@@ -102,9 +102,27 @@ function bo_show_archive_map()
 
 			if ($ani_preset == 'now')
 			{
-				$hour_range = $ani_default_range + time()/3600 - intval(time()/3600);  // add seconds to full hour
-				$hour_from = date('H') - $hour_range - $ani_pic_range / 60 + 1;
-				$day = date('d');
+				$end 	= floor(time()/$hours_interval/3600) * $hours_interval*3600 - $ani_pic_range * 60;
+				$start 	= $end - $ani_default_range*3600;
+				
+				if (!is_float($hours_interval))
+				{
+					$hour_range 	= $ani_default_range + intval((time()/3600 - floor(time()/3600))*3600) / 3600;
+					$minute_from = 0;
+				}
+				else
+				{
+					$minute_from 	= (int)date('i', $start);
+					$hour_range 	= $ani_default_range + $hours_interval;
+				}
+				
+				$hour_from   	= (int)date('H', $start);
+				$year      		= (int)date('Y', $start);
+				$month     		= (int)date('m', $start);
+				$day       		= (int)date('d', $start);
+	
+				
+
 			}
 			elseif ($ani_preset == 'day')
 			{
@@ -157,7 +175,7 @@ function bo_show_archive_map()
 	$year      = date('Y', $time);
 	$month     = date('m', $time);
 	$day       = date('d', $time);
-	$hour_from = date('H', $time);
+	$hour_from = date('H', $time) + $minute_from/60;
 
 	
 	//min/max strike-time
@@ -189,12 +207,12 @@ function bo_show_archive_map()
 		echo '<select name="bo_year" id="bo_arch_strikes_select_year">';
 		for($i=date('Y', $start_time); $i<=date('Y');$i++)
 			echo '<option value="'.$i.'" '.($i == $year ? 'selected' : '').'>'.$i.'</option>';
-		echo '</select>';
+		echo '</select>&nbsp;';
 
 		echo '<select name="bo_month" id="bo_arch_strikes_select_month">';
 		for($i=1;$i<=12;$i++)
 			echo '<option value="'.$i.'" '.($i == $month ? 'selected' : '').'>'._BL(date('M', strtotime("2000-$i-01"))).'</option>';
-		echo '</select>';
+		echo '</select>&nbsp;';
 
 		echo '<select name="bo_day" id="bo_arch_strikes_select_day" onchange="submit()">';
 		for($i=1;$i<=31;$i++)
@@ -297,6 +315,18 @@ function bo_show_archive_map()
 		
 		if ($ani_div)
 			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'&bo_map='.$map.'&bo_day_add=1&bo_hour_from=0&bo_hour_range=24&bo_animation=day#bo_arch_strikes_maps_form" >'._BL('Animation').'</a> ';
+
+		echo '  &nbsp;  &nbsp; &nbsp; ';
+		
+		echo '<span class="bo_form_descr">';
+		echo _BL('Now').': &nbsp; ';
+		echo '</span>';
+		
+		if (!$ani_cfg['force'])
+			echo ' &nbsp; <a href="'.bo_insert_url(array('bo_page', 'bo_*')).'&bo_showmap='.$map.'" >'._BL('Picture').'</a> ';
+		
+		if ($ani_div)
+			echo ' &nbsp; <a href="'.bo_insert_url('bo_*').'&bo_map='.$map.'&bo_animation=now" >'._BL('Animation').'</a> ';
 			
 		echo '</div>';
 		
@@ -931,7 +961,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		$sql_where .= "AND ".bo_latlon2sql($latS, $latN, $lonW, $lonE); //" AND NOT (s.lat < '$latS' OR s.lat > '$latN' OR s.lon < '$lonW' OR s.lon > '$lonE') ";
 		$show_strike_list = true;
 
-		$hours_back = 24 * 50;
+		$hours_back = 24 * 7;
 	}
 	else if ($strike_id && $strikes_before)
 	{
@@ -988,13 +1018,15 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	}
 	else if ($show_strike_list) // display strikes
 	{
-		$time_end = time();
+		$time_end = time() - 120;
 		$time_start = $time_end - 3600 * $hours_back;
 		$sort = 'DESC';
 	}
 	else //display signals
 	{
 		$time_end = 0;
+		
+		/*
 		if (!isset($_GET['bo_action']) && !$date && $station_id > 0 && $station_id == bo_station_id())
 		{
 			$sql = "SELECT MAX(time) time 
@@ -1005,6 +1037,7 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			if ($row['time'])
 				$time_end = strtotime($row['time'].' UTC');
 		}
+		*/
 
 		
 		if (!$time_end && $station_id > 0 && $station_id == bo_station_id())
@@ -1012,8 +1045,10 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			$row = BoDb::query("SELECT MAX(time) time FROM ".BO_DB_PREF."raw")->fetch_assoc();
 			$time_end = strtotime($row['time'].' UTC');
 		}
-		elseif (!$time_end)
-			$time_end = time();
+		
+		//wait some time until signals available for download
+		if (!$time_end || $time_end > time() - 120)
+			$time_end = time() - 120;
 		
 		$time_start = $time_end - 3600 * $hours_back;
 		$sort = 'DESC';
@@ -1025,7 +1060,6 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	if ($show_strike_list) // all strikes, maybe with own sigs
 	{
 		$table = 's';
-		
 		
 		if ($station_id > 0 && !$own_station && !$strike_id)
 		{
@@ -1122,7 +1156,10 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 	if ($show_strike_list)
 	{
 		echo '<p class="bo_general_description" id="bo_archive_striketable_info">';
-		echo _BL('archive_striketable_info');
+		if ($perm)
+			echo _BL('archive_striketable_info');
+		else
+			echo _BL('archive_striketable_info_guests');
 		echo '</p>';
 	}
 	else
@@ -1152,22 +1189,25 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 			echo '</fieldset>';
 		}
 		
-		echo '<fieldset>';
-		echo '<legend>'._BL('settings').'</legend>';
-		
-		if (!$show_strike_list)
-		{
-			echo '<input type="checkbox" name="bo_only_strikes" value="1" '.($only_strikes ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_strikes">';
-			echo '<label for="check_only_strikes"> '._BL('check_only_strikes').'</label>&nbsp;&nbsp; ';
-		}
-		elseif ($own_station)
-		{
-			echo '<input type="checkbox" name="bo_only_participated" value="1" '.($only_participated ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_participated">';
-			echo '<label for="check_only_participated"> '._BL('check_only_participated').'</label>&nbsp;&nbsp; ';
-		}
 		
 		if ($perm)
 		{
+		
+		
+			echo '<fieldset>';
+			echo '<legend>'._BL('settings').'</legend>';
+			
+			if (!$show_strike_list)
+			{
+				echo '<input type="checkbox" name="bo_only_strikes" value="1" '.($only_strikes ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_strikes">';
+				echo '<label for="check_only_strikes"> '._BL('check_only_strikes').'</label>&nbsp;&nbsp; ';
+			}
+			elseif ($own_station)
+			{
+				echo '<input type="checkbox" name="bo_only_participated" value="1" '.($only_participated ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_only_participated">';
+				echo '<label for="check_only_participated"> '._BL('check_only_participated').'</label>&nbsp;&nbsp; ';
+			}
+
 			if (($show_strike_list || $only_strikes) && BO_STATION_STAT_DISABLE !== true)
 			{
 				echo '<input type="checkbox" name="bo_show_details" value="1" '.($show_details ? 'checked="checked"' : '').' onchange="submit();" onclick="submit();" id="check_show_details">';
@@ -1193,9 +1233,11 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 				echo bo_archive_select_map($map);
 
 			echo '&nbsp;&nbsp; <input type="submit" value="'._BL('Ok').'">';
+			
+			echo '</fieldset>';
 		}
 		
-		echo '</fieldset>';
+		
 
 	}
 
@@ -1790,7 +1832,7 @@ function bo_signal_url($station_id, $raw_id = null, $strike_time = null, $strike
 	{
 		
 		//no station id --> find first signal
-		if ($station_id === false && BO_ARCHIVE_SHOW_FIRST_SIGNAL === true && is_array($strike))
+		if (!$station_id && BO_ARCHIVE_SHOW_FIRST_SIGNAL === true && is_array($strike))
 		{
 			$sql = "SELECT s.id id, ".bo_sql_latlon2dist($strike['lat'], $strike['lon'], 's.lat', 's.lon')." dist
 						FROM ".BO_DB_PREF."stations s
@@ -1813,7 +1855,7 @@ function bo_signal_url($station_id, $raw_id = null, $strike_time = null, $strike
 		$station_time  = $station_ntime > 1 ? $strike_time+1 : $strike_time;
 		$station_ntime = $station_ntime > 1 ? $station_ntime-1 : $station_ntime;
 		
-		$url .= 'bo_graph&bo_station_id='.$station_id.'&bo_time='.urlencode(gmdate('Y-m-d H:i:s',$station_time).'.'.round($station_ntime * 1E9));
+		$url .= 'bo_graph&bo_station_id='.$station_id.'&bo_dist='.round($dist).'&bo_time='.urlencode(gmdate('Y-m-d H:i:s',$station_time).'.'.round($station_ntime * 1E9));
 		
 	}
 	else

@@ -23,7 +23,7 @@ function bo_show_archive()
 	$enabled['density']    = ($perm || (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES)) && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES;
 	$enabled['search']     = ($perm || (defined('BO_ENABLE_ARCHIVE_SEARCH') && BO_ENABLE_ARCHIVE_SEARCH));
 	//$enabled['signals']    = ($perm || (defined('BO_ENABLE_ARCHIVE_SIGNALS') && BO_ENABLE_ARCHIVE_SIGNALS)) && BO_UP_INTVL_RAW > 0 && bo_station_id() > 0;
-	$enabled['strikes']    = (bo_user_get_level() & BO_PERM_ARCHIVE); // to see strike table => only logged in users with archive permission!
+	$enabled['strikes']    = true; //$perm; 
 	
 	if (($show && !$enabled[$show]) || !$show )
 	{

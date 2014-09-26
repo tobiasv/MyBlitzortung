@@ -36,8 +36,46 @@ class BoDb extends BoDbMain
 		}
 			
 		$qtype = strtolower(substr(trim($query), 0, 6));
+		
+		//query cache optimization
+		$lockfile = false;
+		$ms = 0;
+		if ($qtype == 'select')
+		{
+			$cache_dir = BO_DIR.'/'.BO_CACHE_DIR;
+			
+			if (is_writable($cache_dir))
+			{
+				$lockfile = $cache_dir.'/.lock_'.md5($query);
+				
+				clearstatcache();
+				while (file_exists($lockfile) && time() - @filemtime($lockfile) < 5 && $ms < 5000)
+				{
+					usleep(10000);
+					$ms += 10;
+					clearstatcache();
+				}
+
+				if ($ms == 0)
+				{
+					@touch($lockfile);
+				}
+				//else
+				//	file_put_contents($cache_dir.'/lock.log', "\n".date('Ymd His')." $ms ".md5($query), FILE_APPEND);
+				
+			}
+		}
+
+		$start = microtime(true);
+		
 		$result = self::do_query($query);
 
+		//if ($ms > 0)
+		//	file_put_contents($cache_dir.'/lock.log', " ".round((microtime(true) - $start)*1000)." ".strtr($query, array("\n" => " ")), FILE_APPEND);
+			
+		if ($lockfile)
+			@unlink($lockfile);
+		
 		if ($result === false)
 		{
 			if ($die_on_errors !== false)

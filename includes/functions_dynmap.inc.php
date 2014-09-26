@@ -1,7 +1,7 @@
 <?php
 
 
-function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAULT_ZOOM, $type=BO_DEFAULT_MAP)
+function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAULT_ZOOM, $type=BO_DEFAULT_MAP, $poverlay = false)
 {
 	global $_BO;
 
@@ -23,7 +23,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	<script type="text/javascript" id="bo_script_map">
 	
 	
-	
+<?php if ($poverlay) { ?>
 	//bo_ProjectedOverlay
 	//Source: http://www.usnaviguide.com/v3maps/js/bo_ProjectedOverlay.js
 	var bo_ProjectedOverlay = function(map, imageUrl, bounds, opts)
@@ -37,7 +37,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	 this.layer_ = opts.layer || 0;
 	 this.map_ = map;
 	}
-
+<?php } ?>
 	
 	var bo_map;
 	var bo_home;
@@ -102,9 +102,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 
 
-
-
-
+<?php if ($poverlay) { ?>
 
 		bo_ProjectedOverlay.prototype = new google.maps.OverlayView();	
 		
@@ -226,7 +224,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 			 }
 		}
 
-
+<?php } ?>
 
 		bo_gmap_init2();
 		
@@ -288,7 +286,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 	function bo_setcookie(name, value)
 	{
 		var now = new Date();
-		now = new Date(now.getTime()+ 3600*24*365);
+		now = new Date(now.getTime()+ 1000*3600*24*365);
 		document.cookie = name+'='+value+'; expires='+now.toGMTString()+';';
 	}
 
