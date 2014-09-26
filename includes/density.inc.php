@@ -901,7 +901,7 @@ function bo_get_density_image()
 			}
 			else
 			{
-				$DATA2 = gzinflate($row_own['data']);
+				$DATA2 = @gzinflate($row_own['data']);
 				$info = unserialize($row_own['info']);
 				$max_real_own_count = $info['max']; //max strike count
 				$bps2 = $info['bps'];
@@ -909,7 +909,9 @@ function bo_get_density_image()
 			}
 		}
 		
-		if ($length < 0.02)
+		if (!$DATA2)
+			$exit_msg = _BL('Not enough data available!', true);
+		else if ($length < 0.02)
 			$exit_msg = 'Error: Length!';
 	}
 

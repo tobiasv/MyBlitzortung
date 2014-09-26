@@ -79,6 +79,9 @@ function bo_graph_raw()
 			$url .= $boid.'/'.gmdate('Y/m/d/H/i', floor($tstamp/600)*600).'.log';
 			$lines = bo_get_file($url, $code, 'raw_data_other', $dummy1, $dummy2, true);
 
+			if (!$lines)
+				$lines = array();
+			
 			if ($caching)
 			{
 				$dir = dirname($cache_file);
