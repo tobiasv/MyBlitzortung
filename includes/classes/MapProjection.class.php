@@ -83,9 +83,9 @@ class BoMapProjection
 	}
 	
 	
-	function LatLon2Image($lat, $lon)
+	function LatLon2Image($lat, $lon, $no_sql = false)
 	{
-		$result = $this->Calculate($lat, $lon);
+		$result = $this->Calculate($lat, $lon, $no_sql);
 		
 		if ($result === false)
 		{
@@ -99,9 +99,9 @@ class BoMapProjection
 	}
 
 	
-	function Calculate($lat, $lon)
+	function Calculate($lat, $lon, $no_sql = false)
 	{
-		if ($this->UseSql)
+		if ($this->UseSql && !$no_sql)
 		{
 			return array($lon, $lat);
 		}

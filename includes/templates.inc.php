@@ -144,8 +144,9 @@ $_BO['tpl_imgmap_default']['top_font'] = array(9, true, array('fff1', 1, '000a')
 $_BO['tpl_imgmap_default']['top_style'] = array(16, 2, '9999ff66', 1, 'ccf8');
 $_BO['tpl_imgmap_default']['bottom_font'] = array(8, false, array('ffffff', 1, '00000099'));
 $_BO['tpl_imgmap_default']['bottom_style'] = array(0, 1, '9999ff66', 1, 'ccf8');
-$_BO['tpl_imgmap_default']['legend'] = array(5, 80, 40, 4, 4, 1);
-$_BO['tpl_imgmap_default']['legend_font'] = array(7, true, array('3330', 0, 'aaa0'),0,2);
+$_BO['tpl_imgmap_default']['legend'] = array(5, 80, 30, 6, 13, 1);
+$_BO['tpl_imgmap_default']['legend']['smooth'] = 4;
+$_BO['tpl_imgmap_default']['legend_font'] = array(7, false, array('ffffff', 1, '00000099'));;
 $_BO['tpl_imgmap_default']['menu'] = true;
 $_BO['tpl_imgmap_default']['archive'] = true;
 $_BO['tpl_imgmap_default']['trange'] = array(2); //hours!
@@ -157,6 +158,8 @@ $_BO['tpl_imgmap_default']['density'] = true;
 $_BO['tpl_imgmap_default']['density_blocksize'] = 4;
 $_BO['tpl_imgmap_default']['density_colors'] = $_BO['tpl_density_colors'];
 $_BO['tpl_imgmap_default']['density_darken'] = array(80, 230);
+
+
 
 //smaller points for overview maps
 $_BO['tpl_imgmap_default2'] = $_BO['tpl_imgmap_default'];
@@ -514,8 +517,9 @@ $_BO['tpl_imgmap']['meteosat_europe_central']['trange'] = 1; //hours!
 $_BO['tpl_imgmap']['meteosat_europe_central']['maxrange'] = 1; //hours!
 $_BO['tpl_imgmap']['meteosat_europe_central']['hoursinterval'] = 1; //hours!
 $_BO['tpl_imgmap']['meteosat_europe_central']['upd_intv'] = 30; //minutes
-$_BO['tpl_imgmap']['meteosat_europe_central']['legend'] = array(5, 80, 40, 6, 28, 1);
-$_BO['tpl_imgmap']['meteosat_europe_central']['legend_font'] = array(7, true, array('0000', 1, 'ddd0'),0,1);
+$_BO['tpl_imgmap']['meteosat_europe_central']['legend'] = array(5, 80, 30, 6, 40, 1);
+$_BO['tpl_imgmap']['meteosat_europe_central']['legend']['smooth'] = 4;
+$_BO['tpl_imgmap']['meteosat_europe_central']['legend_font'] = array(7, false, array('ffffff', 1, '00000099'));;
 $_BO['tpl_imgmap']['meteosat_europe_central']['bottom_style'] = array(0, 24, '9999ff66', 1, 'ccf8');
 $_BO['tpl_imgmap']['meteosat_europe_central']['density'] = false;
 $_BO['tpl_imgmap']['meteosat_europe_central']['file'] = 'maps_europe/map_eumetsat_central_eu_blank.jpg';
