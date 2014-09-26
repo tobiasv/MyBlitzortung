@@ -49,15 +49,17 @@ class BoDb extends BoDbMain
 				$lockfile = $cache_dir.'/.lock_'.md5($query);
 				
 				clearstatcache();
-				while (file_exists($lockfile) && time() - filemtime($lockfile) < 5 && $ms < 5000)
+				while (file_exists($lockfile) && time() - @filemtime($lockfile) < 5 && $ms < 5000)
 				{
-					usleep(50000);
-					$ms += 50;
+					usleep(10000);
+					$ms += 10;
 					clearstatcache();
 				}
 
 				if ($ms == 0)
-					touch($lockfile);
+				{
+					@touch($lockfile);
+				}
 				//else
 				//	file_put_contents($cache_dir.'/lock.log', "\n".date('Ymd His')." $ms ".md5($query), FILE_APPEND);
 				
