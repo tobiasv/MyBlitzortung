@@ -92,15 +92,19 @@ function bo_load_locale($locale = '')
 		}
 	}
 	
-	if (BO_LANG_REDIRECT === true 
+	if (BO_LANG_REDIRECT && defined('BO_LANG_REDIRECT')
 		&& empty($_POST) 
 		&& !headers_sent()
 		&& php_sapi_name() != 'cli'
 		&& $main_lang 
-		&& (!isset($_GET[BO_LANG_ARGUMENT]) || $_GET[BO_LANG_ARGUMENT] != $main_lang) 
 		)
 	{
-		return $main_lang;
+		if (   (BO_LANG_REDIRECT === true && (!isset($_GET[BO_LANG_ARGUMENT]) || $_GET[BO_LANG_ARGUMENT] != $main_lang))
+			|| (BO_LANG_REDIRECT === 1 && $_GET[BO_LANG_ARGUMENT] != $main_lang && $main_lang != BO_LOCALE))
+		{
+			
+			return $main_lang;
+		}
 	}
 	
 	//Send the language
