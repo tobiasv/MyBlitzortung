@@ -1318,7 +1318,7 @@ function bo_add_cities2image($I, $cfg, $w, $h, $Projection)
 	$erg = BoDb::query($sql);
 	while ($row = $erg->fetch_assoc())
 	{
-		list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon']);
+		list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon'], true);
 
 		$c = $cfg['cities'][$row['type']];
 	
