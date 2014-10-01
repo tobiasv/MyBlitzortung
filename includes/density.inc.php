@@ -906,12 +906,13 @@ function bo_get_density_image()
 				$max_real_own_count = $info['max']; //max strike count
 				$bps2 = $info['bps'];
 				$last_changed = max($row['changed'], $last_changed);
+				
+				if (!$DATA2)
+					$exit_msg = _BL('Not enough data available!', true);
 			}
 		}
 		
-		if (!$DATA2)
-			$exit_msg = _BL('Not enough data available!', true);
-		else if ($length < 0.02)
+		if ($length < 0.02)
 			$exit_msg = 'Error: Length!';
 	}
 
