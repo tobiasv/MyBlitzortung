@@ -14,6 +14,7 @@ class BoMapProjection
 	var $ImageCoor;
 	var $SatLon;
 	var $StrikeBounds = array();
+	var $LonRef;
 	
 	public $UseSql = false;
 	
@@ -42,6 +43,9 @@ class BoMapProjection
 		$this->ImageOffsetX = $x1 * $this->ImageCalibrationX - $cW;
 		$this->ImageOffsetY = $y1 * $this->ImageCalibrationY + $cS;
 		
+		//Longitude Reference point (middle for most projections)
+		$this->LonRef = ($coord[1] - $coord[3]) / 2;
+		
 		
 		//Strike bounds
 		if (isset($coord[9]) && isset($coord[10]) && isset($coord[11]) && isset($coord[12]))
@@ -52,6 +56,11 @@ class BoMapProjection
 			$this->StrikeBounds[3] = $coord[12];
 		}
 		
+	}
+	
+	function SetLonRef($lon)
+	{
+		$this->LonRef = $lon;
 	}
 	
 	function SqlSelect($lat_name, $lon_name, $as_x = '', $as_y = '')
@@ -105,6 +114,12 @@ class BoMapProjection
 		{
 			return array($lon, $lat);
 		}
+		
+		if ($lon < $this->LonRef-180)
+			$lon = $lon+360;
+		else if ($lon > $this->LonRef+180)
+			$lon = $lon-360;
+			
 		
 		switch ($this->Method)
 		{

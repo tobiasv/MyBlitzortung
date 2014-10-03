@@ -1363,7 +1363,8 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 		$strike_lat = $row['lat'];
 		$strike_lon = $row['lon'];
 		list($strike_x, $strike_y) = $Projection->LatLon2Image($strike_lat, $strike_lon, true);
-	
+		$Projection->SetLonRef($strike_lon);
+		
 		$strike_dists = array();
 		$sql = "SELECT ss.station_id id
 				FROM ".BO_DB_PREF."stations_strikes ss
