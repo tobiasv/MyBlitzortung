@@ -1291,6 +1291,7 @@
 //a update is needed! 
 @define('BO_DB_COMPRESSION', false);
 
+@define("BO_COOKIE_NAME", "bo_login");
 
 
 /*******************************************************************/

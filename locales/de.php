@@ -1150,9 +1150,46 @@ $_BL['de']['lang_nl'] = 'Niederländisch';
 
 $_BL['de']['Search...'] = 'Suche...';
 $_BL['de']['United States'] = 'USA';
+$_BL['de']['North America'] = 'Nordamerika';
+$_BL['de']['South America'] = 'Südamerika';
 $_BL['de']['Indonesia'] = 'Indonesien';
 $_BL['de']['Archives'] = 'Archiv';
+$_BL['de']['Now'] = 'Jetzt';
+
+
+
+
+
+/*************************************************************/
+/* Special text for Lightningmaps.org                        */
+/*************************************************************/
+
+
+//General (Menu...)
+$_BL['de']['Real Time'] = 'Echtzeit';
+$_BL['de']['Real-Time Lightning Map'] = 'Echtzeit Blitzkarte';
+
+//Other
 $_BL['de']['Big'] = 'Groß';
 $_BL['de']['(Big)'] = '(Groß)';
+$_BL['de']['Countries'] = 'Länder';
+
+//REALTIME MAP
+$_BL['de']['lm_live_delay'] = 'Verzögerung';
+$_BL['de']['lm_live_strokes'] = 'Blitze';
+$_BL['de']['lm_live_realtime'] = 'Blitze in Echtzeit';
+$_BL['de']['lm_live_fullscr_off'] = 'Vollbild';
+$_BL['de']['lm_live_fullscr_on'] = 'Normale Größe';
+$_BL['de']['lm_live_stations_off'] = 'Stationen: aus';
+$_BL['de']['lm_live_stations_on'] = 'Stationen: ein';
+$_BL['de']['lm_live_clouds_off'] = 'Wolken: aus';
+$_BL['de']['lm_live_clouds_on'] = 'Wolken: ein';
+$_BL['de']['lm_live_info'] = 'Diese Karte zeigt die Blitze der <strong>letzten 60 Minuten</strong> in Echtzeit an. Die Daten kommen direkt vom Projekt Blitzortung.org, bei dem hunderte von Stationen die Blitze detektieren. Die Verzögerung wird direkt aus den Zeitstempeln der Blitze berechnet.';
+$_BL['de']['lm_live_snd_info'] = 'Lässt ein kurzen Ton für jeden neuen Blitz ertönen. Diese Funktionen ist nicht mit allen Browsern bzw. nicht mit allen Geräten möglich.';
+$_BL['de']['lm_live_fullscr_info'] = 'Zeigt die Karte im Vollbild an (Ihr Browser muss diese Funktion unterstützen).';
+$_BL['de']['lm_live_stations_info'] = 'Zeigt die Stationen an, die den jeweiligen Blitz detektiert haben. Die Farbe der Verbindungslinie hängt von der Entfernung zwischen Station und Blitz ab: Je weiter entfernt, desto bläulicher (statt grün) wird die Linie dargestellt. Entfernungen von maximal einigen hundert kilometern und Stationen runder um den Einschlagsort ergeben die besten Resultate. BITTE BEACHTEN: Diese Funktion kann die Systemleistung negativ beeinflussen! Der Browser "Chrome" wird hierzu empfohlen.';
+$_BL['de']['lm_live_clouds_info'] = 'Bitte beachten: Die Wolkendaten werden von einer externen Quelle geladen und können mehrere Stunden alt sein. Diese Funktion ist nicht bei höheren Zoom-Leveln verfügbar.';
+$_BL['de']['lm_live_blitzortung_more'] = 'Weitere Echtzeit-Blitzkarten auf Blitzortung.org';
+$_BL['de']['lm_live_usage'] = 'WICHTIG: Diese Karte dient rein zur Unterhaltung!';
 
 ?>

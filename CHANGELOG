@@ -3,6 +3,15 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 1.4-dev3 (2014-09-26)
+-----------------------------
+
+- static maps: legend improved
+- fix: wrong 'miller' projection
+- removed some PHP error messages
+- added English/German texts of Lightningmaps.org
+
+
 Version 1.4-dev2 (2014-06-06)
 -----------------------------
 

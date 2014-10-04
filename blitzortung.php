@@ -72,6 +72,7 @@ if (!defined("BO_VER"))
 	require_once 'includes/functions_sql.inc.php';
 	require_once 'includes/functions_signal.inc.php';
 	require_once 'includes/functions_strokes.inc.php';
+	require_once 'includes/functions_user.inc.php';
 	require_once 'includes/data.inc.php';
 	require_once 'includes/user.inc.php';
 	
@@ -111,9 +112,6 @@ if (!defined("BO_VER"))
 	
 	//User init (session, cookie, etc...)
 	bo_user_init();
-	
-	//Cookie login
-	bo_user_cookie_login();
 
 	//Station init
 	bo_station_init();

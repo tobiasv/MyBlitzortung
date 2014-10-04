@@ -791,6 +791,8 @@ located out of the correspondending times (time of arrival method - TOA).
 In this case additional information about the lightning stroke will be displayed here.
 ';
 
+$_BL['en']['archive_striketable_info_guests'] = 'Some of the latest strokes with the signal of the closest station.';
+
 $_BL['en']['archive_striketable_info'] = 'Here you can see the same information as on the site "signals" but also
 strokes where no signal was detected by you station. To stay in common with the Blitzortung.org rules,
 this page can only be accessed with an user account.
@@ -1091,6 +1093,72 @@ $_BL['en']['Search...'] = 'Search...';
 $_BL['en']['Archives'] = 'Archives';
 $_BL['en']['Indonesia'] = 'Indonesia';
 
+$_BL['en']['Now'] = 'Now';
+
 $_BL['en']['twitter_instructions'] = 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow <em><a href="https://twitter.com/{TWITTER}" target="_blank">{TWITTER}</a></em>!';
+
+
+
+/*************************************************************/
+/* Special text for Lightningmaps.org: REALTIME MAP          */
+/*************************************************************/
+
+$_BL['en']['lm_live_delay'] = 'Delay';
+$_BL['en']['lm_live_strokes'] = 'Strokes';
+$_BL['en']['lm_live_realtime'] = 'Real-Time Lightning';
+
+$_BL['en']['lm_live_settings_info'] = 'Settings';
+
+$_BL['en']['lm_live_set_fullscreen'] = 'Fullscreen';
+$_BL['en']['lm_live_set_fullscreen_on'] = 'on';
+$_BL['en']['lm_live_set_fullscreen_off'] = 'off';
+$_BL['en']['lm_live_set_fullscreen_info'] = 'Shows the map in fullscreen mode (only if your browser supports it).';
+
+$_BL['en']['lm_live_set_thunder'] = 'Thunder';
+$_BL['en']['lm_live_set_thunder_max'] = 'max';
+$_BL['en']['lm_live_set_thunder_off'] = 'off';
+$_BL['en']['lm_live_set_thunder_info'] = 'Shows the thunder sound front in realtime.';
+
+$_BL['en']['lm_live_set_clouds'] = 'Clouds';
+$_BL['en']['lm_live_set_clouds_on'] = 'on';
+$_BL['en']['lm_live_set_clouds_off'] = 'off';
+$_BL['en']['lm_live_set_clouds_info'] = 'Clouds are from an external source and might be some hours behind. The layer is not available on closer zoom levels.';
+
+$_BL['en']['lm_live_set_radar'] = 'Radar';
+$_BL['en']['lm_live_set_radar_on'] = 'on';
+$_BL['en']['lm_live_set_radar_off'] = 'off';
+$_BL['en']['lm_live_set_radar_info'] = 'Rain radar is currently only available for the United States!';
+
+$_BL['en']['lm_live_set_strokes_show'] = 'Show Strokes';
+$_BL['en']['lm_live_set_strokes_show_all'] = 'last hour';
+$_BL['en']['lm_live_set_strokes_show_last'] = 'last minutes';
+$_BL['en']['lm_live_set_strokes_show_info'] = 'Decide whether you want to see only "current" strokes or also those occurred up to an hour ago.';
+
+$_BL['en']['lm_live_stations_off'] = 'Stations: off';
+$_BL['en']['lm_live_stations_on'] = 'Stations: on';
+
+$_BL['en']['lm_live_info'] = 'Strokes of the <strong>last 60 minutes</strong> are shown. The real-time data comes directly from the computing servers of [Blitzortung], which are fed by hundreds of stations on several continents. The delay is calculated from the time stamps of each strokes compared to the current time.';
+$_BL['en']['lm_live_info_legend_title'] = 'Legend';
+$_BL['en']['lm_live_info_legend1'] = 'New lightning strikes have a <span id="live_legend1_1">red circle</span> which gets smaller and disappears when it gets older than [sec] seconds.';
+$_BL['en']['lm_live_info_legend2'] = 'The color of filled circles represent the age of strikes up to [minutes] minutes. New strikes are <span id="live_legend2_1">yellow</span>. The older they get, the darker the color. <span id="live_legend2_2">Dark brown</span> is equal to almost [minutes] minutes. Those strikes will vanish soon.';
+$_BL['en']['lm_live_info_legend3'] = 'On higher zoom levels the thunder front of current strikes is shown as <span id="live_legend3_1">white transparent</span> growing circle (speed of sound). It gets more transparent while travelling and disappears after a while.';
+$_BL['en']['lm_live_snd_info'] = 'Enable "tick" sound on every lightning stroke in the current map view. This feature might not be available on every device/browser.';
+
+$_BL['en']['lm_live_stations_info'] = 'Displays participating stations for each lightning stroke. The color of the lines between stations and stroke depends on the distance. The higher the distance the more blue instead of green. Note that the angle spanned by participating station is another important factor. Distances of a few hundred kilometers max. and stations on every side of the thunderstorms give best results. Station which have been used for calculating the position are highlighted in purple for a short time. IMPORTANT: This feature can have negative impact on your system performance! Using "Chrome" is recommended.';
+$_BL['en']['lm_live_blitzortung_more'] = 'See more real-time maps on Blitzortung.org';
+$_BL['en']['lm_live_usage'] = 'IMPORTANT: This map is intended for entertainment purposes only!';
+$_BL['en']['lm_live_snd_volume'] = 'Volume';
+$_BL['en']['lm_live_set_fullscreen'] = 'Fullscreen';
+
+$_BL['en'][''] = '';
+$_BL['en'][''] = '';
+$_BL['en'][''] = '';
+$_BL['en'][''] = '';
+$_BL['en'][''] = '';
+$_BL['en'][''] = '';
+$_BL['en'][''] = '';
+
+
+
 
 ?>
