@@ -907,7 +907,7 @@
 //spectrum settings
 @define('BO_GRAPH_RAW_SPEC_WIDTH', 1);
 @define('BO_GRAPH_RAW_SPEC_MAX_X', 160); //kHz
-@define('BO_GRAPH_RAW_SPEC_MAX_Y', 7);
+@define('BO_GRAPH_RAW_SPEC_MAX_Y', 10);
 
 //width, height when displaying all graphs to a stroke
 @define('BO_GRAPH_RAW_W2', 450);
@@ -917,16 +917,24 @@
 @define('BO_GRAPH_RAW_W_BIG', 1000);
 @define('BO_GRAPH_RAW_H_BIG', 500);
 
+//width, height when displaying on statistics page
+@define('BO_GRAPH_RAW_STATION_STATISTICS', false);
+@define('BO_GRAPH_RAW_W_STAT', 600);
+@define('BO_GRAPH_RAW_H_STAT', 300);
+@define('BO_GRAPH_RAW_W_STAT_SPEC', 600);
+@define('BO_GRAPH_RAW_H_STAT_SPEC', 150);
+
+
 //max. time in µs for displaying all graphs to a stroke
 @define('BO_GRAPH_RAW_MAX_TIME2', 350);
 
 //Colors
-@define('BO_GRAPH_RAW_COLOR1', '#f00@0');
-@define('BO_GRAPH_RAW_COLOR2', '#0f0@0');
-@define('BO_GRAPH_RAW_COLOR3', '#ff0@0');
-@define('BO_GRAPH_RAW_COLOR4', '#f0d@0');
-@define('BO_GRAPH_RAW_COLOR5', '#0dd@0');
-@define('BO_GRAPH_RAW_COLOR6', '#f80@0');
+@define('BO_GRAPH_RAW_COLOR1', '#f00@0.2');
+@define('BO_GRAPH_RAW_COLOR2', '#0f0@0.2');
+@define('BO_GRAPH_RAW_COLOR3', '#ff0@0.2');
+@define('BO_GRAPH_RAW_COLOR4', '#f0d@0.2');
+@define('BO_GRAPH_RAW_COLOR5', '#0dd@0.2');
+@define('BO_GRAPH_RAW_COLOR6', '#f80@0.2');
 @define('BO_GRAPH_RAW_COLOR_LINES', '#555@0.7');
 @define('BO_GRAPH_RAW_COLOR_XY1', '#00f@0.6');
 @define('BO_GRAPH_RAW_COLOR_XY2', '#f00@0.6');

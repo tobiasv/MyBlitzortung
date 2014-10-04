@@ -977,7 +977,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			//strokes per minute 
 			$max_spm = $max_val/$xtimestep;
 			$scale = pow(10, floor(log($max_spm, 10)));
-			$max_spm = ceil($max_spm/$scale/2)*$scale*2;
+			$max_spm = $scale > 0 ? ceil($max_spm/$scale/2)*$scale*2 : 1;
 			
 			//adjust max_strokes to max strokes per minute
 			$max_val = $max_spm*$xtimestep;

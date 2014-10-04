@@ -1098,6 +1098,10 @@ $_BL['en']['Now'] = 'Now';
 $_BL['en']['twitter_instructions'] = 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow <em><a href="https://twitter.com/{TWITTER}" target="_blank">{TWITTER}</a></em>!';
 
 
+$_BL['en']['h4_stat_station_signal_last'] = 'Last signal';
+$_BL['en']['bo_graph_descr_signal'] = 'Shows one of the latest signals which the station did send to the server.';
+$_BL['en'][''] = '';
+
 
 /*************************************************************/
 /* Special text for Lightningmaps.org: REALTIME MAP          */
@@ -1150,9 +1154,6 @@ $_BL['en']['lm_live_usage'] = 'IMPORTANT: This map is intended for entertainment
 $_BL['en']['lm_live_snd_volume'] = 'Volume';
 $_BL['en']['lm_live_set_fullscreen'] = 'Fullscreen';
 
-$_BL['en'][''] = '';
-$_BL['en'][''] = '';
-$_BL['en'][''] = '';
 $_BL['en'][''] = '';
 $_BL['en'][''] = '';
 $_BL['en'][''] = '';

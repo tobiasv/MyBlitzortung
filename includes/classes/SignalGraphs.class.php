@@ -8,6 +8,7 @@ class BoSignalGraph
 	var $width  = 0;
 	var $height = 0;
 	var $big = false;
+	var $time = 0;
 	
 	function __construct($w, $h, $big=false)
 	{
@@ -35,6 +36,8 @@ class BoSignalGraph
 		$tickLabels = array();
 		$tickMajPositions = array();
 		$tickPositions = array();	
+	
+		$this->time = $data['time'];
 	
 		if ($type == 'xy') 
 			$this->width = $this->height;
@@ -284,7 +287,7 @@ class BoSignalGraph
 				foreach($data['channel'] as $ch => $d)
 					$datay[$ch][] = $d['data_volt'][$i];
 				
-				$tickLabels[] = round($time_us / $ustepdisplay, 1) * $ustepdisplay.'µs';
+				$tickLabels[] = _BN((round($time_us / $ustepdisplay, 1) * $ustepdisplay), 0).'µs';
 				
 				if (!($i%12))
 				{
@@ -425,7 +428,7 @@ class BoSignalGraph
 		$this->graph->AddText($caption);
 	}
 	
-	public function Display()
+	public function Display($expire = 3600)
 	{
 		if (!is_object($this->graph))
 		{
@@ -437,9 +440,9 @@ class BoSignalGraph
 
 			header("Content-Type: image/png");
 			header("Pragma: ");
-			header("Cache-Control: public, max-age=".(3600 * 24));
-			header("Last-Modified: ".gmdate("D, d M Y H:i:s", $time)." GMT");
-			header("Expires: ".gmdate("D, d M Y H:i:s", $time + 3600 * 24)." GMT");
+			header("Cache-Control: public, max-age=".($expire));
+			header("Last-Modified: ".gmdate("D, d M Y H:i:s", $this->time)." GMT");
+			header("Expires: ".gmdate("D, d M Y H:i:s", time() + $expire)." GMT");
 
 			$I = $this->graph->Stroke(_IMG_HANDLER);
 			imagepng($I);
