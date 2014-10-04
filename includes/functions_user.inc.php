@@ -231,10 +231,13 @@ function bo_user_init($force = false)
 		if (!isset($_SESSION['bo_user']))
 			$_SESSION['bo_user'] = 0;
 	}
+	else
+	{
+		bo_user_cookie_login();
+	}
 	
 	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
-	
-	bo_user_cookie_login();
+
 }
 
 function bo_sess_parms_set()
