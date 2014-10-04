@@ -33,7 +33,12 @@ class BoMapProjection
 
 		if (isset($coord[8]))
 			$this->SatLon = $coord[8];
+
 		
+		//Longitude Reference point (middle for most projections)
+		$this->LonRef = $coord[3] + ($coord[1] - $coord[3]) / 2;
+
+		//Image Dimensions
 		list($x1, $y1) = $this->Calculate($coord[2], $coord[3]); //South, West
 		list($x2, $y2) = $this->Calculate($coord[0], $coord[1]); //North, East
 	
@@ -42,10 +47,7 @@ class BoMapProjection
 		
 		$this->ImageOffsetX = $x1 * $this->ImageCalibrationX - $cW;
 		$this->ImageOffsetY = $y1 * $this->ImageCalibrationY + $cS;
-		
-		//Longitude Reference point (middle for most projections)
-		$this->LonRef = ($coord[1] - $coord[3]) / 2;
-		
+
 		
 		//Strike bounds
 		if (isset($coord[9]) && isset($coord[10]) && isset($coord[11]) && isset($coord[12]))
@@ -119,7 +121,6 @@ class BoMapProjection
 			$lon = $lon+360;
 		else if ($lon > $this->LonRef+180)
 			$lon = $lon-360;
-			
 		
 		switch ($this->Method)
 		{
