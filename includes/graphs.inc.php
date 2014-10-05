@@ -79,8 +79,13 @@ function bo_graph_raw()
 		if (!$lines || (is_array($lines) && empty($lines)))
 			$graph->DisplayEmpty(true, 'Signal file not found or empty');
 		
-		$signal = bo_signal_json2data(json_decode($lines[0]));
+		$signal = json_decode($lines[0]);
 
+		if (!$signal)
+			$graph->DisplayEmpty(true, 'Error in signal data');
+		
+		$signal = bo_signal_json2data($signal);
+		
 		$mod_time = $signal['time'];
 		
 		header("Pragma: ");
