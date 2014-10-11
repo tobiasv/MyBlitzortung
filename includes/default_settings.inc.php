@@ -159,7 +159,7 @@
 @define('BO_LOCALE2', '');
 
 //available locales
-@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv,pl');
+@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv,pl,cz');
 
 //show links in the footer
 @define('BO_SHOW_LANGUAGES', true);
