@@ -142,11 +142,15 @@
 //stations update interval
 @define('BO_UP_INTVL_STATIONS', 15);
 
-//signal update interval
-@define('BO_UP_INTVL_RAW', 0);
-
 //min interval of external downloads
 @define('BO_UP_INTVL_DOWNLOADS', 1);
+
+
+/*******************************************************************/
+/*** Update intervals (Minutes!)                                 ***/
+
+//max age of a stroke
+@define('BO_UP_STROKE_MIN_TIME', "now -48 hours");
 
 
 /*******************************************************************/
@@ -230,7 +234,7 @@
 /*** Warn with email if station/tracker sends no signals         ***/
 
 //Warnings enabled?
-@define('BO_TRACKER_WARN_ENABLED', true);
+@define('BO_TRACKER_WARN_ENABLED', false);
 
 //Warn after given when no signals were send (plus 60 minutes due to stations.txt statistics)
 @define('BO_TRACKER_WARN_AFTER_HOURS', 1);

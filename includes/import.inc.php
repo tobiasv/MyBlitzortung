@@ -62,8 +62,7 @@ function bo_update_all2($force = false, $only = '')
 
 
 	//check if we should do an async update
-	if (    (BO_UP_INTVL_STRIKES > BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS)
-	     || (BO_UP_INTVL_STRIKES > BO_UP_INTVL_RAW)     && BO_UP_INTVL_RAW)
+	if (    (BO_UP_INTVL_STRIKES > BO_UP_INTVL_STATIONS && BO_UP_INTVL_STATIONS) )
 	{
 		if (!$force)
 			bo_echod("Info: Asynchronous update. No problem, but untestet. To avoid set strike timer < station timer < signal timer (or equal).");
@@ -91,24 +90,6 @@ function bo_update_all2($force = false, $only = '')
 
 		if (!$only || $only == 'stations')
 			$stations_imported = bo_update_stations($force);
-
-
-		//Signals
-		if (bo_exit_on_timeout()) return;
-
-		if (!$only || $only == 'signals')
-			$signals_imported  = bo_update_raw_signals($force);
-		
-		
-		//Assign strikes->signals
-		if (bo_exit_on_timeout()) return;
-		
-		if ($signals_imported && 
-			BoData::get('uptime_strikes_modified') - BO_MIN_MINUTES_STRIKE_CONFIRMED*60-60 < BoData::get('uptime_raw'))
-		{
-			bo_match_strike2raw();
-		}
-
 
 		//Daily statistics
 		if (bo_exit_on_timeout()) return;
@@ -260,330 +241,6 @@ function bo_get_archive($args='', $bo_login_id=false, $as_array=false)
 
 }
 
-// Get raw data from blitzortung.org
-function bo_update_raw_signals($force = false)
-{
-	bo_echod(" ");
-	bo_echod("=== Raw-Data ===");
-	bo_echod("Not implemented!");
-	
-	return;
-	
-	if (!defined('BO_UP_INTVL_RAW') || !BO_UP_INTVL_RAW)
-	{
-		bo_echod("Disabled!");
-		return true;
-	}
-	
-	if (bo_version() < 801)
-	{
-		bo_echod("Database version too old. Need update...");
-		return;
-	}
-
-	list($last_update, $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified) = @unserialize(BoData::get('uptime_raw_data'));
-
-	$count_inserted = 0;
-	$count_exists = 0;
-
-	$do_update = time() - $last_update > BO_UP_INTVL_RAW * 60 - 30 || $force || time() < $last_update;
-
-	//Auto force = if there are more files to load (e.g. after installation)
-	if (!$do_update && 0 < $auto_force && $auto_force < 30)
-	{
-		bo_echod("Auto forced update out of order to get the remaining data");
-		$do_update = true;
-	}
-
-	if ($do_update)
-	{
-		//set only the important entries to avoid problems if import crashes
-		BoData::set('uptime_raw_data', serialize(array(time(), 0, $update_errs+1)));
-
-		$max_signal_back_hours = 22;
-		$read_back_seconds = 180;
-		$update_err = false;
-
-		// Search last signal
-		$sql = "SELECT MAX(time) mtime FROM ".BO_DB_PREF."raw";
-		$res = BoDb::query($sql);
-		$row = $res->fetch_assoc();
-		$last_signal = strtotime($row['mtime'].' UTC');
-		$update_time_start = $last_signal - $read_back_seconds;
-		$update_time_end   = time();
-
-		if ($update_errs > 10 || (!$last_signal && $last_update) )
-		{
-			//avoid downloading the same (missing) files again and again -> only (try to) get the latest data
-			bo_echod("There were errors during the last import or couldn't find any signal in the database ($update_errs)! Getting only the latest raw-data file.");
-			$update_time_start = time() - 3600;
-			$last_file_pos = 0;
-			$last_hour = false;
-		}
-		elseif (!$last_signal && !$last_update)
-		{
-			//First update ever
-			bo_echod("No last signal found (maybe first update)! Update begins at 'now -$max_signal_back_hours hours'");
-			$update_time_start = time() - 3600 * $max_signal_back_hours;
-			$last_file_pos = 0;
-			$last_hour = false;
-		}
-		elseif (	$last_signal > time()
-				|| time() - $last_update > $max_signal_back_hours * 3600
-				|| time() - $last_signal > $max_signal_back_hours * 3600
-				)
-		{
-			//Last update or last signal was too long ago
-			bo_echod("No last signal found or last recieved signal too old! Last time: ".$row['mtime'].". Setting to now -$max_signal_back_hours hours.");
-			$update_time_start = time() - 3600 * $max_signal_back_hours;
-			$last_file_pos = 0;
-			$last_hour = false;
-		}
-
-
-		//anti-duplicate without using unique-db keys
-		//Searching for old Signals (to avoid duplicates)
-		$old_times = array();
-		$date_start = gmdate('Y-m-d H:i:s', $update_time_start);
-		$date_end = gmdate('Y-m-d H:i:s', time() + 3600 * 6); //6h to the future to be sure
-		$sql = "SELECT id, time, time_ns
-				FROM ".BO_DB_PREF."raw
-				WHERE time BETWEEN '$date_start' AND '$date_end'";
-		$res = BoDb::query($sql);
-		while ($row = $res->fetch_assoc())
-		{
-			$id = $row['id'];
-			$old_times[$row['id']] = $row['time'].'.'.$row['time_ns'];
-		}
-
-
-		//which files to download
-		$hours = array();
-		for ($i=floor($update_time_start/3600); $i<=floor($update_time_end/3600);$i++)
-			$hours[] = gmdate('H', $i*3600);
-
-
-		//Debug output
-		$loadcount = BoData::get('upcount_raw');
-		BoData::set('upcount_raw', $loadcount+1);
-		bo_echod('Last signal: '.date('Y-m-d H:i:s', $last_signal).
-				' *** Importing only signals newer than: '.date('Y-m-d H:i:s', $update_time_start).
-				' *** Loading '.count($hours).' files'.
-				' *** This is update #'.$loadcount);
-
-		//bo_echod("Last hour: $last_hour  Last pos: $last_file_pos");
-
-		$files = 0;
-		$lines = 0;
-		foreach($hours as $hour)
-		{
-			$range = 0;
-			$bytes = 0;
-			$files++;
-			$text = " $files. Reading file $hour.log ";
-			$url  = bo_access_url().BO_IMPORT_PATH_RAW.trim(BO_USER).'/'.$hour.'.log';
-			$modified = $last_modified ? $last_modified : $last_signal;
-
-			//using range-method if parameters known
-			if ($files == 1 && $last_hour !== false && $last_hour == $hour && $last_file_pos)
-			{
-				$range = $last_file_pos;
-				$text .= " using range method (starting at $last_file_pos bytes)";
-				$last_hour = false; //reset
-			}
-
-			// GET THE FILE
-			$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
-
-
-			//sth. went wrong -> retry without range
-			if ($file === false && intval($code) != 304)
-			{
-				$text .= 'sth went rong -> getting the file the 2nd time';
-				$modified = $last_modified ? $last_modified : $last_signal;
-
-				// GET THE FILE (again)
-				$file = bo_get_file($url, $code, 'raw_data', $range, $modified, true);
-			}
-			elseif ($file !== false && empty($range) && $last_file_pos && $files == 1)
-			{
-				$text .= " - got whole file ";
-			}
-
-			//Check the file
-			if ($file === false)
-			{
-				if (intval($code) == 304)
-				{
-					bo_echod($text." *** file not modified");
-				}
-				else
-				{
-					bo_echod($text." *** couldn't get file $url *** Code: $code");
-					$update_err = true;
-					$last_file_pos = 0;
-				}
-
-				continue;
-			}
-			else
-			{
-				//use the range method for the previous hour-file if
-				if (!$modified || gmdate('H', $modified-$read_back_seconds) == $hour)
-				{
-					//save range and modified-time for the next try
-					if (isset($range[1]))
-						$last_file_pos = $range[1];
-					else
-						$last_file_pos = strlen(implode('', $file));
-
-					$last_modified = $modified;
-					$last_hour = $hour;
-				}
-
-				bo_echod($text." *** ".count($file)." Lines ... ");
-			}
-
-			//Read the signals
-			foreach($file as $line)
-			{
-				$bytes += strlen($line)+1;
-
-				if (!trim($line))
-					continue;
-
-				if (!preg_match('/([0-9]{4}\-[0-9]{2}\-[0-9]{2}) ([0-9]{2}:[0-9]{2}:[0-9]{2})\.([0-9]+) ([-0-9\.]+) ([-0-9\.]+) ([-0-9\.]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([A-F0-9]+)/', $line, $r))
-				{
-					bo_echod("Wrong line format: \"$line\"");
-					continue;
-				}
-
-				$date = $r[1];
-				$time = $r[2];
-				$time_ns = intval($r[3]);
-				$utime = strtotime("$date $time UTC");
-
-				// update strike-data only some seconds *before* the *last signal*
-				if ($utime < $update_time_start)
-				{
-					$count_exists++;
-					continue;
-				}
-
-				//don't look at existsing signals
-				$id = array_search("$date $time.$time_ns", $old_times);
-				if ($id)
-				{
-					$count_exists++;
-					continue;
-				}
-
-				$lines++;
-
-				$lat = $r[4];
-				$lon = $r[5];
-				$height = (double)$r[6];
-				$channels = $r[7];
-				$values = $r[8];
-				$bpv = $r[9];
-				$ntime = $r[10]; //nanosec per sample
-				$data = trim($r[11]);
-
-				//check wether data string fits hex-code
-				if (trim($data, "1234567890abcdefABCDEF"))
-					$data = '';
-				elseif (strlen($data) % 2)
-					$data .= '0';
-
-				// signal examinations adn SQL
-				$bdata = bo_hex2bin($data);
-				$sql_data = bo_examine_signal($bdata, $channels, $ntime);
-				$sql_data['time'] = "$date $time";
-				$sql_data['time_ns'] = $time_ns;
-				$sql_data['lat'] = $lat;
-				$sql_data['lon'] = $lon;
-				$sql_data['height'] = $height;
-				$sql_data['strike_id'] = '0';
-				$sql_data['channels'] = $channels;
-				$sql_data['ntime'] = $ntime;
-				$sql_data['data'] = array($data, 'hex');
-							
-				BoDb::bulk_insert('raw', $sql_data);
-				$count_inserted++;
-				
-				//Timeout
-				if (bo_exit_on_timeout())
-				{
-					if (count($hours) - $files > 1)
-					{
-						$auto_force++;
-						bo_echod('Auto update will occur during the next import to get the remaining files!');
-					}
-
-					//change byte range for partial download
-					if ($last_file_pos)
-						$last_file_pos -= $bytes;
-
-					$timeout = true;
-					break 2;
-				}
-
-			}
-
-		}
-
-		if ($update_err)
-			$update_errs++;
-		else
-			$update_errs = 0;
-		
-		if (!$timeout)
-			$auto_force = false;
-
-		//Write stuff
-		BoDb::bulk_insert('raw');
-			
-		//bo_echod("Pos: $last_file_pos Hour: $last_hour");
-
-		BoData::set('uptime_raw_data', serialize(array(time(), $auto_force, $update_errs, $last_file_pos, $last_hour, $last_modified)));
-
-		bo_echod("Lines: $lines *** Files: $files *** New Raw Data: $count_inserted *** Already read: $count_exists");
-
-		if ($channels && $values && $bpv)
-		{
-			BoData::set('raw_channels', $channels);
-			BoData::set('raw_values', $values);
-			BoData::set('raw_bitspervalue', $bpv);
-			BoData::set('raw_ntime', $ntime);
-		}
-
-		//Longtime
-		$count = BoData::get('count_raw_signals');
-		BoData::set('count_raw_signals', $count + $count_inserted);
-
-		if (!$timeout)
-		{
-			BoData::set('uptime_raw', time());
-			bo_update_status_files('signals');
-			bo_match_strike2raw();
-			$updated = true;
-		}
-		else
-			$updated = false;
-
-		if ($update_err)
-			bo_update_error('rawdata', 'Download of raw data failed.');
-		else
-			bo_update_error('rawdata', true);
-	}
-	else
-	{
-		bo_echod("No update. Last update ".(time() - $last_update)." seconds ago. This is normal and no error message!");
-		$updated = false;
-	}
-
-	return $updated;
-}
 
 // Get new strikes from blitzortung.org
 function bo_update_strikes($force = false, $time_start_import = null)
@@ -669,7 +326,12 @@ function bo_update_strikes($force = false, $time_start_import = null)
 		if ($strike_last_time >= time() || $strike_last_time <= 0)
 			$strike_last_time = 1;
 
-			
+		if (BO_UP_STROKE_MIN_TIME && strtotime(BO_UP_STROKE_MIN_TIME) > $strike_last_time)
+		{
+			bo_echod('Last strike to long ago: "'.date('Y-m-d H:i:s', $strike_last_time).'", minimum age is "'.BO_UP_STROKE_MIN_TIME.'"');
+			$strike_last_time = strtotime(BO_UP_STROKE_MIN_TIME);
+		}
+		
 		$Files = new FilesDownload('strikes', 10, bo_access_url().BO_IMPORT_PATH_STROKES, $strike_last_time);
 	
 
@@ -1086,189 +748,6 @@ function bo_update_strikes($force = false, $time_start_import = null)
 	return $updated;
 }
 
-
-
-// Update strike_id <-> raw_id
-function bo_match_strike2raw()
-{
-	static $done = false;
-	if (!BO_UP_INTVL_RAW || $done)
-		return;
-	$done = true;
-		
-	//not really physical values but determined empirical
-	$c = BO_STR2SIG_C;
-	$fuzz = BO_STR2SIG_FUZZ_SEC ; //minimum fuzzy-seconds
-	$dist_fuzz = BO_STR2SIG_FUZZ_SECM; //fuzzy-seconds per meter (seconds)
-	$offset_fuzz = BO_STR2SIG_FUZZ_OFFSET;
-
-	$amp_trigger = (BO_TRIGGER_VOLTAGE * BO_STR2SIG_TRIGGER_FACTOR / BO_MAX_VOLTAGE) * 256 / 2;
-
-	//time of last update
-	$last_modified = BoData::get('uptime_strikes_modified');
-	
-	//update only strikes that are "old enough"
-	//because younger ones could be updated during the next strike-import
-	//and this will overwrite "part" and "raw_id"!
-	$maxtime = $last_modified - BO_MIN_MINUTES_STRIKE_CONFIRMED * 60 - 60;
-	$mintime = $maxtime - 3600 * 2;
-	
-	$u = array();
-	$n = array();
-	$m = array();
-	$d = $d2 = array();
-	$polarity = array();
-	$part = array();
-	$own_found = 0;
-	$own_strikes = 0;
-
-	$sql = "SELECT id, time, time_ns, distance, bearing, polarity, part
-			FROM ".BO_DB_PREF."strikes
-			WHERE 1
-					AND raw_id IS NULL
-					AND time BETWEEN '".gmdate('Y-m-d H:i:s', $mintime)."' AND '".gmdate('Y-m-d H:i:s', $maxtime)."'
-			ORDER BY part DESC
-			LIMIT 10000
-			";
-	$res = BoDb::query($sql);
-	while($row = $res->fetch_assoc())
-	{
-		if ($row['part'] > 0)
-			$own_strikes++;
-
-		$time_strike  = strtotime($row['time']." UTC");
-		$ntime_strike = 1E-9 * $row['time_ns'];
-
-		$time_raw  = $time_strike - 1;      //Raw times are 1 second behind strike time
-		$ntime_raw = $ntime_strike + $row['distance'] / $c;  //Speed of Light
-
-		if ($ntime_raw > 1)
-		{
-			$time_raw  += 1;
-			$ntime_raw -= 1;
-		}
-
-		//fuzzy search
-		$search_from  = $time_raw;
-		$search_to    = $time_raw;
-		$nsearch_from = $ntime_raw - $fuzz * (1 + $row['distance'] * $dist_fuzz) + $offset_fuzz;
-		$nsearch_to   = $ntime_raw + $fuzz * (1 + $row['distance'] * $dist_fuzz) + $offset_fuzz;
-
-		if ($nsearch_from < 0) { $nsearch_from++; $search_from--; }
-		else if ($nsearch_from > 1) { $nsearch_from--; $search_from++; }
-
-		if ($nsearch_to < 0) { $nsearch_to++; $search_to--; }
-		else if ($nsearch_to > 1) { $nsearch_to--; $search_to++; }
-
-		$search_date_from = gmdate('Y-m-d H:i:s', intval($search_from));
-		$search_date_to   = gmdate('Y-m-d H:i:s', intval($search_to));
-
-		$nsearch_from *= 1E9;
-		$nsearch_to   *= 1E9;
-
-		if ($nsearch_from > $nsearch_to)
-			$nsql = " time_ns > '$nsearch_from'  OR time_ns < '$nsearch_to' ";
-		else
-			$nsql = " time_ns > '$nsearch_from' AND time_ns < '$nsearch_to' ";
-
-		$sql = "SELECT id, time, time_ns, data, amp1, amp2, amp1_max, amp2_max
-				FROM ".BO_DB_PREF."raw
-				WHERE 	time BETWEEN '$search_date_from' AND '$search_date_to'
-						AND (strike_id=0 OR strike_id='".$row['id']."')
-						AND $nsql
-				LIMIT 2";
-		$res2 = BoDb::query($sql);
-		$num = $res2->num_rows;
-		$row2 = $res2->fetch_assoc();
-
-		switch($num)
-		{
-			case 0:  $n[] = $row['id'];	break; //no raw data found
-			default: $m[] = $row['id']; break; //too much lines matched
-
-			case 1:  //exact match
-
-				//bo_echod(round($row2['time_ns'] - $nsearch_from).' '.abs(round($row2['time_ns'] - $nsearch_to)).' '.$row2['time_ns']);
-
-				if ($raw2assigned[$row2['id']] && $row['part'] <= 0) // if signal already assigned and not participated
-				{
-					$d2[] = $row['id'];
-					continue;
-				}
-				else
-					$raw2assigned[$row2['id']] = true;
-
-				$u[] = array($row2['id'], $row['id']);
-				$polarity[$row['id']] = $row['polarity'];
-				$part[$row['id']] = $row['part'] > 0 ? 1 : 0;
-
-				//channel examination
-				$trigger1_first = abs($row2['amp1']     - 128) >= $amp_trigger;
-				$trigger2_first = abs($row2['amp2']     - 128) >= $amp_trigger;
-				$trigger1_later = abs($row2['amp1_max'] - 128) >= $amp_trigger;
-				$trigger2_later = abs($row2['amp2_max'] - 128) >= $amp_trigger;
-
-				$part[$row['id']] += $trigger1_first ? pow(2, 1) : 0;
-				$part[$row['id']] += $trigger2_first ? pow(2, 2) : 0;
-				$part[$row['id']] += $trigger1_later ? pow(2, 3) : 0;
-				$part[$row['id']] += $trigger2_later ? pow(2, 4) : 0;
-
-				//mark negative --> got strike but not tracked by blitzortung
-				if (!($part[$row['id']] & 1))
-					$part[$row['id']] = abs($part[$row['id']]) * -1;
-				else
-					$own_found++;
-
-				break;
-
-		}
-
-		//bo_echod("Strike: ".$row['time'].".".$row['time_ns']." <-> Your Station: ".$row2['time'].".".$row2['time_ns']." Num Rows: ".$num);
-		
-		
-		//Timeout
-		if (bo_exit_on_timeout())
-		{
-			$timeout = true;
-			break;
-		}
-	}
-
-	bo_echod(" ");
-	bo_echod("== Assign raw data to strikes ==");
-	bo_echod("Max strike time: ".date('Y-m-d H:i:s', $maxtime)." | Strikes: ".(count($u) + count($n) + count($m))." | Own: ".$own_strikes);
-	bo_echod("Found unique: ".count($u).
-			" | Found own unique: ".$own_found." (Rate ".round($own_strikes ? $own_found / $own_strikes * 100 : 0,1)."%)".
-			" | Not found: ".count($n).
-			" | Multiple Sig->Str: ".count($m).
-			" | Multiple Str->Sig: ".count($d2));
-
-	//Update matched
-	foreach($u as $data)
-	{
-		$strike_id = $data[1];
-		$raw_id = $data[0];
-		$sql = "UPDATE ".BO_DB_PREF."strikes
-				SET
-					raw_id='$raw_id',
-					polarity='".intval($polarity[$strike_id])."',
-					part='".intval($part[$strike_id])."'
-				WHERE id='$strike_id'";
-		BoDb::query($sql);
-
-		BoDb::query("UPDATE ".BO_DB_PREF."raw SET strike_id='$strike_id' WHERE id='$raw_id'");
-	}
-
-	//Update unmatched
-	$d = array_merge($n, $m);
-	$sql = '';
-	foreach($d as $strike_id)
-		$sql .= " OR id='$strike_id' ";
-	$sql = "UPDATE ".BO_DB_PREF."strikes SET raw_id='0' WHERE 1=0 $sql";
-	BoDb::query($sql);
-
-	return true;
-}
 
 // Get stations-data and statistics from blitzortung.org
 function bo_update_stations($force = false)
@@ -1803,12 +1282,10 @@ function bo_update_stations($force = false)
 
 		}
 
-
 		BoData::set('uptime_stations', time());
 
-
 		//send mail to owner if no signals
-		if (0 && BO_TRACKER_WARN_ENABLED === true && $own_id > 0)
+		if (BO_TRACKER_WARN_ENABLED === true && $own_id > 0)
 		{
 			$data = unserialize(BoData::get('warn_tracker_offline'));
 			$owndata = $StData[ bo_station_id(true) ];
@@ -1886,7 +1363,6 @@ function bo_update_daily_stat($time = false, $force_renew = false)
 		$day_end =   gmdate('Y-m-d H:i:s', strtotime(gmdate('Y-m-d 23:59:59', $time)));
 
 		$stat_ok = BoData::get('uptime_stations') > $day_end + 60;
-		//$raw_ok  = BoData::get('uptime_raw') > $day_end + 60;
 
 		// Strikes SQL template
 		$sql_template = "SELECT COUNT(id) cnt FROM ".BO_DB_PREF."strikes s WHERE {where} time BETWEEN '$day_start' AND '$day_end'";
@@ -2339,7 +1815,6 @@ function bo_update_status_files($type)
 
 	$IMPORT_LAST_STRIKES   = _BDT(BoData::get('uptime_strikes'));
 	$IMPORT_LAST_STATIONS  = _BDT(BoData::get('uptime_stations'));
-	$IMPORT_LAST_SIGNALS   = _BDT(BoData::get('uptime_raw'));
 
 	$replace = array(
 		'{STATION_CURRENT_STRIKES}'  => $STATION_CURRENT_STRIKES,
@@ -2352,8 +1827,6 @@ function bo_update_status_files($type)
 		'{STATION_LAST_INACTIVE}'    => $STATION_LAST_INACTIVE,
 		'{IMPORT_LAST_STRIKES}'      => $IMPORT_LAST_STRIKES,
 		'{IMPORT_LAST_STATIONS}'     => $IMPORT_LAST_STRIKES,
-		'{IMPORT_LAST_SIGNALS}'      => $IMPORT_LAST_STRIKES,
-
 	);
 
 	$config = file_get_contents($cfile);
@@ -2445,25 +1918,6 @@ function bo_purge_olddata($force = false)
 			$num_signals = 0;
 			$num_stastr = 0;
 
-			//Raw-Signals, where no strike assigned
-			if (defined('BO_PURGE_SIG_NS') && BO_PURGE_SIG_NS)
-			{
-				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_SIG_NS * 3600);
-				$num = BoDb::query("DELETE FROM ".BO_DB_PREF."raw WHERE time < '$dtime' AND strike_id=0");
-				$num_signals += $num;
-				bo_echod("Raw signals (with no strikes assigned): $num");
-			}
-
-
-			//All Raw-Signals
-			if (defined('BO_PURGE_SIG_ALL') && BO_PURGE_SIG_ALL)
-			{
-				$dtime = gmdate('Y-m-d H:i:s', time() - BO_PURGE_SIG_ALL * 3600);
-				$num = BoDb::query("DELETE FROM ".BO_DB_PREF."raw WHERE time < '$dtime'");
-				$num_signals += $num;
-				bo_echod("Raw signals: $num");
-			}
-
 			//Strikes (not participated)
 			if (defined('BO_PURGE_STR_NP') && BO_PURGE_STR_NP)
 			{
@@ -2550,11 +2004,6 @@ function bo_purge_olddata($force = false)
 					BoDb::query("OPTIMIZE TABLE ".BO_DB_PREF."stations_stat");
 				}
 
-				if ($num_signals > BO_PURGE_OPTIMIZE_TABLES)
-				{
-					bo_echod("Optimizing signals table");
-					BoDb::query("OPTIMIZE TABLE ".BO_DB_PREF."raw");
-				}
 
 				if ($num_stastr > BO_PURGE_OPTIMIZE_TABLES)
 				{
