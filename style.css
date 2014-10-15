@@ -796,6 +796,11 @@ padding: 4px;
 display: none;
 }
 
+#myblitzortung #bo_stat_station_signal_last  img {
+display: block;
+}
+
+
 /*** User ***/
 #myblitzortung .bo_form_checkbox_text {
 display: inline-block;

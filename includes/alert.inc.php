@@ -605,11 +605,16 @@ function bo_alert_send()
 								$text .= "\n\n--\n".$d['name']." / ".$d['address']."/ $user_id";
 								
 								$text = preg_replace("#(?<!\r)\n#si", "\r\n", $text); 								
-								
+
+								bo_echod("Sending email to \"".$d['address']."\"");
+
 								$ret = bo_mail($d['address'], 
 											_BL('Strikes detected', true).' ('.$d['name'].')', 
 											$text);
-								
+
+								if (!$ret)
+									bo_echod("ERROR sending mail!");
+											
 								$log[$alert_dbname]['text']   = $text;
 								
 								

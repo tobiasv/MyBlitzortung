@@ -3,6 +3,24 @@
    MyBlitzortung Changelog
 *****************************
 
+Version 1.4-dev4 (2014-10-05)
+-----------------------------
+
+- added live signals
+- use new signal format (JSON)
+- use a longitude reference for static maps (i.e. when longitude close to +/-180°)
+- several minor fixes
+
+
+Version 1.4-dev3 (2014-09-26)
+-----------------------------
+
+- static maps: legend improved
+- fix: wrong 'miller' projection
+- removed some PHP error messages
+- added English/German texts of Lightningmaps.org
+
+
 Version 1.4-dev2 (2014-06-06)
 -----------------------------
 

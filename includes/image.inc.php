@@ -623,7 +623,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			else
 				$color[$i] = imagecolorallocatealpha($I, $rgb[0], $rgb[1], $rgb[2], $rgb[3]);
 				
-			$count[$i] = 0;
+			$color_count[$i] = 0;
 		}
 		
 		if (!empty($color_tmp))
@@ -731,13 +731,27 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				$time_string .= date('H:i', $time_min).' - '.date('H:i', $time_max);
 
 			$time_string .= _BZ($time_min);
-			
+
 			break;
 	}
 
 	
-	$count = array();
+	//Legend counter
+	$legend_count = array();
 	
+	if ((int)$cfg['legend']['smooth'] > 0 && $cfg['col_smooth'])
+		$legend_smooth = (int)$cfg['legend']['smooth'];
+	else
+		$legend_smooth = 1;
+
+	for ($i=0; $i<count($color)*$legend_smooth; $i++)
+		$legend_count[$i] = 0;
+
+	if ($time_max - $time_min > 3600 * 12)
+		$time_string_legend = round(($time_max-$time_min)/3600).'h';
+	else
+		$time_string_legend = round(($time_max-$time_min)/60).'min';
+		
 	//get the strikes
 	if (!$blank)
 	{
@@ -798,7 +812,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				bo_drawpoint($I, $x, $y, $cfg['point_style'], $pcolor, !$transparent);
 			}
 			
-			$count[$color_index]++;
+			$legend_index = floor($age / $color_intvl * $legend_smooth);
+			$legend_count[$legend_index]++;
 		}
 	}
 	
@@ -834,7 +849,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			
 			if ($stinfo)
 			{
-				list($x, $y) = $Projection->LatLon2Image($stinfo['lat'], $stinfo['lon']);
+				list($x, $y) = $Projection->LatLon2Image($stinfo['lat'], $stinfo['lon'], true);
 
 				$size = $cfg['show_station'][0];
 				
@@ -877,8 +892,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				list(,$lat2) = @each($reg);
 				list(,$lon2) = @each($reg);
 				
-				list($rx1, $ry1) = $Projection->LatLon2Image($lat1, $lon1);
-				list($rx2, $ry2) = $Projection->LatLon2Image($lat2, $lon2);
+				list($rx1, $ry1) = $Projection->LatLon2Image($lat1, $lon1, true);
+				list($rx2, $ry2) = $Projection->LatLon2Image($lat2, $lon2, true);
 				
 				imagerectangle($I, $rx1, $ry1, $rx2, $ry2, $rect_col[$rect_type]);
 			}
@@ -931,7 +946,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$cx = $cfg['legend'][3];
 			$cy = $cfg['legend'][4];
 
-			$coLegendWidth = floor($cw / count($color));
+			$coLegendWidth = $cw / count($legend_count);
 			$cx = $w - $cw - $cx;
 			$cy = $h - $ch - $cy;
 			$legend = true;
@@ -942,7 +957,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if ($show_banners)
 	{
 		if (!$blank)
-			$extra_text = _BL('Strikes').': '.array_sum($count);
+			$extra_text = _BL('Strikes').': '.array_sum($legend_count);
 
 		bo_image_banner_top($I, $w, $h, $cfg, $time_string, $extra_text);
 		bo_image_banner_bottom($I, $w, $h, $cfg, $cw);
@@ -952,26 +967,50 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	if (!$blank && $legend)
 	{
 		$legend_text_drawn = false;
-
-		ksort($count);
+		$max_val = max($legend_count);
 		
-		foreach($count as $i => $cnt)
+		//legend x-axis smoothing => use rounded max value
+		if (isset($cfg['legend']['smooth'])) 
 		{
-			if (max($count))
-				$height = $ch * $cnt / max($count);
+			$xtimestep = (($time_max - $time_min)/60/count($legend_count));
+					
+			//strokes per minute 
+			$max_spm = $max_val/$xtimestep;
+			$scale = pow(10, floor(log($max_spm, 10)));
+			$max_spm = $scale > 0 ? ceil($max_spm/$scale/2)*$scale*2 : 1;
+			
+			//adjust max_strokes to max strokes per minute
+			$max_val = $max_spm*$xtimestep;
+			
+			$ytext = $max_spm.'/min';
+		}
+		
+		
+		ksort($legend_count);
+		
+		foreach($legend_count as $i => $cnt)
+		{
+			if (max($legend_count))
+				$height = $ch * $cnt / $max_val;
 			else
 				$height = 0;
 
-			$px1 = $cx + (count($color)-$i-1) * $coLegendWidth;
-			$px2 = $cx + (count($color)-$i) * $coLegendWidth - 1;
+			$px1 = $cx + (count($legend_count)-$i-1) * $coLegendWidth;
+			$px2 = $cx + (count($legend_count)-$i) * $coLegendWidth - 1;
 			$py1 = $cy + $ch;
 			$py2 = $cy + $ch - $height;
 
-			imagefilledrectangle($I, $px1, $py1, $px2, $py2, $color[$i]);
+			if ($cfg['col_smooth'])
+				$pcolor = $color_smooth[floor($i/count($legend_count)*count($color_smooth))];
+			else
+				$pcolor = $color[floor($i/count($legend_count)*count($color))];
+			
+			imagefilledrectangle($I, $px1, $py1, $px2, $py2, $pcolor);
 
-			if (!$legend_text_drawn && $cfg['legend'][0] &&
-					(    ($transparent  && $i == count($color)-1)
-					  || (!$transparent && $cnt == max($count))
+			
+			if (!$legend_text_drawn && $cfg['legend'][0] && !isset($cfg['legend']['smooth']) &&
+					(    ($transparent  && $i == count($legend_count)-1)
+					  || (!$transparent && $cnt == max($legend_count))
 					) 
 			   )
 			{
@@ -998,6 +1037,14 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			imagesetthickness($I, 1);
 			imageline($I, $cx-1, $cy-1, $cx-1, $cy+$ch, $text_col);
 			imageline($I, $cx-1, $cy+$ch, $cx+$cw+2, $cy+$ch, $text_col);
+		}
+		
+		if ($cfg['legend']['smooth'])
+		{
+			$font = $cfg['legend_font'];
+			bo_imagestringright($I, $font[0], $cx+$font[3]-1, $cy+$font[4]-2,            $ytext,     	      $font[2], $font[1]);
+			bo_imagestringright($I, $font[0], $cx+$font[3]-1, $cy+$font[4]-$font[0]+$ch, 0,                   $font[2], $font[1]);
+			bo_imagestringcenter($I, $font[0], $cx + ($cw/2), $cy+$ch+3,                 $time_string_legend, $font[2], $font[1]);
 		}
 	}
 
@@ -1271,7 +1318,7 @@ function bo_add_cities2image($I, $cfg, $w, $h, $Projection)
 	$erg = BoDb::query($sql);
 	while ($row = $erg->fetch_assoc())
 	{
-		list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon']);
+		list($x, $y) = $Projection->LatLon2Image($row['lat'], $row['lon'], true);
 
 		$c = $cfg['cities'][$row['type']];
 	
@@ -1315,8 +1362,9 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 		$row = $erg->fetch_assoc();
 		$strike_lat = $row['lat'];
 		$strike_lon = $row['lon'];
-		list($strike_x, $strike_y) = $Projection->LatLon2Image($strike_lat, $strike_lon);
-	
+		list($strike_x, $strike_y) = $Projection->LatLon2Image($strike_lat, $strike_lon, true);
+		$Projection->SetLonRef($strike_lon);
+		
 		$strike_dists = array();
 		$sql = "SELECT ss.station_id id
 				FROM ".BO_DB_PREF."stations_strikes ss
@@ -1372,7 +1420,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 		else
 			$c = $cfg['stations'][0];
 		
-		list($x, $y) = $Projection->LatLon2Image(round($d['lat'],2), round($d['lon'],2));
+		list($x, $y) = $Projection->LatLon2Image(round($d['lat'],2), round($d['lon'],2), true);
 		
 		if ($c['font'][0])
 		{
@@ -1442,7 +1490,7 @@ function bo_add_stations2image($I, $cfg, $w, $h, $Projection, $strike_id = 0)
 						if ($lon <= -180 || $lon >= 180 || $lat < -90 || $lat > 90)
 							continue;
 		
-						list($x, $y) = $Projection->LatLon2Image($lat, $lon);
+						list($x, $y) = $Projection->LatLon2Image($lat, $lon, true);
 						
 						if ($x === false || $y === false)
 							break;

@@ -564,6 +564,44 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 	echo '</ul>';
 
+	if ($active && (BO_GRAPH_RAW_STATION_STATISTICS === true || BO_GRAPH_RAW_STATION_STATISTICS > 0))
+	{
+		echo '<h4>'._BL('h4_stat_station_signal_last').'</h4>';
+		echo '<div id="bo_stat_station_signal_last">';
+		echo '<p class="bo_graph_description" id="bo_graph_descr_signal">';
+		echo strtr(_BL('bo_graph_descr_signal'), array('{STATION_CITY}' => $city));
+		echo '</p>';
+		
+		echo '<img src=\''.bo_bofile_url().'?bo_graph&bo_station_id='.$station_id.'&bo_size=4\'             onload="bo_stat_graph_reload();" onerror="bo_stat_graph_reload();" alt="" style="width:'.BO_GRAPH_RAW_W_STAT.'px;height:'.BO_GRAPH_RAW_H_STAT.'px" class="bo_sig" id="bo_stat_sig">';
+		echo '<img src=\''.bo_bofile_url().'?bo_graph&bo_station_id='.$station_id.'&bo_size=4&bo_spectrum\' alt="" style="width:'.BO_GRAPH_RAW_W_STAT_SPEC.'px;height:'.BO_GRAPH_RAW_H_STAT_SPEC.'px" class="bo_sig_spec" id="bo_stat_spec">';
+		
+		echo '</div>';
+		echo '<script>
+
+		var bo_sig  = document.getElementById("bo_stat_sig");
+		var bo_spec = document.getElementById("bo_stat_spec");
+		
+		var bo_sig_url = bo_sig.src;
+		var bo_spec_url = bo_spec.src;
+		
+		var bo_sig_reload = '.intval(BO_GRAPH_RAW_STATION_STATISTICS).';
+		
+		function bo_stat_graph_reload(image)
+		{
+			if (bo_sig_reload <= 10)
+				return;
+			
+			setTimeout(function() {
+				var time = Math.round(new Date().getTime() / 1000);
+				bo_sig.src  = bo_sig_url + "&t=" + time;
+				bo_spec.src = bo_spec_url+ "&t=" + time;
+			}, bo_sig_reload);
+			
+		}
+		
+		
+		</script>';
+	}
 	
 	
 	$antenna = $own_station ? bo_get_antenna_data() : false;

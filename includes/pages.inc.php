@@ -112,10 +112,11 @@ function bo_show_statistics()
 	require_once 'statistics.inc.php';
 	
 	$show = $_GET['bo_show'] ? $_GET['bo_show'] : 'strikes';
+	$station_id = bo_get_current_stationid();
 
-	if (defined('BO_STATISTICS_ALL_STATIONS') && BO_STATISTICS_ALL_STATIONS || ((bo_user_get_level() & BO_PERM_NOLIMIT)))
+	if (defined('BO_STATISTICS_ALL_STATIONS') && BO_STATISTICS_ALL_STATIONS || ((bo_user_get_level() & BO_PERM_NOLIMIT)) || array_search($station_id, bo_stations_own()) !== false )
 	{
-		$station_id = bo_get_current_stationid();
+		
 		
 		if ($station_id && $station_id != bo_station_id())
 		{

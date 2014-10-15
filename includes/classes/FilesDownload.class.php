@@ -64,7 +64,16 @@ class FilesDownload
 		
 		for ($time=$this->TimeStart; $time<=$this->TimeEnd; $time+=60*$min_step)
 		{
-			$this->Files[$time] = preg_replace('/%([A-Z])/ie', 'gmdate("\1", $time)', $time_format);
+			if ( ((int)PHP_MAJOR_VERSION >= 5 && (int)PHP_MINOR_VERSION >= 3) || (int)PHP_MAJOR_VERSION >= 6)
+			{
+				$this->Files[$time] = preg_replace_callback('/%([A-Z])/i', function($matches) use($time) { 
+					return gmdate($matches[1], $time);
+				}, $time_format);
+			}
+			else
+			{
+				$this->Files[$time] = preg_replace('/%([A-Z])/ie', 'gmdate("\1", $time)', $time_format);
+			}
 		}
 		
 		$this->FoundFiles = count($this->Files);
