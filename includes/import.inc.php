@@ -1068,7 +1068,7 @@ function bo_update_stations($force = false)
 		$own_stations = bo_stations_own();
 		$from_all_stations = !(defined('BO_STATION_STAT_DISABLE') && BO_STATION_STAT_DISABLE == true);
 		
-		if ($from_all_stations && count($own_stations) == 1)
+		if (!$from_all_stations && count($own_stations) == 1)
 		{
 			$only_own = bo_station_id();
 			$sql = "SELECT $only_own sid, COUNT(*) cnt
