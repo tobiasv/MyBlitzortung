@@ -224,6 +224,12 @@
 //Starts session only if there's a special GET parameter
 @define('BO_SESSION_GET_PARAM', false);
 
+//Starts session only if there's a special COOKIE parameter
+@define('BO_SESSION_COOKIE_PARAM', false);
+
+//Cookie name of saved login data
+@define("BO_COOKIE_NAME", "bo_login");
+
 
 
 /*******************************************************************/
@@ -1299,7 +1305,6 @@
 //a update is needed! 
 @define('BO_DB_COMPRESSION', false);
 
-@define("BO_COOKIE_NAME", "bo_login");
 
 
 /*******************************************************************/

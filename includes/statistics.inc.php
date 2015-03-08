@@ -208,12 +208,14 @@ function bo_show_statistics_strikes($station_id = 0, $own_station = true, $add_g
 //show station-statistics
 function bo_show_statistics_station($station_id = 0, $own_station = true, $add_graph = '')
 {
-
 	$strikesh_own = 0;
 	$signalsh_own = 0;
 	$stInfo = bo_station_info($station_id);
 	$city = _BC($stInfo['city']);
 
+	if (empty($stInfo))
+		return;
+	
 	if ($own_station)
 	{
 		$own_station_info = bo_station_info();
@@ -290,7 +292,6 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	$last_strike = $tmp[$station_id][0];
 	$last_signal = strtotime($stInfo['last_time'].' UTC');
 	$active = $stInfo['status'] >= STATUS_RUNNING*10;
-
 
 	if (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES)
 	{
@@ -1378,7 +1379,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 
 		$sql = "SELECT id, country, city, first_seen
 				FROM ".BO_DB_PREF."stations
-				WHERE status >= ".((int)STATUS_OFFLINE)." 
+				WHERE status >= ".((int)STATUS_OFFLINE)." AND status != 'D'
 					AND id < ".intval(BO_DELETED_STATION_MIN_ID)."
 					AND first_seen > (SELECT MIN(first_seen) FROM ".BO_DB_PREF."stations) 
 				ORDER BY first_seen DESC

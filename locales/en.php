@@ -1118,6 +1118,12 @@ $_BL['en']['lm_live_set_fullscreen_on'] = 'on';
 $_BL['en']['lm_live_set_fullscreen_off'] = 'off';
 $_BL['en']['lm_live_set_fullscreen_info'] = 'Shows the map in fullscreen mode (only if your browser supports it).';
 
+$_BL['en']['lm_live_set_map_style'] = 'Style';
+$_BL['en']['lm_live_set_map_style_normal'] = 'Normal';
+$_BL['en']['lm_live_set_map_style_sat'] = 'Satellite';
+$_BL['en']['lm_live_set_map_style_terrain'] = 'Terrain';
+$_BL['en']['lm_live_set_map_style_roads'] = 'Roads';
+
 $_BL['en']['lm_live_set_thunder'] = 'Thunder';
 $_BL['en']['lm_live_set_thunder_max'] = 'max';
 $_BL['en']['lm_live_set_thunder_off'] = 'off';

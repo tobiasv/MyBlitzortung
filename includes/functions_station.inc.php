@@ -19,7 +19,7 @@ function bo_stations($index = 'id', $only = '', $only_own = false)
 			$sql .= " AND id IN (".implode(',', $own)." ) ";
 	}
 		
-	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND bo_station_id > 0 
+	$sql = "SELECT * FROM ".BO_DB_PREF."stations WHERE 1 $sql AND bo_station_id > 0 AND status != 'D'
 			AND id < ".intval(BO_DELETED_STATION_MIN_ID);
 	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())

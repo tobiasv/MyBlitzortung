@@ -744,7 +744,7 @@ function bo_error_handler($errno, $errstr, $errfile, $errline)
 	{
 		@header('HTTP/1.1 500 Internal Server Error');
 		
-		if (BO_DEBUG === true)
+		if (BO_DEBUG === true || php_sapi_name() === 'cli')
 			echo $text;
 			
 		echo "<p>Oops! An error occured. Please try again later.<br />\n";

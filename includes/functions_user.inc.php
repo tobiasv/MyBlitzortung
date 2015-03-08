@@ -61,8 +61,8 @@ function bo_user_do_login_byid($id, $pass)
 
 function bo_user_do_logout()
 {
-	if ($_COOKIE['bo_login'] && !$_BO['headers_sent'])
-		setcookie("bo_login", '', time()+3600*24*9999,'/');
+	if ($_COOKIE[BO_COOKIE_NAME] && !$_BO['headers_sent'])
+		setcookie(BO_COOKIE_NAME, '', time()+3600*24*9999,'/');
 
 	bo_set_conf_user('cookie', '');
 
@@ -86,7 +86,8 @@ function bo_user_set_session($id, $level, $cookie, $pass='')
 	$_SESSION['bo_login_time'] = time();
 
 	$cookie_days = intval(BO_LOGIN_COOKIE_TIME);
-
+	
+	//user checked "stay logged in"
 	if ($cookie && !$_BO['headers_sent'] && $cookie_days)
 	{
 		$data = unserialize(bo_get_conf_user('cookie', $id));
@@ -97,12 +98,12 @@ function bo_user_set_session($id, $level, $cookie, $pass='')
 		$data['pass'] = $pass;
 		bo_set_conf_user('user_cookie', serialize($data), $id);
 
-		setcookie(BO_COOKIE_NAME, $id.'_'.$data['uid'], time()+3600*24*$cookie_days,'/');
+		setcookie(BO_COOKIE_NAME, $id.'_'.$data['uid'], time()+3600*24*$cookie_days, '/');
 	}
-	else
+	else if (!$_COOKIE[BO_COOKIE_NAME])
 	{
-		//just as info for underlying http server that a user is connecting (i.e. for caching)
-		setcookie(BO_COOKIE_NAME, $id, 0,'/');
+		//only set if not present (otherwise overwriting cookie-login data)
+		setcookie(BO_COOKIE_NAME, $id, 0, '/');
 	}
 
 	$lastlogin = bo_get_conf_user('lastlogin_next', $id);
@@ -201,18 +202,18 @@ function bo_get_conf_user($name, $id=0)
 function bo_user_init($force = false)
 {
 	global $_BO;
-	
+
 	//don't create a session if request comes through non-cookie-domain
 	if (strpos(BO_FILE_NOCOOKIE, 'http://'.$_SERVER['HTTP_HOST'].'/') !== false)
 	{
 		$_BO['radius'] = BO_RADIUS;
 		return;
 	}
-	
+		
 	$init = true;
 	
 	//don't init if GET parameter option is set and no parameter present
-	if (BO_SESSION_GET_PARAM !== false && !bo_sess_parms_set() && !$force)
+	if ( (BO_SESSION_GET_PARAM !== false || BO_SESSION_COOKIE_PARAM !== false) && !bo_sess_parms_set() && !$force)
 	{
 		$init = false;
 	}
@@ -227,23 +228,43 @@ function bo_user_init($force = false)
 		//Session handling
 		@session_start();
 
-		//Set user_id
-		if (!isset($_SESSION['bo_user']))
+		//check cookie here if no user logged in
+		if (!$_SESSION['bo_user'])
+		{
+			if (bo_user_cookie_login())
+				return;
+		}
+		
+		//remove session-info cookie if no user logged in in this session
+		if (!$force && !count($_POST) && BO_SESSION_COOKIE_PARAM !== false && !$_SESSION['bo_user'])
+		{
+			//delete cookie
+			setcookie(BO_COOKIE_NAME, null, -1, '/');
+			session_destroy();
+		}
+		else if (!isset($_SESSION['bo_user'])) //Set user_id
+		{
 			$_SESSION['bo_user'] = 0;
-	}
-	else
-	{
-		bo_user_cookie_login();
+		}
+		
+		if ($_SESSION['bo_user'] && !$_COOKIE[BO_COOKIE_NAME])
+		{
+			//user is in session, but cookie not set
+			setcookie(BO_COOKIE_NAME, $_SESSION['bo_user'], 0,'/');
+		}
 	}
 	
 	$_BO['radius'] = (bo_user_get_level() & BO_PERM_NOLIMIT) ? 0 : BO_RADIUS;
-
 }
 
 function bo_sess_parms_set()
 {
-	return BO_SESSION_GET_PARAM !== false 
+	$get_present = BO_SESSION_GET_PARAM !== false 
 		&& (isset($_GET[BO_SESSION_GET_PARAM]) || strpos($_SERVER['HTTP_REFERER'], BO_SESSION_GET_PARAM) !== false);
+	
+	$cookie_present = BO_SESSION_COOKIE_PARAM !== false && isset($_COOKIE[BO_COOKIE_NAME]);
+	
+	return $get_present || $cookie_present;
 }
 
 function bo_add_sess_parms($force = false)
@@ -258,6 +279,13 @@ function bo_add_sess_parms($force = false)
 
 function bo_user_cookie_login()
 {
+	static $checked = false;
+	
+	if ($checked)
+		return false;
+		
+	$checked = true;
+	
 	if (isset($_COOKIE[BO_COOKIE_NAME]) && !bo_user_get_id())
 	{
 		//Check for stored login in cookie
@@ -271,6 +299,7 @@ function bo_user_cookie_login()
 			if ($cookie_uid == $data['uid'] && trim($data['uid']))
 			{
 				bo_user_do_login_byid($cookie_user_id, $data['pass']);
+				return true;
 			}
 
 		}
@@ -280,6 +309,8 @@ function bo_user_cookie_login()
 			setcookie(BO_COOKIE_NAME, null, -1, '/');
 		}
 	}
+	
+	return false;
 }
 
 

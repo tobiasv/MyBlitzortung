@@ -248,6 +248,11 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$sql = "SELECT time, time_ns FROM ".BO_DB_PREF."strikes s WHERE id='$strike_id' ";
 			$res = BoDb::query($sql);
 			$row = $res->fetch_assoc();
+			
+			if (!$row['time'])
+				bo_image_error('Stroke not found!');
+
+			
 			$time_min = $time_max = strtotime($row['time'].' UTC');
 
 			
@@ -290,6 +295,10 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 				$time_max = strtotime("$year-$month-$day $hour:$minute:00 +$duration minutes");
 			}
 
+			if (!$time_min || !$time_max)
+				bo_image_error('Time range not allowed!');
+			
+			
 			if (!bo_user_get_level() && $duration != $cfg['animation']['range'])
 			{
 				if (     $duration > 60 * BO_SMAP_MAX_RANGE 
@@ -323,7 +332,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 			$file_by_time = true;
 			
 			break;
-		
+	
+		default:
 		case 'live':
 
 			//the normal "live" image
@@ -969,20 +979,28 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$legend_text_drawn = false;
 		$max_val = max($legend_count);
 		
-		//legend x-axis smoothing => use rounded max value
+		//legend y-axis smoothing => use rounded max value
 		if (isset($cfg['legend']['smooth'])) 
 		{
 			$xtimestep = (($time_max - $time_min)/60/count($legend_count));
 					
 			//strokes per minute 
-			$max_spm = $max_val/$xtimestep;
-			$scale = pow(10, floor(log($max_spm, 10)));
-			$max_spm = $scale > 0 ? ceil($max_spm/$scale/2)*$scale*2 : 1;
+			if ($xtimestep)
+			{
+				$max_spm = $max_val/$xtimestep;
+				$scale = pow(10, floor(log($max_spm, 10)));
+				$max_spm = $scale > 0 ? ceil($max_spm/$scale/2)*$scale*2 : 1;
+				
+				//adjust max_strokes to max strokes per minute
+				$max_val = $max_spm*$xtimestep;
+			}
+			else
+			{
+				$max_spm = 0;
+			}
 			
-			//adjust max_strokes to max strokes per minute
-			$max_val = $max_spm*$xtimestep;
 			
-			$ytext = $max_spm.'/min';
+			$ytext = _BN($max_spm).'/min';
 		}
 		
 		
