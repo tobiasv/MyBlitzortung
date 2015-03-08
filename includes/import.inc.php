@@ -1391,7 +1391,8 @@ function bo_update_stations($force = false)
 		bo_update_error('stationcount', true);
 
 		$activebyuser = array();
-
+		$errors = 0;
+		
 		foreach($lines as $l)
 		{
 			$D = array();
@@ -1499,6 +1500,7 @@ function bo_update_stations($force = false)
 				
 			if (empty($D) || $error)
 			{
+				$errors++;
 				continue;
 			}
 
@@ -1576,10 +1578,24 @@ function bo_update_stations($force = false)
 		if ($num)
 			bo_echod("Set $num stations offline");
 
-		//deactivate old stations which are not in file
+		//deactivate old stations
 		$num = BoDb::query("UPDATE ".BO_DB_PREF."stations SET status=0 WHERE changed < '".gmdate('Y-m-d H:i:s', time() - 60 * BO_STATION_NOT_PRESENT_MINUTES)."'");
 		if ($num)
 			bo_echod("Deactivated $num stations");
+
+		//set non-existend stations as deleted
+		if (!$errors)
+		{
+			foreach($all_stations as $id => $dummy)
+			{
+				if (!isset($StData[$id]))
+				{
+					bo_echod("Deleted station $id");
+					BoDb::query("UPDATE ".BO_DB_PREF."stations SET status='D' WHERE bo_station_id='$id'");
+
+				}
+			}
+		}
 		
 		//Update Statistics
 		$datetime      = gmdate('Y-m-d H:i:s', $time);
