@@ -65,6 +65,8 @@ class BoSignalGraph
 				$this->graph->SetBox(true, BO_GRAPH_RAW_COLOR_BOX_BIG);
 			else
 				$this->graph->SetBox(false);
+			
+			$use_max = 0; //use 1st highest maximum for max y-scale
 		}
 		else 
 		{
@@ -83,6 +85,8 @@ class BoSignalGraph
 				$this->graph->SetBox(true, BO_GRAPH_RAW_COLOR_BOX);
 			else
 				$this->graph->SetBox(false);
+				
+			$use_max = 2; //use third highest maximum for max y-scale
 		}
 		
 		$this->graph->SetMargin(24,1,1,1);
@@ -92,6 +96,14 @@ class BoSignalGraph
 		{
 			//set labels
 			$max_i = 0;
+			$tickPos = array(0);
+			$tickLabels = array(0);
+			$minTickPos = array(0);
+			$last = 0;
+			$last_min = 0;
+			
+			define("BO_GRAPH_RAW_SPEC_TICK_KHZ", 25);
+			
 			foreach ($data['spec_freq'] as $i => $khz)
 			{
 				if ($khz > BO_GRAPH_RAW_SPEC_MAX_X)
@@ -100,15 +112,25 @@ class BoSignalGraph
 					break;
 				}
 				
-				$tickLabels[$i] = (round($khz / 5) * 5).'kHz';
-			}
+				if ( floor($khz/BO_GRAPH_RAW_SPEC_TICK_KHZ)*BO_GRAPH_RAW_SPEC_TICK_KHZ > $last)
+				{
+					$tickPos[] = $i;
+					$tickLabels[] = (floor($khz/BO_GRAPH_RAW_SPEC_TICK_KHZ)*BO_GRAPH_RAW_SPEC_TICK_KHZ).'kHz';
+					$last = $khz;
+				}
 
+				if ( floor($khz/5)*5 > $last_min)
+				{
+					$minTickPos[] = $i;
+					$last_min = $khz;
+				}
+			}
+	
+			
 			$max_ch = array();
 			//parse data for each channel
 			foreach($data['channel'] as $ch => $d)
 			{
-
-				
 				foreach($d['spec'] as $i => $v)
 				{
 					if ($max_i && $i > $max_i)
@@ -119,7 +141,7 @@ class BoSignalGraph
 
 				$tmp = $D[$ch];
 				rsort($tmp);
-				$max_ch[$ch] = $tmp[2]; //the third highest maximum
+				$max_ch[$ch] = $tmp[$use_max];
 			}
 			
 			$this->graph->SetScale("textlin", 0, max($max_ch), 0, BO_GRAPH_RAW_SPEC_MAX_X * $data['max_values'] * $ntime * 1e-6);
@@ -203,11 +225,7 @@ class BoSignalGraph
 			$this->graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			$this->graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			$this->graph->yaxis->HideLabels();
-
-			$this->graph->xaxis->SetTickLabels($tickLabels);
-			$this->graph->xaxis->SetTextLabelInterval(3);
-			$this->graph->xaxis->SetTextTickInterval(20);
-
+			$this->graph->xaxis->SetTickPositions($tickPos, $minTickPos, $tickLabels);			
 		}
 		elseif ($type == 'xy')
 		{
@@ -263,7 +281,7 @@ class BoSignalGraph
 		}
 		else
 		{
-			$ustepdisplay = 50;
+			$ustepdisplay = 100;
 			$data_tmp = array();
 
 			foreach ($data['signal_time'] as $i => $time_us)
@@ -277,6 +295,12 @@ class BoSignalGraph
 					$data_tmp[] = $us;
 			}
 			
+			$datax = array();
+			$tickPos = array();
+			$tickLabels = array();
+			$minTickPos = array();
+			$last = null;
+			
 			foreach($data_tmp as $i => $time_us)
 			{
 				if ($this->MaxTime !== null && $time_us > $this->MaxTime)
@@ -287,19 +311,16 @@ class BoSignalGraph
 				foreach($data['channel'] as $ch => $d)
 					$datay[$ch][] = $d['data_volt'][$i];
 				
-				$tickLabels[] = _BN((round($time_us / $ustepdisplay, 1) * $ustepdisplay), 0).'µs';
+				$us = floor($time_us / $ustepdisplay) * $ustepdisplay;
 				
-				if (!($i%12))
+				if ($last === null) //don't show 1st one
+					$last = $us;
+					
+				if ($last < $us)
 				{
-					if (!($i%18))
-					{
-						$tickMajPositions[] = $i;
-						
-					}
-					elseif (!($i%6))
-					{
-						$tickPositions[] = $i;
-					}
+					$tickPos[] = $i;
+					$tickLabels[] = _BN($us, 0).'µs';
+					$last = $us;
 				}
 			}
 
@@ -338,12 +359,19 @@ class BoSignalGraph
 				$this->graph->Add($p);
 			
 			$this->graph->xaxis->SetPos('min');
-			$this->graph->xaxis->SetTickLabels($tickLabels);
-			//$this->graph->xaxis->scale->ticks->Set(28);
+			$this->graph->xaxis->SetTickPositions($tickPos, null, $tickLabels);
 			$this->graph->xaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_XAXIS_BIG : BO_GRAPH_RAW_COLOR_XAXIS);
 			$this->graph->yaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_YAXIS_BIG : BO_GRAPH_RAW_COLOR_YAXIS);
 
+			$v_step = max(0.01, $data['max_volt']/5);
+			$n = $data['max_volt'] < 0.5 ? 2 : 1;
+			for ($v = -$data['max_volt']+$v_step; $v < $data['max_volt']; $v+= $v_step)
+			{
+				$y_tickPos[] = $v;
+				$y_tickLabels[] = _BN($v, $v?$n:0 ).'V';
+			}
 			
+			$this->graph->yaxis->SetTickPositions($y_tickPos, null, $y_tickLabels);
 			
 			$grid = $this->big ? BO_GRAPH_RAW_COLOR_XGRID_BIG : BO_GRAPH_RAW_COLOR_XGRID;
 			
@@ -387,7 +415,7 @@ class BoSignalGraph
 			$this->graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			$this->graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			
-			$this->graph->SetMargin(32,4,4,3);
+			$this->graph->SetMargin(34,4,4,3);
 
 			$sig = null;
 			$y = $this->height-73;

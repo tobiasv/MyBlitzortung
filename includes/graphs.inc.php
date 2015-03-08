@@ -4,7 +4,7 @@
 function bo_signal_json2data($data_json)
 {
 	$signal['time'] = floor($data_json->time);
-	$signal['time_ns'] = round(($data_json->time-$signal['time']) * 1E9);
+	$signal['time_ns'] = round(($data_json->time - $signal['time']) * 1E9);
 	$signal['lat'] = $data_json->lat;
 	$signal['lon'] = $data_json->lon;
 	$signal['alt'] = $data_json->alt;
@@ -14,7 +14,7 @@ function bo_signal_json2data($data_json)
 		$signal['channel'][$ch]['values'] = $data_json->values;
 		$signal['channel'][$ch]['start'] = $data_json->start;
 		$signal['channel'][$ch]['bits'] = $data_json->bits;
-		$signal['channel'][$ch]['shift'] = $data_json->shift;
+		$signal['channel'][$ch]['shift'] = $d->shift;
 		$signal['channel'][$ch]['conv_gap'] = $data_json->cv_gap;
 		
 		$signal['channel'][$ch]['pcb'] = $d->board;
@@ -72,7 +72,7 @@ function bo_graph_raw()
 	{
 		$boid = bo_station2boid($station_id);
 		$url = bo_access_url(BO_IMPORT_SERVER_SIGNALS, BO_IMPORT_PATH_SIGNALS);
-		$url .= $boid.'/last_signal.json';
+		$url .= $boid.'/last.json';
 		
 		$lines = bo_get_file($url, $code, 'raw_data_other', $dummy1, $dummy2, true);
 
@@ -80,6 +80,7 @@ function bo_graph_raw()
 			$graph->DisplayEmpty(true, 'Signal file not found or empty');
 		
 		$signal = json_decode($lines[0]);
+		$signal->time /= 1E9;
 
 		if (!$signal)
 			$graph->DisplayEmpty(true, 'Error in signal data');
@@ -129,7 +130,7 @@ function bo_graph_raw()
 				touch($dfile);
 				
 				$url = bo_access_url(BO_IMPORT_SERVER_SIGNALS, BO_IMPORT_PATH_SIGNALS);
-				$url .= $boid.'/'.gmdate('Y/m/d/H/i', floor($tstamp/600)*600).'.json';
+				$url .= $boid.'/'.gmdate('Y/m/d/H/i', floor($tstamp/600)*600).'.log';
 				$lines = bo_get_file($url, $code, 'raw_data_other', $dummy1, $dummy2, true);
 
 				if (!$lines)
@@ -162,6 +163,7 @@ function bo_graph_raw()
 		{
 			$data = json_decode($line);
 			
+			$data->time /= 1E9;
 			$data_time = floor($data->time);
 			$data_time_ns = round(($data->time-$data_time) * 1E9);
 			$raw_time->Set($data_time, $data_time_ns);
@@ -178,13 +180,13 @@ function bo_graph_raw()
 			
 			$min_dt = min($min_dt, round(abs($dt)));
 		}
-		
+
 		if (abs($last_dt) > $max_tolerance)
 			$graph->DisplayEmpty(true, "Signal not found! Tolerance of ".$min_dt."µs bigger than allowed ".$max_tolerance."µs");
 
 	}
 
-	if ($size != 3)
+	if ($size != 3 && $size != 4)
 		$graph->SetMaxTime(BO_GRAPH_RAW_MAX_TIME2);
 		
 	$graph->SetData($type, $signal);
@@ -490,11 +492,11 @@ function bo_graph_statistics()
 		
 		$graph_type = 'datlin';
 
-		$caption  = array_sum($Y).' '._BL('total strikes');
+		$caption  = _BN(array_sum($Y)).' '._BL('total strikes');
 		if ($show_station)
 		{
 			$caption .= "\n";
-			$caption .= array_sum($Y2).' Filter: '.$filt_text;
+			$caption .= _BN(array_sum($Y2)).' Filter: '.$filt_text;
 		}
 		
 		$type = 'strikes_now';
@@ -550,11 +552,11 @@ function bo_graph_statistics()
 
 		$graph_type = 'datlin';
 
-		$caption  = (array_sum($Y) * $group_minutes).' '._BL('total strikes');
+		$caption  = _BN(array_sum($Y) * $group_minutes).' '._BL('total strikes');
 		if ($show_station)
 		{
 			$caption .= "\n";
-			$caption .= (array_sum($Y2) * $group_minutes).' '._BL('total strikes station2');
+			$caption .= _BN(array_sum($Y2) * $group_minutes).' '._BL('total strikes station2');
 		}
 	}
 	else if ($type == 'strikes_time')
@@ -671,12 +673,12 @@ function bo_graph_statistics()
 			}
 		}
 
-		$caption  = array_sum($Y3).' '._BL('total strikes');
+		$caption  = _BN(array_sum($Y3)).' '._BL('total strikes');
 
 		if (bo_station_id() > 0 && !$station_id)
 		{
 			$caption .= "\n";
-			$caption .= array_sum($Y).' '._BL('total strikes station');
+			$caption .= _BN(array_sum($Y)).' '._BL('total strikes station');
 		}
 
 		$title_no_hours = true;
@@ -741,9 +743,9 @@ function bo_graph_statistics()
 				$Y2[$i] = isset($Y2[$i]) ? $Y2[$i] : null;
 			}
 
-			$caption  = $sum_all.' '._BL('total strikes');
+			$caption  = _BN($sum_all).' '._BL('total strikes');
 			$caption .= "\n";
-			$caption .= $sum_own.' '._BL('total strikes station');
+			$caption .= _BN($sum_own).' '._BL('total strikes station');
 			
 		}
 
@@ -897,9 +899,9 @@ function bo_graph_statistics()
 
 		$graph_type = 'linlin';
 
-		$caption  = $sum_all.' '._BL('total strikes');
+		$caption  = _BN($sum_all).' '._BL('total strikes');
 		$caption .= "\n";
-		$caption .= $sum_own.' '._BL('total strikes station');
+		$caption .= _BN($sum_own).' '._BL('total strikes station');
 
 		$xmin = 0;
 		if ($type == 'ratio_bearing')
@@ -1054,8 +1056,8 @@ function bo_graph_statistics()
 		}
 
 		$total = array_sum($Y) + array_sum($Y2);
-		$caption  = ($total).' '._BL('total strikes');
-		$caption .= '      '.array_sum($Y).' '._BL('strikes_station2');
+		$caption  = _BN($total).' '._BL('total strikes');
+		$caption .= '      '._BN(array_sum($Y)).' '._BL('strikes_station2');
 
 		if ($total > 0)
 			$caption .= '      '._BL('mean ratio').': '.round(array_sum($Y)/$total*100).'%'."\n";
@@ -1242,9 +1244,9 @@ function bo_graph_statistics()
 
 		$graph_type = 'datint';
 
-		$caption  = $count_all.' '._BL('total strikes');
+		$caption  = _BN($count_all).' '._BL('total strikes');
 		$caption .= "\n";
-		$caption .= $count_own.' '._BL('total strikes station2');
+		$caption .= _BN($count_own).' '._BL('total strikes station2');
 
 		if (!$average)
 		{
