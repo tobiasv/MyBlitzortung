@@ -1175,6 +1175,49 @@ $_BL['de']['(Big)'] = '(Groß)';
 $_BL['de']['Countries'] = 'Länder';
 
 //REALTIME MAP
+$_BL['de']['lm_live_realtime'] = 'Blitze in Echtzeit';
+
+$_BL['de']['lm_live_settings_info'] = 'Einstellungen';
+
+$_BL['de']['lm_live_set_fullscreen'] = 'Vollbild';
+$_BL['de']['lm_live_set_fullscreen_on'] = 'an';
+$_BL['de']['lm_live_set_fullscreen_off'] = 'aus';
+$_BL['de']['lm_live_set_fullscreen_info'] = 'Zeigt die Karte im Vollbild (falls es der Browser unterstützt).';
+
+$_BL['de']['lm_live_set_map_style'] = 'Stil';
+$_BL['de']['lm_live_set_map_style_normal'] = 'Normal';
+$_BL['de']['lm_live_set_map_style_sat'] = 'Satellit';
+$_BL['de']['lm_live_set_map_style_terrain'] = 'Gelände';
+$_BL['de']['lm_live_set_map_style_roads'] = 'Straßen';
+
+$_BL['de']['lm_live_set_thunder'] = 'Donner';
+$_BL['de']['lm_live_set_thunder_max'] = 'max';
+$_BL['de']['lm_live_set_thunder_off'] = 'off';
+$_BL['de']['lm_live_set_thunder_info'] = 'Zeigt die Donnerfront in Echtzeit (nur auf höheren Zoom-Ebenen).';
+
+$_BL['de']['lm_live_set_clouds'] = 'Wolken';
+$_BL['de']['lm_live_set_clouds_on'] = 'an';
+$_BL['de']['lm_live_set_clouds_off'] = 'aus';
+$_BL['de']['lm_live_set_clouds_info'] = 'Wolken und Niederschlag and precipitation von openweathermap.org (experimentell!).';
+
+$_BL['de']['lm_live_set_radar'] = 'Radar (USA)';
+$_BL['de']['lm_live_set_radar_on'] = 'an';
+$_BL['de']['lm_live_set_radar_off'] = 'aus';
+$_BL['de']['lm_live_set_radar_info'] = '&nbsp;';
+
+$_BL['de']['lm_live_set_strokes_show'] = 'Zeige Blitze';
+$_BL['de']['lm_live_set_strokes_show_all'] = 'letzte Stunde';
+$_BL['de']['lm_live_set_strokes_show_last'] = 'letzte Minuten';
+$_BL['de']['lm_live_set_strokes_show_info'] = 'Nur "aktuelle" Blitze anzeigen oder auch die der letzten 60 Minuten.';
+
+
+$_BL['de']['lm_live_info_legend_title'] = 'Legende';
+$_BL['de']['lm_live_info_legend1'] = 'Neue Blitze haben einen <span id="live_legend1_1">roten Rand</span> welcher lansgam verschwindet und ab [sec]s nicht mehr zu sehen ist.';
+$_BL['de']['lm_live_info_legend2'] = 'Die Farbe der gefüllten Punkte steht für das Alter der Blitze (bis [minutes]min). Neue Blitze sind <span id="live_legend2_1">gelb</span>. Je älter, desto dunkler die Farbe. <span id="live_legend2_2">Dunkles braun</span> entspricht etwa [minutes]min. Diese Blitze werden bald von der Karte verschwinden.';
+$_BL['de']['lm_live_info_legend3'] = 'Die Donnerfront von von aktuellen Blitzen wird als dicker und <span id="live_legend3_1">weißer</span> Kreis dargestellt. Dieser wächst entsprechend der Schallgeschwindigkeit an. Die Kreise werden immer immer durchsichtiger und verschwinden nach einiger Zeit. In dieser Entfernen ist der Donner kaum noch zu hören.';
+
+
+
 $_BL['de']['lm_live_delay'] = 'Verzögerung';
 $_BL['de']['lm_live_strokes'] = 'Blitze';
 $_BL['de']['lm_live_realtime'] = 'Blitze in Echtzeit';
@@ -1184,11 +1227,13 @@ $_BL['de']['lm_live_stations_off'] = 'Stationen: aus';
 $_BL['de']['lm_live_stations_on'] = 'Stationen: ein';
 $_BL['de']['lm_live_clouds_off'] = 'Wolken: aus';
 $_BL['de']['lm_live_clouds_on'] = 'Wolken: ein';
+$_BL['de']['lm_live_set_clouds_info'] = 'Wolken und Regen von openweathermap.org (experimentell!).';
+
 $_BL['de']['lm_live_info'] = 'Diese Karte zeigt die Blitze der <strong>letzten 60 Minuten</strong> in Echtzeit an. Die Daten kommen direkt vom Projekt Blitzortung.org, bei dem hunderte von Stationen die Blitze detektieren. Die Verzögerung wird direkt aus den Zeitstempeln der Blitze berechnet.';
+$_BL['de']['lm_live_snd_volume'] = 'Lautstärke';
 $_BL['de']['lm_live_snd_info'] = 'Lässt ein kurzen Ton für jeden neuen Blitz ertönen. Diese Funktionen ist nicht mit allen Browsern bzw. nicht mit allen Geräten möglich.';
-$_BL['de']['lm_live_fullscr_info'] = 'Zeigt die Karte im Vollbild an (Ihr Browser muss diese Funktion unterstützen).';
 $_BL['de']['lm_live_stations_info'] = 'Zeigt die Stationen an, die den jeweiligen Blitz detektiert haben. Die Farbe der Verbindungslinie hängt von der Entfernung zwischen Station und Blitz ab: Je weiter entfernt, desto bläulicher (statt grün) wird die Linie dargestellt. Entfernungen von maximal einigen hundert kilometern und Stationen runder um den Einschlagsort ergeben die besten Resultate. BITTE BEACHTEN: Diese Funktion kann die Systemleistung negativ beeinflussen! Der Browser "Chrome" wird hierzu empfohlen.';
-$_BL['de']['lm_live_clouds_info'] = 'Bitte beachten: Die Wolkendaten werden von einer externen Quelle geladen und können mehrere Stunden alt sein. Diese Funktion ist nicht bei höheren Zoom-Leveln verfügbar.';
+
 $_BL['de']['lm_live_blitzortung_more'] = 'Weitere Echtzeit-Blitzkarten auf Blitzortung.org';
 $_BL['de']['lm_live_usage'] = 'WICHTIG: Diese Karte dient rein zur Unterhaltung!';
 

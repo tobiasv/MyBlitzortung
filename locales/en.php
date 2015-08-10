@@ -1127,12 +1127,12 @@ $_BL['en']['lm_live_set_map_style_roads'] = 'Roads';
 $_BL['en']['lm_live_set_thunder'] = 'Thunder';
 $_BL['en']['lm_live_set_thunder_max'] = 'max';
 $_BL['en']['lm_live_set_thunder_off'] = 'off';
-$_BL['en']['lm_live_set_thunder_info'] = 'Shows the thunder sound front in realtime.';
+$_BL['en']['lm_live_set_thunder_info'] = 'Shows the thunder sound front in realtime on higher zoom levels.';
 
 $_BL['en']['lm_live_set_clouds'] = 'Clouds';
 $_BL['en']['lm_live_set_clouds_on'] = 'on';
 $_BL['en']['lm_live_set_clouds_off'] = 'off';
-$_BL['en']['lm_live_set_clouds_info'] = 'Clouds are from an external source and might be some hours behind. The layer is not available on closer zoom levels.';
+$_BL['en']['lm_live_set_clouds_info'] = 'Clouds and precipitation from openweathermap.org (experimental!).';
 
 $_BL['en']['lm_live_set_radar'] = 'Radar';
 $_BL['en']['lm_live_set_radar_on'] = 'on';
