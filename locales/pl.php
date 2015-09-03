@@ -49,6 +49,7 @@ $_BL['pl']['_date'] = 'Y-m-d';
 $_BL['pl']['_dateshort'] = 'm/d';
 $_BL['pl']['_datetime'] = 'Y-m-d G:i:s';
 
+
 $_BL['pl']['_before'] = false;
 $_BL['pl']['_minutes_ago'] = 'minut temu';
 $_BL['pl']['_minute_ago'] = 'minuta temu';
@@ -745,6 +746,7 @@ Podpowiedzi: Dane wyświetlane tutaj nie sa standaryzowane, dlatego rezultaty ni
 
 $_BL['pl']['archive_signaltable_info'] = 'Każada stacja wykrywania wyładowań w sieci Blitzortung.org odbiera sygnały oraz mniej lub bardziej szum. Tutaj można zobaczyć sygnały, które zostały odebrane przez stację {STATION} w ciągu sotatnich minut. Jeśli inne stacje odbiorą ten sam sygnał w bardzo krutkim okresie czasu to moż się okazać, że wyłądowanie może być zlokalizowane poza odpowiednimi czasami (metoda TOA). W takim przypadku dodatkowa informacja o wyładowaniu będzie tu wyświetlona.';
 
+
 $_BL['pl']['archive_striketable_info'] = 'Tutaj można zobaczyć takie same informacje jak na stronie "sygnały" ale także uderzenia gdzie nie było sygnału wykrytego przez twoją stację. Aby być w zgodzie z zasadami Blitzortung.org, ta strone jest dostepna tylko z kontem użytkownika.
 
 Podpowiedź: krzywe hiperboliczne wyświetlone obok map są tylko informacyjne i nie obrazują aktualnych obliczeń ({MYBO_ORIG} nie zna czasów innych stacji).';
@@ -1017,6 +1019,243 @@ $_BL['pl']['lang_it'] = 'Włoski';
 $_BL['pl']['lang_nl'] = 'Holenderski';
 
 
+
+/*************************************************************/
+/* Special text for Lightningmaps.org                        */
+/*************************************************************/
+
+
+//REALTIME MAP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/********************/
+/*  NOT TRANSLATED  */
+/********************/
+
+
+//en: 'Alerts: Twitter'
+$_BL['pl']['user_perm8'] = '';
+
+//en: 'Some of the latest strokes with the signal of the closest station.'
+$_BL['pl']['archive_striketable_info_guests'] = '';
+
+//en: 'Twitter'
+$_BL['pl']['alert_twitter'] = '';
+
+//en: ''
+$_BL['pl']['bo_stat_network_descr'] = '';
+
+//en: ''
+$_BL['pl']['bo_graph_descr_strikes_station_residual_time'] = '';
+
+//en: 'Indonesia'
+$_BL['pl']['Indonesia'] = '';
+
+//en: 'Niederlande'
+$_BL['pl']['Netherlands'] = '';
+
+//en: 'Slovenien'
+$_BL['pl']['Slovenia'] = '';
+
+//en: 'Luxemburg'
+$_BL['pl']['Luxembourg'] = '';
+
+//en: 'Russland'
+$_BL['pl']['Russian Federation'] = '';
+
+//en: 'Slovakia'
+$_BL['pl']['Slovakia'] = '';
+
+//en: 'Oceania'
+$_BL['pl']['Oceania'] = '';
+
+//en: 'Australia'
+$_BL['pl']['Australia'] = '';
+
+//en: 'America'
+$_BL['pl']['America'] = '';
+
+//en: 'Colombia'
+$_BL['pl']['Colombia'] = '';
+
+//en: 'Asia'
+$_BL['pl']['Asia'] = '';
+
+//en: 'Africa'
+$_BL['pl']['Africa'] = '';
+
+//en: 'United States'
+$_BL['pl']['United States'] = '';
+
+//en: 'North America'
+$_BL['pl']['North America'] = '';
+
+//en: 'South America'
+$_BL['pl']['South America'] = '';
+
+//en: 'Danish'
+$_BL['pl']['lang_dk'] = '';
+
+//en: 'Search...'
+$_BL['pl']['Search...'] = '';
+
+//en: 'Archives'
+$_BL['pl']['Archives'] = '';
+
+//en: 'Now'
+$_BL['pl']['Now'] = '';
+
+//en: 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow {TWITTER}!'
+$_BL['pl']['twitter_instructions'] = '';
+
+//en: 'Last signal'
+$_BL['pl']['h4_stat_station_signal_last'] = '';
+
+//en: 'Shows one of the latest signals which the station did send to the server.'
+$_BL['pl']['bo_graph_descr_signal'] = '';
+
+//en: 'Real Time'
+$_BL['pl']['Real Time'] = '';
+
+//en: 'Real-Time Lightning Map'
+$_BL['pl']['Real-Time Lightning Map'] = '';
+
+//en: 'Delay'
+$_BL['pl']['lm_live_delay'] = '';
+
+//en: 'Strokes'
+$_BL['pl']['lm_live_strokes'] = '';
+
+//en: 'Real-Time Lightning'
+$_BL['pl']['lm_live_realtime'] = '';
+
+//en: 'Settings'
+$_BL['pl']['lm_live_settings_info'] = '';
+
+//en: 'Fullscreen'
+$_BL['pl']['lm_live_set_fullscreen'] = '';
+
+//en: 'on'
+$_BL['pl']['lm_live_set_fullscreen_on'] = '';
+
+//en: 'off'
+$_BL['pl']['lm_live_set_fullscreen_off'] = '';
+
+//en: 'Shows the map in fullscreen mode (only if your browser supports it).'
+$_BL['pl']['lm_live_set_fullscreen_info'] = '';
+
+//en: 'Style'
+$_BL['pl']['lm_live_set_map_style'] = '';
+
+//en: 'Normal'
+$_BL['pl']['lm_live_set_map_style_normal'] = '';
+
+//en: 'Satellite'
+$_BL['pl']['lm_live_set_map_style_sat'] = '';
+
+//en: 'Terrain'
+$_BL['pl']['lm_live_set_map_style_terrain'] = '';
+
+//en: 'Roads'
+$_BL['pl']['lm_live_set_map_style_roads'] = '';
+
+//en: 'Thunder'
+$_BL['pl']['lm_live_set_thunder'] = '';
+
+//en: 'max'
+$_BL['pl']['lm_live_set_thunder_max'] = '';
+
+//en: 'off'
+$_BL['pl']['lm_live_set_thunder_off'] = '';
+
+//en: 'Shows the thunder sound front in realtime on higher zoom levels.'
+$_BL['pl']['lm_live_set_thunder_info'] = '';
+
+//en: 'Clouds'
+$_BL['pl']['lm_live_set_clouds'] = '';
+
+//en: 'on'
+$_BL['pl']['lm_live_set_clouds_on'] = '';
+
+//en: 'off'
+$_BL['pl']['lm_live_set_clouds_off'] = '';
+
+//en: 'Clouds and precipitation from openweathermap.org (experimental!).'
+$_BL['pl']['lm_live_set_clouds_info'] = '';
+
+//en: 'Radar'
+$_BL['pl']['lm_live_set_radar'] = '';
+
+//en: 'on'
+$_BL['pl']['lm_live_set_radar_on'] = '';
+
+//en: 'off'
+$_BL['pl']['lm_live_set_radar_off'] = '';
+
+//en: 'Rain radar is currently only available for the United States!'
+$_BL['pl']['lm_live_set_radar_info'] = '';
+
+//en: 'Show Strokes'
+$_BL['pl']['lm_live_set_strokes_show'] = '';
+
+//en: 'last hour'
+$_BL['pl']['lm_live_set_strokes_show_all'] = '';
+
+//en: 'last minutes'
+$_BL['pl']['lm_live_set_strokes_show_last'] = '';
+
+//en: 'Decide whether you want to see only "current" strokes or also those occurred up to an hour ago.'
+$_BL['pl']['lm_live_set_strokes_show_info'] = '';
+
+//en: 'Stations: off'
+$_BL['pl']['lm_live_stations_off'] = '';
+
+//en: 'Stations: on'
+$_BL['pl']['lm_live_stations_on'] = '';
+
+//en: 'Strokes of the last 60 minutes are shown. The real-time data comes directly from the computing servers of [Blitzortung], which are fed by hundreds of stations on several continents. The delay is calculated from the time stamps of each strokes compared to the current time.'
+$_BL['pl']['lm_live_info'] = '';
+
+//en: 'Legend'
+$_BL['pl']['lm_live_info_legend_title'] = '';
+
+//en: 'New lightning strikes have a red circle which gets smaller and disappears when it gets older than [sec] seconds.'
+$_BL['pl']['lm_live_info_legend1'] = '';
+
+//en: 'The color of filled circles represent the age of strikes up to [minutes] minutes. New strikes are yellow. The older they get, the darker the color. Dark brown is equal to almost [minutes] minutes. Those strikes will vanish soon.'
+$_BL['pl']['lm_live_info_legend2'] = '';
+
+//en: 'On higher zoom levels the thunder front of current strikes is shown as white transparent growing circle (speed of sound). It gets more transparent while travelling and disappears after a while.'
+$_BL['pl']['lm_live_info_legend3'] = '';
+
+//en: 'Enable "tick" sound on every lightning stroke in the current map view. This feature might not be available on every device/browser.'
+$_BL['pl']['lm_live_snd_info'] = '';
+
+//en: 'Displays participating stations for each lightning stroke. The color of the lines between stations and stroke depends on the distance. The higher the distance the more blue instead of green. Note that the angle spanned by participating station is another important factor. Distances of a few hundred kilometers max. and stations on every side of the thunderstorms give best results. Station which have been used for calculating the position are highlighted in purple for a short time. IMPORTANT: This feature can have negative impact on your system performance! Using "Chrome" is recommended.'
+$_BL['pl']['lm_live_stations_info'] = '';
+
+//en: 'See more real-time maps on Blitzortung.org'
+$_BL['pl']['lm_live_blitzortung_more'] = '';
+
+//en: 'IMPORTANT: This map is intended for entertainment purposes only!'
+$_BL['pl']['lm_live_usage'] = '';
+
+//en: 'Volume'
+$_BL['pl']['lm_live_snd_volume'] = '';
 
 
 ?>

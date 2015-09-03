@@ -7,35 +7,41 @@
 */
 
 $_BL['locale'] = 'nl';
+$_BL['nl']['is_utf8'] = false;
+
 
 
 /*************************************************************/
-/* Namen / Copyrights                                        */
+/* Names / Copyrights                                        */
 /*                                                           */
-/* Gebruik BO_OWN_COPYRIGHT in config.php om uw              */
-/* copyright toe te voegen                                   */
+/* Use BO_OWN_COPYRIGHT in config.php for                    */
+/* additional own copyright                                  */
 /*************************************************************/
 
 
-//Naam (titel) MyBlitzortung met html tags
+//Translated name of MyBlitzortung with html tags
 $_BL['nl']['MyBlitzortung'] = '<span class="bo_my">Mijn</span><span class="bo_mybo">Bliksemdetector</span>';
 
-//TNaam (titel) van MyBlitzortung zonder html tags
+//Translated name of MyBlitzortung without html tags
 $_BL['nl']['MyBlitzortung_notags'] = 'MijnBliksemdetector';
 
-//Extra toevoeging in footer
+//For displaying things like "translated by..." in footer
 $_BL['nl']['copyright_extra'] = 'Vertaling Nederlands: Willem <a href="http://www.meteomoes.be/paginas" target="_blank">MeteoMoes</a>';
 
-// *** PLEASE DON'T CHANGE OR TRANSLATE THE NAMES IN THE FOLLOWING ENTRIES *** THANKS! // NIET VERTALEN AUB
+// *** PLEASE DON'T CHANGE OR TRANSLATE THE NAMES IN THE FOLLOWING ENTRIES *** THANKS!
 $_BL['nl']['MyBlitzortung_original'] = 'MyBlitzortung';
 $_BL['nl']['copyright_footer'] = 'Powered by {MYBO_ORIG}';
 $_BL['nl']['Blitzortung.org'] = 'Blitzortung.org';
 $_BL['nl']['Lightning data from Blitzortung.org'] = 'Lightning data from Blitzortung.org';
 
 
+
+
 /*************************************************************/
-/* Algemeen                                                  */
+/* General                                                   */
 /*************************************************************/
+
+
 
 $_BL['nl']['.'] = ',';
 $_BL['nl'][','] = '.';
@@ -43,13 +49,14 @@ $_BL['nl']['_date'] = 'd.m.Y';
 $_BL['nl']['_dateshort'] = 'd.m';
 $_BL['nl']['_datetime'] = 'd.m.Y H:i:s';
 
+
 $_BL['nl']['_before'] = 'voor ';
 $_BL['nl']['_minutes_ago'] = 'minuten';
 $_BL['nl']['_minute_ago'] = 'minuut';
 $_BL['nl']['unit_meters'] = 'm';
 $_BL['nl']['unit_minutes'] = 'minuten';
 $_BL['nl']['unit_hours'] = 'uren';
-$_BL['nl']['unit_us_short'] = 'µs';
+$_BL['nl']['unit_us_short'] = '';
 $_BL['nl']['unit_ksps'] = 'Kilosamples per second';
 $_BL['nl']['unit_days'] = 'dagen';
 $_BL['nl']['unit_kilometers'] = 'km';
@@ -60,30 +67,32 @@ $_BL['nl']['number_1every_minute'] = 'elke minuut';
 $_BL['nl']['number_minutes'] = '{NUMBER} minuten';
 $_BL['nl']['number_1minute'] = 'een minuut';
 
+
 $_BL['nl']['CEST'] = 'MEZT';
 $_BL['nl']['CET'] = 'MET';
 $_BL['nl']['unit_strikesperminute'] = ' bliksems per minuut';
 $_BL['nl']['unit_strikesperminute_one'] = ' bliksem per minuut';
 
-$_BL['nl']['Jan_short'] ='jan';
-$_BL['nl']['Feb_short'] ='feb';
-$_BL['nl']['Mar_short'] ='maa';
-$_BL['nl']['Apr_short'] ='apr';
-$_BL['nl']['May_short'] ='mei';
-$_BL['nl']['Jun_short'] ='jun';
-$_BL['nl']['Jul_short'] ='jul';
-$_BL['nl']['Aug_short'] ='aug';
-$_BL['nl']['Sep_short'] ='sep';
-$_BL['nl']['Oct_short'] ='okt';
-$_BL['nl']['Nov_short'] ='nov';
-$_BL['nl']['Dec_short'] ='dec';
+
+$_BL['nl']['Jan_short'] = 'jan';
+$_BL['nl']['Feb_short'] = 'feb';
+$_BL['nl']['Mar_short'] = 'maa';
+$_BL['nl']['Apr_short'] = 'apr';
+$_BL['nl']['May_short'] = 'mei';
+$_BL['nl']['Jun_short'] = 'jun';
+$_BL['nl']['Jul_short'] = 'jul';
+$_BL['nl']['Aug_short'] = 'aug';
+$_BL['nl']['Sep_short'] = 'sep';
+$_BL['nl']['Oct_short'] = 'okt';
+$_BL['nl']['Nov_short'] = 'nov';
+$_BL['nl']['Dec_short'] = 'dec';
 
 
 $_BL['nl']['January'] = 'januari';
 $_BL['nl']['February'] = 'februari';
 $_BL['nl']['March'] = 'maart';
 $_BL['nl']['April'] = 'april';
-$_BL['nl']['May'] ='mei';
+$_BL['nl']['May'] = 'mei';
 $_BL['nl']['June'] = 'juni';
 $_BL['nl']['July'] = 'juli';
 $_BL['nl']['August'] = 'augustus';
@@ -183,7 +192,7 @@ $_BL['nl']['Count'] = 'Aantal';
 $_BL['nl']['More than'] = 'Meer dan';
 $_BL['nl']['Percent'] = 'Percent';
 $_BL['nl']['Degrees'] = 'Graden';
-$_BL['nl']['Coordinates'] = 'Coördinaten';
+$_BL['nl']['Coordinates'] = '';
 $_BL['nl']['Locating ratio'] = 'Locatie gegevens';
 $_BL['nl']['Last update'] = 'Laatste update';
 $_BL['nl']['Strike ratio'] = 'Inslagverhouding';
@@ -203,7 +212,7 @@ $_BL['nl']['no_strike_yet'] = 'nog geen';
 $_BL['nl']['Current strike rate'] = ' Huidig aantal inslagen';
 $_BL['nl']['Last detected strike'] = ' Laatste inslag';
 $_BL['nl']['Not yet'] = 'Nog niet';
-$_BL['nl']['Evaluated'] = 'Geëvalueerd';
+$_BL['nl']['Evaluated'] = '';
 $_BL['nl']['Channels'] = 'Kanalen';
 $_BL['nl']['Samples per Channel'] = 'Samples per kanaal';
 $_BL['nl']['Recording time'] = 'Opnametijd';
@@ -268,11 +277,14 @@ $_BL['nl']['Unknown'] = 'Onbekend';
 $_BL['nl']['Unknown or longer'] = 'Onbekend of langer';
 $_BL['nl']['Up to'] = 'Tot aan';
 $_BL['nl']['Locating angle'] = 'Locatie hoek';
+
+
 $_BL['nl']['timezone_is'] = 'Huidige datum & tijd en standaard tijdzone:';
 
 /*************************************************************/
 /* Main Menu (Standalone)                                    */
 /*************************************************************/
+
 
 $_BL['nl']['main_title_map'] = 'Bliksemkaarten';
 $_BL['nl']['main_title_statistics'] = 'Statistieken';
@@ -285,6 +297,7 @@ $_BL['nl']['main_menu_archive'] = 'Archieven';
 $_BL['nl']['main_menu_statistics'] = 'Statistieken';
 $_BL['nl']['main_menu_info'] = 'Informatie';
 $_BL['nl']['main_menu_login'] = 'Leden';
+
 
 /*************************************************************/
 /* Main Map                                                  */
@@ -309,7 +322,7 @@ $_BL['nl']['tile_maximum_time_range_err'] = 'Periode te groot!\nMaximum is {HOUR
 
 
 /*************************************************************/
-/* Graphs / kaarten                                          */
+/* Graphs                                                    */
 /*************************************************************/
 
 $_BL['nl']['graph_stat_title_strikes'] = 'Bliksem statistieken';
@@ -400,7 +413,7 @@ $_BL['nl']['h4_graph_deviations'] = 'Detectie afwijkingen';
 $_BL['nl']['h4_graph_amplitudes_time'] = 'Ontwikkeling van de amplitudes';
 $_BL['nl']['h4_graph_distance'] = 'Afstand';
 $_BL['nl']['h4_graph_deviations_time'] = 'Ontwikkeling van de afwijkingen';
-$_BL['nl']['h4_graph_evaluated_signals'] = 'Bliksemhoeveelheid / geëvalueerde signalen';
+$_BL['nl']['h4_graph_evaluated_signals'] = '';
 $_BL['nl']['h4_graph_signals_all'] = 'Signalen van alle stations';
 $_BL['nl']['h4_graph_amplitudes'] = 'Amplitudes';
 $_BL['nl']['h4_graph_spectrum'] = 'Frequentie spectrum';
@@ -410,7 +423,7 @@ $_BL['nl']['graph_stat_yaxis_title'] = 'Amplitude';
 
 
 /*************************************************************/
-/* Archief                                                   */
+/* Archive                                                   */
 /*************************************************************/
 $_BL['nl']['check_only_strikes'] = 'enkel met getedecteerde inslagen';
 $_BL['nl']['rawgraph'] = 'Signaal grafiek';
@@ -437,7 +450,6 @@ $_BL['nl']['Maximum strike density calculated'] = 'Maximum berekende inslagconce
 $_BL['nl']['Maximum mean strike density displayed'] = 'Maximum gemiddelde inslagconcentratie getoond';
 $_BL['nl']['densities_strikes_station'] = 'Inslagen station {STATION_CITY}';
 $_BL['nl']['Legend'] = 'Legende';
-$_BL['nl']['Strikes per square kilometer'] = 'Inslagen per vierkante kilometer';
 $_BL['nl']['Min time'] = 'Min tijd';
 $_BL['nl']['Max time'] = 'Max tijd';
 $_BL['nl']['enter_time_hint'] = 'Geef waarden als "YYYY-MM-DD HH:MM:SS". Kleinere tijdseenheden mogen weggelaten worden, bijvoorbeeld "YYYY-MM" is ook mogelijk.';
@@ -459,7 +471,7 @@ $_BL['nl']['Additional information'] = 'Bijkomende informatie';
 
 
 /*************************************************************/
-/* Statistieken                                                */
+/* Statistics                                                */
 /*************************************************************/
 $_BL['nl']['h3_stat_last_signals'] = 'De laatst ontvangen signalen ';
 $_BL['nl']['h3_stat_station'] = 'Statistieken van station {STATION_CITY}';
@@ -509,13 +521,13 @@ $_BL['nl']['Entries (all data)'] = 'Gegevens (alle data)';
 $_BL['nl']['Station active'] = 'Station actief';
 $_BL['nl']['Last update strikes'] = 'Laatste nieuwe bliksem';
 $_BL['nl']['Last update stations'] = 'Laatste nieuwe stationgegevens';
-$_BL['nl']['Last update signals'] = 'Laatste nieuwe  signaalgegevens';
+$_BL['nl']['Last update signals'] = 'Laatste nieuwe signaalgegevens';
 $_BL['nl']['Active Stations'] = 'Actieve stations';
 $_BL['nl']['Sum of Signals'] = 'Som signalen';
 $_BL['nl']['Sum of Strikes'] = 'Som inslagen';
 $_BL['nl']['Strikes detected'] = 'Inslagen gedetecteerd';
 $_BL['nl']['of the last'] = 'van de laatste';
-$_BL['nl']['Currently no GPS coordinates available!'] = 'Momenteel geen GPS coördinaten beschikbaar!';
+$_BL['nl']['Currently no GPS coordinates available!'] = '';
 $_BL['nl']['stat_navi_strikes'] = 'Bliksem';
 $_BL['nl']['total strikes'] = 'totaal inslagen';
 $_BL['nl']['total strikes station'] = 'totaal inslagen station {STATION}';
@@ -653,6 +665,7 @@ $_BL['nl']['stat_navi_longtime'] = 'Langetijd Stats';
 $_BL['nl']['stat_navi_advanced'] = 'Uitgebreid';
 
 
+
 /*************************************************************/
 /* Info                                                     */
 /*************************************************************/
@@ -664,15 +677,10 @@ $_BL['nl']['h3_info_hint'] = 'Belangrijke opmerking';
 
 $_BL['nl']['info_general_warning'] = '
 We zijn niet verantwoordelijk voor de juistheid, actualiteit, kwaliteit en nauwkeurigheid van de informatie op onze website. We zijn niet verantwoordelijk voor schade geleden als gevolg van beslissingen genomen naar aanleiding van info op onze site. ';
-$_BL['nl']['info_general_text'] = '
-Blitzortung.org is een privé netwerk van bliksemdetectie stations. Ze ontvangen electromagnetische signalen van Blikseminslagen. Door toevoegen van het exacte tijdstip kan de positie van de inslag berekend worden. (TOA - time of arrival methode).
+$_BL['nl']['info_general_text'] = '';
 
-Meer informatie is beschikbaar op de hoofdsite van dit project: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
 
-';
-$_BL['nl']['info_accuracy_text'] = '
-De nauwkeurigheid is vrij goed en is soms beter dan 1km. Dit is vergelijkbaar met commerciële bliksemdetectiebedrijven.
-';
+$_BL['nl']['info_accuracy_text'] = '';
 $_BL['nl']['info_participate_text'] = '
 U moet uw eigen ontvanger bouwen (kost ongeveer 170 Euro). Hiermee kunt u meewerken aan het project en krijgt u toegang tot alle gegevens van het netwerk.
 Meer informatie hier:
@@ -681,10 +689,7 @@ Zie ook:
 <a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a>
 ';
 
-$_BL['nl']['info_usage_text'] = '
-De gegevens op deze pagina, op de paginas van {STATION} en op de paginas van Blitzortung.org worden enkel gebruikt voor privé en hobby doeleinden. We zijn geen commerciële informatiedienst voor bliksemgegevens! Zie voor meer informatie op:
-<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=5" target="_blank">Blitzortung.org</a>
-';
+$_BL['nl']['info_usage_text'] = '';
 $_BL['nl']['info_myblitzortung_text'] = '
 De opbouw van deze pagina is gerealiseerd door software met naam:
 {MYBO} ({MYBO_ORIG}).<br>
@@ -711,7 +716,7 @@ $_BL['nl']['bo_stat_longtime_descr'] = 'Al de informatie hier is vernieuwd sinds
 $_BL['nl']['bo_stat_other_database_descr'] = 'Alle bliksem-, signaal- en stationgegevens zijn opgeslagen in een locale database met actuele inhoud:';
 $_BL['nl']['bo_stat_other_updates_descr'] = 'Nieuwe gegevens zijn verzameld bij blitzortung.org in volgende tijdintervallen:';
 $_BL['nl']['bo_stat_other_gps_descr'] = 'Informatie over de GPS ontvanger, gebruikt voor de exacte tijd en positie. Indien bekend, wordt ook de richting van de antenne getoond (rood, groen).';
-$_BL['nl']['bo_stat_station_descr_lasth'] = 'Het bliksemdetectie station {STATION_CITY} ontvangt de electromagnetische signalen, veroorzaakt door een bliksem. Ze worden naar Blitzortung.org verzonden waar met de hulp van de andere stations de positie en de tijd van de bliksem verkregen worden. Daarnaast is niet elk verzonden signaal veroorzaakt door bliksm en wordt ook niet elke inslag gedetecteerd. Informatie hierover vindt u in de grafieken hieronder. Om een inslag te detecteren zijn minstens {MIN_PARTICIPANTS} stations nodig. Is station {STATION_CITY} één van deze {MIN_PARTICIPANTS} stations dan is de inslag een "eigen" inslag.';
+$_BL['nl']['bo_stat_station_descr_lasth'] = '';
 $_BL['nl']['bo_graph_descr_radi'] = 'Overzicht van de eigen locatie detectiegegevens in functie van de richting. Aantal gedetecteerde inslagen is ook zichtbaar.';
 $_BL['nl']['bo_graph_descr_strikes'] = 'Hier het aantal inslagen per uur gedetecteerd door het netwerk, het aantal inslagen per uur gedetecteerd door het station {STATION_CITY} en het gemiddelde aantal inslagen per uur gedetecteerd door alle stations';
 $_BL['nl']['bo_graph_descr_signals'] = 'Het aantal ontvangen signalen per uur van station {STATION_CITY} en de gemiddelde waarde van alle stations.';
@@ -758,33 +763,18 @@ Enkel tips: De getoonde gegevens zijn niet gestandariseerd, de resultaten kunnen
 
 $_BL['nl']['archive_signaltable_info'] = '
 Elk bliksemdetectie station van het Blitzortung.org netwerk ontvangt signalen van inslagen en ook meer of minder neveninformatie. Hier zijn enkele signalen zichtbaar, ontvangen van het station {STATION}
- gedurende de laatste minuten.
+gedurende de laatste minuten.
 Als andere stations hetzelfde signaal ontvangen gedurende een zeer korte tijd dan is er kans dat een bliksem gedetecteerd werd gesitueerd buiten normaal overeenstemmende tijd (tijd van aankomst methode - TOA).
- In dit geval wordt hier informatie over deze inslag weergegeven.
+In dit geval wordt hier informatie over deze inslag weergegeven.
 ';
+
 
 $_BL['nl']['archive_striketable_info'] = 'Hier is dezelfde informatie te zien als op de pagina "Signalen" maar ook van inslagen waarbij geen signaal gedetecteerd werd door uw station. Om in overeenstemming te blijven met de regels van Blitzortung.org, mag deze pagina enkel toegankelijk zijn met een gebruikers login.
 <br><br>
 Tip: De hyperbolische curven getoond in de kaart zijn enkel informatief en vertegenwooordigen niet de actuele berekening ({MYBO_ORIG} kent de tijden van andere stations niet).
 ';
 
-$_BL['nl']['archive_signaltable_info_bottom'] = '
-<p>
-Wanneer een blikseminslag gedetecteerd werd, worden hier enkele supplementaire gegevens van station {STATION} weergegeven.
-</p>
-<ul>
-<li><span class="bo_descr">Looptijd:</span> Verschil tussen de tijd van de inslag en de ontvangst</li>
-<li><span class="bo_descr">Afstand:</span> Afstand inslag tot station {STATION} berekend volgens verplaatsingsnelheid signaal (1ms = 300km)</li>
-<li><span class="bo_descr">Richting:</span> Benaderende richting (exacte waarde zal niet getoond worden wegens gebruikersbeperkingen)</li>
-<li><span class="bo_descr">Afwijking:</span> Hoe kleiner, hoe beter de localisering</li>
-<li><span class="bo_descr">Stroom:</span> Stroom van de inslag. Zeer experimenteel! Momenteel bijna geen informatieve waarde!</li>
-<li><span class="bo_descr">Polariteit:</span> Positieve/negatieve bliksem. Is bepaald uit het signaal. Zeer experimenteel, enkel van betekenis voor inslagen dichtbij!</li>
-<li><span class="bo_descr">Deelnemers:</span> Aantal stations welke de inslag detecteerden. Hoe meer, hoe beter.</li>
-<li><span class="bo_descr">Deelgenomen:</span> Heeft station {STATION} deelgenomen? Indien "neen" gekleurd is, dan is het signaal ontvangen maar het werd niet opgenomen in de berekening</li>
-<li><span class="bo_descr">Locatie hoek:</span> Max. hoek van deelgenomen stations rond de bliksem (tussen haakjes: stations die niet opgenomen werden in de berekening). Een waarde van 270° zou ideaal zijn, doch een goede bepaling van locatie is ook mogelijk met veel kleinere waarden.
-<li><span class="bo_descr">Kanaal:</span> Opgeslagen kannaal in de grafiek (wanneer het station werkt in "Best Channel Mode")
-</ul>
-';
+$_BL['nl']['archive_signaltable_info_bottom'] = '';
 
 
 
@@ -814,7 +804,7 @@ $_BL['nl']['alert_settings_legend_table'] = 'Opties';
 $_BL['nl']['show other users'] = 'Toon de instellingen van andere gebruikers';
 $_BL['nl']['User'] = 'Gebruiker';
 $_BL['nl']['Send to'] = 'Verzonden naar';
-$_BL['nl']['Lat/Lon'] = 'Coördinaten';
+$_BL['nl']['Lat/Lon'] = '';
 $_BL['nl']['Max. Distance'] = 'Max. afstand';
 $_BL['nl']['Min. strike rate'] = 'Min. aantal inslagen';
 $_BL['nl']['Last alert'] = 'Laatste alarm';
@@ -831,7 +821,7 @@ $_BL['nl']['alert_mail_first_strike'] = 'Eerste bliksem ';
 $_BL['nl']['alert_sms_last_strike'] = 'Laatste bliksem';
 $_BL['nl']['alert_sms_distance'] = 'Afstand';
 $_BL['nl']['alert_sms_description'] = '{MYBO_NOTAGS} station {STATION}';
-$_BL['nl']['No alerts available. Create one yourself!'] = 'Geen alarm beschikbaar. Maak er zelf één!';
+$_BL['nl']['No alerts available. Create one yourself!'] = '';
 $_BL['nl']['You must fill all fields!'] = 'Alle vakjes moeten ingevuld worden!';
 $_BL['nl']['Wrong format of E-Mail address'] = 'Verkeerd formaat van het E-Mail adres';
 $_BL['nl']['Wrong format of telephone number'] = 'Verkeerd formaat van het telefoonnummer';
@@ -871,29 +861,13 @@ $_BL['nl']['DONE'] = 'KLAAR';
 $_BL['nl']['Really continue?'] = 'Echt verder gaan?';
 $_BL['nl']['Couldnt get login id'] = 'Kon de login id niet ontvangen';
 
-$_BL['nl']['mybo_station_update_info'] = '
-<p>
-Met deze mogelijkheid, kunt u uw {MYBO_ORIG} installatie verbinden met andere stations die {MYBO_ORIG} gebruiken. 
-Het volgende zal gebeuren, wanneer u klikt op onderstaande link:
-</p>
+$_BL['nl']['mybo_station_update_info'] = '';
 
-<ul>
-<li>1. Uw station id en de url van deze website zal verzonden worden naar <em>{LINK_HOST}</em>.
-</li>
-<li>2. U ontvangt alle urls van alle andere stations die momenteel meewerken.
-</li>
-</ul>
 
-<p>
-De gegevens moeten regelmatig vernieuwd worden zodat nieuwe stations opgenomen worden, een auto-update is ook voorzien.
-</p>
 
-<p>
-Om u te herkennen als blitzortung.org lid, wordt een login-ID gevraagd door blitzortung.org.
-Deze ID wordt verzonden naar <em>{LINK_HOST}</em> waar het opnieuw nagekeken wordt door blitzortung.org.
-De ID is niet opgeslagen! Uw wachtwoord zal nooit naar andere websites dan blitzortung.org gezonden worden!
-Uw station moet ten minste één signaal verzonden hebben binnen de laatste 2 uur, anders werkt de identificatie niet.
-</p>';
+
+
+
 
 
 /*************************************************************/
@@ -927,40 +901,38 @@ $_BL['nl']['France'] = 'Frankrijk';
 $_BL['nl']['Austria'] = 'Oostenrijk';
 $_BL['nl']['Switzerland'] = 'Zwitserland';
 $_BL['nl']['Hungary'] = 'Hungarije';
-$_BL['nl']['Belgium'] = 'België';
-$_BL['nl']['Czech Republic'] = 'Tsjechië';
+$_BL['nl']['Belgium'] = '';
+$_BL['nl']['Czech Republic'] = '';
 $_BL['nl']['Denmark'] = 'Denemarken';
 $_BL['nl']['England'] = 'Engeland';
 $_BL['nl']['Estonia'] = 'Estland';
 $_BL['nl']['Finland'] = 'Finland';
 $_BL['nl']['Greece'] = 'Griekenland';
-$_BL['nl']['Italy'] = 'Italië';
+$_BL['nl']['Italy'] = '';
 $_BL['nl']['Luxemburg'] = 'Luxemburg';
 $_BL['nl']['Norway'] = 'Noorwegen';
 $_BL['nl']['Poland'] = 'Polen';
 $_BL['nl']['Spain'] = 'Spanje';
 $_BL['nl']['Sweden'] = 'Zweden';
-$_BL['nl']['Netherlands'] = 'Nederland';
 $_BL['nl']['United Kingdom'] = 'Verenigd Koninkrijk';
 $_BL['nl']['Bulgaria'] = 'Bulgarije';
-$_BL['nl']['Albania'] = 'Albanië';
+$_BL['nl']['Albania'] = '';
 $_BL['nl']['Russia'] = 'Rusland';
-$_BL['nl']['Romania'] = 'Roemenië';
+$_BL['nl']['Romania'] = '';
 $_BL['nl']['Rome'] = 'Rome';
 $_BL['nl']['Lithuania'] = 'Litouwen';
 $_BL['nl']['Ireland'] = 'Ierland';
-$_BL['nl']['Ukraine'] = 'Oekraïne';
 
-//Europe: Regions 
+//Europe: Regions
 $_BL['nl']['Europe'] = 'Europa';
-$_BL['nl']['Western Europe'] = 'West-Europa'; 
+$_BL['nl']['Western Europe'] = 'West-Europa';
 
 //Europe: German states
 $_BL['nl']['Bavaria'] = 'Beieren (D)';
 $_BL['nl']['NRW'] = 'NRW (D)';
 
 //Europe: Italy
-$_BL['nl']['Sardinia'] = 'Sardinië (I)';
+$_BL['nl']['Sardinia'] = '';
 
 
 
@@ -973,6 +945,8 @@ $_BL['nl']['New Zealand'] = 'Nieuw Zealand';
 /*** OTHER TEMPLATE NAMES***/
 
 $_BL['nl']['Meteox rain radar'] = 'Regen radar (meteox.com)';
+
+
 
 
 
@@ -1001,7 +975,6 @@ $_BL['nl']['Login string is'] = 'Login is';
 $_BL['nl']['Auth ID is'] = 'Aanmelding ID is';
 $_BL['nl']['Logging out from Blitzortung.org'] = 'Uitloggen bij Blitzortung.org';
 $_BL['nl']['Already DONE BEFORE'] = 'Reeds VROEGER UITGEVOERD';
-$_BL['nl']['Download only external files'] = 'Download enkel externe bestanden';
 $_BL['nl']['Update database keys'] = 'Sleutels database vernieuwen';
 $_BL['nl']['without GPS'] = 'zonder GPS';
 $_BL['nl']['Record longtime data since'] = 'Neemt de volledige gegevens op sinds';
@@ -1011,8 +984,8 @@ $_BL['nl']['no_lightning_data'] = 'Geen bliksemgegevens!';
 $_BL['nl']['Residual time'] = 'Resttijd';
 $_BL['nl']['graph_stat_title_residual_time'] = 'Verdeling van resttijd';
 $_BL['nl']['h4_graph_residual_time'] = 'Verdeling van resttijd';
-$_BL['nl']['bo_graph_descr_strikes_station_residual_time'] = false; // ToDo
-$_BL['nl']['Mean coordinates'] = 'Gemiddelde coördinaten';
+$_BL['nl']['bo_graph_descr_strikes_station_residual_time'] = false;
+$_BL['nl']['Mean coordinates'] = '';
 $_BL['nl']['h4_stat_station_area'] = 'Omgeving';
 $_BL['nl']['Last position'] = 'Laatste positie';
 $_BL['nl']['Select station'] = 'Kies een station';
@@ -1026,7 +999,6 @@ $_BL['nl']['City names'] = 'Naam steden';
 $_BL['nl']['Only strikes of selected station'] = 'Enkel inslagen van gekozen station';
 $_BL['nl']['map_autoupdate_stalled_msg'] = 'Geen gebruikers activiteit. Auto-update op stal.';
 $_BL['nl']['tile_zoom_not_allowed'] = 'Zoom-hoeveelheid\n hier niet toegelaten!';
-$_BL['nl']['tile_station_not_allowed'] = 'Kiezen van station\n niet toegelaten!';
 $_BL['nl']['tile_station_not_allowed'] = 'Cell tracks uitgeschakeld!';
 $_BL['nl']['Last time without GPS'] = 'Laatste tijd zonder GPS';
 $_BL['nl']['h4_stat_station_general'] = 'Algemene statistieken van het laatste uur';
@@ -1036,5 +1008,286 @@ $_BL['nl']['station strikes with MIN-MAX participants'] = 'Inslagen {STATION_CIT
 $_BL['nl']['strikes_station2'] = '{STATION_CITY}';
 $_BL['nl']['mean ratio'] = 'gemiddelde hoeveelheid';
 $_BL['nl']['ratio of all strikes is'] = 'hoeveelheid van alle inslagen is';
+$_BL['nl']['Ukraine'] = '';
+$_BL['nl']['Netherlands'] = 'Nederland';
+
+
+
+
+/*************************************************************/
+/* Special text for Lightningmaps.org                        */
+/*************************************************************/
+
+
+//REALTIME MAP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/********************/
+/*  NOT TRANSLATED  */
+/********************/
+
+
+//en: 'mi'
+$_BL['nl']['unit_miles'] = '';
+
+//en: 'yd'
+$_BL['nl']['unit_yards'] = '';
+
+//en: 'Alerts: Twitter'
+$_BL['nl']['user_perm8'] = '';
+
+//en: 'Some of the latest strokes with the signal of the closest station.'
+$_BL['nl']['archive_striketable_info_guests'] = '';
+
+//en: 'Twitter'
+$_BL['nl']['alert_twitter'] = '';
+
+//en: 'Netherlands'
+$_BL['nl']['The Netherlands'] = '';
+
+//en: 'Strokes per'
+$_BL['nl']['Strikes per'] = '';
+
+//en: 'Latvia'
+$_BL['nl']['Latvia'] = '';
+
+//en: 'Croatia'
+$_BL['nl']['Croatia'] = '';
+
+//en: 'Baltic States'
+$_BL['nl']['Baltic States'] = '';
+
+//en: 'Indonesia'
+$_BL['nl']['Indonesia'] = '';
+
+//en: 'Slovenien'
+$_BL['nl']['Slovenia'] = '';
+
+//en: 'Luxemburg'
+$_BL['nl']['Luxembourg'] = '';
+
+//en: 'Russland'
+$_BL['nl']['Russian Federation'] = '';
+
+//en: 'Slovakia'
+$_BL['nl']['Slovakia'] = '';
+
+//en: 'Oceania'
+$_BL['nl']['Oceania'] = '';
+
+//en: 'Australia'
+$_BL['nl']['Australia'] = '';
+
+//en: 'America'
+$_BL['nl']['America'] = '';
+
+//en: 'Colombia'
+$_BL['nl']['Colombia'] = '';
+
+//en: 'Asia'
+$_BL['nl']['Asia'] = '';
+
+//en: 'Africa'
+$_BL['nl']['Africa'] = '';
+
+//en: 'United States'
+$_BL['nl']['United States'] = '';
+
+//en: 'North America'
+$_BL['nl']['North America'] = '';
+
+//en: 'South America'
+$_BL['nl']['South America'] = '';
+
+//en: 'English'
+$_BL['nl']['lang_en'] = '';
+
+//en: 'German'
+$_BL['nl']['lang_de'] = '';
+
+//en: 'French'
+$_BL['nl']['lang_fr'] = '';
+
+//en: 'Hungarian'
+$_BL['nl']['lang_hu'] = '';
+
+//en: 'Italian'
+$_BL['nl']['lang_it'] = '';
+
+//en: 'Dutch'
+$_BL['nl']['lang_nl'] = '';
+
+//en: 'Danish'
+$_BL['nl']['lang_dk'] = '';
+
+//en: 'Search...'
+$_BL['nl']['Search...'] = '';
+
+//en: 'Archives'
+$_BL['nl']['Archives'] = '';
+
+//en: 'Now'
+$_BL['nl']['Now'] = '';
+
+//en: 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow <em><a href="https://twitter.com/{TWITTER}" target="_blank">{TWITTER}</a></em>!'
+$_BL['nl']['twitter_instructions'] = '';
+
+//en: 'Last signal'
+$_BL['nl']['h4_stat_station_signal_last'] = '';
+
+//en: 'Shows one of the latest signals which the station did send to the server.'
+$_BL['nl']['bo_graph_descr_signal'] = '';
+
+//en: 'Real Time'
+$_BL['nl']['Real Time'] = '';
+
+//en: 'Real-Time Lightning Map'
+$_BL['nl']['Real-Time Lightning Map'] = '';
+
+//en: 'Delay'
+$_BL['nl']['lm_live_delay'] = '';
+
+//en: 'Strokes'
+$_BL['nl']['lm_live_strokes'] = '';
+
+//en: 'Real-Time Lightning'
+$_BL['nl']['lm_live_realtime'] = '';
+
+//en: 'Settings'
+$_BL['nl']['lm_live_settings_info'] = '';
+
+//en: 'Fullscreen'
+$_BL['nl']['lm_live_set_fullscreen'] = '';
+
+//en: 'on'
+$_BL['nl']['lm_live_set_fullscreen_on'] = '';
+
+//en: 'off'
+$_BL['nl']['lm_live_set_fullscreen_off'] = '';
+
+//en: 'Shows the map in fullscreen mode (only if your browser supports it).'
+$_BL['nl']['lm_live_set_fullscreen_info'] = '';
+
+//en: 'Style'
+$_BL['nl']['lm_live_set_map_style'] = '';
+
+//en: 'Normal'
+$_BL['nl']['lm_live_set_map_style_normal'] = '';
+
+//en: 'Satellite'
+$_BL['nl']['lm_live_set_map_style_sat'] = '';
+
+//en: 'Terrain'
+$_BL['nl']['lm_live_set_map_style_terrain'] = '';
+
+//en: 'Roads'
+$_BL['nl']['lm_live_set_map_style_roads'] = '';
+
+//en: 'Thunder'
+$_BL['nl']['lm_live_set_thunder'] = '';
+
+//en: 'max'
+$_BL['nl']['lm_live_set_thunder_max'] = '';
+
+//en: 'off'
+$_BL['nl']['lm_live_set_thunder_off'] = '';
+
+//en: 'Shows the thunder sound front in realtime on higher zoom levels.'
+$_BL['nl']['lm_live_set_thunder_info'] = '';
+
+//en: 'Clouds'
+$_BL['nl']['lm_live_set_clouds'] = '';
+
+//en: 'on'
+$_BL['nl']['lm_live_set_clouds_on'] = '';
+
+//en: 'off'
+$_BL['nl']['lm_live_set_clouds_off'] = '';
+
+//en: 'Clouds and precipitation from openweathermap.org (experimental!).'
+$_BL['nl']['lm_live_set_clouds_info'] = '';
+
+//en: 'Radar'
+$_BL['nl']['lm_live_set_radar'] = '';
+
+//en: 'on'
+$_BL['nl']['lm_live_set_radar_on'] = '';
+
+//en: 'off'
+$_BL['nl']['lm_live_set_radar_off'] = '';
+
+//en: 'Rain radar is currently only available for the United States!'
+$_BL['nl']['lm_live_set_radar_info'] = '';
+
+//en: 'Show Strokes'
+$_BL['nl']['lm_live_set_strokes_show'] = '';
+
+//en: 'last hour'
+$_BL['nl']['lm_live_set_strokes_show_all'] = '';
+
+//en: 'last minutes'
+$_BL['nl']['lm_live_set_strokes_show_last'] = '';
+
+//en: 'Decide whether you want to see only "current" strokes or also those occurred up to an hour ago.'
+$_BL['nl']['lm_live_set_strokes_show_info'] = '';
+
+//en: 'Stations: off'
+$_BL['nl']['lm_live_stations_off'] = '';
+
+//en: 'Stations: on'
+$_BL['nl']['lm_live_stations_on'] = '';
+
+//en: 'Strokes of the <strong>last 60 minutes</strong> are shown. The real-time data comes directly from the computing servers of [Blitzortung], which are fed by hundreds of stations on several continents. The delay is calculated from the time stamps of each strokes compared to the current time.'
+$_BL['nl']['lm_live_info'] = '';
+
+//en: 'Legend'
+$_BL['nl']['lm_live_info_legend_title'] = '';
+
+//en: 'New lightning strikes have a <span id="live_legend1_1">red circle</span> which gets smaller and disappears when it gets older than [sec] seconds.'
+$_BL['nl']['lm_live_info_legend1'] = '';
+
+//en: 'The color of filled circles represent the age of strikes up to [minutes] minutes. New strikes are <span id="live_legend2_1">yellow</span>. The older they get, the darker the color. <span id="live_legend2_2">Dark brown</span> is equal to almost [minutes] minutes. Those strikes will vanish soon.'
+$_BL['nl']['lm_live_info_legend2'] = '';
+
+//en: 'On higher zoom levels the thunder front of current strikes is shown as <span id="live_legend3_1">white transparent</span> growing circle (speed of sound). It gets more transparent while travelling and disappears after a while.'
+$_BL['nl']['lm_live_info_legend3'] = '';
+
+//en: 'Enable "tick" sound on every lightning stroke in the current map view. This feature might not be available on every device/browser.'
+$_BL['nl']['lm_live_snd_info'] = '';
+
+//en: 'Displays participating stations for each lightning stroke. The color of the lines between stations and stroke depends on the distance. The higher the distance the more blue instead of green. Note that the angle spanned by participating station is another important factor. Distances of a few hundred kilometers max. and stations on every side of the thunderstorms give best results. Station which have been used for calculating the position are highlighted in purple for a short time. IMPORTANT: This feature can have negative impact on your system performance! Using "Chrome" is recommended.'
+$_BL['nl']['lm_live_stations_info'] = '';
+
+//en: 'See more real-time maps on Blitzortung.org'
+$_BL['nl']['lm_live_blitzortung_more'] = '';
+
+//en: 'IMPORTANT: This map is intended for entertainment purposes only!'
+$_BL['nl']['lm_live_usage'] = '';
+
+//en: 'Volume'
+$_BL['nl']['lm_live_snd_volume'] = '';
+
+
+/*******************************/
+/*  NOT AVAILABLE IN ORIGINAL  */
+/*******************************/
+
+$_BL['nl']['Strikes per square kilometer'] = 'Inslagen per vierkante kilometer';
+$_BL['nl']['Download only external files'] = 'Download enkel externe bestanden';
+
 
 ?>

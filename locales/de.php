@@ -15,7 +15,7 @@ $_BL['de']['is_utf8'] = true;
 
 
 //Translated name of MyBlitzortung with html tags
-$_BL['de']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">Blitzortung</span>';
+$_BL['de']['MyBlitzortung'] = 'MyBlitzortung';
 
 //Translated name of MyBlitzortung without html tags
 $_BL['de']['MyBlitzortung_notags'] = 'MyBlitzortung';
@@ -55,6 +55,8 @@ $_BL['de']['unit_us_short'] = 'µs';
 $_BL['de']['unit_ksps'] = 'Kilosamples pro Sekunde';
 $_BL['de']['unit_days'] = 'Tage';
 $_BL['de']['unit_kilometers'] = 'km';
+$_BL['de']['unit_miles'] = 'mi';
+$_BL['de']['unit_yards'] = 'yd';
 $_BL['de']['days'] = 'Tage';
 $_BL['de']['hours'] = 'Stunden';
 $_BL['de']['number_every_minutes'] = 'alle {NUMBER} Minuten';
@@ -552,6 +554,7 @@ $_BL['de']['legend_stat_participants_time'] = 'Optionen';
 $_BL['de']['legend_stat_deviations_time'] = 'Optionen';
 $_BL['de']['legend_stat_active_stations'] = 'Optionen';
 
+
 /*************************************************************/
 /* User                                                     */
 /*************************************************************/
@@ -696,10 +699,10 @@ Für die Teilnahme am Blitzortungsnetzwerk braucht man zunächst etwas Übung be
 mit dem Lötkolben. Für das Zusammenbauen der Platinen, anschließen der Antennen und des GPS-Empfängers
 und die anschließende Inbetriebnahme sollte man ein paar Abende einplanen. Bei Problemen
 bekommt man im
-<a href="http://www.wetter-board.de/index.php?page=Board&boardID=381" target="_blank">Wetter-Board</a>
+Wetter-Board
 recht schnell Hilfestellungen von den andern Teilnehmern.
 Die Gesamtkosten betragen um die 150 Euro. Weitere Infos dazu unter
-<a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=2" target="_blank">Blitzortung &gt; Mitmachen</a>.';
+Blitzortung > Mitmachen.';
 
 $_BL['de']['info_usage_text'] = '
 Die hier und auf Blitzortung.org angebotenen Daten sind ausschließlich für den privaten
@@ -707,7 +710,7 @@ Gebrauch der teilnehmenden Benutzer bestimmt.
 Blitzortung.org ist kein offizieller Informationsdienst für Blitzdaten.
 Eine gewerbliche Nutzung der hier angebotenen Informationen ist strengstens verboten!
 Beachten Sie auch die Nutzungsbedingungen auf
-<a href="http://www.blitzortung.org/Webpages/index.php?lang=de&page=5" target="_blank">Blitzortung.org</a>
+Blitzortung.org
 ';
 $_BL['de']['info_myblitzortung_text'] = '
 Die Aufbereitung und Visualisierung der Daten auf dieser Internetseite
@@ -715,7 +718,7 @@ erfolgt durch das Programm {MYBO}. Die Verwendung von {MYBO} erfolgt auf eigene
 Verantwortung! Weder der Betreiber der Internetseite noch der/die Ersteller des Programms
 können für fehlerfreie Funktion Garantieren. {MYBO} ist freie Software. Mehr
 Informationen dazu unter
-<a href="http://www.myblitzortung.org" target="_blank">myblitzortung.org</a>.
+myblitzortung.org.
 ';
 
 
@@ -771,7 +774,7 @@ $_BL['de']['bo_graph_deviations_time'] = 'Zeitlicher Verlauf der mittleren Abwei
 $_BL['de']['bo_graph_distance'] = 'Zeitlicher Verlauf der durschnittlichen Entfernung zur Station {STATION}. Durch Vergleich der beiden Kurven kann die Empfindlichkeit der Station im Verhältnis zur Entfernung abgeschätzt werden.';
 $_BL['de']['bo_descr_strikes_now'] = 'Die Blitzdaten werden {UPDATE_INTERVAL} von Blitzortung.org übernommen und direkt hier angezeigt. Das Intervall in welchem die Blitzrate bestimmt wird, beträgt {RATE_INTERVAL}.';
 $_BL['de']['bo_stat_advanced_info'] = 'Erweiterte Statistiken, welche für den Stationsbetreiber hilfreich sein könnten um die Auswertungen zu optimieren. Im Gegensatz zur den Statistiken unter "Station" werden genauere Daten zur Berechnung verwendet.';
-$_BL['de']['bo_stat_other_station_info'] = 'Hinweis: Es werden Statistiken der <strong>Station {STATION_CITY}</strong> angezeigt. Aus technischen Gründen kann nur eine Auswahl der sonst vorhandenen Informationen angezeigt werden.';
+$_BL['de']['bo_stat_other_station_info'] = 'Hinweis: Es werden Statistiken der Station {STATION_CITY} angezeigt. Aus technischen Gründen kann nur eine Auswahl der sonst vorhandenen Informationen angezeigt werden.';
 $_BL['de']['bo_stat_other_station_info_back'] = 'Zurück zur Station {STATION}';
 
 
@@ -796,7 +799,9 @@ Auch im zeitlichen Verlauf ist dies der Fall, da die Ortungen des Stationsnetzwe
 immer mehr Blitze registriert werden.
 Ein Vergleich der absoluten Zahlen über einen größeren Zeitraum ist von daher nicht immer sinnvoll.
 Innerhalb einer Region mit entsprechender Anzahl an Stationen sowie innerhalb eines kurzen Zeitraums ist dies dagegen sehr gut möglich.
-<br><br>
+
+
+
 Bei der Auswahl einer Ortungsstation werden nur von dieser registrierte Blitze einbezogen.
 Somit lässt sich deren Blitzquote anzeigen, d.h. die Regionen in denen die Station Blitze mehr oder weniger gut empfängt.
 Dies kann Aufschluss über Empfangseigenschaften der Station sowie auf atmosphärische Einflüsse geben.
@@ -812,11 +817,15 @@ Informationen zum Blitz werden dann entsprechend mit angegeben. Erläuterungen z
 sind am Ende der Seite zu finden.
 ';
 
+$_BL['de']['archive_striketable_info_guests'] = 'Einige der letzten Blitze mit dem Signal der nächsten Station.';
+
 $_BL['de']['archive_striketable_info'] = '
 Die hier gezeigten Informationen entsprechen denen auf der Seite "Signale", es werden jedoch alle Blitze angezeigt.
 Um im Einklang mit den Blitzortung.org-Teilnehmer-Nutzungsbedingungen zu bleiben, wird diese Seite nur für
 User eingeblendet.
-<br><br>
+
+
+
 Bei der Anzeige der "Details" werden die teilgenommen Stationen in der Reihenfolge der Entfernung zum berechneten Blitzort angezeigt.
 Die Stationen werden zudem markiert, entsprechend der Reihenfolge "Mindestteilnehmerzahl", "Zusätzliche Teilnehmer" und
 "Teilgenommen, aber nicht in Berechnung eingeflossen".
@@ -830,21 +839,31 @@ dies müssen aber nicht die selben sein wie vom Blitzortung.org-Rechenserver.
 ';
 
 $_BL['de']['archive_signaltable_info_bottom'] = '
-<p>
+
+
 Wurde ein Blitz registriert, erscheinen weitere Infos bezogen auf die Station {STATION}:
-</p>
-<ul>
-<li><span class="bo_descr">Laufzeit:</span> Differenz von Blitz- und Empfangszeitpunkt</li>
-<li><span class="bo_descr">Entfernung:</span> Distanz Blitz <-> Station {STATION} aus der Laufzeit (1ms = 300km)</li>
-<li><span class="bo_descr">Richtung:</span> Grobe Himmelsrichtung (dieser Wert wird absichtlich nicht genauer angegeben)</li>
-<li><span class="bo_descr">Abweichung:</span> Maß für die Ortungsgenauigkeit</li>
-<li><span class="bo_descr">Blitzstrom:</span> Experimenteller Wert, hat momentan kaum Aussagekraft!</li>
-<li><span class="bo_descr">Polarität:</span> Positiver oder negativer Blitz. Wird aus dem nebenstehenden Diagramm ermittelt, ist momentan sehr experimentell und nur für nahe Blitze brauchbar.</li>
-<li><span class="bo_descr">Teilnehmer:</span> Anzahl der Stationen, welche den Blitz registriert haben. Je mehr, desto zuverlässiger.</li>
-<li><span class="bo_descr">Teilgenommen:</span> Hat die Station {STATION} an der Ortung teilgenommen? Wenn das "nein" eingefärbt ist, so wurde ein passendes Signal empfangen, welches jedoch nicht in die Berechnung mit einging.</li>
-<li><span class="bo_descr">Ortungswinkel:</span> Max. Winkel der Stationen um den Blitzort, welche aktiv an der Berechnung der Position teilgenommen haben (in Klammern: Stationen die nicht aktiv teilgenommen haben). Der Winkel ist ein Maß für die Genauigkeit der Position. Ein Wert von 270° wäre ideal, aber bereits bei viel kleineren Winkeln ist eine sehr gute Ortung möglich.
-<li><span class="bo_descr">Kanal:</span> Aufgezeichneter Kanal im Signaldiagramm (falls "Best Channel Mode" gewählt)
-</ul>
+
+
+Laufzeit: Differenz von Blitz- und Empfangszeitpunkt
+
+Entfernung: Distanz Blitz <-> Station {STATION} aus der Laufzeit (1ms = 300km)
+
+Richtung: Grobe Himmelsrichtung (dieser Wert wird absichtlich nicht genauer angegeben)
+
+Abweichung: Maß für die Ortungsgenauigkeit
+
+Blitzstrom: Experimenteller Wert, hat momentan kaum Aussagekraft!
+
+Polarität: Positiver oder negativer Blitz. Wird aus dem nebenstehenden Diagramm ermittelt, ist momentan sehr experimentell und nur für nahe Blitze brauchbar.
+
+Teilnehmer: Anzahl der Stationen, welche den Blitz registriert haben. Je mehr, desto zuverlässiger.
+
+Teilgenommen: Hat die Station {STATION} an der Ortung teilgenommen? Wenn das "nein" eingefärbt ist, so wurde ein passendes Signal empfangen, welches jedoch nicht in die Berechnung mit einging.
+
+Ortungswinkel: Max. Winkel der Stationen um den Blitzort, welche aktiv an der Berechnung der Position teilgenommen haben (in Klammern: Stationen die nicht aktiv teilgenommen haben). Der Winkel ist ein Maß für die Genauigkeit der Position. Ein Wert von 270° wäre ideal, aber bereits bei viel kleineren Winkeln ist eine sehr gute Ortung möglich.
+Kanal: Aufgezeichneter Kanal im Signaldiagramm (falls "Best Channel Mode" gewählt)
+
+
 ';
 
 
@@ -860,6 +879,7 @@ $_BL['de']['alert_name'] = 'Name / Beschreibung';
 $_BL['de']['alert_type'] = 'Art des Versands';
 $_BL['de']['alert_mail'] = 'E-Mail';
 $_BL['de']['alert_sms'] = 'SMS';
+$_BL['de']['alert_twitter'] = 'Twitter';
 $_BL['de']['Number'] = 'Nummer';
 $_BL['de']['alert_url'] = 'URL';
 $_BL['de']['URL'] = 'URL';
@@ -933,37 +953,38 @@ $_BL['de']['Really continue?'] = 'Wirklich fortfahren?';
 $_BL['de']['Couldnt get login id'] = 'Konnte Login Kennung nicht holen';
 
 $_BL['de']['mybo_station_update_info'] = '
-<p>
+
+
 Hier hast Du die Möglichkeit Deine {MYBO_NOTAGS}-Webseite mit anderen Stationen
 zu verknüpfen, die ebenfalls {MYBO_NOTAGS} einsetzen.
-</p>
 
-<p>
+
+
 Die folgenden Dinge werden passieren wenn Du fortfährst:
-</p>
 
-<ul>
-<li>1. Deine Stations-ID, Deine Website-Adresse sowie die von Dir hinterlegten Koordinaten werden zu <em>{LINK_HOST}</em> gesendet.
-</li>
-<li>2. Gleichzeitig bekommst Du eine Liste von Stationen, die dies ebenfalls getan haben zurück.
-</li>
-</ul>
 
-<p>
+
+1. Deine Stations-ID, Deine Website-Adresse sowie die von Dir hinterlegten Koordinaten werden zu {LINK_HOST} gesendet.
+
+2. Gleichzeitig bekommst Du eine Liste von Stationen, die dies ebenfalls getan haben zurück.
+
+
+
+
 Du solltest diese Daten von Zeit zu Zeit erneuern bzw. die automatische Aktualisierung aktivieren.
-</p>
 
-<p>
+
+
 Wichtiger HINWEIS:
 Um Dich als Teilnehmer zu authentifizieren, wird mit Deinen Zugangsdaten erst einmal
 eine Login-Kennung bei blitzortung.org abgefragt, so wie es auch automatisch beim Hohlen
 neuer Blitzdaten geschieht.
-Diese wird (ohne das Passwort!) an <em>{LINK_HOST}</em> gesendet und dort wiederrum bei blitzortung.org überprüft.
+Diese wird (ohne das Passwort!) an {LINK_HOST} gesendet und dort wiederrum bei blitzortung.org überprüft.
 Somit ist sichergestellt, dass nur Teilnehmer diesen Mechanismus benutzen können.
 Die Login-Kennung wird nicht gespeichert. Sie wird sofort wieder unbrauchbar gemacht.
-Dein Passwort selbst wird <strong>niemals an andere Webseiten</strong> außer blitzortung.org gesendet!
+Dein Passwort selbst wird niemals an andere Webseiten außer blitzortung.org gesendet!
 Um dieses Feature nutzen zu können, muss Deine Station in den letzten zwei Stunden Signale gesendet haben.
-</p>';
+';
 
 
 
@@ -1017,7 +1038,6 @@ $_BL['de']['Poland'] = 'Polen';
 $_BL['de']['Spain'] = 'Spanien';
 $_BL['de']['Sweden'] = 'Schweden';
 $_BL['de']['The Netherlands'] = 'Niederlande';
-$_BL['de']['Netherlands'] = 'Niederlande';
 $_BL['de']['United Kingdom'] = 'Großbritannien';
 $_BL['de']['Bulgaria'] = 'Bulgarien';
 $_BL['de']['Albania'] = 'Albanien';
@@ -1025,17 +1045,7 @@ $_BL['de']['Russia'] = 'Russland';
 $_BL['de']['Romania'] = 'Rumänien';
 $_BL['de']['Rome'] = 'Rom';
 $_BL['de']['Lithuania'] = 'Litauen';
-$_BL['de']['Slovenia'] = 'Slovenien';
 $_BL['de']['Ireland'] = 'Irland';
-$_BL['de']['Latvia'] = 'Lettland';
-$_BL['de']['Ukraine'] = 'Ukraine';
-$_BL['de']['Croatia'] = 'Kroatien';
-$_BL['de']['Baltic States'] = 'Baltikum';
-$_BL['de']['Luxembourg'] = 'Luxemburg';
-$_BL['de']['Russian Federation'] = 'Russland';
-$_BL['de']['Slovakia'] = 'Slowakei';
-$_BL['de']['Slovakia (Slovak Republic)'] = 'Slowakei (Slowakische Republik)';
-
 
 //Europe: Regions
 $_BL['de']['Europe'] = 'Europa';
@@ -1052,18 +1062,8 @@ $_BL['de']['Sardinia'] = 'Sardinien';
 
 /*** OCEANIA ***/
 $_BL['de']['New Zealand'] = 'Neuseeland';
-$_BL['de']['Oceania'] = 'Ozeanien';
-$_BL['de']['Australia'] = 'Australien';
 
 
-/*** USA/America ***/
-$_BL['de']['America'] = 'Amerika';
-$_BL['de']['Colombia'] = 'Kolumbien';
-
-
-/*** OTHER REGIONS ***/
-$_BL['de']['Asia'] = 'Asien';
-$_BL['de']['Africa'] = 'Afrika';
 
 
 /*** OTHER TEMPLATE NAMES***/
@@ -1103,18 +1103,12 @@ $_BL['de']['Update database keys'] = 'Datenbank-Index erneuern';
 $_BL['de']['without GPS'] = 'ohne GPS';
 $_BL['de']['Record longtime data since'] = 'Langzeitdaten seit';
 $_BL['de']['Show all signals'] = 'Zeige alle Signale';
-
-
-
-/*******************************/
-/*  New translations           */
-/*******************************/
+$_BL['de']['no_lightning_data'] = 'Keine Blitzdaten verfügbar!';
 
 $_BL['de']['Residual time'] = 'Restzeit';
 $_BL['de']['graph_stat_title_residual_time'] = 'Verteilung der Restzeit';
 $_BL['de']['h4_graph_residual_time'] = 'Verteilung der Restzeit';
 $_BL['de']['bo_graph_descr_strikes_station_residual_time'] = 'Hier wird die Restzeit zu jedem von der Station gemessenen Signal bestimmt und als Histogramm dargestellt. Grüne Flächen repräsentieren Blitze bei der die Station {STATION} am Blitz beteiligt war. Rote Flächen hingegen zeigen eine passende Zeit, aber keine Berücksichtigung der Signale der Station';
-$_BL['de']['no_lightning_data'] = 'Keine Blitzdaten verfügbar!';
 $_BL['de']['Mean coordinates'] = 'Gemittelte Koordinaten';
 $_BL['de']['h4_stat_station_area'] = 'Umgebung der Station';
 $_BL['de']['Last position'] = 'Letzte Position';
@@ -1129,8 +1123,6 @@ $_BL['de']['City names'] = 'Städtenamen';
 $_BL['de']['Only strikes of selected station'] = 'Nur Blitze der gewählten Station';
 $_BL['de']['map_autoupdate_stalled_msg'] = 'Info: Die automatische Aktualisierung wurde deaktiviert, da es keine Nutzeraktivität mehr gab.';
 $_BL['de']['tile_zoom_not_allowed'] = 'Diese Zoomstufe\nist nicht erlaubt!';
-$_BL['de']['tile_station_not_allowed'] = 'Auswahl von Stationen\nnicht erlaubt!';
-$_BL['de']['tile_station_not_allowed'] = 'Zugrichtungen sind deaktiviert!';
 $_BL['de']['Last time without GPS'] = 'GPS-Signal zuletzt verloren';
 $_BL['de']['h4_stat_station_general'] = 'Allgemeine Statistiken der letzten Stunde';
 
@@ -1140,6 +1132,25 @@ $_BL['de']['strikes_station2'] = '{STATION_CITY}';
 $_BL['de']['mean ratio'] = 'Mittlere Quote';
 $_BL['de']['ratio of all strikes is'] = 'Quote alle Blitze';
 $_BL['de']['Strikes per'] = 'Blitze pro';
+$_BL['de']['Latvia'] = 'Lettland';
+$_BL['de']['Ukraine'] = 'Ukraine';
+$_BL['de']['Croatia'] = 'Kroatien';
+$_BL['de']['Baltic States'] = 'Baltikum';
+$_BL['de']['Indonesia'] = 'Indonesien';
+$_BL['de']['Netherlands'] = 'Niederlande';
+$_BL['de']['Slovenia'] = 'Slovenien';
+$_BL['de']['Luxembourg'] = 'Luxemburg';
+$_BL['de']['Russian Federation'] = 'Russland';
+$_BL['de']['Slovakia'] = 'Slowakei';
+$_BL['de']['Oceania'] = 'Ozeanien';
+$_BL['de']['Australia'] = 'Australien';
+$_BL['de']['America'] = 'Amerika';
+$_BL['de']['Colombia'] = 'Kolumbien';
+$_BL['de']['Asia'] = 'Asien';
+$_BL['de']['Africa'] = 'Afrika';
+$_BL['de']['United States'] = 'USA';
+$_BL['de']['North America'] = 'Nordamerika';
+$_BL['de']['South America'] = 'Südamerika';
 
 $_BL['de']['lang_en'] = 'Englisch';
 $_BL['de']['lang_de'] = 'Deutsch';
@@ -1147,17 +1158,13 @@ $_BL['de']['lang_fr'] = 'Französisch';
 $_BL['de']['lang_hu'] = 'Ungarisch';
 $_BL['de']['lang_it'] = 'Italienisch';
 $_BL['de']['lang_nl'] = 'Niederländisch';
+$_BL['de']['lang_dk'] = 'Dänisch';
 
 $_BL['de']['Search...'] = 'Suche...';
-$_BL['de']['United States'] = 'USA';
-$_BL['de']['North America'] = 'Nordamerika';
-$_BL['de']['South America'] = 'Südamerika';
-$_BL['de']['Indonesia'] = 'Indonesien';
 $_BL['de']['Archives'] = 'Archiv';
 $_BL['de']['Now'] = 'Jetzt';
-
-
-
+$_BL['de']['h4_stat_station_signal_last'] = 'Letztes Signal';
+$_BL['de']['bo_graph_descr_signal'] = 'Zeigt eines der letzten Signale, welches die Station zum Server geschickt hat.';
 
 
 /*************************************************************/
@@ -1165,16 +1172,12 @@ $_BL['de']['Now'] = 'Jetzt';
 /*************************************************************/
 
 
-//General (Menu...)
+//REALTIME MAP
 $_BL['de']['Real Time'] = 'Echtzeit';
 $_BL['de']['Real-Time Lightning Map'] = 'Echtzeit Blitzkarte';
 
-//Other
-$_BL['de']['Big'] = 'Groß';
-$_BL['de']['(Big)'] = '(Groß)';
-$_BL['de']['Countries'] = 'Länder';
-
-//REALTIME MAP
+$_BL['de']['lm_live_delay'] = 'Verzögerung';
+$_BL['de']['lm_live_strokes'] = 'Blitze';
 $_BL['de']['lm_live_realtime'] = 'Blitze in Echtzeit';
 
 $_BL['de']['lm_live_settings_info'] = 'Einstellungen';
@@ -1198,43 +1201,74 @@ $_BL['de']['lm_live_set_thunder_info'] = 'Zeigt die Donnerfront in Echtzeit (nur
 $_BL['de']['lm_live_set_clouds'] = 'Wolken';
 $_BL['de']['lm_live_set_clouds_on'] = 'an';
 $_BL['de']['lm_live_set_clouds_off'] = 'aus';
-$_BL['de']['lm_live_set_clouds_info'] = 'Wolken und Niederschlag and precipitation von openweathermap.org (experimentell!).';
+$_BL['de']['lm_live_set_clouds_info'] = 'Wolken und Regen von openweathermap.org (experimentell!).';
 
 $_BL['de']['lm_live_set_radar'] = 'Radar (USA)';
 $_BL['de']['lm_live_set_radar_on'] = 'an';
 $_BL['de']['lm_live_set_radar_off'] = 'aus';
-$_BL['de']['lm_live_set_radar_info'] = '&nbsp;';
+$_BL['de']['lm_live_set_radar_info'] = ' ';
 
 $_BL['de']['lm_live_set_strokes_show'] = 'Zeige Blitze';
 $_BL['de']['lm_live_set_strokes_show_all'] = 'letzte Stunde';
 $_BL['de']['lm_live_set_strokes_show_last'] = 'letzte Minuten';
 $_BL['de']['lm_live_set_strokes_show_info'] = 'Nur "aktuelle" Blitze anzeigen oder auch die der letzten 60 Minuten.';
 
-
-$_BL['de']['lm_live_info_legend_title'] = 'Legende';
-$_BL['de']['lm_live_info_legend1'] = 'Neue Blitze haben einen <span id="live_legend1_1">roten Rand</span> welcher lansgam verschwindet und ab [sec]s nicht mehr zu sehen ist.';
-$_BL['de']['lm_live_info_legend2'] = 'Die Farbe der gefüllten Punkte steht für das Alter der Blitze (bis [minutes]min). Neue Blitze sind <span id="live_legend2_1">gelb</span>. Je älter, desto dunkler die Farbe. <span id="live_legend2_2">Dunkles braun</span> entspricht etwa [minutes]min. Diese Blitze werden bald von der Karte verschwinden.';
-$_BL['de']['lm_live_info_legend3'] = 'Die Donnerfront von von aktuellen Blitzen wird als dicker und <span id="live_legend3_1">weißer</span> Kreis dargestellt. Dieser wächst entsprechend der Schallgeschwindigkeit an. Die Kreise werden immer immer durchsichtiger und verschwinden nach einiger Zeit. In dieser Entfernen ist der Donner kaum noch zu hören.';
-
-
-
-$_BL['de']['lm_live_delay'] = 'Verzögerung';
-$_BL['de']['lm_live_strokes'] = 'Blitze';
-$_BL['de']['lm_live_realtime'] = 'Blitze in Echtzeit';
-$_BL['de']['lm_live_fullscr_off'] = 'Vollbild';
-$_BL['de']['lm_live_fullscr_on'] = 'Normale Größe';
 $_BL['de']['lm_live_stations_off'] = 'Stationen: aus';
 $_BL['de']['lm_live_stations_on'] = 'Stationen: ein';
-$_BL['de']['lm_live_clouds_off'] = 'Wolken: aus';
-$_BL['de']['lm_live_clouds_on'] = 'Wolken: ein';
-$_BL['de']['lm_live_set_clouds_info'] = 'Wolken und Regen von openweathermap.org (experimentell!).';
 
-$_BL['de']['lm_live_info'] = 'Diese Karte zeigt die Blitze der <strong>letzten 60 Minuten</strong> in Echtzeit an. Die Daten kommen direkt vom Projekt Blitzortung.org, bei dem hunderte von Stationen die Blitze detektieren. Die Verzögerung wird direkt aus den Zeitstempeln der Blitze berechnet.';
-$_BL['de']['lm_live_snd_volume'] = 'Lautstärke';
+$_BL['de']['lm_live_info'] = 'Diese Karte zeigt die Blitze der letzten 60 Minuten in Echtzeit an. Die Daten kommen direkt vom Projekt Blitzortung.org, bei dem hunderte von Stationen die Blitze detektieren. Die Verzögerung wird direkt aus den Zeitstempeln der Blitze berechnet.';
+$_BL['de']['lm_live_info_legend_title'] = 'Legende';
+$_BL['de']['lm_live_info_legend1'] = 'Neue Blitze haben einen roten Rand welcher lansgam verschwindet und ab [sec]s nicht mehr zu sehen ist.';
+$_BL['de']['lm_live_info_legend2'] = 'Die Farbe der gefüllten Punkte steht für das Alter der Blitze (bis [minutes]min). Neue Blitze sind gelb. Je älter, desto dunkler die Farbe. Dunkles braun entspricht etwa [minutes]min. Diese Blitze werden bald von der Karte verschwinden.';
+$_BL['de']['lm_live_info_legend3'] = 'Die Donnerfront von von aktuellen Blitzen wird als dicker und weißer Kreis dargestellt. Dieser wächst entsprechend der Schallgeschwindigkeit an. Die Kreise werden immer immer durchsichtiger und verschwinden nach einiger Zeit. In dieser Entfernen ist der Donner kaum noch zu hören.';
 $_BL['de']['lm_live_snd_info'] = 'Lässt ein kurzen Ton für jeden neuen Blitz ertönen. Diese Funktionen ist nicht mit allen Browsern bzw. nicht mit allen Geräten möglich.';
-$_BL['de']['lm_live_stations_info'] = 'Zeigt die Stationen an, die den jeweiligen Blitz detektiert haben. Die Farbe der Verbindungslinie hängt von der Entfernung zwischen Station und Blitz ab: Je weiter entfernt, desto bläulicher (statt grün) wird die Linie dargestellt. Entfernungen von maximal einigen hundert kilometern und Stationen runder um den Einschlagsort ergeben die besten Resultate. BITTE BEACHTEN: Diese Funktion kann die Systemleistung negativ beeinflussen! Der Browser "Chrome" wird hierzu empfohlen.';
 
+$_BL['de']['lm_live_stations_info'] = 'Zeigt die Stationen an, die den jeweiligen Blitz detektiert haben. Die Farbe der Verbindungslinie hängt von der Entfernung zwischen Station und Blitz ab: Je weiter entfernt, desto bläulicher (statt grün) wird die Linie dargestellt. Entfernungen von maximal einigen hundert kilometern und Stationen runder um den Einschlagsort ergeben die besten Resultate. BITTE BEACHTEN: Diese Funktion kann die Systemleistung negativ beeinflussen! Der Browser "Chrome" wird hierzu empfohlen.';
 $_BL['de']['lm_live_blitzortung_more'] = 'Weitere Echtzeit-Blitzkarten auf Blitzortung.org';
 $_BL['de']['lm_live_usage'] = 'WICHTIG: Diese Karte dient rein zur Unterhaltung!';
+$_BL['de']['lm_live_snd_volume'] = 'Lautstärke';
+
+
+
+
+
+
+
+/********************/
+/*  NOT TRANSLATED  */
+/********************/
+
+//en: 'Alerts: Twitter'
+$_BL['de']['user_perm8'] = '';
+
+//en: 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow {TWITTER}!'
+$_BL['de']['twitter_instructions'] = '';
+
+/*******************************/
+/*  NOT AVAILABLE IN ORIGINAL  */
+/*******************************/
+
+$_BL['de']['Slovakia (Slovak Republic)'] = 'Slowakei (Slowakische Republik)';
+$_BL['de']['Big'] = 'Groß';
+$_BL['de']['(Big)'] = '(Groß)';
+$_BL['de']['Countries'] = 'Länder';
+$_BL['de']['About'] = 'Über';
+$_BL['de']['Contact'] = 'Kontakt';
+$_BL['de']['Configuration'] = 'Konfiguration';
+$_BL['de']['Extend'] = 'Erweitern';
+$_BL['de']['Dynamic maps'] = 'Dyn. Karte';
+$_BL['de']['Maps'] = 'Karten';
+$_BL['de']['Animations'] = 'Animationen';
+$_BL['de']['Colors/Markers'] = 'Farben/Marker';
+$_BL['de']['Cities/Regions'] = 'Städte/Regionen';
+$_BL['de']['Lightning densities'] = 'Blitzdichten';
+$_BL['de']['Examples'] = 'Beispiel';
+$_BL['de']['Information'] = 'Infos';
+$_BL['de']['For Participants'] = 'Für Teilnehmer';
+$_BL['de']['Maps and statistics'] = 'Karten/Statistiken';
+$_BL['de']['on Facebook'] = 'auf Facebook';
+$_BL['de']['Germany Radar (BETA!)'] = 'Deutschland Radar (BETA!)';
+$_BL['de']['Germany + Radar'] = 'Dtl. + Radar';
+
 
 ?>

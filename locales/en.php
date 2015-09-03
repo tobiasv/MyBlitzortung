@@ -59,9 +59,7 @@ $_BL['en']['unit_us_short'] = 'µs';
 $_BL['en']['unit_ksps'] = 'Kilosamples per second';
 $_BL['en']['unit_days'] = 'days';
 $_BL['en']['unit_kilometers'] = 'km';
-$_BL['en']['unit_meters'] = 'm';
 $_BL['en']['unit_miles'] = 'mi';
-$_BL['en']['unit_meters'] = 'm';
 $_BL['en']['unit_yards'] = 'yd';
 $_BL['en']['days'] = 'days';
 $_BL['en']['hours'] = 'hours';
@@ -980,8 +978,7 @@ $_BL['en']['Poland'] = 'Poland';
 $_BL['en']['Spain'] = 'Spain';
 $_BL['en']['Sweden'] = 'Sweden';
 $_BL['en']['The Netherlands'] = 'Netherlands';
-$_BL['en']['The Netherlands'] = 'Netherlands';
-$_BL['en']['United Kingdom'] = 'United Kingdom ';
+$_BL['en']['United Kingdom'] = 'United Kingdom';
 $_BL['en']['Bulgaria'] = 'Bulgaria';
 $_BL['en']['Albania'] = 'Albania';
 $_BL['en']['Russia'] = 'Russia';
@@ -1067,7 +1064,6 @@ $_BL['en']['Only strikes of selected station'] = 'Only strokes of selected stati
 $_BL['en']['map_autoupdate_stalled_msg'] = 'No user activity. Auto-update was stalled.';
 $_BL['en']['tile_zoom_not_allowed'] = 'Zoom level\nnot allowed here!';
 $_BL['en']['tile_station_not_allowed'] = 'Station selection\nnot allowed!';
-$_BL['en']['tile_station_not_allowed'] = 'Cell tracks disabled!';
 $_BL['en']['Last time without GPS'] = 'Last time without GPS';
 $_BL['en']['h4_stat_station_general'] = 'General statistics of the last hour';
 
@@ -1081,31 +1077,46 @@ $_BL['en']['Latvia'] = 'Latvia';
 $_BL['en']['Ukraine'] = 'Ukraine';
 $_BL['en']['Croatia'] = 'Croatia';
 $_BL['en']['Baltic States'] = 'Baltic States';
+$_BL['en']['Indonesia'] = 'Indonesia';
+$_BL['en']['Netherlands'] = 'Niederlande';
+$_BL['en']['Slovenia'] = 'Slovenien';
+$_BL['en']['Luxembourg'] = 'Luxemburg';
+$_BL['en']['Russian Federation'] = 'Russland';
+$_BL['en']['Slovakia'] = 'Slovakia';
+$_BL['en']['Oceania'] = 'Oceania';
+$_BL['en']['Australia'] = 'Australia';
+$_BL['en']['America'] = 'America';
+$_BL['en']['Colombia'] = 'Colombia';
+$_BL['en']['Asia'] = 'Asia';
+$_BL['en']['Africa'] = 'Africa';
+$_BL['en']['United States'] = 'United States';
+$_BL['en']['North America'] = 'North America';
+$_BL['en']['South America'] = 'South America';
 
 $_BL['en']['lang_en'] = 'English';
 $_BL['en']['lang_de'] = 'German';
 $_BL['en']['lang_fr'] = 'French';
 $_BL['en']['lang_hu'] = 'Hungarian';
-$_BL['en']['lang_it'] = 'Italien';
+$_BL['en']['lang_it'] = 'Italian';
 $_BL['en']['lang_nl'] = 'Dutch';
+$_BL['en']['lang_dk'] = 'Danish';
 
 $_BL['en']['Search...'] = 'Search...';
 $_BL['en']['Archives'] = 'Archives';
-$_BL['en']['Indonesia'] = 'Indonesia';
-
 $_BL['en']['Now'] = 'Now';
-
 $_BL['en']['twitter_instructions'] = 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow <em><a href="https://twitter.com/{TWITTER}" target="_blank">{TWITTER}</a></em>!';
-
-
 $_BL['en']['h4_stat_station_signal_last'] = 'Last signal';
 $_BL['en']['bo_graph_descr_signal'] = 'Shows one of the latest signals which the station did send to the server.';
-$_BL['en'][''] = '';
 
 
 /*************************************************************/
-/* Special text for Lightningmaps.org: REALTIME MAP          */
+/* Special text for Lightningmaps.org                        */
 /*************************************************************/
+
+
+//REALTIME MAP
+$_BL['en']['Real Time'] = 'Real Time';
+$_BL['en']['Real-Time Lightning Map'] = 'Real-Time Lightning Map';
 
 $_BL['en']['lm_live_delay'] = 'Delay';
 $_BL['en']['lm_live_strokes'] = 'Strokes';
@@ -1158,13 +1169,6 @@ $_BL['en']['lm_live_stations_info'] = 'Displays participating stations for each 
 $_BL['en']['lm_live_blitzortung_more'] = 'See more real-time maps on Blitzortung.org';
 $_BL['en']['lm_live_usage'] = 'IMPORTANT: This map is intended for entertainment purposes only!';
 $_BL['en']['lm_live_snd_volume'] = 'Volume';
-$_BL['en']['lm_live_set_fullscreen'] = 'Fullscreen';
-
-$_BL['en'][''] = '';
-$_BL['en'][''] = '';
-$_BL['en'][''] = '';
-$_BL['en'][''] = '';
-
 
 
 

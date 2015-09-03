@@ -18,7 +18,7 @@ $_BL['cz']['is_utf8'] = true;
 
 
 //Translated name of MyBlitzortung with html tags
-$_BL['cz']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">LightningDetection</span>';
+$_BL['cz']['MyBlitzortung'] = 'MyLightningDetection';
 
 //Translated name of MyBlitzortung without html tags
 $_BL['cz']['MyBlitzortung_notags'] = 'MyLightningDetection';
@@ -58,9 +58,7 @@ $_BL['cz']['unit_us_short'] = 'µs';
 $_BL['cz']['unit_ksps'] = 'Kilosamples za vteřinu';
 $_BL['cz']['unit_days'] = 'dní';
 $_BL['cz']['unit_kilometers'] = 'km';
-$_BL['cz']['unit_meters'] = 'm';
 $_BL['cz']['unit_miles'] = 'mi';
-$_BL['cz']['unit_meters'] = 'm';
 $_BL['cz']['unit_yards'] = 'yd';
 $_BL['cz']['days'] = 'dny';
 $_BL['cz']['hours'] = 'hodinami';
@@ -680,29 +678,31 @@ $_BL['cz']['h3_info_hint'] = 'Důležité upozornění';
 
 $_BL['cz']['info_general_warning'] = '
 Neneseme zodpovědnost za úplnost, kvalitu a přesnost informací na našich stránkách.
-Neneseme zodpovědnost za škody vzniklé spoléháním se a používáním dat z naší stránky. ' ;
+Neneseme zodpovědnost za škody vzniklé spoléháním se a používáním dat z naší stránky. ';
 $_BL['cz']['info_general_text'] = '
 Blitzortung.org je soukromá síť stanic pozorovatelů blesků, kteří zachycují elektromagnetické signály blesků.
 Spolu s časovou značkou a pozicí stanice lze vypočítat z těchto signálů pozici blesků (metodou TOA - time of arrival method - čas zachycení signálu).
 
-Více informací naleznete na hlavní stránce projektu na: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
+Více informací naleznete na hlavní stránce projektu na: www.blitzortung.org.
 
 ';
+
+
 $_BL['cz']['info_accuracy_text'] = '
 Přesnost je velmi dobrá, někdy až na úroveň nižší než 1 km. To je v podstatě vyrovná komerčním detekčním systémům.
 ';
 $_BL['cz']['info_participate_text'] = '
 Svůj příjimač si musíte sestavit sami (stojí asi 150 euro). S ním se pak můžete zapojit do naší sítě a získáte přístup k veškerým dostupným datům o blescích.
 Více informací na:
-<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=2" target="_blank">Blitzortung.org &gt; Pokryjte svou oblast</a>.
+Blitzortung.org > Pokryjte svou oblast.
 Viz také:
-<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a>
+Wetter-Board
 ';
 
 $_BL['cz']['info_usage_text'] = '
 Poskytovaná data na Blitzortung.org jsou využívána pouze pro soukromé a nekomerční účely.
 Nejsme komerční informační službou o datech o blescích! Více informací na
-<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=5" target="_blank">Blitzortung.org</a>
+Blitzortung.org
 ';
 $_BL['cz']['info_myblitzortung_text'] = '
 Vizualizace na této stránce jsou vytvářeny programem
@@ -710,7 +710,7 @@ Vizualizace na této stránce jsou vytvářeny programem
 Nelze zaručit, že tento software poskytuje správné informace!
 Tyto data můžete použít na vlastní zodpovědnost!
 {MYBO} je bezplatný software. Více informaci na:
-<a href="http://www.myblitzortung.org?lang=en" target="_blank">www.myblitzortung.org</a>.
+www.myblitzortung.org.
 ';
 
 
@@ -718,10 +718,12 @@ Tyto data můžete použít na vlastní zodpovědnost!
 /* Statistics: Descriptions                                  */
 /*************************************************************/
 
-$_BL['cz']['bo_graph_descr_ratio'] = 'Bleskové a lokalizační poměry jsou důležitými parametry pro správné nastavení stanice. 
+$_BL['cz']['bo_graph_descr_ratio'] = 'Bleskové a lokalizační poměry jsou důležitými parametry pro správné nastavení stanice.
 Výpočty:
-<br>lokalizační poměr = (blesky detekované stanicí) / (počet signálů ze stanice)
-<br>bleskový poměr = (detekované blesky stanicí) / (počet blesků v síti)
+
+lokalizační poměr = (blesky detekované stanicí) / (počet signálů ze stanice)
+
+bleskový poměr = (detekované blesky stanicí) / (počet blesků v síti)
 ';
 
 $_BL['cz']['bo_stat_network_descr_lasth'] = 'Veškeré informace se vztahují k časové periodě 60 minut před poslední aktualizací.';
@@ -785,26 +787,38 @@ Pokud jiné stanice obdrží tentýž signál ve velmi malém časovém interval
 $_BL['cz']['archive_striketable_info_guests'] = 'Některé z posledních blesků se signálem z nejbližší stanice.';
 
 $_BL['cz']['archive_striketable_info'] = 'Zde vidíte stejné informace jako na stránce "signály", ale také blesky, u kterých z vaší stanice nebyl detekován žádný signál. Pro dodržení pravidel Blitzortung.org lze tuto stránku zobrazit pouze po přihlášení.
-<br><br>
+
+
+
 Info: Hyperbolické křivky na mapě jsou pouze informativní a nereprezentují skutečný výpočet ({MYBO_ORIG}. Skutečné časy na jiných stanicích nejsou známy.
 ';
 
 $_BL['cz']['archive_signaltable_info_bottom'] = '
-<p>
+
+
 Pokud došlo k detekci blesku, budou zobrazeny některé další informace vztahující se ke stanici {STATION}.
-</p>
-<ul>
-<li><span class="bo_descr">Doba:</span> Rozdíl mezi časem blesku a obdržením signálu</li>
-<li><span class="bo_descr">Vzdálenost:</span> Vzdálenost blesku od stanice {STATION} vypočítaná z času (1ms = 300km)</li>
-<li><span class="bo_descr">Směr:</span> Přibližný směr (přesná hodnota není zobrazena)</li>
-<li><span class="bo_descr">Směr:</span> Čím nižší hodnota, tím lepší lokalizace</li>
-<li><span class="bo_descr">Napětí:</span> Napětí blesku. Velmi experimentální! V současnosti v podstatě nemá žádnou vypovídající hodnotu!</li>
-<li><span class="bo_descr">Polarita:</span> Pozitivní/negativní blesk. Vypočítáno ze signálu. Velmi experimentální, vhodné pouze pro blesky v blízkosti!</li>
-<li><span class="bo_descr">Účastníci:</span> Počet stanic, které detekovaly tento blesk. Čím více, tím lépe.</li>
-<li><span class="bo_descr">Účast:</span> Účastnila se stanice {STATION}? Pokud je vybarveno "ne", potom byl signál obdržen, ale nebyl použit pro výpočet.</li>
-<li><span class="bo_descr">Lokalizační úhel:</span> Max. úhel zúčastněné stanice kolem pozice blesku (v závorce: stanice, které nebyly použity pro výpočet). Ideální je hodnota 270 °, ale dobrá lokalizace je i z hodnot výrazně nižších.
-<li><span class="bo_descr">Kanál:</span> Zaznamenaný kanál na grafu (pokud je stanice v režimu "Nejlepší kanál")
-</ul>
+
+
+    Doba: Rozdíl mezi časem blesku a obdržením signálu
+
+    Vzdálenost: Vzdálenost blesku od stanice {STATION} vypočítaná z času (1ms = 300km)
+
+    Směr: Přibližný směr (přesná hodnota není zobrazena)
+
+    Směr: Čím nižší hodnota, tím lepší lokalizace
+
+    Napětí: Napětí blesku. Velmi experimentální! V současnosti v podstatě nemá žádnou vypovídající hodnotu!
+
+    Polarita: Pozitivní/negativní blesk. Vypočítáno ze signálu. Velmi experimentální, vhodné pouze pro blesky v blízkosti!
+
+    Účastníci: Počet stanic, které detekovaly tento blesk. Čím více, tím lépe.
+
+    Účast: Účastnila se stanice {STATION}? Pokud je vybarveno "ne", potom byl signál obdržen, ale nebyl použit pro výpočet.
+
+    Lokalizační úhel: Max. úhel zúčastněné stanice kolem pozice blesku (v závorce: stanice, které nebyly použity pro výpočet). Ideální je hodnota 270 °, ale dobrá lokalizace je i z hodnot výrazně nižších.
+    Kanál: Zaznamenaný kanál na grafu (pokud je stanice v režimu "Nejlepší kanál")
+
+
 ';
 
 
@@ -894,28 +908,32 @@ $_BL['cz']['Really continue?'] = 'Chcete pokračovat?';
 $_BL['cz']['Couldnt get login id'] = 'Nepodařilo se získat přihlašovací ID.';
 
 $_BL['cz']['mybo_station_update_info'] = '
-<p>
+
+
 S touto funkcí můžete propojit vaši {MYBO_ORIG} instalaci s jinými stanicemi, na kterých běží {MYBO_ORIG}.
 Po kliknutí na níže uvedený odkaz dojde k následujícímu:
-</p>
 
-<ul>
-<li>1. ID vaší stanice URL této stránky budou odeslány na <em>{LINK_HOST}</em>.
-</li>
-<li>2. Obdržíte všechny URL ostatních stanic, které jsou v současnosti na seznamu.
-</li>
-</ul>
 
-<p>
+
+    1. ID vaší stanice URL této stránky budou odeslány na {LINK_HOST}.
+
+    2. Obdržíte všechny URL ostatních stanic, které jsou v současnosti na seznamu.
+
+
+
+
 Občas musíte data aktualizovat, aby se vám objevily nové stanice, můžete také použít funkci automatické aktualizace.
-</p>
 
-<p>
+
+
 Pro autentizaci jako člen blitzortung.org je třeba přihlašovací jméno od blitzortung.org.
-Toto id bude odesláno na <em>{LINK_HOST}</em> a zde znovu ověřeno s blitzortung.org.
+Toto id bude odesláno na {LINK_HOST} a zde znovu ověřeno s blitzortung.org.
 ID není ukládáno! Vaše heslo nikdy nebude odesláno na jiné stránky než je blitzortung.org!
 Vaše stanice musí odeslat alespoň jeden signál za poslední dvě hodiny, jinak nebude autentizace fungovat.
-</p>';
+';
+
+
+
 
 
 
@@ -965,7 +983,6 @@ $_BL['cz']['Norway'] = 'Norsko';
 $_BL['cz']['Poland'] = 'Polsko';
 $_BL['cz']['Spain'] = 'Španělsko';
 $_BL['cz']['Sweden'] = 'Švédsko';
-$_BL['cz']['The Netherlands'] = 'Nizozemsko';
 $_BL['cz']['The Netherlands'] = 'Nizozemsko';
 $_BL['cz']['United Kingdom'] = 'Spojené Království';
 $_BL['cz']['Bulgaria'] = 'Bulharsko';
@@ -1037,7 +1054,7 @@ $_BL['cz']['no_lightning_data'] = 'Žádná data o blescích!';
 $_BL['cz']['Residual time'] = 'Zbývající čas';
 $_BL['cz']['graph_stat_title_residual_time'] = 'Rozložení zbývajícího času';
 $_BL['cz']['h4_graph_residual_time'] = 'Rozložení zbývajícího času';
-$_BL['cz']['bo_graph_descr_strikes_station_residual_time'] = false; // ToDo
+$_BL['cz']['bo_graph_descr_strikes_station_residual_time'] = false;
 $_BL['cz']['Mean coordinates'] = 'Průměrné souřadnice';
 $_BL['cz']['h4_stat_station_area'] = 'Okolní oblast';
 $_BL['cz']['Last position'] = 'Poslední pozice';
@@ -1052,7 +1069,6 @@ $_BL['cz']['City names'] = 'Názvy měst';
 $_BL['cz']['Only strikes of selected station'] = 'Pouze blesky vybrané stanice';
 $_BL['cz']['map_autoupdate_stalled_msg'] = 'Žádná uživatelská aktivita. Automatická aktualizace byla zastavena.';
 $_BL['cz']['tile_zoom_not_allowed'] = 'Přibližování zde není možné!';
-$_BL['cz']['tile_station_not_allowed'] = 'Výběr stanice není možný!';
 $_BL['cz']['tile_station_not_allowed'] = 'Trasy buněk vypnuté!';
 $_BL['cz']['Last time without GPS'] = 'Naposledy bez GPS';
 $_BL['cz']['h4_stat_station_general'] = 'Obecné statistiky z poslední hodiny';
@@ -1067,6 +1083,7 @@ $_BL['cz']['Latvia'] = 'Litva';
 $_BL['cz']['Ukraine'] = 'Ukrajina';
 $_BL['cz']['Croatia'] = 'Chorvatsko';
 $_BL['cz']['Baltic States'] = 'Baltické státy';
+$_BL['cz']['Indonesia'] = 'Indonézie';
 
 $_BL['cz']['lang_en'] = 'Anglicky';
 $_BL['cz']['lang_de'] = 'Německy';
@@ -1077,21 +1094,18 @@ $_BL['cz']['lang_nl'] = 'Holandsky';
 
 $_BL['cz']['Search...'] = 'Vyhledat...';
 $_BL['cz']['Archives'] = 'Archiv';
-$_BL['cz']['Indonesia'] = 'Indonézie';
-
 $_BL['cz']['Now'] = 'Nyní';
-
-$_BL['cz']['twitter_instructions'] = 'Zadejte své uživatelské jméno na Twitter a výstrahy budou automaticky odesílány jako zprávy. Aplikace Twitter na chytré telefony potom zobrazí notifikace. Poznámka: Musíte sledovat <em><a href="https://twitter.com/{TWITTER}" target="_blank">{TWITTER}</a></em>!';
-
-
+$_BL['cz']['twitter_instructions'] = 'Zadejte své uživatelské jméno na Twitter a výstrahy budou automaticky odesílány jako zprávy. Aplikace Twitter na chytré telefony potom zobrazí notifikace. Poznámka: Musíte sledovat {TWITTER}!';
 $_BL['cz']['h4_stat_station_signal_last'] = 'Poslední signál';
 $_BL['cz']['bo_graph_descr_signal'] = 'Zobrazuje jeden z posledních signálů, které stanice odeslala na server.';
-$_BL['cz'][''] = '';
 
 
 /*************************************************************/
-/* Special text for Lightningmaps.org: REALTIME MAP          */
+/* Special text for Lightningmaps.org                        */
 /*************************************************************/
+
+
+//REALTIME MAP
 
 $_BL['cz']['lm_live_delay'] = 'Zpoždění';
 $_BL['cz']['lm_live_strokes'] = 'Blesky';
@@ -1103,6 +1117,7 @@ $_BL['cz']['lm_live_set_fullscreen'] = 'Celá obrazovka';
 $_BL['cz']['lm_live_set_fullscreen_on'] = 'zapnuto';
 $_BL['cz']['lm_live_set_fullscreen_off'] = 'vypnuto';
 $_BL['cz']['lm_live_set_fullscreen_info'] = 'Zobrazí mapu v režimu celé obrazovky (pokud to váš prohlížeč podporuje).';
+
 
 $_BL['cz']['lm_live_set_thunder'] = 'Bouřky';
 $_BL['cz']['lm_live_set_thunder_max'] = 'max';
@@ -1127,25 +1142,92 @@ $_BL['cz']['lm_live_set_strokes_show_info'] = 'Vyberte zda chcete zobrazit pouze
 $_BL['cz']['lm_live_stations_off'] = 'Stanice: vypnuto';
 $_BL['cz']['lm_live_stations_on'] = 'Stanice: zapnuto';
 
-$_BL['cz']['lm_live_info'] = 'Zobrazeny blesky z <strong>posledních 60 minut</strong>. Data v reálném čase pochází přímo z výpočetních serverů [Blitzortung], které mají informace ze stanic ze všech koutů světa. Zpoždění je vypočítáváno z časových značek každého blesku srovnaných s aktuálním časem.';
+$_BL['cz']['lm_live_info'] = 'Zobrazeny blesky z posledních 60 minut. Data v reálném čase pochází přímo z výpočetních serverů [Blitzortung], které mají informace ze stanic ze všech koutů světa. Zpoždění je vypočítáváno z časových značek každého blesku srovnaných s aktuálním časem.';
 $_BL['cz']['lm_live_info_legend_title'] = 'Legenda';
-$_BL['cz']['lm_live_info_legend1'] = 'Nové blesky mají <span id="live_legend1_1">červené kolečko</span> které se zmenšuje a mizí pokud je starší než [sec] vteřin.';
-$_BL['cz']['lm_live_info_legend2'] = 'Barva výplně kolečka značí stáří blesku až do [minutes] minut. Nové blesky jsou <span id="live_legend2_1">žluté</span>. Čím jsou starší, tím je barva tmavší. <span id="live_legend2_2">Tmavě hnědá</span> se rovná přibližně [minutes] minutám. Tyto blesky brzy zmizí.';
-$_BL['cz']['lm_live_info_legend3'] = 'Při menším zvětšení je zobrazena linie bouřky aktuálních blesků jako <span id="live_legend3_1">průhledně bílé</span> zvětšující se kolečko (rychlost zvuku). Při postupu se postupně stává více transparentní a po nějaké době vymizí.';
+$_BL['cz']['lm_live_info_legend1'] = 'Nové blesky mají červené kolečko které se zmenšuje a mizí pokud je starší než [sec] vteřin.';
+$_BL['cz']['lm_live_info_legend2'] = 'Barva výplně kolečka značí stáří blesku až do [minutes] minut. Nové blesky jsou žluté. Čím jsou starší, tím je barva tmavší. Tmavě hnědá se rovná přibližně [minutes] minutám. Tyto blesky brzy zmizí.';
+$_BL['cz']['lm_live_info_legend3'] = 'Při menším zvětšení je zobrazena linie bouřky aktuálních blesků jako průhledně bílé zvětšující se kolečko (rychlost zvuku). Při postupu se postupně stává více transparentní a po nějaké době vymizí.';
 $_BL['cz']['lm_live_snd_info'] = 'Povolte "fajfkou" zvuk při každém záblesku na aktuálním mapovém zobrazení. Tato funkce nemusí být podporována všemi prohlížeči a zařízeními.';
 
 $_BL['cz']['lm_live_stations_info'] = 'Zobrazuje zúčastněné stanice pro každý detekovaný blesk. Barva čar mezi stanicemi a bleskem záleží na vzdálenosti. Čím větší je vzdálenost tím více modrá namísto zelené. Důležitým faktorem je také pokrytý úhel stanic. Vzdálenosti několika stovek kilometrů maximálně a stanice na každé straně bouřky dávají nejpřesnější hodnoty. Stanice, které byly použity pro výpočet polohy jsou po krátký čas zvýrazněny fialově. DŮLEŽITÉ: Tato funkce může mít neblahý vliv na výkon vašeho systému! Doporučujeme používat prohlížeč Google Chrome.';
 $_BL['cz']['lm_live_blitzortung_more'] = 'Více map na Blitzortung.org';
 $_BL['cz']['lm_live_usage'] = 'DŮLEŽITÉ: Tato mapa je určena pouze pro zábavní účely!';
 $_BL['cz']['lm_live_snd_volume'] = 'Hlasitost';
-$_BL['cz']['lm_live_set_fullscreen'] = 'Celá obrazovka';
-
-$_BL['cz'][''] = '';
-$_BL['cz'][''] = '';
-$_BL['cz'][''] = '';
-$_BL['cz'][''] = '';
 
 
+
+
+
+/********************/
+/*  NOT TRANSLATED  */
+/********************/
+
+
+//en: 'Niederlande'
+$_BL['cz']['Netherlands'] = '';
+
+//en: 'Slovenien'
+$_BL['cz']['Slovenia'] = '';
+
+//en: 'Luxemburg'
+$_BL['cz']['Luxembourg'] = '';
+
+//en: 'Russland'
+$_BL['cz']['Russian Federation'] = '';
+
+//en: 'Slovakia'
+$_BL['cz']['Slovakia'] = '';
+
+//en: 'Oceania'
+$_BL['cz']['Oceania'] = '';
+
+//en: 'Australia'
+$_BL['cz']['Australia'] = '';
+
+//en: 'America'
+$_BL['cz']['America'] = '';
+
+//en: 'Colombia'
+$_BL['cz']['Colombia'] = '';
+
+//en: 'Asia'
+$_BL['cz']['Asia'] = '';
+
+//en: 'Africa'
+$_BL['cz']['Africa'] = '';
+
+//en: 'United States'
+$_BL['cz']['United States'] = '';
+
+//en: 'North America'
+$_BL['cz']['North America'] = '';
+
+//en: 'South America'
+$_BL['cz']['South America'] = '';
+
+//en: 'Danish'
+$_BL['cz']['lang_dk'] = '';
+
+//en: 'Real Time'
+$_BL['cz']['Real Time'] = '';
+
+//en: 'Real-Time Lightning Map'
+$_BL['cz']['Real-Time Lightning Map'] = '';
+
+//en: 'Style'
+$_BL['cz']['lm_live_set_map_style'] = '';
+
+//en: 'Normal'
+$_BL['cz']['lm_live_set_map_style_normal'] = '';
+
+//en: 'Satellite'
+$_BL['cz']['lm_live_set_map_style_sat'] = '';
+
+//en: 'Terrain'
+$_BL['cz']['lm_live_set_map_style_terrain'] = '';
+
+//en: 'Roads'
+$_BL['cz']['lm_live_set_map_style_roads'] = '';
 
 
 ?>

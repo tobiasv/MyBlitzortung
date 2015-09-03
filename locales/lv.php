@@ -6,9 +6,9 @@
 */
 
 
+$_BL['locale'] = 'lv';
 $_BL['lv']['is_utf8'] = true;
 
-$_BL['locale'] = 'lv';
 
 
 /*************************************************************/
@@ -20,7 +20,7 @@ $_BL['locale'] = 'lv';
 
 
 //Translated name of MyBlitzortung with html tags
-$_BL['lv']['MyBlitzortung'] = '<span class="bo_my">Mans</span><span class="bo_mybo">ZibensDetektors</span>';
+$_BL['lv']['MyBlitzortung'] = 'MansZibensDetektors';
 
 //Translated name of MyBlitzortung without html tags
 $_BL['lv']['MyBlitzortung_notags'] = 'MansZibensDetektors';
@@ -60,6 +60,8 @@ $_BL['lv']['unit_us_short'] = 'µs';
 $_BL['lv']['unit_ksps'] = 'Kiloparaugu sekundē';
 $_BL['lv']['unit_days'] = 'dienas';
 $_BL['lv']['unit_kilometers'] = 'km';
+$_BL['lv']['unit_miles'] = 'jdz';
+$_BL['lv']['unit_yards'] = 'jrd';
 $_BL['lv']['days'] = 'dienas';
 $_BL['lv']['hours'] = 'stundas';
 $_BL['lv']['number_every_minutes'] = 'katras {NUMBER} minūtes';
@@ -74,18 +76,18 @@ $_BL['lv']['unit_strikesperminute'] = ' izlādes minūtē';
 $_BL['lv']['unit_strikesperminute_one'] = ' izlāde minūtē';
 
 
-$_BL['lv']['Jan_short'] ='Jan';
-$_BL['lv']['Feb_short'] ='Feb';
-$_BL['lv']['Mar_short'] ='Mar';
-$_BL['lv']['Apr_short'] ='Apr';
-$_BL['lv']['May_short'] ='Mai';
-$_BL['lv']['Jun_short'] ='Jūn';
-$_BL['lv']['Jul_short'] ='Jūl';
-$_BL['lv']['Aug_short'] ='Aug';
-$_BL['lv']['Sep_short'] ='Sep';
-$_BL['lv']['Oct_short'] ='Okt';
-$_BL['lv']['Nov_short'] ='Nov';
-$_BL['lv']['Dec_short'] ='Dec';
+$_BL['lv']['Jan_short'] = 'Jan';
+$_BL['lv']['Feb_short'] = 'Feb';
+$_BL['lv']['Mar_short'] = 'Mar';
+$_BL['lv']['Apr_short'] = 'Apr';
+$_BL['lv']['May_short'] = 'Mai';
+$_BL['lv']['Jun_short'] = 'Jūn';
+$_BL['lv']['Jul_short'] = 'Jūl';
+$_BL['lv']['Aug_short'] = 'Aug';
+$_BL['lv']['Sep_short'] = 'Sep';
+$_BL['lv']['Oct_short'] = 'Okt';
+$_BL['lv']['Nov_short'] = 'Nov';
+$_BL['lv']['Dec_short'] = 'Dec';
 
 
 $_BL['lv']['January'] = 'janvāris';
@@ -201,7 +203,7 @@ $_BL['lv']['Text'] = 'Teksts';
 $_BL['lv']['Error'] = 'Kļūda';
 $_BL['lv']['Back'] = 'Atpakaļ';
 $_BL['lv']['Participants'] = 'Dalībnieki';
-$_BL['lv']['oclock'] = '';
+$_BL['lv']['oclock'] = 'stundā';
 $_BL['lv']['On'] = 'Ieslēgts';
 $_BL['lv']['Available stations'] = 'Uzstādītās stacijas';
 $_BL['lv']['strikes'] = 'zibeņi';
@@ -452,7 +454,6 @@ $_BL['lv']['Maximum strike density calculated'] = 'Maksimāliais aprēķinātais
 $_BL['lv']['Maximum mean strike density displayed'] = 'Maksimālais parādītais blīvums';
 $_BL['lv']['densities_strikes_station'] = 'Zibeņi stacijā {STATION_CITY}';
 $_BL['lv']['Legend'] = 'Leģenda';
-$_BL['lv']['Strikes per square kilometer'] = 'Zibeņi kvadrātkilometrā';
 $_BL['lv']['Min time'] = 'Min laiks';
 $_BL['lv']['Max time'] = 'Max laiks';
 $_BL['lv']['enter_time_hint'] = 'Ievadi laiku formātā "YYYY-MM-DD HH:MM:SS". Vari nenorādīt mazākās vērtības, piem., "YYYY-MM" ir OK';
@@ -559,7 +560,6 @@ $_BL['lv']['legend_stat_advanced_options'] = 'Parametri';
 $_BL['lv']['legend_stat_participants_time'] = 'Parametri';
 $_BL['lv']['legend_stat_deviations_time'] = 'Parametri';
 $_BL['lv']['legend_stat_active_stations'] = 'Parametri';
-
 
 
 /*************************************************************/
@@ -686,24 +686,26 @@ $_BL['lv']['info_general_text'] = '
 Blitzortung.org ir privātu zibens izlāžu detektorstaciju tīkls. Stacijas uztver zibens izlāžu radītos elektromagnētiskos radioviļņus.
 Kopā ar laika zīmoga un stacijas pozīcijas informāciju ir iespējams apēķināt zibens izlādes vietu (TOA - pienākšanas laika metode).
 
-Vairāk informācijas projekta galvenajā interneta vietnē: <a href="http://www.blitzortung.org" target="_blank">www.blitzortung.org</a>.
+Vairāk informācijas projekta galvenajā interneta vietnē: www.blitzortung.org.
 
 ';
+
+
 $_BL['lv']['info_accuracy_text'] = '
 Precizitāte ir laba un brīžiem novirze ir mazāka par kilometru. Tas ir samērojami ar komerciāli piedāvātajām sistēmām.
 ';
 $_BL['lv']['info_participate_text'] = '
 Jāuzbūvē pašam savs detektors (orientējošās izmaksas ap 100Ls). Ar šo detektoru var piedalīties kopējā tīklā un iegūt piekļuvi visiem zibens izlādes datiem.
 Vairāk informācijas šeit:
-<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=2" target="_blank">Blitzortung.org &gt; Cover your Area</a>.
+Blitzortung.org > Cover your Area.
 Apskati arī:
-<a href="http://www.wetter-board.de/index.php?page=Board&boardID=290" target="_blank">Wetter-Board</a>
+Wetter-Board
 ';
 
 $_BL['lv']['info_usage_text'] = '
 Informācija šajā lapā un no Blitzortung.org ir tikai privātām un izklaides vajadzībām.
-Mēs neesam komerciāls zibens izlādes vietas noteikšanas serviss! Skati vairāk 
-<a href="http://www.blitzortung.org/Webpages/index.php?lang=en&page=5" target="_blank">Blitzortung.org</a>
+Mēs neesam komerciāls zibens izlādes vietas noteikšanas serviss! Skati vairāk
+Blitzortung.org
 ';
 $_BL['lv']['info_myblitzortung_text'] = '
 Vizualizāciju šajā lapā nodrošina
@@ -711,7 +713,7 @@ Vizualizāciju šajā lapā nodrošina
 Neviens negarantē, ka informācija šajā lapā ir vienmēr korekta!
 Atbildība paliek tava!
 {MYBO} ir bezmaksas programmatūra, vairāk informācijas:
-<a href="http://www.myblitzortung.de?lang=en" target="_blank">www.myblitzortung.de</a>.
+www.myblitzortung.de.
 ';
 
 
@@ -720,8 +722,10 @@ Atbildība paliek tava!
 /*************************************************************/
 
 $_BL['lv']['bo_graph_descr_ratio'] = 'Lokalizācijas un dalības attiecības ir nopietni rādītāji pareizai stacijas noregulēšanai. Aprēķini:
-<br>noteikšanas attiecība = (stacijā detektētie zibeņi) / (stacijas signāli)
-<br>dalības attiecība = (stacijā detektētie zibeņi) / (visā tīklā detektētie zibeņi)
+
+noteikšanas attiecība = (stacijā detektētie zibeņi) / (stacijas signāli)
+
+dalības attiecība = (stacijā detektētie zibeņi) / (visā tīklā detektētie zibeņi)
 ';
 
 $_BL['lv']['bo_stat_network_descr_lasth'] = 'Visa informācija attiecas tikai par pēdējo stundu pirms pēdējās informācijas atsvaidzināšanas';
@@ -774,8 +778,10 @@ Dati ir pieejami no {DATE_START} līdz {DATE_END}. Nav garantiju par datu pilnī
 $_BL['lv']['archive_density_info'] = '
 Šeit tiek attēloti izlāžu blīvumi dažādiem reģioniem. Šie dati tiek glabāti
 neatkarīgi no citiem zibeņu datiem.
-<br>
-<br>
+
+
+
+
 Ieteikums: Šeit attēlotie dati nav standartizēti, dati nevar tikt salīdzināti
 ar ilgāku laika posmu vai citu reģionu!
 Tas ir tāpēc, ka zibens noteikšanas bāzes staciju blīvums dažādos reģionos ir
@@ -792,30 +798,43 @@ iespējams aprēķināt izbens izlādes vietu (\'time of arrival\' metode - TOA)
 Šajā gadījumā tiks parādīta papildus informācija arī par zibens izlādi.
 ';
 
+
 $_BL['lv']['archive_striketable_info'] = 'Šajā sadaļā var apskatīties līdzīgu informāciju kā lapā
 "Signāli", bet papildus redzēt arī tās izlādes, kad nav detektētas šajā detektorstacijā. Lai ievērotu
 Blitzortung.org noteikumus, šo lapu var atvērt tikai autorizēti lietotāji.
-<br><br>
+
+
+
 Padoms: Attēlotās hipoerbolas ir tikai ilustratīvas un neatspoguļo patieso zibens izlādes
 vietas kalkulāciju ({MYBO_ORIG} patiesībā nezina citu uztvērējstaciju saņemto signālu laikus).
 ';
 
 $_BL['lv']['archive_signaltable_info_bottom'] = '
-<p>
+
+
 Ja ir detektēts zibens, tad detektorstacijas {STATION} papildus informācija tiks sniegta.
-</p>
-<ul>
-<li><span class="bo_descr">Ilgums:</span> Laika starpība starp zibens izlādi un tā uztveršanu</li>
-<li><span class="bo_descr">Distance:</span> Distance no zibens līdz {STATION}, kas aprēķināta no ilguma (1ms = 300km)</li>
-<li><span class="bo_descr">Virziens:</span> Aptuvens virziens (precīzs virziens netiek rādīts noteikumu dēļ)</li>
-<li><span class="bo_descr">Novirze:</span> Jo mazāka, jo precīzāk noteikta vieta</li>
-<li><span class="bo_descr">Strāva:</span> Izlādes strāva. Ļoti eksperimentāli! Pašlaik pavisam greizi!</li>
-<li><span class="bo_descr">Polaritāte:</span> Pozitīvs/negatīvs zibens. Iespējams noteikt no signāla. Ļoti eksperimentāli, tikai tuvākajām izlādēm!</li>
-<li><span class="bo_descr">Dalībnieki:</span> Izlādi sajutušie dalībnieki, jo vairāk, jo labāk.</li>
-<li><span class="bo_descr">Dalība:</span> Vai zibnes ir noteikts stacijā {STATION}? Ja "ņe" ir iekrāsots, tad signāls ir saņemts, bet netika izmantots aprēķinos.</li>
-<li><span class="bo_descr">Noteikšanas leņķis:</span> Maksimālais staciju leņķis apkārt zibens izlādei (iekavās stacijas, kuras nepiedalījās aprēķinos). 270° grādu leņķis būtu ideāls, bet diezgan precīzu vietu var noteikt daudz mazākiem leņķiem.
-<li><span class="bo_descr">Kanāls:</span> Grafikā attēlotais ieraksta kanāls (ja stacija strādā "Labākais Kanāls" režīmā)
-</ul>
+
+
+    Ilgums: Laika starpība starp zibens izlādi un tā uztveršanu
+
+    Distance: Distance no zibens līdz {STATION}, kas aprēķināta no ilguma (1ms = 300km)
+
+    Virziens: Aptuvens virziens (precīzs virziens netiek rādīts noteikumu dēļ)
+
+    Novirze: Jo mazāka, jo precīzāk noteikta vieta
+
+    Strāva: Izlādes strāva. Ļoti eksperimentāli! Pašlaik pavisam greizi!
+
+    Polaritāte: Pozitīvs/negatīvs zibens. Iespējams noteikt no signāla. Ļoti eksperimentāli, tikai tuvākajām izlādēm!
+
+    Dalībnieki: Izlādi sajutušie dalībnieki, jo vairāk, jo labāk.
+
+    Dalība: Vai zibnes ir noteikts stacijā {STATION}? Ja "ņe" ir iekrāsots, tad signāls ir saņemts, bet netika izmantots aprēķinos.
+
+    Noteikšanas leņķis: Maksimālais staciju leņķis apkārt zibens izlādei (iekavās stacijas, kuras nepiedalījās aprēķinos). 270° grādu leņķis būtu ideāls, bet diezgan precīzu vietu var noteikt daudz mazākiem leņķiem.
+    Kanāls: Grafikā attēlotais ieraksta kanāls (ja stacija strādā "Labākais Kanāls" režīmā)
+
+
 ';
 
 
@@ -904,29 +923,33 @@ $_BL['lv']['Really continue?'] = 'Tiešām turpināt?';
 $_BL['lv']['Couldnt get login id'] = 'Nevarēju saņemt pieteikšanās ID';
 
 $_BL['lv']['mybo_station_update_info'] = '
-<p>
+
+
 Šī funkcijas ļauj savienoties ar citām {MYBO_ORIG} stacijām.
 Nospiežot uz saites zemāk, notiks sekojošas lietas:
-</p>
 
-<ul>
-<li>1. Tavas stacijas ID un URL tiks nosūtīts šim serverim <em>{LINK_HOST}</em>.
-</li>
-<li>2. Tu saņemsi citu staciju URL, kas ir šajā sarakstā.
-</li>
-</ul>
 
-<p>
+
+    1. Tavas stacijas ID un URL tiks nosūtīts šim serverim {LINK_HOST}.
+
+    2. Tu saņemsi citu staciju URL, kas ir šajā sarakstā.
+
+
+
+
 Ik pa laikam būs nepieciešams atjaunināt informāciju ar svaigākajiem datiem, bet droši
 vari izmantot arī automātiskās atjaunināšanas funkciju.
-</p>
 
-<p>
+
+
 Lai tevi atpazītu kā blitzortung.org biedru, tavs ID tiks nosūtīts uz blitzortung.org.
-Šo ID vispirms nosūtīs uz <em>{LINK_HOST}</em> un tur to pārsūtīs pārbaudei uz blitzortung.org.
+Šo ID vispirms nosūtīs uz {LINK_HOST} un tur to pārsūtīs pārbaudei uz blitzortung.org.
 ID netiks saglabāts! Tavu paroli nesūtīs nekur citur kā vien uz blitzortung.org!
 Tavai stacijai ir jānosūta vismaz viens signāls pēdējo 2 stundu laikā, citādi autorizācija nenostrādās.
-</p>';
+';
+
+
+
 
 
 
@@ -985,20 +1008,14 @@ $_BL['lv']['Romania'] = 'Rumānija';
 $_BL['lv']['Rome'] = 'Roma';
 $_BL['lv']['Lithuania'] = 'Lietuva';
 $_BL['lv']['Ireland'] = 'Īrija';
-$_BL['lv']['Latvia'] = 'Latvija';
-$_BL['lv']['Ukraine'] = 'Ukraina';
-$_BL['lv']['Croatia'] = 'Horvātija';
-$_BL['lv']['Slovenia'] = 'Slovēnija';
 
 //Europe: Regions
 $_BL['lv']['Europe'] = 'Europa';
 $_BL['lv']['Western Europe'] = 'Rietumeiropa';
-$_BL['lv']['Baltic States'] = 'Baltijas valstis';
 
 //Europe: German states
 $_BL['lv']['Bavaria'] = 'Bavārija';
 $_BL['lv']['NRW'] = 'Ziemeļreina-Vestfālene';
-
 
 //Europe: Italy
 $_BL['lv']['Sardinia'] = 'Sardīnija';
@@ -1007,15 +1024,8 @@ $_BL['lv']['Sardinia'] = 'Sardīnija';
 
 /*** OCEANIA ***/
 $_BL['lv']['New Zealand'] = 'Jaunzēlande';
-$_BL['lv']['Oceania'] = 'Okeānija';
 
 
-/*** USA/America ***/
-$_BL['lv']['America'] = 'Amerika';
-
-/*** OTHER REGIONS ***/
-$_BL['lv']['Asia'] = 'Āzija';
-$_BL['lv']['Africa'] = 'Āfrika';
 
 
 /*** OTHER TEMPLATE NAMES***/
@@ -1054,13 +1064,13 @@ $_BL['lv']['Already DONE BEFORE'] = 'Jau izdarīts IEPRIEKŠ';
 $_BL['lv']['Update database keys'] = 'Atjaunina DB atslēgas';
 $_BL['lv']['without GPS'] = 'bez GPS';
 $_BL['lv']['Record longtime data since'] = 'Ilglaicīgo datu pieraksts kopš';
-$_BL['lv']['Show their signals'] = 'Parādīt to signālus';
+$_BL['lv']['Show all signals'] = 'Parādīt visus signālus';
 $_BL['lv']['no_lightning_data'] = 'Nav zibens datu!';
 
 $_BL['lv']['Residual time'] = 'Atlikuma laiks';
 $_BL['lv']['graph_stat_title_residual_time'] = 'Atlikuma laika izkliede';
 $_BL['lv']['h4_graph_residual_time'] = 'Atlikuma laika izkliede';
-$_BL['lv']['bo_graph_descr_strikes_station_residual_time'] = false; // ToDo
+$_BL['lv']['bo_graph_descr_strikes_station_residual_time'] = false;
 $_BL['lv']['Mean coordinates'] = 'Vidējās koordinātes';
 $_BL['lv']['h4_stat_station_area'] = 'Apkārtējais apgabals';
 $_BL['lv']['Last position'] = 'Pēdējā pozīcija';
@@ -1075,8 +1085,7 @@ $_BL['lv']['City names'] = 'Pilsētu nosaukumi';
 $_BL['lv']['Only strikes of selected station'] = 'Tikai iezīmētās stacijas spērieni';
 $_BL['lv']['map_autoupdate_stalled_msg'] = 'Nav lietotāja aktivitātes, automātiskās atsvaidzināšana apturēta.';
 $_BL['lv']['tile_zoom_not_allowed'] = 'Šāds mērogs\nšeit nav atļauts!';
-$_BL['lv']['tile_station_not_allowed'] = 'Staciju izvēle\nnav atļauta!';
-$_BL['lv']['tile_station_not_allowed'] = 'Šūnu ceļi nav atļauti!';
+$_BL['lv']['tile_station_not_allowed'] = 'Negaisa ceļi atslēgti';
 $_BL['lv']['Last time without GPS'] = 'Pēdējo reizi bez GPS';
 $_BL['lv']['h4_stat_station_general'] = 'Vispārīga pēdējās stundas statistika';
 
@@ -1086,7 +1095,15 @@ $_BL['lv']['strikes_station2'] = '{STATION_CITY}';
 $_BL['lv']['mean ratio'] = 'vidējā attiecība';
 $_BL['lv']['ratio of all strikes is'] = 'visu spērienu attiecība ir';
 $_BL['lv']['Strikes per'] = 'Spērieni';
-
+$_BL['lv']['Latvia'] = 'Latvija';
+$_BL['lv']['Ukraine'] = 'Ukraina';
+$_BL['lv']['Croatia'] = 'Horvātija';
+$_BL['lv']['Baltic States'] = 'Baltijas valstis';
+$_BL['lv']['Slovenia'] = 'Slovēnija';
+$_BL['lv']['Oceania'] = 'Okeānija';
+$_BL['lv']['America'] = 'Amerika';
+$_BL['lv']['Asia'] = 'Āzija';
+$_BL['lv']['Africa'] = 'Āfrika';
 
 $_BL['lv']['lang_en'] = 'Angļu';
 $_BL['lv']['lang_de'] = 'Vācu';
@@ -1095,12 +1112,231 @@ $_BL['lv']['lang_hu'] = 'Ungāru';
 $_BL['lv']['lang_it'] = 'Itāļu';
 $_BL['lv']['lang_nl'] = 'Holandiešu';
 
-$_BL['lv']['unit_meters'] = 'm';
-$_BL['lv']['unit_miles'] = 'jdz';
-$_BL['lv']['unit_meters'] = 'm';
-$_BL['lv']['unit_yards'] = 'jrd';
-$_BL['lv']['oclock'] = 'stundā';
-$_BL['lv']['The Netherlands'] = 'Nīderlande';
-$_BL['lv']['Show all signals'] = 'Parādīt visus signālus';
-$_BL['lv']['tile_station_not_allowed'] = 'Negaisa ceļi atslēgti';
+
+
+/*************************************************************/
+/* Special text for Lightningmaps.org                        */
+/*************************************************************/
+
+
+//REALTIME MAP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/********************/
+/*  NOT TRANSLATED  */
+/********************/
+
+
+//en: 'Alerts: Twitter'
+$_BL['lv']['user_perm8'] = '';
+
+//en: 'Some of the latest strokes with the signal of the closest station.'
+$_BL['lv']['archive_striketable_info_guests'] = '';
+
+//en: 'Twitter'
+$_BL['lv']['alert_twitter'] = '';
+
+//en: 'Indonesia'
+$_BL['lv']['Indonesia'] = '';
+
+//en: 'Niederlande'
+$_BL['lv']['Netherlands'] = '';
+
+//en: 'Luxemburg'
+$_BL['lv']['Luxembourg'] = '';
+
+//en: 'Russland'
+$_BL['lv']['Russian Federation'] = '';
+
+//en: 'Slovakia'
+$_BL['lv']['Slovakia'] = '';
+
+//en: 'Australia'
+$_BL['lv']['Australia'] = '';
+
+//en: 'Colombia'
+$_BL['lv']['Colombia'] = '';
+
+//en: 'United States'
+$_BL['lv']['United States'] = '';
+
+//en: 'North America'
+$_BL['lv']['North America'] = '';
+
+//en: 'South America'
+$_BL['lv']['South America'] = '';
+
+//en: 'Danish'
+$_BL['lv']['lang_dk'] = '';
+
+//en: 'Search...'
+$_BL['lv']['Search...'] = '';
+
+//en: 'Archives'
+$_BL['lv']['Archives'] = '';
+
+//en: 'Now'
+$_BL['lv']['Now'] = '';
+
+//en: 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow {TWITTER}!'
+$_BL['lv']['twitter_instructions'] = '';
+
+//en: 'Last signal'
+$_BL['lv']['h4_stat_station_signal_last'] = '';
+
+//en: 'Shows one of the latest signals which the station did send to the server.'
+$_BL['lv']['bo_graph_descr_signal'] = '';
+
+//en: 'Real Time'
+$_BL['lv']['Real Time'] = '';
+
+//en: 'Real-Time Lightning Map'
+$_BL['lv']['Real-Time Lightning Map'] = '';
+
+//en: 'Delay'
+$_BL['lv']['lm_live_delay'] = '';
+
+//en: 'Strokes'
+$_BL['lv']['lm_live_strokes'] = '';
+
+//en: 'Real-Time Lightning'
+$_BL['lv']['lm_live_realtime'] = '';
+
+//en: 'Settings'
+$_BL['lv']['lm_live_settings_info'] = '';
+
+//en: 'Fullscreen'
+$_BL['lv']['lm_live_set_fullscreen'] = '';
+
+//en: 'on'
+$_BL['lv']['lm_live_set_fullscreen_on'] = '';
+
+//en: 'off'
+$_BL['lv']['lm_live_set_fullscreen_off'] = '';
+
+//en: 'Shows the map in fullscreen mode (only if your browser supports it).'
+$_BL['lv']['lm_live_set_fullscreen_info'] = '';
+
+//en: 'Style'
+$_BL['lv']['lm_live_set_map_style'] = '';
+
+//en: 'Normal'
+$_BL['lv']['lm_live_set_map_style_normal'] = '';
+
+//en: 'Satellite'
+$_BL['lv']['lm_live_set_map_style_sat'] = '';
+
+//en: 'Terrain'
+$_BL['lv']['lm_live_set_map_style_terrain'] = '';
+
+//en: 'Roads'
+$_BL['lv']['lm_live_set_map_style_roads'] = '';
+
+//en: 'Thunder'
+$_BL['lv']['lm_live_set_thunder'] = '';
+
+//en: 'max'
+$_BL['lv']['lm_live_set_thunder_max'] = '';
+
+//en: 'off'
+$_BL['lv']['lm_live_set_thunder_off'] = '';
+
+//en: 'Shows the thunder sound front in realtime on higher zoom levels.'
+$_BL['lv']['lm_live_set_thunder_info'] = '';
+
+//en: 'Clouds'
+$_BL['lv']['lm_live_set_clouds'] = '';
+
+//en: 'on'
+$_BL['lv']['lm_live_set_clouds_on'] = '';
+
+//en: 'off'
+$_BL['lv']['lm_live_set_clouds_off'] = '';
+
+//en: 'Clouds and precipitation from openweathermap.org (experimental!).'
+$_BL['lv']['lm_live_set_clouds_info'] = '';
+
+//en: 'Radar'
+$_BL['lv']['lm_live_set_radar'] = '';
+
+//en: 'on'
+$_BL['lv']['lm_live_set_radar_on'] = '';
+
+//en: 'off'
+$_BL['lv']['lm_live_set_radar_off'] = '';
+
+//en: 'Rain radar is currently only available for the United States!'
+$_BL['lv']['lm_live_set_radar_info'] = '';
+
+//en: 'Show Strokes'
+$_BL['lv']['lm_live_set_strokes_show'] = '';
+
+//en: 'last hour'
+$_BL['lv']['lm_live_set_strokes_show_all'] = '';
+
+//en: 'last minutes'
+$_BL['lv']['lm_live_set_strokes_show_last'] = '';
+
+//en: 'Decide whether you want to see only "current" strokes or also those occurred up to an hour ago.'
+$_BL['lv']['lm_live_set_strokes_show_info'] = '';
+
+//en: 'Stations: off'
+$_BL['lv']['lm_live_stations_off'] = '';
+
+//en: 'Stations: on'
+$_BL['lv']['lm_live_stations_on'] = '';
+
+//en: 'Strokes of the last 60 minutes are shown. The real-time data comes directly from the computing servers of [Blitzortung], which are fed by hundreds of stations on several continents. The delay is calculated from the time stamps of each strokes compared to the current time.'
+$_BL['lv']['lm_live_info'] = '';
+
+//en: 'Legend'
+$_BL['lv']['lm_live_info_legend_title'] = '';
+
+//en: 'New lightning strikes have a red circle which gets smaller and disappears when it gets older than [sec] seconds.'
+$_BL['lv']['lm_live_info_legend1'] = '';
+
+//en: 'The color of filled circles represent the age of strikes up to [minutes] minutes. New strikes are yellow. The older they get, the darker the color. Dark brown is equal to almost [minutes] minutes. Those strikes will vanish soon.'
+$_BL['lv']['lm_live_info_legend2'] = '';
+
+//en: 'On higher zoom levels the thunder front of current strikes is shown as white transparent growing circle (speed of sound). It gets more transparent while travelling and disappears after a while.'
+$_BL['lv']['lm_live_info_legend3'] = '';
+
+//en: 'Enable "tick" sound on every lightning stroke in the current map view. This feature might not be available on every device/browser.'
+$_BL['lv']['lm_live_snd_info'] = '';
+
+//en: 'Displays participating stations for each lightning stroke. The color of the lines between stations and stroke depends on the distance. The higher the distance the more blue instead of green. Note that the angle spanned by participating station is another important factor. Distances of a few hundred kilometers max. and stations on every side of the thunderstorms give best results. Station which have been used for calculating the position are highlighted in purple for a short time. IMPORTANT: This feature can have negative impact on your system performance! Using "Chrome" is recommended.'
+$_BL['lv']['lm_live_stations_info'] = '';
+
+//en: 'See more real-time maps on Blitzortung.org'
+$_BL['lv']['lm_live_blitzortung_more'] = '';
+
+//en: 'IMPORTANT: This map is intended for entertainment purposes only!'
+$_BL['lv']['lm_live_usage'] = '';
+
+//en: 'Volume'
+$_BL['lv']['lm_live_snd_volume'] = '';
+
+
+/*******************************/
+/*  NOT AVAILABLE IN ORIGINAL  */
+/*******************************/
+
+$_BL['lv']['Strikes per square kilometer'] = 'Zibeņi kvadrātkilometrā';
+$_BL['lv']['Show their signals'] = 'Parādīt to signālus';
+
+
 ?>

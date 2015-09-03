@@ -5,7 +5,7 @@
 $in  = 'en';
 
 //Ouput language
-$out = 'de';
+$out = 'sv';
 
 
 
@@ -127,7 +127,7 @@ if (!empty($_BL[$out]))
 {
 	foreach($_BL[$out] as $id => $text)
 	{
-		if ($id == 'is_utf8')
+		if ($id == 'is_utf8' || $id === '')
 			continue;
 			
 		$X .= '$_BL[\''.$out.'\'][\''.$id.'\'] = ';
