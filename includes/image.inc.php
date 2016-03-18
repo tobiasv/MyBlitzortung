@@ -495,8 +495,8 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 	}
 	
 
-	if (BO_CACHE_FAST)
-		$last_update = bo_get_latest_strike_calc_time();
+	//if (BO_CACHE_FAST)
+	//	$last_update = bo_get_latest_strike_calc_time();
 
 	$file_mod_time = false;
 	
@@ -777,7 +777,7 @@ function bo_get_map_image($id=false, $cfg=array(), $return_img=false)
 		$sql_where = bo_strikes_sqlkey($index_sql, $time_min, $time_max, $latS, $latN, $lonW, $lonE);
 	
 		$sql = "SELECT time,
-				".$Projection->SqlSelect('lat', 'lon', 'x', 'y')."
+				".$Projection->SqlSelect('lat', 'lon', 'x', 'y', 'strikes')."
 				FROM ".BO_DB_PREF."strikes s
 				$index_sql
 				WHERE 1 AND

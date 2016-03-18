@@ -65,14 +65,27 @@ class BoMapProjection
 		$this->LonRef = $lon;
 	}
 	
-	function SqlSelect($lat_name, $lon_name, $as_x = '', $as_y = '')
+	function SqlSelect($lat_name, $lon_name, $as_x = '', $as_y = '', $tablename = null)
 	{
 		switch ($this->Method)
 		{
 			default:
 				$this->UseSql = true;
-				$lon_x = " ROUND( $lon_name / 360 * $this->ImageCalibrationX - $this->ImageOffsetX ) ";
-				$lat_y = " ROUND( -LOG(TAN( PI()/4 + RADIANS($lat_name)/2 )) / PI() / 2 * $this->ImageCalibrationY + $this->ImageOffsetY ) ";
+				
+				if (BO_DB_STRIKES_MERCATOR === true && $tablename == 'strikes')
+				{
+					$lon_name .= '_merc';
+					$lat_name .= '_merc';
+					$scale = (1 << BO_DB_STRIKES_MERCATOR_SCALE) * 256;
+					$lon_x = " ROUND(  (($lon_name / $scale) - 0.5) * $this->ImageCalibrationX - $this->ImageOffsetX ) ";
+					$lat_y = " ROUND(  (($lat_name / $scale) - 0.5) * $this->ImageCalibrationY + $this->ImageOffsetY ) ";
+				}
+				else
+				{
+					$lon_x = " ROUND( $lon_name / 360 * $this->ImageCalibrationX - $this->ImageOffsetX ) ";
+					$lat_y = " ROUND( -LOG(TAN( PI()/4 + RADIANS($lat_name)/2 )) / PI() / 2 * $this->ImageCalibrationY + $this->ImageOffsetY ) ";
+				}
+				
 				$sql = " $lat_y $as_y, $lon_x $as_x ";
 				break;
 			

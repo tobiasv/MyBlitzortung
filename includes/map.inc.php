@@ -527,6 +527,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		echo '<label for="bo_map_opt_count">'._BL("show strike counter").'</label> &nbsp; ';
 		echo '</span>';
 		
+		
 		if (BO_STATION_STAT_DISABLE !== true)
 		{
 			echo '<span class="bo_form_checkbox_text">';
@@ -534,6 +535,7 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			echo '<label for="bo_map_opt_count2">'._BL("show strike counter").' ('._BL('stations').')</label> &nbsp; ';
 			echo '</span>';
 		}
+		
 		
 		echo '</div>';
 	}
@@ -876,8 +878,11 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 			
 		bo_map_set();
 
-		if (document.getElementById("bo_check_autoupdate").checked)
-			bo_map_toggle_autoupdate(true);
+		if (document.getElementById("bo_check_autoupdate"))
+		{
+			if (document.getElementById("bo_check_autoupdate").checked)
+				bo_map_toggle_autoupdate(true);
+		}
 
 		window.setTimeout("bo_map_timer();", 1000 * 60);
 	}	
@@ -890,7 +895,9 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 		if (bo_autoupdate && time-bo_user_last_activity > <?php echo intval(BO_MAP_AUTOUPDATE)*60 ?>)
 		{
 			bo_map_toggle_autoupdate(false);
-			document.getElementById("bo_check_autoupdate").checked = false;
+			
+			if (document.getElementById("bo_check_autoupdate"))
+				document.getElementById("bo_check_autoupdate").checked = false;
 			
 			<?php if (BO_MAP_AUTOUPDATE_STALL_MSG === true) { 
 			echo 'alert("'.strtr(_BL(map_autoupdate_stalled_msg), array('"' => '\"')).'");';
@@ -1478,8 +1485,9 @@ if (<?php echo BO_MAPS_AUTOUPDATE_DEFAULTON ? 'true' : 'false'; ?>)
 <?php	
 	}
 ?>
+		if (document.getElementById('bo_check_autoupdate'))
+			document.getElementById('bo_check_autoupdate').disabled = enable;
 		
-		document.getElementById('bo_check_autoupdate').disabled = enable;
 		bo_map_reload_overlays();
 	}
 	

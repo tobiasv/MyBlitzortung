@@ -215,7 +215,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 	if (empty($stInfo))
 		return;
-	
+	//echo nl2br(print_r($stInfo,1));
 	if ($own_station)
 	{
 		$own_station_info = bo_station_info();
@@ -235,13 +235,16 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 	//Other stations from same user
 	$user_stations = array();
-	$sql = "SELECT id, city, bo_station_id, comment
-			FROM ".BO_DB_PREF."stations
-			WHERE bo_user_id='".$stInfo['bo_user_id']."' AND status > 0 AND id != '".$stInfo['id']."'";
-	$res = BoDb::query($sql);
-	while ($row = $res->fetch_assoc())
-		$user_stations[$row['id']] = array('city' => $row['city'], 'bo_id' => $row['bo_station_id'], 'comment' => $row['comment']);
-		
+	if ($stInfo['bo_user_id'])
+	{
+		$sql = "SELECT id, city, bo_station_id, comment
+				FROM ".BO_DB_PREF."stations
+				WHERE bo_user_id='".$stInfo['bo_user_id']."' AND status > 0 AND id != '".$stInfo['id']."'";
+		$res = BoDb::query($sql);
+		while ($row = $res->fetch_assoc())
+			$user_stations[$row['id']] = array('city' => $row['city'], 'bo_id' => $row['bo_station_id'], 'comment' => $row['comment']);
+	}
+	
 	//Own strokes
 	if ($own_station)
 	{
@@ -291,7 +294,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	$tmp = @unserialize(BoData::get('last_strikes_stations'));
 	$last_strike = $tmp[$station_id][0];
 	$last_signal = strtotime($stInfo['last_time'].' UTC');
-	$active = $stInfo['status'] >= STATUS_RUNNING*10;
+	$active = $stInfo['status'] >= STATUS_RUNNING*10 || time()-$last_strike < BO_UP_INTVL_STATIONS*60; //last_strike is updated more often!
 
 	if (defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES && defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES)
 	{
@@ -310,6 +313,9 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	list($pcb) = explode(';', $stInfo['controller_pcb']);
 	
 	echo '<ul class="bo_stat_overview">';
+	
+	echo '<li><span class="bo_descr">'._BL("Id").': </span><span class="bo_value">'.$stInfo['bo_station_id'].'</span>';
+	
 	if ($stInfo['firmware'])
 	{
 		if ($pcb && (int)$pcb < 10)
@@ -557,7 +563,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 		echo '</span></li>';
 	}
-	elseif ($last_signal)
+	elseif ($last_signal && $last_signal > $last_strike)
 	{
 		echo '<li><span class="bo_descr">'._BL('Last signal').': </span><span class="bo_value">'._BDT($last_signal).'</span>';
 	}
@@ -607,7 +613,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 	
 	$antenna = $own_station ? bo_get_antenna_data() : false;
 	$show_overview = (double)$stInfo['lat'] != 0.0 && (double)$stInfo['lon'] != 0.0;
-	$show_gps = $show_overview && (
+	$show_gps = $show_overview && $stInfo['bo_user_id'] && (
 	              ($own_station && ((defined("BO_SHOW_GPS_INFO") && BO_SHOW_GPS_INFO) || (bo_user_get_level() & BO_PERM_SETTINGS)))
 				  || (BO_ENABLE_LONGTIME_ALL === true && (bo_user_get_level() & BO_PERM_SETTINGS))
 				  );
@@ -1377,7 +1383,7 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 	{
 		$new_stations = array();
 
-		$sql = "SELECT id, country, city, first_seen
+		$sql = "SELECT id, bo_station_id, country, city, first_seen
 				FROM ".BO_DB_PREF."stations
 				WHERE status >= ".((int)STATUS_OFFLINE)." AND status != 'D'
 					AND id < ".intval(BO_DELETED_STATION_MIN_ID)."
@@ -1389,7 +1395,8 @@ function bo_show_statistics_network($station_id = 0, $own_station = true, $add_g
 		{
 			$new_stations[$row['id']] = array(
 				strtotime($row['first_seen'].' UTC'), 
-				$row['city'], $row['country']
+				$row['city'] ? $row['city'] : _BL('Station').' #'.$row['bo_station_id'], 
+				$row['country']
 				);
 		}
 

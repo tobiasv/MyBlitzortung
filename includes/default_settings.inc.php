@@ -163,7 +163,7 @@
 @define('BO_LOCALE2', '');
 
 //available locales
-@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv,pl,cz');
+@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv,pl,cz,dk');
 
 //show links in the footer
 @define('BO_SHOW_LANGUAGES', true);
@@ -811,7 +811,18 @@
 // set to ~ "width" of your region
 @define('BO_DB_EXTRA_KEYS_LON_DIV', 30);
 
+//when requesting time periods, then round to full minutes (=60)
+@define('BO_DB_TIME_ROUND_SECONDS', 60);
 
+//cache the maximum and minimum stroke id so it can be used instead of time
+@define('BO_DB_TIME_CACHE', false);
+
+//saves mercator coordinates into database
+@define('BO_DB_STRIKES_MERCATOR', false);
+@define('BO_DB_STRIKES_MERCATOR_SCALE', 20);
+
+//log to file
+@define('BO_DB_DEBUG_LOG', false);
 
 
 /*******************************************************************/
@@ -945,6 +956,8 @@
 @define('BO_GRAPH_RAW_COLOR4', '#f0d@0.2');
 @define('BO_GRAPH_RAW_COLOR5', '#0dd@0.2');
 @define('BO_GRAPH_RAW_COLOR6', '#f80@0.2');
+@define('BO_GRAPH_RAW_COLOR7', '#566aff@0.2');
+@define('BO_GRAPH_RAW_COLOR8', '#56bfff@0.2');
 @define('BO_GRAPH_RAW_COLOR_LINES', '#555@0.7');
 @define('BO_GRAPH_RAW_COLOR_XY1', '#00f@0.6');
 @define('BO_GRAPH_RAW_COLOR_XY2', '#f00@0.6');
@@ -993,6 +1006,7 @@
 
 //max. distance (km)
 @define('BO_GRAPH_STAT_MAX_DISTANCE', 5000);
+@define('BO_GRAPH_STAT_DISTANCE_LOG', false);
 
 //main appearance
 @define('BO_GRAPH_STAT_W', 550);

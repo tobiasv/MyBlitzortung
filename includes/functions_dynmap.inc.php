@@ -53,12 +53,20 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 		bo_home_zoom = <?php echo $zoom ?>;
 
 		var mapOptions = {
-		  zoom: bo_home_zoom,
-		  center: bo_home,
-		  mapTypeId: google.maps.MapTypeId.<?php echo $type ?>,
-		  scaleControl: true,
-		  streetViewControl: false,
-		  scrollwheel: false
+			zoom: bo_home_zoom,
+			zoomControl: true,
+			zoomControlOptions: {
+				position: google.maps.ControlPosition.TOP_LEFT
+			},
+			center: bo_home,
+			mapTypeId: google.maps.MapTypeId.<?php echo $type ?>,
+			mapTypeControl: true,
+			mapTypeControlOptions: {
+				position: google.maps.ControlPosition.TOP_RIGHT
+			},
+			scaleControl: true,
+			streetViewControl: false,
+			scrollwheel: true
 		};
 
 		bo_map = new google.maps.Map(document.getElementById("bo_gmap"), mapOptions);

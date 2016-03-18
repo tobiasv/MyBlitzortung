@@ -70,7 +70,7 @@ class BoData
 		$name_esc = BoDb::esc($name);
 		
 		$low_prio = BO_DB_UPDATE_LOW_PRIORITY ? "LOW_PRIORITY" : "";
-		$sql = "REPLACE $low_prio INTO ".BO_DB_PREF."conf SET data='$data_esc', name='$name_esc'";
+		$sql = "REPLACE $low_prio INTO ".BO_DB_PREF."conf SET name='$name_esc', data='$data_esc'";
 		$ok = BoDb::query($sql);
 		
 		if ($ok && self::$do_cache)

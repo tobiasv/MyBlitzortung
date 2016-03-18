@@ -36,33 +36,39 @@ class BoDb extends BoDbMain
 		}
 			
 		$qtype = strtolower(substr(trim($query), 0, 6));
+		$cache_dir = BO_DIR.'/'.BO_CACHE_DIR;
 		
 		//query cache optimization
-		$lockfile = false;
-		$ms = 0;
-		if ($qtype == 'select')
+		if (DB_LOCK_SAME_QUERIES === true)
 		{
-			$cache_dir = BO_DIR.'/'.BO_CACHE_DIR;
-			
-			if (is_writable($cache_dir))
+			$lockfile = false;
+			$ms = 0;
+			if ($qtype == 'select')
 			{
-				$lockfile = $cache_dir.'/.lock_'.md5($query);
-				
-				clearstatcache();
-				while (file_exists($lockfile) && time() - @filemtime($lockfile) < 5 && $ms < 5000)
+				if (is_writable($cache_dir))
 				{
-					usleep(10000);
-					$ms += 10;
+					$lockfile = $cache_dir.'/.lock_'.md5($query);
+					
 					clearstatcache();
-				}
+					$wait = 20;
+					while (file_exists($lockfile) && time() - @filemtime($lockfile) < $wait && $ms < ($wait*1000))
+					{
+						usleep(100000);
+						$ms += 100;
+						clearstatcache();
+					}
 
-				if ($ms == 0)
-				{
-					@touch($lockfile);
+					if ($ms == 0)
+					{
+						@touch($lockfile);
+					}
+					else
+					{
+						//file_put_contents($cache_dir.'/lock.log', "\n".date('Ymd His')." $ms ".md5($query), FILE_APPEND);
+						//$query = "-- \n".$query;
+					}
+					
 				}
-				//else
-				//	file_put_contents($cache_dir.'/lock.log', "\n".date('Ymd His')." $ms ".md5($query), FILE_APPEND);
-				
 			}
 		}
 
@@ -70,11 +76,26 @@ class BoDb extends BoDbMain
 		
 		$result = self::do_query($query);
 
-		//if ($ms > 0)
-		//	file_put_contents($cache_dir.'/lock.log', " ".round((microtime(true) - $start)*1000)." ".strtr($query, array("\n" => " ")), FILE_APPEND);
-			
-		if ($lockfile)
-			@unlink($lockfile);
+		if (DB_LOCK_SAME_QUERIES === true)
+		{
+			//if ($ms > 0)
+			//	file_put_contents($cache_dir.'/lock.log', " ".round((microtime(true) - $start)*1000)." ".strtr($query, array("\n" => " ")), FILE_APPEND);
+		
+			if ($lockfile)
+				@unlink($lockfile);
+		}
+		
+		if (BO_DB_DEBUG_LOG === true || (BO_DB_DEBUG_LOG == 'err' && $result === false) )
+		{
+			$dtime = (microtime(true) - $start) * 1e3;
+			file_put_contents($cache_dir.'/db.log', 
+				date("Y-m-d H:i:s | ")
+				.sprintf("%5dms | %5d | ", $dtime, $qtype != 'insert' ? self::affected_rows() : 0)
+				.strtr($query, array("\n"=>""))
+				.($result === false ? "\n  --> ".self::error() : "")
+				.' | '.$_SERVER['REQUEST_URI']."\n"
+				, FILE_APPEND);
+		}
 		
 		if ($result === false)
 		{

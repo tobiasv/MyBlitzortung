@@ -2,9 +2,12 @@
 
 require_once 'classes/FilesDownload.class.php'; 
 
+$bo_update_step = 0;
 
 function bo_update_all($force = false, $only = '')
 {
+	global $bo_update_step;
+	
 	bo_echod(" ");
 	bo_echod("***** Getting lightning data from blitzortung.org *****");
 	bo_echod(" ");
@@ -13,14 +16,13 @@ function bo_update_all($force = false, $only = '')
 	ignore_user_abort(true);
 	ini_set('default_socket_timeout', BO_SOCKET_TIMEOUT);
 
-	$start_time = time();
 	$debug = defined('BO_DEBUG') && BO_DEBUG;
-	$is_updating = (int)BoData::get('is_updating');
 	$max_time = bo_update_get_timeout();
 	bo_getset_timeout($max_time);
 
 	//Check if sth. went wrong on the last update (if older continue)
-	if ($is_updating && time() - $is_updating < $max_time*5 + 60 && !($force && $debug))
+	$is_updating = (int)BoData::get('is_updating');
+	if ($is_updating && time() - $is_updating < min($max_time*5+60,$max_time+120) && !($force && $debug))
 	{
 		bo_echod("Another update is running *** Begin: ".date('Y-m-d H:i:s', $is_updating));
 		bo_echod(" ");
@@ -28,8 +30,9 @@ function bo_update_all($force = false, $only = '')
 		return;
 	}
 
+	register_shutdown_function('bo_update_shutdown');
 	BoData::set('is_updating', time());
-	register_shutdown_function('BoData::set', 'is_updating', 0);
+	$bo_update_step = 1;
 
 
 	// to avoid to much connections from different stations to blitzortung.org at the same time
@@ -41,21 +44,6 @@ function bo_update_all($force = false, $only = '')
 		sleep($sleep);
 	}
 
-
-	bo_update_all2($force, $only);
-
-	bo_echod(" ");
-	bo_echod("Import finished. Exiting...");
-	bo_echod(" ");
-
-	BoData::set('is_updating', 0);
-
-	return;
-}
-
-
-function bo_update_all2($force = false, $only = '')
-{
 
 	if (!BoData::get('first_update_time'))
 		BoData::set('first_update_time', time());
@@ -75,7 +63,6 @@ function bo_update_all2($force = false, $only = '')
 
 
 	/*** Get the data! ***/
-
 
 	//Strikes
 	if (!$only || $only == 'strikes')
@@ -120,34 +107,53 @@ function bo_update_all2($force = false, $only = '')
 			bo_update_tracks($force);
 	}
 
-	
 	/*** Download external pictures/files ***/
 	if (!$only || $only == 'download')
 		bo_download_external($force);
 
-		
-	/*** Purge old data ***/
-	if (bo_exit_on_timeout()) return;
 
+	BoData::set('is_updating', 0);
+	$bo_update_step = 0;
+	
+	if (bo_exit_on_timeout()) return;
+	
+	
+	//STEP 2
+	
+	//Check if sth. went wrong on the last update (if older continue)
+	$is_updating = (int)BoData::get('is_updating_step2');
+	if ($is_updating && time() - $is_updating < $max_time*5 + 60 && !($force && $debug))
+	{
+		bo_echod("Another update is running *** Begin: ".date('Y-m-d H:i:s', $is_updating));
+		bo_echod(" ");
+		bo_echod("Exiting...");
+		return;
+	}
+	
+	BoData::set('is_updating_step2', time());
+	$bo_update_step = 2;
+
+	
+	/*** Purge old data ***/
 	if (!$only || $only == 'purge')
 		bo_purge_olddata($only && $force); //only force purge when "only" call
 
 
-	/*** Densities ***/
-	if (bo_exit_on_timeout()) return;
-
-	if (!$only || $only == 'density')
-	{
-		require_once 'density.inc.php';
-		bo_update_densities($force);
-	}
-		
 	/*** File Cache ***/
 	if (bo_exit_on_timeout()) return;
 
 	if (!$only || $only == 'cache')
 		bo_purge_cache($force);
 
+	
+	/*** Densities ***/
+	if (bo_exit_on_timeout()) return;
+
+	if ( ($strikes_imported !== false && !$only) || $only == 'density')
+	{
+		require_once 'density.inc.php';
+		bo_update_densities($force);
+	}
 	
 	/*** TABLE STATUS (takes long time with InnoDB) ***/
 	if (bo_exit_on_timeout()) return;
@@ -172,75 +178,30 @@ function bo_update_all2($force = false, $only = '')
 		$D['last'] = time();
 		BoData::set('db_table_status', serialize($D));
 	}
-		
-		
+
+
+	bo_echod(" ");
+	bo_echod("Import finished. Exiting...");
+	bo_echod(" ");
+
+	BoData::set('is_updating_step2', 0);
+	$bo_update_step = 0;
+
 	return;
 }
 
 
-// Get archive data from blitzortung cgi (OUTDATED!)
-function bo_get_archive($args='', $bo_login_id=false, $as_array=false)
+function bo_update_shutdown()
 {
-	$file = false;
-
-	if (!$bo_login_id)
-	{
-		//$bo_login_id = BoData::get('bo_login_id');
-		$auto_id = true;
-	}
-
-	if ($bo_login_id)
-	{
-		$url = 'http://www.blitzortung.org/cgi-bin/archiv.cgi?login_string='.$bo_login_id.'&lang=en&'.$args;
-		$file = bo_get_file($url, $code, 'archive', $d1, $d2, $as_array);
-
-		if ($file === false)
-		{
-			bo_echod("ERROR: Couldn't get file from archive! Code: $code");
-			bo_update_error('archivedata', 'Download of archive data failed. '.$code);
-			return false;
-		}
-
-		bo_update_error('archivedata', true);
-	}
-
-	if ($file && $as_array)
-		$text_line = $file[0];
-	elseif ($file)
-		$text_line = substr($file, 0, 100);
-	else
-		$text_line = false;
-
-	//Login seems not successful --> new login ID
-	if (!$text_line || strpos($text_line, 'denied') !== false || !$file )
-	{
-
-		if ($auto_id)
-		{
-			$bo_login_id = bo_get_login_str();
-
-			if ($bo_login_id)
-			{
-				bo_echod("Old Login-Id outdated. Got new Login-Id: ".substr($bo_login_id,0,8)."...");
-				$file = bo_get_archive($args,$bo_login_id, $as_array);
-				return $file;
-			}
-			else
-			{
-				bo_echod("ERROR: Tried to get new Login-Id but it didn't work! Wrong Username/Password? ".substr($bo_login_id,0,8)."...");
-				return false;
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-	else
-		return $file;
-
+	global $bo_update_step;
+	
+	if ($bo_update_step == 1)
+		BoData::set('is_updating', 0);
+	else if ($bo_update_step == 2)
+		BoData::set('is_updating_step2', 0);
+	
+	bo_echod("step=".$bo_update_step);
 }
-
 
 // Get new strikes from blitzortung.org
 function bo_update_strikes($force = false, $time_start_import = null)
@@ -345,6 +306,8 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				' *** Loading '.$Files->FoundFiles.' files from '.gmdate('Y-m-d H:i:s', $Files->TimeStart).' to '.gmdate('Y-m-d H:i:s', $Files->TimeEnd).
 				' *** This is update #'.$loadcount);
 
+		BoDb::query("SET autocommit=0", false);
+				
 		while ( ($l = $Files->GetNextLine()) !== false )
 		{
 			if ($Files->LastMessage)
@@ -393,7 +356,13 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				
 				if ($D['lat'] == 0 && $D['lon'] == 0)
 				{
-					bo_echod("  Text: \"$l\" --> Error: lat/lon = 0.0 not allowed!");
+					bo_echod("  Text: \"$l\" --> Error: lat/lon == 0.0 not allowed!");
+					continue;
+				}
+				
+				if (abs($D['lat']) > 90 || abs($D['lon']) > 180)
+				{
+					bo_echod("  Text: \"$l\" --> Error: lat/lon out of range!");
 					continue;
 				}
 			}
@@ -458,6 +427,12 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			{
 				$D['lat_x'] = array('FLOOR((('.(90+$D['lat']).')%'.$key_lat_div.')/'.$key_lat_div.'*'.$key_latlon_vals.')');
 				$D['lon_x'] = array('FLOOR((('.(180+$D['lon']).')%'.$key_lon_div.')/'.$key_lon_div.'*'.$key_latlon_vals.')');
+			}
+			
+			if (BO_DB_STRIKES_MERCATOR === true)
+			{
+				$D['lat_merc'] = array(bo_sql_lat2tiley($D['lat'], BO_DB_STRIKES_MERCATOR_SCALE, false));
+				$D['lon_merc'] = array(bo_sql_lon2tilex($D['lon'], BO_DB_STRIKES_MERCATOR_SCALE, false));
 			}
 			
 			/********* Statistics **********/
@@ -672,7 +647,9 @@ function bo_update_strikes($force = false, $time_start_import = null)
 
 		}
 
-
+		BoDb::query("COMMIT", false);
+		BoDb::query("SET autocommit=1", false);
+		
 		if ($timeout)
 		{
 			bo_echod("TIMEOUT: Continue next time...");
@@ -894,17 +871,17 @@ function bo_update_stations($force = false)
 			else
 				$error++;
 
-			//MyBlitzortung Status
-			if (preg_match('/myblitz;"?([^" ]+)"?/', $l, $r))
-				$D['show_mybo'] = $r[1];
-
 			//City
 			if (preg_match('/city;"([^"]+)"/', $l, $r))
 				$D['city'] = $r[1];
-
+			else
+				$D['city'] = '';
+				
 			//Country
 			if (preg_match('/country;"([^"]+)"/', $l, $r))
 				$D['country'] = $r[1];
+			else
+				$D['country'] = '';
 			
 			//Position
 			if (preg_match('/pos;([-0-9\.]+);([-0-9\.]+);([-0-9\.]+)/', $l, $r))
@@ -919,7 +896,7 @@ function bo_update_stations($force = false)
 			//PCB
 			if (preg_match('/board;"?([^ ]+)"?/', $l, $r))
 				$D['controller_pcb'] = strtr($r[1], array('"' =>''));
-			
+
 			//Status
 			if (preg_match('/status;"?([^ ]+)"?/', $l, $r))
 				$D['status'] = $r[1];
@@ -931,10 +908,14 @@ function bo_update_stations($force = false)
 			//Comment
 			if (preg_match('/comments;"([^"]+)"/', $l, $r))
 				$D['comment'] = $r[1];
-
+			else
+				$D['comment'] = '';
+				
 			//Website
 			if (preg_match('/website;"([^"]+)"/', $l, $r))
 				$D['url'] = $r[1];
+			else
+				$D['url'] = '';
 				
 			//Signals
 			if (preg_match('/signals;"?(([^ ;]+);)?([^ ;]+)"?/', $l, $r))
@@ -2082,7 +2063,7 @@ function bo_exit_on_timeout()
 			bo_echod("TIMEOUT! We will continue the next time.");
 
 		$ptext = true;
-
+		
 		return true;
 	}
 	else
@@ -2103,7 +2084,7 @@ function bo_update_get_timeout()
 	$max_time = $exec_timeout - 10;
 
 	if (!$exec_timeout)
-		$max_time = 300;
+		$max_time = 1800;
 	else if ($max_time < 20)  //give it a try
 		$max_time = 45;
 	else
@@ -2369,6 +2350,9 @@ function bo_purge_cache($force = false)
 
 		bo_echod(" * Graphs");
 		$count += bo_delete_files(BO_DIR.BO_CACHE_DIR.'/graphs', intval(BO_CACHE_PURGE_OTHER_HOURS), 8);
+
+		bo_echod(" * Temp Files");
+		$count += bo_delete_files(BO_DIR.BO_CACHE_DIR.'/strcnt', intval(BO_CACHE_PURGE_OTHER_HOURS), 0);
 		
 		bo_echod(" -> Deleted $count files");
 		$whole_count += $count;

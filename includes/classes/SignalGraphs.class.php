@@ -38,7 +38,10 @@ class BoSignalGraph
 		$tickPositions = array();	
 	
 		$this->time = $data['time'];
-	
+			
+		if (!bo_signal_parse($data, true))
+			return false;
+		
 		if ($type == 'xy') 
 			$this->width = $this->height;
 
@@ -90,7 +93,6 @@ class BoSignalGraph
 		}
 		
 		$this->graph->SetMargin(24,1,1,1);
-		bo_signal_parse($data, true);
 	
 		if ($type == 'spectrum')
 		{
@@ -98,11 +100,18 @@ class BoSignalGraph
 			$max_i = 0;
 			$tickPos = array(0);
 			$tickLabels = array(0);
-			$minTickPos = array(0);
+			$minTickPos = array();
 			$last = 0;
 			$last_min = 0;
 			
-			define("BO_GRAPH_RAW_SPEC_TICK_KHZ", 25);
+			define("BO_GRAPH_RAW_SPEC_TICK_KHZ", 5);
+			define("BO_GRAPH_RAW_SPEC_LABEL_STEPS", 4);
+
+			$tick_khz = BO_GRAPH_RAW_SPEC_TICK_KHZ;
+			$lbl_step = BO_GRAPH_RAW_SPEC_LABEL_STEPS;
+
+			if ($this->width < 300)
+				$lbl_step *= 5; 
 			
 			foreach ($data['spec_freq'] as $i => $khz)
 			{
@@ -112,10 +121,17 @@ class BoSignalGraph
 					break;
 				}
 				
-				if ( floor($khz/BO_GRAPH_RAW_SPEC_TICK_KHZ)*BO_GRAPH_RAW_SPEC_TICK_KHZ > $last)
+				if ( floor($khz/$tick_khz)*$tick_khz > $last)
 				{
 					$tickPos[] = $i;
-					$tickLabels[] = (floor($khz/BO_GRAPH_RAW_SPEC_TICK_KHZ)*BO_GRAPH_RAW_SPEC_TICK_KHZ).'kHz';
+					
+					$k = (floor($khz/$tick_khz)*$tick_khz);
+					
+					if ($k%($tick_khz*$lbl_step))
+						$tickLabels[] = '';
+					else
+						$tickLabels[] = $k.'kHz';
+						
 					$last = $khz;
 				}
 
@@ -181,6 +197,18 @@ class BoSignalGraph
 				$plots[5]=new BarPlot($D[5]);
 				$plots[5]->SetFillColor(BO_GRAPH_RAW_COLOR6);
 			}
+
+			if (isset($data['channel'][6]['spec']))
+			{
+				$plots[6]=new BarPlot($D[6]);
+				$plots[6]->SetFillColor(BO_GRAPH_RAW_COLOR7);
+			}
+
+			if (isset($data['channel'][7]['spec']))
+			{
+				$plots[7]=new BarPlot($D[7]);
+				$plots[7]->SetFillColor(BO_GRAPH_RAW_COLOR8);
+			}
 			
 			foreach($plots as $p)
 			{
@@ -230,7 +258,7 @@ class BoSignalGraph
 		elseif ($type == 'xy')
 		{
 			$c = $data['channel'];
-			
+
 			if ($this->fullscale)
 			{
 				$max = 0;
@@ -296,8 +324,8 @@ class BoSignalGraph
 			}
 			
 			$datax = array();
-			$tickPos = array();
-			$tickLabels = array();
+			$tickPos = array(0); 		//needed for old GREEN stations
+			$tickLabels = array(''); 	//needed for old GREEN stations
 			$minTickPos = array();
 			$last = null;
 			
@@ -313,17 +341,16 @@ class BoSignalGraph
 				
 				$us = floor($time_us / $ustepdisplay) * $ustepdisplay;
 				
-				if ($last === null) //don't show 1st one
+				if ($last === null && $us != 0) //don't show 1st one
 					$last = $us;
 					
-				if ($last < $us)
+				if ($last < $us || $last === null)
 				{
 					$tickPos[] = $i;
 					$tickLabels[] = _BN($us, 0).'µs';
 					$last = $us;
 				}
 			}
-
 
 			$n = count($datax);
 			$xmin = $datax[0];
@@ -343,7 +370,7 @@ class BoSignalGraph
 
 			$plot = array();
 			
-			for ($i=0; $i<6; $i++)
+			for ($i=0; $i<8; $i++)
 			{
 				if (is_array($datay[$i]))
 				{
@@ -446,6 +473,7 @@ class BoSignalGraph
 			}
 		}
 	
+		return true;
 	}
 	
 	public function AddText($text)
@@ -504,6 +532,8 @@ class BoSignalGraph
 			case 3: return BO_GRAPH_RAW_COLOR4;
 			case 4: return BO_GRAPH_RAW_COLOR5;
 			case 5: return BO_GRAPH_RAW_COLOR6;
+			case 6: return BO_GRAPH_RAW_COLOR7;
+			case 7: return BO_GRAPH_RAW_COLOR8;
 		}
 	}
 }

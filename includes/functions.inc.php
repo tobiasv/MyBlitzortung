@@ -10,13 +10,15 @@ function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 		$exclude[] = 'bo_login';
 
 	$exclude_bo = array_search('bo_*', $exclude) !== false;
-
+	$exclude_all = array_search('*', $exclude) !== false;
+	
 	$query = '';
 	foreach($_GET as $name => $val)
 	{
 		if (array_search($name, $exclude) !== false 
 			|| ($exclude_bo && substr($name,0,3) == 'bo_' && $name != 'bo_page') 
-			|| $name == BO_LANG_ARGUMENT)
+			|| $name == BO_LANG_ARGUMENT
+			|| $exclude_all)
 			continue;
 
 		if ($name == 'bo_page' && !$val)
@@ -26,7 +28,12 @@ function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 	}
 
 	if (count($exclude) && $add !== null)
-		$query .= $exclude[0].'='.urlencode($add).'&';
+	{
+		if ($exclude[0] == '*')
+			$query .= urlencode($add).'&';
+		else
+			$query .= $exclude[0].'='.urlencode($add).'&';
+	}
 
 	//Always add current language in url if not default (ie nedded for caching)
 	if ( (BO_LOCALE != _BL() || BO_LANG_REDIRECT) && array_search(BO_LANG_ARGUMENT, $exclude) === false)
@@ -267,7 +274,7 @@ function bo_get_file($url, &$error = '', $type = '', &$range = 0, &$modified = 0
 	}
 
 
-	if ($type)
+	if ($type && $type != 'raw_data_other')
 	{
 		$data = unserialize(BoData::get('download_statistics'));
 		$data[$type]['count'][$err]++;

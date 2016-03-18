@@ -35,7 +35,7 @@ function bo_update_densities($force = false)
 	$res = BoDb::query("SELECT id, type, date_start, date_end, station_id, info, status
 					FROM ".BO_DB_PREF."densities 
 					WHERE status<=0 
-					ORDER BY status DESC, date_start, date_end");
+					ORDER BY station_id, status DESC, date_start, date_end");
 	while ($row = $res->fetch_assoc())
 	{
 		$max_status = max($max_status, $row['status']);
@@ -401,7 +401,8 @@ function bo_show_archive_density()
 	
 	$sql = "SELECT MIN(date_start) mindate, MAX(date_start) maxdate, MAX(date_end) maxdate_end 
 			FROM ".BO_DB_PREF."densities 
-			WHERE (status=1 OR status=3) AND data != '0'
+			WHERE (status=1 OR status=3) 
+			-- AND data != '0'
 			".($station_id ? " AND station_id='$station_id' " : '')."
 			";
 	$res = BoDb::query($sql);
@@ -762,7 +763,7 @@ function bo_get_density_image()
 	//Legend
 	$LegendWidth = 150;
 	$ColorBarWidth  = 10;
-	$ColorBarHeight = $h - 70;
+	$ColorBarHeight = min($h-70, 600);
 	$ColorBarX = $w + 10;
 	$ColorBarY = 50;
 	$ColorBarStep = 15;
@@ -1512,6 +1513,9 @@ function bo_density_insert_ranges($ranges, $force = false, $stations = array())
 	//insert the ranges
 	foreach($ranges as $r)
 	{
+		if ($r[0] <= 0 || $r[1] <= 0) //ignore wrong dates
+			continue;
+		
 		$date_start = gmdate('Y-m-d', $r[0]);
 		$date_end   = gmdate('Y-m-d', $r[1]);
 		$status     = intval($r[2]);

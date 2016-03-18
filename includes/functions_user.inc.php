@@ -231,12 +231,13 @@ function bo_user_init($force = false)
 		//check cookie here if no user logged in
 		if (!$_SESSION['bo_user'])
 		{
+			$_SESSION['bo_user'] = -1; //in case cookie-login doesn't work, session and cookie will be destroyed next time (untested)
 			if (bo_user_cookie_login())
 				return;
 		}
 		
 		//remove session-info cookie if no user logged in in this session
-		if (!$force && !count($_POST) && BO_SESSION_COOKIE_PARAM !== false && !$_SESSION['bo_user'])
+		if (!$force && !count($_POST) && BO_SESSION_COOKIE_PARAM !== false && $_SESSION['bo_user'] <= 0)
 		{
 			//delete cookie
 			setcookie(BO_COOKIE_NAME, null, -1, '/');

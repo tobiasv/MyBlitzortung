@@ -29,6 +29,9 @@ function bo_tile()
 	$restricted   = false;
 	$user_nolimit = (bo_user_get_level() & BO_PERM_NOLIMIT);
 	
+	//if ($zoom > 8 && ($type == 4 || $type == 5) )
+	//	bo_tile_output();
+	
 	if ($tile_size)
 	{
 		if (($tile_size%256) || $tile_size > BO_TILE_SIZE)
@@ -44,7 +47,7 @@ function bo_tile()
 	else
 		$station_id = false;
 	
-	
+	bo_cache_log("Tile START");
 	
 	
 	/***********************************************************/
@@ -596,14 +599,17 @@ function bo_tile()
 			WHERE $sql_where
 			".($grouping ? " GROUP BY x, y" : "")."
 			ORDER BY mtime ASC";
+	bo_cache_log("Tile SQL: ".strtr($sql, array("\n" => "")));
 	$erg = BoDb::query($sql);
-	
 	$num = $erg->num_rows;
 	
-	
+
 	//no points --> blank tile
 	if ($num == 0 && $na_positions == 0)
 	{
+		bo_cache_log("Tile END 0");
+		
+		bo_tile_headers($update_interval*3, $last_update_time, $caching);
 		bo_tile_output($file, $caching);
 	}
 
@@ -648,7 +654,6 @@ function bo_tile()
 	// get the data and paint tile
 	while ($row = $erg->fetch_assoc())
 	{
-
 		if ($grouping)
 		{
 			$px = $row['x'];
@@ -767,7 +772,11 @@ function bo_tile()
 	}
 	
 	imagecolortransparent($I, $blank);
+	
+	bo_cache_log("Tile END $num");
 	bo_tile_output($file, $caching, $I);
+	
+	
 }
 
 function bo_tile_tracks()
@@ -1239,24 +1248,6 @@ function bo_latlon2tile($lat, $lon, $zoom)
 	$scale = (1 << $zoom) * 256;
 
 	return array((int)($x * $scale), (int)($y * $scale));
-}
-
-function bo_sql_lat2tiley($name, $zoom)
-{
-	$scale = (1 << $zoom) * 256;
-	$lat_mercator = " (  LOG(TAN( PI()/4 + RADIANS($name)/2 )) / PI() / 2 ) ";
-	$y = " ROUND( ABS( $lat_mercator - 0.5 ) * $scale ) ";
-
-	return $y;
-}
-
-function bo_sql_lon2tilex($name, $zoom)
-{
-	$scale = (1 << $zoom) * 256;
-	$lon_mercator = " ( $name / 360 ) ";
-	$x = " ROUND( ($lon_mercator+0.5) * $scale ) ";
-
-	return $x;
 }
 
 function bo_tile_positions_all($tile_size)

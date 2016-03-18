@@ -117,6 +117,14 @@ function bo_station_info($id = 0)
 	if (isset($info[$id]))
 		return $info[$id];
 
+	$cache_dir = BO_DIR.'/'.BO_CACHE_DIR.'/data/stations/';
+	$cache_file = $cache_dir.$id;
+	if (file_exists($cache_file) && time() - filemtime($cache_file) < 3600)
+	{
+		$info[$id] = unserialize(file_get_contents($cache_file));
+		return $info[$id];
+	}
+	
 	if ($id)
 	{
 		$tmp = bo_stations('id', $id);
@@ -140,6 +148,12 @@ function bo_station_info($id = 0)
 		$ret = $tmp[bo_station_id()];
 	}
 
+	if (!file_exists($cache_file))
+	{
+		@mkdir($cache_dir, 0777, true);
+		file_put_contents($cache_file, serialize($ret));
+	}
+	
 	$info[$id] = $ret;
 
 	return $info[$id];
@@ -174,8 +188,11 @@ function bo_get_station_list(&$style_class = array(), $only_own = false)
 		if (!bo_station_data_valid($d))
 			continue;
 
-		$opts[$id] = _BL($d['country'], false, true).': ';
-		
+		if ($d['country'])
+			$opts[$id] = _BL($d['country'], false, true).': ';
+		else
+			$opts[$id] = '- ';
+			
 		if (!trim(_BC($d['city'])))
 			$opts[$id] .= "#".$d['bo_station_id'];
 		else
@@ -317,12 +334,11 @@ function bo_station_data_valid(&$d)
 	{
 		$d['city'] = 'Station '.$d['bo_station_id'];
 	}
-
 			
 	if ($d['country'] == '')
 	{
 		//$d['country'] = ' Unknown';
-		return false;
+		//return false;
 	}
 	
 	return true;
@@ -330,18 +346,23 @@ function bo_station_data_valid(&$d)
 
 function bo_round_station_pos($lat, $lon)
 {
-	$round = (bo_user_get_level() & BO_PERM_SETTINGS) ? 10000000 : 50;
-	return array(round($lat*$round)/$round, round($lon*$round)/$round);
+	$round = (bo_user_get_level() & BO_PERM_SETTINGS) ? 8 : 2;
+	return array(round($lat,$round), round($lon,$round));
 }
 
 function bo_stations_json()
 {
 	$S = array();
-	$sql = "SELECT bo_station_id id, lat, lon FROM ".BO_DB_PREF."stations WHERE bo_station_id > 0 AND status > 0 AND lat AND lon AND id < ".intval(BO_DELETED_STATION_MIN_ID);
+	$sql = "SELECT bo_station_id id, lat, lon, city, country, status, alt FROM ".BO_DB_PREF."stations WHERE bo_station_id > 0 AND status > 0 AND lat AND lon AND id < ".intval(BO_DELETED_STATION_MIN_ID);
 	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 	{
 		$S[$row['id']] = bo_round_station_pos($row['lat'], $row['lon']);
+		$S[$row['id']]['a'] = $row['alt'];
+		$S[$row['id']]['c'] = $row['city'];
+		$S[$row['id']]['C'] = _BL($row['country']);
+		$S[$row['id']]['s'] = $row['status'];
+		
 	}
 
 	return json_encode($S);

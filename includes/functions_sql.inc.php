@@ -16,18 +16,39 @@ function bo_times2sql($time_min = 0, $time_max = 0, $table='s', &$auto_reduce=fa
 		$time_max = strtotime($row['time'].' UTC');
 	}
 
+	//round?
+	$time_min = round($time_min/BO_DB_TIME_ROUND_SECONDS) * BO_DB_TIME_ROUND_SECONDS;
+	$time_max = round($time_max/BO_DB_TIME_ROUND_SECONDS) * BO_DB_TIME_ROUND_SECONDS;
+	
 	//date range
 	$date_min = gmdate('Y-m-d H:i:s', $time_min);
 	$date_max = gmdate('Y-m-d H:i:s', $time_max);
 	$sql = " ( $table.time BETWEEN '$date_min' AND '$date_max' ) ";
-
 	
 	//find max and min strike id
 	//useful for joins (i.e. station_strikes, especially when partitioned)
 	if ($time_min && $time_max && $time_min > strtotime('2010-01-01'))
 	{
-		$row = BoDb::query("SELECT MAX(id) maxid, MIN(id) minid, COUNT(*) cnt FROM ".BO_DB_PREF."strikes s WHERE $sql")->fetch_assoc();
-		
+		if (BO_DB_TIME_CACHE === true)
+		{
+			$tmpfile = BO_DIR.BO_CACHE_DIR.'/strcnt/'.$time_min.'_'.$time_max;
+			
+			if (!file_exists($tmpfile) || time() - filemtime($tmpfile) > BO_DB_TIME_ROUND_SECONDS)
+			{
+				$row = BoDb::query("SELECT MAX(id) maxid, MIN(id) minid, COUNT(*) cnt FROM ".BO_DB_PREF."strikes s WHERE $sql")->fetch_assoc();
+				@mkdir(BO_DIR.BO_CACHE_DIR.'/strcnt/');
+				file_put_contents($tmpfile, serialize($row));
+			}
+			else
+			{
+				$row = unserialize(file_get_contents($tmpfile, serialize($row)));
+			}
+		}
+		else
+		{
+			$row = BoDb::query("SELECT MAX(id) maxid, MIN(id) minid, COUNT(*) cnt FROM ".BO_DB_PREF."strikes s WHERE $sql")->fetch_assoc();
+		}
+	
 		if (isset($row['maxid']) && isset($row['minid']))
 		{
 			$sql .= " AND ($table.id BETWEEN ".$row['minid']." AND ".$row['maxid']." ) ";
@@ -74,26 +95,9 @@ function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2
 	$sql  = " (";
 	$sql .= bo_latlon2sql($lat1, $lat2, $lon1, $lon2);
 	$sql .= " AND ";
-	$sql .= bo_times2sql($time_min, $time_max, 's');
+	$sql .= bo_times2sql($time_min, $time_max, 's', $auto_reduce);
 	$sql .= ") ";
 
-	if ($auto_reduce > 0)
-	{
-		$row = BoDb::query("SELECT MAX(id) maxid, MIN(id) minid, COUNT(*) cnt FROM ".BO_DB_PREF."strikes s WHERE $sql")->fetch_assoc();
-		
-		if (isset($row['maxid']) && isset($row['minid']))
-		{
-			$sql .= " AND (s.id BETWEEN ".$row['minid']." AND ".$row['maxid']." ) ";
-		}
-		
-		if ($row['cnt'] > $auto_reduce)
-		{
-			$div = ceil($row['cnt']/$auto_reduce);
-			$sql .= " AND (MOD(s.id,".$div.")=0) ";
-			$auto_reduce = array('divisor' => $div, 'count' => $row['cnt']);
-		}
-	}
-	
 	return $sql;
 }
 
@@ -243,6 +247,38 @@ function bo_sql_latlon2dist($lat1, $lon1, $lat_name='lat', $lon_name='lon')
 	return " ($sql) ";
 }
 
+function bo_sql_lat2tiley($name, $zoom, $cache = true)
+{
+	if (BO_DB_STRIKES_MERCATOR !== true || !$cache)
+	{
+		$scale = (1 << $zoom) * 256;
+		$lat_mercator = " ( LOG(TAN( PI()/4 + RADIANS($name)/2 )) / PI() / 2 ) ";
+		$y = " ROUND( ABS( $lat_mercator - 0.5 ) * $scale ) ";
+	}
+	else
+	{
+		$scale = (1 << (BO_DB_STRIKES_MERCATOR_SCALE-$zoom));
+		$y = " ROUND(lat_merc / $scale) ";
+	}
 
+	return $y;
+}
+
+function bo_sql_lon2tilex($name, $zoom, $cache = true)
+{
+	if (BO_DB_STRIKES_MERCATOR !== true || !$cache)
+	{
+		$scale = (1 << $zoom) * 256;
+		$lon_mercator = " ( $name / 360 ) ";
+		$x = " ROUND( ($lon_mercator+0.5) * $scale ) ";
+	}
+	else
+	{
+		$scale = (1 << (BO_DB_STRIKES_MERCATOR_SCALE-$zoom));
+		$x = " ROUND(lon_merc / $scale) ";
+	}
+	
+	return $x;
+}
 
 ?>

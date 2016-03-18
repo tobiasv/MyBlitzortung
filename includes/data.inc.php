@@ -71,7 +71,7 @@ function bo_db_recreate_strike_keys($quiet = false)
 	$bytes_latlon = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_LATLON_BYTES) : 0;
 	$bytes_time   = 0 < $bytes_time   && $bytes_time   <= $maxbytes ? $bytes_time   : 0;
 	$bytes_latlon = 0 < $bytes_latlon && $bytes_latlon <= $maxbytes ? $bytes_latlon : 0;
-	
+	$mercator     = BO_DB_STRIKES_MERCATOR === true;
 	
 	$sql_alter = array();
 	
@@ -95,6 +95,12 @@ function bo_db_recreate_strike_keys($quiet = false)
 	if (isset($cols['lon_x']) && !$bytes_latlon)
 		$sql_alter[] = 'DROP `lon_x`';
 
+	if (isset($cols['lat_merc']) && !$mercator)
+		$sql_alter[] = 'DROP `lat_merc`';
+
+	if (isset($cols['lon_merc']) && !$mercator)
+		$sql_alter[] = 'DROP `lon_merc`';
+	
 
 	if (!empty($sql_alter))
 		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter), $quiet);
@@ -136,6 +142,18 @@ function bo_db_recreate_strike_keys($quiet = false)
 		$sql_alter[] = 'CHANGE `lon_x` `lon_x` '.$byte2mysql[$bytes_latlon].' UNSIGNED NOT NULL';
 	}
 
+	if (!isset($cols['lat_merc']) && $mercator)
+	{
+		BoData::set('db_mercator_update', 1);
+		$sql_alter[] = 'ADD `lat_merc` INT UNSIGNED NOT NULL';
+	}
+
+	if (!isset($cols['lon_merc']) && $mercator)
+	{
+		BoData::set('db_mercator_update', 1);
+		$sql_alter[] = 'ADD `lon_merc` INT UNSIGNED NOT NULL';
+	}
+	
 	if (!empty($sql_alter))
 		bo_db_recreate_strike_keys_db('ALTER TABLE '.BO_DB_PREF.'strikes '.implode(', ',$sql_alter), $quiet);
 
@@ -196,6 +214,20 @@ function bo_db_recreate_strike_keys($quiet = false)
 									BO_DB_EXTRA_KEYS_LAT_DIV, 
 									BO_DB_EXTRA_KEYS_LON_DIV)));
 		}
+	}
+
+	BoData::set('db_mercator_update', 1);
+	if ( BoData::get('db_mercator_update') )
+	{
+		$sql = 'UPDATE `'.BO_DB_PREF.'strikes` SET '.
+				'lat_merc='.bo_sql_lat2tiley('lat', BO_DB_STRIKES_MERCATOR_SCALE, false).', '.
+				'lon_merc='.bo_sql_lon2tilex('lon', BO_DB_STRIKES_MERCATOR_SCALE, false).
+				'WHERE lat_merc=0 AND lon_merc=0';
+		
+		$ok = bo_db_recreate_strike_keys_db($sql, $quiet) >= 0;
+		
+		if ($ok)
+			BoData::set('db_mercator_update', 0);
 	}
 	
 	if (!$quiet)

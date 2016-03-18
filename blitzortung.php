@@ -29,7 +29,7 @@ if (!defined("BO_VER"))
 	
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '1.4-dev4');
+	define("BO_VER", '1.4-dev6');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -278,6 +278,7 @@ if (!defined("BO_VER"))
 	}
 	else if (isset($_GET['stations_json']))
 	{
+		header("Content-Type:application/json; charset=UTF-8");
 		echo bo_stations_json();
 		exit;
 	}
@@ -299,13 +300,10 @@ if (!defined("BO_VER"))
 		header("Pragma: ");
 		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $bo_data_time)." GMT");
 		header("Expires: ".gmdate("D, d M Y H:i:s", time() + $bo_max_age - 1) ." GMT");
-		
-		
 	}
-
 	
 	//Redirect to correct language (only on pages)
-	if ($bo_redir_lang)
+	if ($bo_redir_lang && strlen($_SERVER['REQUEST_URI']) > 1)
 	{
 		$url = bo_insert_url(BO_LANG_ARGUMENT, $bo_redir_lang, true);
 		header("X-Accel-Expires: 0");

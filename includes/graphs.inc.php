@@ -189,7 +189,9 @@ function bo_graph_raw()
 	if ($size != 3 && $size != 4)
 		$graph->SetMaxTime(BO_GRAPH_RAW_MAX_TIME2);
 		
-	$graph->SetData($type, $signal);
+	if (!$graph->SetData($type, $signal))
+		$graph->DisplayEmpty(true, "No data");
+	
 	$graph->AddText(date('H:i:s', $signal['time']).'.'.sprintf('%09d', $signal['time_ns']).($date&&$nsec ? '    '.($last_dt > 0 ? '+' : '').round($last_dt).'µs      Dist:'.($dist ? round($dist/1000).'km' : '') : ''));
 	
 	bo_session_close(true);
@@ -711,7 +713,7 @@ function bo_graph_statistics()
 			{
 				if (!is_numeric($dist) || $dist*10 > bo_km(BO_GRAPH_STAT_MAX_DISTANCE))
 					continue;
-					
+				
 				$sum_own += $cnt;
 				
 				if ($cnt < 3) //don't display ratios with low strike counts
@@ -749,7 +751,17 @@ function bo_graph_statistics()
 			
 		}
 
-		$graph_type = 'linlin';
+		if (BO_GRAPH_STAT_DISTANCE_LOG === true)
+		{
+			$graph_type = 'loglin';
+			$xmin = 1;
+			$xmax = ceil(log(bo_km(BO_GRAPH_STAT_MAX_DISTANCE)) / log(10));
+		}
+		else
+		{
+			$graph_type = 'linlin';
+		}
+		
 		$title_no_hours = true;
 
 		if (isset($own['time']) && $own['time'] && $station_id != 0)
