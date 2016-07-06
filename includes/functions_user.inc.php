@@ -15,6 +15,7 @@ function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 			if (!$md5pass)
 				$pass = md5($pass);
 
+			bo_user_log("Login $user (BO_USER)");
 			bo_user_set_session(1, pow(2, BO_PERM_COUNT) - 1, $cookie, $pass);
 			return true;
 		}
@@ -32,6 +33,7 @@ function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 			$row = $res->fetch_assoc();
 			if ($row['id'] > 1)
 			{
+				bo_user_log("Login $user");
 				bo_user_set_session($row['id'], $row['level'], $cookie, $pass);
 				return true;
 			}
@@ -39,6 +41,8 @@ function bo_user_do_login($user, $pass, $cookie, $md5pass = false)
 
 	}
 
+	bo_user_log("Login failed $user");
+	
 	return false;
 }
 
@@ -56,13 +60,17 @@ function bo_user_do_login_byid($id, $pass)
 		$user = $row['login'];
 	}
 
+	bo_user_log("Login $id (ID)");
 	bo_user_do_login($user, $pass, false, true);
 }
 
 function bo_user_do_logout()
 {
 	if ($_COOKIE[BO_COOKIE_NAME] && !$_BO['headers_sent'])
+	{
 		setcookie(BO_COOKIE_NAME, '', time()+3600*24*9999,'/');
+		bo_user_log("Cookie emptied (Logout)");
+	}
 
 	bo_set_conf_user('cookie', '');
 
@@ -76,7 +84,7 @@ function bo_user_do_logout()
 	
 }
 
-function bo_user_set_session($id, $level, $cookie, $pass='')
+function bo_user_set_session($id, $level, $cookie, $md5pass='')
 {
 	bo_user_init(true);
 	
@@ -92,18 +100,21 @@ function bo_user_set_session($id, $level, $cookie, $pass='')
 	{
 		$data = unserialize(bo_get_conf_user('cookie', $id));
 
-		if (!$data['uid'])
+		if (!is_array($data['uid']))
 			$data['uid'] = md5(uniqid('', true));
-
-		$data['pass'] = $pass;
+		
+		$data['pass'] = $md5pass;
+		
 		bo_set_conf_user('user_cookie', serialize($data), $id);
-
-		setcookie(BO_COOKIE_NAME, $id.'_'.$data['uid'], time()+3600*24*$cookie_days, '/');
+		$cookie_data = $id.'_'.$data['uid'];
+		setcookie(BO_COOKIE_NAME, $cookie_data, time()+3600*24*$cookie_days, '/');
+		bo_user_log("Cookie added $cookie_data");
 	}
 	else if (!$_COOKIE[BO_COOKIE_NAME])
 	{
 		//only set if not present (otherwise overwriting cookie-login data)
 		setcookie(BO_COOKIE_NAME, $id, 0, '/');
+		bo_user_log("Cookie added (session only) $id");
 	}
 
 	$lastlogin = bo_get_conf_user('lastlogin_next', $id);
@@ -113,7 +124,7 @@ function bo_user_set_session($id, $level, $cookie, $pass='')
 
 function bo_user_get_id()
 {
-	return $_SESSION['bo_user'];
+	return $_SESSION['bo_user'] > 0 ? $_SESSION['bo_user'] : 0;
 }
 
 function bo_user_get_level($user_id = 0)
@@ -232,8 +243,11 @@ function bo_user_init($force = false)
 		if (!$_SESSION['bo_user'])
 		{
 			$_SESSION['bo_user'] = -1; //in case cookie-login doesn't work, session and cookie will be destroyed next time (untested)
+			
 			if (bo_user_cookie_login())
 				return;
+			
+			$_SESSION['bo_user'] = 0;
 		}
 		
 		//remove session-info cookie if no user logged in in this session
@@ -242,6 +256,7 @@ function bo_user_init($force = false)
 			//delete cookie
 			setcookie(BO_COOKIE_NAME, null, -1, '/');
 			session_destroy();
+			bo_user_log("Cookie removed");
 		}
 		else if (!isset($_SESSION['bo_user'])) //Set user_id
 		{
@@ -252,6 +267,7 @@ function bo_user_init($force = false)
 		{
 			//user is in session, but cookie not set
 			setcookie(BO_COOKIE_NAME, $_SESSION['bo_user'], 0,'/');
+			bo_user_log("Cookie added (session only)");
 		}
 	}
 	
@@ -286,7 +302,7 @@ function bo_user_cookie_login()
 		return false;
 		
 	$checked = true;
-	
+
 	if (isset($_COOKIE[BO_COOKIE_NAME]) && !bo_user_get_id())
 	{
 		//Check for stored login in cookie
@@ -299,19 +315,29 @@ function bo_user_cookie_login()
 
 			if ($cookie_uid == $data['uid'] && trim($data['uid']))
 			{
+				bo_user_log("Cookie login $cookie_uid");
 				bo_user_do_login_byid($cookie_user_id, $data['pass']);
 				return true;
 			}
-
+			
+			bo_user_log("Cookie not valid $cookie_uid");
 		}
 		else
 		{
 			//delete cookie
 			setcookie(BO_COOKIE_NAME, null, -1, '/');
+			bo_user_log("Cookie deleted $cookie_uid");
 		}
 	}
 	
 	return false;
+}
+
+function bo_user_log($message)
+{
+	$cache_dir = BO_DIR.'/'.BO_CACHE_DIR;
+	$file = $cache_dir.'/user.log';
+	file_put_contents($file, gmdate("Y-m-d H:i:s")." | ".$message."\n", FILE_APPEND);
 }
 
 

@@ -66,6 +66,18 @@ function bo_insert_url($exclude = array(), $add = null, $absolute = false)
 }
 
 
+function bo_try_redirect($exclude = array(), $add = null)
+{
+	//Redirect, so that URL matches to content (for caching!)
+	if (empty($_POST) && !headers_sent())
+	{
+		$url = bo_insert_url($exclude, null, true);
+		header("Location: http://".$_SERVER['HTTP_HOST'].$url.$add);
+		exit;
+	}
+}
+
+
 
 function bo_gpc_prepare($text)
 {
@@ -518,6 +530,15 @@ function bo_bofile_url()
 		return BO_FILE_NOCOOKIE;
 	else
 		return BO_FILE;
+}
+
+function bo_tile_url()
+{
+	if (defined('BO_TILE_URL_USER') && BO_TILE_URL_USER && bo_user_get_id())
+		return BO_TILE_URL_USER;
+	else
+		return bo_bofile_url();
+	
 }
 
 function bo_participants_locating_min()
@@ -995,6 +1016,13 @@ function bo_readfile_mime($file)
 	$mime = extension2mime($extension);
 	bo_cache_log("Read - $mime");
 	header("Content-Type: $mime");
+	
+	if (filesize($file) == 1 && file_get_contents($file) == "C")
+	{
+		readfile(BO_DIR.'images/blank_tile.png');
+		return;
+	}
+	
 	readfile($file);
 	flush();
 }

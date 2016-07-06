@@ -163,7 +163,7 @@
 @define('BO_LOCALE2', '');
 
 //available locales
-@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv,pl,cz,dk');
+@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv,pl,cz,dk,uk');
 
 //show links in the footer
 @define('BO_SHOW_LANGUAGES', true);
@@ -303,6 +303,9 @@
 
 //cache dir
 @define('BO_CACHE_DIR', 'cache');
+
+//enable data caching
+@define('BO_CACHE_DATA', true);
 
 //purges tiles when older that specified value (hours)
 @define('BO_CACHE_PURGE_TILES_HOURS', 24);
@@ -570,8 +573,8 @@
 @define('BO_MAP_MAX_STRIKES_PER_TILE', 50000);
 
 //some other values, sizes etc...
-@define('BO_MAP_STATION_ICON', 'http://labs.google.com/ridefinder/images/mm_20_red.png');
-@define('BO_MAP_STATION_ICON2', 'http://labs.google.com/ridefinder/images/mm_20_green.png');
+@define('BO_MAP_STATION_ICON', '//labs.google.com/ridefinder/images/mm_20_red.png');
+@define('BO_MAP_STATION_ICON2', '//labs.google.com/ridefinder/images/mm_20_green.png');
 @define('BO_MAP_LEGEND_WIDTH', 80);
 @define('BO_MAP_LEGEND_HEIGHT', 10); //only colorbar
 @define('BO_MAP_LEGEND_FONTSIZE', 2); //no TTF!
@@ -589,7 +592,7 @@
 @define('BO_MAP_MYBO_CIRCLE_OPAC_LINE', '0.8');
 @define('BO_MAP_MYBO_CIRCLE_COLOR_FILL', '#0000FF');
 @define('BO_MAP_MYBO_CIRCLE_OPAC_FILL', '0.05');
-@define('BO_MAP_MYBO_ICON', 'http://labs.google.com/ridefinder/images/mm_20_blue.png');
+@define('BO_MAP_MYBO_ICON', '//labs.google.com/ridefinder/images/mm_20_blue.png');
 
 //Version of Google Maps API
 @define('BO_GMAP_API_VERSION', '3.15');
@@ -785,6 +788,34 @@
 /*   You should enable them if you want to make an archive         */
 /*     -> faster search and drawing, but more disk-usage           */
 
+//use partitioning
+@define('BO_DB_PARTITIONING', false);
+
+//use partitioning
+@define('BO_DB_PARTITIONING_USE', false);
+
+//create partitions for given months in advance
+@define('BO_DB_PARTITION_MONTHS_INADVANCE', 8);
+
+//number of subpartitions
+@define('BO_DB_PARTITION_SUBPARTITIONS', 20);
+
+//maximum number of partitions (only for creation!)
+@define('BO_DB_PARTITION_MAX', 512);
+
+//minimum rows of a range partition
+//if two consecutive existing and old partitions have less rows, then they will be merged
+@define('BO_DB_PARTITION_MIN_ROWS', 3000000);
+
+//create a partition for each day group
+@define('BO_DB_PARTITION_GROUP_DAYS', 0);
+
+//divisor for longitude (stored as hash)
+@define('BO_DB_PARTITION_LON_DIVISOR', 5);
+
+//divisor for longitude (stored as hash)
+@define('BO_DB_PARTITION_LAT_DIVISOR', 45);
+
 //completely enable/disable
 @define('BO_DB_EXTRA_KEYS', false);
 
@@ -969,6 +1000,8 @@
 @define('BO_GRAPH_RAW_COLOR_YGRID', '#eee');
 @define('BO_GRAPH_RAW_COLOR_XAXIS', '#666');
 @define('BO_GRAPH_RAW_COLOR_YAXIS', '#666');
+@define('BO_GRAPH_RAW_COLOR_CAPTION', '#666');
+
 
 @define('BO_GRAPH_RAW_COLOR_LINES_BIG', '#fff@0.7');
 @define('BO_GRAPH_RAW_COLOR_BOX_BIG', '#333');
@@ -979,7 +1012,7 @@
 @define('BO_GRAPH_RAW_COLOR_YGRID_BIG', '#666');
 @define('BO_GRAPH_RAW_COLOR_XAXIS_BIG', '#ccc');
 @define('BO_GRAPH_RAW_COLOR_YAXIS_BIG', '#ccc');
-
+@define('BO_GRAPH_RAW_COLOR_CAPTION_BIG', '#ccc');
 
 /************************/
 /*** Statistics Graph ***/
@@ -1288,10 +1321,6 @@
 // you wouldn't be able to use partial downloads with setting "true"!
 @define('BO_USE_PHPURLWRAPPER', false);
 
-// use experimental mysql key for faster strike search
-// by time *and* latlon
-@define('BO_DB_USE_LATLON_TIME_INDEX', false);
-
 //enable longtime statistics for all stations
 //causes a LOT OF more load during importing
 @define('BO_ENABLE_LONGTIME_ALL', false);
@@ -1323,6 +1352,12 @@
 //a update is needed! 
 @define('BO_DB_COMPRESSION', false);
 
+//load image from cache (if exists) on very high loads, independently of age
+define('BO_LOADAVG_USE_CACHE', 120);
+
+//send not-modified for tiles or station tiles on high loads
+define('BO_LOADAVG_TILES', 120);
+define('BO_LOADAVG_TILES_STATIONS', 70);
 
 
 /*******************************************************************/
@@ -1353,6 +1388,9 @@
 
 //subtract minutes from tile time
 @define("BO_TILE_UPDATE_SUB", 3);
+
+//max. age of last strike update until strikes will be shown as "old"
+@define('BO_TILE_MAX_AGE_STRIKES_MINUTES', 10);
 
 //Min and max count of participants - values are only used if
 //automatic getting from participants.txt failed

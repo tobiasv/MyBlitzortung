@@ -245,6 +245,10 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			$user_stations[$row['id']] = array('city' => $row['city'], 'bo_id' => $row['bo_station_id'], 'comment' => $row['comment']);
 	}
 	
+	$pmin = bo_participants_locating_min();
+	$pmax = bo_participants_locating_max();
+	$pmax = floor(($pmax - $pmin) * 0.5 + $pmin);
+	
 	//Own strokes
 	if ($own_station)
 	{
@@ -252,7 +256,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 		$sql = "SELECT COUNT(*) cnt FROM ".BO_DB_PREF."strikes
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $stations_time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $stations_time)."'
-						AND part>0 AND stations='".bo_participants_locating_min()."'";
+						AND part>0 AND stations BETWEEN '".$pmin."' AND '".$pmax."'";
 		$row = BoDb::query($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
 	}
@@ -264,7 +268,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 				JOIN ".BO_DB_PREF."stations_strikes ss
 				ON s.id=ss.strike_id AND ss.station_id='$station_id'
 				WHERE time BETWEEN '".gmdate('Y-m-d H:i:s', $stations_time - 3600)."' AND '".gmdate('Y-m-d H:i:s', $stations_time)."'
-						AND stations='".bo_participants_locating_min()."'";
+						AND stations BETWEEN '".$pmin."' AND '".$pmax."'";
 		$row = BoDb::query($sql)->fetch_assoc();
 		$strikes_part_min_own = $row['cnt'];
 	}
@@ -287,9 +291,6 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 		$strikesh_own = $row['strikesh'];
 		$signalsh_own = $row['signalsh'];
 	}
-
-
-
 
 	$tmp = @unserialize(BoData::get('last_strikes_stations'));
 	$last_strike = $tmp[$station_id][0];
@@ -547,7 +548,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 		echo '</span></li>';
 
-		echo '<li><span class="bo_descr">'._BL('Strikes station min participants').': </span>';
+		echo '<li><span class="bo_descr">'._BL('Strikes station min participants').' ('.$pmin.'-'.$pmax.' '._BL('stations').'): </span>';
 		echo '<span class="bo_value">';
 		echo _BN($strikes_part_min_own, 0);
 

@@ -1159,6 +1159,8 @@ $_BL['de']['lang_hu'] = 'Ungarisch';
 $_BL['de']['lang_it'] = 'Italienisch';
 $_BL['de']['lang_nl'] = 'Niederländisch';
 $_BL['de']['lang_dk'] = 'Dänisch';
+$_BL['de']['lang_uk'] = 'Ukrainisch';
+
 
 $_BL['de']['Search...'] = 'Suche...';
 $_BL['de']['Archives'] = 'Archiv';
@@ -1195,7 +1197,7 @@ $_BL['de']['lm_live_set_map_style_roads'] = 'Straßen';
 
 $_BL['de']['lm_live_set_thunder'] = 'Donner';
 $_BL['de']['lm_live_set_thunder_max'] = 'max';
-$_BL['de']['lm_live_set_thunder_off'] = 'off';
+$_BL['de']['lm_live_set_thunder_off'] = 'aus';
 $_BL['de']['lm_live_set_thunder_info'] = 'Zeigt die Donnerfront in Echtzeit (nur auf höheren Zoom-Ebenen).';
 
 $_BL['de']['lm_live_set_clouds'] = 'Wolken';
@@ -1203,18 +1205,48 @@ $_BL['de']['lm_live_set_clouds_on'] = 'an';
 $_BL['de']['lm_live_set_clouds_off'] = 'aus';
 $_BL['de']['lm_live_set_clouds_info'] = 'Wolken und Regen von openweathermap.org (experimentell!).';
 
-$_BL['de']['lm_live_set_radar'] = 'Radar (USA)';
+$_BL['de']['lm_live_set_daynight'] = 'Tag/Nacht';
+$_BL['de']['lm_live_set_daynight_on'] = 'an';
+$_BL['de']['lm_live_set_daynight_off'] = 'aus';
+$_BL['de']['lm_live_set_daynight_info'] = 'Zeigt Tag/Nacht Grenze';
+
+$_BL['de']['lm_live_set_darkness'] = 'Helligkeit';
+$_BL['de']['lm_live_set_darkness_info'] = 'Dunklere Karte gibt mehr Kontrast';
+
+$_BL['de']['lm_live_set_radar'] = 'Radar';
 $_BL['de']['lm_live_set_radar_on'] = 'an';
 $_BL['de']['lm_live_set_radar_off'] = 'aus';
-$_BL['de']['lm_live_set_radar_info'] = ' ';
+$_BL['de']['lm_live_set_radar_info'] = 'Aktuell nur für USA ';
 
 $_BL['de']['lm_live_set_strokes_show'] = 'Zeige Blitze';
 $_BL['de']['lm_live_set_strokes_show_all'] = 'letzte Stunde';
 $_BL['de']['lm_live_set_strokes_show_last'] = 'letzte Minuten';
 $_BL['de']['lm_live_set_strokes_show_info'] = 'Nur "aktuelle" Blitze anzeigen oder auch die der letzten 60 Minuten.';
 
-$_BL['de']['lm_live_stations_off'] = 'Stationen: aus';
-$_BL['de']['lm_live_stations_on'] = 'Stationen: ein';
+$_BL['de']['lm_live_stations_level'] = 'Stationen';
+$_BL['de']['lm_live_stations_level_off'] = 'Ohne';
+$_BL['de']['lm_live_stations_level_max'] = 'Alles';
+//$_BL['de']['lm_live_stations_level_info'] = 'Shows stations on the map. Higher levels also show currently participarting stations (purple), offline ones and station names.';
+
+$_BL['de']['lm_live_stations_lines'] = 'Linien';
+$_BL['de']['lm_live_stations_lines_off'] = 'Ohne';
+$_BL['de']['lm_live_stations_lines_max'] = 'Alles';
+//$_BL['de']['lm_live_stations_lines_info'] = 'Displays lines for each lightning stroke connected with participating stations. The color of the lines depends on the distance (close: green, medium: blue, far: red). Note that the angle spanned station is also important. Distances up to a few 100km and stations on every side of the t-storm give best results. ';
+
+$_BL['de']['lm_live_stations_coverage'] = 'Abdeckung';
+$_BL['de']['lm_live_stations_coverage_off'] = 'Aus';
+$_BL['de']['lm_live_stations_coverage_on'] = 'An';
+$_BL['de']['lm_live_stations_coverage_info'] = 'A rought overview of our covered area. The more cirlces around stations overlap the higher the opacity of the colors. Blue is best, green still very good and red means low accuracy.';
+
+$_BL['de']['lm_live_snd_sounds'] = 'Sound';
+$_BL['de']['lm_live_snd_on'] = 'an';
+$_BL['de']['lm_live_snd_off'] = 'aus';
+
+$_BL['de']['lm_live_snd_volume'] = 'Lautstärke';
+$_BL['de']['lm_live_snd_min'] = 'min';
+$_BL['de']['lm_live_snd_max'] = 'max';
+
+$_BL['de']['lm_live_pos_info'] = 'Zeigt Ihre Position auf der Karte. Die Positionsdaten werden nicht zu uns gesendet, sie werden nur zum Anzeigen des Punktes auf der Karte benötigt.';
 
 $_BL['de']['lm_live_info'] = 'Diese Karte zeigt die Blitze der letzten 60 Minuten in Echtzeit an. Die Daten kommen direkt vom Projekt Blitzortung.org, bei dem hunderte von Stationen die Blitze detektieren. Die Verzögerung wird direkt aus den Zeitstempeln der Blitze berechnet.';
 $_BL['de']['lm_live_info_legend_title'] = 'Legende';
@@ -1226,7 +1258,6 @@ $_BL['de']['lm_live_snd_info'] = 'Lässt ein kurzen Ton für jeden neuen Blitz e
 $_BL['de']['lm_live_stations_info'] = 'Zeigt die Stationen an, die den jeweiligen Blitz detektiert haben. Die Farbe der Verbindungslinie hängt von der Entfernung zwischen Station und Blitz ab: Je weiter entfernt, desto bläulicher (statt grün) wird die Linie dargestellt. Entfernungen von maximal einigen hundert kilometern und Stationen runder um den Einschlagsort ergeben die besten Resultate. BITTE BEACHTEN: Diese Funktion kann die Systemleistung negativ beeinflussen! Der Browser "Chrome" wird hierzu empfohlen.';
 $_BL['de']['lm_live_blitzortung_more'] = 'Weitere Echtzeit-Blitzkarten auf Blitzortung.org';
 $_BL['de']['lm_live_usage'] = 'WICHTIG: Diese Karte dient rein zur Unterhaltung!';
-$_BL['de']['lm_live_snd_volume'] = 'Lautstärke';
 
 
 

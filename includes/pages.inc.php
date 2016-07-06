@@ -40,15 +40,22 @@ function bo_show_archive()
 	if (!$show)
 		return;
 	
+	$map_add = '';
+	if (isset($_GET['bo_map']))
+		$map_add .= '&bo_map='.urlencode($_GET['bo_map']);
+	if (isset($_GET['bo_year']))
+		$map_add .= '&bo_year='.urlencode($_GET['bo_year']);
+	
+	
 	echo '<div id="bo_archives">';
 	
 	echo '<ul id="bo_menu">';
 
 	if ($enabled['maps'])
-		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'maps').'" class="bo_navi'.($show == 'maps' ? '_active' : '').'">'._BL('arch_navi_maps').'</a></li>';
+		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'maps').$map_add.'" class="bo_navi'.($show == 'maps' ? '_active' : '').'">'._BL('arch_navi_maps').'</a></li>';
 
 	if ($enabled['density'])
-		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'density').'" class="bo_navi'.($show == 'density' ? '_active' : '').'">'._BL('arch_navi_density').'</a></li>';
+		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'density').$map_add.'" class="bo_navi'.($show == 'density' ? '_active' : '').'">'._BL('arch_navi_density').'</a></li>';
 	
 	if ($enabled['search'])
 		echo '<li><a href="'.bo_insert_url(array('bo_show', 'bo_*'), 'search').'" class="bo_navi'.($show == 'search' ? '_active' : '').'">'._BL('arch_navi_search').'</a></li>';

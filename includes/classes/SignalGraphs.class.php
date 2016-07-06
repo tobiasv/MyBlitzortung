@@ -9,6 +9,7 @@ class BoSignalGraph
 	var $height = 0;
 	var $big = false;
 	var $time = 0;
+	var $textmargin = 45;
 	
 	function __construct($w, $h, $big=false)
 	{
@@ -92,7 +93,7 @@ class BoSignalGraph
 			$use_max = 2; //use third highest maximum for max y-scale
 		}
 		
-		$this->graph->SetMargin(24,1,1,1);
+		
 	
 		if ($type == 'spectrum')
 		{
@@ -160,6 +161,7 @@ class BoSignalGraph
 				$max_ch[$ch] = $tmp[$use_max];
 			}
 			
+			$this->graph->SetMargin(24,1,1,1);
 			$this->graph->SetScale("textlin", 0, max($max_ch), 0, BO_GRAPH_RAW_SPEC_MAX_X * $data['max_values'] * $ntime * 1e-6);
 
 			if (isset($data['channel'][0]['spec']))
@@ -257,6 +259,7 @@ class BoSignalGraph
 		}
 		elseif ($type == 'xy')
 		{
+			$this->textmargin = 15;
 			$c = $data['channel'];
 
 			if ($this->fullscale)
@@ -277,7 +280,8 @@ class BoSignalGraph
 			}
 
 			$this->graph->SetScale("linlin",$ymin,$ymax,$xmin,$xmax);
-
+			$this->graph->SetMargin(1,1,1,1);
+			
 			if (isset($c[0]) && isset($c[1]))
 			{
 				$plot=new LinePlot($c[0]['data_volt'], $c[1]['data_volt']);
@@ -292,6 +296,7 @@ class BoSignalGraph
 				$this->graph->Add($plot);
 			}
 
+			
 			$this->graph->xaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_XAXIS_BIG : BO_GRAPH_RAW_COLOR_XAXIS);
 			$this->graph->yaxis->SetColor($this->big ? BO_GRAPH_RAW_COLOR_YAXIS_BIG : BO_GRAPH_RAW_COLOR_YAXIS);
 			$this->graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,6);
@@ -305,7 +310,7 @@ class BoSignalGraph
 			$this->graph->yaxis->HideLabels();
 			$this->graph->xgrid->Show(true,false);
 			$this->graph->ygrid->Show(true,false);
-			$this->graph->SetMargin(1,1,1,1);
+			
 		}
 		else
 		{
@@ -442,7 +447,7 @@ class BoSignalGraph
 			$this->graph->xaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			$this->graph->yaxis->SetFont(FF_DV_SANSSERIF,FS_NORMAL,7);
 			
-			$this->graph->SetMargin(34,4,4,3);
+			$this->graph->SetMargin(39,4,4,3);
 
 			$sig = null;
 			$y = $this->height-73;
@@ -468,7 +473,7 @@ class BoSignalGraph
 				
 				$caption = new Text("PCB ".$sig['pcb']."\n ".$sig['values']." Values\n $ksps kSps", $this->width - 60, 5);
 				$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
-				$caption->SetColor($this->big ? BO_GRAPH_STAT_COLOR_CAPTION_BIG : BO_GRAPH_STAT_COLOR_CAPTION);
+				$caption->SetColor($this->big ? BO_GRAPH_RAW_COLOR_CAPTION_BIG : BO_GRAPH_RAW_COLOR_CAPTION);
 				$this->graph->AddText($caption);
 			}
 		}
@@ -478,9 +483,9 @@ class BoSignalGraph
 	
 	public function AddText($text)
 	{
-		$caption = new Text($text,35,5);
+		$caption = new Text($text,$this->textmargin,5);
 		$caption->SetFont(FF_DV_SANSSERIF,FS_NORMAL, 6);
-		$caption->SetColor($this->big ? BO_GRAPH_STAT_COLOR_CAPTION_BIG : BO_GRAPH_STAT_COLOR_CAPTION);
+		$caption->SetColor($this->big ? BO_GRAPH_RAW_COLOR_CAPTION_BIG : BO_GRAPH_RAW_COLOR_CAPTION);
 		$this->graph->AddText($caption);
 	}
 	
@@ -512,7 +517,7 @@ class BoSignalGraph
 		imagefill($I, 0, 0, $color);
 		imagecolortransparent($I, $color);
 		
-		bo_imagestring_max($I, 8, 5, 5, $text, BO_GRAPH_STAT_COLOR_CAPTION, BO_GRAPH_RAW_W);
+		bo_imagestring_max($I, 8, 5, 5, $text, BO_GRAPH_RAW_COLOR_CAPTION, BO_GRAPH_RAW_W);
 		
 		
 		Header("Content-type: image/png");

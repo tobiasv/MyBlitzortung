@@ -34,7 +34,8 @@ function bo_latlon2dist_rhumb($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
 }
 
 // latitude, longitude to bearing
-function bo_latlon2bearing($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
+//final bearing
+function bo_latlon2bearing_final($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
 {
 	if ($lat1 == $lat2 && $lon1 == $lon2)
 		return false;
@@ -50,6 +51,18 @@ function bo_latlon2bearing($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
 	return $bear;
 }
 
+//initial bearing relative to station
+//that's what we need in most cases
+function bo_latlon2bearing_initial($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
+{
+	return (bo_latlon2bearing_final($lat2, $lon2, $lat1, $lon1) + 180) % 360;
+}
+
+//standard: map to initial bearing
+function bo_latlon2bearing($lat1, $lon1, $lat2 = BO_LAT, $lon2 = BO_LON)
+{
+	return bo_latlon2bearing_initial($lat1, $lon1, $lat2, $lon2);
+}
 
 // latitude, longitude to bearing (Rhumb Line!)
 function bo_latlon2bearing_rhumb($lat2, $lon2, $lat1 = BO_LAT, $lon1 = BO_LON)

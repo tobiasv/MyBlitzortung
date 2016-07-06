@@ -10,10 +10,6 @@ function bo_tile()
 	/***********************************************************/
 	/*** Variables  ********************************************/
 	/***********************************************************/
-
-	
-
-	
 	$x            = intval($_GET['x']);
 	$y            = intval($_GET['y']);
 	$zoom         = intval(isset($_GET['zoom']) ? $_GET['zoom'] : $_GET['z']);
@@ -28,9 +24,7 @@ function bo_tile()
 	list($min_zoom, $max_zoom) = bo_get_zoom_limits();
 	$restricted   = false;
 	$user_nolimit = (bo_user_get_level() & BO_PERM_NOLIMIT);
-	
-	//if ($zoom > 8 && ($type == 4 || $type == 5) )
-	//	bo_tile_output();
+	$loadavg      = sys_getloadavg()[1];
 	
 	if ($tile_size)
 	{
@@ -48,7 +42,6 @@ function bo_tile()
 		$station_id = false;
 	
 	bo_cache_log("Tile START");
-	
 	
 	/***********************************************************/
 	/*** Restriction *******************************************/
@@ -68,7 +61,7 @@ function bo_tile()
 		
 		$restricted = true;
 	}
-
+	
 	if ($zoom >= BO_MAX_ZOOM_LIMIT && $user_nolimit)
 	{
 		//for correct naming of cache file, we have to set this here
@@ -168,6 +161,9 @@ function bo_tile()
 	//estimate last update
 	$last_update_time = bo_get_latest_strike_calc_time($update_interval * 60, 'tiles');
 
+	if (time() - $last_update_time > 60 * BO_TILE_MAX_AGE_STRIKES_MINUTES)
+		$last_update_time = time() - 60 * BO_TILE_MAX_AGE_STRIKES_MINUTES;
+	
 	bo_tile_headers($update_interval, $last_update_time, $caching);
 
 	
@@ -185,7 +181,20 @@ function bo_tile()
 		bo_output_cachefile_if_exists($file, $last_update_time, $update_interval * 60);
 	}
 	
-
+	//return nothing if loadavg too high
+	if (defined("BO_LOADAVG_TILES") && BO_LOADAVG_TILES > 0 && BO_LOADAVG_TILES < $loadavg)
+	{
+		header("HTTP/1.1 304 Not Modified"); 
+		bo_tile_headers(5); //5 minutes
+		
+		exit;
+	}
+	else if ($station_id && defined("BO_LOADAVG_TILES_STATIONS") && BO_LOADAVG_TILES_STATIONS && BO_LOADAVG_TILES_STATIONS < $loadavg)
+	{
+		header("HTTP/1.1 304 Not Modified"); 
+		bo_tile_headers(5); //5 minutes
+		exit;
+	}
 	
 	
 	/***********************************************************/
@@ -228,7 +237,10 @@ function bo_tile()
 	{
 		$last_update_time = bo_get_latest_strike_calc_time(1, 'tiles');
 	}
-		
+
+	if (time() - $last_update_time > 60 * BO_TILE_MAX_AGE_STRIKES_MINUTES)
+		$last_update_time = time() - 60 * BO_TILE_MAX_AGE_STRIKES_MINUTES;
+	
 	if ($show_count) 
 	{
 		// display strike count
@@ -268,11 +280,11 @@ function bo_tile()
 	{
 		//normal strike display
 		$c = $cfg['col'];
-		$time_min   = ceil(($last_update_time - 60*$cfg['tstart']) / $update_interval / 60) * $update_interval * 60;
-		$time_max   = $time_min + 60 * $cfg['trange'];
+		$time_min   = floor(($last_update_time - 60*$cfg['tstart']) / $update_interval / 60) * $update_interval * 60;
+		$time_max   = $time_min + 60 * $cfg['trange'] + 60;
 	}
 	
-	if (!$time_min || !$time_max)
+	if (!$time_min || !$time_max || $time_min == $time_max)
 		bo_tile_output($file, $caching);
 
 		
@@ -332,8 +344,12 @@ function bo_tile()
 			
 			$sql_where .= " OR s.time BETWEEN '$date_min' AND '$date_max' ";
 		}
+		
+		$times_min_m = min($times_min);
+		$times_max_m = max($times_max);
+		
 		$sql_where .= ') ';
-		$sql_where .= ' AND '.bo_strikes_sqlkey($index_sql, min($times_min), max($times_max), $lat1, $lat2, $lon1, $lon2, $max);
+		$sql_where .= ' AND '.bo_strikes_sqlkey($index_sql, $times_min_m, $times_max_m, $lat1, $lat2, $lon1, $lon2, $max);
 		$sql_where .= $sql_where_radius;
 		
 		if (is_array($max) && $max['divisor'])
@@ -407,12 +423,10 @@ function bo_tile()
 		}
 		
 		//all strike count and participated count
-	 	$sql = "SELECT COUNT(s.time) cnt, $sql_participated participated, $sql_sub_tiles tile_no
-				FROM ".BO_DB_PREF."strikes s $index_sql $sql_join1
-				WHERE $sql_where 
-				GROUP BY tile_no, participated
-				";
-				
+	 	$sql = "SELECT COUNT(s.time) cnt, $sql_participated participated, $sql_sub_tiles tile_no ".
+				"FROM ".BO_DB_PREF."strikes s $index_sql $sql_join1 ".
+				"WHERE $sql_where ".
+				"GROUP BY tile_no, participated";
 				
 		$erg = BoDb::query($sql);
 		while ($row = $erg->fetch_assoc())
@@ -533,8 +547,8 @@ function bo_tile()
 	$zoom_show_deviation = defined('BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM') ? intval(BO_MAP_STRIKE_SHOW_DEVIATION_ZOOM) : 12;
 	
 	//add some space around
-	if ($zoom >= $zoom_show_deviation)
-		$space = 2;
+	if ($zoom >= $zoom_show_deviation || $zoom >= BO_MAP_STRIKE_SHOW_TEXT)
+		$space = 3;
 	else
 		$space = 0.05;
 
@@ -569,7 +583,11 @@ function bo_tile()
 	if ($zoom >= BO_MAP_STRIKE_SHOW_TEXT)
 	{
 		require_once 'functions_image.inc.php';
-		bo_load_locale();
+
+		if (BO_FORCE_MAP_LANG === true || BO_FORCE_MAP_LANG == 'tiles')
+			bo_load_locale(BO_LOCALE);
+		else 
+			bo_load_locale();
 	
 		$sql_select = " s.time mtime, s.lat lat, s.lon lon, 
 						s.time_ns mtime_ns, s.stations stations, s.stations_calc stations_calc ";
@@ -584,21 +602,21 @@ function bo_tile()
 	//Calculate tile coordinates in SQL and group them 
 	else
 	{
-		$sql_select = " MAX(s.time) mtime, 
-						".bo_sql_lat2tiley('s.lat', $zoom)." y, 
-						".bo_sql_lon2tilex('s.lon', $zoom)." x  ";
+		$sql_select = " MAX(s.time) mtime, ".
+						bo_sql_lat2tiley('s.lat', $zoom)." y,". 
+						bo_sql_lon2tilex('s.lon', $zoom)." x ";
 		$grouping   = true;
 	}
 	
 	//get the data!
 	$points = array();
 	$deviation = array();
-	$sql = "SELECT s.id id, s.deviation deviation, s.type type,
-				$sql_select	
-			FROM ".BO_DB_PREF."strikes s $index_sql $sql_join
-			WHERE $sql_where
-			".($grouping ? " GROUP BY x, y" : "")."
-			ORDER BY mtime ASC";
+	$sql = "SELECT s.id id, s.deviation deviation, s.type type, ".
+			$sql_select.
+			" FROM ".BO_DB_PREF."strikes s $index_sql $sql_join ".
+			" WHERE $sql_where ".
+			($grouping ? " GROUP BY x, y" : "").
+			" ORDER BY mtime ASC";
 	bo_cache_log("Tile SQL: ".strtr($sql, array("\n" => "")));
 	$erg = BoDb::query($sql);
 	$num = $erg->num_rows;
@@ -1015,15 +1033,14 @@ function bo_tile_output($file='', $caching=false, &$I=null, $tile_size = BO_TILE
 
 	if ($I === null)
 	{
-		$img = file_get_contents(BO_DIR.'images/blank_tile.png');
-		
 		if ($caching && $file)
 		{
-			file_put_contents($file, $img);
+			file_put_contents($file, "C");
 			bo_output_cache_file($file, $time_max + $update_interval * 60);
 		}
 		else
 		{
+			$img = file_get_contents(BO_DIR.'images/blank_tile.png');
 			header("Content-Type: image/png");
 			echo $img;
 		}
@@ -1086,8 +1103,9 @@ function bo_tile_message($text, $type, $caching=false, $replace = array(), $tile
 
 	}
 
-	header("Content-Type: image/png");
-	readfile($file);
+	//header("Content-Type: image/png");
+	//readfile($file);
+	bo_readfile_mime($file);
 
 	exit;
 }
@@ -1192,8 +1210,11 @@ function bo_tile_time_colors($type, $time_min, $time_max, $show_date, $update_in
 }
 
 
-function bo_tile_headers($update_interval, $last_update_time, $caching)
+function bo_tile_headers($update_interval, $last_update_time = null, $caching = true)
 {
+	if ($last_update_time === null)
+		$last_update_time = time();
+	
 	if (headers_sent())
 		return;
 		

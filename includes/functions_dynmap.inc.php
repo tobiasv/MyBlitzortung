@@ -359,7 +359,7 @@ function bo_insert_map($show_station=3, $lat=BO_LAT, $lon=BO_LON, $zoom=BO_DEFAU
 
 	</script>
 
-    <script type="text/javascript" id="bo_script_google" src="http://maps.googleapis.com/maps/api/js?callback=bo_gmap_init&libraries=places,weather&v=<?php echo BO_GMAP_API_VERSION.'&'.BO_GMAP_PARAM ?>">
+    <script type="text/javascript" id="bo_script_google" src="//maps.googleapis.com/maps/api/js?callback=bo_gmap_init&libraries=places,weather&v=<?php echo BO_GMAP_API_VERSION.'&'.BO_GMAP_PARAM ?>">
     </script>
 
 

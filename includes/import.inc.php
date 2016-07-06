@@ -159,8 +159,9 @@ function bo_update_all($force = false, $only = '')
 	if (bo_exit_on_timeout()) return;
 	$D = @unserialize(BoData::get('db_table_status'));
 	$tables = array('conf', 'raw', 'stations', 'stations_stat', 'stations_strikes', 'strikes', 'station', 'densities', 'cities');
+	$load = sys_getloadavg();
 	
-	if (time() - $D['last'] > 3600)
+	if (time() - $D['last'] > 3600 * 2 && $load[1] < 10)
 	{
 		$res = BoDb::query("SHOW TABLE STATUS WHERE Name LIKE '".BO_DB_PREF."%'");
 		while($row = $res->fetch_assoc())
@@ -200,7 +201,7 @@ function bo_update_shutdown()
 	else if ($bo_update_step == 2)
 		BoData::set('is_updating_step2', 0);
 	
-	bo_echod("step=".$bo_update_step);
+	//bo_echod("step=".$bo_update_step);
 }
 
 // Get new strikes from blitzortung.org
@@ -289,7 +290,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 
 		if (BO_UP_STROKE_MIN_TIME && strtotime(BO_UP_STROKE_MIN_TIME) > $strike_last_time)
 		{
-			bo_echod('Last strike to long ago: "'.date('Y-m-d H:i:s', $strike_last_time).'", minimum age is "'.BO_UP_STROKE_MIN_TIME.'"');
+			bo_echod('Last strike too long ago: "'.date('Y-m-d H:i:s', $strike_last_time).'", minimum age is "'.BO_UP_STROKE_MIN_TIME.'"');
 			$strike_last_time = strtotime(BO_UP_STROKE_MIN_TIME);
 		}
 		
@@ -434,6 +435,12 @@ function bo_update_strikes($force = false, $time_start_import = null)
 				$D['lat_merc'] = array(bo_sql_lat2tiley($D['lat'], BO_DB_STRIKES_MERCATOR_SCALE, false));
 				$D['lon_merc'] = array(bo_sql_lon2tilex($D['lon'], BO_DB_STRIKES_MERCATOR_SCALE, false));
 			}
+			
+			if (BO_DB_PARTITIONING === true)
+			{
+				$D['ppos'] = ( floor( ($D['lat']+90) / BO_DB_PARTITION_LAT_DIVISOR) * (360 / BO_DB_PARTITION_LON_DIVISOR) + floor( ($D['lon']+180) / BO_DB_PARTITION_LON_DIVISOR) ) % 256;
+			}
+
 			
 			/********* Statistics **********/
 			foreach($statistic_stations as $stId)
@@ -679,10 +686,6 @@ function bo_update_strikes($force = false, $time_start_import = null)
 
 					if ($row['minusers'] >= 3)
 					{
-						//reset counter if last value differs from new value
-						if ($tmp['last'] != $row['minusers'])
-							$tmp['count'] = 0;
-
 						//only save the value after some same values
 						if ($tmp['count'] >= $see_same)
 						{

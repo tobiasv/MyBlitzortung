@@ -3,6 +3,9 @@
 
 function bo_signal_json2data($data_json)
 {
+	if (!$data_json || empty($data_json->channels))
+		return false;
+
 	$signal['time'] = floor($data_json->time);
 	$signal['time_ns'] = round(($data_json->time - $signal['time']) * 1E9);
 	$signal['lat'] = $data_json->lat;
@@ -162,6 +165,9 @@ function bo_graph_raw()
 		foreach($lines as $line)
 		{
 			$data = json_decode($line);
+			
+			if (!is_object($data))
+				continue;
 			
 			$data->time /= 1E9;
 			$data_time = floor($data->time);

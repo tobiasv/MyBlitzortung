@@ -76,6 +76,24 @@ class BoDb extends BoDbMain
 		
 		$result = self::do_query($query);
 
+		switch ($qtype)
+		{
+			case 'insert':
+				$ret = self::insert_id();
+				break;
+				
+			case 'replace':
+			case 'delete':
+			case 'update':
+				$rows = self::affected_rows();
+				$ret = $rows == -1 ? false : $rows;
+				break;
+				
+			default:
+				$ret = $result;
+				break;
+		}
+		
 		if (DB_LOCK_SAME_QUERIES === true)
 		{
 			//if ($ms > 0)
@@ -85,16 +103,44 @@ class BoDb extends BoDbMain
 				@unlink($lockfile);
 		}
 		
-		if (BO_DB_DEBUG_LOG === true || (BO_DB_DEBUG_LOG == 'err' && $result === false) )
+		$dtime = (microtime(true) - $start) * 1e3;
+		
+		if ( (is_numeric(BO_DB_DEBUG_LOG) && $dtime > BO_DB_DEBUG_LOG) 
+			|| BO_DB_DEBUG_LOG === true || BO_DB_DEBUG_LOG === 'explain' || (BO_DB_DEBUG_LOG !== false && $result === false) )
 		{
-			$dtime = (microtime(true) - $start) * 1e3;
-			file_put_contents($cache_dir.'/db.log', 
-				date("Y-m-d H:i:s | ")
+			$text = date("Y-m-d H:i:s | ")
 				.sprintf("%5dms | %5d | ", $dtime, $qtype != 'insert' ? self::affected_rows() : 0)
-				.strtr($query, array("\n"=>""))
+				.strtr($query, array("\n"=>" ", "\t" => " ", "  " => " ", "   " => " "))
 				.($result === false ? "\n  --> ".self::error() : "")
-				.' | '.$_SERVER['REQUEST_URI']."\n"
-				, FILE_APPEND);
+				.' | '.$_SERVER['REQUEST_URI']."\n";
+			
+			if ((is_numeric(BO_DB_DEBUG_LOG) || BO_DB_DEBUG_LOG === 'explain') && $qtype == 'select')
+			{
+				$r = self::do_query("explain ".$query);
+				$text .= "                                          -> ";
+				foreach($r->fetch_assoc() as $k => $d)
+				{
+					$text .= "$k: ".print_r($d, 1).", ";
+					
+					if ($k == 'table')
+						$table = $d;
+					
+					if ($k == 'key')
+					{
+						$file = $cache_dir.'/.dbkey.'.$table.'.'.$d;
+						$x = @file_get_contents($file);
+						file_put_contents($file, ++$x);
+						
+						if (!$d)
+							file_put_contents($file.'queries', $dtime.'ms | '.strtr($query, array("\n"=>""))."\n", FILE_APPEND);
+					}
+				}
+				$text .= "\n";
+				
+				
+			}
+
+			file_put_contents($cache_dir.'/db.log', $text, FILE_APPEND);
 		}
 		
 		if ($result === false)
@@ -107,23 +153,8 @@ class BoDb extends BoDbMain
 				die();
 		}
 
-		switch ($qtype)
-		{
-			case 'insert':
-				return self::insert_id();
-
-			case 'replace':
-			case 'delete':
-			case 'update':
-				$rows = self::affected_rows();
-				return $rows == -1 ? false : $rows;
-
-			default:
-				return $result;
-		}
-
+		return $ret;
 	}
-	
 
 	public static function bulk_insert($table, $data = array())
 	{
@@ -146,7 +177,7 @@ class BoDb extends BoDbMain
 			self::$bulk_names[$table] = array();
 			foreach($data as $name => $value)
 			{
-				self::$bulk_query[$table] .= self::$bulk_query[$table] ? ', ' : '';
+				self::$bulk_query[$table] .= self::$bulk_query[$table] ? ',' : '';
 				self::$bulk_query[$table] .= $name;
 				self::$bulk_names[$table][] = $name;
 			}
@@ -160,7 +191,7 @@ class BoDb extends BoDbMain
 		self::$bulk_query[$table] .= '(';
 		foreach (self::$bulk_names[$table] as $i => $name)
 		{
-			self::$bulk_query[$table] .= $i ? ', ' : '';
+			self::$bulk_query[$table] .= $i ? ',' : '';
 			self::$bulk_query[$table] .= self::value2sql($data[$name]);
 		}
 		self::$bulk_query[$table] .= ')';
@@ -201,6 +232,10 @@ class BoDb extends BoDbMain
 		else if ($value === null)
 		{
 			return 'NULL';
+		}
+		else if (is_numeric($value))
+		{
+			return $value;
 		}
 		else
 		{

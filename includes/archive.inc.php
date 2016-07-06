@@ -20,12 +20,12 @@ function bo_show_archive_map()
 	$day = intval($_GET['bo_day']);
 	$day_add = intval($_GET['bo_day_add']);
 	$ani = isset($_GET['bo_animation']) && $_GET['bo_animation'] !== '0' ? 1 : 0;
-	$ani_preset = trim($_GET['bo_animation']);
+	$ani_preset = $_GET['bo_animation'] && $_GET['bo_animation'] != 1 ? trim($_GET['bo_animation']) : '';
 	$hour_from = (int)($_GET['bo_hour_from']);
 	$minute_from = fmod($_GET['bo_hour_from'], 1) * 60;
 	$hour_range = (float)($_GET['bo_hour_range']);
 	$map_changed = isset($_GET['bo_oldmap']) && $map != $_GET['bo_oldmap'];
-	$ani_changed = !isset($_GET['bo_oldani']) || $ani != $_GET['bo_oldani']; // || $map_changed;
+	$ani_changed = isset($_GET['bo_oldani']) && $ani != $_GET['bo_oldani'];
 	
 	//Map
 	$select_map = bo_archive_select_map($map);
@@ -94,12 +94,12 @@ function bo_show_archive_map()
 	//Hours & Range
 	if ($ani)
 	{
-		if ($ani_changed)
+		//now is default for maps with changing backgrounds
+		//if (!$ani_preset && isset($cfg['file_time']))
+		//	$ani_preset = 'now';
+		
+		if ($ani_changed || $ani_preset)
 		{
-			//now is default for maps with changing backgrounds
-			if (!$ani_preset && isset($cfg['file_time']))
-				$ani_preset = 'now';
-
 			if ($ani_preset == 'now')
 			{
 				$end 	= floor(time()/$hours_interval/3600) * $hours_interval*3600 - $ani_pic_range * 60;
@@ -120,9 +120,6 @@ function bo_show_archive_map()
 				$year      		= (int)date('Y', $start);
 				$month     		= (int)date('m', $start);
 				$day       		= (int)date('d', $start);
-	
-				
-
 			}
 			elseif ($ani_preset == 'day')
 			{
@@ -176,14 +173,37 @@ function bo_show_archive_map()
 	$month     = date('m', $time);
 	$day       = date('d', $time);
 	$hour_from = date('H', $time) + $minute_from/60;
-
 	
 	//min/max strike-time
 	$row = BoDb::query("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$strikes_available = $row['mintime'] > 0 || $row['maxtime'] > 0;
 	$start_time = strtotime($row['mintime'].' UTC');
 	$end_time = strtotime($row['maxtime'].' UTC');
-
+	$show_range_sel = $ani || (!$ani && !isset($cfg['file_time_search']) && !isset($cfg['overlays']));
+	
+	if (isset($_GET['bo_oldmap']) || isset($_GET['bo_oldani']) 
+		|| isset($_GET['bo_next']) || isset($_GET['bo_prev'])
+		|| isset($_GET['bo_next_hour']) || isset($_GET['bo_prev_hour'])
+		|| isset($_GET['bo_day_add'])
+		|| (isset($_GET['bo_animation']) && !$ani) 
+		|| (!$show_range_sel && isset($_GET['bo_hour_range'])) )
+	{
+		$url = '';
+		
+		$url .= '&bo_year='.$year;
+		$url .= '&bo_month='.$month;
+		$url .= '&bo_day='.$day;
+		$url .= '&bo_hour_from='.$hour_from;
+		
+		if ($show_range_sel)
+			$url .= '&bo_hour_range='.$hour_range;
+		
+		if ($ani) 
+			$url .= '&bo_animation=1';
+		
+		bo_try_redirect(array('bo_year', 'bo_month', 'bo_day', 'bo_day_add', 'bo_oldmap', 'bo_oldani', 'bo_animation', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_hour_range'), $url);
+	}
+	
 	//Output
 	echo '<div id="bo_arch_maps">';
 	
@@ -226,8 +246,6 @@ function bo_show_archive_map()
 		echo '<div class="bo_input_container">';
 		
 		echo '<span class="bo_form_descr">'._BL('Time range').':</span> ';
-		
-		$show_range_sel = $ani || (!$ani && !isset($cfg['file_time_search']) && !isset($cfg['overlays']));
 		
 		echo '<select name="bo_hour_from" id="bo_arch_strikes_select_hour_from"';
 		echo !$show_range_sel ? ' onchange="submit()"' : '';
@@ -587,7 +605,7 @@ function bo_show_archive_search()
 				FROM ".BO_DB_PREF."strikes s $index_sql
 				WHERE 1
 					$sql_where
-				ORDER BY s.id DESC
+				ORDER BY s.time DESC
 				LIMIT ".intval($select_count + 1);
 
 		$res = BoDb::query($sql);
@@ -757,7 +775,7 @@ function bo_show_archive_search()
 				position: myLatlng,
 				draggable: true,
 				map: bo_map,
-				icon: 'http://maps.google.com/mapfiles/ms/micons/blue-dot.png'
+				icon: '//maps.google.com/mapfiles/ms/micons/blue-dot.png'
 			});
 
 			google.maps.event.addListener(centerMarker, 'dragend', function() {
@@ -1259,15 +1277,14 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 		
 		if ($own_station)
 		{
-			$bearing  = bo_latlon2bearing($row['lat'], $row['lon']);
+			$bearing  = bo_latlon2bearing_initial($row['lat'], $row['lon']);
 			$distance = $row['distance'];
 		}
 		elseif ($station_id && !$own_station)
 		{
-			$bearing  = bo_latlon2bearing($row['lat'], $row['lon'], $station_info['lat'], $station_info['lon']);
+			$bearing  = bo_latlon2bearing_initial($row['lat'], $row['lon'], $station_info['lat'], $station_info['lon']);
 			$distance = bo_latlon2dist($row['lat'], $row['lon'], $station_info['lat'], $station_info['lon']);
 		}
-		
 		
 		if ($row['raw_id'])
 		{
@@ -1324,7 +1341,9 @@ function bo_show_archive_table($show_strike_list = false, $lat = null, $lon = nu
 				foreach ($participated_stations as $sid => $dummy)
 				{
 					$s_dists[0][$sid] = bo_latlon2dist($row['lat'], $row['lon'], $participated_stations[$sid]['lat'], $participated_stations[$sid]['lon']);
-					$s_bears[0][$sid] = bo_latlon2bearing($participated_stations[$sid]['lat'], $participated_stations[$sid]['lon'], $row['lat'], $row['lon']);
+					
+					//bearing must be this way, as it is always relative to the stroke!
+					$s_bears[0][$sid] = bo_latlon2bearing_initial($participated_stations[$sid]['lat'], $participated_stations[$sid]['lon'], $row['lat'], $row['lon']);
 				}
 
 				//Get stations that participated in calculation

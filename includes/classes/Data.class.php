@@ -14,6 +14,20 @@ class BoData
 	{
 		if (isset(self::$cache['data'][$name]))
 			return self::$cache['data'][$name];
+
+		if (BO_CACHE_DATA === true)
+		{
+			if ($name == 'uptime_strikes')
+			{
+				$cache_dir = BO_DIR.'/'.BO_CACHE_DIR.'/data/';
+				$cache_file = $cache_dir.$name;
+				if (file_exists($cache_file) && time() - filemtime($cache_file) < 30)
+				{
+					self::$cache['data'][$name] = unserialize(file_get_contents($cache_file));
+					return self::$cache['data'][$name];
+				}
+			}
+		}
 		
 		$sql = "SELECT data, UNIX_TIMESTAMP(changed) changed FROM ".BO_DB_PREF."conf WHERE name='".BoDb::esc($name)."'";
 		$row = BoDb::query($sql)->fetch_assoc();
@@ -22,6 +36,16 @@ class BoData
 		
 		if (self::$do_cache)
 			self::$cache['data'][$name] = $row['data'];
+		
+		if (BO_CACHE_DATA === true)
+		{
+			if ($name == 'uptime_strikes')
+			{
+				@mkdir($cache_dir, 0777, true);
+				file_put_contents($cache_file, serialize($row['data']));
+			}
+		}
+			
 		
 		return $row['data'];
 	}

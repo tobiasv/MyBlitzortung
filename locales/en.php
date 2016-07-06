@@ -1100,6 +1100,12 @@ $_BL['en']['lang_hu'] = 'Hungarian';
 $_BL['en']['lang_it'] = 'Italian';
 $_BL['en']['lang_nl'] = 'Dutch';
 $_BL['en']['lang_dk'] = 'Danish';
+$_BL['en']['lang_lv'] = 'Latvian';
+$_BL['en']['lang_fi'] = 'Finnish';
+$_BL['en']['lang_sv'] = 'Swedish';
+$_BL['en']['lang_pl'] = 'Polish';
+$_BL['en']['lang_cz'] = 'Czech';
+$_BL['en']['lang_uk'] = 'Ukrainian';
 
 $_BL['en']['Search...'] = 'Search...';
 $_BL['en']['Archives'] = 'Archives';
@@ -1131,8 +1137,9 @@ $_BL['en']['lm_live_set_fullscreen_info'] = 'Shows the map in fullscreen mode (o
 
 $_BL['en']['lm_live_set_map_style'] = 'Map Style';
 $_BL['en']['lm_live_set_map_style_normal'] = 'Normal';
-$_BL['en']['lm_live_set_map_style_sat'] = 'Satellite';
+$_BL['en']['lm_live_set_map_style_sat'] = 'Sat';
 $_BL['en']['lm_live_set_map_style_terrain'] = 'Terrain';
+$_BL['en']['lm_live_set_map_style_osm'] = 'OSM';
 $_BL['en']['lm_live_set_map_style_roads'] = 'Roads';
 
 $_BL['en']['lm_live_set_thunder'] = 'Thunder';
@@ -1150,6 +1157,9 @@ $_BL['en']['lm_live_set_daynight_on'] = 'on';
 $_BL['en']['lm_live_set_daynight_off'] = 'off';
 $_BL['en']['lm_live_set_daynight_info'] = 'Shows current day/night line.';
 
+$_BL['en']['lm_live_set_darkness'] = 'Map Brightness';
+$_BL['en']['lm_live_set_darkness_info'] = 'Darker map gives better contrast.';
+
 $_BL['en']['lm_live_set_radar'] = 'Rain Radar';
 $_BL['en']['lm_live_set_radar_on'] = 'on';
 $_BL['en']['lm_live_set_radar_off'] = 'off';
@@ -1160,9 +1170,6 @@ $_BL['en']['lm_live_set_strokes_show_all'] = 'last hour';
 $_BL['en']['lm_live_set_strokes_show_last'] = 'last minutes';
 $_BL['en']['lm_live_set_strokes_show_info'] = 'Decide whether you want to see only "current" strokes or also those occurred up to an hour ago.';
 
-$_BL['en']['lm_live_stations_off'] = 'Stations: off';
-$_BL['en']['lm_live_stations_on'] = 'Stations: on';
-
 $_BL['en']['lm_live_stations_level'] = 'Stations';
 $_BL['en']['lm_live_stations_level_off'] = 'Hide';
 $_BL['en']['lm_live_stations_level_max'] = 'Detailed';
@@ -1171,7 +1178,7 @@ $_BL['en']['lm_live_stations_level_info'] = 'Shows stations on the map. Higher l
 $_BL['en']['lm_live_stations_lines'] = 'Lines';
 $_BL['en']['lm_live_stations_lines_off'] = 'Hide';
 $_BL['en']['lm_live_stations_lines_max'] = 'Detailed';
-$_BL['en']['lm_live_stations_lines_info'] = 'Displays lines for each lightning stroke connected with participating stations. The color of the lines depends on the distance (close: green / far: blue). Note that the angle spanned station is also important. Distances up to a few 100km and stations on every side of the t-storm give best results. ';
+$_BL['en']['lm_live_stations_lines_info'] = 'Displays lines for each lightning stroke connected with participating stations. The color of the lines depends on the distance (close: green, medium: blue, far: red). Note that the angle spanned station is also important. Distances up to a few 100km and stations on every side of the t-storm give best results. ';
 
 $_BL['en']['lm_live_stations_coverage'] = 'Coverage';
 $_BL['en']['lm_live_stations_coverage_off'] = 'Off';
@@ -1196,11 +1203,12 @@ $_BL['en']['lm_live_info_legend2'] = 'The color of filled circles represent the 
 $_BL['en']['lm_live_info_legend3'] = 'On higher zoom levels the thunder front of current strikes is shown as <span id="live_legend3_1">white transparent</span> growing circle (speed of sound). It gets more transparent while travelling and disappears after a while.';
 $_BL['en']['lm_live_snd_info'] = 'Enable "tick" sound on every lightning stroke in the current map view. This feature might not be available on every device/browser.';
 
-$_BL['en']['lm_live_stations_hint'] = 'IMPORTANT: This features can have negative impact on your system performance! Using Browser "Chrome" is recommended.';
+$_BL['en']['lm_live_stations_hint'] = 'IMPORTANT: These features may have negative impact on your system performance! Using a fast Browser like "Google Chrome" is recommended.';
 $_BL['en']['lm_live_blitzortung_more'] = 'See more real-time maps on Blitzortung.org';
 $_BL['en']['lm_live_usage'] = 'IMPORTANT: This map is intended for entertainment purposes only!';
 
-
+$_BL['en']['meta_site_description'] = 'See lightning strikes in real time across the planet. Free access to maps of former thunderstorms. By Blitzortung.org and contributors.';
+$_BL['en']['meta_site_keywords'] = 'lightning,thunderstorm,realtime,blitzortung,live,worldwide,strike,maps,thunder,tracker,current,weather,radar,detector';
 
 
 ?>

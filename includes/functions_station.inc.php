@@ -117,12 +117,15 @@ function bo_station_info($id = 0)
 	if (isset($info[$id]))
 		return $info[$id];
 
-	$cache_dir = BO_DIR.'/'.BO_CACHE_DIR.'/data/stations/';
-	$cache_file = $cache_dir.$id;
-	if (file_exists($cache_file) && time() - filemtime($cache_file) < 3600)
+	if (BO_CACHE_DATA === true)
 	{
-		$info[$id] = unserialize(file_get_contents($cache_file));
-		return $info[$id];
+		$cache_dir = BO_DIR.'/'.BO_CACHE_DIR.'/data/stations/';
+		$cache_file = $cache_dir.$id;
+		if (file_exists($cache_file) && time() - filemtime($cache_file) < 7200)
+		{
+			$info[$id] = unserialize(file_get_contents($cache_file));
+			return $info[$id];
+		}
 	}
 	
 	if ($id)
@@ -148,10 +151,13 @@ function bo_station_info($id = 0)
 		$ret = $tmp[bo_station_id()];
 	}
 
-	if (!file_exists($cache_file))
+	if (BO_CACHE_DATA === true)
 	{
-		@mkdir($cache_dir, 0777, true);
-		file_put_contents($cache_file, serialize($ret));
+		if (!file_exists($cache_file) || $ret)
+		{
+			@mkdir($cache_dir, 0777, true);
+			file_put_contents($cache_file, serialize($ret));
+		}
 	}
 	
 	$info[$id] = $ret;
@@ -224,14 +230,7 @@ function bo_get_current_stationid()
 	if (!$station_id && intval($_COOKIE['bo_select_stationid']))
 	{
 		$station_id = intval($_COOKIE['bo_select_stationid']);
-		
-		//Redirect, so that URL matches to content (for caching!)
-		if (empty($_POST) && !headers_sent())
-		{
-			$url = bo_insert_url(array('bo_station_id', 'bo_sid'), $station_id, true);
-			header("Location: http://".$_SERVER['HTTP_HOST'].$url);
-			exit;
-		}
+		bo_try_redirect(array('bo_station_id', 'bo_sid'), '&bo_station_id='.$station_id);
 	}
 	
 	return $station_id;

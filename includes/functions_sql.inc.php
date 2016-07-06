@@ -1,6 +1,6 @@
 <?php
 
-function bo_times2sql($time_min = 0, $time_max = 0, $table='s', &$auto_reduce=false)
+function bo_times2sql(&$time_min = 0, &$time_max = 0, $table='s', &$auto_reduce=false)
 {
 
 	$time_min = intval($time_min);
@@ -17,14 +17,16 @@ function bo_times2sql($time_min = 0, $time_max = 0, $table='s', &$auto_reduce=fa
 	}
 
 	//round?
-	$time_min = round($time_min/BO_DB_TIME_ROUND_SECONDS) * BO_DB_TIME_ROUND_SECONDS;
-	$time_max = round($time_max/BO_DB_TIME_ROUND_SECONDS) * BO_DB_TIME_ROUND_SECONDS;
+	//rounded time can be used by calling function due to call by reference
+	$time_min = floor($time_min/BO_DB_TIME_ROUND_SECONDS) * BO_DB_TIME_ROUND_SECONDS;
+	$time_max = ceil($time_max/BO_DB_TIME_ROUND_SECONDS) * BO_DB_TIME_ROUND_SECONDS;
 	
 	//date range
 	$date_min = gmdate('Y-m-d H:i:s', $time_min);
 	$date_max = gmdate('Y-m-d H:i:s', $time_max);
 	$sql = " ( $table.time BETWEEN '$date_min' AND '$date_max' ) ";
 	
+	/*
 	//find max and min strike id
 	//useful for joins (i.e. station_strikes, especially when partitioned)
 	if ($time_min && $time_max && $time_min > strtotime('2010-01-01'))
@@ -61,9 +63,10 @@ function bo_times2sql($time_min = 0, $time_max = 0, $table='s', &$auto_reduce=fa
 			$auto_reduce = array('divisor' => $div, 'count' => $row['cnt']);
 		}
 	}
+	*/
 	
 	//Extra keys for faster search
-	$keys_enabled   = (BO_DB_EXTRA_KEYS === true);
+	//$keys_enabled   = (BO_DB_EXTRA_KEYS === true);
 	$key_bytes_time = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_TIME_BYTES)   : 0;
 	$key_bytes_time = 0 < $key_bytes_time   && $key_bytes_time   <= 4 ? $key_bytes_time   : 0;
 
@@ -85,13 +88,15 @@ function bo_times2sql($time_min = 0, $time_max = 0, $table='s', &$auto_reduce=fa
 		}
 
 	}
-
+	
 
 	return $sql;
 }
 
-function bo_strikes_sqlkey(&$index_sql, $time_min, $time_max, $lat1=false, $lat2=false, $lon1=false, $lon2=false, &$auto_reduce=false)
+function bo_strikes_sqlkey(&$index_sql, &$time_min, &$time_max, $lat1=false, $lat2=false, $lon1=false, $lon2=false, &$auto_reduce=false)
 {
+	//$index_sql = " IGNORE INDEX (...) ";
+	
 	$sql  = " (";
 	$sql .= bo_latlon2sql($lat1, $lat2, $lon1, $lon2);
 	$sql .= " AND ";
@@ -152,7 +157,7 @@ function bo_region2sql($region, $station_id = 0)
 			list(,$lat2) = @each($reg);
 			list(,$lon2) = @each($reg);
 
-			$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1, true);
+			$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1);
 		}
 
 		$sql .= ' ) ';
@@ -169,7 +174,7 @@ function bo_region2sql($region, $station_id = 0)
 				list(,$lat2) = @each($reg);
 				list(,$lon2) = @each($reg);
 
-				$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1, true);
+				$sql .= " OR ".bo_latlon2sql($lat2, $lat1, $lon2, $lon1);
 
 			}
 
@@ -189,11 +194,11 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 	if ($lat1 === false || $lat2 === false || $lon1 === false || $lon2 === false)
 		return " 1 ";
 
-	$sql = " (s.lat BETWEEN '$lat1' AND '$lat2' AND s.lon BETWEEN '$lon1' AND '$lon2') ";
+	$sql = " (s.lat BETWEEN '".round($lat1, 6)."' AND '".round($lat2, 6)."' AND s.lon BETWEEN '".round($lon1, 6)."' AND '".round($lon2, 6)."') ";
 
 
 	//Extra keys for faster search (esp. tiles ans strike search)
-	$keys_enabled = (BO_DB_EXTRA_KEYS === true);
+	//$keys_enabled = (BO_DB_EXTRA_KEYS === true);
 	$key_bytes_latlon = $keys_enabled ? intval(BO_DB_EXTRA_KEYS_LATLON_BYTES) : 0;
 	$key_bytes_latlon = 0 < $key_bytes_latlon && $key_bytes_latlon <= 4 ? $key_bytes_latlon : 0;
 
@@ -227,9 +232,36 @@ function bo_latlon2sql($lat1=false, $lat2=false, $lon1=false, $lon2=false)
 				$sql .= " AND (s.lon_x <= '$lon2_x' OR '$lon1_x' <= s.lon_x)";
 
 		}
-
 	}
-
+	
+	//Partition pruning by lon-hash
+	if (BO_DB_PARTITIONING === true && BO_DB_PARTITIONING_USE == true)
+	{
+		if ($lon1 < $lon2)
+		{
+			$lon_start = $lon1;
+			$lon_end   = $lon2;
+		}
+		else 
+		{
+			$lon_start = $lon1;
+			$lon_end   = ($lon2+360);
+		}
+		$ppos = array();
+		
+		for ($lon = $lon_start; $lon <= $lon_end + BO_DB_PARTITION_LON_DIVISOR; $lon += BO_DB_PARTITION_LON_DIVISOR)
+		{
+			for ($lat = $lat1; $lat <= $lat2 + BO_DB_PARTITION_LAT_DIVISOR; $lat += BO_DB_PARTITION_LAT_DIVISOR)
+			{
+				$id = ( floor( ($lat+90) / BO_DB_PARTITION_LAT_DIVISOR) * (360 / BO_DB_PARTITION_LON_DIVISOR) + floor( ($lon+180)%360 / BO_DB_PARTITION_LON_DIVISOR) ) % 256;
+				$ppos[$id] = $id;
+			}
+		}
+		
+		ksort($ppos); //just looks better
+		if (count($ppos))
+			$sql .= "\n AND ppos IN (".implode(',', $ppos).")\n";
+	}
 
 	return $sql;
 }
@@ -252,13 +284,21 @@ function bo_sql_lat2tiley($name, $zoom, $cache = true)
 	if (BO_DB_STRIKES_MERCATOR !== true || !$cache)
 	{
 		$scale = (1 << $zoom) * 256;
-		$lat_mercator = " ( LOG(TAN( PI()/4 + RADIANS($name)/2 )) / PI() / 2 ) ";
-		$y = " ROUND( ABS( $lat_mercator - 0.5 ) * $scale ) ";
+
+		if (is_numeric($name))
+		{
+			$y = round(abs(log(tan(M_PI/4+deg2rad($name)/2))/M_PI/2 - 0.5) * $scale);
+		}
+		else
+		{
+			$lat_mercator = "(LOG(TAN(PI()/4+RADIANS($name)/2))/PI()/2) ";
+			$y = "ROUND(ABS($lat_mercator-0.5)*$scale)";
+		}
 	}
 	else
 	{
 		$scale = (1 << (BO_DB_STRIKES_MERCATOR_SCALE-$zoom));
-		$y = " ROUND(lat_merc / $scale) ";
+		$y = "ROUND(lat_merc/$scale)";
 	}
 
 	return $y;
@@ -269,13 +309,21 @@ function bo_sql_lon2tilex($name, $zoom, $cache = true)
 	if (BO_DB_STRIKES_MERCATOR !== true || !$cache)
 	{
 		$scale = (1 << $zoom) * 256;
-		$lon_mercator = " ( $name / 360 ) ";
-		$x = " ROUND( ($lon_mercator+0.5) * $scale ) ";
+		
+		if (is_numeric($name))
+		{
+			$x = round(($name/360+0.5)*$scale);
+		}
+		else
+		{
+			$lon_mercator = "($name/360)";
+			$x = "ROUND(($lon_mercator+0.5)*$scale)";
+		}
 	}
 	else
 	{
 		$scale = (1 << (BO_DB_STRIKES_MERCATOR_SCALE-$zoom));
-		$x = " ROUND(lon_merc / $scale) ";
+		$x = "ROUND(lon_merc / $scale)";
 	}
 	
 	return $x;

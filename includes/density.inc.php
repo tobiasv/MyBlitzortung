@@ -461,7 +461,7 @@ function bo_show_archive_density()
 			continue;
 
 		$name = _BS($d['name'], false, BO_CONFIG_IS_UTF8);
-		$selected = (string)$id === (string)$map;
+		$selected = (string)$id === (string)$map || $map == -1;
 		
 		if ($selected)
 			bo_title($name);

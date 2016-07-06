@@ -551,7 +551,8 @@ function bo_alert_send()
 					list($str_lat_min, $str_lon_min) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 225, $d['lat'], $d['lon']);
 					list($str_lat_max, $str_lon_max) = bo_distbearing2latlong($d['dist'] * 1000 * sqrt(2), 45,  $d['lat'], $d['lon']);
 					
-					$sql_where = ' AND '.bo_strikes_sqlkey($index_sql, $search_time, time(), $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
+					$now = time(); //passed by ref
+					$sql_where = ' AND '.bo_strikes_sqlkey($index_sql, $search_time, $now, $str_lat_min, $str_lat_max, $str_lon_min, $str_lon_max);
 					$sql_where .= ' AND '.bo_sql_latlon2dist($d['lat'], $d['lon']).' < '.($d['dist'] * 1000);
 				}
 				
