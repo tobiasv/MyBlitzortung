@@ -1625,6 +1625,9 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 			echo '<li><span class="bo_descr">'._BL('Max strikes per day').' (< '._BK(BO_RADIUS_STAT).') : </span><span class="bo_value">'._BN($max_str_dayrad_own[0], 0).($max_str_dayrad_own[1] ? ' ('._BD($max_str_dayrad_own[1]).')' : '').'</span>';
 		}
 
+
+        	
+
 		echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_own, 1).'</span>';
 		echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_own, 1).'</span>';
 		echo '<li><span class="bo_descr">'._BL('Signals detected').': </span><span class="bo_value">'._BN($signals, 0).'</span>';
@@ -1648,8 +1651,40 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 
 	if ($station_id)
 	{
-		echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_all, 1).'</span>';
-		echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_all, 1).'</span>';
+	        // START OF : Additional code by DnH2016 to add locations of min dist and max dist strikes to long time statistics page    
+                 
+        	// Get a table of strikes, ordered by distance and return only the nearest    
+	        $sql =  "SELECT lat,lon,distance,time  FROM `bo_strikes` ORDER BY distance ASC LIMIT 1";
+        	$res = BoDb::query($sql);
+	        $row = $res->fetch_assoc();
+        
+        	// Next line was existing code - distance mainted during import procedure
+	        echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_all, 1).'</span>';
+        	// Get the nearest distance from the SQl query - this should be the same as the previous  - commented out for normal operation
+	        // echo '<li><span class="bo_descr">'._BL('Min dist for debugging query').': </span><span class="bo_value">'._BK($row['distance']/1000, 1).'</span>';
+        	// Print out the location and time, and make it a hyperlink to a google map
+	        echo '<li><span class="bo_descr">'._BL('At').
+        	     ': </span><a href = "http://maps.google.com/?q= ' . $row['lat']  .','. $row['lon'] .
+	             ' " target="_blank" ><span class="bo_value">'._BN($row['lat'],6).'&deg; / '._BN($row['lon'],6).
+        	     '&deg</span> @ </span><span class="bo_value">' . ($row['time']).'</span></a>';
+        
+        
+	        $sql =  "SELECT lat,lon, distance,time  FROM `bo_strikes` ORDER BY distance DESC LIMIT 1";
+        	$res = BoDb::query($sql);
+	        $row = $res->fetch_assoc();
+        
+	        // Next line was existing code - distance mainted during import procedure
+        	echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_all, 1).'</span>';
+        	// Get the largest distance from the SQl query - this should be the same as the previous - commented out for normal operation
+	        // echo '<li><span class="bo_descr">'._BL('Max dist for debugging query').': </span><span class="bo_value">'._BK($row['distance']/1000, 1).'</span>';
+        	// Print out the location and time, and make it a hyperlink to a google map
+        	echo '<li><span class="bo_descr">'._BL('At').
+             		': </span><a href = "http://maps.google.com/?q= ' . $row['lat']  .','. $row['lon'] .
+             		' " target="_blank" ><span class="bo_value">'._BN($row['lat'],6).'&deg; / '._BN($row['lon'],6).
+             		'&deg</span> @ </span><span class="bo_value">' . ($row['time']).'</span></a>';
+	
+        	// END OF : Additional code by DnH2016 to add locations of min dist and max dist strikes to long time statistics page    
+
 	}
 		
 	echo '<li><span class="bo_descr">'._BL('Max signals per hour').': </span><span class="bo_value">'._BN($max_sig_all, 0).'</span>';
