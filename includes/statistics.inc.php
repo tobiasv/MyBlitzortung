@@ -1652,7 +1652,7 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
                 if (BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES === True)
                 {
                 echo '<li><span class="bo_descr">'._BL('At').
-             ': </span><a href = "http://maps.google.com/?q= ' . $min_dist_own_lat  .','. $max_dist_own_lon .
+             ': </span><a href = "http://maps.google.com/?q= ' . $max_dist_own_lat  .','. $max_dist_own_lon .
              ' " target="_blank" ><span class="bo_value">'._BN($max_dist_own_lat,3).'&deg; / '._BN($max_dist_own_lon,3).
              '&deg</span> </span><span class="bo_value">(' . ($max_dist_own_time).')</span></a>';
                 }
