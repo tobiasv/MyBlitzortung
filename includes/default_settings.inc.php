@@ -441,6 +441,8 @@
 //Update "offline hours counter" only if station was online some time before (hours)
 @define('BO_STATISTICS_COUNT_OFFLINE_AFTER_MIN_ONLINE_HOURS', 96);
 
+//Collect and show location and times of nearest and furthest strokes
+@define('BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES', True);
 
 
 /*******************************************************************/
@@ -977,7 +979,7 @@
 @define('BO_GRAPH_RAW_H_STAT_SPEC', 150);
 
 
-//max. time in µs for displaying all graphs to a stroke
+//max. time in ï¿½s for displaying all graphs to a stroke
 @define('BO_GRAPH_RAW_MAX_TIME2', 350);
 
 //Colors
@@ -1405,7 +1407,7 @@ define('BO_LOADAVG_TILES_STATIONS', 70);
 @define('BO_TRIGGER_VOLTAGE', 0.45);
 
 //search interval for strike -> signal matching for foreign stations
-@define('BO_STR2SIG_INTERVAL_OTHERS', 8000); //µs
+@define('BO_STR2SIG_INTERVAL_OTHERS', 8000); //ï¿½s
 
 //needed for auto linking stations
 @define('BO_LINK_HOST', 'www.myblitzortung.org');
