@@ -1528,11 +1528,11 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	$min_dist_own 		  = BoData::get('longtime_min_dist_own'.$add) / 1000;
         $min_dist_own_lat 	  = BoData::get('longtime_min_dist_own_lat'.$add);
         $min_dist_own_lon         = BoData::get('longtime_min_dist_own_lon'.$add);
-        $min_dist_own_time        = BoData::get('longtime_min_dist_own_time'.$add);
+        $min_dist_own_strike_time = BoData::get('longtime_min_dist_own_strike_time'.$add);
 	$max_dist_own 		  = BoData::get('longtime_max_dist_own'.$add) / 1000;
         $max_dist_own_lat 	  = BoData::get('longtime_max_dist_own_lat'.$add);
         $max_dist_own_lon         = BoData::get('longtime_max_dist_own_lon'.$add);
-        $max_dist_own_time        = BoData::get('longtime_max_dist_own_time'.$add);
+        $max_dist_own_strike_time = BoData::get('longtime_max_dist_own_strike_time'.$add);
 	$max_str_own 		  = (double)BoData::get('longtime_max_strikesh_own'.$add);
 	$max_sig_own 		  = (double)BoData::get('longtime_max_signalsh_own'.$add);
 	$first_update_station = BoData::get('longtime_station_first_time'.$add);
@@ -1544,11 +1544,11 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	$min_dist_all 		= BoData::get('longtime_min_dist_all'.$add) / 1000;
         $min_dist_all_lat       = BoData::get('longtime_min_dist_all_lat'.$add);
         $min_dist_all_lon       = BoData::get('longtime_min_dist_all_lon'.$add);               
-        $min_dist_all_time      = BoData::get('longtime_min_dist_all_time'.$add);               
+        $min_dist_all_strike_time = BoData::get('longtime_min_dist_all_strike_time'.$add);               
 	$max_dist_all 		= BoData::get('longtime_max_dist_all'.$add) / 1000;
         $max_dist_all_lat       = BoData::get('longtime_max_dist_all_lat'.$add);
         $max_dist_all_lon       = BoData::get('longtime_max_dist_all_lon'.$add);
-        $max_dist_all_time      = BoData::get('longtime_max_dist_all_time'.$add);               
+        $max_dist_all_strike_time      = BoData::get('longtime_max_dist_all_strike_time'.$add);               
 	$max_str_all 		= (double)BoData::get('longtime_max_strikesh');
 	$max_sig_all 		= (double)BoData::get('longtime_max_signalsh');
 	$max_active 		= (double)BoData::get('longtime_count_max_active_stations');
@@ -1640,21 +1640,21 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 		echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_own, 1).'</span>';
 		
                 
-                if (BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES === True)
+                if (BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES === True && $min_dist_own_lat != Null  && $min_dist_own_lon != Null)
                 {
-                echo '<li><span class="bo_descr">'._BL('At').
+                echo '<li><span class="bo_descr">'._BL('Lat / Lon (Time)').
              ': </span><a href = "http://maps.google.com/?q= ' . $min_dist_own_lat  .','. $min_dist_own_lon .
              ' " target="_blank" ><span class="bo_value">'._BN($min_dist_own_lat,3).'&deg; / '._BN($min_dist_own_lon,3).
-             '&deg</span> </span><span class="bo_value">(' . ($min_dist_own_time).')</span></a>';
+             '&deg</span> </span><span class="bo_value">(' . ($min_dist_own_strike_time).')</span></a>';
                 }
 		echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_own, 1).'</span>';
 	
-                if (BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES === True)
+                if (BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES === True && $max_dist_own_lat != Null  && $max_dist_own_lon != Null)
                 {
-                echo '<li><span class="bo_descr">'._BL('At').
+                echo '<li><span class="bo_descr">'._BL('Lat / Lon (Time)').
              ': </span><a href = "http://maps.google.com/?q= ' . $max_dist_own_lat  .','. $max_dist_own_lon .
              ' " target="_blank" ><span class="bo_value">'._BN($max_dist_own_lat,3).'&deg; / '._BN($max_dist_own_lon,3).
-             '&deg</span> </span><span class="bo_value">(' . ($max_dist_own_time).')</span></a>';
+             '&deg</span> </span><span class="bo_value">(' . ($max_dist_own_strike_time).')</span></a>';
                 }
 		echo '<li><span class="bo_descr">'._BL('Signals detected').': </span><span class="bo_value">'._BN($signals, 0).'</span>';
 		echo '<li><span class="bo_descr">'._BL('Strike ratio').': </span><span class="bo_value">'.$strike_ratio.'</span>';
@@ -1678,20 +1678,20 @@ function bo_show_statistics_longtime($station_id = 0, $own_station = true, $add_
 	if ($station_id)
 	{
 		echo '<li><span class="bo_descr">'._BL('Min dist').': </span><span class="bo_value">'._BK($min_dist_all, 1).'</span>';
-        if (BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES === True)
+        if (BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES === True && $min_dist_all_lat != Null  && $min_dist_all_lon != Null)
         {
-        echo '<li><span class="bo_descr">'._BL('At').
+        echo '<li><span class="bo_descr">'._BL('Lat / Lon (Time)').
              ': </span><a href = "http://maps.google.com/?q= ' . $min_dist_all_lat  .','. $min_dist_all_lon .
              ' " target="_blank" ><span class="bo_value">'._BN($min_dist_all_lat,3).'&deg; / '._BN($min_dist_all_lon,3).
-             '&deg</span> </span><span class="bo_value">(' . ($min_dist_all_time).')</span></a>';
+             '&deg</span> </span><span class="bo_value">(' . ($min_dist_all_strike_time).')</span></a>';
         }
 		echo '<li><span class="bo_descr">'._BL('Max dist').': </span><span class="bo_value">'._BK($max_dist_all, 1).'</span>';
-        if (BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES === True)
+        if (BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES === True && $max_dist_all_lat != Null  && $max_dist_all_lon != Null)
         {        
-        echo '<li><span class="bo_descr">'._BL('At').
+        echo '<li><span class="bo_descr">'._BL('Lat / Lon (Time)').
              ': </span><a href = "http://maps.google.com/?q= ' . $max_dist_all_lat  .','. $max_dist_all_lon .
              ' " target="_blank" ><span class="bo_value">'._BN($max_dist_all_lat,3).'&deg; / '._BN($max_dist_all_lon,3).
-             '&deg</span> </span><span class="bo_value">(' . ($max_dist_all_time).')</span></a>';
+             '&deg</span> </span><span class="bo_value">(' . ($max_dist_all_strike_time).')</span></a>';
 	}
 		
 

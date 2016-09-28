@@ -441,8 +441,10 @@
 //Update "offline hours counter" only if station was online some time before (hours)
 @define('BO_STATISTICS_COUNT_OFFLINE_AFTER_MIN_ONLINE_HOURS', 96);
 
-//Collect and show location and times of nearest and furthest strokes
-@define('BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES', True);
+//Show location and times of nearest and furthest strokes, if known
+@define('BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES', False);
+
+
 
 
 /*******************************************************************/
@@ -1444,7 +1446,7 @@ define('BO_LOADAVG_TILES_STATIONS', 70);
 /*******************************************************************/
 /*** Settings for Developers                                     ***/
 
-@define('BO_DEBUG', false); //enables PHP error reporting
+@define('BO_DEBUG', true); //enables PHP error reporting
 @define('BO_LANG_AUTO_ADD', false); //automatically adds missing translations to the locale file if it is writeable
 
 
