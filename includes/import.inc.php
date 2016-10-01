@@ -42,7 +42,7 @@ function bo_update_all($force = false, $only = '')
 		$max_sleep = BO_UP_MAX_SLEEP;
 		$sleep = rand(0,$max_sleep);
 		bo_echod("Waiting $sleep seconds, to avoid too high load on Blitzortung servers ...");
-		sleep($sleep);
+		//sleep($sleep);
 	}
 
 
@@ -452,7 +452,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			{
 				$stLat = $stations[$stId]['lat'];
 				$stLon = $stations[$stId]['lon'];
-
+                                $debug = true;
 				if ($stLat == 0.0 && $stLon == 0.0) //station has no position yet
 					continue;
 
@@ -466,7 +466,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
                                 $max_dist_all_lon[$stId] = $D['lon'];                                           
                                 $max_dist_all[$stId] = $dist;
                                 $max_dist_all_strike_time[$stId] = $D['time'];
-                                if ($debug === true) bo_echod("Found a new max in this import for strikes detected by the network at a distance of " . $max_dist_all[$stId]/1000 . "km lat : " . $max_dist_all_lat[$stId] . " lon : "  . $max_dist_all_lon[$stId] . " Time:" . $max_dist_all_strike_time[$stId]);
+                                if ($debug) bo_echod("Found a new max in this import for strikes detected by the network at a distance of " . $max_dist_all[$stId]/1000 . "km lat : " . $max_dist_all_lat[$stId] . " lon : "  . $max_dist_all_lon[$stId] . " Time:" . $max_dist_all_strike_time[$stId]);
                                 }
                                 
 
@@ -476,7 +476,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
                                 $min_dist_all_lon[$stId] = $D['lon'];                                            
                                 $min_dist_all[$stId] = $dist;
                                 $min_dist_all_strike_time[$stId] = $D['time'];
-                                if ($debug === true) bo_echod("Found a new min in this import for strikes detected by the network at a distance of " . $min_dist_all[$stId]/1000 . "km lat : " . $min_dist_all_lat[$stId] . " lon : "  . $min_dist_all_lon[$stId] . ". Time:" . $min_dist_all_strike_time[$stId]);
+                                if ($debug) bo_echod("Found a new min in this import for strikes detected by the network at a distance of " . $min_dist_all[$stId]/1000 . "km lat : " . $min_dist_all_lat[$stId] . " lon : "  . $min_dist_all_lon[$stId] . ". Time:" . $min_dist_all_strike_time[$stId]);
                                 }                                            
 				
 				$bear_data[$stId][$bear_id]++;
@@ -570,7 +570,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			{
 				$last_strike_time = $utime;
 				$timeout = true;
-				break;
+				//break;
 			}
 		}
 	
@@ -622,7 +622,7 @@ function bo_update_strikes($force = false, $time_start_import = null)
 		foreach($strikesperstation as $stId => $count)
 		{
 			$add = $stId == $own_id ? '' : '#'.$stId.'#';
-			
+			$debug = true;
 			BoData::update_add('count_strikes_own'.$add, $count);
 
 			$bear_data_tmp = unserialize(BoData::get('longtime_bear_own'.$add));
@@ -672,11 +672,44 @@ function bo_update_strikes($force = false, $time_start_import = null)
                         {
                                 if ($debug) bo_echod("Did not record a new min distance for strikes detected by station ". $stId . " on this import");
                                 
-		}
-		
-		}
+                        }
+                        bo_echod("Checking for inconsistencies on statistics for own strike distances for station " . $stId);
 
-		//Update Longtime statistics per station for all strikes
+            if ($debug) {
+                bo_echod("Min dist own stored " . BoData::get('longtime_min_dist_own' . $add) / 1000 . "km. Min dist calculate " . bo_latlon2dist(BoData::get('longtime_min_dist_own_lat' . $add), BoData::get('longtime_min_dist_own_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+                bo_echod("Max dist own stored " . BoData::get('longtime_max_dist_own' . $add) / 1000 . "km. Max dist calculate " . bo_latlon2dist(BoData::get('longtime_max_dist_own_lat' . $add), BoData::get('longtime_max_dist_own_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+            }
+
+            if (round(BoData::get('longtime_min_dist_own' . $add), 1) != round(bo_latlon2dist(BoData::get('longtime_min_dist_own_lat' . $add), BoData::get('longtime_min_dist_own_lon' . $add), $stLat, $stLon), 1)) {
+                bo_echod("Min dist stored " . BoData::get('longtime_min_dist_own' . $add) / 1000 . "km. Min dist calculate " . bo_latlon2dist(BoData::get('longtime_min_dist_own_lat' . $add), BoData::get('longtime_min_dist_own_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+                if (BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_OWN_IF_DATA_INCONSISTENT == True) {
+                    bo_echod("Minimum distance own station inconsistency detected - overwriting minimum distance for station " . $stId . ".");
+                    BoData::set('longtime_min_dist_own' . $add, bo_latlon2dist(BoData::get('longtime_min_dist_own_lat' . $add), BoData::get('longtime_min_dist_own_lon' . $add), $stLat, $stLon));
+                    bo_echod("Min dist stored " . BoData::get('longtime_min_dist_own' . $add) / 1000 . "km. Min dist calculate " . bo_latlon2dist(BoData::get('longtime_min_dist_own_lat' . $add), BoData::get('longtime_min_dist_own_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+                } else {
+                    bo_echod("Minimum distance own station inconsistency detected - taking no action for station " . $stId . " as BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_OWN_IF_DATA_INCONSISTENT is not True");
+                }
+            } else {
+                if ($debug)
+                    bo_echod("No inconsistency detected for minimum distance own station : " . $stId);
+            }
+
+            if (round(BoData::get('longtime_max_dist_own' . $add), 1) != round(bo_latlon2dist(BoData::get('longtime_max_dist_own_lat' . $add), BoData::get('longtime_max_dist_own_lon' . $add), $stLat, $stLon), 1)) {
+                bo_echod("Max dist stored " . BoData::get('longtime_max_dist_own' . $add) / 1000 . "km. Max dist calculate " . bo_latlon2dist(BoData::get('longtime_max_dist_own_lat' . $add), BoData::get('longtime_max_dist_own_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $add . ".");
+                if (BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_OWN_IF_DATA_INCONSISTENT == True) {
+                    bo_echod("Maximum distance own station inconsistency detected - overwriting maximum distance for station " . $stId . ".");
+                    BoData::set('longtime_max_dist_own' . $add, bo_latlon2dist(BoData::get('longtime_max_dist_own_lat' . $add), BoData::get('longtime_max_dist_own_lon' . $add), $stLat, $stLon));
+                    bo_echod("Max dist stored " . BoData::get('longtime_max_dist_own' . $add) / 1000 . "km. Max dist calculate " . bo_latlon2dist(BoData::get('longtime_max_dist_own_lat' . $add), BoData::get('longtime_max_dist_own_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $add . ".");
+                } else {
+                    bo_echod("Maximum distance own station inconsistency detected - taking no action for station " . $stId . " as BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_OWN_IF_DATA_INCONSISTENT is not True");
+                }
+            } else {
+                if ($debug)
+                    bo_echod("No inconsistency detected for maximum distance own station : " . $stId);
+            }
+        }
+
+        //Update Longtime statistics per station for all strikes
 		foreach($statistic_stations as $stId)
 		{
 			//update only if station is active or got some strikes during the update
@@ -706,46 +739,91 @@ function bo_update_strikes($force = false, $time_start_import = null)
 
 				$max = BoData::get('longtime_max_dist_all'.$add);
 				
-				if ($max < $max_dist_all[$stId])
-				{
-					BoData::set('longtime_max_dist_all'.$add, $max_dist_all[$stId]);
-					BoData::set('longtime_max_dist_all_time'.$add, time());
-				        BoData::set('longtime_max_dist_all_lat'.$add,$max_dist_all_lat[$stId]);      //storage for latitude
-                                        BoData::set('longtime_max_dist_all_lon'.$add,$max_dist_all_lon[$stId]);      //storage for longtitude 
-                                        BoData::set('longtime_max_dist_all_strike_time'.$add,$max_dist_all_strike_time[$stId]);    //storage for time
-                                        bo_echod("Recorded new max distance for strikes detected by the network at a distance of " . $max_dist_all[$stId]/1000 . "km. lat: " . $max_dist_all_lat[$stId] . " lon: " . $max_dist_all_lon[$stId] ." from station " .$stId . " Time:" . $max_dist_all_strike_time[$stId]);
-                                        
-				}
-                                else
-                                {
-                                        if ($debug) bo_echod("Did not record a new max distance from station ". $stId . " on this import");
+                if ($max < $max_dist_all[$stId]) 
+                {
+                    BoData::set('longtime_max_dist_all' . $add, $max_dist_all[$stId]);
+                    BoData::set('longtime_max_dist_all_time' . $add, time());
+                    BoData::set('longtime_max_dist_all_lat' . $add, $max_dist_all_lat[$stId]);                      //storage for latitude
+                    BoData::set('longtime_max_dist_all_lon' . $add, $max_dist_all_lon[$stId]);                      //storage for longtitude 
+                    BoData::set('longtime_max_dist_all_strike_time' . $add, $max_dist_all_strike_time[$stId]);      //storage for time
+                    bo_echod("Recorded new max distance for strikes detected by the network at a distance of " . $max_dist_all[$stId] / 1000 . "km. lat: " . $max_dist_all_lat[$stId] . " lon: " . $max_dist_all_lon[$stId] . " from station " . $stId . " Time:" . $max_dist_all_strike_time[$stId]);
+                } 
+                else 
+                {
+                    if ($debug) bo_echod("Did not record a new max distance from station " . $stId . " on this import");
+                }
 
-                                }    
+                $min = BoData::get('longtime_min_dist_all' . $add);
 
-				$min = BoData::get('longtime_min_dist_all'.$add);
-                                
-				if (!$min || $min > $min_dist_all[$stId])
-				{
-					BoData::set('longtime_min_dist_all'.$add, $min_dist_all[$stId]);
-					BoData::set('longtime_min_dist_all_time'.$add, time());
-                                        BoData::set('longtime_min_dist_all_lat'.$add,$min_dist_all_lat[$stId]);      //storage for latitude
-                                        BoData::set('longtime_min_dist_all_lon'.$add,$min_dist_all_lon[$stId]);      //storage for longtitude    
-                                        BoData::set('longtime_min_dist_all_strike_time'.$add,$min_dist_all_strike_time[$stId]);    //storage for time
-                                        bo_echod("Recorded new min distance for strikes detected by the network at a distance of " . $min_dist_all[$stId]/1000 . "km. lat: " . $min_dist_all_lat[$stId] . " lon: " . $min_dist_all_lon[$stId] ." from station " .$stId . " Time:" . $min_dist_all_strike_time[$stId]);
-				}
-                                else
-                                {
-                                        if ($debug) bo_echod("Did not record a new min distance from station ". $stId . " on this import");
-			}
-			}
+                if (!$min || $min > $min_dist_all[$stId]) {
+                    BoData::set('longtime_min_dist_all' . $add, $min_dist_all[$stId]);
+                    BoData::set('longtime_min_dist_all_time' . $add, time());
+                    BoData::set('longtime_min_dist_all_lat' . $add, $min_dist_all_lat[$stId]);                      //storage for latitude
+                    BoData::set('longtime_min_dist_all_lon' . $add, $min_dist_all_lon[$stId]);                      //storage for longtitude    
+                    BoData::set('longtime_min_dist_all_strike_time' . $add, $min_dist_all_strike_time[$stId]);      //storage for time
+                    bo_echod("Recorded new min distance for strikes detected by the network at a distance of " . $min_dist_all[$stId] / 1000 . "km. lat: " . $min_dist_all_lat[$stId] . " lon: " . $min_dist_all_lon[$stId] . " from station " . $stId . " Time:" . $min_dist_all_strike_time[$stId]);
+                } else {
+                    if ($debug) bo_echod("Did not record a new min distance from station " . $stId . " on this import");
+                }
 
-		}
+            
+            }
 
-                
-                
-                    
-                
-		BoDb::query("COMMIT", false);
+
+            bo_echod("Checking for inconsistencies on statistics for network all strike distances for station :" . $stId);
+           
+            if ($debug) {
+                bo_echod("Min dist all stored " . BoData::get('longtime_min_dist_all' . $add) / 1000 . "km. Min dist calculate " . bo_latlon2dist(BoData::get('longtime_min_dist_own_lat' . $add), BoData::get('longtime_min_dist_all_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+                bo_echod("Max dist all stored " . BoData::get('longtime_max_dist_all' . $add) / 1000 . "km. Max dist calculate " . bo_latlon2dist(BoData::get('longtime_max_dist_own_lat' . $add), BoData::get('longtime_max_dist_all_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+            }
+
+            if (round(BoData::get('longtime_min_dist_all' . $add), 1) != round(bo_latlon2dist(BoData::get('longtime_min_dist_all_lat' . $add), BoData::get('longtime_min_dist_all_lon' . $add), $stLat, $stLon), 1)) 
+                {
+          
+                bo_echod("Minimum distance stored " . BoData::get('longtime_min_dist_all' . $add) / 1000 . "km. Minimum distance calculated " . bo_latlon2dist(BoData::get('longtime_min_dist_all_lat' . $add), BoData::get('longtime_min_dist_all_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+                bo_echod("Minimum distance stored lat :" . BoData::get('longtime_min_dist_all_lat' . $add) . " . lon : " . BoData::get('longtime_min_dist_all_lon' . $add)) ;
+            
+                if (BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_ALL_IF_DATA_INCONSISTENT == True) {
+                    bo_echod("Minimum distance all station inconsistency detected - overwriting minimum distance for station " . $stId . ".");
+                    BoData::set('longtime_min_dist_all' . $add, bo_latlon2dist(BoData::get('longtime_min_dist_all_lat' . $add), BoData::get('longtime_min_dist_all_lon' . $add), $stLat, $stLon));
+                    bo_echod("Minimum distance stored " . BoData::get('longtime_min_dist_all' . $add) / 1000 . "km. Minimum distance calculated " . bo_latlon2dist(BoData::get('longtime_min_dist_all_lat' . $add), BoData::get('longtime_min_dist_all_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+                } 
+                else 
+                {
+                    bo_echod("Minimum distance all station inconsistency detected - taking no action for station " . $stId . " as BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_ALL_IF_DATA_INCONSISTENT is not True");
+                }
+            } 
+            else 
+            {
+                if ($debug) bo_echod("No inconsistency detected for minimum distance all station : " . $stId);
+            }
+
+            if (round(BoData::get('longtime_max_dist_all' . $add), 1) != round(bo_latlon2dist(BoData::get('longtime_max_dist_all_lat' . $add), BoData::get('longtime_max_dist_all_lon' . $add), $stLat, $stLon), 1)) {
+                bo_echod("Max dist stored " . BoData::get('longtime_max_dist_all' . $add) / 1000 . "km. Max dist calculate " . bo_latlon2dist(BoData::get('longtime_max_dist_all_lat' . $add), BoData::get('longtime_max_dist_all_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+
+
+                if (BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_OWN_IF_DATA_INCONSISTENT == True) 
+                {
+                    bo_echod("Maximum distance all station inconsistency detected - overwriting maximum distance for station " . $stId . ".");
+                    BoData::set('longtime_max_dist_all' . $add, bo_latlon2dist(BoData::get('longtime_max_dist_all_lat' . $add), BoData::get('longtime_max_dist_all_lon' . $add), $stLat, $stLon));
+                    bo_echod("Maximum distance stored " . BoData::get('longtime_max_dist_all' . $add) / 1000 . "km. Maximum distance calculate " . bo_latlon2dist(BoData::get('longtime_max_dist_all_lat' . $add), BoData::get('longtime_max_dist_all_lon' . $add), $stLat, $stLon) / 1000 . "km. for station " . $stId . ".");
+                } 
+                else 
+                {
+                    bo_echod("Maximum distance all station inconsistency detected - taking no action for station " . $stId . " as BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_ALL_IF_DATA_INCONSISTENT is not True");
+                }
+            } 
+            else 
+            {
+            if ($debug) bo_echod("No inconsistency detected for maximum distance all station : " . $stId);
+            }
+        }
+
+
+
+
+
+        BoDb::query("COMMIT", false);
 		BoDb::query("SET autocommit=1", false);
 		
 		if ($timeout)
