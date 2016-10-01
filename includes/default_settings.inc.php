@@ -443,8 +443,8 @@
 
 //Show location and times of nearest and furthest strokes, if known
 @define('BO_STATISTICS_SHOW_LOCATIONS_AND_TIMES_OF_EXTREME_STROKES', False);
-@define('BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_OWN_IF_DATA_INCONSISTENT', True);
-@define('BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_ALL_IF_DATA_INCONSISTENT', True);
+@define('BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_OWN_IF_DATA_INCONSISTENT', False);
+@define('BO_STATISTICS_OVERWRITE_MIN_MAX_DISTANCES_FOR_ALL_IF_DATA_INCONSISTENT', False);
 
 
 /*******************************************************************/
