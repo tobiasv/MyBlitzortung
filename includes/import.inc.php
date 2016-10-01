@@ -42,7 +42,7 @@ function bo_update_all($force = false, $only = '')
 		$max_sleep = BO_UP_MAX_SLEEP;
 		$sleep = rand(0,$max_sleep);
 		bo_echod("Waiting $sleep seconds, to avoid too high load on Blitzortung servers ...");
-		//sleep($sleep);
+		sleep($sleep);
 	}
 
 
