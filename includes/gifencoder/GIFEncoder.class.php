@@ -41,13 +41,14 @@ Class GIFEncoder {
 		ERR03=>"Does not make animation from animated GIF source",
 	);
 
+	
 	/*
 	:::::::::::::::::::::::::::::::::::::::::::::::::::
 	::
 	::	GIFEncoder...
 	::
 	*/
-	function GIFEncoder	(
+	public function __construct	(
 							$GIF_src, $GIF_dly, $GIF_lop, $GIF_dis,
 							$GIF_red, $GIF_grn, $GIF_blu, $GIF_mod
 						) {
