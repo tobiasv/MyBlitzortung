@@ -29,7 +29,7 @@ if (!defined("BO_VER"))
 	
 
 	define("BO_DIR", dirname(__FILE__).'/');
-	define("BO_VER", '1.4-dev6');
+	define("BO_VER", '1.4-dev7');
 
 	define("BO_PERM_ADMIN", 		1);
 	define("BO_PERM_SETTINGS", 		2);
@@ -151,6 +151,8 @@ if (!defined("BO_VER"))
 	//Update with new data from blitzortung.org
 	$bo_do_update = false;
 	$bo_force_update = false;
+	$bo_only = '';
+	
 	if (isset($_GET['update']))
 	{
 		if (defined('BO_UPDATE_SECRET') && BO_UPDATE_SECRET && $_GET['secret'] !== BO_UPDATE_SECRET)
@@ -158,7 +160,8 @@ if (!defined("BO_VER"))
 
 		$bo_do_update = true;
 		$bo_force_update = isset($_GET['force']);
-
+		$bo_only = strtolower($_GET['only']);
+		
 		header("Content-Type: text/plain");
 	}
 	else if (isset($argv))
@@ -169,6 +172,8 @@ if (!defined("BO_VER"))
 				$bo_do_update = true;
 			elseif ($a == 'force')
 				$bo_force_update = true;
+			elseif ($bo_do_update == true && $a)
+				$bo_only = $a;
 		}
 	}
 
@@ -179,7 +184,7 @@ if (!defined("BO_VER"))
 	if ($bo_do_update)
 	{
 		require_once 'includes/import.inc.php';
-		bo_update_all($bo_force_update, strtolower($_GET['only']));
+		bo_update_all($bo_force_update, $bo_only);
 		exit;
 	}
 	else if (isset($_POST['bo_do_login']))

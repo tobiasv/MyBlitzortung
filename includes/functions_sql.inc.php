@@ -26,20 +26,30 @@ function bo_times2sql(&$time_min = 0, &$time_max = 0, $table='s', &$auto_reduce=
 	$date_max = gmdate('Y-m-d H:i:s', $time_max);
 	$sql = " ( $table.time BETWEEN '$date_min' AND '$date_max' ) ";
 	
-	/*
 	//find max and min strike id
 	//useful for joins (i.e. station_strikes, especially when partitioned)
-	if ($time_min && $time_max && $time_min > strtotime('2010-01-01'))
+	//FOREIGN KEY would be better but isn't always avalable
+	if (BO_DB_TIME2ID === true && $time_min && $time_max && $time_min > strtotime('2010-01-01'))
 	{
 		if (BO_DB_TIME_CACHE === true)
 		{
 			$tmpfile = BO_DIR.BO_CACHE_DIR.'/strcnt/'.$time_min.'_'.$time_max;
+
+			$maxloops = 20;
+			while (!file_exists(touch($tmpfile.".lock")) && $maxloops--)
+			{
+				usleep(500000);
+				clearstatcache();
+			}
 			
+			clearstatcache();
 			if (!file_exists($tmpfile) || time() - filemtime($tmpfile) > BO_DB_TIME_ROUND_SECONDS)
 			{
+				touch($tmpfile.".lock");
 				$row = BoDb::query("SELECT MAX(id) maxid, MIN(id) minid, COUNT(*) cnt FROM ".BO_DB_PREF."strikes s WHERE $sql")->fetch_assoc();
 				@mkdir(BO_DIR.BO_CACHE_DIR.'/strcnt/');
 				file_put_contents($tmpfile, serialize($row));
+				unlink($tmpfile.".lock");
 			}
 			else
 			{
@@ -63,7 +73,7 @@ function bo_times2sql(&$time_min = 0, &$time_max = 0, $table='s', &$auto_reduce=
 			$auto_reduce = array('divisor' => $div, 'count' => $row['cnt']);
 		}
 	}
-	*/
+
 	
 	//Extra keys for faster search
 	//$keys_enabled   = (BO_DB_EXTRA_KEYS === true);

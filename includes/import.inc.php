@@ -145,16 +145,6 @@ function bo_update_all($force = false, $only = '')
 	if (!$only || $only == 'cache')
 		bo_purge_cache($force);
 
-	
-	/*** Densities ***/
-	if (bo_exit_on_timeout()) return;
-
-	if ( ($strikes_imported !== false && !$only) || $only == 'density')
-	{
-		require_once 'density.inc.php';
-		bo_update_densities($force);
-	}
-	
 	/*** TABLE STATUS (takes long time with InnoDB) ***/
 	if (bo_exit_on_timeout()) return;
 	$D = @unserialize(BoData::get('db_table_status'));
@@ -180,7 +170,6 @@ function bo_update_all($force = false, $only = '')
 		BoData::set('db_table_status', serialize($D));
 	}
 
-
 	bo_echod(" ");
 	bo_echod("Import finished. Exiting...");
 	bo_echod(" ");
@@ -188,6 +177,17 @@ function bo_update_all($force = false, $only = '')
 	BoData::set('is_updating_step2', 0);
 	$bo_update_step = 0;
 
+	/*** Densities ***/
+	//Separate from the other imports, as they could take veeeery long
+	//they have their own checks
+	if (bo_exit_on_timeout()) return;
+
+	if ( ($strikes_imported !== false && !$only) || $only == 'density')
+	{
+		require_once 'density.inc.php';
+		bo_update_densities($force);
+	}
+	
 	return;
 }
 
@@ -2265,8 +2265,28 @@ function bo_download_external($force = false)
 						continue;
 					}
 					
-					//Save it
-					$put = file_put_contents($file, $file_content);
+					//conversion needed?
+					if (isset($d['convert_from']))
+					{
+						//search the extension
+						$ext_to   = strtolower(substr($file , -3));
+						
+						$I = imagecreatefromstring($file_content);
+						
+						bo_echod("    -> Saving as $ext_to ($I)");
+						
+						switch($ext_to)
+						{
+							case 'png': $put = imagepng($I, $file); break;
+							case 'jpg': $put = imagejpeg($I, $file, 95); break;
+							default: bo_echod("Unknown format"); break;
+						}
+					}
+					else
+					{
+						//Save it
+						$put = file_put_contents($file, $file_content);
+					}
 					
 					if (!$put)
 					{

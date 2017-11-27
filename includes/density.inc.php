@@ -19,9 +19,19 @@ function bo_update_densities($force = false)
 		return true;
 	}
 
+	$is_updating = (int)BoData::get('is_updating_dens');
+	
+	if (!$force && time() - $is_updating < 7200 && $is_updating)
+	{
+		bo_echod("Another computing process is running...");
+		return;
+	}
+	
+	BoData::set('is_updating_dens', time());
+	
 	//check for new time-range and insert them
 	$last = BoData::get('uptime_densities');
-	if (time() - $last > 3600 || $force)
+	if (time() - $last > 3600*6 || $force)
 	{
 		BoData::set('uptime_densities', time());
 		$ranges = bo_get_new_density_ranges(0,0);
@@ -367,6 +377,7 @@ function bo_update_densities($force = false)
 				//Check again for timeout
 				if (bo_exit_on_timeout())
 				{
+					BoData::set('is_updating_dens', 0);
 					return;
 				}
 				
@@ -377,6 +388,8 @@ function bo_update_densities($force = false)
 	
 	if (!$calc_count)
 		bo_echod('Nothing to do');
+	
+	BoData::set('is_updating_dens', 0);
 	
 	return;
 }
@@ -659,8 +672,7 @@ function bo_toggle_dens_map_url(id)
 //render a map with strike positions and strike-bar-plot
 function bo_get_density_image()
 {
-	$densities_enabled = defined('BO_CALC_DENSITIES') && BO_CALC_DENSITIES
-							&& ((defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES) || (bo_user_get_level() & BO_PERM_ARCHIVE))
+	$densities_enabled = ((defined('BO_ENABLE_DENSITIES') && BO_ENABLE_DENSITIES) || (bo_user_get_level() & BO_PERM_ARCHIVE))
 							&& BO_DISABLE_ARCHIVE !== true;
 
 	if (!$densities_enabled)

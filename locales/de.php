@@ -1258,7 +1258,8 @@ $_BL['de']['lm_live_snd_info'] = 'Lässt ein kurzen Ton für jeden neuen Blitz e
 $_BL['de']['lm_live_stations_info'] = 'Zeigt die Stationen an, die den jeweiligen Blitz detektiert haben. Die Farbe der Verbindungslinie hängt von der Entfernung zwischen Station und Blitz ab: Je weiter entfernt, desto bläulicher (statt grün) wird die Linie dargestellt. Entfernungen von maximal einigen hundert kilometern und Stationen runder um den Einschlagsort ergeben die besten Resultate. BITTE BEACHTEN: Diese Funktion kann die Systemleistung negativ beeinflussen! Der Browser "Chrome" wird hierzu empfohlen.';
 $_BL['de']['lm_live_blitzortung_more'] = 'Weitere Echtzeit-Blitzkarten auf Blitzortung.org';
 $_BL['de']['lm_live_usage'] = 'WICHTIG: Diese Karte dient rein zur Unterhaltung!';
-
+$_BL['en']['lm_live_terms'] = 'Nutzungsbedingungen / Kontakt';
+$_BL['en']['lm_live_hideads'] = 'Werbung ausblenden';
 
 
 

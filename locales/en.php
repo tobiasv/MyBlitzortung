@@ -1106,6 +1106,7 @@ $_BL['en']['lang_sv'] = 'Swedish';
 $_BL['en']['lang_pl'] = 'Polish';
 $_BL['en']['lang_cz'] = 'Czech';
 $_BL['en']['lang_uk'] = 'Ukrainian';
+$_BL['en']['lang_sk'] = 'Slovakian';
 
 $_BL['en']['Search...'] = 'Search...';
 $_BL['en']['Archives'] = 'Archives';
@@ -1206,6 +1207,8 @@ $_BL['en']['lm_live_snd_info'] = 'Enable "tick" sound on every lightning stroke 
 $_BL['en']['lm_live_stations_hint'] = 'IMPORTANT: These features may have negative impact on your system performance! Using a fast Browser like "Google Chrome" is recommended.';
 $_BL['en']['lm_live_blitzortung_more'] = 'See more real-time maps on Blitzortung.org';
 $_BL['en']['lm_live_usage'] = 'IMPORTANT: This map is intended for entertainment purposes only!';
+$_BL['en']['lm_live_terms'] = 'Terms / Contact';
+$_BL['en']['lm_live_hideads'] = 'Hide ads';
 
 $_BL['en']['meta_site_description'] = 'See lightning strikes in real time across the planet. Free access to maps of former thunderstorms. By Blitzortung.org and contributors.';
 $_BL['en']['meta_site_keywords'] = 'lightning,thunderstorm,realtime,blitzortung,live,worldwide,strike,maps,thunder,tracker,current,weather,radar,detector';

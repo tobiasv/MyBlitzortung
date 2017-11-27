@@ -163,7 +163,7 @@
 @define('BO_LOCALE2', '');
 
 //available locales
-@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv,pl,cz,dk,uk');
+@define('BO_LANGUAGES', 'en,de,fr,it,hu,nl,lv,fi,sv,pl,cz,dk,uk,sk');
 
 //show links in the footer
 @define('BO_SHOW_LANGUAGES', true);
@@ -410,7 +410,7 @@
 
 
 // Mark stations as not available when no signals have been sent
-@define('BO_STATION_INACTIVE_DAYS', 7);
+@define('BO_STATION_INACTIVE_DAYS', 365);
 
 
 // Show new stations
@@ -845,7 +845,10 @@
 //when requesting time periods, then round to full minutes (=60)
 @define('BO_DB_TIME_ROUND_SECONDS', 60);
 
-//cache the maximum and minimum stroke id so it can be used instead of time
+//calculate the maximum and minimum stroke id so it can be used instead of time for better index usage in database
+@define('BO_DB_TIME2ID', true);
+
+//cache the maximum and minimum stroke id from above
 @define('BO_DB_TIME_CACHE', false);
 
 //saves mercator coordinates into database

@@ -146,7 +146,6 @@ function bo_show_archive_map()
 		if ($ani_changed)
 		{		
 			$hour_from = 0;
-			
 		}
 		
 		if ($map_changed || $ani_changed)
@@ -164,7 +163,7 @@ function bo_show_archive_map()
 	$hour_from = floor($hour_from / $hours_interval) * $hours_interval;
 		
 	//Set to correct time
-	$time      = mktime($hour_from,0,0,$month,$day+$day_add,$year);
+	$time      = mktime($hour_from,$minute_from,0,$month,$day+$day_add,$year);
 	
 	if ($time > time())
 		$time = time() - $hour_range * 3600;
@@ -173,20 +172,28 @@ function bo_show_archive_map()
 	$month     = date('m', $time);
 	$day       = date('d', $time);
 	$hour_from = date('H', $time) + $minute_from/60;
+
+	//show time period select?
+	$show_range_sel = $ani || (!$ani && !isset($cfg['file_time_search']) && !isset($cfg['overlays']));
+	
+	//use standard time period
+	if (!$show_range_sel && $cfg['trange'] != 24)
+		$hour_range = $hours_interval;
 	
 	//min/max strike-time
 	$row = BoDb::query("SELECT MIN(time) mintime, MAX(time) maxtime FROM ".BO_DB_PREF."strikes")->fetch_assoc();
 	$strikes_available = $row['mintime'] > 0 || $row['maxtime'] > 0;
 	$start_time = strtotime($row['mintime'].' UTC');
 	$end_time = strtotime($row['maxtime'].' UTC');
-	$show_range_sel = $ani || (!$ani && !isset($cfg['file_time_search']) && !isset($cfg['overlays']));
+	
 	
 	if (isset($_GET['bo_oldmap']) || isset($_GET['bo_oldani']) 
 		|| isset($_GET['bo_next']) || isset($_GET['bo_prev'])
 		|| isset($_GET['bo_next_hour']) || isset($_GET['bo_prev_hour'])
 		|| isset($_GET['bo_day_add'])
 		|| (isset($_GET['bo_animation']) && !$ani) 
-		|| (!$show_range_sel && isset($_GET['bo_hour_range'])) )
+		|| (!$show_range_sel && isset($_GET['bo_hour_range'])) 
+		)
 	{
 		$url = '';
 		
@@ -201,7 +208,7 @@ function bo_show_archive_map()
 		if ($ani) 
 			$url .= '&bo_animation=1';
 		
-		bo_try_redirect(array('bo_year', 'bo_month', 'bo_day', 'bo_day_add', 'bo_oldmap', 'bo_oldani', 'bo_animation', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_hour_range'), $url);
+		bo_try_redirect(array('bo_year', 'bo_month', 'bo_day', 'bo_day_add', 'bo_oldmap', 'bo_oldani', 'bo_animation', 'bo_next', 'bo_prev', 'bo_next_hour', 'bo_prev_hour', 'bo_hour_range', 'bo_hour_from'), $url);
 	}
 	
 	//Output
@@ -445,10 +452,11 @@ function bo_show_archive_map()
 				$umonth     = gmdate('m', $time);
 				$uday       = gmdate('d', $time);
 				$uhour_from = gmdate('H', $time);
+				$umin_from  = gmdate('i', $time);
 				$date_arg = sprintf('%04d%02d%02d', $uyear, $umonth, $uday);
 				
 				if ($hour_range)
-					$date_arg .= sprintf('%02d', $uhour_from).'00-'.($hour_range*60);
+					$date_arg .= sprintf('%02d', $uhour_from).sprintf('%02d', $umin_from).'-'.($hour_range*60);
 			}
 		
 			$alt = _BL('Lightning map').' '.$mapname.' '._BD($time);

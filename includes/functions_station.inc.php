@@ -352,7 +352,7 @@ function bo_round_station_pos($lat, $lon)
 function bo_stations_json()
 {
 	$S = array();
-	$sql = "SELECT bo_station_id id, lat, lon, city, country, status, alt FROM ".BO_DB_PREF."stations WHERE bo_station_id > 0 AND status > 0 AND lat AND lon AND id < ".intval(BO_DELETED_STATION_MIN_ID);
+	$sql = "SELECT bo_station_id id, lat, lon, city, country, status, alt FROM ".BO_DB_PREF."stations WHERE bo_station_id > 0 AND lat AND lon AND id < ".intval(BO_DELETED_STATION_MIN_ID); //AND status > 0
 	$res = BoDb::query($sql);
 	while($row = $res->fetch_assoc())
 	{

@@ -140,7 +140,8 @@ function bo_db_recreate_strike_keys($quiet = false)
 		
 	
 		//check partitions
-		$create_text = BoDb::query("SHOW CREATE TABLE `".BO_DB_PREF."strikes`")->fetch_assoc()['Create Table'];
+		$res = BoDb::query("SHOW CREATE TABLE `".BO_DB_PREF."strikes`")->fetch_assoc();
+		$create_text = $res['Create Table'];
 		
 		$num_subpartitions = 0;
 		$partitions_exist = array();
@@ -222,6 +223,8 @@ function bo_db_recreate_strike_keys($quiet = false)
 						}
 					}
 					
+					echo " \nMerging ".count($merge).'x'.BO_DB_PARTITION_SUBPARTITIONS." = ".(count($merge) * BO_DB_PARTITION_SUBPARTITIONS)." existing paritions: \n";
+					
 					foreach($merge as $p)
 					{
 						if (count($p) > 1)
@@ -286,7 +289,7 @@ function bo_db_recreate_strike_keys($quiet = false)
 					$time = gmmktime(0,0,0,$month, $day, $year);
 					$name = 'p'.gmdate('Ymd', $time_last).'_'.gmdate('Ymd', $time-1);
 					
-					if ($partitions_exist[$name] || array_search($time, $partitions_exist) || $time_last >= $time)
+					if ($partitions_exist[$name] || array_search($time, $partitions_exist) || $time_last >= $time || $time <= 0)
 						$partitions = array(); //ignore all previous ones
 					else
 						$partitions[$name] = array('time_min' => $time_last, 'time_max' => $time);
@@ -322,9 +325,12 @@ function bo_db_recreate_strike_keys($quiet = false)
 				$merged++;
 			}
 			
-			$name = 'p'.gmdate('Ymd', $mtime_min).'_'.gmdate('Ymd', $mtime_max-1);
-			$partitions[$name] = array('time_min' => $mtime_min, 'time_max' => $mtime_max);
-
+			if ($mtime_min)
+			{
+				$name = 'p'.gmdate('Ymd', $mtime_min).'_'.gmdate('Ymd', $mtime_max-1);
+				$partitions[$name] = array('time_min' => $mtime_min, 'time_max' => $mtime_max);
+			}
+			
 			ksort($partitions);
 			
 			$psql = '';
