@@ -90,7 +90,7 @@ class BoSignalGraph
 			else
 				$this->graph->SetBox(false);
 				
-			$use_max = 2; //use third highest maximum for max y-scale
+			$use_max = 0;
 		}
 		
 		
@@ -156,9 +156,14 @@ class BoSignalGraph
 					$D[$ch][$i] = $v;
 				}
 
+				//check for the 1./2. etc maximum
 				$tmp = $D[$ch];
 				rsort($tmp);
 				$max_ch[$ch] = $tmp[$use_max];
+				
+				//don't use the offset as maximum
+				if ($use_max == 0 && $max_ch[$ch] == $D[$ch][0])
+					$max_ch[$ch] = $tmp[$use_max + 1] * 1.1;
 			}
 			
 			$this->graph->SetMargin(24,1,1,1);
@@ -352,7 +357,7 @@ class BoSignalGraph
 				if ($last < $us || $last === null)
 				{
 					$tickPos[] = $i;
-					$tickLabels[] = _BN($us, 0).'µs';
+					$tickLabels[] = _BN($us, 0).'Âµs';
 					$last = $us;
 				}
 			}
