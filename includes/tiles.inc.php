@@ -185,13 +185,14 @@ function bo_tile()
 	if (defined("BO_LOADAVG_TILES") && BO_LOADAVG_TILES > 0 && BO_LOADAVG_TILES < $loadavg)
 	{
 		header("HTTP/1.1 304 Not Modified"); 
+		header("X-MyBlitzortung-tiles: load");
 		bo_tile_headers(5); //5 minutes
-		
 		exit;
 	}
 	else if ($station_id && defined("BO_LOADAVG_TILES_STATIONS") && BO_LOADAVG_TILES_STATIONS && BO_LOADAVG_TILES_STATIONS < $loadavg)
 	{
 		header("HTTP/1.1 304 Not Modified"); 
+		header("X-MyBlitzortung-tiles: load");
 		bo_tile_headers(5); //5 minutes
 		exit;
 	}
@@ -281,7 +282,7 @@ function bo_tile()
 		//normal strike display
 		$c = $cfg['col'];
 		$time_min   = floor(($last_update_time - 60*$cfg['tstart']) / $update_interval / 60) * $update_interval * 60;
-		$time_max   = $time_min + 60 * $cfg['trange'] + 60;
+		$time_max   = $time_min + 60 * $cfg['trange'];
 	}
 	
 	if (!$time_min || !$time_max || $time_min == $time_max)
@@ -1220,10 +1221,10 @@ function bo_tile_headers($update_interval, $last_update_time = null, $caching = 
 		
 	$exp_time    = floor( ($last_update_time + 60 * $update_interval) / 60) * 60;
 
-	if ($exp_time - time() < 10)
+	if ($exp_time - time() < 30)
         $exp_time = ceil((time()+1) / 60) * 60;	
 	
-	$exp_time += mt_rand(-10, 10);
+	//$exp_time += mt_rand(-10, 10);
 	
 	//Headers
 	header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_update_time)." GMT");
