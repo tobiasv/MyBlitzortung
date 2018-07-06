@@ -1190,7 +1190,7 @@ $_BL['de']['lm_live_set_fullscreen_off'] = 'aus';
 $_BL['de']['lm_live_set_fullscreen_info'] = 'Zeigt die Karte im Vollbild (falls es der Browser unterstützt).';
 
 $_BL['de']['lm_live_set_map_style'] = 'Stil';
-$_BL['de']['lm_live_set_map_style_normal'] = 'Normal';
+$_BL['de']['lm_live_set_map_style_normal'] = 'Google';
 $_BL['de']['lm_live_set_map_style_sat'] = 'Satellit';
 $_BL['de']['lm_live_set_map_style_terrain'] = 'Gelände';
 $_BL['de']['lm_live_set_map_style_roads'] = 'Straßen';
@@ -1203,7 +1203,7 @@ $_BL['de']['lm_live_set_thunder_info'] = 'Zeigt die Donnerfront in Echtzeit (nur
 $_BL['de']['lm_live_set_clouds'] = 'Wolken';
 $_BL['de']['lm_live_set_clouds_on'] = 'an';
 $_BL['de']['lm_live_set_clouds_off'] = 'aus';
-$_BL['de']['lm_live_set_clouds_info'] = 'Wolken und Regen von openweathermap.org (experimentell!).';
+$_BL['de']['lm_live_set_clouds_info'] = 'Satellitenbild, wird alle 15min aktualisiert (Quelle: NOAA)';
 
 $_BL['de']['lm_live_set_daynight'] = 'Tag/Nacht';
 $_BL['de']['lm_live_set_daynight_on'] = 'an';

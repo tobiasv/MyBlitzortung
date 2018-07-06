@@ -1137,7 +1137,7 @@ $_BL['en']['lm_live_set_fullscreen_off'] = 'off';
 $_BL['en']['lm_live_set_fullscreen_info'] = 'Shows the map in fullscreen mode (only if your browser supports it).';
 
 $_BL['en']['lm_live_set_map_style'] = 'Map Style';
-$_BL['en']['lm_live_set_map_style_normal'] = 'Normal';
+$_BL['en']['lm_live_set_map_style_normal'] = 'Google';
 $_BL['en']['lm_live_set_map_style_sat'] = 'Sat';
 $_BL['en']['lm_live_set_map_style_terrain'] = 'Terrain';
 $_BL['en']['lm_live_set_map_style_osm'] = 'OSM';
@@ -1151,7 +1151,7 @@ $_BL['en']['lm_live_set_thunder_info'] = 'Shows the thunder sound front in realt
 $_BL['en']['lm_live_set_clouds'] = 'Clouds';
 $_BL['en']['lm_live_set_clouds_on'] = 'on';
 $_BL['en']['lm_live_set_clouds_off'] = 'off';
-$_BL['en']['lm_live_set_clouds_info'] = 'Clouds and precipitation from openweathermap.org (experimental!).';
+$_BL['en']['lm_live_set_clouds_info'] = 'Satellite image, will be updated every 15 minutes. Source: NOAA';
 
 $_BL['en']['lm_live_set_daynight'] = 'Day/Night';
 $_BL['en']['lm_live_set_daynight_on'] = 'on';
@@ -1194,8 +1194,21 @@ $_BL['en']['lm_live_snd_volume'] = 'Volume';
 $_BL['en']['lm_live_snd_min'] = 'min';
 $_BL['en']['lm_live_snd_max'] = 'max';
 
-
+$_BL['en']['lm_live_set_pos_show'] = 'Show Position';
+$_BL['en']['lm_live_set_pos_show_on'] = 'On';
+$_BL['en']['lm_live_set_pos_show_off'] = 'Off';
 $_BL['en']['lm_live_pos_info'] = 'Shows your position on the map. No position data will be sent to us, it\'s just for displaying the marker on the map.';
+
+$_BL['en']['lm_live_set_pos_follow'] = 'Follow';
+$_BL['en']['lm_live_set_pos_follow_on'] = 'On';
+$_BL['en']['lm_live_set_pos_follow_off'] = 'Off';
+$_BL['en']['lm_live_follow_info'] = 'The map will follow your position.';
+
+$_BL['en']['lm_live_shortlink_descr'] = 'Shortlink';
+$_BL['en']['lm_live_shortlink_info'] = 'Use this URL to share the map with others.';
+
+
+
 
 $_BL['en']['lm_live_info'] = 'Strokes of the <strong>last 60 minutes</strong> are shown. The real-time data comes directly from the computing servers of [Blitzortung], which are fed by hundreds of stations on several continents. The delay is calculated from the time stamps of each strokes compared to the current time.';
 $_BL['en']['lm_live_info_legend_title'] = 'Legend';
@@ -1213,5 +1226,8 @@ $_BL['en']['lm_live_hideads'] = 'Hide ads';
 $_BL['en']['meta_site_description'] = 'See lightning strikes in real time across the planet. Free access to maps of former thunderstorms. By Blitzortung.org and contributors.';
 $_BL['en']['meta_site_keywords'] = 'lightning,thunderstorm,realtime,blitzortung,live,worldwide,strike,maps,thunder,tracker,current,weather,radar,detector';
 
+$_BL['en']['Privacy Policy'] = 'Privacy Policy';
+$_BL['en']['Lightning data by'] = 'Lightning data by';
+$_BL['en']['and contributors'] = 'and contributors';
+$_BL['en']['Blitzortung.org is a free community project'] = 'Blitzortung.org is a free community project';
 
-?>
