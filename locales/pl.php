@@ -1048,13 +1048,13 @@ $_BL['pl']['lang_nl'] = 'Holenderski';
 
 
 //en: 'Alerts: Twitter'
-$_BL['pl']['user_perm8'] = '';
+$_BL['pl']['user_perm8'] = 'Powiadomienia: Twitter';
 
 //en: 'Some of the latest strokes with the signal of the closest station.'
-$_BL['pl']['archive_striketable_info_guests'] = '';
+$_BL['pl']['archive_striketable_info_guests'] = 'Ostatnie wyładowania z sygnałem z najbliższych stacji.';
 
 //en: 'Twitter'
-$_BL['pl']['alert_twitter'] = '';
+$_BL['pl']['alert_twitter'] = 'Twitter';
 
 //en: ''
 $_BL['pl']['bo_stat_network_descr'] = '';
@@ -1063,199 +1063,199 @@ $_BL['pl']['bo_stat_network_descr'] = '';
 $_BL['pl']['bo_graph_descr_strikes_station_residual_time'] = '';
 
 //en: 'Indonesia'
-$_BL['pl']['Indonesia'] = '';
+$_BL['pl']['Indonesia'] = 'Indonezja';
 
 //en: 'Niederlande'
-$_BL['pl']['Netherlands'] = '';
+$_BL['pl']['Netherlands'] = 'Holandia';
 
 //en: 'Slovenien'
-$_BL['pl']['Slovenia'] = '';
+$_BL['pl']['Slovenia'] = 'Słowenia';
 
 //en: 'Luxemburg'
-$_BL['pl']['Luxembourg'] = '';
+$_BL['pl']['Luxembourg'] = 'Luksemburg';
 
 //en: 'Russland'
-$_BL['pl']['Russian Federation'] = '';
+$_BL['pl']['Russian Federation'] = 'Rosja';
 
 //en: 'Slovakia'
-$_BL['pl']['Slovakia'] = '';
+$_BL['pl']['Slovakia'] = 'Słowacja';
 
 //en: 'Oceania'
-$_BL['pl']['Oceania'] = '';
+$_BL['pl']['Oceania'] = 'Oceania';
 
 //en: 'Australia'
-$_BL['pl']['Australia'] = '';
+$_BL['pl']['Australia'] = 'Australia';
 
 //en: 'America'
-$_BL['pl']['America'] = '';
+$_BL['pl']['America'] = 'Ameryka';
 
 //en: 'Colombia'
-$_BL['pl']['Colombia'] = '';
+$_BL['pl']['Colombia'] = 'Kolumbia';
 
 //en: 'Asia'
-$_BL['pl']['Asia'] = '';
+$_BL['pl']['Asia'] = 'Azja';
 
 //en: 'Africa'
-$_BL['pl']['Africa'] = '';
+$_BL['pl']['Africa'] = 'Afryka';
 
 //en: 'United States'
-$_BL['pl']['United States'] = '';
+$_BL['pl']['United States'] = 'Stany Zjednoczone';
 
 //en: 'North America'
-$_BL['pl']['North America'] = '';
+$_BL['pl']['North America'] = 'Ameryka Północna';
 
 //en: 'South America'
-$_BL['pl']['South America'] = '';
+$_BL['pl']['South America'] = 'Ameryka Południowa';
 
 //en: 'Danish'
-$_BL['pl']['lang_dk'] = '';
+$_BL['pl']['lang_dk'] = 'Dania';
 
 //en: 'Search...'
-$_BL['pl']['Search...'] = '';
+$_BL['pl']['Search...'] = 'Szukaj...';
 
 //en: 'Archives'
-$_BL['pl']['Archives'] = '';
+$_BL['pl']['Archives'] = 'Archiwa';
 
 //en: 'Now'
-$_BL['pl']['Now'] = '';
+$_BL['pl']['Now'] = 'Teraz';
 
 //en: 'Enter you twitter user name and the alerts will be sent as direct messages. The Twitter App on smartphones will show them as push notification. Note: You have to follow {TWITTER}!'
-$_BL['pl']['twitter_instructions'] = '';
+$_BL['pl']['twitter_instructions'] = 'Wpisz Twoją nazwę użytkownika z Tweetera, aby włączyć bezpośrednie powiatomienia. Aplikacja Tweetera na urządzenia przenośne będzie pokazywała powiadomienia w formie push. Uwaga: Musisz śledzić {TWITTER}!';
 
 //en: 'Last signal'
-$_BL['pl']['h4_stat_station_signal_last'] = '';
+$_BL['pl']['h4_stat_station_signal_last'] = 'Ostatni sygnał';
 
 //en: 'Shows one of the latest signals which the station did send to the server.'
-$_BL['pl']['bo_graph_descr_signal'] = '';
+$_BL['pl']['bo_graph_descr_signal'] = 'Pokazuje najnowsze sygnały przekazane serwerowi przez stację';
 
 //en: 'Real Time'
-$_BL['pl']['Real Time'] = '';
+$_BL['pl']['Real Time'] = 'W czasie rzeczywistym';
 
 //en: 'Real-Time Lightning Map'
-$_BL['pl']['Real-Time Lightning Map'] = '';
+$_BL['pl']['Real-Time Lightning Map'] = 'Mapa wyładowań w czasie rzeczywystym';
 
 //en: 'Delay'
-$_BL['pl']['lm_live_delay'] = '';
+$_BL['pl']['lm_live_delay'] = 'Opóźnienie';
 
 //en: 'Strokes'
-$_BL['pl']['lm_live_strokes'] = '';
+$_BL['pl']['lm_live_strokes'] = 'Wyładowania';
 
 //en: 'Real-Time Lightning'
-$_BL['pl']['lm_live_realtime'] = '';
+$_BL['pl']['lm_live_realtime'] = 'Wyładowania w czasie rzeczywistym';
 
 //en: 'Settings'
-$_BL['pl']['lm_live_settings_info'] = '';
+$_BL['pl']['lm_live_settings_info'] = 'Ustawienia';
 
 //en: 'Fullscreen'
-$_BL['pl']['lm_live_set_fullscreen'] = '';
+$_BL['pl']['lm_live_set_fullscreen'] = 'Pełny ekran';
 
 //en: 'on'
-$_BL['pl']['lm_live_set_fullscreen_on'] = '';
+$_BL['pl']['lm_live_set_fullscreen_on'] = 'wł.';
 
 //en: 'off'
-$_BL['pl']['lm_live_set_fullscreen_off'] = '';
+$_BL['pl']['lm_live_set_fullscreen_off'] = 'wył.';
 
 //en: 'Shows the map in fullscreen mode (only if your browser supports it).'
-$_BL['pl']['lm_live_set_fullscreen_info'] = '';
+$_BL['pl']['lm_live_set_fullscreen_info'] = 'Pokazuje mapę w trybie pełnoekranowym (tylko jeśli Twoja przeglądarka go obsługuje).';
 
 //en: 'Style'
-$_BL['pl']['lm_live_set_map_style'] = '';
+$_BL['pl']['lm_live_set_map_style'] = 'Rodzaj mapy';
 
 //en: 'Normal'
-$_BL['pl']['lm_live_set_map_style_normal'] = '';
+$_BL['pl']['lm_live_set_map_style_normal'] = 'Normalna';
 
 //en: 'Satellite'
-$_BL['pl']['lm_live_set_map_style_sat'] = '';
+$_BL['pl']['lm_live_set_map_style_sat'] = 'Satelita';
 
 //en: 'Terrain'
-$_BL['pl']['lm_live_set_map_style_terrain'] = '';
+$_BL['pl']['lm_live_set_map_style_terrain'] = 'Teren';
 
 //en: 'Roads'
-$_BL['pl']['lm_live_set_map_style_roads'] = '';
+$_BL['pl']['lm_live_set_map_style_roads'] = 'Drogi';
 
 //en: 'Thunder'
-$_BL['pl']['lm_live_set_thunder'] = '';
+$_BL['pl']['lm_live_set_thunder'] = 'Grzmoty';
 
 //en: 'max'
-$_BL['pl']['lm_live_set_thunder_max'] = '';
+$_BL['pl']['lm_live_set_thunder_max'] = 'max';
 
 //en: 'off'
-$_BL['pl']['lm_live_set_thunder_off'] = '';
+$_BL['pl']['lm_live_set_thunder_off'] = 'wył.';
 
 //en: 'Shows the thunder sound front in realtime on higher zoom levels.'
-$_BL['pl']['lm_live_set_thunder_info'] = '';
+$_BL['pl']['lm_live_set_thunder_info'] = 'Przy odpowiednio dużym powiększeniu pokazuje front fali grzmotu.';
 
 //en: 'Clouds'
-$_BL['pl']['lm_live_set_clouds'] = '';
+$_BL['pl']['lm_live_set_clouds'] = 'Chmury';
 
 //en: 'on'
-$_BL['pl']['lm_live_set_clouds_on'] = '';
+$_BL['pl']['lm_live_set_clouds_on'] = 'wł.';
 
 //en: 'off'
-$_BL['pl']['lm_live_set_clouds_off'] = '';
+$_BL['pl']['lm_live_set_clouds_off'] = 'wył.';
 
 //en: 'Clouds and precipitation from openweathermap.org (experimental!).'
-$_BL['pl']['lm_live_set_clouds_info'] = '';
+$_BL['pl']['lm_live_set_clouds_info'] = 'Chmury i opad atmosferyczny z openweathermap.org (eksperymentalne!)';
 
 //en: 'Radar'
-$_BL['pl']['lm_live_set_radar'] = '';
+$_BL['pl']['lm_live_set_radar'] = 'Radar';
 
 //en: 'on'
-$_BL['pl']['lm_live_set_radar_on'] = '';
+$_BL['pl']['lm_live_set_radar_on'] = 'wł.';
 
 //en: 'off'
-$_BL['pl']['lm_live_set_radar_off'] = '';
+$_BL['pl']['lm_live_set_radar_off'] = 'wył.';
 
 //en: 'Rain radar is currently only available for the United States!'
-$_BL['pl']['lm_live_set_radar_info'] = '';
+$_BL['pl']['lm_live_set_radar_info'] = 'Radar opadów obecnie dostępny jest tylko dla Stanów Zjednoczonych!';
 
 //en: 'Show Strokes'
-$_BL['pl']['lm_live_set_strokes_show'] = '';
+$_BL['pl']['lm_live_set_strokes_show'] = 'Pokaż wyładowania';
 
 //en: 'last hour'
-$_BL['pl']['lm_live_set_strokes_show_all'] = '';
+$_BL['pl']['lm_live_set_strokes_show_all'] = 'ostatnia godzina';
 
 //en: 'last minutes'
-$_BL['pl']['lm_live_set_strokes_show_last'] = '';
+$_BL['pl']['lm_live_set_strokes_show_last'] = 'ostatnie minuty';
 
 //en: 'Decide whether you want to see only "current" strokes or also those occurred up to an hour ago.'
-$_BL['pl']['lm_live_set_strokes_show_info'] = '';
+$_BL['pl']['lm_live_set_strokes_show_info'] = 'Wybierz, czy chcesz widzieć tylko "aktualne" wyładowania, czy także te, które wystąpiły do godziny temu.';
 
 //en: 'Stations: off'
-$_BL['pl']['lm_live_stations_off'] = '';
+$_BL['pl']['lm_live_stations_off'] = 'Stacje: wył.';
 
 //en: 'Stations: on'
-$_BL['pl']['lm_live_stations_on'] = '';
+$_BL['pl']['lm_live_stations_on'] = 'Stacje: wł.';
 
 //en: 'Strokes of the last 60 minutes are shown. The real-time data comes directly from the computing servers of [Blitzortung], which are fed by hundreds of stations on several continents. The delay is calculated from the time stamps of each strokes compared to the current time.'
-$_BL['pl']['lm_live_info'] = '';
+$_BL['pl']['lm_live_info'] = 'Pokazywane są wyładowania z ostatnich 60 minut. Dane czasu rzeczywistego pochodzą bezpośrednio z serwerów obliczeniowych [Blitzortung], które zbierają dane z setek stacji z kilku kontynentów. Opóźnienie jest obliczone jako porównanie znaku czasu wyładowania i czasu aktualnego.';
 
 //en: 'Legend'
-$_BL['pl']['lm_live_info_legend_title'] = '';
+$_BL['pl']['lm_live_info_legend_title'] = 'Legenda';
 
 //en: 'New lightning strikes have a red circle which gets smaller and disappears when it gets older than [sec] seconds.'
-$_BL['pl']['lm_live_info_legend1'] = '';
+$_BL['pl']['lm_live_info_legend1'] = 'Nowe wyładowania są oznaczone czerwonym obramowaniem, które stopniowo zanika po czasie [sec] sekund.';
 
 //en: 'The color of filled circles represent the age of strikes up to [minutes] minutes. New strikes are yellow. The older they get, the darker the color. Dark brown is equal to almost [minutes] minutes. Those strikes will vanish soon.'
-$_BL['pl']['lm_live_info_legend2'] = '';
+$_BL['pl']['lm_live_info_legend2'] = 'Wypełnienie kółek oznacza czas, jaki upłynął od wyładowania, do [minutes] minut. Nowe wyładowania są pokazane na żółto. Im starsze są, tym ciemniejszy kolor. Ciemnobrązowy jest równy prawie [minutes] minut. Te wkrótce znikną.';
 
 //en: 'On higher zoom levels the thunder front of current strikes is shown as white transparent growing circle (speed of sound). It gets more transparent while travelling and disappears after a while.'
-$_BL['pl']['lm_live_info_legend3'] = '';
+$_BL['pl']['lm_live_info_legend3'] = 'Przy odpowiednio dużym powiększeniu pokazany jest front fali grzmotu danego wyładowania, jako biały półprzezroczysty okrąg (szybkość dźwięku). Wraz z dystansem staje się coraz bardziej przezroczysty i zanika po chwili.';
 
 //en: 'Enable "tick" sound on every lightning stroke in the current map view. This feature might not be available on every device/browser.'
-$_BL['pl']['lm_live_snd_info'] = '';
+$_BL['pl']['lm_live_snd_info'] = 'Włącz dźwięk "tykania" dla wyładowania w aktualnym obszarze mapy. Ta opcja może nie być dostępna dla każdego urządzenia/przeglądarki.';
 
 //en: 'Displays participating stations for each lightning stroke. The color of the lines between stations and stroke depends on the distance. The higher the distance the more blue instead of green. Note that the angle spanned by participating station is another important factor. Distances of a few hundred kilometers max. and stations on every side of the thunderstorms give best results. Station which have been used for calculating the position are highlighted in purple for a short time. IMPORTANT: This feature can have negative impact on your system performance! Using "Chrome" is recommended.'
-$_BL['pl']['lm_live_stations_info'] = '';
+$_BL['pl']['lm_live_stations_info'] = 'Wyświetla stacje, które uczestniczyły w wykryciu danego wyładowania. Kolor linii łączących stację z miejscem wyładowania wskazuje na odległość. Im większy dystans, tym bardziej niebieski, zamiast zielonego kolor linii. Zwróć uwagę na pozycję wszystkich stacji raportujących wyładowanie. Odległość kilkuset kilometrów i stacje rozsiane na wszystkie strony dają najlepsze rezultaty. Stacje, które zostały uwzględnione przy obliczaniu miejsca wyładowania są podświetlone na fioletowo przez krótki czas. WAŻNE: Ta opcja może mieć negatywny wpływ na wydajność systemu! Zalecane jest używanie "Chrome".';
 
 //en: 'See more real-time maps on Blitzortung.org'
-$_BL['pl']['lm_live_blitzortung_more'] = '';
+$_BL['pl']['lm_live_blitzortung_more'] = 'Zobacz więcej map w czasie rzeczywistym na Blitzortung.org';
 
 //en: 'IMPORTANT: This map is intended for entertainment purposes only!'
-$_BL['pl']['lm_live_usage'] = '';
+$_BL['pl']['lm_live_usage'] = 'WAŻNE: Ta mapa została stworzona wyłącznie do celów rozrywkowych!';
 
 //en: 'Volume'
-$_BL['pl']['lm_live_snd_volume'] = '';
+$_BL['pl']['lm_live_snd_volume'] = 'Głośność';
 
 
 ?>
