@@ -120,8 +120,8 @@ if (!defined("BO_VER"))
 	//creating tiles should be very fast, other include files not needed
 	if (isset($_GET['tile']))
 	{
-		if (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !(bo_user_get_level() & BO_PERM_NOLIMIT))
-			exit('Google Maps disabled');
+		//if (defined('BO_MAP_DISABLE') && BO_MAP_DISABLE && !(bo_user_get_level() & BO_PERM_NOLIMIT))
+		//	exit('Google Maps disabled');
 
 			
 		require_once 'includes/tiles.inc.php';

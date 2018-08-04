@@ -785,7 +785,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 
 
 		//Show the map
-		if ($show_map)
+		if ($show_map && (BO_MAP_DISABLE !== true || (bo_user_get_level() & BO_PERM_NOLIMIT)) )
 		{
 			echo '<div id="bo_gmap" class="bo_map_gps" style="width:550px;height:200px"></div>';
 ?>
@@ -853,7 +853,7 @@ function bo_show_statistics_station($station_id = 0, $own_station = true, $add_g
 			bo_insert_map(0, $mean_lat, $mean_lon, BO_STATISTICS_GPS_MAP_ZOOM, BO_STATISTICS_GPS_MAPTYPE);
 		}
 	}
-	elseif ($show_overview)
+	elseif ($show_overview && (BO_MAP_DISABLE !== true || (bo_user_get_level() & BO_PERM_NOLIMIT)) )
 	{
 		echo '<h4>'._BL('h4_stat_station_area').'</h4>';
 		
