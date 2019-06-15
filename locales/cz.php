@@ -18,7 +18,7 @@ $_BL['cz']['is_utf8'] = true;
 
 
 //Translated name of MyBlitzortung with html tags
-$_BL['cz']['MyBlitzortung'] = 'MyLightningDetection';
+$_BL['cz']['MyBlitzortung'] = '<span class="bo_my">My</span><span class="bo_mybo">LightningDetection</span>';
 
 //Translated name of MyBlitzortung without html tags
 $_BL['cz']['MyBlitzortung_notags'] = 'MyLightningDetection';
@@ -71,7 +71,7 @@ $_BL['cz']['number_1minute'] = 'minuta';
 $_BL['cz']['CEST'] = 'CEST';
 $_BL['cz']['CET'] = 'CET';
 $_BL['cz']['unit_strikesperminute'] = ' blesků za minutu';
-$_BL['cz']['unit_strikesperminute_one'] = ' blesků za minutu';
+$_BL['cz']['unit_strikesperminute_one'] = ' blesk za minutu';
 
 
 $_BL['cz']['Jan_short'] = 'Led';
@@ -692,7 +692,7 @@ $_BL['cz']['info_accuracy_text'] = '
 Přesnost je velmi dobrá, někdy až na úroveň nižší než 1 km. To je v podstatě vyrovná komerčním detekčním systémům.
 ';
 $_BL['cz']['info_participate_text'] = '
-Svůj příjimač si musíte sestavit sami (stojí asi 150 euro). S ním se pak můžete zapojit do naší sítě a získáte přístup k veškerým dostupným datům o blescích.
+Svůj příjimač si musíte sestavit sami (stojí asi 150 eur). S ním se pak můžete zapojit do naší sítě a získáte přístup k veškerým dostupným datům o blescích.
 Více informací na:
 Blitzortung.org > Pokryjte svou oblast.
 Viz také:
@@ -1084,6 +1084,20 @@ $_BL['cz']['Ukraine'] = 'Ukrajina';
 $_BL['cz']['Croatia'] = 'Chorvatsko';
 $_BL['cz']['Baltic States'] = 'Baltické státy';
 $_BL['cz']['Indonesia'] = 'Indonézie';
+$_BL['cz']['Netherlands'] = 'Nizozemsko';
+$_BL['cz']['Slovenia'] = 'Slovinsko';
+$_BL['cz']['Luxembourg'] = 'Lucembursko';
+$_BL['cz']['Russian Federation'] = 'Ruská federace';
+$_BL['cz']['Slovakia'] = 'Slovensko';
+$_BL['cz']['Oceania'] = 'Oceánie';
+$_BL['cz']['Australia'] = 'Austrálie';
+$_BL['cz']['America'] = 'Amerika';
+$_BL['cz']['Colombia'] = 'Kolumbie';
+$_BL['cz']['Asia'] = 'Asie';
+$_BL['cz']['Africa'] = 'Afrika';
+$_BL['cz']['United States'] = 'Spojené státy';
+$_BL['cz']['North America'] = 'Severní Amerika';
+$_BL['cz']['South America'] = 'Jižní Amerika';
 
 $_BL['cz']['lang_en'] = 'Anglicky';
 $_BL['cz']['lang_de'] = 'Německy';
@@ -1091,6 +1105,15 @@ $_BL['cz']['lang_fr'] = 'Francouzsky';
 $_BL['cz']['lang_hu'] = 'Maďarsky';
 $_BL['cz']['lang_it'] = 'Italsky';
 $_BL['cz']['lang_nl'] = 'Holandsky';
+$_BL['cz']['lang_dk'] = 'Dánsky';
+$_BL['cz']['lang_lv'] = 'Lotyšsky';
+$_BL['cz']['lang_fi'] = 'Finsky';
+$_BL['cz']['lang_sv'] = 'Švédsky';
+$_BL['cz']['lang_pl'] = 'Polsky';
+$_BL['cz']['lang_cz'] = 'Česky';
+$_BL['cz']['lang_uk'] = 'Ukrajinsky';
+$_BL['cz']['lang_sk'] = 'Slovensky';
+
 
 $_BL['cz']['Search...'] = 'Vyhledat...';
 $_BL['cz']['Archives'] = 'Archiv';
@@ -1106,6 +1129,8 @@ $_BL['cz']['bo_graph_descr_signal'] = 'Zobrazuje jeden z posledních signálů, 
 
 
 //REALTIME MAP
+$_BL['cz']['Real Time'] = 'Reálný čas';
+$_BL['cz']['Real-Time Lightning Map'] = 'Mapa blesků v reálném čase';
 
 $_BL['cz']['lm_live_delay'] = 'Zpoždění';
 $_BL['cz']['lm_live_strokes'] = 'Blesky';
@@ -1118,16 +1143,30 @@ $_BL['cz']['lm_live_set_fullscreen_on'] = 'zapnuto';
 $_BL['cz']['lm_live_set_fullscreen_off'] = 'vypnuto';
 $_BL['cz']['lm_live_set_fullscreen_info'] = 'Zobrazí mapu v režimu celé obrazovky (pokud to váš prohlížeč podporuje).';
 
+$_BL['cz']['lm_live_set_map_style'] = 'Styl mapy';
+$_BL['cz']['lm_live_set_map_style_normal'] = 'Google';
+$_BL['cz']['lm_live_set_map_style_sat'] = 'Satelitní';
+$_BL['cz']['lm_live_set_map_style_terrain'] = 'Terén';
+$_BL['cz']['lm_live_set_map_style_osm'] = 'OSM';
+$_BL['cz']['lm_live_set_map_style_roads'] = 'Silnice';
 
-$_BL['cz']['lm_live_set_thunder'] = 'Bouřky';
+$_BL['cz']['lm_live_set_thunder'] = 'Hromy';
 $_BL['cz']['lm_live_set_thunder_max'] = 'max';
 $_BL['cz']['lm_live_set_thunder_off'] = 'vypnuto';
-$_BL['cz']['lm_live_set_thunder_info'] = 'Zobrazuje zvukovou vlnu bouřky v reálném čase.';
+$_BL['cz']['lm_live_set_thunder_info'] = 'Zobrazuje zvukovou vlnu hromů v reálném čase.';
 
 $_BL['cz']['lm_live_set_clouds'] = 'Oblačnost';
 $_BL['cz']['lm_live_set_clouds_on'] = 'zapnuto';
 $_BL['cz']['lm_live_set_clouds_off'] = 'vypnuto';
 $_BL['cz']['lm_live_set_clouds_info'] = 'Oblačnost pochází z externího zdroje a může být o několik hodin opožděná. Vrstva není k dispozici při větším přiblížení.';
+
+$_BL['cz']['lm_live_set_daynight'] = 'Den/Noc';
+$_BL['cz']['lm_live_set_daynight_on'] = 'zapnuto';
+$_BL['cz']['lm_live_set_daynight_off'] = 'vypnuto';
+$_BL['cz']['lm_live_set_daynight_info'] = 'Zobrazuje rozhraní mezi dnem a nocí.';
+
+$_BL['cz']['lm_live_set_darkness'] = 'Jas mapy';
+$_BL['cz']['lm_live_set_darkness_info'] = 'Tmavší mapa poskytuje lepší kontrast.';
 
 $_BL['cz']['lm_live_set_radar'] = 'Radar';
 $_BL['cz']['lm_live_set_radar_on'] = 'zapnuto';
@@ -1139,95 +1178,58 @@ $_BL['cz']['lm_live_set_strokes_show_all'] = 'poslední hodina';
 $_BL['cz']['lm_live_set_strokes_show_last'] = 'poslední minuty';
 $_BL['cz']['lm_live_set_strokes_show_info'] = 'Vyberte zda chcete zobrazit pouze "aktuální" blesky nebo i ty zaznamenané za poslední hodinu.';
 
-$_BL['cz']['lm_live_stations_off'] = 'Stanice: vypnuto';
-$_BL['cz']['lm_live_stations_on'] = 'Stanice: zapnuto';
+$_BL['cz']['lm_live_stations_level'] = 'Stanice';
+$_BL['cz']['lm_live_stations_off'] = 'vypnuto';
+$_BL['cz']['lm_live_stations_on'] = 'detailní';
+$_BL['cz']['lm_live_stations_level_info'] = 'Zobrazuje stanice na mapě. Vyšší urovně zobrazují taky aktuálně zúčastněné stanice (fialové), vypnuté stanice a názvy stanic.';
+
+$_BL['cz']['lm_live_stations_lines'] = 'Čáry';
+$_BL['cz']['lm_live_stations_lines_off'] = 'vypnuto';
+$_BL['cz']['lm_live_stations_lines_max'] = 'detailní';
+$_BL['cz']['lm_live_stations_lines_info'] = 'Zobrazuje čáry spojující každý detekovaný blesk se zúčastněnými stanicemi. Barva čar záleží na vzdálenosti (blízké: zelená, střední: modrá, vzdálené: červená). Důležitým faktorem je také pokrytý úhel stanic. Vzdálenosti maximálně několika stovek kilometrů a stanice na každé straně bouřky dávají nejpřesnější hodnoty.';
+
+$_BL['cz']['lm_live_stations_coverage'] = 'Pokrytí';
+$_BL['cz']['lm_live_stations_coverage_off'] = 'vypnuto';
+$_BL['cz']['lm_live_stations_coverage_on'] = 'zapnuto';
+$_BL['cz']['lm_live_stations_coverage_info'] = 'Přibližný přehled pokryté oblasti. Čím víc kruhů kolem stanic se protíná, tím sytější odstín mají barvy. Nejlepší je modrá, zelená je pořád velmi dobrá a červená znamená nízkou přesnost.';
+
+$_BL['cz']['lm_live_snd_sounds'] = 'Zvuky';
+$_BL['cz']['lm_live_snd_on'] = 'zapnuto';
+$_BL['cz']['lm_live_snd_off'] = 'vypnuto';
+
+$_BL['cz']['lm_live_snd_volume'] = 'Hlasitost';
+$_BL['cz']['lm_live_snd_min'] = 'min';
+$_BL['cz']['lm_live_snd_max'] = 'max';
+
+$_BL['cz']['lm_live_set_pos_show'] = 'Zobrazit polohu';
+$_BL['cz']['lm_live_set_pos_show_on'] = 'zapnuto';
+$_BL['cz']['lm_live_set_pos_show_off'] = 'vypnuto';
+$_BL['cz']['lm_live_pos_info'] = 'Zobrazuje Vaši polohu na mapě. Údaje o poloze se neposílají k ním, slouží jen k zobrazení značky na mapě.';
+
+$_BL['cz']['lm_live_set_pos_follow'] = 'Následovat';
+$_BL['cz']['lm_live_set_pos_follow_on'] = 'On';
+$_BL['cz']['lm_live_set_pos_follow_off'] = 'Off';
+$_BL['cz']['lm_live_follow_info'] = 'Mapa bude následovat vaši polohu.';
+
+$_BL['cz']['lm_live_shortlink_descr'] = 'Krátký odkaz';
+$_BL['cz']['lm_live_shortlink_info'] = 'Použijte tento odkaz ke sdílení mapy s ostatními.';
 
 $_BL['cz']['lm_live_info'] = 'Zobrazeny blesky z posledních 60 minut. Data v reálném čase pochází přímo z výpočetních serverů [Blitzortung], které mají informace ze stanic ze všech koutů světa. Zpoždění je vypočítáváno z časových značek každého blesku srovnaných s aktuálním časem.';
 $_BL['cz']['lm_live_info_legend_title'] = 'Legenda';
 $_BL['cz']['lm_live_info_legend1'] = 'Nové blesky mají červené kolečko které se zmenšuje a mizí pokud je starší než [sec] vteřin.';
 $_BL['cz']['lm_live_info_legend2'] = 'Barva výplně kolečka značí stáří blesku až do [minutes] minut. Nové blesky jsou žluté. Čím jsou starší, tím je barva tmavší. Tmavě hnědá se rovná přibližně [minutes] minutám. Tyto blesky brzy zmizí.';
-$_BL['cz']['lm_live_info_legend3'] = 'Při menším zvětšení je zobrazena linie bouřky aktuálních blesků jako průhledně bílé zvětšující se kolečko (rychlost zvuku). Při postupu se postupně stává více transparentní a po nějaké době vymizí.';
-$_BL['cz']['lm_live_snd_info'] = 'Povolte "fajfkou" zvuk při každém záblesku na aktuálním mapovém zobrazení. Tato funkce nemusí být podporována všemi prohlížeči a zařízeními.';
+$_BL['cz']['lm_live_info_legend3'] = 'Při větších úrovních přiblížení je zobrazena linie hromu aktuálních blesků jako průhledné bílé zvětšující se kolečko (rychlost zvuku). Při postupu se postupně stává více transparentní a po nějaké době vymizí.';
+$_BL['cz']['lm_live_snd_info'] = 'Povolí zvuk "tikání" při každém záblesku na aktuálním mapovém zobrazení. Tato funkce nemusí být podporována všemi prohlížeči a zařízeními.';
 
-$_BL['cz']['lm_live_stations_info'] = 'Zobrazuje zúčastněné stanice pro každý detekovaný blesk. Barva čar mezi stanicemi a bleskem záleží na vzdálenosti. Čím větší je vzdálenost tím více modrá namísto zelené. Důležitým faktorem je také pokrytý úhel stanic. Vzdálenosti několika stovek kilometrů maximálně a stanice na každé straně bouřky dávají nejpřesnější hodnoty. Stanice, které byly použity pro výpočet polohy jsou po krátký čas zvýrazněny fialově. DŮLEŽITÉ: Tato funkce může mít neblahý vliv na výkon vašeho systému! Doporučujeme používat prohlížeč Google Chrome.';
+$_BL['cz']['lm_live_stations_hint'] = 'DŮLEŽITÉ: Tato funkce může mít neblahý vliv na výkon vašeho systému! Doporučuje používat rychlý webový prohlížeč jako například "Google Chrome".';
 $_BL['cz']['lm_live_blitzortung_more'] = 'Více map na Blitzortung.org';
 $_BL['cz']['lm_live_usage'] = 'DŮLEŽITÉ: Tato mapa je určena pouze pro zábavní účely!';
-$_BL['cz']['lm_live_snd_volume'] = 'Hlasitost';
+$_BL['cz']['lm_live_terms'] = 'Podmínky / Kontakty';
+$_BL['cz']['lm_live_hideads'] = 'Skrýt reklamy';
 
-
-
-
-
-/********************/
-/*  NOT TRANSLATED  */
-/********************/
-
-
-//en: 'Niederlande'
-$_BL['cz']['Netherlands'] = '';
-
-//en: 'Slovenien'
-$_BL['cz']['Slovenia'] = '';
-
-//en: 'Luxemburg'
-$_BL['cz']['Luxembourg'] = '';
-
-//en: 'Russland'
-$_BL['cz']['Russian Federation'] = '';
-
-//en: 'Slovakia'
-$_BL['cz']['Slovakia'] = '';
-
-//en: 'Oceania'
-$_BL['cz']['Oceania'] = '';
-
-//en: 'Australia'
-$_BL['cz']['Australia'] = '';
-
-//en: 'America'
-$_BL['cz']['America'] = '';
-
-//en: 'Colombia'
-$_BL['cz']['Colombia'] = '';
-
-//en: 'Asia'
-$_BL['cz']['Asia'] = '';
-
-//en: 'Africa'
-$_BL['cz']['Africa'] = '';
-
-//en: 'United States'
-$_BL['cz']['United States'] = '';
-
-//en: 'North America'
-$_BL['cz']['North America'] = '';
-
-//en: 'South America'
-$_BL['cz']['South America'] = '';
-
-//en: 'Danish'
-$_BL['cz']['lang_dk'] = '';
-
-//en: 'Real Time'
-$_BL['cz']['Real Time'] = '';
-
-//en: 'Real-Time Lightning Map'
-$_BL['cz']['Real-Time Lightning Map'] = '';
-
-//en: 'Style'
-$_BL['cz']['lm_live_set_map_style'] = '';
-
-//en: 'Normal'
-$_BL['cz']['lm_live_set_map_style_normal'] = '';
-
-//en: 'Satellite'
-$_BL['cz']['lm_live_set_map_style_sat'] = '';
-
-//en: 'Terrain'
-$_BL['cz']['lm_live_set_map_style_terrain'] = '';
-
-//en: 'Roads'
-$_BL['cz']['lm_live_set_map_style_roads'] = '';
-
+$_BL['cz']['Privacy Policy'] = 'Ochrana soukromí';
+$_BL['cz']['Lightning data by'] = 'Blesková data od';
+$_BL['cz']['and contributors'] = 'a přispěvatelů';
+$_BL['cz']['Blitzortung.org is a free community project'] = 'Blitzortung.org je bezplatný komunitní projekt';
 
 ?>
