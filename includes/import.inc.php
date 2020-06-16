@@ -341,7 +341,8 @@ function bo_update_strikes($force = false, $time_start_import = null)
 			}
 			
 			$D['time_ns'] = substr($l, 20, 9);
-			
+                        if (strpos($D['time_ns'],"-") != false) { bo_echod($D['time_ns']." $l"); $error++; continue; } // to catch an error in  http://data.blitzortung.org/Data_2/Protected/Strokes/2018/11/05/14/ line 144
+
 			//check if strike is already imported
 			if ($utime == $strike_last_time && $D['time_ns'] == $strike_last_time_ns)
 			{
