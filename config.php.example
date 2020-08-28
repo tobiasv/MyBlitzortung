@@ -19,6 +19,10 @@ define("BO_DB_HOST", "localhost");
 define("BO_DB_PREF", "bo_");
 
 
+//Enter your Google Maps API key
+define("BO_GM_API_KEY", "");
+
+
 //The update secret
 define('BO_UPDATE_SECRET', '');
 
